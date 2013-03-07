@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/defaultMeshes">
+        <file alias="cone">meshes/coneFlat.obj</file>
+        <file alias="coneSmooth">meshes/coneSmooth.obj</file>
+        <file alias="pyramid">meshes/pyramidFlat.obj</file>
+        <file alias="pyramidSmooth">meshes/pyramidSmooth.obj</file>
+        <file alias="bar">meshes/cubeFlat.obj</file>
+        <file alias="barSmooth">meshes/cubeSmooth.obj</file>
+        <file alias="cylinder">meshes/cylinderFlat.obj</file>
+        <file alias="cylinderSmooth">meshes/cylinderSmooth.obj</file>
+        <file alias="ape">meshes/apeFlat.obj</file>
+        <file alias="apeSmooth">meshes/apeSmooth.obj</file>
+        <file alias="background">meshes/backgroudFlat.obj</file>
+        <file alias="backgroundSmooth">meshes/backgroudSmooth.obj</file>
+    </qresource>
+    <qresource prefix="/shaders">
+        <file alias="fragment">shaders/fragmentShader</file>
+        <file alias="vertex">shaders/vertexShader</file>
+        <file alias="fragmentAmbient">shaders/fragmentShaderAmbient</file>
+    </qresource>
+</RCC>
