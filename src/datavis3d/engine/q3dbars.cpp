@@ -117,6 +117,8 @@ void Q3DBars::render()
     int stopRow = 0;
     int stepRow = 0;
 
+    float backgroundRotation = 0;
+
     float barPos = 0;
     float rowPos = 0;
 
@@ -131,8 +133,8 @@ void Q3DBars::render()
                                                               , width(), height());
 
     // Calculate drawing order
-    //qDebug() << "viewMatrix" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
-    //qDebug() << "viewMatrix" << viewMatrix.row(0).x(); // jos negatiivinen, käännä row -piirtojärjestys
+    //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
+    //qDebug() << "viewMatrix x" << viewMatrix.row(0).x(); // jos negatiivinen, käännä row -piirtojärjestys
     // TODO: Needs more tuning unless we get depth test working correctly
     if (viewMatrix.row(0).x() < 0) {
         startRow = 0;
@@ -155,6 +157,19 @@ void Q3DBars::render()
         stepBar = -1;
     }
 
+    // calculate background rotation based on view matrix rotation
+    if (viewMatrix.row(0).x() >= 0 && viewMatrix.row(0).z() <= 0) {
+        backgroundRotation = -90.0f;
+    }
+    else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0) {
+        backgroundRotation = 180.0f;
+    }
+    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() >= 0) {
+        backgroundRotation = 90.0f;
+    }
+    else if (viewMatrix.row(0).x() < 0 && viewMatrix.row(0).z() < 0) {
+        backgroundRotation = 0.0f;
+    }
     //qDebug() << "projectionMatrix" << projectionMatrix;
     QVector3D lightPos = QVector3D(0.0f, 1.5f
                                    , (d_ptr->m_sampleCount.y() / 5.0f));
@@ -166,7 +181,7 @@ void Q3DBars::render()
         modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale
                                     , 1.0f
                                     , d_ptr->m_columnDepth * d_ptr->m_sceneScale));
-        modelMatrix.rotate(-90.0f, 0.0f, 1.0f, 0.0f);
+        modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -608,11 +623,11 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     // Calculate scene scaling and translation factors
     m_rowWidth = ((m_sampleCount.x() + 1) * m_barSpacing.x()) / 2.0f;
     m_columnDepth = ((m_sampleCount.y() + 1) * m_barSpacing.y()) / 2.0f;
-    m_maxDimension = (m_rowWidth > m_columnDepth) ? m_rowWidth : m_columnDepth;
+    m_maxDimension = qMax(m_rowWidth, m_columnDepth);//(m_rowWidth > m_columnDepth) ? m_rowWidth : m_columnDepth;
     m_scaleX = m_barThickness.x() / m_sampleCount.x() * (maxSceneSize / m_maxDimension);
     m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (maxSceneSize / m_maxDimension);
-    m_sceneScale = (m_scaleX < m_scaleZ) ? m_scaleX : m_scaleZ;
-    float minThickness = (m_barThickness.x() < m_barThickness.y()) ? m_barThickness.x() : m_barThickness.y();
+    m_sceneScale = qMin(m_scaleX, m_scaleZ);//(m_scaleX < m_scaleZ) ? m_scaleX : m_scaleZ;
+    float minThickness = qMin(m_barThickness.x(), m_barThickness.y());//(m_barThickness.x() < m_barThickness.y()) ? m_barThickness.x() : m_barThickness.y();
     m_sceneScale = m_sceneScale / minThickness;
     m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / maxSceneSize);
     m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / maxSceneSize);
