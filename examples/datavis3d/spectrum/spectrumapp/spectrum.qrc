@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="file1">onclassical_demo_fiati-di-parma_thuille_terzo-tempo_sestetto_small-version.wav</file>
+    </qresource>
+</RCC>
