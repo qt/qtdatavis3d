@@ -44,10 +44,12 @@
 #include <QTimer>
 #include <QDebug>
 
+using namespace QtDataVis3D;
+
 class ChartDataGenerator : public QObject
 {
 public:
-    explicit ChartDataGenerator(QtDataVis3D::Q3DBars *barchart);
+    explicit ChartDataGenerator(Q3DBars *barchart);
     ~ChartDataGenerator();
 
     void addBars();
@@ -55,20 +57,25 @@ public:
     void start();
 
 private:
-    QtDataVis3D::Q3DBars *m_chart;
+    Q3DBars *m_chart;
     QTimer *m_dataTimer;
     QTimer *m_testTimer;
     int m_columnCount;
 };
 
-ChartDataGenerator::ChartDataGenerator(QtDataVis3D::Q3DBars *barchart)
+ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     : m_chart(barchart)
     , m_dataTimer(0)
     , m_testTimer(0)
     , m_columnCount(20)
 {
-    m_chart->setBarSpecs(QPointF(2.0f, 0.5f), QPointF(0.0f, 0.0f), true);
+    // Set up bar specifications; make the bars twice as wide as they are deep,
+    // and add a small space between the bars
+    m_chart->setBarSpecs(QPointF(2.0f, 1.0f), QPointF(0.2f, 0.2f), true);
+    // Set up sample space; make it twice as deep as it's wide
     m_chart->setupSampleSpace(QPoint(m_columnCount, m_columnCount*2));
+    // Set bar type to smooth bar
+    //m_chart->setBarType(Q3DBars::Bars, true);
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -114,25 +121,25 @@ void ChartDataGenerator::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Cylinders, false);
+        m_chart->setBarType(Q3DBars::Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Cylinders, true);
+        m_chart->setBarType(Q3DBars::Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Cones, false);
+        m_chart->setBarType(Q3DBars::Cones, false);
         break;
     case 3:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Cones, true);
+        m_chart->setBarType(Q3DBars::Cones, true);
         break;
     case 4:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Bars, false);
+        m_chart->setBarType(Q3DBars::Bars, false);
         break;
     case 5:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Bars, true);
+        m_chart->setBarType(Q3DBars::Bars, true);
         break;
     case 6:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Pyramids, false);
+        m_chart->setBarType(Q3DBars::Pyramids, false);
         break;
     case 7:
         m_chart->setBarType(QtDataVis3D::Q3DBars::Pyramids, true);
@@ -147,7 +154,7 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    QtDataVis3D::Q3DBars barchart;
+    Q3DBars barchart;
     barchart.resize(1024, 768);
     barchart.show();
 
