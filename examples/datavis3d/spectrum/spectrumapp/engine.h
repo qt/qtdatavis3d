@@ -53,14 +53,6 @@
 #include <QObject>
 #include <QVector>
 
-#ifdef DUMP_CAPTURED_AUDIO
-#define DUMP_DATA
-#endif
-
-#ifdef DUMP_SPECTRUM
-#define DUMP_DATA
-#endif
-
 class FrequencySpectrum;
 QT_BEGIN_NAMESPACE
 class QAudioInput;
@@ -271,10 +263,6 @@ private:
     qint64              m_spectrumPosition;
 
     int                 m_count;
-
-#ifdef DUMP_DATA
-    QDir                m_outputDir;
-#endif
 
 };
 

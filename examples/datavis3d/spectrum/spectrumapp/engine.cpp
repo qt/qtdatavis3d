@@ -334,10 +334,8 @@ void Engine::audioStateChanged(QAudio::State state)
             }
             if (QAudio::NoError != error) {
                 reset();
-//                emit playbackEnded(error);
                 return;
             }
-//            emit playbackEnded(error);
         }
         setState(state);
     }

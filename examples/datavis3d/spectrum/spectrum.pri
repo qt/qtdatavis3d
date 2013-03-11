@@ -7,8 +7,8 @@
 # Debug output from engine
 #DEFINES += LOG_ENGINE
 
-# Disables rendering of the waveform
-DEFINES += DISABLE_WAVEFORM
+# Disable level calculation
+DEFINES += DISABLE_LEVEL
 
 # Perform spectrum analysis calculation in a separate thread
 DEFINES += SPECTRUM_ANALYSER_SEPARATE_THREAD

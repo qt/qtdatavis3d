@@ -49,9 +49,7 @@
 
 SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
     :   QObject(parent)
-#ifndef DISABLE_FFT
     ,   m_fft(new FFTRealWrapper)
-#endif
     ,   m_numSamples(SpectrumLengthSamples)
     ,   m_windowFunction(DefaultWindowFunction)
     ,   m_window(SpectrumLengthSamples, 0.0)
@@ -73,9 +71,7 @@ SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
 
 SpectrumAnalyserThread::~SpectrumAnalyserThread()
 {
-#ifndef DISABLE_FFT
     delete m_fft;
-#endif
 }
 
 void SpectrumAnalyserThread::setWindowFunction(WindowFunction type)
@@ -108,7 +104,6 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
                                                 int inputFrequency,
                                                 int bytesPerSample)
 {
-#ifndef DISABLE_FFT
     Q_ASSERT(buffer.size() == m_numSamples * bytesPerSample);
 
     // Initialize data array
@@ -144,7 +139,6 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
         amplitude = qMin(qreal(1.0), amplitude);
         m_spectrum[i].amplitude = amplitude;
     }
-#endif
 
     emit calculationComplete(m_spectrum);
 }
@@ -158,9 +152,6 @@ SpectrumAnalyser::SpectrumAnalyser(QObject *parent)
     :   QObject(parent)
     ,   m_thread(new SpectrumAnalyserThread(this))
     ,   m_state(Idle)
-#ifdef DUMP_SPECTRUMANALYSER
-    ,   m_count(0)
-#endif
 {
     CHECKED_CONNECT(m_thread, SIGNAL(calculationComplete(FrequencySpectrum)),
                     this, SLOT(calculationComplete(FrequencySpectrum)));
@@ -170,16 +161,6 @@ SpectrumAnalyser::~SpectrumAnalyser()
 {
 
 }
-
-#ifdef DUMP_SPECTRUMANALYSER
-void SpectrumAnalyser::setOutputPath(const QString &outputDir)
-{
-    m_outputDir.setPath(outputDir);
-    m_textFile.setFileName(m_outputDir.filePath("spectrum.txt"));
-    m_textFile.open(QIODevice::WriteOnly | QIODevice::Text);
-    m_textStream.setDevice(&m_textFile);
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // Public functions
@@ -208,22 +189,6 @@ void SpectrumAnalyser::calculate(const QByteArray &buffer,
 
         const int bytesPerSample = format.sampleSize() * format.channelCount() / 8;
 
-#ifdef DUMP_SPECTRUMANALYSER
-        m_count++;
-        const QString pcmFileName = m_outputDir.filePath(QString("spectrum_%1.pcm").arg(m_count, 4, 10, QChar('0')));
-        QFile pcmFile(pcmFileName);
-        pcmFile.open(QIODevice::WriteOnly);
-        const int bufferLength = m_numSamples * bytesPerSample;
-        pcmFile.write(buffer, bufferLength);
-
-        m_textStream << "TimeDomain " << m_count << "\n";
-        const qint16* input = reinterpret_cast<const qint16*>(buffer);
-        for (int i=0; i<m_numSamples; ++i) {
-            m_textStream << i << "\t" << *input << "\n";
-            input += format.channels();
-        }
-#endif
-
         m_state = Busy;
 
         // Invoke SpectrumAnalyserThread::calculateSpectrum using QMetaObject.  If
@@ -238,16 +203,6 @@ void SpectrumAnalyser::calculate(const QByteArray &buffer,
                                   Q_ARG(int, bytesPerSample));
         Q_ASSERT(b);
         Q_UNUSED(b) // suppress warnings in release builds
-
-#ifdef DUMP_SPECTRUMANALYSER
-        m_textStream << "FrequencySpectrum " << m_count << "\n";
-        FrequencySpectrum::const_iterator x = m_spectrum.begin();
-        for (int i=0; i<m_numSamples; ++i, ++x)
-            m_textStream << i << "\t"
-                         << x->frequency << "\t"
-                         << x->amplitude<< "\t"
-                         << x->phase << "\n";
-#endif
     }
 }
 

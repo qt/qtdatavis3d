@@ -44,6 +44,7 @@
 
 #include <QGuiApplication>
 #include <QAudio>
+#include <QTimer>
 
 using namespace QtDataVis3D;
 
@@ -53,12 +54,15 @@ public:
     MainApp(Q3DBars *window);
     ~MainApp();
 
-    void start();
+    void start(QString fileName);
 
 public slots:
     void spectrumChanged(qint64 position, qint64 length,
                          const FrequencySpectrum &spectrum);
     void stateChanged(QAudio::Mode mode, QAudio::State state);
+
+private slots:
+    void restart();
 
 private:
     int barIndex(qreal frequency) const;
@@ -66,7 +70,7 @@ private:
 private:
     Q3DBars                 *m_chart;
     Engine                  *m_engine;
-    int                     m_infoMessageTimerId;
+    QTimer                  *m_restartTimer;
     // Lower bound of first band in the spectrum in Hz
     qreal                   m_lowFreq;
     // Upper band of last band in the spectrum in Hz
@@ -76,24 +80,28 @@ private:
 MainApp::MainApp(Q3DBars *window)
     : m_chart(window)
     , m_engine(new Engine(this))
-    , m_lowFreq(0.0)
-    , m_highFreq(1000.0)
+    , m_restartTimer(new QTimer(this))
+    , m_lowFreq(SpectrumLowFreq)
+    , m_highFreq(SpectrumHighFreq)
 {
     m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*2));
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.1f));
+    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, 0.1f));
     m_chart->setBarType(Q3DBars::Bars, false);
+    QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
+    QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
+    m_restartTimer->setSingleShot(true);
+    QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 }
 
 MainApp::~MainApp()
 {
+    delete m_engine;
+    delete m_restartTimer;
 }
 
-void MainApp::start()
+void MainApp::start(QString fileName)
 {
-    // create all necessary objects & connect signals
-    QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
-    QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
-    m_engine->loadFile(QStringLiteral(":/file1"));
+    m_engine->loadFile(fileName);
     m_engine->startPlayback();
 }
 
@@ -129,12 +137,27 @@ void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)
     qDebug() << "mode:" << mode << " state: " << state;
     // Restart once playback is finished
     if (QAudio::AudioOutput == mode && QAudio::StoppedState == state) {
-        // TODO: Doesn't work yet -> DEBUG
-        m_engine->reset();
-        // TODO: Change song each time?
-        m_engine->loadFile(QStringLiteral(":/file1"));
-        m_engine->startPlayback();
+        m_restartTimer->start(500);
     }
+}
+
+//-----------------------------------------------------------------------------
+// Private slots
+//-----------------------------------------------------------------------------
+
+void MainApp::restart()
+{
+    // Change file each time
+    QString fileToLoad = QStringLiteral(":/file");
+    static int fileNo = 1;
+    QString nrStr;
+    nrStr.setNum(fileNo);
+    fileToLoad.append(nrStr);
+    qDebug() << fileToLoad;
+    start(fileToLoad);
+    fileNo++;
+    if (fileNo > 3)
+        fileNo = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,7 +188,7 @@ int main(int argc, char *argv[])
     window.show();
 
     MainApp *mainApp = new MainApp(&window);
-    mainApp->start();
+    mainApp->start(QStringLiteral(":/file3"));
 
     return app.exec();
 }
