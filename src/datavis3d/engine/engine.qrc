@@ -17,5 +17,6 @@
         <file alias="fragment">shaders/fragmentShader</file>
         <file alias="vertex">shaders/vertexShader</file>
         <file alias="fragmentAmbient">shaders/fragmentShaderAmbient</file>
+        <file alias="fragmentColorOnY">shaders/fragmentShaderColorOnY</file>
     </qresource>
 </RCC>

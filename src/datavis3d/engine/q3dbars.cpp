@@ -101,7 +101,8 @@ void Q3DBars::initialize()
                                               , QVector3D(0.0f, 0.0f, 0.0f)
                                               , QVector3D(0.0f, 1.0f, 0.0f));
 
-    CameraHelper::setCameraRotation(QPointF(-45.0f, 15.0f));
+    CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation
+                                            , d_ptr->m_verticalRotation));
 
     // Set view port
     glViewport(0, 0, width(), height());
@@ -174,6 +175,7 @@ void Q3DBars::render()
     QVector3D lightPos = QVector3D(0.0f, 1.5f
                                    , (d_ptr->m_sampleCount.y() / 5.0f));
 
+    // TODO: Use a different shader for background?
     // Draw background
     if (d_ptr->m_background) {
         QMatrix4x4 modelMatrix;
@@ -294,7 +296,7 @@ void Q3DBars::render()
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
     // TODO: for testing shaders
-    static bool shaderOne = true;
+    static int shaderNo = 1;
     //qDebug() << "mouse button pressed" << event->button();
     if (Qt::LeftButton == event->button()) {
         d_ptr->m_mousePressed = true;
@@ -307,15 +309,21 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
     }
     else if (Qt::MiddleButton == event->button()) {
         // TODO: testing shaders
-        if (shaderOne) {
-            shaderOne = false;
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-                               , QStringLiteral(":/shaders/fragmentAmbient"));
-        }
-        else {
-            shaderOne = true;
+        if (++shaderNo > 3)
+            shaderNo = 1;
+        switch (shaderNo) {
+        case 1:
             d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                                , QStringLiteral(":/shaders/fragment"));
+            break;
+        case 2:
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                               , QStringLiteral(":/shaders/fragmentColorOnY"));
+            break;
+        case 3:
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                               , QStringLiteral(":/shaders/fragmentAmbient"));
+            break;
         }
     }
     CameraHelper::updateMousePos(d_ptr->m_mousePos);
@@ -465,6 +473,16 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount)
     d_ptr->calculateSceneScalingFactors();
 }
 
+void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
+{
+    d_ptr->m_horizontalRotation = qMin(qMax(horizontal, -180.0f), 180.0f);
+    d_ptr->m_verticalRotation = qMin(qMax(vertical, 0.0f), 90.0f);
+    d_ptr->m_zoomLevel = qMin(qMax(distance, 10), 500);
+    CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation
+                                            , d_ptr->m_verticalRotation));
+    qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
+}
+
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q)
     , m_program(0)
@@ -476,6 +494,8 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_mousePressed(false)
     , m_mousePos(QPoint(0, 0))
     , m_zoomLevel(100)
+    , m_horizontalRotation(-45.0f)
+    , m_verticalRotation(15.0f)
     , m_barThickness(QPointF(0.75f, 0.75f))
     , m_barSpacing(m_barThickness * 3.0f)
     , m_meshDataLoaded(false)

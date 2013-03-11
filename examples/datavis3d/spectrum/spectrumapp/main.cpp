@@ -84,9 +84,10 @@ MainApp::MainApp(Q3DBars *window)
     , m_lowFreq(SpectrumLowFreq)
     , m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*2));
-    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, 0.1f));
-    m_chart->setBarType(Q3DBars::Bars, false);
+    m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*3));
+    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, -0.5f));
+    m_chart->setBarType(Q3DBars::Cones, true);
+    m_chart->setCameraPosition(10.0f, 5.0f, 90);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);
@@ -134,11 +135,10 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)
 {
-    qDebug() << "mode:" << mode << " state: " << state;
+    //qDebug() << "mode:" << mode << " state: " << state;
     // Restart once playback is finished
-    if (QAudio::AudioOutput == mode && QAudio::StoppedState == state) {
+    if (QAudio::AudioOutput == mode && QAudio::StoppedState == state)
         m_restartTimer->start(500);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ void MainApp::restart()
     QString nrStr;
     nrStr.setNum(fileNo);
     fileToLoad.append(nrStr);
-    qDebug() << fileToLoad;
+    //qDebug() << fileToLoad;
     start(fileToLoad);
     fileNo++;
     if (fileNo > 3)

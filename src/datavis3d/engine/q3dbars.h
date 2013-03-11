@@ -42,6 +42,10 @@ public:
     void setMeshFileName(const QString &objFileName);
     // how many samples per row and column
     void setupSampleSpace(QPoint sampleCount);
+    // Set camera rotation (in horizontal (-180...180) and vertical (0...90) angles and distance in percentage (10...500))
+    void setCameraPosition(float horizontal, float vertical, int distance = 100);
+    // TODO: värien asetus (themet?)
+    // TODO: shaderien vaihto (themet?)
 
 protected:
     void mousePressEvent(QMouseEvent *event);

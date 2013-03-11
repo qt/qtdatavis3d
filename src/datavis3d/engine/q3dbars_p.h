@@ -53,6 +53,8 @@ public:
     bool m_mousePressed;
     QPoint m_mousePos;
     int m_zoomLevel;
+    float m_horizontalRotation;
+    float m_verticalRotation;
     QPointF m_barThickness;
     QPointF m_barSpacing;
     bool m_meshDataLoaded;
