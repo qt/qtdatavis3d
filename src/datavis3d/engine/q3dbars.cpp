@@ -426,8 +426,16 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow)
 void Q3DBars::addDataSet(const QVector<QVector<float>> &data)
 {
     d_ptr->m_dataSet.clear();
-    // TODO: Check sizes
+    // Check sizes
+    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
+        qCritical("Too much data per row, aborting");
+        return;
+    }
     d_ptr->m_dataSet = data;
+    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
+        qWarning("Data set too large for sample space. Cropping it to fit.");
+        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+    }
 }
 
 void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
@@ -508,8 +516,8 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount)
     }
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative
-    m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
-    //qDebug() << "maxSceneSize" << m_maxSceneSize;
+    d_ptr->m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
+    //qDebug() << "maxSceneSize" << d_ptr->m_maxSceneSize;
     // Calculate here and at setting bar specs
     d_ptr->calculateSceneScalingFactors();
 }
