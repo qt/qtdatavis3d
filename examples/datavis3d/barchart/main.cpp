@@ -44,6 +44,9 @@
 #include <QTimer>
 #include <QDebug>
 
+#define CYCLE_THROUGH_STYLES
+#define USE_STATIC_DATA
+
 using namespace QtDataVis3D;
 
 class ChartDataGenerator : public QObject
@@ -52,6 +55,7 @@ public:
     explicit ChartDataGenerator(Q3DBars *barchart);
     ~ChartDataGenerator();
 
+    void addDataSet();
     void addBars();
     void changeStyle();
     void start();
@@ -61,21 +65,25 @@ private:
     QTimer *m_dataTimer;
     QTimer *m_testTimer;
     int m_columnCount;
+    int m_rowCount;
 };
 
 ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     : m_chart(barchart)
     , m_dataTimer(0)
     , m_testTimer(0)
-    , m_columnCount(20)
+    , m_columnCount(10)
+    , m_rowCount(10)
 {
     // Set up bar specifications; make the bars twice as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(2.0f, 1.0f), QPointF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.5f, 0.5f), true);
     // Set up sample space; make it twice as deep as it's wide
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_columnCount*2));
+    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
     // Set bar type to smooth bar
     //m_chart->setBarType(Q3DBars::Bars, true);
+    // Set bar colors
+    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::cyan), QColor(Qt::darkGreen), false);
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -93,18 +101,37 @@ ChartDataGenerator::~ChartDataGenerator()
 
 void ChartDataGenerator::start()
 {
+#ifndef USE_STATIC_DATA
     m_dataTimer = new QTimer();
     m_dataTimer->setTimerType(Qt::CoarseTimer);
     m_dataTimer->setInterval(100);
     QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addBars);
     m_dataTimer->start(100);
+#else
+    addDataSet();
+#endif
 
-    // Uncomment this to enable style changing every 10 seconds
-//    m_testTimer = new QTimer();
-//    m_testTimer->setTimerType(Qt::CoarseTimer);
-//    m_testTimer->setInterval(10000);
-//    QObject::connect(m_testTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
-//    m_testTimer->start(10000);
+#ifdef CYCLE_THROUGH_STYLES
+    m_testTimer = new QTimer();
+    m_testTimer->setTimerType(Qt::CoarseTimer);
+    m_testTimer->setInterval(10000);
+    QObject::connect(m_testTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
+    m_testTimer->start(10000);
+#endif
+}
+
+void ChartDataGenerator::addDataSet()
+{
+    QVector<QVector<float>> data;
+    QVector<float> row;
+    for (int j = 0; j < m_rowCount; j++) {
+        for (int i = 0; i < m_columnCount; i++) {
+            row.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
+        }
+        data.append(row);
+        row.clear();
+    }
+    m_chart->addDataSet(data);
 }
 
 void ChartDataGenerator::addBars()
@@ -113,7 +140,7 @@ void ChartDataGenerator::addBars()
     for (int i = 0; i < m_columnCount; i++) {
         data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
     }
-    m_chart->addDataSet(data);
+    m_chart->addDataRow(data);
 }
 
 void ChartDataGenerator::changeStyle()

@@ -85,9 +85,16 @@ MainApp::MainApp(Q3DBars *window)
     , m_highFreq(SpectrumHighFreq)
 {
     m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*3));
-    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, -0.5f));
+    // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
+    // inside each other
+    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, -0.75f));
+    // Set bar type, smooth cones
     m_chart->setBarType(Q3DBars::Cones, true);
-    m_chart->setCameraPosition(10.0f, 5.0f, 90);
+    // Adjust zoom manually; automatic zoom level calculation does not work well with negative
+    // spacings (in setBarSpecs)
+    m_chart->setCameraPosition(10.0f, 5.0f, 70);
+    // Set color scheme
+    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);
@@ -130,7 +137,7 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
         }
     }
     if (data.size() > 0)
-        m_chart->addDataSet(data);
+        m_chart->addDataRow(data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)

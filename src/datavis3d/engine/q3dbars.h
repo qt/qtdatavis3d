@@ -29,7 +29,11 @@ public:
     void initialize();
     void render();
 
-    void addDataSet(QVector<float> data);
+    // Add a row of data. Each new row is added to the front of the sample space, moving previous
+    // rows back (if sample space is more than one row deep)
+    void addDataRow(const QVector<float> &dataRow);
+    // Add complete data set at a time, as a vector of data rows
+    void addDataSet(const QVector<QVector<float>> &data);
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
@@ -44,8 +48,10 @@ public:
     void setupSampleSpace(QPoint sampleCount);
     // Set camera rotation (in horizontal (-180...180) and vertical (0...90) angles and distance in percentage (10...500))
     void setCameraPosition(float horizontal, float vertical, int distance = 100);
-    // TODO: värien asetus (themet?)
+    // TODO: värien asetus (vai themeillä?). Set uniform to false if you want the (height) color to change from bottom to top
+    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform = true);
     // TODO: shaderien vaihto (themet?)
+    // TODO: valon siirto / asetus
 
 protected:
     void mousePressEvent(QMouseEvent *event);

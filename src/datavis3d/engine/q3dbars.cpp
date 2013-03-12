@@ -49,13 +49,11 @@
 #include <QScreen>
 #include <QMouseEvent>
 
-//#include <qmath.h>
+#include <qmath.h>
 
 #include <QDebug>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
-
-const float maxSceneSize = 40.0;
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -77,7 +75,16 @@ Q3DBars::~Q3DBars()
 void Q3DBars::initialize()
 {
     // Initialize shaders
-    d_ptr->initShaders(QStringLiteral(":/shaders/vertex"), QStringLiteral(":/shaders/fragment"));
+    if (!d_ptr->m_uniformColor) {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                           , QStringLiteral(":/shaders/fragmentColorOnY"));
+    }
+    else {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                           , QStringLiteral(":/shaders/fragment"));
+    }
+    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex")
+                                 , QStringLiteral(":/shaders/fragment"));
 
     // Load default mesh
     d_ptr->loadBarMesh();
@@ -124,8 +131,6 @@ void Q3DBars::render()
     float rowPos = 0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    d_ptr->m_program->bind();
 
     QMatrix4x4 projectionMatrix;
     projectionMatrix.perspective(45.0f, (float)width() / (float)height(), 0.1f, 100.0f);
@@ -175,7 +180,9 @@ void Q3DBars::render()
     QVector3D lightPos = QVector3D(0.0f, 1.5f
                                    , (d_ptr->m_sampleCount.y() / 5.0f));
 
-    // TODO: Use a different shader for background?
+    // Bind background shader
+    d_ptr->m_backgroundShader->bind();
+
     // Draw background
     if (d_ptr->m_background) {
         QMatrix4x4 modelMatrix;
@@ -190,31 +197,37 @@ void Q3DBars::render()
         //qDebug() << "modelMatrix" << modelMatrix;
         //qDebug() << "MVPMatrix" << MVPMatrix;
 
-        QVector3D barColor = QVector3D(0.5, 0.5, 0.5);
+        QVector3D backgroundColor = QVector3D(0.5, 0.5, 0.5);
 
-        d_ptr->m_program->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
-        d_ptr->m_program->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
-        d_ptr->m_program->setUniformValue(d_ptr->m_modelMatrixUniform, modelMatrix);
-        d_ptr->m_program->setUniformValue(d_ptr->m_invTransModelMatrixUniform
-                                          , modelMatrix.inverted().transposed());
-        d_ptr->m_program->setUniformValue(d_ptr->m_mvpMatrixUniform, MVPMatrix);
-        d_ptr->m_program->setUniformValue(d_ptr->m_colorUniform, barColor);
-        d_ptr->m_program->setUniformValue(d_ptr->m_lightStrengthUniform, 4.0f);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_lightPositionUniformBackground
+                                                   , lightPos);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_viewMatrixUniformBackground
+                                                   , viewMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_modelMatrixUniformBackground
+                                                   , modelMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_invTransModelMatrixUniformBackground
+                                                   , modelMatrix.inverted().transposed());
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_mvpMatrixUniformBackground
+                                                   , MVPMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_colorUniformBackground
+                                                   , backgroundColor);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_lightStrengthUniformBackground
+                                                   , 4.0f);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbufferBackground);
-        glVertexAttribPointer(d_ptr->m_positionAttr, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_positionAttrBackground, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
 
         // 2nd attribute buffer : normals
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
-        glVertexAttribPointer(d_ptr->m_normalAttr, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
 
         // 3rd attribute buffer : UVs
         //glEnableVertexAttribArray(2);
         //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_uvbufferBackground);
-        //glVertexAttribPointer(d_ptr->m_uvAttr, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        //glVertexAttribPointer(d_ptr->m_uvAttrBackground, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbufferBackground);
@@ -226,6 +239,12 @@ void Q3DBars::render()
         glDisableVertexAttribArray(1);
         //glDisableVertexAttribArray(2);
     }
+
+    // Release background shader
+    d_ptr->m_backgroundShader->release();
+
+    // Bind bar shader
+    d_ptr->m_barShader->bind();
 
     // Draw bars
     for (int row = startRow; row != stopRow; row += stepRow) {
@@ -248,19 +267,28 @@ void Q3DBars::render()
             //qDebug() << "modelMatrix" << modelMatrix;
             //qDebug() << "MVPMatrix" << MVPMatrix;
 
-            QVector3D barColor = QVector3D(float(row) / float(d_ptr->m_sampleCount.y())
-                                           , 0
-                                           , barHeight);
-            //QVector3D barColor = QVector3D(0.1, 0.1, 0.5);
+            QVector3D baseColor = QVector3D(d_ptr->m_baseColor.redF()
+                                            , d_ptr->m_baseColor.greenF()
+                                            , d_ptr->m_baseColor.blueF());
+            QVector3D heightColor = QVector3D(d_ptr->m_heightColor.redF()
+                                              , d_ptr->m_heightColor.greenF()
+                                              , d_ptr->m_heightColor.blueF())
+                    * barHeight;
+            QVector3D depthColor = QVector3D(d_ptr->m_depthColor.redF()
+                                             , d_ptr->m_depthColor.greenF()
+                                             , d_ptr->m_depthColor.blueF())
+                    * (float(row) / float(d_ptr->m_sampleCount.y()));
 
-            d_ptr->m_program->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
-            d_ptr->m_program->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
-            d_ptr->m_program->setUniformValue(d_ptr->m_modelMatrixUniform, modelMatrix);
-            d_ptr->m_program->setUniformValue(d_ptr->m_invTransModelMatrixUniform
-                                              , modelMatrix.inverted().transposed());
-            d_ptr->m_program->setUniformValue(d_ptr->m_mvpMatrixUniform, MVPMatrix);
-            d_ptr->m_program->setUniformValue(d_ptr->m_colorUniform, barColor);
-            d_ptr->m_program->setUniformValue(d_ptr->m_lightStrengthUniform, 4.0f);
+            QVector3D barColor = baseColor + heightColor + depthColor;
+
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_modelMatrixUniform, modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_invTransModelMatrixUniform
+                                                , modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_mvpMatrixUniform, MVPMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_colorUniform, barColor);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightStrengthUniform, 4.0f);
             //qDebug() << "height:" << barHeight;
 
             // 1st attribute buffer : vertices
@@ -290,7 +318,8 @@ void Q3DBars::render()
         }
     }
 
-    d_ptr->m_program->release();
+    // Release bar shader
+    d_ptr->m_barShader->release();
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
@@ -377,20 +406,28 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     // TODO: Handle it
 }
 
-void Q3DBars::addDataSet(QVector<float> data)
+void Q3DBars::addDataRow(const QVector<float> &dataRow)
 {
+    QVector<float> row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
-    if (data.size() > d_ptr->m_sampleCount.x()) {
-        data.resize(d_ptr->m_sampleCount.x());
+    if (row.size() > d_ptr->m_sampleCount.x()) {
+        row.resize(d_ptr->m_sampleCount.x());
         qWarning("Data set too large for sample space");
     }
     // The vector contains data (=height) for each bar, a row at a time
     // With each new row, the previous data set (=row) must be moved back
     // ie. we need as many vectors as we have rows in the sample space
-    d_ptr->m_dataSet.prepend(data);
+    d_ptr->m_dataSet.prepend(row);
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
         d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+}
+
+void Q3DBars::addDataSet(const QVector<QVector<float>> &data)
+{
+    d_ptr->m_dataSet.clear();
+    // TODO: Check sizes
+    d_ptr->m_dataSet = data;
 }
 
 void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
@@ -469,23 +506,37 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount)
     for (int rows = 0; rows < sampleCount.y(); rows++) {
         d_ptr->m_dataSet.append(row);
     }
+    // TODO: Invent "idiotproof" max scene size formula..
+    // This seems to work ok if spacing is not negative
+    m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
+    //qDebug() << "maxSceneSize" << m_maxSceneSize;
     // Calculate here and at setting bar specs
     d_ptr->calculateSceneScalingFactors();
 }
 
 void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
 {
-    d_ptr->m_horizontalRotation = qMin(qMax(horizontal, -180.0f), 180.0f);
-    d_ptr->m_verticalRotation = qMin(qMax(vertical, 0.0f), 90.0f);
-    d_ptr->m_zoomLevel = qMin(qMax(distance, 10), 500);
+    d_ptr->m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
+    d_ptr->m_verticalRotation = qBound(0.0f, vertical, 90.0f);
+    d_ptr->m_zoomLevel = qBound(10, distance, 500);
     CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation
                                             , d_ptr->m_verticalRotation));
     qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
 }
 
+void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+{
+    d_ptr->m_baseColor = baseColor;
+    d_ptr->m_heightColor = heightColor;
+    d_ptr->m_depthColor = depthColor;
+    //qDebug() << "colors:" << d_ptr->m_baseColor << d_ptr->m_heightColor << d_ptr->m_depthColor;
+    d_ptr->m_uniformColor = uniform;
+}
+
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q)
-    , m_program(0)
+    , m_barShader(0)
+    , m_backgroundShader(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
     , m_vertexCount(0)
@@ -509,6 +560,11 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_scaleFactorX(0)
     , m_scaleFactorZ(0)
     , m_sceneScale(0)
+    , m_maxSceneSize(40.0)
+    , m_baseColor(QColor(Qt::gray))
+    , m_heightColor(QColor(Qt::white))
+    , m_depthColor(QColor(Qt::darkGray))
+    , m_uniformColor(true)
 {
 }
 
@@ -618,24 +674,47 @@ void Q3DBarsPrivate::loadBackgroundMesh()
 
 void Q3DBarsPrivate::initShaders(QString vertexShader, QString fragmentShader)
 {
-    if (m_program)
-        delete m_program;
-    m_program = new QOpenGLShaderProgram(q_ptr);
-    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShader))
+    qDebug("initShaders");
+    if (m_barShader)
+        delete m_barShader;
+    m_barShader = new QOpenGLShaderProgram(q_ptr);
+    if (!m_barShader->addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShader))
         qFatal("Compiling Vertex shader failed");
-    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentShader))
+    if (!m_barShader->addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentShader))
         qFatal("Compiling Fragment shader failed");
-    m_program->link();
-    m_mvpMatrixUniform = m_program->uniformLocation("MVP");
-    m_viewMatrixUniform = m_program->uniformLocation("V");
-    m_modelMatrixUniform = m_program->uniformLocation("M");
-    m_invTransModelMatrixUniform = m_program->uniformLocation("itM");
-    m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
-    m_uvAttr = m_program->attributeLocation("vertexUV");
-    m_normalAttr = m_program->attributeLocation("vertexNormal_mdl");
-    m_lightPositionUniform = m_program->uniformLocation("lightPosition_wrld");
-    m_colorUniform = m_program->uniformLocation("color_mdl");
-    m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
+    m_barShader->link();
+    m_mvpMatrixUniform = m_barShader->uniformLocation("MVP");
+    m_viewMatrixUniform = m_barShader->uniformLocation("V");
+    m_modelMatrixUniform = m_barShader->uniformLocation("M");
+    m_invTransModelMatrixUniform = m_barShader->uniformLocation("itM");
+    m_positionAttr = m_barShader->attributeLocation("vertexPosition_mdl");
+    m_uvAttr = m_barShader->attributeLocation("vertexUV");
+    m_normalAttr = m_barShader->attributeLocation("vertexNormal_mdl");
+    m_lightPositionUniform = m_barShader->uniformLocation("lightPosition_wrld");
+    m_colorUniform = m_barShader->uniformLocation("color_mdl");
+    m_lightStrengthUniform = m_barShader->uniformLocation("lightStrength");
+}
+
+void Q3DBarsPrivate::initBackgroundShaders(QString vertexShader, QString fragmentShader)
+{
+    if (m_backgroundShader)
+        delete m_backgroundShader;
+    m_backgroundShader = new QOpenGLShaderProgram(q_ptr);
+    if (!m_backgroundShader->addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShader))
+        qFatal("Compiling Vertex shader failed");
+    if (!m_backgroundShader->addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentShader))
+        qFatal("Compiling Fragment shader failed");
+    m_backgroundShader->link();
+    m_mvpMatrixUniformBackground = m_backgroundShader->uniformLocation("MVP");
+    m_viewMatrixUniformBackground = m_backgroundShader->uniformLocation("V");
+    m_modelMatrixUniformBackground = m_backgroundShader->uniformLocation("M");
+    m_invTransModelMatrixUniformBackground = m_backgroundShader->uniformLocation("itM");
+    m_positionAttrBackground = m_backgroundShader->attributeLocation("vertexPosition_mdl");
+    m_uvAttrBackground = m_backgroundShader->attributeLocation("vertexUV");
+    m_normalAttrBackground = m_backgroundShader->attributeLocation("vertexNormal_mdl");
+    m_lightPositionUniformBackground = m_backgroundShader->uniformLocation("lightPosition_wrld");
+    m_colorUniformBackground = m_backgroundShader->uniformLocation("color_mdl");
+    m_lightStrengthUniformBackground = m_backgroundShader->uniformLocation("lightStrength");
 }
 
 void Q3DBarsPrivate::calculateSceneScalingFactors()
@@ -644,13 +723,13 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     m_rowWidth = ((m_sampleCount.x() + 1) * m_barSpacing.x()) / 2.0f;
     m_columnDepth = ((m_sampleCount.y() + 1) * m_barSpacing.y()) / 2.0f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);//(m_rowWidth > m_columnDepth) ? m_rowWidth : m_columnDepth;
-    m_scaleX = m_barThickness.x() / m_sampleCount.x() * (maxSceneSize / m_maxDimension);
-    m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (maxSceneSize / m_maxDimension);
+    m_scaleX = m_barThickness.x() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
+    m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
     m_sceneScale = qMin(m_scaleX, m_scaleZ);//(m_scaleX < m_scaleZ) ? m_scaleX : m_scaleZ;
     float minThickness = qMin(m_barThickness.x(), m_barThickness.y());//(m_barThickness.x() < m_barThickness.y()) ? m_barThickness.x() : m_barThickness.y();
     m_sceneScale = m_sceneScale / minThickness;
-    m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / maxSceneSize);
-    m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / maxSceneSize);
+    m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
+    m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
     qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactorX" << m_scaleFactorX;
     qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactorZ" << m_scaleFactorZ;
     qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
