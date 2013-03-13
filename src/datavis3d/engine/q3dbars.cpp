@@ -55,6 +55,8 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
+#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
+
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
 {
@@ -66,6 +68,13 @@ Q3DBars::~Q3DBars()
     glDeleteBuffers(1, &d_ptr->m_uvbuffer);
     glDeleteBuffers(1, &d_ptr->m_normalbuffer);
     glDeleteBuffers(1, &d_ptr->m_elementbuffer);
+
+#ifndef USE_HAX0R_SELECTION
+    glDeleteFramebuffers(1, &d_ptr->m_framebufferSelection);
+    glDeleteTextures(1, &d_ptr->m_selectionTexture);
+    glDeleteTextures(1, &d_ptr->m_depthTexture);
+#endif
+
     glDeleteBuffers(1, &d_ptr->m_vertexbufferBackground);
     glDeleteBuffers(1, &d_ptr->m_uvbufferBackground);
     glDeleteBuffers(1, &d_ptr->m_normalbufferBackground);
@@ -85,6 +94,12 @@ void Q3DBars::initialize()
     }
     d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex")
                                  , QStringLiteral(":/shaders/fragment"));
+    d_ptr->initSelectionShader();
+
+#ifndef USE_HAX0R_SELECTION
+    // Init the selection buffer
+    d_ptr->initSelectionBuffer();
+#endif
 
     // Load default mesh
     d_ptr->loadBarMesh();
@@ -97,7 +112,7 @@ void Q3DBars::initialize()
 
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LEQUAL);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     //glFrontFace(GL_CCW);
@@ -179,6 +194,107 @@ void Q3DBars::render()
     //qDebug() << "projectionMatrix" << projectionMatrix;
     QVector3D lightPos = QVector3D(0.0f, 1.5f
                                    , (d_ptr->m_sampleCount.y() / 5.0f));
+
+    // Bind selection shader
+    d_ptr->m_selectionShader->bind();
+
+    // Draw bars to selection buffer
+    float barID = 0;
+    glDisable(GL_DITHER);
+    for (int row = startRow; row != stopRow; row += stepRow) {
+        for (int bar = startBar; bar != stopBar; bar += stepBar) {
+            float barHeight = d_ptr->m_dataSet.at(row).at(bar);
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+            barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
+            rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
+            modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
+                                  , barHeight - 1.0f
+                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ);
+            modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
+
+            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+            QVector3D barColor = QVector3D((float)row / (float)d_ptr->m_sampleCount.y()
+                                           , (float)bar / (float)d_ptr->m_sampleCount.x()
+                                           , ++barID / ((float)d_ptr->m_sampleCount.x()
+                                                        * (float)d_ptr->m_sampleCount.y()));
+
+            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_mvpMatrixUniformSelection
+                                                      , MVPMatrix);
+            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_colorUniformSelection
+                                                      , barColor);
+
+#ifdef USE_HAX0R_SELECTION
+            // 1st attribute buffer : vertices
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
+            glVertexAttribPointer(d_ptr->m_positionAttrSelection
+                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+            // Index buffer
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+
+            // Draw the triangles
+            glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
+
+            glDisableVertexAttribArray(0);
+#else // TODO: fix this - doesn't work yet
+            glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
+            //glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+            // 1st attribute buffer : vertices
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
+            glVertexAttribPointer(d_ptr->m_positionAttrSelection
+                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+            // Index buffer
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+
+            // Draw the triangles
+            GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+            glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, DrawBuffers);
+
+            glDisableVertexAttribArray(0);
+
+            //glReadBuffer(GL_NONE);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+        }
+    }
+    glEnable(GL_DITHER);
+
+    // Read color under cursor
+    if (d_ptr->m_mousePressed) {
+#ifndef USE_HAX0R_SELECTION
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
+#endif
+        GLubyte pixel[4];
+        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+                     GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+
+//        GLuint pixel2[3];
+//        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+//                     GL_RGBA, GL_IMPLEMENTATION_COLOR_READ_FORMAT, (void *)pixel2);
+
+//        GLushort pixel3[3];
+//        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+//                     GL_RGB, GL_UNSIGNED_SHORT_5_6_5, (void *)pixel3);
+
+        qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2] << pixel[3];
+        //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
+        //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
+#ifndef USE_HAX0R_SELECTION
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+    }
+
+    // Release selection shader
+    d_ptr->m_selectionShader->release();
+#if 0
+    // Clear after selection
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
@@ -320,6 +436,7 @@ void Q3DBars::render()
 
     // Release bar shader
     d_ptr->m_barShader->release();
+#endif
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
@@ -373,6 +490,25 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
         //qDebug() << "mouse moved while pressed" << event->pos();
         d_ptr->m_mousePos = event->pos();
     }
+
+    // TODO: Testi - lue pikselin väri kursorin alla
+//    float pixel[3];
+//    glReadPixels(event->pos().x(), event->pos().y(), width(), height(), GL_RGB, GL_FLOAT, &pixel);
+//    qDebug() << "rgb" << pixel[0] << pixel[1] << pixel[2];
+
+    // TODO: Testi - laske kursorin sijainti scenessä
+    QPointF mouse3D((2.0f * event->pos().x() - width()) / height()
+                    , 1.0f - (2.0f * event->pos().y()) / height());
+    //qDebug() << "mouse position in scene" << mouse3D;
+
+    // TODO: Testi laske focal point
+    float focalPoint = tan(45.0f / 2.0f);
+
+    // TODO: Testi - laske viewmatriisin kerroin
+    QVector3D worldRay = QVector3D(0.0f, 0.0f, 0.0f)
+            - QVector3D(mouse3D.x(), mouse3D.y(), -focalPoint);
+    //qDebug() << "worldRay" << worldRay;
+    // multiply viewmatrix with this to get something?
 }
 
 void Q3DBars::wheelEvent(QWheelEvent *event)
@@ -392,7 +528,6 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
     else if (d_ptr->m_zoomLevel < 10) {
         d_ptr->m_zoomLevel = 10;
     }
-
 }
 
 void Q3DBars::resizeEvent(QResizeEvent *event)
@@ -544,6 +679,7 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q)
     , m_barShader(0)
+    , m_selectionShader(0)
     , m_backgroundShader(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
@@ -682,7 +818,6 @@ void Q3DBarsPrivate::loadBackgroundMesh()
 
 void Q3DBarsPrivate::initShaders(QString vertexShader, QString fragmentShader)
 {
-    qDebug("initShaders");
     if (m_barShader)
         delete m_barShader;
     m_barShader = new QOpenGLShaderProgram(q_ptr);
@@ -701,6 +836,56 @@ void Q3DBarsPrivate::initShaders(QString vertexShader, QString fragmentShader)
     m_lightPositionUniform = m_barShader->uniformLocation("lightPosition_wrld");
     m_colorUniform = m_barShader->uniformLocation("color_mdl");
     m_lightStrengthUniform = m_barShader->uniformLocation("lightStrength");
+}
+
+void Q3DBarsPrivate::initSelectionShader()
+{
+    m_selectionShader = new QOpenGLShaderProgram(q_ptr);
+    if (!m_selectionShader->addShaderFromSourceFile(QOpenGLShader::Vertex
+                                                    , QStringLiteral(":/shaders/vertexSelection")))
+        qFatal("Compiling Vertex shader failed");
+    if (!m_selectionShader->addShaderFromSourceFile(QOpenGLShader::Fragment
+                                                    , QStringLiteral(":/shaders/fragmentSelection")))
+        qFatal("Compiling Fragment shader failed");
+    m_selectionShader->link();
+    m_mvpMatrixUniformSelection = m_selectionShader->uniformLocation("MVP");
+    m_colorUniformSelection = m_selectionShader->uniformLocation("color_mdl");
+    m_positionAttrSelection = m_selectionShader->attributeLocation("vertexPosition_mdl");
+}
+
+void Q3DBarsPrivate::initSelectionBuffer()
+{
+    // Create frame buffer object
+    glGenFramebuffers(1, &m_framebufferSelection);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferSelection);
+
+    // Create texture object for the primitive information buffer
+    glGenTextures(1, &m_selectionTexture);
+    glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, q_ptr->width(), q_ptr->height(),
+                 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                           m_selectionTexture, 0);
+
+    // Create texture object for the depth buffer
+    glGenTextures(1, &m_depthTexture);
+    glBindTexture(GL_TEXTURE_2D, m_depthTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, q_ptr->width(), q_ptr->height(),
+                 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                           m_depthTexture, 0);
+
+    // Verify that the frame buffer is complete
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        qCritical() << "Frame buffer creation failed" << status;
+        return;
+    }
+
+    // Restore the default framebuffer
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Q3DBarsPrivate::initBackgroundShaders(QString vertexShader, QString fragmentShader)

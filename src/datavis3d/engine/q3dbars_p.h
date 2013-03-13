@@ -20,7 +20,9 @@ public:
     void loadBarMesh();
     void loadBackgroundMesh();
     void initShaders(QString vertexShader, QString fragmentShader);
+    void initSelectionShader();
     void initBackgroundShaders(QString vertexShader, QString fragmentShader);
+    void initSelectionBuffer();
     void calculateSceneScalingFactors();
 
     GLuint m_positionAttr;
@@ -33,6 +35,11 @@ public:
     GLuint m_mvpMatrixUniform;
     GLuint m_lightPositionUniform;
     GLuint m_lightStrengthUniform;
+
+    GLuint m_positionAttrSelection;
+    GLuint m_mvpMatrixUniformSelection;
+    GLuint m_colorUniformSelection;
+
     GLuint m_positionAttrBackground;
     GLuint m_uvAttrBackground;
     GLuint m_normalAttrBackground;
@@ -48,14 +55,21 @@ public:
     GLuint m_uvbuffer;
     GLuint m_normalbuffer;
     GLuint m_elementbuffer;
+
+    GLuint m_framebufferSelection;
+
     GLuint m_vertexbufferBackground;
     GLuint m_uvbufferBackground;
     GLuint m_normalbufferBackground;
     GLuint m_elementbufferBackground;
 
+    GLuint m_selectionTexture;
+    GLuint m_depthTexture;
+
     Q3DBars *q_ptr;
 
     QOpenGLShaderProgram *m_barShader;
+    QOpenGLShaderProgram *m_selectionShader;
     QOpenGLShaderProgram *m_backgroundShader;
     QPoint m_sampleCount;
     QString m_objFile;
