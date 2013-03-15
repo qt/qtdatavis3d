@@ -14,12 +14,12 @@ void main() {
 	highp vec3 n = normalize(normal_cmr);
 	highp vec3 l = normalize(lightDirection_cmr);
 	highp float cosTheta = dot(n, l);
-        if (cosTheta < 0.0) { cosTheta = -cosTheta; } //0.0; }
+        if (cosTheta < 0.0) { cosTheta = 0.0; }
         if (cosTheta > 1.0) { cosTheta = 1.0; }
         highp vec3 E = normalize(eyeDirection_cmr);
 	highp vec3 R = reflect(-l, n);
 	highp float cosAlpha = dot(E, R);
-        if (cosAlpha < 0.0) { cosAlpha = -cosAlpha; } //0.0; }
+        if (cosAlpha < 0.0) { cosAlpha = 0.0; }
         if (cosAlpha > 1.0) { cosAlpha = 1.0; }
         gl_FragColor.rgb = //color_mdl + color_mdl * vec3(cosTheta * cosTheta) / (distance * distance) + vec3(cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / (distance * distance);
                 materialAmbientColor +

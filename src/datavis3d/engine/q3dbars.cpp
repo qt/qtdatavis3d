@@ -57,7 +57,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 
-float zComp = 0.0f; // TODO: if can't fix shader, use this to move all stuff to positive z (causes problems with view matrix..)
+const float zComp = 3.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -120,8 +120,8 @@ void Q3DBars::initialize()
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f)
-                                              , QVector3D(0.0f, 0.0f, 0.0f)
+    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp)
+                                              , QVector3D(0.0f, 0.0f, zComp)
                                               , QVector3D(0.0f, 1.0f, 0.0f));
 
     CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation
@@ -197,9 +197,11 @@ void Q3DBars::render()
     else if (viewMatrix.row(0).x() < 0 && viewMatrix.row(0).z() < 0) {
         backgroundRotation = 0.0f;
     }
-    //qDebug() << "projectionMatrix" << projectionMatrix;
-    //QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart // TODO: test to keep all z's positive
-    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
+
+    // TODO: Rotate light with camera (position light a bit above camera)
+    //QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart
+    QVector3D lightPos = QVector3D(0.5f, 3.0f, zComp * 2.5f);
+//    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
 //    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
 //    QVector3D lightPos = viewMatrix.row(0).toVector3D();
 //    lightPos.setY(lightPos.y() + 3.0f);
@@ -219,7 +221,7 @@ void Q3DBars::render()
             rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
                                   , barHeight - 1.0f
-                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp); // TODO: test to keep all z's positive
+                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -322,7 +324,7 @@ void Q3DBars::render()
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         if (zComp != 0)
-            modelMatrix.translate(0.0f, 0.0f, zComp); // TODO: test to keep all z's positive
+            modelMatrix.translate(0.0f, 0.0f, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale
                                     , 1.0f
                                     , d_ptr->m_columnDepth * d_ptr->m_sceneScale));
@@ -393,7 +395,7 @@ void Q3DBars::render()
             //qDebug() << "z" << rowPos << "-" << d_ptr->m_columnDepth << "=" << rowPos - d_ptr->m_columnDepth;
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
                                   , barHeight - 1.0f
-                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp); // TODO: test to keep all z's positive
+                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -424,7 +426,7 @@ void Q3DBars::render()
                 barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
                 lightStrength = 10.0f;
                 if (d_ptr->m_mousePressed) {
-                    qDebug() << "selected object:" << barIndex << "(row:" << row + 1 << ", column:" << bar + 1;
+                    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
                     qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
                     qDebug() << "light position:" << lightPos;
                 }
