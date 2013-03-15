@@ -198,8 +198,8 @@ void Q3DBars::render()
         backgroundRotation = 0.0f;
     }
     //qDebug() << "projectionMatrix" << projectionMatrix;
-    QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart // TODO: test to keep all z's positive
-//    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
+    //QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart // TODO: test to keep all z's positive
+    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
 //    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
 //    QVector3D lightPos = viewMatrix.row(0).toVector3D();
 //    lightPos.setY(lightPos.y() + 3.0f);
@@ -415,7 +415,7 @@ void Q3DBars::render()
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
-            float lightStrength = 4.0f;
+            float lightStrength = 5.0f;
             Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
             switch (selectionType) {
             case Q3DBarsPrivate::Bar:

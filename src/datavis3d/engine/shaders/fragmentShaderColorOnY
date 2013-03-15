@@ -8,7 +8,7 @@ uniform highp vec3 color_mdl;
 uniform highp float lightStrength;
 void main() {
         highp vec3 materialDiffuseColor = vec3(coords_mdl.y * color_mdl.x, coords_mdl.y * color_mdl.y, coords_mdl.y * color_mdl.z);
-        highp vec3 materialAmbientColor = vec3(0.1, 0.1, 0.1) * color_mdl;//materialDiffuseColor;
+        highp vec3 materialAmbientColor = vec3(0.2, 0.2, 0.2) * color_mdl;//materialDiffuseColor;
         highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
         highp float distance = length(lightPosition_wrld - position_wrld);
         highp vec3 n = normalize(normal_cmr);

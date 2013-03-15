@@ -83,7 +83,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     // Set bar type to smooth bar
     //m_chart->setBarType(Q3DBars::Bars, true);
     // Set bar colors
-    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::cyan), QColor(Qt::darkGreen), false);
+    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::green), QColor(Qt::black), false);
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -122,11 +122,12 @@ void ChartDataGenerator::start()
 
 void ChartDataGenerator::addDataSet()
 {
-    QVector<QVector<float>> data;
+    QVector< QVector<float> > data;
     QVector<float> row;
     for (int j = 0; j < m_rowCount; j++) {
         for (int i = 0; i < m_columnCount; i++) {
             row.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
+            //row.append(1.0f);
         }
         data.append(row);
         row.clear();
