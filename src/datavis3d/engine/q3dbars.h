@@ -18,8 +18,7 @@ public:
         Bars = 0,
         Pyramids,
         Cones,
-        Cylinders,
-        Apes // TODO: remove; inserted now just for fun
+        Cylinders
     };
 
 public:

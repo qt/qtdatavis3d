@@ -8,8 +8,6 @@
         <file alias="barSmooth">meshes/cubeSmooth.obj</file>
         <file alias="cylinder">meshes/cylinderFlat.obj</file>
         <file alias="cylinderSmooth">meshes/cylinderSmooth.obj</file>
-        <file alias="ape">meshes/apeFlat.obj</file>
-        <file alias="apeSmooth">meshes/apeSmooth.obj</file>
         <file alias="background">meshes/backgroudFlat.obj</file>
         <file alias="backgroundSmooth">meshes/backgroudSmooth.obj</file>
     </qresource>

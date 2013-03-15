@@ -112,10 +112,9 @@ void Q3DBars::initialize()
 
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
@@ -144,6 +143,8 @@ void Q3DBars::render()
 
     float barPos = 0;
     float rowPos = 0;
+
+    static QVector3D selection = QVector3D(0, 0, 0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -180,7 +181,7 @@ void Q3DBars::render()
 
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() >= 0 && viewMatrix.row(0).z() <= 0) {
-        backgroundRotation = -90.0f;
+        backgroundRotation = 270.0f;
     }
     else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0) {
         backgroundRotation = 180.0f;
@@ -192,15 +193,17 @@ void Q3DBars::render()
         backgroundRotation = 0.0f;
     }
     //qDebug() << "projectionMatrix" << projectionMatrix;
-    QVector3D lightPos = QVector3D(0.0f, 1.5f
-                                   , (d_ptr->m_sampleCount.y() / 5.0f));
+//    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
+    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
+//    QVector3D lightPos = viewMatrix.row(0).toVector3D();
+//    lightPos.setY(lightPos.y() + 3.0f);
+    qDebug() << lightPos;
 
     // Bind selection shader
     d_ptr->m_selectionShader->bind();
 
     // Draw bars to selection buffer
-    float barID = 0;
-    glDisable(GL_DITHER);
+    glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float barHeight = d_ptr->m_dataSet.at(row).at(bar);
@@ -215,10 +218,10 @@ void Q3DBars::render()
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            QVector3D barColor = QVector3D((float)row / (float)d_ptr->m_sampleCount.y()
-                                           , (float)bar / (float)d_ptr->m_sampleCount.x()
-                                           , ++barID / ((float)d_ptr->m_sampleCount.x()
-                                                        * (float)d_ptr->m_sampleCount.y()));
+            // add +2 to avoid black
+            QVector3D barColor = QVector3D((float)(row + 2) / (float)(d_ptr->m_sampleCount.y() + 2)
+                                           , (float)(bar + 2) / (float)(d_ptr->m_sampleCount.x() + 2)
+                                           , 0.0f);
 
             d_ptr->m_selectionShader->setUniformValue(d_ptr->m_mvpMatrixUniformSelection
                                                       , MVPMatrix);
@@ -227,13 +230,14 @@ void Q3DBars::render()
 
 #ifdef USE_HAX0R_SELECTION
             // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
             glVertexAttribPointer(d_ptr->m_positionAttrSelection
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+
+            glEnableVertexAttribArray(0);
 
             // Draw the triangles
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
@@ -266,25 +270,32 @@ void Q3DBars::render()
     glEnable(GL_DITHER);
 
     // Read color under cursor
+    // TODO: Move into a separate function?
     if (d_ptr->m_mousePressed) {
 #ifndef USE_HAX0R_SELECTION
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
 #endif
+        // This is the only one that works with ANGLE (ES 2.0)
+        // Item count will be limited to 256*256*256
         GLubyte pixel[4];
         glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
                      GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 
-//        GLuint pixel2[3];
-//        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-//                     GL_RGBA, GL_IMPLEMENTATION_COLOR_READ_FORMAT, (void *)pixel2);
+        // These work with desktop OpenGL
+        // They offer a lot higher possible object count and a possibility to use object id's
+        //GLuint pixel2[3];
+        //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+        //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
 
-//        GLushort pixel3[3];
-//        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-//                     GL_RGB, GL_UNSIGNED_SHORT_5_6_5, (void *)pixel3);
+        //GLfloat pixel3[3];
+        //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+        //             GL_RGB, GL_FLOAT, (void *)pixel3);
 
-        qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2] << pixel[3];
+        //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
         //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
         //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
+        selection = QVector3D(pixel[0], pixel[1], pixel[2]);
+        //qDebug() << selection;
 #ifndef USE_HAX0R_SELECTION
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
@@ -292,7 +303,8 @@ void Q3DBars::render()
 
     // Release selection shader
     d_ptr->m_selectionShader->release();
-#if 0
+
+#if 1
     // Clear after selection
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -310,10 +322,7 @@ void Q3DBars::render()
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-        //qDebug() << "modelMatrix" << modelMatrix;
-        //qDebug() << "MVPMatrix" << MVPMatrix;
-
-        QVector3D backgroundColor = QVector3D(0.5, 0.5, 0.5);
+        QVector3D backgroundColor = QVector3D(0.75, 0.75, 0.75);
 
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_lightPositionUniformBackground
                                                    , lightPos);
@@ -333,12 +342,13 @@ void Q3DBars::render()
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbufferBackground);
-        glVertexAttribPointer(d_ptr->m_positionAttrBackground, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_positionAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 2nd attribute buffer : normals
-        glEnableVertexAttribArray(1);
+        //glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
-        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+//        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, &d_ptr->m_normalbufferBackground);
 
         // 3rd attribute buffer : UVs
         //glEnableVertexAttribArray(2);
@@ -351,9 +361,9 @@ void Q3DBars::render()
         // Draw the triangles
         glDrawElements(GL_TRIANGLES, d_ptr->m_indexCountBackground, GL_UNSIGNED_SHORT, (void*)0);
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
         //glDisableVertexAttribArray(2);
+        //glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(0);
     }
 
     // Release background shader
@@ -397,6 +407,39 @@ void Q3DBars::render()
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
+//            if (d_ptr->m_mousePressed) {
+//                qDebug() << "baseColor:" << baseColor;
+//                qDebug() << "heightColor:" << heightColor;
+//                qDebug() << "depthColor:" << depthColor;
+//                qDebug() << "barColor:" << barColor;
+//            }
+
+            float lightStrength = 4.0f;
+            Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
+            switch (selectionType) {
+            case Q3DBarsPrivate::Bar:
+            {
+                // highlight bar by inverting the color of the bar
+                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                lightStrength = 10.0f;
+                break;
+            }
+            case Q3DBarsPrivate::Row:
+            {
+                // Current bar is on the same row as the selected bar
+                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                lightStrength = 0.1f;
+                break;
+            }
+            case Q3DBarsPrivate::Column:
+            {
+                // Current bar is on the same column as the selected bar
+                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                lightStrength = 0.1f;
+                break;
+            }
+            }
+
             d_ptr->m_barShader->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_modelMatrixUniform, modelMatrix);
@@ -404,18 +447,18 @@ void Q3DBars::render()
                                                 , modelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_mvpMatrixUniform, MVPMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_colorUniform, barColor);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightStrengthUniform, 4.0f);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightStrengthUniform, lightStrength);
             //qDebug() << "height:" << barHeight;
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
-            glVertexAttribPointer(d_ptr->m_positionAttr, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+            glVertexAttribPointer(d_ptr->m_positionAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 2nd attribute buffer : normals
-            glEnableVertexAttribArray(1);
+            //glEnableVertexAttribArray(1);
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbuffer);
-            glVertexAttribPointer(d_ptr->m_normalAttr, 3, GL_FLOAT, GL_TRUE, 0, (void*)0);
+            glVertexAttribPointer(d_ptr->m_normalAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 3rd attribute buffer : UVs
             //glEnableVertexAttribArray(2);
@@ -428,9 +471,9 @@ void Q3DBars::render()
             // Draw the triangles
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
 
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
             //glDisableVertexAttribArray(2);
+            //glDisableVertexAttribArray(1);
+            glDisableVertexAttribArray(0);
         }
     }
 
@@ -490,12 +533,7 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
         //qDebug() << "mouse moved while pressed" << event->pos();
         d_ptr->m_mousePos = event->pos();
     }
-
-    // TODO: Testi - lue pikselin väri kursorin alla
-//    float pixel[3];
-//    glReadPixels(event->pos().x(), event->pos().y(), width(), height(), GL_RGB, GL_FLOAT, &pixel);
-//    qDebug() << "rgb" << pixel[0] << pixel[1] << pixel[2];
-
+#if 0
     // TODO: Testi - laske kursorin sijainti scenessä
     QPointF mouse3D((2.0f * event->pos().x() - width()) / height()
                     , 1.0f - (2.0f * event->pos().y()) / height());
@@ -509,6 +547,7 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
             - QVector3D(mouse3D.x(), mouse3D.y(), -focalPoint);
     //qDebug() << "worldRay" << worldRay;
     // multiply viewmatrix with this to get something?
+#endif
 }
 
 void Q3DBars::wheelEvent(QWheelEvent *event)
@@ -539,38 +578,6 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
 
     // If orientation changes, we need to scale again
     // TODO: Handle it
-}
-
-void Q3DBars::addDataRow(const QVector<float> &dataRow)
-{
-    QVector<float> row = dataRow;
-    // Check that the input data fits into sample space, and resize if it doesn't
-    if (row.size() > d_ptr->m_sampleCount.x()) {
-        row.resize(d_ptr->m_sampleCount.x());
-        qWarning("Data set too large for sample space");
-    }
-    // The vector contains data (=height) for each bar, a row at a time
-    // With each new row, the previous data set (=row) must be moved back
-    // ie. we need as many vectors as we have rows in the sample space
-    d_ptr->m_dataSet.prepend(row);
-    // if the added data pushed us over sample space, remove the oldest data set
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
-}
-
-void Q3DBars::addDataSet(const QVector<QVector<float>> &data)
-{
-    d_ptr->m_dataSet.clear();
-    // Check sizes
-    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
-        qCritical("Too much data per row, aborting");
-        return;
-    }
-    d_ptr->m_dataSet = data;
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
-        qWarning("Data set too large for sample space. Cropping it to fit.");
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
-    }
 }
 
 void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
@@ -621,14 +628,6 @@ void Q3DBars::setBarType(BarStyle style, bool smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
         }
     }
-    else if (style == Apes) {
-        if (smooth) {
-            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/apeSmooth");
-        }
-        else {
-            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/ape");
-        }
-    }
     // Reload mesh data
     d_ptr->loadBarMesh();
 }
@@ -676,6 +675,38 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
     d_ptr->m_uniformColor = uniform;
 }
 
+void Q3DBars::addDataRow(const QVector<float> &dataRow)
+{
+    QVector<float> row = dataRow;
+    // Check that the input data fits into sample space, and resize if it doesn't
+    if (row.size() > d_ptr->m_sampleCount.x()) {
+        row.resize(d_ptr->m_sampleCount.x());
+        qWarning("Data set too large for sample space");
+    }
+    // The vector contains data (=height) for each bar, a row at a time
+    // With each new row, the previous data set (=row) must be moved back
+    // ie. we need as many vectors as we have rows in the sample space
+    d_ptr->m_dataSet.prepend(row);
+    // if the added data pushed us over sample space, remove the oldest data set
+    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
+        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+}
+
+void Q3DBars::addDataSet(const QVector<QVector<float>> &data)
+{
+    d_ptr->m_dataSet.clear();
+    // Check sizes
+    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
+        qCritical("Too much data per row, aborting");
+        return;
+    }
+    d_ptr->m_dataSet = data;
+    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
+        qWarning("Data set too large for sample space. Cropping it to fit.");
+        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+    }
+}
+
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q)
     , m_barShader(0)
@@ -720,10 +751,10 @@ void Q3DBarsPrivate::loadBarMesh()
 {
     if (m_meshDataLoaded) {
         // Delete old data
-        glDeleteBuffers(1, &m_vertexbuffer);
-        glDeleteBuffers(1, &m_uvbuffer);
-        glDeleteBuffers(1, &m_normalbuffer);
-        glDeleteBuffers(1, &m_elementbuffer);
+        q_ptr->glDeleteBuffers(1, &m_vertexbuffer);
+        q_ptr->glDeleteBuffers(1, &m_uvbuffer);
+        q_ptr->glDeleteBuffers(1, &m_normalbuffer);
+        q_ptr->glDeleteBuffers(1, &m_elementbuffer);
     }
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;
@@ -746,27 +777,27 @@ void Q3DBarsPrivate::loadBarMesh()
     m_indexCount = indices.size();
     //qDebug() << "index count" << m_indexCount;
 
-    glGenBuffers(1, &m_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
-                 , &indexed_vertices.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_vertexbuffer);
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
+                        , &indexed_vertices.at(0)
+                        , GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_normalbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
-    glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
-                 , &indexed_normals.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_normalbuffer);
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
+    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
+                        , &indexed_normals.at(0)
+                        , GL_STATIC_DRAW);
 
-    //glGenBuffers(1, &m_uvbuffer);
-    //glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    //glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
+    //q_ptr->glGenBuffers(1, &m_uvbuffer);
+    //q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+    //q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
     //        , GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_elementbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_elementbuffer);
+    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+    q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
+                        , GL_STATIC_DRAW);
 
     m_meshDataLoaded = true;
 }
@@ -791,32 +822,32 @@ void Q3DBarsPrivate::loadBackgroundMesh()
 
     m_indexCountBackground = indices.size();
 
-    glGenBuffers(1, &m_vertexbufferBackground);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbufferBackground);
-    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
-                 , &indexed_vertices.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_vertexbufferBackground);
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_vertexbufferBackground);
+    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
+                        , &indexed_vertices.at(0)
+                        , GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_normalbufferBackground);
-    glBindBuffer(GL_ARRAY_BUFFER, m_normalbufferBackground);
-    glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
-                 , &indexed_normals.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_normalbufferBackground);
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_normalbufferBackground);
+    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
+                        , &indexed_normals.at(0)
+                        , GL_STATIC_DRAW);
 
-    //glGenBuffers(1, &m_uvbufferBackground);
-    //glBindBuffer(GL_ARRAY_BUFFER, m_uvbufferBackground);
-    //glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
+    //q_ptr->glGenBuffers(1, &m_uvbufferBackground);
+    //q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_uvbufferBackground);
+    //q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
     //        , GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_elementbufferBackground);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbufferBackground);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
-                 , GL_STATIC_DRAW);
+    q_ptr->glGenBuffers(1, &m_elementbufferBackground);
+    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbufferBackground);
+    q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
+                        , GL_STATIC_DRAW);
 
     m_background = true;
 }
 
-void Q3DBarsPrivate::initShaders(QString vertexShader, QString fragmentShader)
+void Q3DBarsPrivate::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_barShader)
         delete m_barShader;
@@ -855,28 +886,29 @@ void Q3DBarsPrivate::initSelectionShader()
 
 void Q3DBarsPrivate::initSelectionBuffer()
 {
+#if 0
     // Create frame buffer object
-    glGenFramebuffers(1, &m_framebufferSelection);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferSelection);
+    q_ptr->glGenFramebuffers(1, &m_framebufferSelection);
+    q_ptr->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferSelection);
 
     // Create texture object for the primitive information buffer
-    glGenTextures(1, &m_selectionTexture);
-    glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, q_ptr->width(), q_ptr->height(),
-                 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                           m_selectionTexture, 0);
+    q_ptr->glGenTextures(1, &m_selectionTexture);
+    q_ptr->glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
+    q_ptr->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, q_ptr->width(), q_ptr->height(),
+                        0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    q_ptr->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                  m_selectionTexture, 0);
 
     // Create texture object for the depth buffer
-    glGenTextures(1, &m_depthTexture);
-    glBindTexture(GL_TEXTURE_2D, m_depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, q_ptr->width(), q_ptr->height(),
-                 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                           m_depthTexture, 0);
+    q_ptr->glGenTextures(1, &m_depthTexture);
+    q_ptr->glBindTexture(GL_TEXTURE_2D, m_depthTexture);
+    q_ptr->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, q_ptr->width(), q_ptr->height(),
+                        0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    q_ptr->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                                  m_depthTexture, 0);
 
     // Verify that the frame buffer is complete
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    GLenum status = q_ptr->glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if (status != GL_FRAMEBUFFER_COMPLETE) {
         qCritical() << "Frame buffer creation failed" << status;
@@ -884,11 +916,13 @@ void Q3DBarsPrivate::initSelectionBuffer()
     }
 
     // Restore the default framebuffer
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    q_ptr->glBindTexture(GL_TEXTURE_2D, 0);
+    q_ptr->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 }
 
-void Q3DBarsPrivate::initBackgroundShaders(QString vertexShader, QString fragmentShader)
+void Q3DBarsPrivate::initBackgroundShaders(const QString &vertexShader
+                                           , const QString &fragmentShader)
 {
     if (m_backgroundShader)
         delete m_backgroundShader;
@@ -927,6 +961,30 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactorZ" << m_scaleFactorZ;
     qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
     qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
+}
+
+Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const QVector3D &selection)
+{
+    SelectionType isSelectedType = None;
+    if (selection == QVector3D(0, 0, 0))
+        return isSelectedType; // skip background (= black)
+    QVector3D current = QVector3D((GLubyte)(((float)(row + 2) / (float)(m_sampleCount.y() + 2))
+                                            * 255 + 0.49) // add 0.49 to fix rounding
+                                  , (GLubyte)(((float)(bar + 2) / (float)(m_sampleCount.x() + 2))
+                                              * 255 + 0.49) // add 0.49 to fix rounding
+                                  , 0);
+    //if (m_mousePressed)
+    //    qDebug() << "selected:" << selection << "current:" << current;
+    if (current == selection) {
+        isSelectedType = Bar;
+    }
+    else if (current.x() == selection.x()) {
+        isSelectedType = Column;
+    }
+    else if (current.y() == selection.y()) {
+        isSelectedType = Row;
+    }
+    return isSelectedType;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

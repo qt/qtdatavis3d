@@ -88,6 +88,8 @@ class Q3DWindow : public QWindow, protected QOpenGLFunctions
 
     private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;
+
+    friend class Q3DBarsPrivate;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

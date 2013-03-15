@@ -2,6 +2,7 @@
 #define Q3DBARS_p_H
 
 #include "qdatavis3dglobal.h"
+#include <QOpenGLFunctions>
 
 class QOpenGLShaderProgram;
 class QPoint;
@@ -14,16 +15,25 @@ class Q3DBars;
 class Q3DBarsPrivate
 {
 public:
+    enum SelectionType {
+        None = 0,
+        Bar,
+        Row,
+        Column
+    };
+
+public:
     Q3DBarsPrivate(Q3DBars *q);
     ~Q3DBarsPrivate();
 
     void loadBarMesh();
     void loadBackgroundMesh();
-    void initShaders(QString vertexShader, QString fragmentShader);
+    void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShader();
-    void initBackgroundShaders(QString vertexShader, QString fragmentShader);
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
     void calculateSceneScalingFactors();
+    SelectionType isSelected(int row, int bar, const QVector3D &selection);
 
     GLuint m_positionAttr;
     GLuint m_uvAttr;
@@ -99,7 +109,6 @@ public:
     QColor m_heightColor;
     QColor m_depthColor;
     bool m_uniformColor;
-
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

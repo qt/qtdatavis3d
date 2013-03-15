@@ -59,10 +59,10 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     QSurfaceFormat surfaceFormat;
     //surfaceFormat.setDepthBufferSize(16000000);
     surfaceFormat.setSamples(4);
-    surfaceFormat.setMajorVersion(2);
-    surfaceFormat.setMinorVersion(1);
+    //surfaceFormat.setMajorVersion(2);
+    //surfaceFormat.setMinorVersion(1);
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    //surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES); // OpenGL crashes
+    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL); // OpenGL crashes with ANGLE, comment out or define OpenGLES
     setFormat(surfaceFormat);
     qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
     qDebug() << "OpenGL renderer" << format().renderableType();
