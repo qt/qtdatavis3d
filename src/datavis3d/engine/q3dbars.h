@@ -32,7 +32,7 @@ public:
     // rows back (if sample space is more than one row deep)
     void addDataRow(const QVector<float> &dataRow);
     // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector<QVector<float>> &data);
+    void addDataSet(const QVector< QVector<float> > &data);
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between

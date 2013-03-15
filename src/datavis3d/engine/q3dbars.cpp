@@ -57,6 +57,8 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 
+float zComp = 0.0f; // TODO: if can't fix shader, use this to move all stuff to positive z (causes problems with view matrix..)
+
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
 {
@@ -196,11 +198,12 @@ void Q3DBars::render()
         backgroundRotation = 0.0f;
     }
     //qDebug() << "projectionMatrix" << projectionMatrix;
+    QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart // TODO: test to keep all z's positive
 //    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
-    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
+//    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
 //    QVector3D lightPos = viewMatrix.row(0).toVector3D();
 //    lightPos.setY(lightPos.y() + 3.0f);
-    qDebug() << lightPos;
+//    qDebug() << lightPos;
 
     // Bind selection shader
     d_ptr->m_selectionShader->bind();
@@ -216,7 +219,7 @@ void Q3DBars::render()
             rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
                                   , barHeight - 1.0f
-                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ);
+                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp); // TODO: test to keep all z's positive
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -318,6 +321,8 @@ void Q3DBars::render()
     if (d_ptr->m_background) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+        if (zComp != 0)
+            modelMatrix.translate(0.0f, 0.0f, zComp); // TODO: test to keep all z's positive
         modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale
                                     , 1.0f
                                     , d_ptr->m_columnDepth * d_ptr->m_sceneScale));
@@ -351,7 +356,6 @@ void Q3DBars::render()
         //glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
         glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-//        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, &d_ptr->m_normalbufferBackground);
 
         // 3rd attribute buffer : UVs
         //glEnableVertexAttribArray(2);
@@ -376,6 +380,7 @@ void Q3DBars::render()
     d_ptr->m_barShader->bind();
 
     // Draw bars
+    int barIndex = 1; // TODO: Remove when done debugging
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float barHeight = d_ptr->m_dataSet.at(row).at(bar);
@@ -388,7 +393,7 @@ void Q3DBars::render()
             //qDebug() << "z" << rowPos << "-" << d_ptr->m_columnDepth << "=" << rowPos - d_ptr->m_columnDepth;
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
                                   , barHeight - 1.0f
-                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ);
+                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp); // TODO: test to keep all z's positive
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -410,13 +415,6 @@ void Q3DBars::render()
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
-//            if (d_ptr->m_mousePressed) {
-//                qDebug() << "baseColor:" << baseColor;
-//                qDebug() << "heightColor:" << heightColor;
-//                qDebug() << "depthColor:" << depthColor;
-//                qDebug() << "barColor:" << barColor;
-//            }
-
             float lightStrength = 4.0f;
             Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
             switch (selectionType) {
@@ -425,6 +423,11 @@ void Q3DBars::render()
                 // highlight bar by inverting the color of the bar
                 barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
                 lightStrength = 10.0f;
+                if (d_ptr->m_mousePressed) {
+                    qDebug() << "selected object:" << barIndex << "(row:" << row + 1 << ", column:" << bar + 1;
+                    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
+                    qDebug() << "light position:" << lightPos;
+                }
                 break;
             }
             case Q3DBarsPrivate::Row:
@@ -442,6 +445,15 @@ void Q3DBars::render()
                 break;
             }
             }
+
+            if (d_ptr->m_mousePressed) {
+                //qDebug() << "baseColor:" << baseColor;
+                //qDebug() << "heightColor:" << heightColor;
+                //qDebug() << "depthColor:" << depthColor;
+                //qDebug() << "barColor:" << barColor;
+                //qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
+            }
+            barIndex++; // TODO: Remove when done debugging
 
             d_ptr->m_barShader->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
@@ -697,7 +709,7 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow)
         d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
 }
 
-void Q3DBars::addDataSet(const QVector<QVector<float>> &data)
+void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
 {
     d_ptr->m_dataSet.clear();
     // Check sizes

@@ -10,20 +10,20 @@ void main() {
         highp vec3 materialDiffuseColor = vec3(coords_mdl.y * color_mdl.x, coords_mdl.y * color_mdl.y, coords_mdl.y * color_mdl.z);
         highp vec3 materialAmbientColor = vec3(0.1, 0.1, 0.1) * color_mdl;//materialDiffuseColor;
         highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
-	highp float distance = length(lightPosition_wrld - position_wrld);
-	highp vec3 n = normalize(normal_cmr);
+        highp float distance = length(lightPosition_wrld - position_wrld);
+        highp vec3 n = normalize(normal_cmr);
 	highp vec3 l = normalize(lightDirection_cmr);
 	highp float cosTheta = dot(n, l);
-        if (cosTheta < 0.0) { cosTheta = 0.0; }
+        if (cosTheta < 0.0) { cosTheta = -cosTheta; }//0.0; } // this seems to be the problem when z position is negative
         if (cosTheta > 1.0) { cosTheta = 1.0; }
         highp vec3 E = normalize(eyeDirection_cmr);
 	highp vec3 R = reflect(-l, n);
 	highp float cosAlpha = dot(E, R);
-        if (cosAlpha < 0.0) { cosAlpha = 0.0; }
+        if (cosAlpha < 0.0) { cosAlpha = -cosAlpha; }//0.0; } // this seems to be the problem when z position is negative
         if (cosAlpha > 1.0) { cosAlpha = 1.0; }
         gl_FragColor.rgb = //color_mdl + color_mdl * vec3(cosTheta * cosTheta) / (distance * distance) + vec3(cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / (distance * distance);
                 materialAmbientColor +
-                materialDiffuseColor * lightStrength * (cosTheta * cosTheta) / distance +
-                materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / distance;
+                materialDiffuseColor * lightStrength * (cosTheta * cosTheta) / (distance * distance) +
+                materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / (distance * distance);
 }
 

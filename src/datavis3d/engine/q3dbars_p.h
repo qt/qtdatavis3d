@@ -95,7 +95,7 @@ public:
     QPointF m_barSpacing;
     bool m_meshDataLoaded;
     bool m_background;
-    QVector<QVector<float>> m_dataSet;
+    QVector< QVector<float> > m_dataSet;
     float m_rowWidth;
     float m_columnDepth;
     float m_maxDimension;

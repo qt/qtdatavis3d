@@ -44,7 +44,8 @@ void CameraHelper::setDefaultCameraOrientation(QVector3D defaultPosition
     m_up = defaultUp;
 }
 
-QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom, int screenWidth, int screenHeight)
+QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom
+                                             , int screenWidth, int screenHeight)
 {
     QMatrix4x4 viewMatrix;
 
