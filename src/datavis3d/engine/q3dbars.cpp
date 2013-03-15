@@ -355,7 +355,7 @@ void Q3DBars::render()
         glVertexAttribPointer(d_ptr->m_positionAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 2nd attribute buffer : normals
-        //glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(1); // this causes trouble with desktop opengl, but ANGLE requires it
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
         glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -371,7 +371,7 @@ void Q3DBars::render()
         glDrawElements(GL_TRIANGLES, d_ptr->m_indexCountBackground, GL_UNSIGNED_SHORT, (void*)0);
 
         //glDisableVertexAttribArray(2);
-        //glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(1); // this causes trouble with desktop opengl, but ANGLE requires it
         glDisableVertexAttribArray(0);
     }
 
@@ -418,6 +418,7 @@ void Q3DBars::render()
             QVector3D barColor = baseColor + heightColor + depthColor;
 
             float lightStrength = 5.0f;
+            // TODO: Make highlightings modifiable via API (highlight row & column, or just bar)
             Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
             switch (selectionType) {
             case Q3DBarsPrivate::Bar:
@@ -428,7 +429,7 @@ void Q3DBars::render()
                 if (d_ptr->m_mousePressed) {
                     qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
                     qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
-                    qDebug() << "light position:" << lightPos;
+                    //qDebug() << "light position:" << lightPos;
                 }
                 break;
             }
@@ -473,7 +474,7 @@ void Q3DBars::render()
             glVertexAttribPointer(d_ptr->m_positionAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 2nd attribute buffer : normals
-            //glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(1); // this causes trouble with desktop opengl, but ANGLE requires it
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbuffer);
             glVertexAttribPointer(d_ptr->m_normalAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -489,7 +490,7 @@ void Q3DBars::render()
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
 
             //glDisableVertexAttribArray(2);
-            //glDisableVertexAttribArray(1);
+            glDisableVertexAttribArray(1); // this causes trouble with desktop opengl, but ANGLE requires it
             glDisableVertexAttribArray(0);
         }
     }
