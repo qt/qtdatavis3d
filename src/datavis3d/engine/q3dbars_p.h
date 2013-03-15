@@ -109,6 +109,7 @@ public:
     QColor m_heightColor;
     QColor m_depthColor;
     bool m_uniformColor;
+    bool m_isInitialized;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -127,6 +127,9 @@ void Q3DBars::initialize()
 
     // Set view port
     glViewport(0, 0, width(), height());
+
+    // Set initialized -flag
+    d_ptr->m_isInitialized = true;
 }
 
 void Q3DBars::render()
@@ -628,8 +631,10 @@ void Q3DBars::setBarType(BarStyle style, bool smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
         }
     }
-    // Reload mesh data
-    d_ptr->loadBarMesh();
+    if (d_ptr->m_isInitialized) {
+        // Reload mesh data
+        d_ptr->loadBarMesh();
+    }
 }
 
 void Q3DBars::setMeshFileName(const QString &objFileName)
@@ -740,6 +745,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_heightColor(QColor(Qt::white))
     , m_depthColor(QColor(Qt::darkGray))
     , m_uniformColor(true)
+    , m_isInitialized(false)
 {
 }
 
