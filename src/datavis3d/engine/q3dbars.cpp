@@ -417,35 +417,37 @@ void Q3DBars::render()
             QVector3D barColor = baseColor + heightColor + depthColor;
 
             float lightStrength = 5.0f;
-            // TODO: Make highlightings modifiable via API (highlight row & column, or just bar)
-            Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
-            switch (selectionType) {
-            case Q3DBarsPrivate::Bar:
-            {
-                // highlight bar by inverting the color of the bar
-                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                lightStrength = 10.0f;
-                if (d_ptr->m_mousePressed) {
-                    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
-                    //qDebug() << "light position:" << lightPos;
+            if (d_ptr->m_selectionMode > None) {
+                Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
+                                                                                , selection);
+                switch (selectionType) {
+                case Q3DBarsPrivate::Bar:
+                {
+                    // highlight bar by inverting the color of the bar
+                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                    lightStrength = 10.0f;
+                    if (d_ptr->m_mousePressed) {
+                        qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
+                        qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
+                        //qDebug() << "light position:" << lightPos;
+                    }
+                    break;
                 }
-                break;
-            }
-            case Q3DBarsPrivate::Row:
-            {
-                // Current bar is on the same row as the selected bar
-                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                lightStrength = 0.1f;
-                break;
-            }
-            case Q3DBarsPrivate::Column:
-            {
-                // Current bar is on the same column as the selected bar
-                barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                lightStrength = 0.1f;
-                break;
-            }
+                case Q3DBarsPrivate::Row:
+                {
+                    // Current bar is on the same row as the selected bar
+                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                    lightStrength = 1.0f;
+                    break;
+                }
+                case Q3DBarsPrivate::Column:
+                {
+                    // Current bar is on the same column as the selected bar
+                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                    lightStrength = 1.0f;
+                    break;
+                }
+                }
             }
 
             if (d_ptr->m_mousePressed) {
@@ -694,6 +696,11 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
     d_ptr->m_uniformColor = uniform;
 }
 
+void Q3DBars::setSelectionMode(SelectionMode mode)
+{
+    d_ptr->m_selectionMode = mode;
+}
+
 void Q3DBars::addDataRow(const QVector<float> &dataRow)
 {
     QVector<float> row = dataRow;
@@ -733,7 +740,6 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_backgroundShader(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
-    , m_vertexCount(0)
     , m_indexCount(0)
     , m_indexCountBackground(0)
     , m_mousePressed(false)
@@ -760,6 +766,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_depthColor(QColor(Qt::darkGray))
     , m_uniformColor(true)
     , m_isInitialized(false)
+    , m_selectionMode(Q3DBars::Bar)
 {
 }
 
@@ -783,8 +790,7 @@ void Q3DBarsPrivate::loadBarMesh()
     if (!loadOk)
         qFatal("loading failed");
 
-    m_vertexCount = vertices.size();
-    qDebug() << "vertex count" << m_vertexCount;
+    qDebug() << "vertex count" << vertices.size();;
 
     // Index vertices
     QVector<unsigned short> indices;
@@ -998,10 +1004,12 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const
     if (current == selection) {
         isSelectedType = Bar;
     }
-    else if (current.x() == selection.x()) {
+    else if (current.y() == selection.y() && (m_selectionMode == Q3DBars::BarAndColumn
+                                              || m_selectionMode == Q3DBars::BarRowAndColumn)) {
         isSelectedType = Column;
     }
-    else if (current.y() == selection.y()) {
+    else if (current.x() == selection.x() && (m_selectionMode == Q3DBars::BarAndRow
+                                              || m_selectionMode == Q3DBars::BarRowAndColumn)) {
         isSelectedType = Row;
     }
     return isSelectedType;

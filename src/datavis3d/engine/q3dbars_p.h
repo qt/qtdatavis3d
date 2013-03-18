@@ -83,7 +83,6 @@ public:
     QOpenGLShaderProgram *m_backgroundShader;
     QPoint m_sampleCount;
     QString m_objFile;
-    int m_vertexCount;
     int m_indexCount;
     int m_indexCountBackground;
     bool m_mousePressed;
@@ -110,6 +109,7 @@ public:
     QColor m_depthColor;
     bool m_uniformColor;
     bool m_isInitialized;
+    Q3DBars::SelectionMode m_selectionMode;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

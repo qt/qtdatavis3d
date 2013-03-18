@@ -20,6 +20,13 @@ public:
         Cones,
         Cylinders
     };
+    enum SelectionMode {
+        None = 0,
+        Bar,
+        BarAndRow,
+        BarAndColumn,
+        BarRowAndColumn
+    };
 
 public:
     explicit Q3DBars();
@@ -51,6 +58,7 @@ public:
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform = true);
     // TODO: shaderien vaihto (themet?)
     // TODO: valon siirto / asetus
+    void setSelectionMode(SelectionMode mode);
 
 protected:
     void mousePressEvent(QMouseEvent *event);

@@ -95,6 +95,8 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
+    // Disable selection
+    m_chart->setSelectionMode(Q3DBars::None);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);
@@ -156,7 +158,7 @@ void MainApp::restart()
 {
     // Change file each time
     QString fileToLoad = QStringLiteral(":/file");
-    static int fileNo = 1;
+    static int fileNo = 3;
     QString nrStr;
     nrStr.setNum(fileNo);
     fileToLoad.append(nrStr);
@@ -195,7 +197,7 @@ int main(int argc, char *argv[])
     window.show();
 
     MainApp *mainApp = new MainApp(&window);
-    mainApp->start(QStringLiteral(":/file3"));
+    mainApp->start(QStringLiteral(":/file2"));
 
     return app.exec();
 }

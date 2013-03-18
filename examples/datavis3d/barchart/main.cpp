@@ -84,6 +84,8 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #ifndef CYCLE_THROUGH_STYLES
     m_chart->setBarType(Q3DBars::Bars, true);
 #endif
+    // Set selection mode to full
+    m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
     // Set bar colors
     m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));//, false);
 }
