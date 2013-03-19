@@ -4,6 +4,7 @@
 #include "qdatavis3dglobal.h"
 #include <QOpenGLFunctions>
 
+class QOpenGLPaintDevice;
 class QOpenGLShaderProgram;
 class QPoint;
 class QPointF;
@@ -78,6 +79,7 @@ public:
 
     Q3DBars *q_ptr;
 
+    QOpenGLPaintDevice *m_paintDevice;
     QOpenGLShaderProgram *m_barShader;
     QOpenGLShaderProgram *m_selectionShader;
     QOpenGLShaderProgram *m_backgroundShader;

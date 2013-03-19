@@ -70,7 +70,7 @@ class Q3DWindowPrivate
     public:
     Q3DWindow *q_ptr;
 
-    bool m_update_pending;
+    bool m_updatePending;
     bool m_animating;
 
     QOpenGLContext *m_context;

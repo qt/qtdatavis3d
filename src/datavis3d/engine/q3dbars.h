@@ -34,6 +34,7 @@ public:
 
     void initialize();
     void render();
+    void render(QPainter *painter);
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -68,6 +69,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
+    void drawScene();
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

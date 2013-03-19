@@ -87,9 +87,12 @@ class Q3DWindow : public QWindow, protected QOpenGLFunctions
     void resizeEvent(QResizeEvent *event);
 
     private:
+    QOpenGLPaintDevice *getDevice();
+
     QScopedPointer<Q3DWindowPrivate> d_ptr;
 
     friend class Q3DBarsPrivate;
+    friend class Q3DBars;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

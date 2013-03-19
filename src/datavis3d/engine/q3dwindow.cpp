@@ -64,9 +64,15 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     //surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES); // OpenGL crashes with ANGLE, comment out or define OpenGLES
     setFormat(surfaceFormat);
-    qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
-    qDebug() << "OpenGL renderer" << format().renderableType();
-    qDebug() << "OpenGL swapBehavior" << format().swapBehavior();
+
+    create();
+
+    d_ptr->m_context->setFormat(requestedFormat());
+    d_ptr->m_context->create();
+    d_ptr->m_context->makeCurrent(this);
+
+    initializeOpenGLFunctions();
+    initialize();
 }
 
 Q3DWindow::~Q3DWindow()
@@ -80,23 +86,20 @@ void Q3DWindow::render(QPainter *painter)
 
 void Q3DWindow::initialize()
 {
+    qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
+    qDebug() << "OpenGL renderer" << format().renderableType();
+    qDebug() << "OpenGL swapBehavior" << format().swapBehavior();
+    setAnimating(true);
 }
 
 void Q3DWindow::render()
 {
-//    if (!d_ptr->m_device)
-//        d_ptr->m_device = new QOpenGLPaintDevice;
-
-//    d_ptr->m_device->setSize(size());
-
-//    QPainter painter(d_ptr->m_device);
-//    render(&painter);
 }
 
 void Q3DWindow::renderLater()
 {
-    if (!d_ptr->m_update_pending) {
-        d_ptr->m_update_pending = true;
+    if (!d_ptr->m_updatePending) {
+        d_ptr->m_updatePending = true;
         QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
     }
 }
@@ -133,24 +136,17 @@ void Q3DWindow::renderNow()
     if (!isExposed())
         return;
 
-    d_ptr->m_update_pending = false;
+    static bool needsInit = true;
 
-    bool needsInitialize = false;
+    d_ptr->m_updatePending = false;
 
-    if (!d_ptr->m_context) {
-        d_ptr->m_context = new QOpenGLContext(this);
-        d_ptr->m_context->setFormat(requestedFormat());
-        d_ptr->m_context->create();
-
-        needsInitialize = true;
+    if (needsInit) {
+        getDevice();
+        initialize();
+        needsInit = false;
     }
 
     d_ptr->m_context->makeCurrent(this);
-
-    if (needsInitialize) {
-        initializeOpenGLFunctions();
-        initialize();
-    }
 
     render();
 
@@ -168,11 +164,19 @@ void Q3DWindow::setAnimating(bool animating)
         renderLater();
 }
 
+QOpenGLPaintDevice *Q3DWindow::getDevice()
+{
+    if (!d_ptr->m_device)
+        d_ptr->m_device = new QOpenGLPaintDevice;
+    d_ptr->m_device->setSize(size());
+    return d_ptr->m_device;
+}
+
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
     : q_ptr(q)
-    , m_update_pending(false)
-    , m_animating(true)
-    , m_context(0)
+    , m_updatePending(false)
+    , m_animating(false)
+    , m_context(new QOpenGLContext(q))
     , m_device(0)
 {
 }

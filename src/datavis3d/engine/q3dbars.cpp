@@ -46,6 +46,8 @@
 
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLPaintDevice>
+#include <QPainter>
 #include <QScreen>
 #include <QMouseEvent>
 
@@ -136,6 +138,42 @@ void Q3DBars::initialize()
 
 void Q3DBars::render()
 {
+    if (!d_ptr->m_isInitialized)
+        return;
+
+    if (d_ptr->m_paintDevice) {
+        QPainter painter(d_ptr->m_paintDevice);
+        render(&painter);
+        painter.end();
+    }
+    else {
+        d_ptr->m_paintDevice = getDevice();
+    }
+}
+
+void Q3DBars::render(QPainter *painter)
+{
+    painter->beginNativePainting();
+    // Do native OpenGL rendering
+    drawScene();
+    painter->endNativePainting();
+
+    // TODO: If selected, draw value above the bar (or mouse cursor) - add a "selected" -flag and save all necessary data for text drawing
+    if (d_ptr->m_mousePressed) {
+        painter->save();
+        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);//CompositionMode_Source);
+        painter->setPen(Qt::white);
+        painter->setFont(QFont(QStringLiteral("Arial"), 20));
+        //painter->setBackgroundMode(Qt::OpaqueMode);
+        //painter->setBackground(QBrush(Qt::black));
+        painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
+                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs, QStringLiteral("20.0"));
+        painter->restore();
+    }
+}
+
+void Q3DBars::drawScene()
+{
     int startBar = 0;
     int stopBar = 0;
     int stepBar = 0;
@@ -199,13 +237,7 @@ void Q3DBars::render()
     }
 
     // TODO: Rotate light with camera (position light a bit above camera)
-    //QVector3D lightPos = QVector3D(0.0f, 2.0f, zComp); // above the center of bar chart
     QVector3D lightPos = QVector3D(0.5f, 3.0f, zComp * 2.5f);
-//    QVector3D lightPos = QVector3D(0.0f, 1.5f, (d_ptr->m_sampleCount.y() / 2.0f));
-//    QVector3D lightPos = QVector3D(0.0f, 2.0f, (float)qSqrt((float)d_ptr->m_sampleCount.y()/3.0f));
-//    QVector3D lightPos = viewMatrix.row(0).toVector3D();
-//    lightPos.setY(lightPos.y() + 3.0f);
-//    qDebug() << lightPos;
 
     // Bind selection shader
     d_ptr->m_selectionShader->bind();
@@ -249,6 +281,10 @@ void Q3DBars::render()
             // Draw the triangles
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
 
+            // Free buffers
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
             glDisableVertexAttribArray(d_ptr->m_positionAttrSelection);
 #else // TODO: fix this - doesn't work yet
             glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
@@ -268,6 +304,10 @@ void Q3DBars::render()
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, DrawBuffers);
 
             glDisableVertexAttribArray(d_ptr->m_positionAttrSelection);
+
+            // Free buffers
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
             //glReadBuffer(GL_NONE);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -311,7 +351,6 @@ void Q3DBars::render()
     // Release selection shader
     d_ptr->m_selectionShader->release();
 
-#if 1
     // Clear after selection
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -368,6 +407,10 @@ void Q3DBars::render()
 
         // Draw the triangles
         glDrawElements(GL_TRIANGLES, d_ptr->m_indexCountBackground, GL_UNSIGNED_SHORT, (void*)0);
+
+        // Free buffers
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         //glDisableVertexAttribArray(d_ptr->m_uvAttrBackground);
         glDisableVertexAttribArray(d_ptr->m_normalAttrBackground);
@@ -426,11 +469,11 @@ void Q3DBars::render()
                     // highlight bar by inverting the color of the bar
                     barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
                     lightStrength = 10.0f;
-                    if (d_ptr->m_mousePressed) {
-                        qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                        qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
-                        //qDebug() << "light position:" << lightPos;
-                    }
+                    //if (d_ptr->m_mousePressed) {
+                    //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
+                    //    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
+                    //}
+                    // TODO: Save needed selection info (bar value etc.) so that we can draw text above the bar in painter
                     break;
                 }
                 case Q3DBarsPrivate::Row:
@@ -490,6 +533,10 @@ void Q3DBars::render()
             // Draw the triangles
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
 
+            // Free buffers
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
             //glDisableVertexAttribArray(d_ptr->m_uvAttr);
             glDisableVertexAttribArray(d_ptr->m_normalAttr);
             glDisableVertexAttribArray(d_ptr->m_positionAttr);
@@ -498,7 +545,6 @@ void Q3DBars::render()
 
     // Release bar shader
     d_ptr->m_barShader->release();
-#endif
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
@@ -735,6 +781,7 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q)
+    , m_paintDevice(0)
     , m_barShader(0)
     , m_selectionShader(0)
     , m_backgroundShader(0)
@@ -825,6 +872,9 @@ void Q3DBarsPrivate::loadBarMesh()
     q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
                         , GL_STATIC_DRAW);
 
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     m_meshDataLoaded = true;
 }
 
@@ -869,6 +919,9 @@ void Q3DBarsPrivate::loadBackgroundMesh()
     q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbufferBackground);
     q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
                         , GL_STATIC_DRAW);
+
+    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, 0);
+    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     m_background = true;
 }
