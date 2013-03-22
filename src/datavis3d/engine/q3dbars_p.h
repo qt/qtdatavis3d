@@ -12,6 +12,7 @@ class QPointF;
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
+class SampleData;
 
 class Q3DBarsPrivate
 {
@@ -112,6 +113,7 @@ public:
     bool m_uniformColor;
     bool m_isInitialized;
     Q3DBars::SelectionMode m_selectionMode;
+    SampleData *m_selectedBar;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

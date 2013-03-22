@@ -43,6 +43,7 @@
 #include "meshloader_p.h"
 #include "vertexindexer_p.h"
 #include "camerahelper_p.h"
+#include "sampledata_p.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
@@ -68,21 +69,6 @@ Q3DBars::Q3DBars()
 
 Q3DBars::~Q3DBars()
 {
-    glDeleteBuffers(1, &d_ptr->m_vertexbuffer);
-    glDeleteBuffers(1, &d_ptr->m_uvbuffer);
-    glDeleteBuffers(1, &d_ptr->m_normalbuffer);
-    glDeleteBuffers(1, &d_ptr->m_elementbuffer);
-
-#ifndef USE_HAX0R_SELECTION
-    glDeleteFramebuffers(1, &d_ptr->m_framebufferSelection);
-    glDeleteTextures(1, &d_ptr->m_selectionTexture);
-    glDeleteTextures(1, &d_ptr->m_depthTexture);
-#endif
-
-    glDeleteBuffers(1, &d_ptr->m_vertexbufferBackground);
-    glDeleteBuffers(1, &d_ptr->m_uvbufferBackground);
-    glDeleteBuffers(1, &d_ptr->m_normalbufferBackground);
-    glDeleteBuffers(1, &d_ptr->m_elementbufferBackground);
 }
 
 void Q3DBars::initialize()
@@ -154,20 +140,31 @@ void Q3DBars::render()
 void Q3DBars::render(QPainter *painter)
 {
     painter->beginNativePainting();
+    // Set OpenGL features
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     // Do native OpenGL rendering
     drawScene();
     painter->endNativePainting();
 
-    // TODO: If selected, draw value above the bar (or mouse cursor) - add a "selected" -flag and save all necessary data for text drawing
-    if (d_ptr->m_mousePressed) {
+    // If a bar is selected, display it's value
+    SampleData *data = d_ptr->m_selectedBar;
+    if (data) {
+        glDisable(GL_DEPTH_TEST);
         painter->save();
-        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);//CompositionMode_Source);
+        painter->setCompositionMode(QPainter::CompositionMode_Source);//CompositionMode_SourceOver);
         painter->setPen(Qt::white);
-        painter->setFont(QFont(QStringLiteral("Arial"), 20));
-        //painter->setBackgroundMode(Qt::OpaqueMode);
-        //painter->setBackground(QBrush(Qt::black));
-        painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
-                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs, QStringLiteral("20.0"));
+        painter->setFont(QFont(QStringLiteral("Arial"), 15));
+        painter->setBackgroundMode(Qt::OpaqueMode);
+        painter->setBackground(QBrush(Qt::black));
+        painter->drawText(data->position().x() - 50, data->position().y() - 30, 100, 30
+                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
+                          , data->valueStr());
+        //painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
+        //                  , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
+        //                  , QStringLiteral("kukkuu"));
         painter->restore();
     }
 }
@@ -424,11 +421,13 @@ void Q3DBars::drawScene()
     d_ptr->m_barShader->bind();
 
     // Draw bars
-    int barIndex = 1; // TODO: Remove when done debugging
+    //int barIndex = 1; // TODO: Remove when done debugging
+    bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float barHeight = d_ptr->m_dataSet.at(row).at(bar);
-            //qDebug() << "barHeight" << barHeight;
+            if (barHeight == 0)
+                continue;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
@@ -441,9 +440,6 @@ void Q3DBars::drawScene()
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
-
-            //qDebug() << "modelMatrix" << modelMatrix;
-            //qDebug() << "MVPMatrix" << MVPMatrix;
 
             QVector3D baseColor = QVector3D(d_ptr->m_baseColor.redF()
                                             , d_ptr->m_baseColor.greenF()
@@ -473,7 +469,11 @@ void Q3DBars::drawScene()
                     //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
                     //    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
                     //}
-                    // TODO: Save needed selection info (bar value etc.) so that we can draw text above the bar in painter
+                    // Save data to SampleData
+                    if (d_ptr->m_selectedBar)
+                        delete d_ptr->m_selectedBar;
+                    d_ptr->m_selectedBar = new SampleData(d_ptr->m_mousePos, barHeight);
+                    barSelectionFound = true;
                     break;
                 }
                 case Q3DBarsPrivate::Row:
@@ -493,14 +493,14 @@ void Q3DBars::drawScene()
                 }
             }
 
-            if (d_ptr->m_mousePressed) {
+            //if (d_ptr->m_mousePressed) {
                 //qDebug() << "baseColor:" << baseColor;
                 //qDebug() << "heightColor:" << heightColor;
                 //qDebug() << "depthColor:" << depthColor;
                 //qDebug() << "barColor:" << barColor;
                 //qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
-            }
-            barIndex++; // TODO: Remove when done debugging
+            //}
+            //barIndex++; // TODO: Remove when done debugging
 
             d_ptr->m_barShader->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
@@ -541,6 +541,10 @@ void Q3DBars::drawScene()
             glDisableVertexAttribArray(d_ptr->m_normalAttr);
             glDisableVertexAttribArray(d_ptr->m_positionAttr);
         }
+    }
+    if (!barSelectionFound) {
+        delete d_ptr->m_selectedBar;
+        d_ptr->m_selectedBar = NULL;
     }
 
     // Release bar shader
@@ -814,11 +818,33 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_uniformColor(true)
     , m_isInitialized(false)
     , m_selectionMode(Q3DBars::Bar)
+    , m_selectedBar(0)
 {
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
+    qDebug() << "Destroying Q3DBarsPrivate";
+    delete m_barShader;
+    delete m_selectionShader;
+    delete m_backgroundShader;
+    delete m_selectedBar;
+
+    q_ptr->glDeleteBuffers(1, &m_vertexbuffer);
+    q_ptr->glDeleteBuffers(1, &m_uvbuffer);
+    q_ptr->glDeleteBuffers(1, &m_normalbuffer);
+    q_ptr->glDeleteBuffers(1, &m_elementbuffer);
+
+#ifndef USE_HAX0R_SELECTION
+    q_ptr->glDeleteFramebuffers(1, &m_framebufferSelection);
+    q_ptr->glDeleteTextures(1, &m_selectionTexture);
+    q_ptr->glDeleteTextures(1, &m_depthTexture);
+#endif
+
+    q_ptr->glDeleteBuffers(1, &m_vertexbufferBackground);
+    q_ptr->glDeleteBuffers(1, &m_uvbufferBackground);
+    q_ptr->glDeleteBuffers(1, &m_normalbufferBackground);
+    q_ptr->glDeleteBuffers(1, &m_elementbufferBackground);
 }
 
 void Q3DBarsPrivate::loadBarMesh()
