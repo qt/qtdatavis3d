@@ -5,7 +5,6 @@
 #include <QOpenGLFunctions>
 
 class QOpenGLPaintDevice;
-class QOpenGLShaderProgram;
 class QPoint;
 class QPointF;
 
@@ -13,6 +12,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
 class SampleData;
+class ShaderHelper;
 
 class Q3DBarsPrivate
 {
@@ -37,32 +37,6 @@ public:
     void calculateSceneScalingFactors();
     SelectionType isSelected(int row, int bar, const QVector3D &selection);
 
-    GLuint m_positionAttr;
-    GLuint m_uvAttr;
-    GLuint m_normalAttr;
-    GLuint m_colorUniform;
-    GLuint m_viewMatrixUniform;
-    GLuint m_modelMatrixUniform;
-    GLuint m_invTransModelMatrixUniform;
-    GLuint m_mvpMatrixUniform;
-    GLuint m_lightPositionUniform;
-    GLuint m_lightStrengthUniform;
-
-    GLuint m_positionAttrSelection;
-    GLuint m_mvpMatrixUniformSelection;
-    GLuint m_colorUniformSelection;
-
-    GLuint m_positionAttrBackground;
-    GLuint m_uvAttrBackground;
-    GLuint m_normalAttrBackground;
-    GLuint m_colorUniformBackground;
-    GLuint m_viewMatrixUniformBackground;
-    GLuint m_modelMatrixUniformBackground;
-    GLuint m_invTransModelMatrixUniformBackground;
-    GLuint m_mvpMatrixUniformBackground;
-    GLuint m_lightPositionUniformBackground;
-    GLuint m_lightStrengthUniformBackground;
-
     GLuint m_vertexbuffer;
     GLuint m_uvbuffer;
     GLuint m_normalbuffer;
@@ -81,9 +55,9 @@ public:
     Q3DBars *q_ptr;
 
     QOpenGLPaintDevice *m_paintDevice;
-    QOpenGLShaderProgram *m_barShader;
-    QOpenGLShaderProgram *m_selectionShader;
-    QOpenGLShaderProgram *m_backgroundShader;
+    ShaderHelper *m_barShader;
+    ShaderHelper *m_selectionShader;
+    ShaderHelper *m_backgroundShader;
     QPoint m_sampleCount;
     QString m_objFile;
     int m_indexCount;

@@ -44,9 +44,9 @@
 #include "vertexindexer_p.h"
 #include "camerahelper_p.h"
 #include "sampledata_p.h"
+#include "shaderhelper_p.h"
 
 #include <QMatrix4x4>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
 #include <QScreen>
@@ -98,7 +98,7 @@ void Q3DBars::initialize()
     d_ptr->loadBackgroundMesh();
 
     // Set clear color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
@@ -260,16 +260,16 @@ void Q3DBars::drawScene()
                                            , (float)(bar + 2) / (float)(d_ptr->m_sampleCount.x() + 2)
                                            , 0.0f);
 
-            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_mvpMatrixUniformSelection
+            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP()
                                                       , MVPMatrix);
-            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_colorUniformSelection
+            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->color()
                                                       , barColor);
 
 #ifdef USE_HAX0R_SELECTION
             // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_positionAttrSelection);
+            glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
-            glVertexAttribPointer(d_ptr->m_positionAttrSelection
+            glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
@@ -282,15 +282,15 @@ void Q3DBars::drawScene()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-            glDisableVertexAttribArray(d_ptr->m_positionAttrSelection);
+            glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
 #else // TODO: fix this - doesn't work yet
             glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
             //glReadBuffer(GL_COLOR_ATTACHMENT0);
 
             // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_positionAttrSelection);
+            glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
-            glVertexAttribPointer(d_ptr->m_positionAttrSelection
+            glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
@@ -300,7 +300,7 @@ void Q3DBars::drawScene()
             GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
             glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, DrawBuffers);
 
-            glDisableVertexAttribArray(d_ptr->m_positionAttrSelection);
+            glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
 
             // Free buffers
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -369,35 +369,38 @@ void Q3DBars::drawScene()
 
         QVector3D backgroundColor = QVector3D(0.75, 0.75, 0.75);
 
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_lightPositionUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP()
                                                    , lightPos);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_viewMatrixUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->view()
                                                    , viewMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_modelMatrixUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->model()
                                                    , modelMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_invTransModelMatrixUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->nModel()
                                                    , modelMatrix.inverted().transposed());
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_mvpMatrixUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP()
                                                    , MVPMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_colorUniformBackground
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color()
                                                    , backgroundColor);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_lightStrengthUniformBackground
-                                                   , 4.0f);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS()
+                                                   , 6.0f);
 
         // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_positionAttrBackground);
+        glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbufferBackground);
-        glVertexAttribPointer(d_ptr->m_positionAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_backgroundShader->posAtt()
+                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 2nd attribute buffer : normals
-        glEnableVertexAttribArray(d_ptr->m_normalAttrBackground);
+        glEnableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
-        glVertexAttribPointer(d_ptr->m_normalAttrBackground, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt()
+                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 3rd attribute buffer : UVs
-        //glEnableVertexAttribArray(d_ptr->m_uvAttrBackground);
+        //glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
         //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_uvbufferBackground);
-        //glVertexAttribPointer(d_ptr->m_uvAttrBackground, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        //glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
+        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbufferBackground);
@@ -409,9 +412,9 @@ void Q3DBars::drawScene()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        //glDisableVertexAttribArray(d_ptr->m_uvAttrBackground);
-        glDisableVertexAttribArray(d_ptr->m_normalAttrBackground);
-        glDisableVertexAttribArray(d_ptr->m_positionAttrBackground);
+        //glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
+        glDisableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
+        glDisableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
     }
 
     // Release background shader
@@ -455,7 +458,7 @@ void Q3DBars::drawScene()
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
-            float lightStrength = 5.0f;
+            float lightStrength = 6.0f;
             if (d_ptr->m_selectionMode > None) {
                 Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
                                                                                 , selection);
@@ -502,30 +505,33 @@ void Q3DBars::drawScene()
             //}
             //barIndex++; // TODO: Remove when done debugging
 
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightPositionUniform, lightPos);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_viewMatrixUniform, viewMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_modelMatrixUniform, modelMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_invTransModelMatrixUniform
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel()
                                                 , modelMatrix.inverted().transposed());
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_mvpMatrixUniform, MVPMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_colorUniform, barColor);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_lightStrengthUniform, lightStrength);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
             //qDebug() << "height:" << barHeight;
 
             // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_positionAttr);
+            glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
-            glVertexAttribPointer(d_ptr->m_positionAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glVertexAttribPointer(d_ptr->m_barShader->posAtt()
+                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 2nd attribute buffer : normals
-            glEnableVertexAttribArray(d_ptr->m_normalAttr);
+            glEnableVertexAttribArray(d_ptr->m_barShader->normalAtt());
             glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbuffer);
-            glVertexAttribPointer(d_ptr->m_normalAttr, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glVertexAttribPointer(d_ptr->m_barShader->normalAtt()
+                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 3rd attribute buffer : UVs
-            //glEnableVertexAttribArray(d_ptr->m_uvAttr);
+            //glEnableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
             //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_uvbuffer);
-            //glVertexAttribPointer(d_ptr->m_uvAttr, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            //glVertexAttribPointer(d_ptr->m_barShader->m_uvAtt()
+            //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
@@ -537,9 +543,9 @@ void Q3DBars::drawScene()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-            //glDisableVertexAttribArray(d_ptr->m_uvAttr);
-            glDisableVertexAttribArray(d_ptr->m_normalAttr);
-            glDisableVertexAttribArray(d_ptr->m_positionAttr);
+            //glDisableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
+            glDisableVertexAttribArray(d_ptr->m_barShader->normalAtt());
+            glDisableVertexAttribArray(d_ptr->m_barShader->posAtt());
         }
     }
     if (!barSelectionFound) {
@@ -956,37 +962,17 @@ void Q3DBarsPrivate::initShaders(const QString &vertexShader, const QString &fra
 {
     if (m_barShader)
         delete m_barShader;
-    m_barShader = new QOpenGLShaderProgram(q_ptr);
-    if (!m_barShader->addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShader))
-        qFatal("Compiling Vertex shader failed");
-    if (!m_barShader->addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentShader))
-        qFatal("Compiling Fragment shader failed");
-    m_barShader->link();
-    m_mvpMatrixUniform = m_barShader->uniformLocation("MVP");
-    m_viewMatrixUniform = m_barShader->uniformLocation("V");
-    m_modelMatrixUniform = m_barShader->uniformLocation("M");
-    m_invTransModelMatrixUniform = m_barShader->uniformLocation("itM");
-    m_positionAttr = m_barShader->attributeLocation("vertexPosition_mdl");
-    m_uvAttr = m_barShader->attributeLocation("vertexUV");
-    m_normalAttr = m_barShader->attributeLocation("vertexNormal_mdl");
-    m_lightPositionUniform = m_barShader->uniformLocation("lightPosition_wrld");
-    m_colorUniform = m_barShader->uniformLocation("color_mdl");
-    m_lightStrengthUniform = m_barShader->uniformLocation("lightStrength");
+    m_barShader = new ShaderHelper(q_ptr, vertexShader, fragmentShader);
+    m_barShader->initialize();
 }
 
 void Q3DBarsPrivate::initSelectionShader()
 {
-    m_selectionShader = new QOpenGLShaderProgram(q_ptr);
-    if (!m_selectionShader->addShaderFromSourceFile(QOpenGLShader::Vertex
-                                                    , QStringLiteral(":/shaders/vertexSelection")))
-        qFatal("Compiling Vertex shader failed");
-    if (!m_selectionShader->addShaderFromSourceFile(QOpenGLShader::Fragment
-                                                    , QStringLiteral(":/shaders/fragmentSelection")))
-        qFatal("Compiling Fragment shader failed");
-    m_selectionShader->link();
-    m_mvpMatrixUniformSelection = m_selectionShader->uniformLocation("MVP");
-    m_colorUniformSelection = m_selectionShader->uniformLocation("color_mdl");
-    m_positionAttrSelection = m_selectionShader->attributeLocation("vertexPosition_mdl");
+    if (m_selectionShader)
+        delete m_selectionShader;
+    m_selectionShader = new ShaderHelper(q_ptr, QStringLiteral(":/shaders/vertexSelection")
+                                         , QStringLiteral(":/shaders/fragmentSelection"));
+    m_selectionShader->initialize();
 }
 
 void Q3DBarsPrivate::initSelectionBuffer()
@@ -1031,22 +1017,8 @@ void Q3DBarsPrivate::initBackgroundShaders(const QString &vertexShader
 {
     if (m_backgroundShader)
         delete m_backgroundShader;
-    m_backgroundShader = new QOpenGLShaderProgram(q_ptr);
-    if (!m_backgroundShader->addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShader))
-        qFatal("Compiling Vertex shader failed");
-    if (!m_backgroundShader->addShaderFromSourceFile(QOpenGLShader::Fragment, fragmentShader))
-        qFatal("Compiling Fragment shader failed");
-    m_backgroundShader->link();
-    m_mvpMatrixUniformBackground = m_backgroundShader->uniformLocation("MVP");
-    m_viewMatrixUniformBackground = m_backgroundShader->uniformLocation("V");
-    m_modelMatrixUniformBackground = m_backgroundShader->uniformLocation("M");
-    m_invTransModelMatrixUniformBackground = m_backgroundShader->uniformLocation("itM");
-    m_positionAttrBackground = m_backgroundShader->attributeLocation("vertexPosition_mdl");
-    m_uvAttrBackground = m_backgroundShader->attributeLocation("vertexUV");
-    m_normalAttrBackground = m_backgroundShader->attributeLocation("vertexNormal_mdl");
-    m_lightPositionUniformBackground = m_backgroundShader->uniformLocation("lightPosition_wrld");
-    m_colorUniformBackground = m_backgroundShader->uniformLocation("color_mdl");
-    m_lightStrengthUniformBackground = m_backgroundShader->uniformLocation("lightStrength");
+    m_backgroundShader = new ShaderHelper(q_ptr, vertexShader, fragmentShader);
+    m_backgroundShader->initialize();
 }
 
 void Q3DBarsPrivate::calculateSceneScalingFactors()
@@ -1071,8 +1043,8 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
 Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const QVector3D &selection)
 {
     SelectionType isSelectedType = None;
-    if (selection == QVector3D(0, 0, 0))
-        return isSelectedType; // skip background (= black)
+    if (selection == QVector3D(0.1f, 0.1f, 0.1f))
+        return isSelectedType; // skip background
     QVector3D current = QVector3D((GLubyte)(((float)(row + 2) / (float)(m_sampleCount.y() + 2))
                                             * 255 + 0.49) // add 0.49 to fix rounding
                                   , (GLubyte)(((float)(bar + 2) / (float)(m_sampleCount.x() + 2))
