@@ -40,11 +40,10 @@
 
 #include "q3dbars.h"
 #include "q3dbars_p.h"
-#include "meshloader_p.h"
-#include "vertexindexer_p.h"
 #include "camerahelper_p.h"
 #include "sampledata_p.h"
 #include "shaderhelper_p.h"
+#include "objecthelper_p.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLPaintDevice>
@@ -268,15 +267,16 @@ void Q3DBars::drawScene()
 #ifdef USE_HAX0R_SELECTION
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
             glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
             // Draw the triangles
-            glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
+            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                           , GL_UNSIGNED_SHORT, (void*)0);
 
             // Free buffers
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -289,16 +289,17 @@ void Q3DBars::drawScene()
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
             glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
             // Draw the triangles
             GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-            glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, DrawBuffers);
+            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                           , GL_UNSIGNED_SHORT, DrawBuffers);
 
             glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
 
@@ -355,7 +356,7 @@ void Q3DBars::drawScene()
     d_ptr->m_backgroundShader->bind();
 
     // Draw background
-    if (d_ptr->m_background) {
+    if (d_ptr->m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         if (zComp != 0)
@@ -386,27 +387,28 @@ void Q3DBars::drawScene()
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbufferBackground);
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
         glVertexAttribPointer(d_ptr->m_backgroundShader->posAtt()
                               , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 2nd attribute buffer : normals
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbufferBackground);
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->normalBuf());
         glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt()
                               , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 3rd attribute buffer : UVs
         //glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_uvbufferBackground);
+        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
         //glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
         //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbufferBackground);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
 
         // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_indexCountBackground, GL_UNSIGNED_SHORT, (void*)0);
+        glDrawElements(GL_TRIANGLES, d_ptr->m_backgroundObj->indexCount()
+                       , GL_UNSIGNED_SHORT, (void*)0);
 
         // Free buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -517,27 +519,28 @@ void Q3DBars::drawScene()
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_vertexbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
             glVertexAttribPointer(d_ptr->m_barShader->posAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 2nd attribute buffer : normals
             glEnableVertexAttribArray(d_ptr->m_barShader->normalAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_normalbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->normalBuf());
             glVertexAttribPointer(d_ptr->m_barShader->normalAtt()
                                   , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // 3rd attribute buffer : UVs
             //glEnableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
-            //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_uvbuffer);
+            //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->uvBuf());
             //glVertexAttribPointer(d_ptr->m_barShader->m_uvAtt()
             //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
             // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_elementbuffer);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
             // Draw the triangles
-            glDrawElements(GL_TRIANGLES, d_ptr->m_indexCount, GL_UNSIGNED_SHORT, (void*)0);
+            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                           , GL_UNSIGNED_SHORT, (void*)0);
 
             // Free buffers
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -795,10 +798,10 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_barShader(0)
     , m_selectionShader(0)
     , m_backgroundShader(0)
+    , m_barObj(0)
+    , m_backgroundObj(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
-    , m_indexCount(0)
-    , m_indexCountBackground(0)
     , m_mousePressed(false)
     , m_mousePos(QPoint(0, 0))
     , m_zoomLevel(100)
@@ -806,8 +809,6 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_verticalRotation(15.0f)
     , m_barThickness(QPointF(0.75f, 0.75f))
     , m_barSpacing(m_barThickness * 3.0f)
-    , m_meshDataLoaded(false)
-    , m_background(false)
     , m_dataSet(0)
     , m_rowWidth(0)
     , m_columnDepth(0)
@@ -835,127 +836,30 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_selectedBar;
-
-    q_ptr->glDeleteBuffers(1, &m_vertexbuffer);
-    q_ptr->glDeleteBuffers(1, &m_uvbuffer);
-    q_ptr->glDeleteBuffers(1, &m_normalbuffer);
-    q_ptr->glDeleteBuffers(1, &m_elementbuffer);
+    delete m_barObj;
+    delete m_backgroundObj;
 
 #ifndef USE_HAX0R_SELECTION
     q_ptr->glDeleteFramebuffers(1, &m_framebufferSelection);
     q_ptr->glDeleteTextures(1, &m_selectionTexture);
     q_ptr->glDeleteTextures(1, &m_depthTexture);
 #endif
-
-    q_ptr->glDeleteBuffers(1, &m_vertexbufferBackground);
-    q_ptr->glDeleteBuffers(1, &m_uvbufferBackground);
-    q_ptr->glDeleteBuffers(1, &m_normalbufferBackground);
-    q_ptr->glDeleteBuffers(1, &m_elementbufferBackground);
 }
 
 void Q3DBarsPrivate::loadBarMesh()
 {
-    if (m_meshDataLoaded) {
-        // Delete old data
-        q_ptr->glDeleteBuffers(1, &m_vertexbuffer);
-        q_ptr->glDeleteBuffers(1, &m_uvbuffer);
-        q_ptr->glDeleteBuffers(1, &m_normalbuffer);
-        q_ptr->glDeleteBuffers(1, &m_elementbuffer);
-    }
-    QVector<QVector3D> vertices;
-    QVector<QVector2D> uvs;
-    QVector<QVector3D> normals;
-    bool loadOk = MeshLoader::loadOBJ(m_objFile, vertices, uvs, normals);
-    if (!loadOk)
-        qFatal("loading failed");
-
-    qDebug() << "vertex count" << vertices.size();;
-
-    // Index vertices
-    QVector<unsigned short> indices;
-    QVector<QVector3D> indexed_vertices;
-    QVector<QVector2D> indexed_uvs;
-    QVector<QVector3D> indexed_normals;
-    VertexIndexer::indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs
-                            , indexed_normals);
-
-    m_indexCount = indices.size();
-    //qDebug() << "index count" << m_indexCount;
-
-    q_ptr->glGenBuffers(1, &m_vertexbuffer);
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
-                        , &indexed_vertices.at(0)
-                        , GL_STATIC_DRAW);
-
-    q_ptr->glGenBuffers(1, &m_normalbuffer);
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
-    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
-                        , &indexed_normals.at(0)
-                        , GL_STATIC_DRAW);
-
-    //q_ptr->glGenBuffers(1, &m_uvbuffer);
-    //q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    //q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
-    //        , GL_STATIC_DRAW);
-
-    q_ptr->glGenBuffers(1, &m_elementbuffer);
-    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
-                        , GL_STATIC_DRAW);
-
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, 0);
-    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    m_meshDataLoaded = true;
+    if (m_barObj)
+        delete m_barObj;
+    m_barObj = new ObjectHelper(q_ptr, m_objFile);
+    m_barObj->load();
 }
 
 void Q3DBarsPrivate::loadBackgroundMesh()
 {
-    QVector<QVector3D> vertices;
-    QVector<QVector2D> uvs;
-    QVector<QVector3D> normals;
-    bool loadOk = MeshLoader::loadOBJ(QStringLiteral(":/defaultMeshes/background")
-                                      , vertices, uvs, normals);
-    if (!loadOk)
-        qFatal("loading failed");
-
-    // Index vertices
-    QVector<unsigned short> indices;
-    QVector<QVector3D> indexed_vertices;
-    QVector<QVector2D> indexed_uvs;
-    QVector<QVector3D> indexed_normals;
-    VertexIndexer::indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs
-                            , indexed_normals);
-
-    m_indexCountBackground = indices.size();
-
-    q_ptr->glGenBuffers(1, &m_vertexbufferBackground);
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_vertexbufferBackground);
-    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D)
-                        , &indexed_vertices.at(0)
-                        , GL_STATIC_DRAW);
-
-    q_ptr->glGenBuffers(1, &m_normalbufferBackground);
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_normalbufferBackground);
-    q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D)
-                        , &indexed_normals.at(0)
-                        , GL_STATIC_DRAW);
-
-    //q_ptr->glGenBuffers(1, &m_uvbufferBackground);
-    //q_ptr->glBindBuffer(GL_ARRAY_BUFFER, m_uvbufferBackground);
-    //q_ptr->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
-    //        , GL_STATIC_DRAW);
-
-    q_ptr->glGenBuffers(1, &m_elementbufferBackground);
-    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbufferBackground);
-    q_ptr->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
-                        , GL_STATIC_DRAW);
-
-    q_ptr->glBindBuffer(GL_ARRAY_BUFFER, 0);
-    q_ptr->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    m_background = true;
+    if (m_backgroundObj)
+        delete m_backgroundObj;
+    m_backgroundObj = new ObjectHelper(q_ptr, QStringLiteral(":/defaultMeshes/background"));
+    m_backgroundObj->load();
 }
 
 void Q3DBarsPrivate::initShaders(const QString &vertexShader, const QString &fragmentShader)

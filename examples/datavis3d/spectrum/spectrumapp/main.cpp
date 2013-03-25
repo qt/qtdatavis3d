@@ -46,6 +46,8 @@
 #include <QAudio>
 #include <QTimer>
 
+//#define USE_CONES
+
 using namespace QtDataVis3D;
 
 class MainApp : public QObject
@@ -84,7 +86,8 @@ MainApp::MainApp(Q3DBars *window)
     , m_lowFreq(SpectrumLowFreq)
     , m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*3));
+    m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*2));
+#if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
     m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, -0.75f));
@@ -93,6 +96,14 @@ MainApp::MainApp(Q3DBars *window)
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpecs)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
+#else
+    // Set bar specifications; make them twice as wide as they're deep
+    m_chart->setBarSpecs(QPointF(1.0f, 0.5f), QPointF(0.0f, 0.0f));
+    // Set bar type, flat bars
+    m_chart->setBarType(Q3DBars::Bars, false);
+    // Adjust camera position
+    m_chart->setCameraPosition(10.0f, 7.5f, 75);
+#endif
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
     // Disable selection

@@ -39,75 +39,43 @@
 **
 ****************************************************************************/
 
-#ifndef SHADERHELPER_P_H
-#define SHADERHELPER_P_H
+#ifndef OBJECTHELPER_P_H
+#define OBJECTHELPER_P_H
 
 #include "qdatavis3dglobal.h"
 #include <QOpenGLFunctions>
 
-class QOpenGLShaderProgram;
-
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class ShaderHelper
+class ObjectHelper
 {
     public:
-    ShaderHelper(QObject *parent
-                 , const QString &vertexShader = QString()
-                 , const QString &fragmentShader = QString()
-                 , const QString &texture = QString()
-                 , const QString &depthTexture = QString());
-    ~ShaderHelper();
+    ObjectHelper(QOpenGLFunctions *parent, const QString &objectFile = QString());
+    ~ObjectHelper();
 
-    void setShaders(const QString &vertexShader, const QString &fragmentShader);
-    void setTextures(const QString &texture, const QString &depthTexture);
+    void setObjectFile(const QString &objectFile);
 
-    void initialize();
-    void bind();
-    void release();
-    void setUniformValue(GLuint uniform, const QVector3D &value);
-    void setUniformValue(GLuint uniform, const QVector4D &value);
-    void setUniformValue(GLuint uniform, const QMatrix4x4 &value);
-    void setUniformValue(GLuint uniform, GLfloat value);
+    void load();
 
-    GLuint MVP();
-    GLuint view();
-    GLuint model();
-    GLuint nModel();
-    GLuint lightP();
-    GLuint lightS();
-    GLuint color();
-
-    GLuint posAtt();
-    GLuint uvAtt();
-    GLuint normalAtt();
+    GLuint vertexBuf();
+    GLuint normalBuf();
+    GLuint uvBuf();
+    GLuint elementBuf();
+    GLuint indexCount();
 
     private:
-    QObject *m_caller;
-    QOpenGLShaderProgram *m_program;
+    QOpenGLFunctions *m_caller;
 
-    QString m_vertexShaderFile;
-    QString m_fragmentShaderFile;
+    QString m_objectFile;
 
-    QString m_textureFile;
-    QString m_depthTextureFile;
+    GLuint m_vertexbuffer;
+    GLuint m_uvbuffer;
+    GLuint m_normalbuffer;
+    GLuint m_elementbuffer;
 
-    GLuint m_positionAttr;
-    GLuint m_uvAttr;
-    GLuint m_normalAttr;
+    GLuint m_indexCount;
 
-    GLuint m_colorUniform;
-    GLuint m_viewMatrixUniform;
-    GLuint m_modelMatrixUniform;
-    GLuint m_invTransModelMatrixUniform;
-    GLuint m_mvpMatrixUniform;
-    GLuint m_lightPositionUniform;
-    GLuint m_lightStrengthUniform;
-
-    GLuint m_texture;
-    GLuint m_depthTexture;
-
-    GLboolean m_initialized;
+    GLboolean m_meshDataLoaded;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

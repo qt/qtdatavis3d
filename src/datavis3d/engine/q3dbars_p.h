@@ -13,6 +13,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 class Q3DBars;
 class SampleData;
 class ShaderHelper;
+class ObjectHelper;
 
 class Q3DBarsPrivate
 {
@@ -37,20 +38,7 @@ public:
     void calculateSceneScalingFactors();
     SelectionType isSelected(int row, int bar, const QVector3D &selection);
 
-    GLuint m_vertexbuffer;
-    GLuint m_uvbuffer;
-    GLuint m_normalbuffer;
-    GLuint m_elementbuffer;
-
     GLuint m_framebufferSelection;
-
-    GLuint m_vertexbufferBackground;
-    GLuint m_uvbufferBackground;
-    GLuint m_normalbufferBackground;
-    GLuint m_elementbufferBackground;
-
-    GLuint m_selectionTexture;
-    GLuint m_depthTexture;
 
     Q3DBars *q_ptr;
 
@@ -58,10 +46,10 @@ public:
     ShaderHelper *m_barShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
+    ObjectHelper *m_barObj;
+    ObjectHelper *m_backgroundObj;
     QPoint m_sampleCount;
     QString m_objFile;
-    int m_indexCount;
-    int m_indexCountBackground;
     bool m_mousePressed;
     QPoint m_mousePos;
     int m_zoomLevel;
@@ -69,8 +57,6 @@ public:
     float m_verticalRotation;
     QPointF m_barThickness;
     QPointF m_barSpacing;
-    bool m_meshDataLoaded;
-    bool m_background;
     QVector< QVector<float> > m_dataSet;
     float m_rowWidth;
     float m_columnDepth;
