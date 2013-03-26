@@ -128,6 +128,7 @@ void Q3DBars::render()
 
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
         render(&painter);
         painter.end();
     }

@@ -39,20 +39,10 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
 #ifndef Q3DWINDOW_H
 #define Q3DWINDOW_H
 
-#include "qdatavis3dglobal.h"
+#include "QtDataVis3D/qdatavis3dglobal.h"
 #include "q3dwindow_p.h"
 
 #include <QWindow>

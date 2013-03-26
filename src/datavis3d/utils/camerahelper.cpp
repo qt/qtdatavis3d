@@ -81,10 +81,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom
     viewMatrix.rotate(m_xRotation, 0, cos(m_yRotation*m_pi/180), sin(m_yRotation*m_pi/180));
     // y rotation is always "clean"
     viewMatrix.rotate(m_yRotation, 1.0f, 0, 0);
-    // Compensate for translation (if m_target is off origin)
-    viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
     // handle zoom by scaling
     viewMatrix.scale((float)zoom / 100.0f);
+    // Compensate for translation (if m_target is off origin)
+    viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
     //qDebug() << m_xRotation << m_yRotation;
 
     //qDebug() << "sin(m_yRotation)" << sin(m_yRotation*m_pi/180);
