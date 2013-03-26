@@ -44,7 +44,8 @@
 #include <QTimer>
 #include <QDebug>
 
-#define CYCLE_THROUGH_STYLES
+//#define CYCLE_THROUGH_STYLES
+#define CYCLE_THROUGH_PRESET_CAMERAS
 #define USE_STATIC_DATA
 
 using namespace QtDataVis3D;
@@ -58,12 +59,14 @@ public:
     void addDataSet();
     void addBars();
     void changeStyle();
+    void changePresetCamera();
     void start();
 
 private:
     Q3DBars *m_chart;
     QTimer *m_dataTimer;
-    QTimer *m_testTimer;
+    QTimer *m_styleTimer;
+    QTimer *m_presetTimer;
     int m_columnCount;
     int m_rowCount;
 };
@@ -71,23 +74,25 @@ private:
 ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     : m_chart(barchart)
     , m_dataTimer(0)
-    , m_testTimer(0)
+    , m_styleTimer(0)
+    , m_presetTimer(0)
     , m_columnCount(10)
     , m_rowCount(10)
 {
     // Set up bar specifications; make the bars twice as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.5f, 0.5f), true);
+    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.2f), true);
     // Set up sample space; make it twice as deep as it's wide
     m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
     // Set bar type to smooth bar
 #ifndef CYCLE_THROUGH_STYLES
-    m_chart->setBarType(Q3DBars::Bars, true);
+    m_chart->setBarType(Q3DBars::Bars, false);
 #endif
     // Set selection mode to full
     m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
     // Set bar colors
-    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));//, false);
+    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::cyan), QColor(Qt::green), true);
+    //m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -96,9 +101,13 @@ ChartDataGenerator::~ChartDataGenerator()
         m_dataTimer->stop();
         delete m_dataTimer;
     }
-    if (m_testTimer) {
-        m_testTimer->stop();
-        delete m_testTimer;
+    if (m_styleTimer) {
+        m_styleTimer->stop();
+        delete m_styleTimer;
+    }
+    if (m_presetTimer) {
+        m_presetTimer->stop();
+        delete m_presetTimer;
     }
     delete m_chart;
 }
@@ -116,11 +125,22 @@ void ChartDataGenerator::start()
 #endif
 
 #ifdef CYCLE_THROUGH_STYLES
-    m_testTimer = new QTimer();
-    m_testTimer->setTimerType(Qt::CoarseTimer);
-    m_testTimer->setInterval(10000);
-    QObject::connect(m_testTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
-    m_testTimer->start(10000);
+    // Change bar style every 10 seconds
+    m_styleTimer = new QTimer();
+    m_styleTimer->setTimerType(Qt::CoarseTimer);
+    m_styleTimer->setInterval(10000);
+    QObject::connect(m_styleTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
+    m_styleTimer->start(10000);
+#endif
+
+#ifdef CYCLE_THROUGH_PRESET_CAMERAS
+    // Change preset camera every 5 seconds
+    m_presetTimer = new QTimer();
+    m_presetTimer->setTimerType(Qt::CoarseTimer);
+    m_presetTimer->setInterval(5000);
+    QObject::connect(m_presetTimer, &QTimer::timeout, this
+                     , &ChartDataGenerator::changePresetCamera);
+    m_presetTimer->start(5000);
 #endif
 }
 
@@ -174,7 +194,7 @@ void ChartDataGenerator::changeStyle()
         m_chart->setBarType(Q3DBars::Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(QtDataVis3D::Q3DBars::Pyramids, true);
+        m_chart->setBarType(Q3DBars::Pyramids, true);
         break;
     }
     model++;
@@ -182,12 +202,22 @@ void ChartDataGenerator::changeStyle()
         model = 0;
 }
 
+void ChartDataGenerator::changePresetCamera()
+{
+    static int preset = 0;
+
+    m_chart->setCameraPreset((Q3DBars::CameraPreset)preset);
+
+    if (++preset > (int)Q3DBars::PresetDirectlyAboveCCW45)
+        preset = 0;
+}
+
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
     Q3DBars barchart;
-    barchart.resize(1024, 768);
+    barchart.resize(800, 600);
     barchart.show();
 
     ChartDataGenerator *generator = new ChartDataGenerator(&barchart);

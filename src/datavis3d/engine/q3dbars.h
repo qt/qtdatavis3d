@@ -20,6 +20,29 @@ public:
         Cones,
         Cylinders
     };
+
+    enum CameraPreset {
+        PresetFrontLow = 0,
+        PresetFront,
+        PresetFrontHigh,
+        PresetLeftLow,
+        PresetLeft,
+        PresetLeftHigh,
+        PresetRightLow,
+        PresetRight,
+        PresetRightHigh,
+        PresetBehindLow,
+        PresetBehind,
+        PresetBehindHigh,
+        PresetIsometricLeft,
+        PresetIsometricLeftHigh,
+        PresetIsometricRight,
+        PresetIsometricRightHigh,
+        PresetDirectlyAbove,
+        PresetDirectlyAboveCW45,
+        PresetDirectlyAboveCCW45
+    };
+
     enum SelectionMode {
         None = 0,
         Bar,
@@ -53,12 +76,18 @@ public:
     void setMeshFileName(const QString &objFileName);
     // how many samples per row and column
     void setupSampleSpace(QPoint sampleCount);
-    // Set camera rotation (in horizontal (-180...180) and vertical (0...90) angles and distance in percentage (10...500))
+    // Select preset camera placement
+    void setCameraPreset(CameraPreset preset);
+    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
+    // vertical (0...90) angles and distance in percentage (10...500))
     void setCameraPosition(float horizontal, float vertical, int distance = 100);
-    // TODO: värien asetus (vai themeillä?). Set uniform to false if you want the (height) color to change from bottom to top
+    // Set theme (bar colors, shaders, background colors and text colors are affected)
+    void setTheme(); // TODO: joku enum kai
+    // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform = true);
     // TODO: shaderien vaihto (themet?)
     // TODO: valon siirto / asetus
+    // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
 
 protected:

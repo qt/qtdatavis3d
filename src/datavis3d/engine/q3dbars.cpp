@@ -736,6 +736,109 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount)
     d_ptr->calculateSceneScalingFactors();
 }
 
+void Q3DBars::setCameraPreset(CameraPreset preset)
+{
+    switch (preset) {
+    case PresetFrontLow: {
+        qDebug("PresetFrontLow");
+        setCameraPosition(0.0f, 0.0f);
+        break;
+    }
+    case PresetFront: {
+        qDebug("PresetFront");
+        setCameraPosition(0.0f, 22.5f);
+        break;
+    }
+    case PresetFrontHigh: {
+        qDebug("PresetFrontHigh");
+        setCameraPosition(0.0f, 45.0f);
+        break;
+    }
+    case PresetLeftLow: {
+        qDebug("PresetLeftLow");
+        setCameraPosition(90.0f, 0.0f);
+        break;
+    }
+    case PresetLeft: {
+        qDebug("PresetLeft");
+        setCameraPosition(90.0f, 22.5f);
+        break;
+    }
+    case PresetLeftHigh: {
+        qDebug("PresetLeftHigh");
+        setCameraPosition(90.0f, 45.0f);
+        break;
+    }
+    case PresetRightLow: {
+        qDebug("PresetRightLow");
+        setCameraPosition(-90.0f, 0.0f);
+        break;
+    }
+    case PresetRight: {
+        qDebug("PresetRight");
+        setCameraPosition(-90.0f, 22.5f);
+        break;
+    }
+    case PresetRightHigh: {
+        qDebug("PresetRightHigh");
+        setCameraPosition(-90.0f, 45.0f);
+        break;
+    }
+    case PresetBehindLow: {
+        qDebug("PresetBehindLow");
+        setCameraPosition(180.0f, 0.0f);
+        break;
+    }
+    case PresetBehind: {
+        qDebug("PresetBehind");
+        setCameraPosition(180.0f, 22.5f);
+        break;
+    }
+    case PresetBehindHigh: {
+        qDebug("PresetBehindHigh");
+        setCameraPosition(180.0f, 45.0f);
+        break;
+    }
+    case PresetIsometricLeft: {
+        qDebug("PresetIsometricLeft");
+        setCameraPosition(45.0f, 22.5f);
+        break;
+    }
+    case PresetIsometricLeftHigh: {
+        qDebug("PresetIsometricLeftHigh");
+        setCameraPosition(45.0f, 45.0f);
+        break;
+    }
+    case PresetIsometricRight: {
+        qDebug("PresetIsometricRight");
+        setCameraPosition(-45.0f, 22.5f);
+        break;
+    }
+    case PresetIsometricRightHigh: {
+        qDebug("PresetIsometricRightHigh");
+        setCameraPosition(-45.0f, 45.0f);
+        break;
+    }
+    case PresetDirectlyAbove: {
+        qDebug("PresetDirectlyAbove");
+        setCameraPosition(0.0f, 90.0f);
+        break;
+    }
+    case PresetDirectlyAboveCW45: {
+        qDebug("PresetDirectlyAboveCW45");
+        setCameraPosition(-45.0f, 90.0f);
+        break;
+    }
+    case PresetDirectlyAboveCCW45: {
+        qDebug("PresetDirectlyAboveCCW45");
+        setCameraPosition(45.0f, 90.0f);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
 {
     d_ptr->m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);

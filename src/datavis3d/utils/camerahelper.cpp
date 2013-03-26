@@ -1,5 +1,6 @@
 #include "camerahelper_p.h"
 
+#include <qmath.h>
 #include <QMatrix4x4>
 #include <QVector3D>
 
@@ -58,7 +59,7 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom
     m_xRotation -= mouseMoveX;
     m_yRotation -= mouseMoveY;
     // Reset at 360 in x and limit to 0...90 in y
-    if (fabs(m_xRotation) >= 360)
+    if (qFabs(m_xRotation) >= 360)
         m_xRotation = 0;
     if (m_yRotation >= 90) {
         m_yRotation = 90;

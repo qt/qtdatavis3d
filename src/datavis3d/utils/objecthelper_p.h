@@ -69,8 +69,8 @@ class ObjectHelper
     QString m_objectFile;
 
     GLuint m_vertexbuffer;
-    GLuint m_uvbuffer;
     GLuint m_normalbuffer;
+    GLuint m_uvbuffer;
     GLuint m_elementbuffer;
 
     GLuint m_indexCount;
