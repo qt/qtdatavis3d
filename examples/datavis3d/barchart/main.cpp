@@ -45,7 +45,8 @@
 #include <QDebug>
 
 //#define CYCLE_THROUGH_STYLES
-#define CYCLE_THROUGH_PRESET_CAMERAS
+//#define CYCLE_THROUGH_PRESET_CAMERAS
+#define CYCLE_THROUGH_THEMES
 #define USE_STATIC_DATA
 
 using namespace QtDataVis3D;
@@ -60,6 +61,7 @@ public:
     void addBars();
     void changeStyle();
     void changePresetCamera();
+    void changeTheme();
     void start();
 
 private:
@@ -67,6 +69,7 @@ private:
     QTimer *m_dataTimer;
     QTimer *m_styleTimer;
     QTimer *m_presetTimer;
+    QTimer *m_themeTimer;
     int m_columnCount;
     int m_rowCount;
 };
@@ -76,6 +79,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     , m_dataTimer(0)
     , m_styleTimer(0)
     , m_presetTimer(0)
+    , m_themeTimer(0)
     , m_columnCount(10)
     , m_rowCount(10)
 {
@@ -90,9 +94,10 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #endif
     // Set selection mode to full
     m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
+#ifndef CYCLE_THROUGH_THEMES
     // Set bar colors
-    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::cyan), QColor(Qt::green), true);
-    //m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));
+    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));
+#endif
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -108,6 +113,10 @@ ChartDataGenerator::~ChartDataGenerator()
     if (m_presetTimer) {
         m_presetTimer->stop();
         delete m_presetTimer;
+    }
+    if (m_themeTimer) {
+        m_themeTimer->stop();
+        delete m_themeTimer;
     }
     delete m_chart;
 }
@@ -141,6 +150,16 @@ void ChartDataGenerator::start()
     QObject::connect(m_presetTimer, &QTimer::timeout, this
                      , &ChartDataGenerator::changePresetCamera);
     m_presetTimer->start(5000);
+#endif
+
+#ifdef CYCLE_THROUGH_THEMES
+    // Change theme every 2 seconds
+    m_themeTimer = new QTimer();
+    m_themeTimer->setTimerType(Qt::CoarseTimer);
+    m_themeTimer->setInterval(2000);
+    QObject::connect(m_themeTimer, &QTimer::timeout, this
+                     , &ChartDataGenerator::changeTheme);
+    m_themeTimer->start(2000);
 #endif
 }
 
@@ -210,6 +229,16 @@ void ChartDataGenerator::changePresetCamera()
 
     if (++preset > (int)Q3DBars::PresetDirectlyAboveCCW45)
         preset = 0;
+}
+
+void ChartDataGenerator::changeTheme()
+{
+    static int theme = 1; // TODO: System theme not yet implemented
+
+    m_chart->setTheme((Q3DBars::ColorTheme)theme);
+
+    if (++theme > (int)Q3DBars::ThemeLight)
+        theme = 1; // TODO: System theme not yet implemented
 }
 
 int main(int argc, char **argv)

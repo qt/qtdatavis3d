@@ -43,6 +43,17 @@ public:
         PresetDirectlyAboveCCW45
     };
 
+    enum ColorTheme {
+        ThemeSystem = 0,
+        ThemeBlueCerulean,
+        ThemeBlueIcy,
+        ThemeBlueNcs,
+        ThemeBrownSand,
+        ThemeDark,
+        ThemeHighContrast,
+        ThemeLight
+    };
+
     enum SelectionMode {
         None = 0,
         Bar,
@@ -81,8 +92,8 @@ public:
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
     void setCameraPosition(float horizontal, float vertical, int distance = 100);
-    // Set theme (bar colors, shaders, background colors and text colors are affected)
-    void setTheme(); // TODO: joku enum kai
+    // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
+    void setTheme(ColorTheme theme);
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform = true);
     // TODO: shaderien vaihto (themet?)

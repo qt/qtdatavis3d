@@ -44,6 +44,7 @@
 #include "sampledata_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "utils_p.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLPaintDevice>
@@ -95,9 +96,6 @@ void Q3DBars::initialize()
 
     // Load background mesh
     d_ptr->loadBackgroundMesh();
-
-    // Set clear color
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
@@ -154,17 +152,24 @@ void Q3DBars::render(QPainter *painter)
     if (data) {
         glDisable(GL_DEPTH_TEST);
         painter->save();
-        painter->setCompositionMode(QPainter::CompositionMode_Source);//CompositionMode_SourceOver);
-        painter->setPen(Qt::white);
+        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);//CompositionMode_SourceOver);
+        painter->setPen(d_ptr->m_textColor);
         painter->setFont(QFont(QStringLiteral("Arial"), 15));
-        painter->setBackgroundMode(Qt::OpaqueMode);
-        painter->setBackground(QBrush(Qt::black));
+        //painter->setBackgroundMode(Qt::OpaqueMode);
+        //painter->setBackground(QBrush(d_ptr->m_textBackgroundColor));
+//        painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
+//        painter->setBrush(QBrush(d_ptr->m_textColor));
+//        painter->drawRoundedRect(data->position().x() - 50, data->position().y() - 30
+//                                 , 100, 30, 10.0, 10.0);
         painter->drawText(data->position().x() - 50, data->position().y() - 30, 100, 30
-                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
+                          , Qt::AlignCenter | Qt::AlignVCenter
+                          | Qt::TextExpandTabs | Qt::TextDontClip
                           , data->valueStr());
-        //painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
-        //                  , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
-        //                  , QStringLiteral("kukkuu"));
+//        painter->fillRect(/*d_ptr->m_mousePos.x() - 50*/0, /*d_ptr->m_mousePos.y() - 30*/0
+//                                 , 500, 300, d_ptr->m_textBackgroundColor);
+//        painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
+//                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
+//                          , QStringLiteral("kukkuu"));
         painter->restore();
     }
 }
@@ -185,6 +190,10 @@ void Q3DBars::drawScene()
     float rowPos = 0;
 
     static QVector3D selection = QVector3D(0, 0, 0);
+
+    // Set clear color
+    QVector3D clearColor = Utils::vectorFromColor(d_ptr->m_windowColor);
+    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -369,7 +378,7 @@ void Q3DBars::drawScene()
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-        QVector3D backgroundColor = QVector3D(0.75, 0.75, 0.75);
+        QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_backgroundColor);
 
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP()
                                                    , lightPos);
@@ -384,7 +393,7 @@ void Q3DBars::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color()
                                                    , backgroundColor);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS()
-                                                   , 6.0f);
+                                                   , d_ptr->m_lightStrength);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
@@ -447,21 +456,14 @@ void Q3DBars::drawScene()
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            QVector3D baseColor = QVector3D(d_ptr->m_baseColor.redF()
-                                            , d_ptr->m_baseColor.greenF()
-                                            , d_ptr->m_baseColor.blueF());
-            QVector3D heightColor = QVector3D(d_ptr->m_heightColor.redF()
-                                              , d_ptr->m_heightColor.greenF()
-                                              , d_ptr->m_heightColor.blueF())
-                    * barHeight;
-            QVector3D depthColor = QVector3D(d_ptr->m_depthColor.redF()
-                                             , d_ptr->m_depthColor.greenF()
-                                             , d_ptr->m_depthColor.blueF())
+            QVector3D baseColor = Utils::vectorFromColor(d_ptr->m_baseColor);
+            QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_heightColor) * barHeight;
+            QVector3D depthColor = Utils::vectorFromColor(d_ptr->m_depthColor)
                     * (float(row) / float(d_ptr->m_sampleCount.y()));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
-            float lightStrength = 6.0f;
+            float lightStrength = d_ptr->m_lightStrength;
             if (d_ptr->m_selectionMode > None) {
                 Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
                                                                                 , selection);
@@ -469,8 +471,9 @@ void Q3DBars::drawScene()
                 case Q3DBarsPrivate::Bar:
                 {
                     // highlight bar by inverting the color of the bar
-                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                    lightStrength = 10.0f;
+                    //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
                     //if (d_ptr->m_mousePressed) {
                     //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
                     //    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
@@ -485,15 +488,15 @@ void Q3DBars::drawScene()
                 case Q3DBarsPrivate::Row:
                 {
                     // Current bar is on the same row as the selected bar
-                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                    lightStrength = 1.0f;
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
                     break;
                 }
                 case Q3DBarsPrivate::Column:
                 {
                     // Current bar is on the same column as the selected bar
-                    barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                    lightStrength = 1.0f;
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
                     break;
                 }
                 }
@@ -739,6 +742,8 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount)
 
 void Q3DBars::setCameraPreset(CameraPreset preset)
 {
+    // TODO: This should be moved to CameraHelper to be directly usable by other vis types - just call directly a function there?
+    // TODO: Move these enums to namespace level?
     switch (preset) {
     case PresetFrontLow: {
         qDebug("PresetFrontLow");
@@ -850,6 +855,153 @@ void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
     qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
 }
 
+void Q3DBars::setTheme(ColorTheme theme)
+{
+    // TODO: Get themes from a theme class? Move enum to namespace level?
+    // TODO: Hardcoded here at first..
+    switch (theme) {
+    case ThemeSystem: {
+//        d_ptr->m_baseColor = QColor();
+//        d_ptr->m_heightColor = QColor();
+//        d_ptr->m_depthColor = QColor();
+//        d_ptr->m_backgroundColor = QColor();
+//        d_ptr->m_windowColor = QColor();
+//        d_ptr->m_textColor = QColor();
+//        d_ptr->m_textBackgroundColor = QColor();
+//        d_ptr->m_highlightBarColor = QColor();
+//        d_ptr->m_highlightRowColor = QColor();
+//        d_ptr->m_highlightColumnColor = QColor();
+//        d_ptr->m_lightStrength = QColor();
+//        d_ptr->m_highlightLightStrength = QColor();
+//        d_ptr->m_uniformColor = QColor();
+        break;
+    }
+    case ThemeBlueCerulean: {
+        d_ptr->m_baseColor = QColor(QRgb(0xc7e85b));
+        d_ptr->m_heightColor = QColor(QRgb(0xee7392));
+        d_ptr->m_depthColor = QColor(Qt::black);
+        d_ptr->m_backgroundColor = QColor(QRgb(0x056189));
+        d_ptr->m_windowColor = QColor(QRgb(0x101a31));
+        d_ptr->m_textColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        d_ptr->m_highlightBarColor = QColor(Qt::blue);
+        d_ptr->m_highlightRowColor = QColor(Qt::darkBlue);
+        d_ptr->m_highlightColumnColor = QColor(Qt::darkBlue);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_uniformColor = true;
+        break;
+    }
+    case ThemeBlueIcy: {
+        d_ptr->m_baseColor = QRgb(0x3daeda);
+        d_ptr->m_heightColor = QRgb(0x2fa3b4);
+        d_ptr->m_depthColor = QColor(Qt::white);
+        d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
+        d_ptr->m_windowColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textColor = QColor(QRgb(0x404044));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        d_ptr->m_highlightBarColor = QColor(Qt::white);
+        d_ptr->m_highlightRowColor = QColor(Qt::lightGray);
+        d_ptr->m_highlightColumnColor = QColor(Qt::lightGray);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_uniformColor = true;
+        break;
+    }
+    case ThemeBlueNcs: {
+        d_ptr->m_baseColor = QColor(QRgb(0x1db0da));
+        d_ptr->m_heightColor = QColor(QRgb(0x398ca3));
+        d_ptr->m_depthColor = QColor(Qt::lightGray);
+        d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
+        d_ptr->m_windowColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textColor = QColor(QRgb(0x404044));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        d_ptr->m_highlightBarColor = QColor(Qt::lightGray);
+        d_ptr->m_highlightRowColor = QColor(Qt::gray);
+        d_ptr->m_highlightColumnColor = QColor(Qt::gray);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 6.0f;
+        d_ptr->m_uniformColor = true;
+        break;
+    }
+    case ThemeBrownSand: {
+        d_ptr->m_baseColor = QColor(QRgb(0xb39b72));
+        d_ptr->m_heightColor = QColor(QRgb(0x494345));
+        d_ptr->m_depthColor = QColor(Qt::darkYellow);
+        d_ptr->m_backgroundColor = QColor(QRgb(0xf3ece0));
+        d_ptr->m_windowColor = QColor(QRgb(0xf3ece0));
+        d_ptr->m_textColor = QColor(QRgb(0x404044));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0xb5b0a7));
+        d_ptr->m_highlightBarColor = QColor(Qt::yellow);
+        d_ptr->m_highlightRowColor = QColor(Qt::darkYellow);
+        d_ptr->m_highlightColumnColor = QColor(Qt::darkYellow);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 8.0f;
+        d_ptr->m_uniformColor = false;
+        break;
+    }
+    case ThemeDark: {
+        d_ptr->m_baseColor = QColor(QRgb(0x38ad6b));
+        d_ptr->m_heightColor = QColor(QRgb(0xbf593e));
+        d_ptr->m_depthColor = QColor(Qt::black);
+        d_ptr->m_backgroundColor = QColor(QRgb(0x2e303a));
+        d_ptr->m_windowColor = QColor(QRgb(0x121218));
+        d_ptr->m_textColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0x86878c));
+        d_ptr->m_highlightBarColor = QColor(Qt::gray);
+        d_ptr->m_highlightRowColor = QColor(Qt::darkGray);
+        d_ptr->m_highlightColumnColor = QColor(Qt::darkGray);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 8.0f;
+        d_ptr->m_uniformColor = false;
+        break;
+    }
+    case ThemeHighContrast: {
+        d_ptr->m_baseColor = QColor(QRgb(0x202020));
+        d_ptr->m_heightColor = QColor(QRgb(0xff4a41));
+        d_ptr->m_depthColor = QColor(Qt::white);
+        d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
+        d_ptr->m_windowColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textColor = QColor(QRgb(0x181818));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0x8c8c8c));
+        d_ptr->m_highlightBarColor = QColor(Qt::black);
+        d_ptr->m_highlightRowColor = QColor(Qt::white);
+        d_ptr->m_highlightColumnColor = QColor(Qt::white);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 15.0f;
+        d_ptr->m_uniformColor = true;
+        break;
+    }
+    case ThemeLight: {
+        d_ptr->m_baseColor = QColor(QRgb(0x209fdf));
+        d_ptr->m_heightColor = QColor(QRgb(0xbf593e));
+        d_ptr->m_depthColor = QColor(Qt::lightGray);
+        d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
+        d_ptr->m_windowColor = QColor(QRgb(0xffffff));
+        d_ptr->m_textColor = QColor(QRgb(0x404044));
+        d_ptr->m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        d_ptr->m_highlightBarColor = QColor(Qt::white);
+        d_ptr->m_highlightRowColor = QColor(Qt::lightGray);
+        d_ptr->m_highlightColumnColor = QColor(Qt::lightGray);
+        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_uniformColor = true;
+        break;
+    }
+    default:
+        break;
+    }
+    // Re-initialize shaders
+    if (!d_ptr->m_uniformColor) {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                           , QStringLiteral(":/shaders/fragmentColorOnY"));
+    }
+    else {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                           , QStringLiteral(":/shaders/fragment"));
+    }
+}
+
 void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
 {
     d_ptr->m_baseColor = baseColor;
@@ -926,6 +1078,15 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_baseColor(QColor(Qt::gray))
     , m_heightColor(QColor(Qt::white))
     , m_depthColor(QColor(Qt::darkGray))
+    , m_backgroundColor(QColor(Qt::gray))
+    , m_windowColor(QColor(Qt::gray))
+    , m_textColor(QColor(Qt::white))
+    , m_textBackgroundColor(QColor(Qt::black))
+    , m_highlightBarColor(QColor(Qt::red))
+    , m_highlightRowColor(QColor(Qt::darkRed))
+    , m_highlightColumnColor(QColor(Qt::darkMagenta))
+    , m_lightStrength(6.0f)
+    , m_highlightLightStrength(10.0f)
     , m_uniformColor(true)
     , m_isInitialized(false)
     , m_selectionMode(Q3DBars::Bar)
@@ -1051,8 +1212,8 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
 Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const QVector3D &selection)
 {
     SelectionType isSelectedType = None;
-    if (selection == QVector3D(0.1f, 0.1f, 0.1f))
-        return isSelectedType; // skip background
+    if (selection == Utils::vectorFromColor(m_windowColor))
+        return isSelectedType; // skip window
     QVector3D current = QVector3D((GLubyte)(((float)(row + 2) / (float)(m_sampleCount.y() + 2))
                                             * 255 + 0.49) // add 0.49 to fix rounding
                                   , (GLubyte)(((float)(bar + 2) / (float)(m_sampleCount.x() + 2))
