@@ -148,28 +148,50 @@ void Q3DBars::render(QPainter *painter)
     painter->endNativePainting();
 
     // If a bar is selected, display it's value
+    // TODO: Move text printing to a helper class, so that it can be used from other vis types?
     SampleData *data = d_ptr->m_selectedBar;
     if (data) {
         glDisable(GL_DEPTH_TEST);
         painter->save();
-        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);//CompositionMode_SourceOver);
-        painter->setPen(d_ptr->m_textColor);
-        painter->setFont(QFont(QStringLiteral("Arial"), 15));
+        painter->setCompositionMode(QPainter::CompositionMode_Source);
+        // TODO: None of the commented-out stuff works..
         //painter->setBackgroundMode(Qt::OpaqueMode);
         //painter->setBackground(QBrush(d_ptr->m_textBackgroundColor));
-//        painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
-//        painter->setBrush(QBrush(d_ptr->m_textColor));
-//        painter->drawRoundedRect(data->position().x() - 50, data->position().y() - 30
-//                                 , 100, 30, 10.0, 10.0);
-        painter->drawText(data->position().x() - 50, data->position().y() - 30, 100, 30
+        //painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
+        //painter->setPen(d_ptr->m_textBackgroundColor);
+        painter->setPen(Qt::black); // TODO: Use black, as nothing works
+        QFont bgrFont = QFont(QStringLiteral("Arial"), 18);
+        QFont valueFont = QFont(QStringLiteral("Arial"), 12);
+        valueFont.setBold(true);
+        painter->setFont(bgrFont);
+        QFontMetrics valueFM(valueFont);
+        QFontMetrics bgrFM(bgrFont);
+        int valueStrLen = valueFM.width(data->valueStr());
+        int bgrStrLen = 0;
+        int bgrHeight = valueFM.height() + 6;
+        QString bgrStr = QString();
+        do {
+            bgrStr.append(QStringLiteral("X"));
+            bgrStrLen = bgrFM.width(bgrStr);
+        } while (bgrStrLen <= valueStrLen);
+        //int bgrLen = valueStrLen + 10;
+        //painter->drawRoundedRect(data->position().x() - (bgrLen / 2)
+        //                         , data->position().y() - 30
+        //                         , bgrLen, 30, 10.0, 10.0);
+        // Hack solution, as drawRect doesn't work
+        painter->drawText(data->position().x() - (bgrStrLen / 2)
+                          , data->position().y() - bgrHeight
+                          , bgrStrLen, bgrHeight
                           , Qt::AlignCenter | Qt::AlignVCenter
-                          | Qt::TextExpandTabs | Qt::TextDontClip
+                          , bgrStr);
+        //painter->setPen(d_ptr->m_textColor);
+        painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
+        painter->setFont(valueFont);
+        painter->drawText(data->position().x() - (valueStrLen / 2)
+                          , data->position().y() - bgrHeight
+                          , valueStrLen, bgrHeight
+                          , Qt::AlignCenter | Qt::AlignVCenter
                           , data->valueStr());
-//        painter->fillRect(/*d_ptr->m_mousePos.x() - 50*/0, /*d_ptr->m_mousePos.y() - 30*/0
-//                                 , 500, 300, d_ptr->m_textBackgroundColor);
-//        painter->drawText(d_ptr->m_mousePos.x() - 50, d_ptr->m_mousePos.y() - 30, 100, 30
-//                          , Qt::AlignCenter | Qt::AlignVCenter | Qt::TextExpandTabs
-//                          , QStringLiteral("kukkuu"));
         painter->restore();
     }
 }
@@ -1008,6 +1030,17 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
     d_ptr->m_heightColor = heightColor;
     d_ptr->m_depthColor = depthColor;
     //qDebug() << "colors:" << d_ptr->m_baseColor << d_ptr->m_heightColor << d_ptr->m_depthColor;
+    if (d_ptr->m_uniformColor != uniform) {
+        // Re-initialize shaders
+        if (!d_ptr->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                               , QStringLiteral(":/shaders/fragmentColorOnY"));
+        }
+        else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+                               , QStringLiteral(":/shaders/fragment"));
+        }
+    }
     d_ptr->m_uniformColor = uniform;
 }
 
