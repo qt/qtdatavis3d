@@ -18,9 +18,9 @@ bool VertexIndexer::is_near(float v1, float v2)
 // Searches through all already-exported vertices
 // for a similar one.
 // Similar = same position + same UVs + same normal
-bool VertexIndexer::getSimilarVertexIndex(QVector3D &in_vertex
-                                          , QVector2D &in_uv
-                                          , QVector3D &in_normal
+bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex
+                                          , const QVector2D &in_uv
+                                          , const QVector3D &in_normal
                                           , QVector<QVector3D> &out_vertices
                                           , QVector<QVector2D> &out_uvs
                                           , QVector<QVector3D> &out_normals
@@ -45,7 +45,7 @@ bool VertexIndexer::getSimilarVertexIndex(QVector3D &in_vertex
     return false;
 }
 
-bool VertexIndexer::getSimilarVertexIndex_fast(PackedVertex &packed
+bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed
                                                , QMap<PackedVertex, unsigned short> &VertexToOutIndex
                                                , unsigned short &result)
 {
@@ -59,9 +59,9 @@ bool VertexIndexer::getSimilarVertexIndex_fast(PackedVertex &packed
     }
 }
 
-void VertexIndexer::indexVBO(QVector<QVector3D> &in_vertices
-                             , QVector<QVector2D> &in_uvs
-                             , QVector<QVector3D> &in_normals
+void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices
+                             , const QVector<QVector2D> &in_uvs
+                             , const QVector<QVector3D> &in_normals
                              , QVector<unsigned short> &out_indices
                              , QVector<QVector3D> &out_vertices
                              , QVector<QVector2D> &out_uvs
@@ -94,11 +94,11 @@ void VertexIndexer::indexVBO(QVector<QVector3D> &in_vertices
     qDebug() << "unique vertices" << unique_vertices;
 }
 
-void VertexIndexer::indexVBO_TBN(QVector<QVector3D> &in_vertices
-                                 , QVector<QVector2D> &in_uvs
-                                 , QVector<QVector3D> &in_normals
-                                 , QVector<QVector3D> &in_tangents
-                                 , QVector<QVector3D> &in_bitangents
+void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices
+                                 , const QVector<QVector2D> &in_uvs
+                                 , const QVector<QVector3D> &in_normals
+                                 , const QVector<QVector3D> &in_tangents
+                                 , const QVector<QVector3D> &in_bitangents
                                  , QVector<unsigned short> &out_indices
                                  , QVector<QVector3D> &out_vertices
                                  , QVector<QVector2D> &out_uvs

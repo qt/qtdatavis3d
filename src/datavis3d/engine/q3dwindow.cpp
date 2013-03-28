@@ -41,7 +41,7 @@
 #include "q3dwindow.h"
 #include "q3dwindow_p.h"
 
-#include <QCoreApplication>
+#include <QGuiApplication>
 
 #include <QOpenGLContext>
 #include <QOpenGLPaintDevice>

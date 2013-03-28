@@ -12,7 +12,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 QString slashTag = QStringLiteral("/");
 
-bool MeshLoader::loadOBJ(QString path,
+bool MeshLoader::loadOBJ(const QString &path,
                          QVector<QVector3D> &out_vertices,
                          QVector<QVector2D> &out_uvs,
                          QVector<QVector3D> &out_normals)

@@ -28,7 +28,7 @@ void CameraHelper::setRotationSpeed(int speed)
     m_rotationSpeed = speed;
 }
 
-void CameraHelper::setCameraRotation(QPointF rotation)
+void CameraHelper::setCameraRotation(const QPointF &rotation)
 {
     m_xRotation = rotation.x();
     m_defaultXRotation = m_xRotation;
@@ -36,16 +36,16 @@ void CameraHelper::setCameraRotation(QPointF rotation)
     m_defaultYRotation = m_yRotation;
 }
 
-void CameraHelper::setDefaultCameraOrientation(QVector3D defaultPosition
-                                               , QVector3D defaultTarget
-                                               , QVector3D defaultUp)
+void CameraHelper::setDefaultCameraOrientation(const QVector3D &defaultPosition
+                                               , const QVector3D &defaultTarget
+                                               , const QVector3D &defaultUp)
 {
     m_position = defaultPosition;
     m_target = defaultTarget;
     m_up = defaultUp;
 }
 
-QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom
+QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
                                              , int screenWidth, int screenHeight)
 {
     QMatrix4x4 viewMatrix;
@@ -96,7 +96,15 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(QPoint mousePos, int zoom
     return viewMatrix;
 }
 
-void CameraHelper::updateMousePos(QPoint mousePos)
+QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition)
+{
+    QVector3D newLightPosition = lightPosition;
+    // TODO: Implement rotation based on m_xRotation and m_yRotation
+
+    return newLightPosition;
+}
+
+void CameraHelper::updateMousePos(const QPoint &mousePos)
 {
     m_previousMousePos = mousePos;
     // if mouse position is set to (0, 0), reset rotations

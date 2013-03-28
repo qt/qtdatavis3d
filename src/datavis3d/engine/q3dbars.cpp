@@ -61,6 +61,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 
 const float zComp = 3.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
+const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp * 2.5f);
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -222,13 +223,15 @@ void Q3DBars::drawScene()
     QMatrix4x4 projectionMatrix;
     projectionMatrix.perspective(45.0f, (float)width() / (float)height(), 0.1f, 100.0f);
 
-    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos, d_ptr->m_zoomLevel
+    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos
+                                                              , d_ptr->m_zoomLevel
                                                               , width(), height());
 
     // Calculate drawing order
     //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
     //qDebug() << "viewMatrix x" << viewMatrix.row(0).x(); // jos negatiivinen, käännä row -piirtojärjestys
     // TODO: Needs more tuning unless we get depth test working correctly
+    // TODO: If depth test gets fixed, the draw order should be reversed for best performance (ie. draw front objects first)
     if (viewMatrix.row(0).x() < 0) {
         startRow = 0;
         stopRow = d_ptr->m_sampleCount.y();
@@ -264,8 +267,8 @@ void Q3DBars::drawScene()
         backgroundRotation = 0.0f;
     }
 
-    // TODO: Rotate light with camera (position light a bit above camera)
-    QVector3D lightPos = QVector3D(0.5f, 3.0f, zComp * 2.5f);
+    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
+    QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
 
     // Bind selection shader
     d_ptr->m_selectionShader->bind();

@@ -21,19 +21,19 @@ class VertexIndexer
         }
     };
 
-    static void indexVBO(QVector<QVector3D> &in_vertices
-                         , QVector<QVector2D> &in_uvs
-                         , QVector<QVector3D> &in_normals
+    static void indexVBO(const QVector<QVector3D> &in_vertices
+                         , const QVector<QVector2D> &in_uvs
+                         , const QVector<QVector3D> &in_normals
                          , QVector<unsigned short> &out_indices
                          , QVector<QVector3D> &out_vertices
                          , QVector<QVector2D> &out_uvs
                          , QVector<QVector3D> &out_normals);
 
-    static void indexVBO_TBN(QVector<QVector3D> &in_vertices
-                             , QVector<QVector2D> &in_uvs
-                             , QVector<QVector3D> &in_normals
-                             , QVector<QVector3D> &in_tangents
-                             , QVector<QVector3D> &in_bitangents
+    static void indexVBO_TBN(const QVector<QVector3D> &in_vertices
+                             , const QVector<QVector2D> &in_uvs
+                             , const QVector<QVector3D> &in_normals
+                             , const QVector<QVector3D> &in_tangents
+                             , const QVector<QVector3D> &in_bitangents
                              , QVector<unsigned short> &out_indices
                              , QVector<QVector3D> &out_vertices
                              , QVector<QVector2D> &out_uvs
@@ -43,14 +43,14 @@ class VertexIndexer
 
     private:
     static bool is_near(float v1, float v2);
-    static bool getSimilarVertexIndex(QVector3D &in_vertex
-                                      , QVector2D &in_uv
-                                      , QVector3D &in_normal
+    static bool getSimilarVertexIndex(const QVector3D &in_vertex
+                                      , const QVector2D &in_uv
+                                      , const QVector3D &in_normal
                                       , QVector<QVector3D> &out_vertices
                                       , QVector<QVector2D> &out_uvs
                                       , QVector<QVector3D> &out_normals
                                       , unsigned short &result);
-    static bool getSimilarVertexIndex_fast(PackedVertex &packed
+    static bool getSimilarVertexIndex_fast(const PackedVertex &packed
                                            , QMap<PackedVertex, unsigned short> &VertexToOutIndex
                                            , unsigned short &result);
 };
