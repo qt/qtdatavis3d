@@ -98,9 +98,17 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
 
 QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition)
 {
-    QVector3D newLightPosition = lightPosition;
-    // TODO: Implement rotation based on m_xRotation and m_yRotation
-
+    // Move light with camera
+    QVector3D newLightPosition;
+    float radius = m_target.z() * 2.5f;
+    float angle = m_xRotation * m_pi / 180;
+    float zPos = radius * cos(angle);
+    float xPos = radius * sin(angle);
+    // TODO: Does not work perfectly yet
+    newLightPosition = QVector3D(-xPos /*+ lightPosition.x()*/
+                                 , lightPosition.y() // TODO: Lift light higher with m_yRotation?
+                                 , zPos + radius);//m_target.z()/*+ lightPosition.z()*/);
+    qDebug() << newLightPosition << angle;
     return newLightPosition;
 }
 
