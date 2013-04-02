@@ -60,8 +60,8 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 
-const float zComp = 3.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
-const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp * 2.5f);
+const float zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
+const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -269,6 +269,7 @@ void Q3DBars::drawScene()
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
     QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+    //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
     // Bind selection shader
     d_ptr->m_selectionShader->bind();
@@ -501,12 +502,13 @@ void Q3DBars::drawScene()
                     lightStrength = d_ptr->m_highlightLightStrength;
                     //if (d_ptr->m_mousePressed) {
                     //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                    //    qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
+                    //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
                     //}
                     // Save data to SampleData
                     if (d_ptr->m_selectedBar)
                         delete d_ptr->m_selectedBar;
                     d_ptr->m_selectedBar = new SampleData(d_ptr->m_mousePos, barHeight);
+                    //d_ptr->m_selectedBar->setPosition(QPoint());
                     barSelectionFound = true;
                     break;
                 }
