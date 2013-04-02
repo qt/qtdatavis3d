@@ -57,10 +57,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 {
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
-    //surfaceFormat.setDepthBufferSize(16000000);
     surfaceFormat.setSamples(4);
-    //surfaceFormat.setMajorVersion(2);
-    //surfaceFormat.setMinorVersion(1);
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     //surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES); // OpenGL crashes with ANGLE, comment out or define OpenGLES
     setFormat(surfaceFormat);
@@ -69,9 +66,9 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 
     d_ptr->m_context->setFormat(requestedFormat());
     d_ptr->m_context->create();
-    d_ptr->m_context->makeCurrent(this);
+    //d_ptr->m_context->makeCurrent(this); // doesn't work with Mac
 
-    initializeOpenGLFunctions();
+    //initializeOpenGLFunctions(); // doesn't work with Mac
     initialize();
 }
 
@@ -140,13 +137,14 @@ void Q3DWindow::renderNow()
 
     d_ptr->m_updatePending = false;
 
+    d_ptr->m_context->makeCurrent(this); // needed here for Mac
+
     if (needsInit) {
+        initializeOpenGLFunctions(); // needed here for Mac
         getDevice();
         initialize();
         needsInit = false;
     }
-
-    d_ptr->m_context->makeCurrent(this);
 
     render();
 

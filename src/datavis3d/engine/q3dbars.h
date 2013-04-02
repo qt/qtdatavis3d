@@ -2,7 +2,7 @@
 #define Q3DBARS_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/q3dwindow.h"
+#include "q3dwindow.h"
 
 class QOpenGLShaderProgram;
 
