@@ -526,6 +526,12 @@ void Q3DBars::drawScene()
                     lightStrength = d_ptr->m_highlightLightStrength;
                     break;
                 }
+                case Q3DBarsPrivate::None:
+                {
+                    // Current bar is not selected, nor on a row or column
+                    // do nothing
+                    break;
+                }
                 }
             }
 

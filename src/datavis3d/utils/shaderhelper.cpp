@@ -93,6 +93,7 @@ void ShaderHelper::initialize()
     m_invTransModelMatrixUniform = m_program->uniformLocation("itM");
     m_lightPositionUniform = m_program->uniformLocation("lightPosition_wrld");
     m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
+    m_ambientStrengthUniform = m_program->uniformLocation("ambientStrength");
     m_colorUniform = m_program->uniformLocation("color_mdl");
 
     m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
@@ -172,6 +173,13 @@ GLuint ShaderHelper::lightS()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_lightStrengthUniform;
+}
+
+GLuint ShaderHelper::ambientS()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_ambientStrengthUniform;
 }
 
 GLuint ShaderHelper::color()

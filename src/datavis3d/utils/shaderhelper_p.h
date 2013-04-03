@@ -76,6 +76,7 @@ class ShaderHelper
     GLuint nModel();
     GLuint lightP();
     GLuint lightS();
+    GLuint ambientS();
     GLuint color();
 
     GLuint posAtt();
@@ -103,9 +104,10 @@ class ShaderHelper
     GLuint m_mvpMatrixUniform;
     GLuint m_lightPositionUniform;
     GLuint m_lightStrengthUniform;
+    GLuint m_ambientStrengthUniform;
 
-    GLuint m_texture;
-    GLuint m_depthTexture;
+    //GLuint m_texture; // currently unused
+    //GLuint m_depthTexture; // currently unused
 
     GLboolean m_initialized;
 };
