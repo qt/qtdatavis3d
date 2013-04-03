@@ -128,6 +128,7 @@ void Q3DBars::render()
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
         painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
+        //painter.setRenderHint(QPainter::Antialiasing, true);
         render(&painter);
         painter.end();
     }
@@ -420,6 +421,8 @@ void Q3DBars::drawScene()
                                                    , backgroundColor);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS()
                                                    , d_ptr->m_lightStrength);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS()
+                                                   , d_ptr->m_ambientStrength);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
@@ -552,6 +555,8 @@ void Q3DBars::drawScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS()
+                                                , d_ptr->m_ambientStrength);
             //qDebug() << "height:" << barHeight;
 
             // 1st attribute buffer : vertices
@@ -905,6 +910,7 @@ void Q3DBars::setTheme(ColorTheme theme)
 //        d_ptr->m_highlightRowColor = QColor();
 //        d_ptr->m_highlightColumnColor = QColor();
 //        d_ptr->m_lightStrength = QColor();
+//        d_ptr->m_ambientStrength = QColor();
 //        d_ptr->m_highlightLightStrength = QColor();
 //        d_ptr->m_uniformColor = QColor();
         break;
@@ -920,15 +926,17 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightBarColor = QColor(Qt::blue);
         d_ptr->m_highlightRowColor = QColor(Qt::darkBlue);
         d_ptr->m_highlightColumnColor = QColor(Qt::darkBlue);
-        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_lightStrength = 5.0f;
+        d_ptr->m_ambientStrength = 0.2f;
         d_ptr->m_highlightLightStrength = 10.0f;
         d_ptr->m_uniformColor = true;
+        qDebug("ThemeBlueCerulean");
         break;
     }
     case ThemeBlueIcy: {
         d_ptr->m_baseColor = QRgb(0x3daeda);
         d_ptr->m_heightColor = QRgb(0x2fa3b4);
-        d_ptr->m_depthColor = QColor(Qt::white);
+        d_ptr->m_depthColor = QColor(Qt::lightGray);
         d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
         d_ptr->m_windowColor = QColor(QRgb(0xffffff));
         d_ptr->m_textColor = QColor(QRgb(0x404044));
@@ -936,9 +944,11 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightBarColor = QColor(Qt::white);
         d_ptr->m_highlightRowColor = QColor(Qt::lightGray);
         d_ptr->m_highlightColumnColor = QColor(Qt::lightGray);
-        d_ptr->m_lightStrength = 6.0f;
-        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_lightStrength = 5.0f;
+        d_ptr->m_ambientStrength = 0.4f;
+        d_ptr->m_highlightLightStrength = 8.0f;
         d_ptr->m_uniformColor = true;
+        qDebug("ThemeBlueIcy");
         break;
     }
     case ThemeBlueNcs: {
@@ -952,9 +962,11 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightBarColor = QColor(Qt::lightGray);
         d_ptr->m_highlightRowColor = QColor(Qt::gray);
         d_ptr->m_highlightColumnColor = QColor(Qt::gray);
-        d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_lightStrength = 4.0f;
+        d_ptr->m_ambientStrength = 0.2f;
         d_ptr->m_highlightLightStrength = 6.0f;
         d_ptr->m_uniformColor = true;
+        qDebug("ThemeBlueNcs");
         break;
     }
     case ThemeBrownSand: {
@@ -969,8 +981,10 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightRowColor = QColor(Qt::darkYellow);
         d_ptr->m_highlightColumnColor = QColor(Qt::darkYellow);
         d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_ambientStrength = 0.3f;
         d_ptr->m_highlightLightStrength = 8.0f;
         d_ptr->m_uniformColor = false;
+        qDebug("ThemeBrownSand");
         break;
     }
     case ThemeDark: {
@@ -985,14 +999,16 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightRowColor = QColor(Qt::darkGray);
         d_ptr->m_highlightColumnColor = QColor(Qt::darkGray);
         d_ptr->m_lightStrength = 6.0f;
+        d_ptr->m_ambientStrength = 0.2f;
         d_ptr->m_highlightLightStrength = 8.0f;
         d_ptr->m_uniformColor = false;
+        qDebug("ThemeDark");
         break;
     }
     case ThemeHighContrast: {
         d_ptr->m_baseColor = QColor(QRgb(0x202020));
         d_ptr->m_heightColor = QColor(QRgb(0xff4a41));
-        d_ptr->m_depthColor = QColor(Qt::white);
+        d_ptr->m_depthColor = QColor(Qt::red);
         d_ptr->m_backgroundColor = QColor(QRgb(0xffffff));
         d_ptr->m_windowColor = QColor(QRgb(0xffffff));
         d_ptr->m_textColor = QColor(QRgb(0x181818));
@@ -1000,9 +1016,11 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightBarColor = QColor(Qt::black);
         d_ptr->m_highlightRowColor = QColor(Qt::white);
         d_ptr->m_highlightColumnColor = QColor(Qt::white);
-        d_ptr->m_lightStrength = 6.0f;
-        d_ptr->m_highlightLightStrength = 15.0f;
-        d_ptr->m_uniformColor = true;
+        d_ptr->m_lightStrength = 5.0f;
+        d_ptr->m_ambientStrength = 1.0f;
+        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_uniformColor = false;
+        qDebug("ThemeHighContrast");
         break;
     }
     case ThemeLight: {
@@ -1016,9 +1034,11 @@ void Q3DBars::setTheme(ColorTheme theme)
         d_ptr->m_highlightBarColor = QColor(Qt::white);
         d_ptr->m_highlightRowColor = QColor(Qt::lightGray);
         d_ptr->m_highlightColumnColor = QColor(Qt::lightGray);
-        d_ptr->m_lightStrength = 6.0f;
-        d_ptr->m_highlightLightStrength = 10.0f;
+        d_ptr->m_lightStrength = 3.0f;
+        d_ptr->m_ambientStrength = 0.5f;
+        d_ptr->m_highlightLightStrength = 6.0f;
         d_ptr->m_uniformColor = true;
+        qDebug("ThemeLight");
         break;
     }
     default:
@@ -1129,8 +1149,9 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_highlightBarColor(QColor(Qt::red))
     , m_highlightRowColor(QColor(Qt::darkRed))
     , m_highlightColumnColor(QColor(Qt::darkMagenta))
-    , m_lightStrength(6.0f)
-    , m_highlightLightStrength(10.0f)
+    , m_lightStrength(4.0f)
+    , m_ambientStrength(0.3f)
+    , m_highlightLightStrength(8.0f)
     , m_uniformColor(true)
     , m_isInitialized(false)
     , m_selectionMode(Q3DBars::Bar)

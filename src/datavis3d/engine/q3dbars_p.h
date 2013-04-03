@@ -79,6 +79,7 @@ public:
     QColor m_highlightRowColor;
     QColor m_highlightColumnColor;
     float m_lightStrength;
+    float m_ambientStrength;
     float m_highlightLightStrength;
     bool m_uniformColor;
     // TODO: Perhaps different shaders are required for different themes
