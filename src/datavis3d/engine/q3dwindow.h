@@ -3,7 +3,7 @@
 ** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the QtXmlPatterns module of the Qt Toolkit.
+** This file is part of the QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -43,7 +43,6 @@
 #define Q3DWINDOW_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-#include "q3dwindow_p.h"
 
 #include <QWindow>
 #include <QOpenGLFunctions>
@@ -51,6 +50,8 @@
 class QPainter;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+
+class Q3DWindowPrivate;
 
 class Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
