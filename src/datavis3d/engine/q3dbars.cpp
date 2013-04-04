@@ -3,36 +3,37 @@
 ** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the documentation of the Qt Toolkit.
+** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** $QT_BEGIN_LICENSE:LGPL$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.  For licensing terms and
+** conditions see http://qt.digia.com/licensing.  For further information
+** use the contact form at http://qt.digia.com/contact-us.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
+** GNU Lesser General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU Lesser
+** General Public License version 2.1 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU Lesser General Public License version 2.1 requirements
+** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
 **
+** In addition, as a special exception, Digia gives you certain additional
+** rights.  These rights are described in the Digia Qt LGPL Exception
+** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 3.0 as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL included in the
+** packaging of this file.  Please review the following information to
+** ensure the GNU General Public License version 3.0 requirements will be
+** met: http://www.gnu.org/copyleft/gpl.html.
+**
 **
 ** $QT_END_LICENSE$
 **
@@ -41,7 +42,7 @@
 #include "q3dbars.h"
 #include "q3dbars_p.h"
 #include "camerahelper_p.h"
-#include "sampledata_p.h"
+#include "qdataitem_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "utils_p.h"
@@ -151,7 +152,7 @@ void Q3DBars::render(QPainter *painter)
 
     // If a bar is selected, display it's value
     // TODO: Move text printing to a helper class, so that it can be used from other vis types?
-    SampleData *data = d_ptr->m_selectedBar;
+    QDataItem *data = d_ptr->m_selectedBar;
     if (data) {
         glDisable(GL_DEPTH_TEST);
         painter->save();
@@ -168,7 +169,7 @@ void Q3DBars::render(QPainter *painter)
         painter->setFont(bgrFont);
         QFontMetrics valueFM(valueFont);
         QFontMetrics bgrFM(bgrFont);
-        int valueStrLen = valueFM.width(data->valueStr());
+        int valueStrLen = valueFM.width(data->d_ptr->valueStr());
         int bgrStrLen = 0;
         int bgrHeight = valueFM.height() + 6;
         QString bgrStr = QString();
@@ -181,19 +182,19 @@ void Q3DBars::render(QPainter *painter)
         //                         , data->position().y() - 30
         //                         , bgrLen, 30, 10.0, 10.0);
         // Hack solution, as drawRect doesn't work
-        painter->drawText(data->position().x() - (bgrStrLen / 2)
-                          , data->position().y() - bgrHeight
+        painter->drawText(data->d_ptr->position().x() - (bgrStrLen / 2)
+                          , data->d_ptr->position().y() - bgrHeight
                           , bgrStrLen, bgrHeight
                           , Qt::AlignCenter | Qt::AlignVCenter
                           , bgrStr);
         //painter->setPen(d_ptr->m_textColor);
         painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
         painter->setFont(valueFont);
-        painter->drawText(data->position().x() - (valueStrLen / 2)
-                          , data->position().y() - bgrHeight
+        painter->drawText(data->d_ptr->position().x() - (valueStrLen / 2)
+                          , data->d_ptr->position().y() - bgrHeight
                           , valueStrLen, bgrHeight
                           , Qt::AlignCenter | Qt::AlignVCenter
-                          , data->valueStr());
+                          , data->d_ptr->valueStr());
         painter->restore();
     }
 }
@@ -279,7 +280,8 @@ void Q3DBars::drawScene()
     glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            float barHeight = d_ptr->m_dataSet.at(row).at(bar);
+            QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
+            float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
@@ -469,7 +471,8 @@ void Q3DBars::drawScene()
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            float barHeight = d_ptr->m_dataSet.at(row).at(bar);
+            QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
+            float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             if (barHeight == 0)
                 continue;
             QMatrix4x4 modelMatrix;
@@ -507,11 +510,9 @@ void Q3DBars::drawScene()
                     //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
                     //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
                     //}
-                    // Save data to SampleData
-                    if (d_ptr->m_selectedBar)
-                        delete d_ptr->m_selectedBar;
-                    d_ptr->m_selectedBar = new SampleData(d_ptr->m_mousePos, barHeight);
-                    //d_ptr->m_selectedBar->setPosition(QPoint());
+                    // Insert data to QDataItem. We have no ownership, don't delete the previous one
+                    d_ptr->m_selectedBar = item;
+                    d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
                     barSelectionFound = true;
                     break;
                 }
@@ -594,7 +595,7 @@ void Q3DBars::drawScene()
         }
     }
     if (!barSelectionFound) {
-        delete d_ptr->m_selectedBar;
+        // We have no ownership, don't delete. Just NULL the pointer.
         d_ptr->m_selectedBar = NULL;
     }
 
@@ -759,13 +760,14 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
     d_ptr->m_objFile = objFileName;
 }
 
-void Q3DBars::setupSampleSpace(QPoint sampleCount)
+void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
+        , const QString &labelColumn, const QString &labelHeight)
 {
     d_ptr->m_sampleCount = sampleCount;
     // Initialize data set
-    QVector<float> row;
+    QVector<QDataItem*> row;
     for (int columns = 0; columns < sampleCount.x(); columns ++) {
-        row.append(0.0f);
+        row.append(new QDataItem());
     }
     for (int rows = 0; rows < sampleCount.y(); rows++) {
         d_ptr->m_dataSet.append(row);
@@ -1080,7 +1082,13 @@ void Q3DBars::setSelectionMode(SelectionMode mode)
     d_ptr->m_selectionMode = mode;
 }
 
-void Q3DBars::addDataRow(const QVector<float> &dataRow)
+void Q3DBars::setWindowTitle(const QString &title)
+{
+    setTitle(title);
+}
+
+void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
+                         , const QVector<QString> &labelsColumn)
 {
     QVector<float> row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
@@ -1088,6 +1096,31 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow)
         row.resize(d_ptr->m_sampleCount.x());
         qWarning("Data set too large for sample space");
     }
+    // Convert row of floats into sample data
+    QVector<QDataItem*> sampleRow;
+    for (int i = 0; i < row.size(); i++) {
+        sampleRow.append(new QDataItem(row.at(i)));
+    }
+    d_ptr->findHighestValue(sampleRow);
+    // The vector contains data (=height) for each bar, a row at a time
+    // With each new row, the previous data set (=row) must be moved back
+    // ie. we need as many vectors as we have rows in the sample space
+    d_ptr->m_dataSet.prepend(sampleRow);
+    // if the added data pushed us over sample space, remove the oldest data set
+    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
+        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+}
+
+void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow
+                         , const QVector<QString> &labelsColumn)
+{
+    QVector<QDataItem*> row = dataRow;
+    // Check that the input data fits into sample space, and resize if it doesn't
+    if (row.size() > d_ptr->m_sampleCount.x()) {
+        row.resize(d_ptr->m_sampleCount.x());
+        qWarning("Data set too large for sample space");
+    }
+    d_ptr->findHighestValue(row);
     // The vector contains data (=height) for each bar, a row at a time
     // With each new row, the previous data set (=row) must be moved back
     // ie. we need as many vectors as we have rows in the sample space
@@ -1097,7 +1130,8 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow)
         d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
 }
 
-void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
+void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow
+                         , const QVector<QString> &labelsColumn)
 {
     d_ptr->m_dataSet.clear();
     // Check sizes
@@ -1105,11 +1139,34 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
         qCritical("Too much data per row, aborting");
         return;
     }
-    d_ptr->m_dataSet = data;
+    for (int i = 0; i < data.size(); i++)
+        addDataRow(data.at(i));
+
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
         qWarning("Data set too large for sample space. Cropping it to fit.");
         d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
     }
+}
+
+void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data, const QVector<QString> &labelsRow
+                         , const QVector<QString> &labeslsColumn)
+{
+    d_ptr->m_dataSet.clear();
+    // Check sizes
+    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
+        qCritical("Too much data per row, aborting");
+        return;
+    }
+
+    d_ptr->m_dataSet = data;
+
+    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
+        qWarning("Data set too large for sample space. Cropping it to fit.");
+        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+    }
+
+    for (int i = 0; i < d_ptr->m_dataSet.size(); i++)
+        d_ptr->findHighestValue(d_ptr->m_dataSet.at(i));
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
@@ -1130,6 +1187,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_barThickness(QPointF(0.75f, 0.75f))
     , m_barSpacing(m_barThickness * 3.0f)
     , m_dataSet(0)
+    , m_heightNormalizer(0.0f)
     , m_rowWidth(0)
     , m_columnDepth(0)
     , m_maxDimension(0)
@@ -1174,6 +1232,16 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     q_ptr->glDeleteTextures(1, &m_selectionTexture);
     q_ptr->glDeleteTextures(1, &m_depthTexture);
 #endif
+}
+
+void Q3DBarsPrivate::findHighestValue(const QVector<QDataItem*> &row)
+{
+    for (int i = 0; i < row.size(); i++) {
+        QDataItem *item = row.at(i);
+        float itemValue = item->d_ptr->value();
+        if (m_heightNormalizer < itemValue)
+            m_heightNormalizer = itemValue;
+    }
 }
 
 void Q3DBarsPrivate::loadBarMesh()

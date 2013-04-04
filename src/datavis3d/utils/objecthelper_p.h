@@ -3,7 +3,7 @@
 ** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the QtXmlPatterns module of the Qt Toolkit.
+** This file is part of the QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage

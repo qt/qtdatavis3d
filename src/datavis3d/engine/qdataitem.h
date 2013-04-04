@@ -3,7 +3,7 @@
 ** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the QtXmlPatterns module of the Qt Toolkit.
+** This file is part of the QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -39,32 +39,30 @@
 **
 ****************************************************************************/
 
-#ifndef SAMPLEDATA_P_H
-#define SAMPLEDATA_P_H
+#ifndef QDATAITEM_H
+#define QDATAITEM_H
 
-#include "qdatavis3dglobal.h"
-#include <QPoint>
-
-//class QPoint;
+#include "QtDataVis3D/qdatavis3dglobal.h"
+#include <QScopedPointer>
+#include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class SampleData
-{
-    public:
-    SampleData(QPoint position, float value = 0.0f);
-    ~SampleData();
+class QDataItemPrivate;
 
-    void setPosition(const QPoint &position);
+class QTCOMMERCIALDATAVIS3D_EXPORT QDataItem
+{
+public:
+    explicit QDataItem(float value = 0.0f, const QString &label = QString());
+    ~QDataItem();
+
+    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
     void setValue(float value);
 
-    QPoint position();
-    float value();
-    QString valueStr();
-
-    private:
-    QPoint m_position;
-    float m_value;
+private:
+    QDataItemPrivate *d_ptr; // TODO: Why doesn't QScopedPointer work here?
+    friend class Q3DBars;
+    friend class Q3DBarsPrivate;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

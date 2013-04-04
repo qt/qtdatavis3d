@@ -39,22 +39,78 @@
 **
 ****************************************************************************/
 
-#ifndef UTILS_P_H
-#define UTILS_P_H
+#include "qdataitem.h"
+#include "qdataitem_p.h"
 
-#include "qdatavis3dglobal.h"
-
-class QVector3D;
-class QColor;
+#include <QPoint>
+#include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class Utils
+QDataItem::QDataItem(float value, const QString &label)
+    : d_ptr(new QDataItemPrivate(this, value, label))
 {
-public:
-    static QVector3D vectorFromColor(const QColor &color);
-};
+    qDebug("QDataItem");
+}
+
+QDataItem::~QDataItem()
+{
+    qDebug("~QDataItem");
+    delete d_ptr;
+}
+
+void QDataItem::setLabel(const QString &label, bool prepend)
+{
+    d_ptr->m_label = label;
+    d_ptr->m_prependLabel = prepend;
+}
+
+void QDataItem::setValue(float value)
+{
+    d_ptr->m_value = value;
+}
+
+QDataItemPrivate::QDataItemPrivate(QDataItem *parent, float value, const QString &label)
+    : q_ptr(parent)
+    , m_value(value)
+    , m_label(label)
+    , m_prependLabel(false)
+    , m_position(QPoint(0, 0))
+{
+}
+
+QDataItemPrivate::~QDataItemPrivate()
+{
+}
+
+void QDataItemPrivate::setPosition(const QPoint &position)
+{
+    m_position = position;
+}
+
+QPoint QDataItemPrivate::position()
+{
+    return m_position;
+}
+
+float QDataItemPrivate::value()
+{
+    return m_value;
+}
+
+QString QDataItemPrivate::valueStr()
+{
+    QString strVal;
+    if (m_prependLabel) {
+        strVal.append(m_label);
+        strVal.append(QStringLiteral(" "));
+        strVal.setNum(m_value);
+    }
+    else {
+        strVal.setNum(m_value);
+        strVal.append(m_label);
+    }
+    return strVal;
+}
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
-
-#endif

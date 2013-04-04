@@ -39,20 +39,36 @@
 **
 ****************************************************************************/
 
-#ifndef UTILS_P_H
-#define UTILS_P_H
+#ifndef QDATAITEM_P_H
+#define QDATAITEM_P_H
 
 #include "qdatavis3dglobal.h"
-
-class QVector3D;
-class QColor;
+#include "qdataitem.h"
+#include <QPoint>
+#include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class Utils
+class QDataItemPrivate
 {
-public:
-    static QVector3D vectorFromColor(const QColor &color);
+    public:
+    explicit QDataItemPrivate(QDataItem *parent, float value = 0.0f
+            , const QString &label = QString());
+    ~QDataItemPrivate();
+
+    void setPosition(const QPoint &position);
+
+    QPoint position();
+    float value();
+    QString valueStr(); // append value and label. If label has prepend -flag set, append label and value
+
+    private:
+    QDataItem *q_ptr;
+    float m_value;
+    QString m_label;
+    bool m_prependLabel;
+    QPoint m_position;
+    friend class QDataItem;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
