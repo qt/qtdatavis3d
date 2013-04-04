@@ -132,7 +132,7 @@ public:
     // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
     void addDataSet(const QVector< QVector<QDataItem*> > &data
                     , const QVector<QString> &labelsRow = QVector<QString>()
-                    , const QVector<QString> &labeslsColumn = QVector<QString>());
+                    , const QVector<QString> &labelsColumn = QVector<QString>());
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction

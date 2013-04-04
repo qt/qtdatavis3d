@@ -70,7 +70,10 @@ public:
     Q3DBarsPrivate(Q3DBars *q);
     ~Q3DBarsPrivate();
 
-    void findHighestValue(const QVector<QDataItem*> &row);
+    void findHighestValue(const QVector<QDataItem*> &row); // TODO: Move to QDataSet class when it's done
+    void resizeDataSet(); // TODO: Move to QDataSet class when it's done
+    void resizeDataRow(QVector<QDataItem*> *row); // TODO: Move to QDataSet class when it's done
+    void clearDataSet(); // TODO: Move to QDataSet class when it's done
     void loadBarMesh();
     void loadBackgroundMesh();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);

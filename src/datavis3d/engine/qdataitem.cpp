@@ -50,12 +50,12 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 QDataItem::QDataItem(float value, const QString &label)
     : d_ptr(new QDataItemPrivate(this, value, label))
 {
-    qDebug("QDataItem");
+    //qDebug("QDataItem");
 }
 
 QDataItem::~QDataItem()
 {
-    qDebug("~QDataItem");
+    //qDebug("~QDataItem");
     delete d_ptr;
 }
 

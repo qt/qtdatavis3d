@@ -766,11 +766,12 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
     d_ptr->m_sampleCount = sampleCount;
     // Initialize data set
     QVector<QDataItem*> row;
-    for (int columns = 0; columns < sampleCount.x(); columns ++) {
-        row.append(new QDataItem());
-    }
     for (int rows = 0; rows < sampleCount.y(); rows++) {
+        for (int columns = 0; columns < sampleCount.x(); columns ++) {
+            row.append(new QDataItem());
+        }
         d_ptr->m_dataSet.append(row);
+        row.clear();
     }
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative
@@ -1108,7 +1109,7 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
     d_ptr->m_dataSet.prepend(sampleRow);
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+        d_ptr->resizeDataSet();
 }
 
 void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow
@@ -1117,7 +1118,7 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
     QVector<QDataItem*> row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
     if (row.size() > d_ptr->m_sampleCount.x()) {
-        row.resize(d_ptr->m_sampleCount.x());
+        d_ptr->resizeDataRow(&row);
         qWarning("Data set too large for sample space");
     }
     d_ptr->findHighestValue(row);
@@ -1127,16 +1128,17 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
     d_ptr->m_dataSet.prepend(row);
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+        d_ptr->resizeDataSet();
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
-    d_ptr->m_dataSet.clear();
+    d_ptr->clearDataSet();
     // Check sizes
     if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
         qCritical("Too much data per row, aborting");
+        // TODO: Implement a function that goes through all rows and crops the column count
         return;
     }
     for (int i = 0; i < data.size(); i++)
@@ -1148,13 +1150,15 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
     }
 }
 
-void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data, const QVector<QString> &labelsRow
-                         , const QVector<QString> &labeslsColumn)
+void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
+                         , const QVector<QString> &labelsRow
+                         , const QVector<QString> &labelsColumn)
 {
-    d_ptr->m_dataSet.clear();
+    d_ptr->clearDataSet();
     // Check sizes
     if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
         qCritical("Too much data per row, aborting");
+        // TODO: Implement a function that goes through all rows and crops the column count
         return;
     }
 
@@ -1162,7 +1166,7 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data, const QVect
 
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
         qWarning("Data set too large for sample space. Cropping it to fit.");
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
+        d_ptr->resizeDataSet();
     }
 
     for (int i = 0; i < d_ptr->m_dataSet.size(); i++)
@@ -1220,10 +1224,10 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
     qDebug() << "Destroying Q3DBarsPrivate";
+    clearDataSet();
     delete m_barShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_selectedBar;
     delete m_barObj;
     delete m_backgroundObj;
 
@@ -1242,6 +1246,54 @@ void Q3DBarsPrivate::findHighestValue(const QVector<QDataItem*> &row)
         if (m_heightNormalizer < itemValue)
             m_heightNormalizer = itemValue;
     }
+}
+
+void Q3DBarsPrivate::resizeDataSet()
+{
+    qDebug("resizeDataSet");
+    // QVector's resize doesn't delete data contained in it
+    // Delete contents of rows to be removed
+    int nbrToBeRemoved = m_dataSet.size() - m_sampleCount.y();
+    for (int rowCount = 0; rowCount < nbrToBeRemoved; rowCount++) {
+        int rowToBeRemoved = m_dataSet.size() - rowCount - 1; // -1 to compensate index 0
+        QVector<QDataItem*> row = m_dataSet.at(rowToBeRemoved);
+        for (int itemCount = 0; itemCount < row.size(); itemCount++) {
+            delete row.at(itemCount);
+        }
+        row.clear();
+    }
+    // Resize vector
+    m_dataSet.resize(m_sampleCount.y());
+}
+
+void Q3DBarsPrivate::resizeDataRow(QVector<QDataItem *> *row)
+{
+    qDebug("resizeDataRow");
+    // QVector's resize doesn't delete data contained in it
+    // Delete contents of items to be removed
+    int nbrToBeRemoved = row->size() - m_sampleCount.x();
+    for (int itemCount = 0; itemCount < nbrToBeRemoved; itemCount++) {
+        int itemToBeRemoved = row->size() - itemCount - 1; // -1 to compensate index 0
+        delete row->at(itemToBeRemoved);
+    }
+    // Resize vector
+    row->resize(m_sampleCount.x());
+}
+
+void Q3DBarsPrivate::clearDataSet()
+{
+    qDebug("clearDataSet");
+    // QVector's clear doesn't delete data contained in it
+    // Delete contents
+    for (int rowCount = 0; rowCount < m_dataSet.size(); rowCount++) {
+        QVector<QDataItem*> row = m_dataSet.at(rowCount);
+        for (int itemCount = 0; itemCount < row.size(); itemCount++) {
+            delete row.at(itemCount);
+        }
+        row.clear();
+    }
+    // Clear vector
+    m_dataSet.clear();
 }
 
 void Q3DBarsPrivate::loadBarMesh()
