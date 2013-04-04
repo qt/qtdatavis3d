@@ -53,11 +53,11 @@ class Q3DWindow;
 
 class Q3DWindowPrivate
 {
-    public:
+public:
     Q3DWindowPrivate(Q3DWindow *q);
     ~Q3DWindowPrivate();
 
-    public:
+public:
     Q3DWindow *q_ptr;
 
     bool m_updatePending;

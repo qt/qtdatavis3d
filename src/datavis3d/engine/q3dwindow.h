@@ -56,7 +56,7 @@ class Q3DWindowPrivate;
 class Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
-    public:
+public:
     explicit Q3DWindow(QWindow *parent = 0);
     ~Q3DWindow();
 
@@ -67,17 +67,17 @@ class Q3DWindow : public QWindow, protected QOpenGLFunctions
 
     void setAnimating(bool animating);
 
-    public slots:
+public slots:
     void renderLater();
     void renderNow();
 
-    protected:
+protected:
     bool event(QEvent *event);
 
     void exposeEvent(QExposeEvent *event);
     void resizeEvent(QResizeEvent *event);
 
-    private:
+private:
     QOpenGLPaintDevice *getDevice();
 
     QScopedPointer<Q3DWindowPrivate> d_ptr;
