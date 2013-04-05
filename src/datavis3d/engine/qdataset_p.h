@@ -56,6 +56,7 @@ class QDataSetPrivate
     ~QDataSetPrivate();
 
     QVector<QDataRow*> set();
+    QDataRow *getRow(int rowIndex);
     QVector<QString> rowLabels();
     QVector<QString> columnLabels();
     void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);

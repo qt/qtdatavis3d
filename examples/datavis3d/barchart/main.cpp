@@ -175,7 +175,7 @@ void ChartDataGenerator::start()
 
 void ChartDataGenerator::addDataSet()
 {
-#if 1
+#if 0
     // Prepare data to be visualized
     // Use float vector adder
     QVector< QVector<float> > data;
@@ -226,7 +226,7 @@ void ChartDataGenerator::addDataSet()
         // Create data items
         for (int day = 0; day < days.size(); day++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(hours[week][day], "hours," + days.at(day)));
+            dataRow->addItem(new QDataItem(hours[week][day], "h, " + days.at(day)));
         }
         // Add row to set
         dataSet->addRow(dataRow);

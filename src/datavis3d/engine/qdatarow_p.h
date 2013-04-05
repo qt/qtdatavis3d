@@ -58,6 +58,7 @@ class QDataRowPrivate
     ~QDataRowPrivate();
 
     QVector<QDataItem*> row();
+    QDataItem *getItem(int itemIndex);
     void verifySize(int size);
     float highestValue();
 

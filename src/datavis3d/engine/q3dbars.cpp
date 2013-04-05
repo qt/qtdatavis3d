@@ -131,7 +131,7 @@ void Q3DBars::render()
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
         painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
-        //painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setRenderHint(QPainter::Antialiasing, true);
         render(&painter);
         painter.end();
     }
@@ -282,9 +282,17 @@ void Q3DBars::drawScene()
     glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
+#if 0
             if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
                 continue;
             QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
+#else
+            if (!d_ptr->m_dataSetTest->d_ptr->getRow(row))
+                continue;
+            QDataItem *item = d_ptr->m_dataSetTest->d_ptr->getRow(row)->d_ptr->getItem(bar);
+            if (!item)
+                continue;
+#endif
             float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -475,9 +483,17 @@ void Q3DBars::drawScene()
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
+#if 0
             if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
                 continue;
             QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
+#else
+            if (!d_ptr->m_dataSetTest->d_ptr->getRow(row))
+                continue;
+            QDataItem *item = d_ptr->m_dataSetTest->d_ptr->getRow(row)->d_ptr->getItem(bar);
+            if (!item)
+                continue;
+#endif
             float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             if (barHeight == 0)
                 continue;
@@ -785,6 +801,9 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
     //qDebug() << "maxSceneSize" << d_ptr->m_maxSceneSize;
     // Calculate here and at setting bar specs
     d_ptr->calculateSceneScalingFactors();
+    d_ptr->m_axisLabelX = labelRow;
+    d_ptr->m_axisLabelZ = labelColumn;
+    d_ptr->m_axisLabelY = labelHeight;
 }
 
 void Q3DBars::setCameraPreset(CameraPreset preset)
@@ -1097,6 +1116,7 @@ void Q3DBars::setWindowTitle(const QString &title)
 void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
                          , const QVector<QString> &labelsColumn)
 {
+#if 0
     QVector<float> row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
     if (row.size() > d_ptr->m_sampleCount.x()) {
@@ -1116,11 +1136,24 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
         d_ptr->resizeDataSet();
+#else
+    // Convert to QDataRow and add to QDataSet
+    QDataRow *row = new QDataRow(labelRow);
+    for (int i = 0; i < dataRow.size(); i++)
+        row->addItem(new QDataItem(dataRow.at(i)));
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    d_ptr->m_dataSetTest->addRow(row);
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
+    d_ptr->m_dataSetTest->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
+                                    , QVector<QString>(), labelsColumn);
+    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+#endif
 }
 
 void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow
                          , const QVector<QString> &labelsColumn)
 {
+#if 0
     QVector<QDataItem*> row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
     if (row.size() > d_ptr->m_sampleCount.x()) {
@@ -1134,6 +1167,18 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
         d_ptr->resizeDataSet();
+#else
+    // Convert to QDataRow and add to QDataSet
+    QDataRow *row = new QDataRow(labelRow);
+    for (int i = 0; i < dataRow.size(); i++)
+        row->addItem(dataRow.at(i));
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    d_ptr->m_dataSetTest->addRow(row);
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
+    d_ptr->m_dataSetTest->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
+                                    , QVector<QString>(), labelsColumn);
+    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+#endif
 }
 
 void Q3DBars::addDataRow(QDataRow *dataRow)
@@ -1152,6 +1197,7 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
+#if 0
     d_ptr->clearDataSet();
     // Check sizes
     if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
@@ -1166,12 +1212,35 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
         qWarning("Data set too large for sample space. Cropping it to fit.");
         d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
     }
+#else
+    delete d_ptr->m_dataSetTest;
+    d_ptr->m_dataSetTest = new QDataSet();
+    // Convert to QDataRow and add to QDataSet
+    QDataRow *row;
+    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
+        if (labelsRow.size() >= (rowNr + 1)) {
+            row = new QDataRow(labelsRow.at(rowNr));
+        }
+        else {
+            row = new QDataRow();
+        }
+        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
+            row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
+        row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+        d_ptr->m_dataSetTest->addRow(row);
+        row++;
+    }
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
+    d_ptr->m_dataSetTest->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+#endif
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
                          , const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
+#if 0
     d_ptr->clearDataSet();
     // Check sizes
     if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
@@ -1189,6 +1258,28 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
 
     for (int i = 0; i < d_ptr->m_dataSet.size(); i++)
         d_ptr->findHighestValue(d_ptr->m_dataSet.at(i));
+#else
+    delete d_ptr->m_dataSetTest;
+    d_ptr->m_dataSetTest = new QDataSet();
+    // Convert to QDataRow and add to QDataSet
+    QDataRow *row;
+    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
+        if (labelsRow.size() >= (rowNr + 1)) {
+            row = new QDataRow(labelsRow.at(rowNr));
+        }
+        else {
+            row = new QDataRow();
+        }
+        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
+            row->addItem(data.at(rowNr).at(colNr));
+        row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+        d_ptr->m_dataSetTest->addRow(row);
+        row++;
+    }
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
+    d_ptr->m_dataSetTest->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+#endif
 }
 
 void Q3DBars::addDataSet(QDataSet* dataSet)
@@ -1248,6 +1339,9 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_selectionMode(Q3DBars::Bar)
     , m_selectedBar(0)
     , m_dataSetTest(0)
+    , m_axisLabelX(QStringLiteral("X"))
+    , m_axisLabelZ(QStringLiteral("Z"))
+    , m_axisLabelY(QStringLiteral("Y"))
 {
 }
 

@@ -102,6 +102,14 @@ QVector<QDataRow*> QDataSetPrivate::set()
     return m_set;
 }
 
+QDataRow *QDataSetPrivate::getRow(int rowIndex)
+{
+    QDataRow *row = NULL;
+    if (m_set.size() >= rowIndex)
+        row = m_set.at(rowIndex);
+    return row;
+}
+
 QVector<QString> QDataSetPrivate::rowLabels()
 {
     return m_labelsRow;

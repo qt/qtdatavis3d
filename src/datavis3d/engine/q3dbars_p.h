@@ -135,6 +135,9 @@ public:
     Q3DBars::SelectionMode m_selectionMode;
     QDataItem *m_selectedBar;
     QDataSet *m_dataSetTest;
+    QString m_axisLabelX;
+    QString m_axisLabelZ;
+    QString m_axisLabelY;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

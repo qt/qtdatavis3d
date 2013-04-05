@@ -88,6 +88,14 @@ QVector<QDataItem*> QDataRowPrivate::row()
     return m_row;
 }
 
+QDataItem *QDataRowPrivate::getItem(int itemIndex)
+{
+    QDataItem *item = NULL;
+    if (m_row.size() >= itemIndex)
+        item = m_row.at(itemIndex);
+    return item;
+}
+
 void QDataRowPrivate::verifySize(int size)
 {
     qDebug("verifySize (QDataRow)");
