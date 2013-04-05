@@ -39,31 +39,38 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAITEM_H
-#define QDATAITEM_H
+#ifndef QDATASET_H
+#define QDATASET_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
+#include "qdataitem.h"
+#include "qdatarow.h"
+
 #include <QScopedPointer>
+#include <QVector>
 #include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate;
+class QDataSetPrivate;
 
-class QTCOMMERCIALDATAVIS3D_EXPORT QDataItem
+class QTCOMMERCIALDATAVIS3D_EXPORT QDataSet
 {
 public:
-    explicit QDataItem(float value = 0.0f, const QString &label = QString());
-    ~QDataItem();
+    explicit QDataSet();
+    ~QDataSet();
 
-    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
-    void setValue(float value);
+    void setLabels(const QString &xAxis = QString()
+            , const QString &zAxis = QString()
+            , const QString &yAxis = QString()
+            , const QVector<QString> &labelsRow = QVector<QString>()
+            , const QVector<QString> &labelsColumn = QVector<QString>());
+    void addRow(QDataRow *row);
 
 private:
-    QScopedPointer<QDataItemPrivate> d_ptr;
+    QScopedPointer<QDataSetPrivate> d_ptr;
     friend class Q3DBars;
     friend class Q3DBarsPrivate;
-    friend class QDataRowPrivate;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

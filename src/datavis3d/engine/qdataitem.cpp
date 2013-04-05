@@ -56,7 +56,6 @@ QDataItem::QDataItem(float value, const QString &label)
 QDataItem::~QDataItem()
 {
     //qDebug("~QDataItem");
-    delete d_ptr;
 }
 
 void QDataItem::setLabel(const QString &label, bool prepend)
@@ -70,8 +69,8 @@ void QDataItem::setValue(float value)
     d_ptr->m_value = value;
 }
 
-QDataItemPrivate::QDataItemPrivate(QDataItem *parent, float value, const QString &label)
-    : q_ptr(parent)
+QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)
+    : q_ptr(q)
     , m_value(value)
     , m_label(label)
     , m_prependLabel(false)

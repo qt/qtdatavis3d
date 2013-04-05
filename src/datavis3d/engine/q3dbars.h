@@ -51,6 +51,8 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 class QDataItem;
+class QDataRow;
+class QDataSet;
 
 class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -96,12 +98,16 @@ public:
         ThemeLight
     };
 
+    // TODO: Implement modes for "zooming" into selected row/column, ie. display only selected row/column
+    // in full window and 3d chart in a small viewport
     enum SelectionMode {
         None = 0,
         Bar,
         BarAndRow,
         BarAndColumn,
-        BarRowAndColumn
+        BarRowAndColumn,
+        ZoomRow,
+        ZoomColumn
     };
 
 public:
@@ -119,9 +125,12 @@ public:
                     , const QString &labelRow = QString()
                     , const QVector<QString> &labelsColumn = QVector<QString>());
     // TODO: Replace QVector<..> with a data row class (QDataRow)? Move labels to class.
+    // ownership of dataItems is transferred
     void addDataRow(const QVector<QDataItem*> &dataRow
                     , const QString &labelRow = QString()
                     , const QVector<QString> &labelsColumn = QVector<QString>());
+    // ownership of dataRow is transferred
+    void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
     // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
@@ -130,9 +139,12 @@ public:
                     , const QVector<QString> &labelsColumn = QVector<QString>());
 
     // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
+    // ownership of dataItems is transferred
     void addDataSet(const QVector< QVector<QDataItem*> > &data
                     , const QVector<QString> &labelsRow = QVector<QString>()
                     , const QVector<QString> &labelsColumn = QVector<QString>());
+    // ownership of dataSet is transferred
+    void addDataSet(QDataSet* dataSet);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction

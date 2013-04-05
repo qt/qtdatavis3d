@@ -53,6 +53,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
 class QDataItem;
+class QDataSet;
 class ShaderHelper;
 class ObjectHelper;
 
@@ -133,6 +134,7 @@ public:
     bool m_isInitialized;
     Q3DBars::SelectionMode m_selectionMode;
     QDataItem *m_selectedBar;
+    QDataSet *m_dataSetTest;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

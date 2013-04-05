@@ -52,7 +52,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 class QDataItemPrivate
 {
     public:
-    explicit QDataItemPrivate(QDataItem *parent, float value = 0.0f
+    explicit QDataItemPrivate(QDataItem *q, float value = 0.0f
             , const QString &label = QString());
     ~QDataItemPrivate();
 

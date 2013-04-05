@@ -43,6 +43,8 @@
 #include "q3dbars_p.h"
 #include "camerahelper_p.h"
 #include "qdataitem_p.h"
+#include "qdatarow_p.h"
+#include "qdataset_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "utils_p.h"
@@ -280,6 +282,8 @@ void Q3DBars::drawScene()
     glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
+            if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
+                continue;
             QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
             float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             QMatrix4x4 modelMatrix;
@@ -471,6 +475,8 @@ void Q3DBars::drawScene()
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
+            if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
+                continue;
             QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
             float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             if (barHeight == 0)
@@ -1104,7 +1110,7 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
     }
     d_ptr->findHighestValue(sampleRow);
     // The vector contains data (=height) for each bar, a row at a time
-    // With each new row, the previous data set (=row) must be moved back
+    // With each new row, the previous data row must be moved back
     // ie. we need as many vectors as we have rows in the sample space
     d_ptr->m_dataSet.prepend(sampleRow);
     // if the added data pushed us over sample space, remove the oldest data set
@@ -1122,13 +1128,25 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
         qWarning("Data set too large for sample space");
     }
     d_ptr->findHighestValue(row);
-    // The vector contains data (=height) for each bar, a row at a time
-    // With each new row, the previous data set (=row) must be moved back
+    // With each new row, the previous data row must be moved back
     // ie. we need as many vectors as we have rows in the sample space
     d_ptr->m_dataSet.prepend(row);
     // if the added data pushed us over sample space, remove the oldest data set
     if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
         d_ptr->resizeDataSet();
+}
+
+void Q3DBars::addDataRow(QDataRow *dataRow)
+{
+    QDataRow *row = dataRow;
+    // Check that the input data fits into sample space, and resize if it doesn't
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    d_ptr->m_heightNormalizer = row->d_ptr->highestValue();
+    // With each new row, the previous data row must be moved back
+    // ie. we need as many vectors as we have rows in the sample space
+    d_ptr->m_dataSetTest->addRow(row);
+    // if the added data pushed us over sample space, remove the oldest data set
+    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow
@@ -1171,6 +1189,17 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
 
     for (int i = 0; i < d_ptr->m_dataSet.size(); i++)
         d_ptr->findHighestValue(d_ptr->m_dataSet.at(i));
+}
+
+void Q3DBars::addDataSet(QDataSet* dataSet)
+{
+    delete d_ptr->m_dataSetTest;
+    // Check sizes
+    dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y(), d_ptr->m_sampleCount.x());
+    // Take ownership of given set
+    d_ptr->m_dataSetTest = dataSet;
+    // Find highest value
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
@@ -1218,6 +1247,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_isInitialized(false)
     , m_selectionMode(Q3DBars::Bar)
     , m_selectedBar(0)
+    , m_dataSetTest(0)
 {
 }
 

@@ -39,33 +39,84 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAITEM_H
-#define QDATAITEM_H
+#include "qdatarow.h"
+#include "qdatarow_p.h"
+#include "qdataitem.h"
+#include "qdataitem_p.h"
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include <QScopedPointer>
 #include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate;
-
-class QTCOMMERCIALDATAVIS3D_EXPORT QDataItem
+QDataRow::QDataRow(const QString &label)
+    : d_ptr(new QDataRowPrivate(this, label))
 {
-public:
-    explicit QDataItem(float value = 0.0f, const QString &label = QString());
-    ~QDataItem();
+    qDebug("QDataRow");
+}
 
-    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
-    void setValue(float value);
+QDataRow::~QDataRow()
+{
+    qDebug("~QDataRow");
+}
 
-private:
-    QScopedPointer<QDataItemPrivate> d_ptr;
-    friend class Q3DBars;
-    friend class Q3DBarsPrivate;
-    friend class QDataRowPrivate;
-};
+void QDataRow::setLabel(const QString &label)
+{
+    d_ptr->m_label = label;
+}
+
+void QDataRow::addItem(QDataItem *item)
+{
+    d_ptr->m_row.prepend(item);
+}
+
+QDataRowPrivate::QDataRowPrivate(QDataRow *q, const QString &label)
+    : q_ptr(q)
+    , m_label(label)
+{
+}
+
+QDataRowPrivate::~QDataRowPrivate()
+{
+    for (int itemCount = 0; itemCount < m_row.size(); itemCount++) {
+        delete m_row.at(itemCount);
+    }
+    m_row.clear();
+}
+
+QVector<QDataItem*> QDataRowPrivate::row()
+{
+    return m_row;
+}
+
+void QDataRowPrivate::verifySize(int size)
+{
+    qDebug("verifySize (QDataRow)");
+    if (size > m_row.size()) {
+        // QVector's resize doesn't delete data contained in it
+        // Delete contents of items to be removed
+        int nbrToBeRemoved = m_row.size() - size;
+        for (int itemCount = 0; itemCount < nbrToBeRemoved; itemCount++) {
+            int itemToBeRemoved = m_row.size() - itemCount - 1; // -1 to compensate index 0
+            delete m_row.at(itemToBeRemoved);
+        }
+        // Resize vector
+        m_row.resize(size);
+    }
+    else if (size < m_row.size()) {
+        qCritical("Check your sample space size! Your row is too short.");
+    }
+}
+
+float QDataRowPrivate::highestValue()
+{
+    float max = 0;
+    for (int i = 0; i < m_row.size(); i++) {
+        QDataItem *item = m_row.at(i);
+        float itemValue = item->d_ptr->value();
+        if (max < itemValue)
+            max = itemValue;
+    }
+    return max;
+}
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
-
-#endif
