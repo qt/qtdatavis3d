@@ -156,51 +156,10 @@ void Q3DBars::render(QPainter *painter)
     painter->endNativePainting();
 
     // If a bar is selected, display it's value
-    // TODO: Move text printing to a helper class, so that it can be used from other vis types?
     QDataItem *data = d_ptr->m_selectedBar;
     if (d_ptr->m_selectionMode < ZoomRow && data) {
         glDisable(GL_DEPTH_TEST);
-        painter->save();
-        painter->setCompositionMode(QPainter::CompositionMode_Source);
-        // TODO: None of the commented-out stuff works..
-        //painter->setBackgroundMode(Qt::OpaqueMode);
-        //painter->setBackground(QBrush(d_ptr->m_textBackgroundColor));
-        //painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
-        //painter->setPen(d_ptr->m_textBackgroundColor);
-        painter->setPen(Qt::black); // TODO: Use black, as nothing works
-        QFont bgrFont = QFont(QStringLiteral("Arial"), 17);
-        QFont valueFont = QFont(QStringLiteral("Arial"), 11);
-        valueFont.setBold(true);
-        painter->setFont(bgrFont);
-        QFontMetrics valueFM(valueFont);
-        QFontMetrics bgrFM(bgrFont);
-        int valueStrLen = valueFM.width(data->d_ptr->valueStr());
-        int bgrStrLen = 0;
-        int bgrHeight = valueFM.height() + 8;
-        QString bgrStr = QString();
-        do {
-            bgrStr.append(QStringLiteral("I"));
-            bgrStrLen = bgrFM.width(bgrStr);
-        } while (bgrStrLen <= (valueStrLen + 8));
-        //int bgrLen = valueStrLen + 10;
-        //painter->drawRoundedRect(data->d_ptr->position().x() - (bgrLen / 2)
-        //                         , data->d_ptr->position().y() - 30
-        //                         , bgrLen, 30, 10.0, 10.0);
-        // Hack solution, as drawRect doesn't work
-        painter->drawText(data->d_ptr->position().x() - (bgrStrLen / 2)
-                          , data->d_ptr->position().y() - bgrHeight
-                          , bgrStrLen, bgrHeight
-                          , Qt::AlignCenter | Qt::AlignVCenter
-                          , bgrStr);
-        //painter->setPen(d_ptr->m_textColor);
-        painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
-        painter->setFont(valueFont);
-        painter->drawText(data->d_ptr->position().x() - (valueStrLen / 2)
-                          , data->d_ptr->position().y() - bgrHeight
-                          , valueStrLen, bgrHeight
-                          , Qt::AlignCenter | Qt::AlignVCenter
-                          , data->d_ptr->valueStr());
-        painter->restore();
+        Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->position());
     }
 }
 

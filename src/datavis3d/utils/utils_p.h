@@ -46,6 +46,9 @@
 
 class QVector3D;
 class QColor;
+class QPainter;
+class QString;
+class QPoint;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -53,6 +56,7 @@ class Utils
 {
 public:
     static QVector3D vectorFromColor(const QColor &color);
+    static void printText(QPainter *painter, const QString &text, const QPoint &position);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

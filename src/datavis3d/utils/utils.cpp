@@ -43,12 +43,60 @@
 
 #include <QVector3D>
 #include <QColor>
+#include <QPainter>
+#include <QPoint>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 QVector3D Utils::vectorFromColor(const QColor &color)
 {
     return QVector3D(color.redF(), color.greenF(), color.blueF());
+}
+
+void Utils::printText(QPainter *painter, const QString &text, const QPoint &position)
+{
+    painter->save();
+    painter->setCompositionMode(QPainter::CompositionMode_Source);
+    // TODO: None of the commented-out stuff works..
+    //painter->setBackgroundMode(Qt::OpaqueMode);
+    //painter->setBackground(QBrush(d_ptr->m_textBackgroundColor));
+    //painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
+    //painter->setPen(d_ptr->m_textBackgroundColor);
+    painter->setPen(Qt::black); // TODO: Use black, as nothing works
+    QFont bgrFont = QFont(QStringLiteral("Arial"), 17);
+    QFont valueFont = QFont(QStringLiteral("Arial"), 11);
+    valueFont.setBold(true);
+    painter->setFont(bgrFont);
+    QFontMetrics valueFM(valueFont);
+    QFontMetrics bgrFM(bgrFont);
+    int valueStrLen = valueFM.width(text);
+    int bgrStrLen = 0;
+    int bgrHeight = valueFM.height() + 8;
+    QString bgrStr = QString();
+    do {
+        bgrStr.append(QStringLiteral("I"));
+        bgrStrLen = bgrFM.width(bgrStr);
+    } while (bgrStrLen <= (valueStrLen + 8));
+    //int bgrLen = valueStrLen + 10;
+    //painter->drawRoundedRect(data->d_ptr->position().x() - (bgrLen / 2)
+    //                         , data->d_ptr->position().y() - 30
+    //                         , bgrLen, 30, 10.0, 10.0);
+    // Hack solution, as drawRect doesn't work
+    painter->drawText(position.x() - (bgrStrLen / 2)
+                      , position.y() - bgrHeight
+                      , bgrStrLen, bgrHeight
+                      , Qt::AlignCenter | Qt::AlignVCenter
+                      , bgrStr);
+    //painter->setPen(d_ptr->m_textColor);
+    painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
+    painter->setFont(valueFont);
+    painter->drawText(position.x() - (valueStrLen / 2)
+                      , position.y() - bgrHeight
+                      , valueStrLen, bgrHeight
+                      , Qt::AlignCenter | Qt::AlignVCenter
+                      , text);
+    painter->restore();
+
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -95,7 +95,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 
     // Set bar type to smooth bar
 #ifndef CYCLE_THROUGH_STYLES
-    m_chart->setBarType(Q3DBars::Bars, false);
+    m_chart->setBarType(Q3DBars::Pyramids, false);
 #endif
 
 #ifndef USE_STATIC_DATA
@@ -109,7 +109,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 
 #ifndef CYCLE_THROUGH_THEMES
     // Set bar colors
-    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkBlue));
+    m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
 #endif
 
     // Set preset camera position
@@ -213,10 +213,10 @@ void ChartDataGenerator::addDataSet()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data
-    float hours[5][7] = {{2, 1, 3, 0, 1, 5, 7}
-                        , {0, 1, 3, 1, 2, 2, 3}
+    float hours[5][7] = {{2, 1, 3, 0.25, 1, 5, 7}
+                        , {0.5, 1, 3, 1, 2, 2, 3}
                         , {1, 1, 2, 1, 4, 4, 4}
-                        , {0, 0, 0, 0, 2, 2, 0}
+                        , {0, 0, 0, 0, 2, 2, 0.25}
                         , {3, 3, 6, 2, 2, 1, 1}};
 
     // Create data set
