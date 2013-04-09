@@ -98,8 +98,14 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     m_chart->setBarType(Q3DBars::Bars, false);
 #endif
 
+#ifndef USE_STATIC_DATA
     // Set selection mode to full
     m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
+#else
+    // Set selection mode to zoom row
+    m_chart->setSelectionMode(Q3DBars::ZoomColumn);
+#endif
+
 
 #ifndef CYCLE_THROUGH_THEMES
     // Set bar colors

@@ -149,13 +149,16 @@ void Q3DBars::render(QPainter *painter)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     // Do native OpenGL rendering
+    // If zoom selection is on, draw zoom scene
+    drawZoomScene();
+    // Draw bars scene
     drawScene();
     painter->endNativePainting();
 
     // If a bar is selected, display it's value
     // TODO: Move text printing to a helper class, so that it can be used from other vis types?
     QDataItem *data = d_ptr->m_selectedBar;
-    if (data) {
+    if (d_ptr->m_selectionMode < ZoomRow && data) {
         glDisable(GL_DEPTH_TEST);
         painter->save();
         painter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -165,23 +168,23 @@ void Q3DBars::render(QPainter *painter)
         //painter->setBrush(QBrush(d_ptr->m_textBackgroundColor));
         //painter->setPen(d_ptr->m_textBackgroundColor);
         painter->setPen(Qt::black); // TODO: Use black, as nothing works
-        QFont bgrFont = QFont(QStringLiteral("Arial"), 18);
-        QFont valueFont = QFont(QStringLiteral("Arial"), 12);
+        QFont bgrFont = QFont(QStringLiteral("Arial"), 17);
+        QFont valueFont = QFont(QStringLiteral("Arial"), 11);
         valueFont.setBold(true);
         painter->setFont(bgrFont);
         QFontMetrics valueFM(valueFont);
         QFontMetrics bgrFM(bgrFont);
         int valueStrLen = valueFM.width(data->d_ptr->valueStr());
         int bgrStrLen = 0;
-        int bgrHeight = valueFM.height() + 6;
+        int bgrHeight = valueFM.height() + 8;
         QString bgrStr = QString();
         do {
-            bgrStr.append(QStringLiteral("X"));
+            bgrStr.append(QStringLiteral("I"));
             bgrStrLen = bgrFM.width(bgrStr);
-        } while (bgrStrLen <= valueStrLen);
+        } while (bgrStrLen <= (valueStrLen + 8));
         //int bgrLen = valueStrLen + 10;
-        //painter->drawRoundedRect(data->position().x() - (bgrLen / 2)
-        //                         , data->position().y() - 30
+        //painter->drawRoundedRect(data->d_ptr->position().x() - (bgrLen / 2)
+        //                         , data->d_ptr->position().y() - 30
         //                         , bgrLen, 30, 10.0, 10.0);
         // Hack solution, as drawRect doesn't work
         painter->drawText(data->d_ptr->position().x() - (bgrStrLen / 2)
@@ -201,6 +204,193 @@ void Q3DBars::render(QPainter *painter)
     }
 }
 
+void Q3DBars::drawZoomScene()
+{
+    // Set clear color
+    QVector3D clearColor = Utils::vectorFromColor(d_ptr->m_windowColor);
+    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // If no zoom, return
+    if (!d_ptr->m_zoomActivated)
+        return;
+
+    float barPosX = 0;
+    int startBar = 0;
+    int stopBar = 0;
+    int stepBar = 0;
+
+    // Specify viewport
+    glViewport(d_ptr->m_zoomViewPort.x(), d_ptr->m_zoomViewPort.y()
+               , d_ptr->m_zoomViewPort.width(), d_ptr->m_zoomViewPort.height());
+
+    // Set up projection matrix
+    QMatrix4x4 projectionMatrix;
+    projectionMatrix.perspective(45.0f, (float)d_ptr->m_zoomViewPort.width()
+                                 / (float)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
+
+    // Calculate view matrix
+    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos
+                                                              , d_ptr->m_zoomLevel
+                                                              , d_ptr->m_zoomViewPort.width()
+                                                              , d_ptr->m_zoomViewPort.height());
+
+    if (viewMatrix.row(0).z() > 0) {
+        startBar = 0;
+        stopBar = d_ptr->m_zoomSelection->d_ptr->row().size();
+        stepBar = 1;
+    }
+    else {
+        startBar = d_ptr->m_zoomSelection->d_ptr->row().size() - 1;
+        stopBar = -1;
+        stepBar = -1;
+    }
+
+    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
+    QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+
+    // Bind bar shader
+    d_ptr->m_barShader->bind();
+
+    // Draw bars
+//    bool barSelectionFound = false;
+    // Draw the selected row / column
+    qDebug() << d_ptr->m_zoomSelection->d_ptr->row().size();
+    for (int bar = startBar; bar != stopBar; bar += stepBar) {
+        QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(bar);
+        if (!item)
+            continue;
+        float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        if (ZoomRow == d_ptr->m_selectionMode)
+            barPosX = item->d_ptr->translation().x();
+        else
+            barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
+        modelMatrix.translate(barPosX
+                              , item->d_ptr->translation().y()
+                              , zComp);
+        modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
+
+        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+        QVector3D baseColor = Utils::vectorFromColor(d_ptr->m_baseColor);
+        QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_heightColor) * barHeight;
+
+        QVector3D barColor = baseColor + heightColor;
+
+        float lightStrength = d_ptr->m_lightStrength;
+#if 0 // TODO: Implement selection in zoom
+            if (d_ptr->m_selectionMode > None) {
+                Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
+                                                                                , selection);
+                switch (selectionType) {
+                case Q3DBarsPrivate::Bar:
+                {
+                    // highlight bar by inverting the color of the bar
+                    //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
+                    //if (d_ptr->m_mousePressed) {
+                    //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
+                    //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
+                    //}
+                    // Insert data to QDataItem. We have no ownership, don't delete the previous one
+                    d_ptr->m_selectedBar = item;
+                    d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
+                    barSelectionFound = true;
+                    break;
+                }
+                case Q3DBarsPrivate::Row:
+                {
+                    // Current bar is on the same row as the selected bar
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
+                    break;
+                }
+                case Q3DBarsPrivate::Column:
+                {
+                    // Current bar is on the same column as the selected bar
+                    barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
+                    lightStrength = d_ptr->m_highlightLightStrength;
+                    break;
+                }
+                case Q3DBarsPrivate::None:
+                {
+                    // Current bar is not selected, nor on a row or column
+                    // do nothing
+                    break;
+                }
+                }
+            }
+#endif
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel()
+                                            , modelMatrix.inverted().transposed());
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS()
+                                            , d_ptr->m_ambientStrength);
+
+        // 1st attribute buffer : vertices
+        glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
+        glVertexAttribPointer(d_ptr->m_barShader->posAtt()
+                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        // 2nd attribute buffer : normals
+        glEnableVertexAttribArray(d_ptr->m_barShader->normalAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->normalBuf());
+        glVertexAttribPointer(d_ptr->m_barShader->normalAtt()
+                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        // 3rd attribute buffer : UVs
+        //glEnableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
+        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->uvBuf());
+        //glVertexAttribPointer(d_ptr->m_barShader->m_uvAtt()
+        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        // Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+
+        // Draw the triangles
+        glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                       , GL_UNSIGNED_SHORT, (void*)0);
+
+        // Free buffers
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        //glDisableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
+        glDisableVertexAttribArray(d_ptr->m_barShader->normalAtt());
+        glDisableVertexAttribArray(d_ptr->m_barShader->posAtt());
+    }
+#if 0
+    if (!barSelectionFound) {
+        // We have no ownership, don't delete. Just NULL the pointer.
+        d_ptr->m_selectedBar = NULL;
+        if (d_ptr->m_zoomActivated && Q3DBarsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
+            qDebug() << "kukkuu";
+            d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+            d_ptr->m_zoomActivated = false;
+        }
+    }
+    else if (d_ptr->m_selectionMode >= ZoomRow
+             && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
+        qDebug("hiihaa");
+        d_ptr->m_zoomActivated = true;
+        d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
+                                       , width() / 5, height() / 5);
+    }
+#endif
+    // Release bar shader
+    d_ptr->m_barShader->release();
+}
+
 void Q3DBars::drawScene()
 {
     int startBar = 0;
@@ -218,18 +408,20 @@ void Q3DBars::drawScene()
 
     static QVector3D selection = QVector3D(0, 0, 0);
 
-    // Set clear color
-    QVector3D clearColor = Utils::vectorFromColor(d_ptr->m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
+    // Specify viewport
+    glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y()
+               , d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    // Set projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (float)width() / (float)height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (float)d_ptr->m_sceneViewPort.width()
+                                 / (float)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
 
+    // Calculate view matrix
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos
                                                               , d_ptr->m_zoomLevel
-                                                              , width(), height());
+                                                              , d_ptr->m_sceneViewPort.width()
+                                                              , d_ptr->m_sceneViewPort.height());
 
     // Calculate drawing order
     //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
@@ -275,133 +467,129 @@ void Q3DBars::drawScene()
     QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
-    // Bind selection shader
-    d_ptr->m_selectionShader->bind();
+    if (!d_ptr->m_zoomActivated) {
+        // Bind selection shader
+        d_ptr->m_selectionShader->bind();
 
-    // Draw bars to selection buffer
-    glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-    for (int row = startRow; row != stopRow; row += stepRow) {
-        for (int bar = startBar; bar != stopBar; bar += stepBar) {
-#if 0
-            if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
-                continue;
-            QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
-#else
-            if (!d_ptr->m_dataSetTest->d_ptr->getRow(row))
-                continue;
-            QDataItem *item = d_ptr->m_dataSetTest->d_ptr->getRow(row)->d_ptr->getItem(bar);
-            if (!item)
-                continue;
-#endif
-            float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
-            barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
-            rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
-            modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
-                                  , barHeight - 1.0f
-                                  , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
-            modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
+        // Draw bars to selection buffer
+        glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
+        for (int row = startRow; row != stopRow; row += stepRow) {
+            for (int bar = startBar; bar != stopBar; bar += stepBar) {
+                if (!d_ptr->m_dataSet->d_ptr->getRow(row))
+                    continue;
+                QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
+                if (!item)
+                    continue;
+                float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+                barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
+                rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
+                modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
+                                      , barHeight - 1.0f
+                                      , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
+                modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
-            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+                MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            // add +2 to avoid black
-            QVector3D barColor = QVector3D((float)(row + 2) / (float)(d_ptr->m_sampleCount.y() + 2)
-                                           , (float)(bar + 2) / (float)(d_ptr->m_sampleCount.x() + 2)
-                                           , 0.0f);
+                // add +2 to avoid black
+                QVector3D barColor = QVector3D((float)(row + 2) / (float)(d_ptr->m_sampleCount.y() + 2)
+                                               , (float)(bar + 2) / (float)(d_ptr->m_sampleCount.x() + 2)
+                                               , 0.0f);
 
-            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP()
-                                                      , MVPMatrix);
-            d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->color()
-                                                      , barColor);
+                d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP()
+                                                          , MVPMatrix);
+                d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->color()
+                                                          , barColor);
 
 #ifdef USE_HAX0R_SELECTION
-            // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
-            glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
-                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+                // 1st attribute buffer : vertices
+                glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
+                glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
+                glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
+                                      , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-            // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+                // Index buffer
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
-            // Draw the triangles
-            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
-                           , GL_UNSIGNED_SHORT, (void*)0);
+                // Draw the triangles
+                glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                               , GL_UNSIGNED_SHORT, (void*)0);
 
-            // Free buffers
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                // Free buffers
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-            glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
+                glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
 #else // TODO: fix this - doesn't work yet
+                glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
+                //glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+                // 1st attribute buffer : vertices
+                glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
+                glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
+                glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
+                                      , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+                // Index buffer
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+
+                // Draw the triangles
+                GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+                glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
+                               , GL_UNSIGNED_SHORT, DrawBuffers);
+
+                glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
+
+                // Free buffers
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+                //glReadBuffer(GL_NONE);
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+            }
+        }
+        glEnable(GL_DITHER);
+
+        // Read color under cursor
+        // TODO: Move into a separate function?
+        if (Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
+#ifndef USE_HAX0R_SELECTION
             glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
-            //glReadBuffer(GL_COLOR_ATTACHMENT0);
+#endif
+            // This is the only one that works with ANGLE (ES 2.0)
+            // Item count will be limited to 256*256*256
+            GLubyte pixel[4];
+            glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+                         GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 
-            // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
-            glVertexAttribPointer(d_ptr->m_selectionShader->posAtt()
-                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            // These work with desktop OpenGL
+            // They offer a lot higher possible object count and a possibility to use object id's
+            //GLuint pixel2[3];
+            //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+            //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
 
-            // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+            //GLfloat pixel3[3];
+            //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+            //             GL_RGB, GL_FLOAT, (void *)pixel3);
 
-            // Draw the triangles
-            GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
-                           , GL_UNSIGNED_SHORT, DrawBuffers);
-
-            glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-
-            // Free buffers
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-            //glReadBuffer(GL_NONE);
+            //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
+            //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
+            //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
+            selection = QVector3D(pixel[0], pixel[1], pixel[2]);
+            //qDebug() << selection;
+#ifndef USE_HAX0R_SELECTION
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
         }
+
+        // Release selection shader
+        d_ptr->m_selectionShader->release();
+
+        // Clear after selection
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
-    glEnable(GL_DITHER);
-
-    // Read color under cursor
-    // TODO: Move into a separate function?
-    if (d_ptr->m_mousePressed) {
-#ifndef USE_HAX0R_SELECTION
-        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
-#endif
-        // This is the only one that works with ANGLE (ES 2.0)
-        // Item count will be limited to 256*256*256
-        GLubyte pixel[4];
-        glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-                     GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
-
-        // These work with desktop OpenGL
-        // They offer a lot higher possible object count and a possibility to use object id's
-        //GLuint pixel2[3];
-        //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-        //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
-
-        //GLfloat pixel3[3];
-        //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-        //             GL_RGB, GL_FLOAT, (void *)pixel3);
-
-        //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
-        //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
-        //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
-        selection = QVector3D(pixel[0], pixel[1], pixel[2]);
-        //qDebug() << selection;
-#ifndef USE_HAX0R_SELECTION
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
-    }
-
-    // Release selection shader
-    d_ptr->m_selectionShader->release();
-
-    // Clear after selection
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
@@ -479,30 +667,23 @@ void Q3DBars::drawScene()
     d_ptr->m_barShader->bind();
 
     // Draw bars
-    //int barIndex = 1; // TODO: Remove when done debugging
+    if (!d_ptr->m_zoomActivated && d_ptr->m_zoomSelection)
+        d_ptr->m_zoomSelection->d_ptr->clear();
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-#if 0
-            if (d_ptr->m_dataSet.at(row).size() < (bar + 1))
+            if (!d_ptr->m_dataSet->d_ptr->getRow(row))
                 continue;
-            QDataItem *item = d_ptr->m_dataSet.at(row).at(bar);
-#else
-            if (!d_ptr->m_dataSetTest->d_ptr->getRow(row))
-                continue;
-            QDataItem *item = d_ptr->m_dataSetTest->d_ptr->getRow(row)->d_ptr->getItem(bar);
+            QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
             if (!item)
                 continue;
-#endif
             float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             if (barHeight == 0)
                 continue;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
-            //qDebug() << "x" << d_ptr->m_rowWidth << "-" << barPos << "=" << d_ptr->m_rowWidth - barPos;
             rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
-            //qDebug() << "z" << rowPos << "-" << d_ptr->m_columnDepth << "=" << rowPos - d_ptr->m_columnDepth;
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX
                                   , barHeight - 1.0f
                                   , (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
@@ -518,24 +699,26 @@ void Q3DBars::drawScene()
             QVector3D barColor = baseColor + heightColor + depthColor;
 
             float lightStrength = d_ptr->m_lightStrength;
-            if (d_ptr->m_selectionMode > None) {
+            if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > None) {
                 Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
                                                                                 , selection);
                 switch (selectionType) {
                 case Q3DBarsPrivate::Bar:
                 {
-                    // highlight bar by inverting the color of the bar
-                    //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
                     barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
                     lightStrength = d_ptr->m_highlightLightStrength;
                     //if (d_ptr->m_mousePressed) {
                     //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                    //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
+                    //    qDebug() << "object position:" << modelMatrix.column(3).toVector3D();
                     //}
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     d_ptr->m_selectedBar = item;
                     d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
                     barSelectionFound = true;
+                    if (d_ptr->m_selectionMode >= ZoomRow) {
+                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+                        d_ptr->m_zoomSelection->addItem(item);
+                    }
                     break;
                 }
                 case Q3DBarsPrivate::Row:
@@ -543,6 +726,10 @@ void Q3DBars::drawScene()
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
                     lightStrength = d_ptr->m_highlightLightStrength;
+                    if (ZoomRow == d_ptr->m_selectionMode) {
+                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+                        d_ptr->m_zoomSelection->addItem(item);
+                    }
                     break;
                 }
                 case Q3DBarsPrivate::Column:
@@ -550,6 +737,10 @@ void Q3DBars::drawScene()
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
                     lightStrength = d_ptr->m_highlightLightStrength;
+                    if (ZoomColumn == d_ptr->m_selectionMode) {
+                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+                        d_ptr->m_zoomSelection->addItem(item);
+                    }
                     break;
                 }
                 case Q3DBarsPrivate::None:
@@ -561,15 +752,6 @@ void Q3DBars::drawScene()
                 }
             }
 
-            //if (d_ptr->m_mousePressed) {
-                //qDebug() << "baseColor:" << baseColor;
-                //qDebug() << "heightColor:" << heightColor;
-                //qDebug() << "depthColor:" << depthColor;
-                //qDebug() << "barColor:" << barColor;
-                //qDebug() << barIndex << "object position:" << modelMatrix.column(3).toVector3D();
-            //}
-            //barIndex++; // TODO: Remove when done debugging
-
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -580,7 +762,6 @@ void Q3DBars::drawScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS()
                                                 , d_ptr->m_ambientStrength);
-            //qDebug() << "height:" << barHeight;
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
@@ -619,6 +800,16 @@ void Q3DBars::drawScene()
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         d_ptr->m_selectedBar = NULL;
+        if (d_ptr->m_zoomActivated && Q3DBarsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
+            d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+            d_ptr->m_zoomActivated = false;
+        }
+    }
+    else if (d_ptr->m_selectionMode >= ZoomRow
+             && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
+        d_ptr->m_zoomActivated = true;
+        d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
+                                       , width() / 5, height() / 5);
     }
 
     // Release bar shader
@@ -628,35 +819,54 @@ void Q3DBars::drawScene()
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
     // TODO: for testing shaders
-    static int shaderNo = 1;
+    //static int shaderNo = 1;
     //qDebug() << "mouse button pressed" << event->button();
     if (Qt::LeftButton == event->button()) {
-        d_ptr->m_mousePressed = true;
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        d_ptr->m_mousePos = event->pos();
+        if (d_ptr->m_zoomActivated) {
+            qDebug() << event->pos().x() << event->pos().y() << d_ptr->m_sceneViewPort << d_ptr->m_zoomViewPort;
+            if (event->pos().x() <= d_ptr->m_sceneViewPort.width()
+                    && event->pos().y() <= d_ptr->m_sceneViewPort.height()) {
+                d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnOverview;
+                qDebug() << "Mouse pressed on overview";
+            }
+            else {
+                d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnZoom;
+                qDebug() << "Mouse pressed on zoom";
+            }
+        }
+        else {
+            d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnScene;
+            // update mouse positions to prevent jumping when releasing or repressing a button
+            d_ptr->m_mousePos = event->pos();
+            qDebug() << "Mouse pressed on scene";
+        }
     }
-    else if (Qt::RightButton == event->button()) {
+    else if (Qt::MiddleButton == event->button()) {
         // reset rotations
         d_ptr->m_mousePos = QPoint(0, 0);
     }
-    else if (Qt::MiddleButton == event->button()) {
+    else if (Qt::RightButton == event->button()) {
+        d_ptr->m_mousePressed = Q3DBarsPrivate::MouseRotating;
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        d_ptr->m_mousePos = event->pos();
+
         // TODO: testing shaders
-        if (++shaderNo > 3)
-            shaderNo = 1;
-        switch (shaderNo) {
-        case 1:
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-                               , QStringLiteral(":/shaders/fragment"));
-            break;
-        case 2:
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-                               , QStringLiteral(":/shaders/fragmentColorOnY"));
-            break;
-        case 3:
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-                               , QStringLiteral(":/shaders/fragmentAmbient"));
-            break;
-        }
+//        if (++shaderNo > 3)
+//            shaderNo = 1;
+//        switch (shaderNo) {
+//        case 1:
+//            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+//                               , QStringLiteral(":/shaders/fragment"));
+//            break;
+//        case 2:
+//            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+//                               , QStringLiteral(":/shaders/fragmentColorOnY"));
+//            break;
+//        case 3:
+//            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
+//                               , QStringLiteral(":/shaders/fragmentAmbient"));
+//            break;
+//        }
     }
     CameraHelper::updateMousePos(d_ptr->m_mousePos);
 }
@@ -664,15 +874,17 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
     //qDebug() << "mouse button released" << event->button();
-    d_ptr->m_mousePressed = false;
-    // update mouse positions to prevent jumping when releasing or repressing a button
-    d_ptr->m_mousePos = event->pos();
-    CameraHelper::updateMousePos(event->pos());
+    if (Q3DBarsPrivate::MouseRotating == d_ptr->m_mousePressed) {
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        d_ptr->m_mousePos = event->pos();
+        CameraHelper::updateMousePos(event->pos());
+    }
+    d_ptr->m_mousePressed = Q3DBarsPrivate::MouseNone;
 }
 
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    if (d_ptr->m_mousePressed) {
+    if (Q3DBarsPrivate::MouseRotating == d_ptr->m_mousePressed) {
         //qDebug() << "mouse moved while pressed" << event->pos();
         d_ptr->m_mousePos = event->pos();
     }
@@ -717,7 +929,13 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
 
     // Set view port
-    glViewport(0, 0, width(), height());
+    if (d_ptr->m_zoomActivated) {
+        d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
+    }
+    else {
+        d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    }
+    d_ptr->m_zoomViewPort = QRect(0, 0, width(), height());
 
     // If orientation changes, we need to scale again
     // TODO: Handle it
@@ -786,15 +1004,6 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
         , const QString &labelColumn, const QString &labelHeight)
 {
     d_ptr->m_sampleCount = sampleCount;
-    // Initialize data set
-    QVector<QDataItem*> row;
-    for (int rows = 0; rows < sampleCount.y(); rows++) {
-        for (int columns = 0; columns < sampleCount.x(); columns ++) {
-            row.append(new QDataItem());
-        }
-        d_ptr->m_dataSet.append(row);
-        row.clear();
-    }
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative
     d_ptr->m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
@@ -1106,6 +1315,9 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 void Q3DBars::setSelectionMode(SelectionMode mode)
 {
     d_ptr->m_selectionMode = mode;
+    if (mode >= ZoomRow && !d_ptr->m_zoomSelection) {
+        d_ptr->m_zoomSelection = new QDataRow();
+    }
 }
 
 void Q3DBars::setWindowTitle(const QString &title)
@@ -1116,69 +1328,31 @@ void Q3DBars::setWindowTitle(const QString &title)
 void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
                          , const QVector<QString> &labelsColumn)
 {
-#if 0
-    QVector<float> row = dataRow;
-    // Check that the input data fits into sample space, and resize if it doesn't
-    if (row.size() > d_ptr->m_sampleCount.x()) {
-        row.resize(d_ptr->m_sampleCount.x());
-        qWarning("Data set too large for sample space");
-    }
-    // Convert row of floats into sample data
-    QVector<QDataItem*> sampleRow;
-    for (int i = 0; i < row.size(); i++) {
-        sampleRow.append(new QDataItem(row.at(i)));
-    }
-    d_ptr->findHighestValue(sampleRow);
-    // The vector contains data (=height) for each bar, a row at a time
-    // With each new row, the previous data row must be moved back
-    // ie. we need as many vectors as we have rows in the sample space
-    d_ptr->m_dataSet.prepend(sampleRow);
-    // if the added data pushed us over sample space, remove the oldest data set
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
-        d_ptr->resizeDataSet();
-#else
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(new QDataItem(dataRow.at(i)));
     row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
-    d_ptr->m_dataSetTest->addRow(row);
-    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
-    d_ptr->m_dataSetTest->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
+    d_ptr->m_dataSet->addRow(row);
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
+    d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
                                     , QVector<QString>(), labelsColumn);
-    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
-#endif
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow
                          , const QVector<QString> &labelsColumn)
 {
-#if 0
-    QVector<QDataItem*> row = dataRow;
-    // Check that the input data fits into sample space, and resize if it doesn't
-    if (row.size() > d_ptr->m_sampleCount.x()) {
-        d_ptr->resizeDataRow(&row);
-        qWarning("Data set too large for sample space");
-    }
-    d_ptr->findHighestValue(row);
-    // With each new row, the previous data row must be moved back
-    // ie. we need as many vectors as we have rows in the sample space
-    d_ptr->m_dataSet.prepend(row);
-    // if the added data pushed us over sample space, remove the oldest data set
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y())
-        d_ptr->resizeDataSet();
-#else
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(dataRow.at(i));
     row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
-    d_ptr->m_dataSetTest->addRow(row);
-    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
-    d_ptr->m_dataSetTest->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
+    d_ptr->m_dataSet->addRow(row);
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
+    d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY
                                     , QVector<QString>(), labelsColumn);
-    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
-#endif
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataRow(QDataRow *dataRow)
@@ -1189,32 +1363,16 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
     d_ptr->m_heightNormalizer = row->d_ptr->highestValue();
     // With each new row, the previous data row must be moved back
     // ie. we need as many vectors as we have rows in the sample space
-    d_ptr->m_dataSetTest->addRow(row);
+    d_ptr->m_dataSet->addRow(row);
     // if the added data pushed us over sample space, remove the oldest data set
-    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
-#if 0
-    d_ptr->clearDataSet();
-    // Check sizes
-    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
-        qCritical("Too much data per row, aborting");
-        // TODO: Implement a function that goes through all rows and crops the column count
-        return;
-    }
-    for (int i = 0; i < data.size(); i++)
-        addDataRow(data.at(i));
-
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
-        qWarning("Data set too large for sample space. Cropping it to fit.");
-        d_ptr->m_dataSet.resize(d_ptr->m_sampleCount.y());
-    }
-#else
-    delete d_ptr->m_dataSetTest;
-    d_ptr->m_dataSetTest = new QDataSet();
+    delete d_ptr->m_dataSet;
+    d_ptr->m_dataSet = new QDataSet();
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
@@ -1227,40 +1385,20 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
         row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
-        d_ptr->m_dataSetTest->addRow(row);
+        d_ptr->m_dataSet->addRow(row);
         row++;
     }
-    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
-    d_ptr->m_dataSetTest->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
-    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
-#endif
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
+    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
                          , const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
-#if 0
-    d_ptr->clearDataSet();
-    // Check sizes
-    if (data.at(0).size() > d_ptr->m_sampleCount.x()) {
-        qCritical("Too much data per row, aborting");
-        // TODO: Implement a function that goes through all rows and crops the column count
-        return;
-    }
-
-    d_ptr->m_dataSet = data;
-
-    if (d_ptr->m_dataSet.size() > d_ptr->m_sampleCount.y()) {
-        qWarning("Data set too large for sample space. Cropping it to fit.");
-        d_ptr->resizeDataSet();
-    }
-
-    for (int i = 0; i < d_ptr->m_dataSet.size(); i++)
-        d_ptr->findHighestValue(d_ptr->m_dataSet.at(i));
-#else
-    delete d_ptr->m_dataSetTest;
-    d_ptr->m_dataSetTest = new QDataSet();
+    delete d_ptr->m_dataSet;
+    d_ptr->m_dataSet = new QDataSet();
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
@@ -1273,24 +1411,23 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(data.at(rowNr).at(colNr));
         row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
-        d_ptr->m_dataSetTest->addRow(row);
+        d_ptr->m_dataSet->addRow(row);
         row++;
     }
-    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
-    d_ptr->m_dataSetTest->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
-    d_ptr->m_dataSetTest->d_ptr->verifySize(d_ptr->m_sampleCount.y());
-#endif
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
+    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
 void Q3DBars::addDataSet(QDataSet* dataSet)
 {
-    delete d_ptr->m_dataSetTest;
+    delete d_ptr->m_dataSet;
     // Check sizes
     dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y(), d_ptr->m_sampleCount.x());
     // Take ownership of given set
-    d_ptr->m_dataSetTest = dataSet;
+    d_ptr->m_dataSet = dataSet;
     // Find highest value
-    d_ptr->m_heightNormalizer = d_ptr->m_dataSetTest->d_ptr->highestValue();
+    d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
@@ -1303,14 +1440,13 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_backgroundObj(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
-    , m_mousePressed(false)
+    , m_mousePressed(MouseNone)
     , m_mousePos(QPoint(0, 0))
     , m_zoomLevel(100)
     , m_horizontalRotation(-45.0f)
     , m_verticalRotation(15.0f)
     , m_barThickness(QPointF(0.75f, 0.75f))
     , m_barSpacing(m_barThickness * 3.0f)
-    , m_dataSet(0)
     , m_heightNormalizer(0.0f)
     , m_rowWidth(0)
     , m_columnDepth(0)
@@ -1338,17 +1474,25 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_isInitialized(false)
     , m_selectionMode(Q3DBars::Bar)
     , m_selectedBar(0)
-    , m_dataSetTest(0)
+    , m_zoomSelection(0)
+    , m_dataSet(new QDataSet())
     , m_axisLabelX(QStringLiteral("X"))
     , m_axisLabelZ(QStringLiteral("Z"))
     , m_axisLabelY(QStringLiteral("Y"))
+    , m_sceneViewPort(0, 0, q->width(), q->height())
+    , m_zoomViewPort(0, 0, q->width(), q->height())
+    , m_zoomActivated(false)
 {
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
     qDebug() << "Destroying Q3DBarsPrivate";
-    clearDataSet();
+    delete m_dataSet;
+    if (m_zoomSelection) {
+        m_zoomSelection->d_ptr->clear();
+        delete m_zoomSelection;
+    }
     delete m_barShader;
     delete m_selectionShader;
     delete m_backgroundShader;
@@ -1360,64 +1504,6 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     q_ptr->glDeleteTextures(1, &m_selectionTexture);
     q_ptr->glDeleteTextures(1, &m_depthTexture);
 #endif
-}
-
-void Q3DBarsPrivate::findHighestValue(const QVector<QDataItem*> &row)
-{
-    for (int i = 0; i < row.size(); i++) {
-        QDataItem *item = row.at(i);
-        float itemValue = item->d_ptr->value();
-        if (m_heightNormalizer < itemValue)
-            m_heightNormalizer = itemValue;
-    }
-}
-
-void Q3DBarsPrivate::resizeDataSet()
-{
-    qDebug("resizeDataSet");
-    // QVector's resize doesn't delete data contained in it
-    // Delete contents of rows to be removed
-    int nbrToBeRemoved = m_dataSet.size() - m_sampleCount.y();
-    for (int rowCount = 0; rowCount < nbrToBeRemoved; rowCount++) {
-        int rowToBeRemoved = m_dataSet.size() - rowCount - 1; // -1 to compensate index 0
-        QVector<QDataItem*> row = m_dataSet.at(rowToBeRemoved);
-        for (int itemCount = 0; itemCount < row.size(); itemCount++) {
-            delete row.at(itemCount);
-        }
-        row.clear();
-    }
-    // Resize vector
-    m_dataSet.resize(m_sampleCount.y());
-}
-
-void Q3DBarsPrivate::resizeDataRow(QVector<QDataItem *> *row)
-{
-    qDebug("resizeDataRow");
-    // QVector's resize doesn't delete data contained in it
-    // Delete contents of items to be removed
-    int nbrToBeRemoved = row->size() - m_sampleCount.x();
-    for (int itemCount = 0; itemCount < nbrToBeRemoved; itemCount++) {
-        int itemToBeRemoved = row->size() - itemCount - 1; // -1 to compensate index 0
-        delete row->at(itemToBeRemoved);
-    }
-    // Resize vector
-    row->resize(m_sampleCount.x());
-}
-
-void Q3DBarsPrivate::clearDataSet()
-{
-    qDebug("clearDataSet");
-    // QVector's clear doesn't delete data contained in it
-    // Delete contents
-    for (int rowCount = 0; rowCount < m_dataSet.size(); rowCount++) {
-        QVector<QDataItem*> row = m_dataSet.at(rowCount);
-        for (int itemCount = 0; itemCount < row.size(); itemCount++) {
-            delete row.at(itemCount);
-        }
-        row.clear();
-    }
-    // Clear vector
-    m_dataSet.clear();
 }
 
 void Q3DBarsPrivate::loadBarMesh()
@@ -1534,11 +1620,13 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const
         isSelectedType = Bar;
     }
     else if (current.y() == selection.y() && (m_selectionMode == Q3DBars::BarAndColumn
-                                              || m_selectionMode == Q3DBars::BarRowAndColumn)) {
+                                              || m_selectionMode == Q3DBars::BarRowAndColumn
+                                              || m_selectionMode == Q3DBars::ZoomColumn)) {
         isSelectedType = Column;
     }
     else if (current.x() == selection.x() && (m_selectionMode == Q3DBars::BarAndRow
-                                              || m_selectionMode == Q3DBars::BarRowAndColumn)) {
+                                              || m_selectionMode == Q3DBars::BarRowAndColumn
+                                              || m_selectionMode == Q3DBars::ZoomRow)) {
         isSelectedType = Row;
     }
     return isSelectedType;

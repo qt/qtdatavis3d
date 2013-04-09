@@ -53,6 +53,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
 class QDataItem;
+class QDataRow;
 class QDataSet;
 class ShaderHelper;
 class ObjectHelper;
@@ -67,14 +68,18 @@ public:
         Column
     };
 
+    enum MousePressType {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating
+    };
+
 public:
     Q3DBarsPrivate(Q3DBars *q);
     ~Q3DBarsPrivate();
 
-    void findHighestValue(const QVector<QDataItem*> &row); // TODO: Move to QDataSet class when it's done
-    void resizeDataSet(); // TODO: Move to QDataSet class when it's done
-    void resizeDataRow(QVector<QDataItem*> *row); // TODO: Move to QDataSet class when it's done
-    void clearDataSet(); // TODO: Move to QDataSet class when it's done
     void loadBarMesh();
     void loadBackgroundMesh();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -96,14 +101,13 @@ public:
     ObjectHelper *m_backgroundObj;
     QPoint m_sampleCount;
     QString m_objFile;
-    bool m_mousePressed;
+    MousePressType m_mousePressed;
     QPoint m_mousePos;
     int m_zoomLevel;
     float m_horizontalRotation;
     float m_verticalRotation;
     QPointF m_barThickness;
     QPointF m_barSpacing;
-    QVector< QVector<QDataItem*> > m_dataSet;
     float m_heightNormalizer;
     float m_rowWidth;
     float m_columnDepth;
@@ -134,10 +138,15 @@ public:
     bool m_isInitialized;
     Q3DBars::SelectionMode m_selectionMode;
     QDataItem *m_selectedBar;
-    QDataSet *m_dataSetTest;
+    QDataRow *m_zoomSelection;
+    QDataSet *m_dataSet;
     QString m_axisLabelX;
     QString m_axisLabelZ;
     QString m_axisLabelY;
+    QRect m_sceneViewPort;
+    QRect m_zoomViewPort;
+    bool m_zoomActivated;
+
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

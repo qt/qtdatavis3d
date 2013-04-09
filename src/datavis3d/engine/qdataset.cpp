@@ -105,7 +105,7 @@ QVector<QDataRow*> QDataSetPrivate::set()
 QDataRow *QDataSetPrivate::getRow(int rowIndex)
 {
     QDataRow *row = NULL;
-    if (m_set.size() >= rowIndex)
+    if (m_set.size() > rowIndex)
         row = m_set.at(rowIndex);
     return row;
 }
@@ -133,7 +133,7 @@ void QDataSetPrivate::verifySize(int colSize, int rowSize)
     // First verify columns
     // QVector's resize doesn't delete data contained in it
     // Delete contents of rows to be removed
-    if (colSize > m_set.size()) {
+    if (colSize < m_set.size()) {
         int nbrToBeRemoved = m_set.size() - colSize;
         for (int rowCount = 0; rowCount < nbrToBeRemoved; rowCount++) {
             int rowToBeRemoved = m_set.size() - rowCount - 1; // -1 to compensate index 0

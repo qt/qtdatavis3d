@@ -46,6 +46,7 @@
 #include "qdataitem.h"
 #include <QPoint>
 #include <QString>
+#include <QVector3D>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -57,8 +58,9 @@ class QDataItemPrivate
     ~QDataItemPrivate();
 
     void setPosition(const QPoint &position);
-
     QPoint position();
+    void setTranslation(const QVector3D &translation);
+    QVector3D translation();
     float value();
     QString valueStr(); // append value and label. If label has prepend -flag set, append label and value
 
@@ -68,6 +70,7 @@ class QDataItemPrivate
     QString m_label;
     bool m_prependLabel;
     QPoint m_position;
+    QVector3D m_translation;
     friend class QDataItem;
 };
 

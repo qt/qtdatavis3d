@@ -58,6 +58,8 @@ class QDataRowPrivate
     ~QDataRowPrivate();
 
     QVector<QDataItem*> row();
+    // Clears vector, doesn't delete items
+    void clear();
     QDataItem *getItem(int itemIndex);
     void verifySize(int size);
     float highestValue();

@@ -75,6 +75,7 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &lab
     , m_label(label)
     , m_prependLabel(false)
     , m_position(QPoint(0, 0))
+    , m_translation(QVector3D(0, 0, 0))
 {
 }
 
@@ -90,6 +91,16 @@ void QDataItemPrivate::setPosition(const QPoint &position)
 QPoint QDataItemPrivate::position()
 {
     return m_position;
+}
+
+void QDataItemPrivate::setTranslation(const QVector3D &translation)
+{
+    m_translation = translation;
+}
+
+QVector3D QDataItemPrivate::translation()
+{
+    return m_translation;
 }
 
 float QDataItemPrivate::value()
