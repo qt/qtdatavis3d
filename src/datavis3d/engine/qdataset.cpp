@@ -52,12 +52,12 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 QDataSet::QDataSet()
     : d_ptr(new QDataSetPrivate(this))
 {
-    qDebug("QDataSet");
+    //qDebug("QDataSet");
 }
 
 QDataSet::~QDataSet()
 {
-    qDebug("~QDataSet");
+    //qDebug("~QDataSet");
 }
 
 void QDataSet::setLabels(const QString &xAxis

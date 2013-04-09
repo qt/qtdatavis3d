@@ -137,22 +137,30 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
     return viewMatrix;
 }
 
-QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition)
+QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, float fixedRotation)
 {
     // Move light with camera
     QVector3D newLightPosition;
+    float xAngle;
+    float yAngle;
+    if (!fixedRotation) {
+        xAngle = m_xRotation * m_pi / 180;
+        yAngle = m_yRotation * m_pi / 180;
+    }
+    else {
+        xAngle = fixedRotation * m_pi / 180;
+        yAngle = 0;
+    }
     float radius = lightPosition.y() * 2.0f; // set radius to match the highest height of the light
-    float xAngle = m_xRotation * m_pi / 180;
-    float yAngle = m_yRotation * m_pi / 180;
     float zPos = radius * cos(xAngle) * cos(yAngle);
     float xPos = radius * sin(xAngle) * cos(yAngle);
     float yPos = lightPosition.y() * sin(yAngle);
     // Keep light in the set position in relation to camera
-    // TODO: Does not work perfectly yet; Light seems wrong when viewing scene from sides (or isometricly)
+    // TODO: Does not work perfectly yet; Light seems wrong when viewing scene from sides (or isometrically)
     newLightPosition = QVector3D(-xPos + lightPosition.x()
                                  , yPos + lightPosition.y()
                                  , zPos + lightPosition.z());
-    //qDebug() << newLightPosition << xAngle << yAngle;
+    //qDebug() << newLightPosition << xAngle << yAngle << fixedRotation;
     return newLightPosition;
 }
 

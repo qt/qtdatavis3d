@@ -67,7 +67,8 @@ public:
                                           , int screenWidth, int screenHeight);
     // Calcluate light position based on rotation. Call after calling calculateViewMatrix to get
     // up-to-date position
-    static QVector3D calculateLightPosition(const QVector3D &lightPosition);
+    static QVector3D calculateLightPosition(const QVector3D &lightPosition
+                                            , float fixedRotation = 0.0f);
     static void updateMousePos(const QPoint &mousePos);
 };
 

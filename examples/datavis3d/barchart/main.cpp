@@ -103,7 +103,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
 #else
     // Set selection mode to zoom row
-    m_chart->setSelectionMode(Q3DBars::ZoomColumn);
+    m_chart->setSelectionMode(Q3DBars::ZoomRow);
 #endif
 
 

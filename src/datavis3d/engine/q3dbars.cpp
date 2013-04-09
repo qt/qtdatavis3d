@@ -218,8 +218,9 @@ void Q3DBars::drawZoomScene()
 
     float barPosX = 0;
     int startBar = 0;
-    int stopBar = 0;
-    int stepBar = 0;
+    int stopBar = d_ptr->m_zoomSelection->d_ptr->row().size();
+    int stepBar = 1;
+    QVector3D lightPos;
 
     // Specify viewport
     glViewport(d_ptr->m_zoomViewPort.x(), d_ptr->m_zoomViewPort.y()
@@ -230,25 +231,36 @@ void Q3DBars::drawZoomScene()
     projectionMatrix.perspective(45.0f, (float)d_ptr->m_zoomViewPort.width()
                                  / (float)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
 
+#ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos
                                                               , d_ptr->m_zoomLevel
                                                               , d_ptr->m_zoomViewPort.width()
                                                               , d_ptr->m_zoomViewPort.height());
 
-    if (viewMatrix.row(0).z() > 0) {
-        startBar = 0;
-        stopBar = d_ptr->m_zoomSelection->d_ptr->row().size();
-        stepBar = 1;
-    }
-    else {
+    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
+    lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+
+    if (viewMatrix.row(0).z() <= 0) {
         startBar = d_ptr->m_zoomSelection->d_ptr->row().size() - 1;
         stopBar = -1;
         stepBar = -1;
     }
+#else
+    // Set view matrix
+    QMatrix4x4 viewMatrix;
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 6.0f + zComp)
+                      , QVector3D(0.0f, 0.0f, zComp)
+                      , QVector3D(0.0f, 1.0f, 0.0f));
 
-    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+    // Set light position a bit above the camera (depends on do we have row or column zoom)
+    if (ZoomColumn == d_ptr->m_selectionMode) {
+        lightPos = CameraHelper::calculateLightPosition(defaultLightPos, -85.0f);
+    }
+    else {
+        lightPos = CameraHelper::calculateLightPosition(defaultLightPos, 5.0f);
+    }
+#endif
 
     // Bind bar shader
     d_ptr->m_barShader->bind();
@@ -256,7 +268,6 @@ void Q3DBars::drawZoomScene()
     // Draw bars
 //    bool barSelectionFound = false;
     // Draw the selected row / column
-    qDebug() << d_ptr->m_zoomSelection->d_ptr->row().size();
     for (int bar = startBar; bar != stopBar; bar += stepBar) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(bar);
         if (!item)

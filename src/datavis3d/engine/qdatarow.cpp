@@ -51,12 +51,12 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 QDataRow::QDataRow(const QString &label)
     : d_ptr(new QDataRowPrivate(this, label))
 {
-    qDebug("QDataRow");
+    //qDebug("QDataRow");
 }
 
 QDataRow::~QDataRow()
 {
-    qDebug("~QDataRow");
+    //qDebug("~QDataRow");
 }
 
 void QDataRow::setLabel(const QString &label)
