@@ -115,8 +115,7 @@ QString QDataItemPrivate::valueStr()
         strVal.append(m_label);
         strVal.append(QStringLiteral(" "));
         strVal.setNum(m_value);
-    }
-    else {
+    } else {
         strVal.setNum(m_value);
         strVal.append(m_label);
     }

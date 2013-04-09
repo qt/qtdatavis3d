@@ -91,9 +91,8 @@ QDataSetPrivate::QDataSetPrivate(QDataSet *q)
 
 QDataSetPrivate::~QDataSetPrivate()
 {
-    for (int itemCount = 0; itemCount < m_set.size(); itemCount++) {
+    for (int itemCount = 0; itemCount < m_set.size(); itemCount++)
         delete m_set.at(itemCount);
-    }
     m_set.clear();
 }
 
@@ -129,7 +128,6 @@ void QDataSetPrivate::axisLabels(QString *xAxis, QString *zAxis, QString *yAxis)
 
 void QDataSetPrivate::verifySize(int colSize, int rowSize)
 {
-    qDebug("verifySize (QDataSet)");
     // First verify columns
     // QVector's resize doesn't delete data contained in it
     // Delete contents of rows to be removed

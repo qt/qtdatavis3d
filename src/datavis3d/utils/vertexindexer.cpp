@@ -93,8 +93,7 @@ bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed
     QMap<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
     if (it == VertexToOutIndex.end()) {
         return false;
-    }
-    else {
+    } else {
         result = it.value();
         return true;
     }
@@ -121,8 +120,7 @@ void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices
 
         if (found) { // A similar vertex is already in the VBO, use it instead !
             out_indices.append(index);
-        }
-        else { // If not, it needs to be added in the output data.
+        } else { // If not, it needs to be added in the output data.
             unique_vertices++;
             out_vertices.append(in_vertices[i]);
             out_uvs.append(in_uvs[i]);
@@ -162,8 +160,7 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices
             // Average the tangents and the bitangents
             out_tangents[index] += in_tangents[i];
             out_bitangents[index] += in_bitangents[i];
-        }
-        else { // If not, it needs to be added in the output data.
+        } else { // If not, it needs to be added in the output data.
             unique_vertices++;
             out_vertices.append(in_vertices[i]);
             out_uvs.append(in_uvs[i]);

@@ -81,8 +81,7 @@ void Q3DBars::initialize()
     if (!d_ptr->m_uniformColor) {
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragmentColorOnY"));
-    }
-    else {
+    } else {
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragment"));
     }
@@ -134,8 +133,7 @@ void Q3DBars::render()
         painter.setRenderHint(QPainter::Antialiasing, true);
         render(&painter);
         painter.end();
-    }
-    else {
+    } else {
         d_ptr->m_paintDevice = getDevice();
     }
 }
@@ -160,6 +158,38 @@ void Q3DBars::render(QPainter *painter)
     if (d_ptr->m_selectionMode < ZoomRow && data) {
         glDisable(GL_DEPTH_TEST);
         Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->position());
+    } else if (d_ptr->m_zoomActivated) {
+        glDisable(GL_DEPTH_TEST);
+        for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+            // print value of each column
+            QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
+            // we need to convert 3D coordinates to screen coordinates for printing
+            // posX = (2 * X - W) / H   ->   coordX = (posX * H + W) / 2
+            // posY = 1 - (2 * Y) / H   ->   coordY = ((1 - posY) * H) / 2
+            float coordX;
+            if (ZoomColumn == d_ptr->m_selectionMode) {
+                coordX = (-(item->d_ptr->translation().z() - zComp) // flip front to left
+                          * d_ptr->m_zoomViewPort.width() / 2
+                          + d_ptr->m_zoomViewPort.width()) / 2;
+                //coordX = ((item->d_ptr->translation().z() - zComp)
+                //          * d_ptr->m_zoomViewPort.height()
+                //          + d_ptr->m_zoomViewPort.width()) / 2;
+            } else {
+                coordX = (item->d_ptr->translation().x()
+                          * d_ptr->m_zoomViewPort.width() / 2
+                          + d_ptr->m_zoomViewPort.width()) / 2;
+                //coordX = (item->d_ptr->translation().x()
+                //          * d_ptr->m_zoomViewPort.height()
+                //          + d_ptr->m_zoomViewPort.width()) / 2;
+            }
+            float coordY = ((1 - item->d_ptr->translation().y())
+                            * d_ptr->m_zoomViewPort.height()) / 2;
+            QPoint screenCoords(coordX
+                                , coordY - (d_ptr->m_zoomViewPort.height() / 4)
+                                * (item->d_ptr->value() / d_ptr->m_heightNormalizer) - 50);
+            //qDebug() << "bar" << col << "position on screen" << screenCoords << item->d_ptr->valueStr();
+            Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, 45);
+        }
     }
 }
 
@@ -187,7 +217,7 @@ void Q3DBars::drawZoomScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (float)d_ptr->m_zoomViewPort.width()
+    projectionMatrix.perspective(30.0f, (float)d_ptr->m_zoomViewPort.width()
                                  / (float)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
 
 #ifdef ROTATE_ZOOM_SELECTION
@@ -211,14 +241,13 @@ void Q3DBars::drawZoomScene()
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 6.0f + zComp)
                       , QVector3D(0.0f, 0.0f, zComp)
                       , QVector3D(0.0f, 1.0f, 0.0f));
+    //viewMatrix.scale(1.275f);
 
     // Set light position a bit above the camera (depends on do we have row or column zoom)
-    if (ZoomColumn == d_ptr->m_selectionMode) {
+    if (ZoomColumn == d_ptr->m_selectionMode)
         lightPos = CameraHelper::calculateLightPosition(defaultLightPos, -85.0f);
-    }
-    else {
+    else
         lightPos = CameraHelper::calculateLightPosition(defaultLightPos, 5.0f);
-    }
 #endif
 
     // Bind bar shader
@@ -239,7 +268,7 @@ void Q3DBars::drawZoomScene()
         else
             barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX
-                              , item->d_ptr->translation().y()
+                              , item->d_ptr->translation().y() - 0.5f
                               , zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
@@ -348,8 +377,7 @@ void Q3DBars::drawZoomScene()
             d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
             d_ptr->m_zoomActivated = false;
         }
-    }
-    else if (d_ptr->m_selectionMode >= ZoomRow
+    } else if (d_ptr->m_selectionMode >= ZoomRow
              && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
         qDebug("hiihaa");
         d_ptr->m_zoomActivated = true;
@@ -402,8 +430,7 @@ void Q3DBars::drawScene()
         startRow = 0;
         stopRow = d_ptr->m_sampleCount.y();
         stepRow = 1;
-    }
-    else {
+    } else {
         startRow = d_ptr->m_sampleCount.y() - 1;
         stopRow = -1;
         stepRow = -1;
@@ -412,8 +439,7 @@ void Q3DBars::drawScene()
         startBar = 0;
         stopBar = d_ptr->m_sampleCount.x();
         stepBar = 1;
-    }
-    else {
+    } else {
         startBar = d_ptr->m_sampleCount.x() - 1;
         stopBar = -1;
         stepBar = -1;
@@ -422,14 +448,11 @@ void Q3DBars::drawScene()
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() >= 0 && viewMatrix.row(0).z() <= 0) {
         backgroundRotation = 270.0f;
-    }
-    else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0) {
+    } else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0) {
         backgroundRotation = 180.0f;
-    }
-    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() >= 0) {
+    } else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() >= 0) {
         backgroundRotation = 90.0f;
-    }
-    else if (viewMatrix.row(0).x() < 0 && viewMatrix.row(0).z() < 0) {
+    } else if (viewMatrix.row(0).x() < 0 && viewMatrix.row(0).z() < 0) {
         backgroundRotation = 0.0f;
     }
 
@@ -776,8 +799,7 @@ void Q3DBars::drawScene()
             d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
             d_ptr->m_zoomActivated = false;
         }
-    }
-    else if (d_ptr->m_selectionMode >= ZoomRow
+    } else if (d_ptr->m_selectionMode >= ZoomRow
              && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
         d_ptr->m_zoomActivated = true;
         d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
@@ -799,25 +821,21 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
             if (event->pos().x() <= d_ptr->m_sceneViewPort.width()
                     && event->pos().y() <= d_ptr->m_sceneViewPort.height()) {
                 d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnOverview;
-                qDebug() << "Mouse pressed on overview";
-            }
-            else {
+                //qDebug() << "Mouse pressed on overview";
+            } else {
                 d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnZoom;
-                qDebug() << "Mouse pressed on zoom";
+                //qDebug() << "Mouse pressed on zoom";
             }
-        }
-        else {
+        } else {
             d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnScene;
             // update mouse positions to prevent jumping when releasing or repressing a button
             d_ptr->m_mousePos = event->pos();
-            qDebug() << "Mouse pressed on scene";
+            //qDebug() << "Mouse pressed on scene";
         }
-    }
-    else if (Qt::MiddleButton == event->button()) {
+    } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
         d_ptr->m_mousePos = QPoint(0, 0);
-    }
-    else if (Qt::RightButton == event->button()) {
+    } else if (Qt::RightButton == event->button()) {
         d_ptr->m_mousePressed = Q3DBarsPrivate::MouseRotating;
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
@@ -881,17 +899,14 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
 {
     if (d_ptr->m_zoomLevel > 100) {
         d_ptr->m_zoomLevel += event->angleDelta().y() / 12;
-    }
-    else if (d_ptr->m_zoomLevel > 50) {
+    } else if (d_ptr->m_zoomLevel > 50) {
         d_ptr->m_zoomLevel += event->angleDelta().y() / 60;
-    }
-    else {
+    } else {
         d_ptr->m_zoomLevel += event->angleDelta().y() / 120;
     }
     if (d_ptr->m_zoomLevel > 500) {
         d_ptr->m_zoomLevel = 500;
-    }
-    else if (d_ptr->m_zoomLevel < 10) {
+    } else if (d_ptr->m_zoomLevel < 10) {
         d_ptr->m_zoomLevel = 10;
     }
 }
@@ -901,12 +916,10 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
 
     // Set view port
-    if (d_ptr->m_zoomActivated) {
+    if (d_ptr->m_zoomActivated)
         d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
-    }
-    else {
+    else
         d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
-    }
     d_ptr->m_zoomViewPort = QRect(0, 0, width(), height());
 
     // If orientation changes, we need to scale again
@@ -919,8 +932,7 @@ void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
     if (relative) {
         d_ptr->m_barSpacing.setX((thickness.x() * 2) * (spacing.x() + 1.0f));
         d_ptr->m_barSpacing.setY((thickness.y() * 2) * (spacing.y() + 1.0f));
-    }
-    else {
+    } else {
         d_ptr->m_barSpacing = thickness * 2 + spacing * 2;
     }
     // Calculate here and at setting sample space
@@ -930,41 +942,29 @@ void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
 void Q3DBars::setBarType(BarStyle style, bool smooth)
 {
     if (style == Bars) {
-        if (smooth) {
+        if (smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/barSmooth");
-        }
-        else {
+        else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/bar");
-        }
-    }
-    else if (style == Pyramids) {
-        if (smooth) {
+    } else if (style == Pyramids) {
+        if (smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/pyramidSmooth");
-        }
-        else {
+        else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/pyramid");
-        }
-    }
-    else if (style == Cones) {
-        if (smooth) {
+    } else if (style == Cones) {
+        if (smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/coneSmooth");
-        }
-        else {
+        else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cone");
-        }
-    }
-    else if (style == Cylinders) {
-        if (smooth) {
+    } else if (style == Cylinders) {
+        if (smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
-        }
-        else {
+        else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
-        }
     }
-    if (d_ptr->m_isInitialized) {
-        // Reload mesh data
+    // Reload mesh data
+    if (d_ptr->m_isInitialized)
         d_ptr->loadBarMesh();
-    }
 }
 
 void Q3DBars::setMeshFileName(const QString &objFileName)
@@ -1257,8 +1257,7 @@ void Q3DBars::setTheme(ColorTheme theme)
     if (!d_ptr->m_uniformColor) {
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragmentColorOnY"));
-    }
-    else {
+    } else {
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragment"));
     }
@@ -1275,8 +1274,7 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
         if (!d_ptr->m_uniformColor) {
             d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                                , QStringLiteral(":/shaders/fragmentColorOnY"));
-        }
-        else {
+        } else {
             d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                                , QStringLiteral(":/shaders/fragment"));
         }
@@ -1287,9 +1285,8 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 void Q3DBars::setSelectionMode(SelectionMode mode)
 {
     d_ptr->m_selectionMode = mode;
-    if (mode >= ZoomRow && !d_ptr->m_zoomSelection) {
+    if (mode >= ZoomRow && !d_ptr->m_zoomSelection)
         d_ptr->m_zoomSelection = new QDataRow();
-    }
 }
 
 void Q3DBars::setWindowTitle(const QString &title)
@@ -1348,12 +1345,10 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1)) {
+        if (labelsRow.size() >= (rowNr + 1))
             row = new QDataRow(labelsRow.at(rowNr));
-        }
-        else {
+        else
             row = new QDataRow();
-        }
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
         row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
@@ -1374,12 +1369,10 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1)) {
+        if (labelsRow.size() >= (rowNr + 1))
             row = new QDataRow(labelsRow.at(rowNr));
-        }
-        else {
+        else
             row = new QDataRow();
-        }
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(data.at(rowNr).at(colNr));
         row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
@@ -1562,18 +1555,18 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     // Calculate scene scaling and translation factors
     m_rowWidth = ((m_sampleCount.x() + 1) * m_barSpacing.x()) / 2.0f;
     m_columnDepth = ((m_sampleCount.y() + 1) * m_barSpacing.y()) / 2.0f;
-    m_maxDimension = qMax(m_rowWidth, m_columnDepth);//(m_rowWidth > m_columnDepth) ? m_rowWidth : m_columnDepth;
+    m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleX = m_barThickness.x() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
     m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
-    m_sceneScale = qMin(m_scaleX, m_scaleZ);//(m_scaleX < m_scaleZ) ? m_scaleX : m_scaleZ;
-    float minThickness = qMin(m_barThickness.x(), m_barThickness.y());//(m_barThickness.x() < m_barThickness.y()) ? m_barThickness.x() : m_barThickness.y();
+    m_sceneScale = qMin(m_scaleX, m_scaleZ);
+    float minThickness = qMin(m_barThickness.x(), m_barThickness.y());
     m_sceneScale = m_sceneScale / minThickness;
     m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
     m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
     qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactorX" << m_scaleFactorX;
     qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactorZ" << m_scaleFactorZ;
     qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
-    qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
+    //qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
 }
 
 Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const QVector3D &selection)
@@ -1586,21 +1579,16 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const
                                   , (GLubyte)(((float)(bar + 2) / (float)(m_sampleCount.x() + 2))
                                               * 255 + 0.49) // add 0.49 to fix rounding
                                   , 0);
-    //if (m_mousePressed)
-    //    qDebug() << "selected:" << selection << "current:" << current;
-    if (current == selection) {
+    if (current == selection)
         isSelectedType = Bar;
-    }
     else if (current.y() == selection.y() && (m_selectionMode == Q3DBars::BarAndColumn
                                               || m_selectionMode == Q3DBars::BarRowAndColumn
-                                              || m_selectionMode == Q3DBars::ZoomColumn)) {
+                                              || m_selectionMode == Q3DBars::ZoomColumn))
         isSelectedType = Column;
-    }
     else if (current.x() == selection.x() && (m_selectionMode == Q3DBars::BarAndRow
                                               || m_selectionMode == Q3DBars::BarRowAndColumn
-                                              || m_selectionMode == Q3DBars::ZoomRow)) {
+                                              || m_selectionMode == Q3DBars::ZoomRow))
         isSelectedType = Row;
-    }
     return isSelectedType;
 }
 

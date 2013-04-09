@@ -59,7 +59,7 @@ float m_yRotation = 0;
 float m_defaultXRotation = 0;
 float m_defaultYRotation = 0;
 
-float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
+const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 float m_rotationSpeed = 100;
 
 // FUNCTIONS
@@ -102,12 +102,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
     // Reset at 360 in x and limit to 0...90 in y
     if (qFabs(m_xRotation) >= 360)
         m_xRotation = 0;
-    if (m_yRotation >= 90) {
+    if (m_yRotation >= 90)
         m_yRotation = 90;
-    }
-    else if (m_yRotation <= 0) {
+    else if (m_yRotation <= 0)
         m_yRotation = 0;
-    }
 
     // Apply to view matrix
     viewMatrix.lookAt(
@@ -146,8 +144,7 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, f
     if (!fixedRotation) {
         xAngle = m_xRotation * m_pi / 180;
         yAngle = m_yRotation * m_pi / 180;
-    }
-    else {
+    } else {
         xAngle = fixedRotation * m_pi / 180;
         yAngle = 0;
     }

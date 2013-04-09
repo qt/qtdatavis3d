@@ -46,14 +46,19 @@
 #include <QPainter>
 #include <QPoint>
 
+#include <QDebug>
+
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+
+const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 
 QVector3D Utils::vectorFromColor(const QColor &color)
 {
     return QVector3D(color.redF(), color.greenF(), color.blueF());
 }
 
-void Utils::printText(QPainter *painter, const QString &text, const QPoint &position)
+void Utils::printText(QPainter *painter, const QString &text, const QPoint &position
+                      , qreal rotation)
 {
     painter->save();
     painter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -81,6 +86,7 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
     //painter->drawRoundedRect(data->d_ptr->position().x() - (bgrLen / 2)
     //                         , data->d_ptr->position().y() - 30
     //                         , bgrLen, 30, 10.0, 10.0);
+#if 0
     // Hack solution, as drawRect doesn't work
     painter->drawText(position.x() - (bgrStrLen / 2)
                       , position.y() - bgrHeight
@@ -95,8 +101,24 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
                       , valueStrLen, bgrHeight
                       , Qt::AlignCenter | Qt::AlignVCenter
                       , text);
+#else
+    painter->translate(position.x() - ((bgrStrLen / 2) * cos(rotation * m_pi / 180))
+                       + ((bgrHeight / 2) * sin(rotation * m_pi / 180))
+                       , position.y() - bgrHeight);
+    painter->rotate(rotation);
+    painter->drawText(0, 0
+                      , bgrStrLen, bgrHeight
+                      , Qt::AlignCenter | Qt::AlignVCenter
+                      , bgrStr);
+    painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
+    painter->setFont(valueFont);
+    painter->drawText(6, 0
+                      , valueStrLen, bgrHeight
+                      , Qt::AlignCenter | Qt::AlignVCenter
+                      , text);
+    painter->resetTransform();
+#endif
     painter->restore();
-
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

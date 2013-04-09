@@ -80,7 +80,8 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *rainfall)
     m_chart->setBarType(Q3DBars::Cylinders, false);
 
     // Set selection mode to bar and column
-    m_chart->setSelectionMode(Q3DBars::BarAndColumn);
+    //m_chart->setSelectionMode(Q3DBars::BarAndColumn);
+    m_chart->setSelectionMode(Q3DBars::ZoomColumn);
 
     // Set theme
     m_chart->setTheme(Q3DBars::ThemeBlueNcs);

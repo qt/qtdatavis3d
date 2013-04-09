@@ -77,9 +77,8 @@ QDataRowPrivate::QDataRowPrivate(QDataRow *q, const QString &label)
 
 QDataRowPrivate::~QDataRowPrivate()
 {
-    for (int itemCount = 0; itemCount < m_row.size(); itemCount++) {
+    for (int itemCount = 0; itemCount < m_row.size(); itemCount++)
         delete m_row.at(itemCount);
-    }
     m_row.clear();
 }
 
@@ -103,7 +102,6 @@ QDataItem *QDataRowPrivate::getItem(int itemIndex)
 
 void QDataRowPrivate::verifySize(int size)
 {
-    qDebug("verifySize (QDataRow)");
     if (size > m_row.size()) {
         // QVector's resize doesn't delete data contained in it
         // Delete contents of items to be removed
@@ -114,8 +112,7 @@ void QDataRowPrivate::verifySize(int size)
         }
         // Resize vector
         m_row.resize(size);
-    }
-    else if (size < m_row.size()) {
+    } else if (size < m_row.size()) {
         qCritical("Check your sample space size! Your row is too short.");
     }
 }

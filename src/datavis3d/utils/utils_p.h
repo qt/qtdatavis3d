@@ -56,7 +56,8 @@ class Utils
 {
 public:
     static QVector3D vectorFromColor(const QColor &color);
-    static void printText(QPainter *painter, const QString &text, const QPoint &position);
+    static void printText(QPainter *painter, const QString &text, const QPoint &position
+                          , qreal rotation = 0);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
