@@ -669,7 +669,7 @@ void Q3DBars::drawScene()
             QVector3D barColor = baseColor + heightColor + depthColor;
 
             float lightStrength = d_ptr->m_lightStrength;
-            if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > None) {
+            if (d_ptr->m_selectionMode > None) {
                 Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
                                                                                 , selection);
                 switch (selectionType) {
@@ -682,12 +682,14 @@ void Q3DBars::drawScene()
                     //    qDebug() << "object position:" << modelMatrix.column(3).toVector3D();
                     //}
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
-                    d_ptr->m_selectedBar = item;
-                    d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
-                    barSelectionFound = true;
-                    if (d_ptr->m_selectionMode >= ZoomRow) {
-                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                        d_ptr->m_zoomSelection->addItem(item);
+                    if (!d_ptr->m_zoomActivated) {
+                        d_ptr->m_selectedBar = item;
+                        d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
+                        barSelectionFound = true;
+                        if (d_ptr->m_selectionMode >= ZoomRow) {
+                            item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+                            d_ptr->m_zoomSelection->addItem(item);
+                        }
                     }
                     break;
                 }
@@ -696,7 +698,7 @@ void Q3DBars::drawScene()
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
                     lightStrength = d_ptr->m_highlightLightStrength;
-                    if (ZoomRow == d_ptr->m_selectionMode) {
+                    if (!d_ptr->m_zoomActivated && ZoomRow == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
                     }
@@ -707,7 +709,7 @@ void Q3DBars::drawScene()
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
                     lightStrength = d_ptr->m_highlightLightStrength;
-                    if (ZoomColumn == d_ptr->m_selectionMode) {
+                    if (!d_ptr->m_zoomActivated && ZoomColumn == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
                     }
@@ -793,7 +795,7 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
     //qDebug() << "mouse button pressed" << event->button();
     if (Qt::LeftButton == event->button()) {
         if (d_ptr->m_zoomActivated) {
-            qDebug() << event->pos().x() << event->pos().y() << d_ptr->m_sceneViewPort << d_ptr->m_zoomViewPort;
+            //qDebug() << event->pos().x() << event->pos().y() << d_ptr->m_sceneViewPort << d_ptr->m_zoomViewPort;
             if (event->pos().x() <= d_ptr->m_sceneViewPort.width()
                     && event->pos().y() <= d_ptr->m_sceneViewPort.height()) {
                 d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnOverview;

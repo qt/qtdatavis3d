@@ -42,6 +42,7 @@
 #include "qdataset.h"
 
 #include <QGuiApplication>
+#include <QScreen>
 #include <QTimer>
 #include <QDebug>
 
@@ -316,7 +317,9 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     Q3DBars barchart;
-    barchart.resize(800, 600);
+    QSize screenSize = barchart.screen()->size();
+    barchart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
+    barchart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
     barchart.show();
 
     ChartDataGenerator *generator = new ChartDataGenerator(&barchart);
