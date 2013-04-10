@@ -10,6 +10,7 @@
         <file alias="cylinderSmooth">meshes/cylinderSmooth.obj</file>
         <file alias="background">meshes/backgroudFlat.obj</file>
         <file alias="backgroundSmooth">meshes/backgroudSmooth.obj</file>
+        <file alias="label">meshes/plane.obj</file>
     </qresource>
     <qresource prefix="/shaders">
         <file alias="fragment">shaders/fragmentShader</file>
@@ -18,5 +19,7 @@
         <file alias="fragmentColorOnY">shaders/fragmentShaderColorOnY</file>
         <file alias="fragmentSelection">shaders/fragmentShaderSelection</file>
         <file alias="vertexSelection">shaders/vertexShaderSelection</file>
+        <file alias="fragmentTexture">shaders/fragmentShaderTexture</file>
+        <file alias="vertexTexture">shaders/vertexShaderTexture</file>
     </qresource>
 </RCC>

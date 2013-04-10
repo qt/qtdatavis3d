@@ -46,6 +46,8 @@
 #include <QPainter>
 #include <QPoint>
 
+#include <qmath.h>
+
 #include <QDebug>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE

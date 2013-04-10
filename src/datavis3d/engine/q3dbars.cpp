@@ -623,6 +623,12 @@ void Q3DBars::drawScene()
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
+    // Texture test
+    //glEnable(GL_TEXTURE_2D);
+    //GLuint bgrTexture = QGLContext::bindTexture(QImage(":/cube.png"));
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     // Draw background
     if (d_ptr->m_backgroundObj) {
         QMatrix4x4 modelMatrix;
@@ -655,6 +661,11 @@ void Q3DBars::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS()
                                                    , d_ptr->m_ambientStrength);
 
+        // Bind the texture in texture unit 0
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, bgrTexture);
+//        glUniform1i(d_ptr->m_backgroundShader->texture(), 0);
+
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
@@ -668,10 +679,10 @@ void Q3DBars::drawScene()
                               , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // 3rd attribute buffer : UVs
-        //glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
-        //glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
-        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
+        glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
+                              , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());

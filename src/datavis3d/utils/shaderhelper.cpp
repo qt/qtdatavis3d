@@ -96,6 +96,7 @@ void ShaderHelper::initialize()
     m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
     m_ambientStrengthUniform = m_program->uniformLocation("ambientStrength");
     m_colorUniform = m_program->uniformLocation("color_mdl");
+    m_textureUniform = m_program->uniformLocation("textureSampler");
 
     m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
     m_uvAttr = m_program->attributeLocation("vertexUV");
@@ -188,6 +189,13 @@ GLuint ShaderHelper::color()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_colorUniform;
+}
+
+GLuint ShaderHelper::texture()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_textureUniform;
 }
 
 GLuint ShaderHelper::posAtt()

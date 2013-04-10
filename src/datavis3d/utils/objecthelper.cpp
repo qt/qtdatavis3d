@@ -113,15 +113,15 @@ void ObjectHelper::load()
                         , &indexed_normals.at(0)
                         , GL_STATIC_DRAW);
 
-    //m_caller->glGenBuffers(1, &m_uvbuffer);
-    //m_caller->glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    //m_caller->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D), &indexed_uvs.at(0)
-    //        , GL_STATIC_DRAW);
+    m_caller->glGenBuffers(1, &m_uvbuffer);
+    m_caller->glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+    m_caller->glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D)
+                           , &indexed_uvs.at(0), GL_STATIC_DRAW);
 
     m_caller->glGenBuffers(1, &m_elementbuffer);
     m_caller->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    m_caller->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices.at(0)
-                        , GL_STATIC_DRAW);
+    m_caller->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short)
+                           , &indices.at(0), GL_STATIC_DRAW);
 
     m_caller->glBindBuffer(GL_ARRAY_BUFFER, 0);
     m_caller->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
