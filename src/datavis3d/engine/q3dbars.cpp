@@ -160,6 +160,10 @@ void Q3DBars::render(QPainter *painter)
         Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->position());
     } else if (d_ptr->m_zoomActivated) {
         glDisable(GL_DEPTH_TEST);
+        float scale = 1.0f;
+        //painter->setWindow(d_ptr->m_zoomViewPort); // Using these causes unwanted transformations
+        //painter->setViewport(d_ptr->m_zoomViewPort); // Using these causes unwanted transformations
+        //painter->setViewTransformEnabled(false); // Using these causes unwanted transformations
         for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
             // print value of each column
             QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
@@ -169,26 +173,29 @@ void Q3DBars::render(QPainter *painter)
             float coordX;
             if (ZoomColumn == d_ptr->m_selectionMode) {
                 coordX = (-(item->d_ptr->translation().z() - zComp) // flip front to left
-                          * d_ptr->m_zoomViewPort.width() / 2
-                          + d_ptr->m_zoomViewPort.width()) / 2;
-                //coordX = ((item->d_ptr->translation().z() - zComp)
-                //          * d_ptr->m_zoomViewPort.height()
-                //          + d_ptr->m_zoomViewPort.width()) / 2;
+                          * d_ptr->m_zoomViewPort.height() / 2.0f
+                          + d_ptr->m_zoomViewPort.width()) / 2.0f;
             } else {
                 coordX = (item->d_ptr->translation().x()
-                          * d_ptr->m_zoomViewPort.width() / 2
-                          + d_ptr->m_zoomViewPort.width()) / 2;
-                //coordX = (item->d_ptr->translation().x()
-                //          * d_ptr->m_zoomViewPort.height()
-                //          + d_ptr->m_zoomViewPort.width()) / 2;
+                          * d_ptr->m_zoomViewPort.height() / 2.0f
+                          + d_ptr->m_zoomViewPort.width()) / 2.0f;
             }
-            float coordY = ((1 - item->d_ptr->translation().y())
-                            * d_ptr->m_zoomViewPort.height()) / 2;
-            QPoint screenCoords(coordX
-                                , coordY - (d_ptr->m_zoomViewPort.height() / 4)
-                                * (item->d_ptr->value() / d_ptr->m_heightNormalizer) - 50);
-            //qDebug() << "bar" << col << "position on screen" << screenCoords << item->d_ptr->valueStr();
-            Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, 45);
+            if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
+                scale = (float)d_ptr->m_zoomViewPort.width()
+                        / (float)d_ptr->m_zoomViewPort.height();
+            }
+            //float coordY = ((1.0f - item->d_ptr->translation().y())
+            //                * d_ptr->m_zoomViewPort.height()) / 2.0f;
+            // Use a fixed label distance from the bottom of the screen
+            QPoint screenCoords(coordX, 150.0f); // use coord Y for reducing from painter window height to avoid unwanted transformations
+            Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, false, 60.0f, scale);
+            //QPoint screenCoords(coordX, d_ptr->m_zoomViewPort.height() - 100.0f);
+            // Use a label distance from the bottom of the screen based on bar height
+            //QPoint screenCoords(coordX, coordY - (d_ptr->m_zoomViewPort.height() / 4.0f)
+            //                    * (item->d_ptr->value() / d_ptr->m_heightNormalizer));
+            //qDebug() << "bar" << col << "position on screen" << screenCoords << item->d_ptr->valueStr()
+            //         << "viewport:" << d_ptr->m_zoomViewPort.width() << d_ptr->m_zoomViewPort.height();
+            //Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, true, 60.0f);
         }
     }
 }
@@ -217,7 +224,7 @@ void Q3DBars::drawZoomScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(30.0f, (float)d_ptr->m_zoomViewPort.width()
+    projectionMatrix.perspective(45.0f, (float)d_ptr->m_zoomViewPort.width()
                                  / (float)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
 
 #ifdef ROTATE_ZOOM_SELECTION
@@ -238,10 +245,34 @@ void Q3DBars::drawZoomScene()
 #else
     // Set view matrix
     QMatrix4x4 viewMatrix;
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 6.0f + zComp)
+#if 1
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 5.0f + zComp)
                       , QVector3D(0.0f, 0.0f, zComp)
                       , QVector3D(0.0f, 1.0f, 0.0f));
-    //viewMatrix.scale(1.275f);
+#else
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, d_ptr->m_scaleFactorX + zComp)
+                      , QVector3D(0.0f, 0.0f, zComp)
+                      , QVector3D(0.0f, 1.0f, 0.0f));
+    float zoomwidth;
+    if (ZoomRow == d_ptr->m_selectionMode) {
+        zoomwidth = d_ptr->m_zoomSelection->d_ptr->getItem(0)->d_ptr->translation().x()
+                - d_ptr->m_zoomSelection->d_ptr->getItem(d_ptr->m_zoomSelection->d_ptr->row().size()
+                                                         - 1)->d_ptr->translation().x();
+        zoomwidth *= d_ptr->m_scaleX;
+    } else {
+        zoomwidth = d_ptr->m_zoomSelection->d_ptr->getItem(0)->d_ptr->translation().z()
+                - d_ptr->m_zoomSelection->d_ptr->getItem(d_ptr->m_zoomSelection->d_ptr->row().size()
+                                                         - 1)->d_ptr->translation().z();
+        zoomwidth *= d_ptr->m_scaleZ;
+    }
+    qDebug() << "zoomwidth" << zoomwidth << "inverse / 2" << 0.5f / zoomwidth;
+    viewMatrix.scale(0.5f / zoomwidth);
+#endif
+    if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
+        viewMatrix.scale((float)d_ptr->m_zoomViewPort.width()
+                         / (float)d_ptr->m_zoomViewPort.height());
+        // TODO: Center shrunk view
+    }
 
     // Set light position a bit above the camera (depends on do we have row or column zoom)
     if (ZoomColumn == d_ptr->m_selectionMode)
@@ -268,7 +299,7 @@ void Q3DBars::drawZoomScene()
         else
             barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX
-                              , item->d_ptr->translation().y() - 0.5f
+                              , item->d_ptr->translation().y() - 0.5f// TODO: Needs a better system; calculate y position modifier somehow
                               , zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
@@ -410,7 +441,7 @@ void Q3DBars::drawScene()
     glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y()
                , d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
 
-    // Set projection matrix
+    // Set up projection matrix
     QMatrix4x4 projectionMatrix;
     projectionMatrix.perspective(45.0f, (float)d_ptr->m_sceneViewPort.width()
                                  / (float)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
@@ -420,6 +451,11 @@ void Q3DBars::drawScene()
                                                               , d_ptr->m_zoomLevel
                                                               , d_ptr->m_sceneViewPort.width()
                                                               , d_ptr->m_sceneViewPort.height());
+    if (d_ptr->m_sceneViewPort.height() > d_ptr->m_sceneViewPort.width()) {
+        viewMatrix.scale((float)d_ptr->m_sceneViewPort.width()
+                         / (float)d_ptr->m_sceneViewPort.height());
+        // TODO: Center shrunk view
+    }
 
     // Calculate drawing order
     //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
@@ -921,9 +957,7 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     else
         d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
     d_ptr->m_zoomViewPort = QRect(0, 0, width(), height());
-
-    // If orientation changes, we need to scale again
-    // TODO: Handle it
+    qDebug() << d_ptr->m_zoomViewPort;
 }
 
 void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)

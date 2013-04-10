@@ -58,7 +58,7 @@ QVector3D Utils::vectorFromColor(const QColor &color)
 }
 
 void Utils::printText(QPainter *painter, const QString &text, const QPoint &position
-                      , qreal rotation)
+                      , bool absoluteCoords, qreal rotation, qreal scale)
 {
     painter->save();
     painter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -102,9 +102,26 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
                       , Qt::AlignCenter | Qt::AlignVCenter
                       , text);
 #else
-    painter->translate(position.x() - ((bgrStrLen / 2) * cos(rotation * m_pi / 180))
-                       + ((bgrHeight / 2) * sin(rotation * m_pi / 180))
-                       , position.y() - bgrHeight);
+    //qDebug() << painter->window() << painter->viewport();
+    painter->scale(scale, scale);
+    if (absoluteCoords) {
+        // This assumes absolute screen coordinates
+        painter->translate(position.x() - (((float)bgrStrLen / 2.0f) * cos(rotation * m_pi / 180.0f))
+                           + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f))
+                           , position.y()
+                           - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
+                              + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
+    } else {
+        // This calculates y as a distance from screen bottom
+        painter->translate(position.x() - (((float)bgrStrLen / 2) * cos(rotation * m_pi / 180.0f))
+                           + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f))
+                           , painter->window().height() - position.y()
+                           - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
+                              + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
+    }
+    //qDebug() << painter->window().height() - position.y()
+    //            - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
+    //               + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f)));
     painter->rotate(rotation);
     painter->drawText(0, 0
                       , bgrStrLen, bgrHeight
