@@ -1,3 +1,4 @@
+qtHaveModule(multimedia) {
 include(spectrum.pri)
 
 TEMPLATE = subdirs
@@ -9,4 +10,4 @@ SUBDIRS += 3rdparty/fftreal
 SUBDIRS += spectrumapp
 
 TARGET = spectrum
-
+}

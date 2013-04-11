@@ -22,4 +22,7 @@
         <file alias="fragmentTexture">shaders/fragmentShaderTexture</file>
         <file alias="vertexTexture">shaders/vertexShaderTexture</file>
     </qresource>
+    <qresource prefix="/textures">
+        <file alias="cubetex">textures/cube.png</file>
+    </qresource>
 </RCC>

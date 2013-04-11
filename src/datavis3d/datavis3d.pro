@@ -1,5 +1,5 @@
 TARGET = QtDataVis3D
-QT = core gui #qml
+QT = core gui opengl #qml
 
 DEFINES += QTCOMMERCIALDATAVIS3D_LIBRARY
 

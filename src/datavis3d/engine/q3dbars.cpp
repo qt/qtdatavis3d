@@ -47,6 +47,7 @@
 #include "qdataset_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "texturehelper_p.h"
 #include "utils_p.h"
 
 #include <QMatrix4x4>
@@ -85,8 +86,11 @@ void Q3DBars::initialize()
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragment"));
     }
-    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex")
-                                 , QStringLiteral(":/shaders/fragment"));
+    // TODO: Texture test
+    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture")
+                                 , QStringLiteral(":/shaders/fragmentTexture"));
+//    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture")
+//                                 , QStringLiteral(":/shaders/fragmentTexture"));
     d_ptr->initSelectionShader();
 
 #ifndef USE_HAX0R_SELECTION
@@ -623,11 +627,9 @@ void Q3DBars::drawScene()
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
-    // Texture test
-    //glEnable(GL_TEXTURE_2D);
-    //GLuint bgrTexture = QGLContext::bindTexture(QImage(":/cube.png"));
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // TODO: Texture test
+    glEnable(GL_TEXTURE_2D);
+    GLuint bgrTexture = TextureHelper::create2DTexture(QImage(QStringLiteral(":/textures/cubetex")));
 
     // Draw background
     if (d_ptr->m_backgroundObj) {
@@ -660,11 +662,11 @@ void Q3DBars::drawScene()
                                                    , d_ptr->m_lightStrength);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS()
                                                    , d_ptr->m_ambientStrength);
-
-        // Bind the texture in texture unit 0
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, bgrTexture);
-//        glUniform1i(d_ptr->m_backgroundShader->texture(), 0);
+        // TODO: Texture test
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, bgrTexture);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->texture()
+                                                   , 0);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
@@ -678,6 +680,7 @@ void Q3DBars::drawScene()
         glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt()
                               , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+        // TODO: Texture test
         // 3rd attribute buffer : UVs
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
         glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
@@ -695,10 +698,17 @@ void Q3DBars::drawScene()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        //glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
+        // TODO: Texture test
+        glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
+
         glDisableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
         glDisableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
     }
+
+    // TODO: Texture test
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &bgrTexture);
+    glDisable(GL_TEXTURE_2D);
 
     // Release background shader
     d_ptr->m_backgroundShader->release();
