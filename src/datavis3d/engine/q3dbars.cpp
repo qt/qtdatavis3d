@@ -63,6 +63,7 @@
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
+//#define USE_PAINTER_TEXT // Use QPainter labels or opengl labels
 
 const float zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
@@ -86,11 +87,14 @@ void Q3DBars::initialize()
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
                            , QStringLiteral(":/shaders/fragment"));
     }
-    // TODO: Texture test
-    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture")
-                                 , QStringLiteral(":/shaders/fragmentTexture"));
 //    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture")
 //                                 , QStringLiteral(":/shaders/fragmentTexture"));
+    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex")
+                                 , QStringLiteral(":/shaders/fragment"));
+#ifndef USE_PAINTER_TEXT
+    d_ptr->initLabelShaders(QStringLiteral(":/shaders/vertexLabel")
+                            , QStringLiteral(":/shaders/fragmentLabel"));
+#endif
     d_ptr->initSelectionShader();
 
 #ifndef USE_HAX0R_SELECTION
@@ -103,6 +107,11 @@ void Q3DBars::initialize()
 
     // Load background mesh
     d_ptr->loadBackgroundMesh();
+
+#ifndef USE_PAINTER_TEXT
+    // Load label mesh
+    d_ptr->loadLabelMesh();
+#endif
 
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
@@ -131,6 +140,7 @@ void Q3DBars::render()
     if (!d_ptr->m_isInitialized)
         return;
 
+#ifdef USE_PAINTER_TEXT
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
         painter.setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -140,6 +150,17 @@ void Q3DBars::render()
     } else {
         d_ptr->m_paintDevice = getDevice();
     }
+#else
+    // Set OpenGL features
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    // If zoom selection is on, draw zoom scene
+    drawZoomScene();
+    // Draw bars scene
+    drawScene();
+#endif
 }
 
 void Q3DBars::render(QPainter *painter)
@@ -422,6 +443,99 @@ void Q3DBars::drawZoomScene()
 #endif
     // Release bar shader
     d_ptr->m_barShader->release();
+
+#ifndef USE_PAINTER_TEXT
+    // Draw labels (or values of bars)
+    const bool transparentLabel = false;
+    d_ptr->m_labelShader->bind();
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    if (transparentLabel) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+        // TODO: Optimize! Create textures only when zoomselection changes! Store the texture id's into zoomselection
+        QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
+        // Create labels
+        // Print label into a QImage using QPainter
+        QImage label = Utils::printTextToImage(item->d_ptr->valueStr(), d_ptr->m_backgroundColor
+                                               , d_ptr->m_textColor, transparentLabel);
+
+        // Insert text texture into label
+        GLuint labelTexture = d_ptr->m_textureHelper->create2DTexture(label, false, false);
+
+        // Draw label
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        if (ZoomColumn == d_ptr->m_selectionMode) {
+            modelMatrix.translate(-(item->d_ptr->translation().z()) - zComp
+                                  , -1.5f//item->d_ptr->translation().y()
+                                  , zComp);
+        } else {
+            modelMatrix.translate(item->d_ptr->translation().x()
+                                  , -1.5f//item->d_ptr->translation().y()
+                                  , zComp);
+        }
+
+        // Rotate
+        modelMatrix.rotate(-45.0f, 0.0f, 0.0f, 1.0f);
+
+        // TODO: Calculate uniform scaling from font height
+        // Scale label based on text size
+        modelMatrix.scale(QVector3D((float)label.width() / 450.0f
+                                    , (float)label.height() / 450.0f
+                                    , 0.0f));
+
+        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP()
+                                              , MVPMatrix);
+
+        // Activate texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, labelTexture);
+        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->texture()
+                                              , 0);
+
+        // 1st attribute buffer : vertices
+        glEnableVertexAttribArray(d_ptr->m_labelShader->posAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->vertexBuf());
+        glVertexAttribPointer(d_ptr->m_labelShader->posAtt()
+                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        // 2nd attribute buffer : UVs
+        glEnableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->uvBuf());
+        glVertexAttribPointer(d_ptr->m_labelShader->uvAtt()
+                              , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+        // Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_labelObj->elementBuf());
+
+        // Draw the triangles
+        glDrawElements(GL_TRIANGLES, d_ptr->m_labelObj->indexCount()
+                       , GL_UNSIGNED_SHORT, (void*)0);
+
+        // Free buffers
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        glDisableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
+        glDisableVertexAttribArray(d_ptr->m_labelShader->posAtt());
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDeleteTextures(1, &labelTexture);
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    if (transparentLabel)
+        glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+
+    // Release label shader
+    d_ptr->m_labelShader->release();
+#endif
 }
 
 void Q3DBars::drawScene()
@@ -627,9 +741,11 @@ void Q3DBars::drawScene()
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
-    // TODO: Texture test
-    glEnable(GL_TEXTURE_2D);
-    GLuint bgrTexture = TextureHelper::create2DTexture(QImage(QStringLiteral(":/textures/cubetex")));
+    // TODO: If we want to use background texture, we should create it in initBackground instead of here and keep the texture id in d_ptr
+    // Create texture
+    //glEnable(GL_TEXTURE_2D);
+    //GLuint bgrTexture = d_ptr->m_textureHelper->create2DTexture(
+    //            QImage(QStringLiteral(":/textures/cubetex")), true);
 
     // Draw background
     if (d_ptr->m_backgroundObj) {
@@ -662,11 +778,11 @@ void Q3DBars::drawScene()
                                                    , d_ptr->m_lightStrength);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS()
                                                    , d_ptr->m_ambientStrength);
-        // TODO: Texture test
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, bgrTexture);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->texture()
-                                                   , 0);
+        // Activate texture
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, bgrTexture);
+        //d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->texture()
+        //                                           , 0);
 
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
@@ -680,12 +796,11 @@ void Q3DBars::drawScene()
         glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt()
                               , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-        // TODO: Texture test
         // 3rd attribute buffer : UVs
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
-                              , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        //glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
+        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
+        //glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
+        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
@@ -698,17 +813,15 @@ void Q3DBars::drawScene()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        // TODO: Texture test
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-
+        //glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
         glDisableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
         glDisableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
     }
 
-    // TODO: Texture test
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDeleteTextures(1, &bgrTexture);
-    glDisable(GL_TEXTURE_2D);
+    // Disable textures
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    //glDeleteTextures(1, &bgrTexture);  // TODO: If we want to use background texture, we should create it in initBackground and delete on exit
+    //glDisable(GL_TEXTURE_2D);
 
     // Release background shader
     d_ptr->m_backgroundShader->release();
@@ -1456,8 +1569,10 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_barShader(0)
     , m_selectionShader(0)
     , m_backgroundShader(0)
+    , m_labelShader(0)
     , m_barObj(0)
     , m_backgroundObj(0)
+    , m_labelObj(0)
     , m_sampleCount(QPoint(0, 0))
     , m_objFile(QStringLiteral(":/defaultMeshes/bar"))
     , m_mousePressed(MouseNone)
@@ -1502,6 +1617,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_sceneViewPort(0, 0, q->width(), q->height())
     , m_zoomViewPort(0, 0, q->width(), q->height())
     , m_zoomActivated(false)
+    , m_textureHelper(new TextureHelper())
 {
 }
 
@@ -1518,6 +1634,7 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_backgroundShader;
     delete m_barObj;
     delete m_backgroundObj;
+    delete m_textureHelper;
 
 #ifndef USE_HAX0R_SELECTION
     q_ptr->glDeleteFramebuffers(1, &m_framebufferSelection);
@@ -1530,7 +1647,7 @@ void Q3DBarsPrivate::loadBarMesh()
 {
     if (m_barObj)
         delete m_barObj;
-    m_barObj = new ObjectHelper(q_ptr, m_objFile);
+    m_barObj = new ObjectHelper(m_objFile);
     m_barObj->load();
 }
 
@@ -1538,8 +1655,16 @@ void Q3DBarsPrivate::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
-    m_backgroundObj = new ObjectHelper(q_ptr, QStringLiteral(":/defaultMeshes/background"));
+    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
     m_backgroundObj->load();
+}
+
+void Q3DBarsPrivate::loadLabelMesh()
+{
+    if (m_labelObj)
+        delete m_labelObj;
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj->load();
 }
 
 void Q3DBarsPrivate::initShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -1603,6 +1728,15 @@ void Q3DBarsPrivate::initBackgroundShaders(const QString &vertexShader
         delete m_backgroundShader;
     m_backgroundShader = new ShaderHelper(q_ptr, vertexShader, fragmentShader);
     m_backgroundShader->initialize();
+}
+
+void Q3DBarsPrivate::initLabelShaders(const QString &vertexShader
+                                      , const QString &fragmentShader)
+{
+    if (m_labelShader)
+        delete m_labelShader;
+    m_labelShader = new ShaderHelper(q_ptr, vertexShader, fragmentShader);
+    m_labelShader->initialize();
 }
 
 void Q3DBarsPrivate::calculateSceneScalingFactors()

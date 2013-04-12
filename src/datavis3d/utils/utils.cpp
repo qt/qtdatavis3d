@@ -45,6 +45,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QPoint>
+#include <QImage>
 
 #include <qmath.h>
 
@@ -138,6 +139,53 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
     painter->resetTransform();
 #endif
     painter->restore();
+}
+
+QImage Utils::printTextToImage(const QString &text, const QColor &bgrColor, const QColor &txtColor
+                               , bool noBackground)
+{
+    // Calculate text dimensions
+    QFont valueFont = QFont(QStringLiteral("Arial"), 11);
+    valueFont.setBold(true);
+    QFontMetrics valueFM(valueFont);
+    int valueStrWidth = valueFM.width(text);
+    int valueStrHeight = valueFM.height();
+    QSize labelSize;
+    if (noBackground)
+        labelSize = QSize(valueStrWidth, valueStrHeight);
+    else
+        labelSize = QSize(valueStrWidth + 10, valueStrHeight + 10);
+
+    // Create image
+    QImage image = QImage(labelSize, QImage::Format_ARGB32);
+
+    // Init painter
+    QPainter painter(&image);
+    // Paint text
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    if (noBackground) {
+        painter.setBackgroundMode(Qt::OpaqueMode);
+        painter.setBackground(Qt::transparent);
+        painter.setBrush(Qt::transparent);
+        painter.setFont(valueFont);
+        painter.setPen(txtColor);
+        painter.drawText(0, 0
+                         , valueStrWidth, valueStrHeight
+                         , Qt::AlignCenter | Qt::AlignVCenter
+                         , text);
+    } else {
+        painter.setBrush(QBrush(bgrColor));
+        painter.setPen(bgrColor);
+        painter.drawRect(0, 0, labelSize.width(), labelSize.height());
+        painter.setFont(valueFont);
+        painter.setPen(txtColor);
+        painter.drawText(5, 5
+                         , valueStrWidth, valueStrHeight
+                         , Qt::AlignCenter | Qt::AlignVCenter
+                         , text);
+    }
+    return image;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

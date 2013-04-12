@@ -47,18 +47,32 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering)
+TextureHelper::TextureHelper()
+{
+    initializeOpenGLFunctions();
+}
+
+TextureHelper::~TextureHelper()
+{
+}
+
+GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering, bool convert)
 {
     GLuint textureId;
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
-    QImage glTexture = TextureHelper::convertToGLFormat(image);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height()
-                 , 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
+    if (convert) {
+        QImage glTexture = convertToGLFormat(image);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height()
+                     , 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height()
+                     , 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+    }
     if (useTrilinearFiltering) {
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -71,19 +85,19 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
 {
     GLuint textureId;
     glGenTextures(1, &textureId);
-//    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-//    QImage glTexture = convertToGLFormat(image);
-//    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGB, glTexture.width(), glTexture.height()
-//                 , 0, GL_RGB, GL_UNSIGNED_BYTE, glTexture.bits());
-//    if (useTrilinearFiltering) {
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-//    } else {
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    }
-//    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+    QImage glTexture = convertToGLFormat(image);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGB, glTexture.width(), glTexture.height()
+                 , 0, GL_RGB, GL_UNSIGNED_BYTE, glTexture.bits());
+    if (useTrilinearFiltering) {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    } else {
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;
 }
 
@@ -141,9 +155,9 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
                     const uint *end = p + width;
                     while (p < end) {
                         *q = ((*p << 24) & 0xff000000)
-                             | ((*p >> 24) & 0x000000ff)
-                             | ((*p << 8) & 0x00ff0000)
-                             | ((*p >> 8) & 0x0000ff00);
+                                | ((*p >> 24) & 0x000000ff)
+                                | ((*p << 8) & 0x00ff0000)
+                                | ((*p >> 8) & 0x0000ff00);
                         p++;
                         q++;
                     }
@@ -188,9 +202,9 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
     if (texture_format == GL_BGRA) {
         if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
             return ((src_pixel << 24) & 0xff000000)
-                   | ((src_pixel >> 24) & 0x000000ff)
-                   | ((src_pixel << 8) & 0x00ff0000)
-                   | ((src_pixel >> 8) & 0x0000ff00);
+                    | ((src_pixel >> 24) & 0x000000ff)
+                    | ((src_pixel << 8) & 0x00ff0000)
+                    | ((src_pixel >> 8) & 0x0000ff00);
         } else {
             return src_pixel;
         }
@@ -199,8 +213,8 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
             return (src_pixel << 8) | ((src_pixel >> 24) & 0xff);
         } else {
             return ((src_pixel << 16) & 0xff0000)
-                   | ((src_pixel >> 16) & 0xff)
-                   | (src_pixel & 0xff00ff00);
+                    | ((src_pixel >> 16) & 0xff)
+                    | (src_pixel & 0xff00ff00);
         }
     }
 }

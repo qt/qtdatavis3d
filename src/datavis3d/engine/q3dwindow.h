@@ -76,7 +76,7 @@ protected:
     bool event(QEvent *event);
 
     void exposeEvent(QExposeEvent *event);
-    void resizeEvent(QResizeEvent *event);
+//    void resizeEvent(QResizeEvent *event);
 
 private:
     QOpenGLPaintDevice *getDevice();

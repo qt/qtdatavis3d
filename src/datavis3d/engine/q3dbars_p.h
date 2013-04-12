@@ -57,6 +57,7 @@ class QDataRow;
 class QDataSet;
 class ShaderHelper;
 class ObjectHelper;
+class TextureHelper;
 
 class Q3DBarsPrivate
 {
@@ -82,9 +83,11 @@ public:
 
     void loadBarMesh();
     void loadBackgroundMesh();
+    void loadLabelMesh();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
     void calculateSceneScalingFactors();
     SelectionType isSelected(int row, int bar, const QVector3D &selection);
@@ -97,8 +100,10 @@ public:
     ShaderHelper *m_barShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
+    ShaderHelper *m_labelShader;
     ObjectHelper *m_barObj;
     ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_labelObj;
     QPoint m_sampleCount;
     QString m_objFile;
     MousePressType m_mousePressed;
@@ -146,6 +151,7 @@ public:
     QRect m_sceneViewPort;
     QRect m_zoomViewPort;
     bool m_zoomActivated;
+    TextureHelper *m_textureHelper;
 
 };
 

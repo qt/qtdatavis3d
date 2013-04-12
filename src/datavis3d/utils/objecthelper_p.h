@@ -47,10 +47,10 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class ObjectHelper
+class ObjectHelper: protected QOpenGLFunctions
 {
     public:
-    ObjectHelper(QOpenGLFunctions *parent, const QString &objectFile = QString());
+    ObjectHelper(const QString &objectFile = QString());
     ~ObjectHelper();
 
     void setObjectFile(const QString &objectFile);
@@ -64,8 +64,6 @@ class ObjectHelper
     GLuint indexCount();
 
     private:
-    QOpenGLFunctions *m_caller;
-
     QString m_objectFile;
 
     GLuint m_vertexbuffer;

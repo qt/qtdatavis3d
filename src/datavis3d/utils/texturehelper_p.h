@@ -48,17 +48,21 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class TextureHelper
+class TextureHelper: protected QOpenGLFunctions
 {
 public:
+    TextureHelper();
+    ~TextureHelper();
+
     // Ownership of created texture is transferred to caller
-    static GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false);
-    static GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
+    GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false
+            , bool convert = true);
+    GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
 
 private:
-    static QImage convertToGLFormat(const QImage &srcImage);
-    static void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
-    static QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
+    QImage convertToGLFormat(const QImage &srcImage);
+    void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
+    QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

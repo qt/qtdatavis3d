@@ -49,6 +49,7 @@ class QColor;
 class QPainter;
 class QString;
 class QPoint;
+class QImage;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -58,6 +59,8 @@ public:
     static QVector3D vectorFromColor(const QColor &color);
     static void printText(QPainter *painter, const QString &text, const QPoint &position
                           , bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
+    static QImage printTextToImage(const QString &text, const QColor &bgrColor
+                                  , const QColor &txtColor, bool noBackground = false);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

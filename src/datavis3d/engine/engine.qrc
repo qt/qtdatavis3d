@@ -21,6 +21,8 @@
         <file alias="vertexSelection">shaders/vertexShaderSelection</file>
         <file alias="fragmentTexture">shaders/fragmentShaderTexture</file>
         <file alias="vertexTexture">shaders/vertexShaderTexture</file>
+        <file alias="fragmentLabel">shaders/fragmentShaderLabel</file>
+        <file alias="vertexLabel">shaders/vertexShaderLabel</file>
     </qresource>
     <qresource prefix="/textures">
         <file alias="cubetex">textures/cube.png</file>

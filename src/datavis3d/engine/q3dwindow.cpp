@@ -124,13 +124,13 @@ void Q3DWindow::exposeEvent(QExposeEvent *event)
         renderNow();
 }
 
-void Q3DWindow::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
+//void Q3DWindow::resizeEvent(QResizeEvent *event)
+//{
+//    Q_UNUSED(event);
 
-    if (isExposed())
-        renderNow();
-}
+//    if (isExposed())
+//        renderLater();
+//}
 
 void Q3DWindow::renderNow()
 {
