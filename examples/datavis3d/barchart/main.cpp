@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of the documentation of the Qt Toolkit.
@@ -111,6 +111,9 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #ifndef CYCLE_THROUGH_THEMES
     // Set bar colors
     m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
+    m_chart->setLabelTransparency(Q3DBars::TransparencyFromTheme);
+#else
+    m_chart->setLabelTransparency(Q3DBars::TransparencyNone);
 #endif
 
     // Set preset camera position

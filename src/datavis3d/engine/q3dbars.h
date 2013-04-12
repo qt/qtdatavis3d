@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2012 Digia Plc and/or its subsidiary(-ies).
+** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of the QtDataVis3D module.
@@ -104,8 +104,6 @@ public:
         TransparencyNoBackground    // Draw just text on transparent background
     };
 
-    // TODO: Implement modes for "zooming" into selected row/column, ie. display only selected row/column
-    // in full window and 3d chart in a small viewport
     enum SelectionMode {
         None = 0,
         Bar,
