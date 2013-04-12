@@ -55,7 +55,7 @@ Theme::Theme()
     , m_backgroundColor(QColor(Qt::gray))
     , m_windowColor(QColor(Qt::gray))
     , m_textColor(QColor(Qt::white))
-    , m_textBackgroundColor(QColor(Qt::black))
+    , m_textBackgroundColor(QColor(0x00, 0x00, 0x00, 0x80))
     , m_highlightBarColor(QColor(Qt::red))
     , m_highlightRowColor(QColor(Qt::darkRed))
     , m_highlightColumnColor(QColor(Qt::darkMagenta))
@@ -95,7 +95,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
                                GetGValue(colorWindow),
                                GetBValue(colorWindow));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(QRgb(0xe2e2e2));
         m_highlightRowColor = QColor(QRgb(0xf2f2f2));
         m_highlightColumnColor = QColor(QRgb(0xf2f2f2));
@@ -110,7 +110,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(QRgb(0xe2e2e2));
         m_highlightRowColor = QColor(QRgb(0xf2f2f2));
         m_highlightColumnColor = QColor(QRgb(0xf2f2f2));
@@ -125,7 +125,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(QRgb(0xe2e2e2));
         m_highlightRowColor = QColor(QRgb(0xf2f2f2));
         m_highlightColumnColor = QColor(QRgb(0xf2f2f2));
@@ -140,7 +140,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(QRgb(0xe2e2e2));
         m_highlightRowColor = QColor(QRgb(0xf2f2f2));
         m_highlightColumnColor = QColor(QRgb(0xf2f2f2));
@@ -159,7 +159,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0x056189));
         m_windowColor = QColor(QRgb(0x101a31));
         m_textColor = QColor(QRgb(0xffffff));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(Qt::blue);
         m_highlightRowColor = QColor(Qt::darkBlue);
         m_highlightColumnColor = QColor(Qt::darkBlue);
@@ -177,7 +177,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(Qt::white);
         m_highlightRowColor = QColor(Qt::lightGray);
         m_highlightColumnColor = QColor(Qt::lightGray);
@@ -195,7 +195,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(Qt::lightGray);
         m_highlightRowColor = QColor(Qt::gray);
         m_highlightColumnColor = QColor(Qt::gray);
@@ -213,7 +213,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xf3ece0));
         m_windowColor = QColor(QRgb(0xf3ece0));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xb5b0a7));
+        m_textBackgroundColor = QColor(0xb5, 0xb0, 0xa7, 0x80);
         m_highlightBarColor = QColor(Qt::yellow);
         m_highlightRowColor = QColor(Qt::darkYellow);
         m_highlightColumnColor = QColor(Qt::darkYellow);
@@ -231,7 +231,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0x2e303a));
         m_windowColor = QColor(QRgb(0x121218));
         m_textColor = QColor(QRgb(0xffffff));
-        m_textBackgroundColor = QColor(QRgb(0x86878c));
+        m_textBackgroundColor = QColor(0x86, 0x87, 0x8c, 0x80);
         m_highlightBarColor = QColor(Qt::gray);
         m_highlightRowColor = QColor(Qt::darkGray);
         m_highlightColumnColor = QColor(Qt::darkGray);
@@ -249,7 +249,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xeeeeee));
         m_windowColor = QColor(QRgb(0x000000));
         m_textColor = QColor(QRgb(0x181818));
-        m_textBackgroundColor = QColor(QRgb(0x8c8c8c));
+        m_textBackgroundColor = QColor(0x8c, 0x8c, 0x8c, 0x80);
         m_highlightBarColor = QColor(Qt::black);
         m_highlightRowColor = QColor(Qt::white);
         m_highlightColumnColor = QColor(Qt::white);
@@ -267,7 +267,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(QRgb(0xd6d6d6));
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
         m_highlightBarColor = QColor(Qt::white);
         m_highlightRowColor = QColor(Qt::lightGray);
         m_highlightColumnColor = QColor(Qt::lightGray);

@@ -447,26 +447,29 @@ void Q3DBars::drawZoomScene()
 
 #ifndef USE_PAINTER_TEXT
     // Draw labels (or values of bars)
-    const bool transparentLabel = false;
     d_ptr->m_labelShader->bind();
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
-    if (transparentLabel) {
+    if (d_ptr->m_labelTransparency > TransparencyNone) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+        //
         // TODO: Optimize! Create textures only when zoomselection changes! Store the texture id's into zoomselection
+        //
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         // Create labels
         // Print label into a QImage using QPainter
         QImage label = Utils::printTextToImage(item->d_ptr->valueStr()
                                                , d_ptr->m_theme->m_textBackgroundColor
                                                , d_ptr->m_theme->m_textColor
-                                               , transparentLabel);
+                                               , d_ptr->m_labelTransparency);
 
         // Insert text texture into label
-        GLuint labelTexture = d_ptr->m_textureHelper->create2DTexture(label, false, false);
+        GLuint labelTexture = d_ptr->m_textureHelper->create2DTexture(label, true, true);
+
+        // TODO: Fix drawing of labels when in ZoomColumn -mode
 
         // Draw label
         QMatrix4x4 modelMatrix;
@@ -484,10 +487,13 @@ void Q3DBars::drawZoomScene()
         // Rotate
         modelMatrix.rotate(-45.0f, 0.0f, 0.0f, 1.0f);
 
-        // TODO: Calculate uniform scaling from font height
+        // Calculate scale factor to get uniform font size
+        float scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
+        float scaleFactor = scaledFontSize / (float)label.height();
+
         // Scale label based on text size
-        modelMatrix.scale(QVector3D((float)label.width() / 450.0f
-                                    , (float)label.height() / 450.0f
+        modelMatrix.scale(QVector3D((float)label.width() * scaleFactor
+                                    , scaledFontSize
                                     , 0.0f));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -532,7 +538,7 @@ void Q3DBars::drawZoomScene()
     }
 
     glDisable(GL_TEXTURE_2D);
-    if (transparentLabel)
+    if (d_ptr->m_labelTransparency > TransparencyNone)
         glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
@@ -581,9 +587,8 @@ void Q3DBars::drawScene()
     // Calculate drawing order
     //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
     //qDebug() << "viewMatrix x" << viewMatrix.row(0).x(); // jos negatiivinen, käännä row -piirtojärjestys
-    // TODO: Needs more tuning unless we get depth test working correctly
-    // TODO: If depth test gets fixed, the draw order should be reversed for best performance (ie. draw front objects first)
-    if (viewMatrix.row(0).x() < 0) {
+    // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
+    if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
         stopRow = d_ptr->m_sampleCount.y();
         stepRow = 1;
@@ -592,7 +597,7 @@ void Q3DBars::drawScene()
         stopRow = -1;
         stepRow = -1;
     }
-    if (viewMatrix.row(0).z() > 0) {
+    if (viewMatrix.row(0).z() < 0) {
         startBar = 0;
         stopBar = d_ptr->m_sampleCount.x();
         stepBar = 1;
@@ -703,35 +708,8 @@ void Q3DBars::drawScene()
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        // TODO: Move into a separate function?
         if (Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
-#ifndef USE_HAX0R_SELECTION
-            glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
-#endif
-            // This is the only one that works with ANGLE (ES 2.0)
-            // Item count will be limited to 256*256*256
-            GLubyte pixel[4];
-            glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-                         GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
-
-            // These work with desktop OpenGL
-            // They offer a lot higher possible object count and a possibility to use object id's
-            //GLuint pixel2[3];
-            //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-            //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
-
-            //GLfloat pixel3[3];
-            //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
-            //             GL_RGB, GL_FLOAT, (void *)pixel3);
-
-            //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
-            //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
-            //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
-            selection = QVector3D(pixel[0], pixel[1], pixel[2]);
-            //qDebug() << selection;
-#ifndef USE_HAX0R_SELECTION
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
+            selection = Utils::getSelection(d_ptr->m_mousePos, height());
         }
 
         // Release selection shader
@@ -1317,6 +1295,16 @@ void Q3DBars::setWindowTitle(const QString &title)
     setTitle(title);
 }
 
+void Q3DBars::setFontSize(float fontsize)
+{
+    d_ptr->m_fontSize = fontsize;
+}
+
+void Q3DBars::setLabelTransparency(LabelTransparency transparency)
+{
+    d_ptr->m_labelTransparency = transparency;
+}
+
 void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow
                          , const QVector<QString> &labelsColumn)
 {
@@ -1460,6 +1448,8 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_zoomViewPort(0, 0, q->width(), q->height())
     , m_zoomActivated(false)
     , m_textureHelper(new TextureHelper())
+    , m_labelTransparency(Q3DBars::TransparencyNone)
+    , m_fontSize(10.0f)
 {
 }
 

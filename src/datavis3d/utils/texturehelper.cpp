@@ -87,8 +87,8 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
     QImage glTexture = convertToGLFormat(image);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGB, glTexture.width(), glTexture.height()
-                 , 0, GL_RGB, GL_UNSIGNED_BYTE, glTexture.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGBA, glTexture.width(), glTexture.height()
+                 , 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
     if (useTrilinearFiltering) {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

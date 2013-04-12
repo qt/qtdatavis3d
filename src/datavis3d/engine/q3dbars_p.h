@@ -137,6 +137,8 @@ public:
     QRect m_zoomViewPort;
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
+    Q3DBars::LabelTransparency m_labelTransparency;
+    float m_fontSize;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

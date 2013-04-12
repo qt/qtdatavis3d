@@ -98,6 +98,12 @@ public:
         ThemeLight
     };
 
+    enum LabelTransparency {
+        TransparencyNone = 0,       // Full solid, using colors from theme
+        TransparencyFromTheme,      // Use colors and transparencies from theme
+        TransparencyNoBackground    // Draw just text on transparent background
+    };
+
     // TODO: Implement modes for "zooming" into selected row/column, ie. display only selected row/column
     // in full window and 3d chart in a small viewport
     enum SelectionMode {
@@ -182,6 +188,12 @@ public:
 
     // Set window title
     void setWindowTitle(const QString &title);
+
+    // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just float?
+    void setFontSize(float fontsize);
+
+    // Label transparency adjustment
+    void setLabelTransparency(LabelTransparency transparency);
 
 protected:
     void mousePressEvent(QMouseEvent *event);

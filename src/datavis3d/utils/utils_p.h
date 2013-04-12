@@ -43,6 +43,7 @@
 #define UTILS_P_H
 
 #include "qdatavis3dglobal.h"
+#include "q3dbars.h"
 
 class QVector3D;
 class QColor;
@@ -59,8 +60,11 @@ public:
     static QVector3D vectorFromColor(const QColor &color);
     static void printText(QPainter *painter, const QString &text, const QPoint &position
                           , bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
-    static QImage printTextToImage(const QString &text, const QColor &bgrColor
-                                  , const QColor &txtColor, bool noBackground = false);
+    static QImage printTextToImage(const QString &text
+                                   , const QColor &bgrColor
+                                   , const QColor &txtColor
+                                   , Q3DBars::LabelTransparency transparency);
+    static QVector3D getSelection(QPoint mousepos, int height);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

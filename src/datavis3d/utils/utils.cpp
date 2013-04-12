@@ -142,50 +142,101 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
 }
 
 QImage Utils::printTextToImage(const QString &text, const QColor &bgrColor, const QColor &txtColor
-                               , bool noBackground)
+                               , Q3DBars::LabelTransparency transparency)
 {
     // Calculate text dimensions
-    QFont valueFont = QFont(QStringLiteral("Arial"), 11);
+    QFont valueFont = QFont(QStringLiteral("Arial"), 30);
     valueFont.setBold(true);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
     int valueStrHeight = valueFM.height();
     QSize labelSize;
-    if (noBackground)
+    if (Q3DBars::TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
-        labelSize = QSize(valueStrWidth + 10, valueStrHeight + 10);
+        labelSize = QSize(valueStrWidth + 30, valueStrHeight + 30);
 
     // Create image
     QImage image = QImage(labelSize, QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
 
     // Init painter
     QPainter painter(&image);
     // Paint text
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
-    if (noBackground) {
-        painter.setBackgroundMode(Qt::OpaqueMode);
-        painter.setBackground(Qt::transparent);
-        painter.setBrush(Qt::transparent);
+    switch (transparency) {
+    case Q3DBars::TransparencyNoBackground:
+    {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
         painter.drawText(0, 0
                          , valueStrWidth, valueStrHeight
                          , Qt::AlignCenter | Qt::AlignVCenter
                          , text);
-    } else {
+        break;
+    }
+    case Q3DBars::TransparencyFromTheme:
+    {
+        painter.setBrush(QBrush(bgrColor));
+        painter.setPen(bgrColor);
+        painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
+        painter.setFont(valueFont);
+        painter.setPen(txtColor);
+        painter.drawText(15, 15
+                         , valueStrWidth, valueStrHeight
+                         , Qt::AlignCenter | Qt::AlignVCenter
+                         , text);
+        break;
+    }
+    case Q3DBars::TransparencyNone:
+    {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());
         painter.setFont(valueFont);
         painter.setPen(txtColor);
-        painter.drawText(5, 5
+        painter.drawText(15, 15
                          , valueStrWidth, valueStrHeight
                          , Qt::AlignCenter | Qt::AlignVCenter
                          , text);
+        break;
+    }
     }
     return image;
+}
+
+QVector3D Utils::getSelection(QPoint mousepos, int height)
+{
+    QVector3D selectedColor;
+#ifndef USE_HAX0R_SELECTION
+    //glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
+#endif
+    // This is the only one that works with ANGLE (ES 2.0)
+    // Item count will be limited to 256*256*256
+    GLubyte pixel[4];
+    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
+                 GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+
+    // These work with desktop OpenGL
+    // They offer a lot higher possible object count and a possibility to use object id's
+    //GLuint pixel2[3];
+    //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+    //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
+
+    //GLfloat pixel3[3];
+    //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+    //             GL_RGB, GL_FLOAT, (void *)pixel3);
+
+    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
+    //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
+    //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
+    selectedColor = QVector3D(pixel[0], pixel[1], pixel[2]);
+    //qDebug() << selection;
+#ifndef USE_HAX0R_SELECTION
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+    return selectedColor;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
