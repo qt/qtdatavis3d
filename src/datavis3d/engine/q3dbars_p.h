@@ -58,6 +58,7 @@ class QDataSet;
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
+class Theme;
 
 class Q3DBarsPrivate
 {
@@ -123,23 +124,7 @@ public:
     float m_scaleFactorZ;
     float m_sceneScale;
     float m_maxSceneSize;
-    // TODO: move to themes/theme class..
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-    // TODO: Perhaps different shaders are required for different themes
-    // ..
+    Theme *m_theme;
     bool m_isInitialized;
     Q3DBars::SelectionMode m_selectionMode;
     QDataItem *m_selectedBar;
@@ -152,7 +137,6 @@ public:
     QRect m_zoomViewPort;
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
-
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

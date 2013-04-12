@@ -82,8 +82,8 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
     , m_styleTimer(0)
     , m_presetTimer(0)
     , m_themeTimer(0)
-    , m_columnCount(9)
-    , m_rowCount(9)
+    , m_columnCount(21)
+    , m_rowCount(21)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
@@ -304,12 +304,12 @@ void ChartDataGenerator::changePresetCamera()
 
 void ChartDataGenerator::changeTheme()
 {
-    static int theme = 1; // TODO: System theme not yet implemented
+    static int theme = 0;
 
     m_chart->setTheme((Q3DBars::ColorTheme)theme);
 
     if (++theme > (int)Q3DBars::ThemeLight)
-        theme = 1; // TODO: System theme not yet implemented
+        theme = 0;
 }
 
 int main(int argc, char **argv)
