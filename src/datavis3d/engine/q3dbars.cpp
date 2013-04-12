@@ -461,7 +461,8 @@ void Q3DBars::drawZoomScene()
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         // Create labels
         // Print label into a QImage using QPainter
-        QImage label = Utils::printTextToImage(item->d_ptr->valueStr()
+        QImage label = Utils::printTextToImage(d_ptr->m_font
+                                               , item->d_ptr->valueStr()
                                                , d_ptr->m_theme->m_textBackgroundColor
                                                , d_ptr->m_theme->m_textColor
                                                , d_ptr->m_labelTransparency);
@@ -1300,6 +1301,12 @@ void Q3DBars::setFontSize(float fontsize)
     d_ptr->m_fontSize = fontsize;
 }
 
+void Q3DBars::setFont(const QFont &font)
+{
+    d_ptr->m_font = font;
+    d_ptr->m_fontSize = font.pointSizeF();
+}
+
 void Q3DBars::setLabelTransparency(LabelTransparency transparency)
 {
     d_ptr->m_labelTransparency = transparency;
@@ -1450,6 +1457,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     , m_textureHelper(new TextureHelper())
     , m_labelTransparency(Q3DBars::TransparencyNone)
     , m_fontSize(10.0f)
+    , m_font(QFont(QStringLiteral("Arial")))
 {
 }
 

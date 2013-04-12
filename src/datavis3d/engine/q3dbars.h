@@ -192,6 +192,9 @@ public:
     // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just float?
     void setFontSize(float fontsize);
 
+    // Set font
+    void setFont(const QFont &font);
+
     // Label transparency adjustment
     void setLabelTransparency(LabelTransparency transparency);
 

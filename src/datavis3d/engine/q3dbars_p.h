@@ -44,6 +44,7 @@
 
 #include "qdatavis3dglobal.h"
 #include <QOpenGLFunctions>
+#include <QFont>
 
 class QOpenGLPaintDevice;
 class QPoint;
@@ -139,6 +140,7 @@ public:
     TextureHelper *m_textureHelper;
     Q3DBars::LabelTransparency m_labelTransparency;
     float m_fontSize;
+    QFont m_font;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

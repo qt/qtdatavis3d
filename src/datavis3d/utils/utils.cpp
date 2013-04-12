@@ -141,12 +141,13 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
     painter->restore();
 }
 
-QImage Utils::printTextToImage(const QString &text, const QColor &bgrColor, const QColor &txtColor
+QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor
+                               , const QColor &txtColor
                                , Q3DBars::LabelTransparency transparency)
 {
     // Calculate text dimensions
-    QFont valueFont = QFont(QStringLiteral("Arial"), 30);
-    valueFont.setBold(true);
+    QFont valueFont = font;
+    valueFont.setPointSize(30);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
     int valueStrHeight = valueFM.height();
