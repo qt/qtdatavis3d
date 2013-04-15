@@ -956,29 +956,22 @@ void Q3DBars::drawScene()
 
 // TODO: Move to a separate class, so that it can be used by other vis types as well (will need a lot more parameters..)
 void Q3DBars::drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
-                        , const QMatrix4x4 &projectionmatrix, bool useDepth, qreal rotation) // TODO: Add enum? for label position
+                        , const QMatrix4x4 &projectionmatrix, bool useDepth, qreal rotation) // TODO: Add enum? for label position (below, middle, top etc.)
 {
-    // TODO: Fix drawing of labels when in ZoomColumn -mode
-
     // Draw label
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
     qreal yPosition = -1.5f;
     if (useDepth) // replace with enum? or adjustable height
         yPosition = item.d_ptr->translation().y()
-                + (item.d_ptr->value() / d_ptr->m_heightNormalizer);// / 2.0f;
+                + (item.d_ptr->value() / d_ptr->m_heightNormalizer);
     qreal zPosition = zComp;
+    qreal xPosition = item.d_ptr->translation().x();
     if (useDepth)
         zPosition = item.d_ptr->translation().z();
-    if (ZoomColumn == d_ptr->m_selectionMode) {
-        modelMatrix.translate(-(item.d_ptr->translation().z()) - zComp
-                              , yPosition
-                              , zPosition);
-    } else {
-        modelMatrix.translate(item.d_ptr->translation().x()
-                              , yPosition
-                              , zPosition);
-    }
+    else if (ZoomColumn == d_ptr->m_selectionMode)
+        xPosition = -(item.d_ptr->translation().z()) + zComp; // flip first to left
+    modelMatrix.translate(xPosition, yPosition, zPosition);
 
     // Rotate
     modelMatrix.rotate(rotation, 0.0f, 0.0f, 1.0f);
