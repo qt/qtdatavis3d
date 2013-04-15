@@ -209,6 +209,7 @@ private:
     void drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
                    , const QMatrix4x4 &projectionmatrix, bool useDepth = false
             , qreal rotation = 0.0f);
+    void generateLabelTexture(QDataItem *item);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

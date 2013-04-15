@@ -61,6 +61,12 @@
 
 #include <QDebug>
 
+#define DISPLAY_RENDER_SPEED
+
+#ifdef DISPLAY_RENDER_SPEED
+#include <QTime>
+#endif
+
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
@@ -139,7 +145,21 @@ void Q3DBars::render()
 {
     if (!d_ptr->m_isInitialized)
         return;
+#ifdef DISPLAY_RENDER_SPEED
+    // For speed computation
+    static QTime lastTime = QTime::currentTime();
+    static QTime lastFrameTime = lastTime;
+    static int nbFrames = 0;
 
+    // Measure speed (as milliseconds per frame)
+    lastFrameTime = QTime::currentTime();
+    nbFrames++;
+    if (lastTime.msecsTo(lastFrameTime) >= 1000.0f) { // print only if last measurement was more than 1s ago
+        qDebug() << 1000.0f / double(nbFrames) << "ms/frame (=" << double(nbFrames) << "fps)";
+        nbFrames = 0;
+        lastTime = lastFrameTime;
+    }
+#endif
 #ifdef USE_PAINTER_TEXT
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
@@ -445,7 +465,7 @@ void Q3DBars::drawZoomScene()
     d_ptr->m_barShader->release();
 
 #ifndef USE_PAINTER_TEXT
-    // Draw labels (or values of bars)
+    // Draw bar values
     d_ptr->m_labelShader->bind();
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
@@ -453,33 +473,11 @@ void Q3DBars::drawZoomScene()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+
+    // Do the actual drawing
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
-        //
-        // TODO: Optimize! Create textures only when zoomselection changes! Store the texture id's into zoomselection
-        //
-        // ie. move this segment elsewhere...
-        // Create labels
-        // Print label into a QImage using QPainter
-        QImage label = Utils::printTextToImage(d_ptr->m_font
-                                               , item->d_ptr->valueStr()
-                                               , d_ptr->m_theme->m_textBackgroundColor
-                                               , d_ptr->m_theme->m_textColor
-                                               , d_ptr->m_labelTransparency);
-
-        // Set label size
-        item->d_ptr->setLabelSize(label.size());
-        // Insert text texture into label
-        item->d_ptr->setTextureId(d_ptr->m_textureHelper->create2DTexture(label, true, true));
-        // ...ie. move this segment elsewhere
-
         drawLabel(*item, viewMatrix, projectionMatrix, false, -45.0f);
-
-        // ie. move this segment elsewhere...
-        GLuint labelTexture = item->d_ptr->textureId();
-        glDeleteTextures(1, &labelTexture);
-        item->d_ptr->setTextureId(0);
-        // ...ie. move this segment elsewhere
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -908,9 +906,16 @@ void Q3DBars::drawScene()
         d_ptr->m_zoomActivated = true;
         d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
                                        , width() / 5, height() / 5);
+
+        // Create label textures
+        for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+            QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
+            generateLabelTexture(item);
+        }
     } else {
         // Print value of selected bar
 #ifndef USE_PAINTER_TEXT
+        static QDataItem *prevItem = d_ptr->m_selectedBar;
         d_ptr->m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -918,26 +923,12 @@ void Q3DBars::drawScene()
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
-        // Create label
-        // Print label into a QImage using QPainter
-        QImage label = Utils::printTextToImage(d_ptr->m_font
-                                               , d_ptr->m_selectedBar->d_ptr->valueStr()
-                                               , d_ptr->m_theme->m_textBackgroundColor
-                                               , d_ptr->m_theme->m_textColor
-                                               , d_ptr->m_labelTransparency);
-
-        // Set label size
-        d_ptr->m_selectedBar->d_ptr->setLabelSize(label.size());
-        // Insert text texture into label
-        d_ptr->m_selectedBar->d_ptr->setTextureId(d_ptr->m_textureHelper->create2DTexture(label
-                                                                                          , true
-                                                                                          , true));
+        if (prevItem != d_ptr->m_selectedBar) {
+            generateLabelTexture(d_ptr->m_selectedBar);
+            prevItem = d_ptr->m_selectedBar;
+        }
 
         drawLabel(*d_ptr->m_selectedBar, viewMatrix, projectionMatrix, true);
-
-        GLuint labelTexture = d_ptr->m_selectedBar->d_ptr->textureId();
-        glDeleteTextures(1, &labelTexture);
-        d_ptr->m_selectedBar->d_ptr->setTextureId(0);
 
         glDisable(GL_TEXTURE_2D);
         if (d_ptr->m_labelTransparency > TransparencyNone)
@@ -951,6 +942,33 @@ void Q3DBars::drawScene()
 
     // Release bar shader
     d_ptr->m_barShader->release();
+}
+
+void Q3DBars::generateLabelTexture(QDataItem *item)
+{
+    // Delete previous texture, if there is one
+    GLuint labelTexture = item->d_ptr->textureId();
+    if (labelTexture) {
+        // We have to do this, as we can't know if data is static or not;
+        // texture doesn't change with static data
+        // (basically we could create textures for all bars when data is added, but we
+        // may not need them -> better to do it here dynamically)
+        glDeleteTextures(1, &labelTexture);
+        item->d_ptr->setTextureId(0);
+    }
+
+    // Create labels
+    // Print label into a QImage using QPainter
+    QImage label = Utils::printTextToImage(d_ptr->m_font
+                                           , item->d_ptr->valueStr()
+                                           , d_ptr->m_theme->m_textBackgroundColor
+                                           , d_ptr->m_theme->m_textColor
+                                           , d_ptr->m_labelTransparency);
+
+    // Set label size
+    item->d_ptr->setLabelSize(label.size());
+    // Insert text texture into label
+    item->d_ptr->setTextureId(d_ptr->m_textureHelper->create2DTexture(label, true, true));
 }
 
 // TODO: Move to a separate class, so that it can be used by other vis types as well (will need a lot more parameters..)

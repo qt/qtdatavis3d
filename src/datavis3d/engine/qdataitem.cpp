@@ -76,6 +76,7 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &lab
     , m_prependLabel(false)
     , m_size(QSize(0, 0))
     , m_translation(QVector3D(0, 0, 0))
+    , m_textureId(0)
 {
 }
 
