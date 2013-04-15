@@ -60,7 +60,7 @@ QVector3D Utils::vectorFromColor(const QColor &color)
     return QVector3D(color.redF(), color.greenF(), color.blueF());
 }
 
-void Utils::printText(QPainter *painter, const QString &text, const QPoint &position
+void Utils::printText(QPainter *painter, const QString &text, const QSize &position
                       , bool absoluteCoords, qreal rotation, qreal scale)
 {
     painter->save();
@@ -91,16 +91,16 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
     //                         , bgrLen, 30, 10.0, 10.0);
 #if 0
     // Hack solution, as drawRect doesn't work
-    painter->drawText(position.x() - (bgrStrLen / 2)
-                      , position.y() - bgrHeight
+    painter->drawText(position.width() - (bgrStrLen / 2)
+                      , position.height() - bgrHeight
                       , bgrStrLen, bgrHeight
                       , Qt::AlignCenter | Qt::AlignVCenter
                       , bgrStr);
     //painter->setPen(d_ptr->m_textColor);
     painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
     painter->setFont(valueFont);
-    painter->drawText(position.x() - (valueStrLen / 2)
-                      , position.y() - bgrHeight
+    painter->drawText(position.width() - (valueStrLen / 2)
+                      , position.height() - bgrHeight
                       , valueStrLen, bgrHeight
                       , Qt::AlignCenter | Qt::AlignVCenter
                       , text);
@@ -109,20 +109,20 @@ void Utils::printText(QPainter *painter, const QString &text, const QPoint &posi
     painter->scale(scale, scale);
     if (absoluteCoords) {
         // This assumes absolute screen coordinates
-        painter->translate(position.x() - (((float)bgrStrLen / 2.0f) * cos(rotation * m_pi / 180.0f))
+        painter->translate(position.width() - (((float)bgrStrLen / 2.0f) * cos(rotation * m_pi / 180.0f))
                            + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f))
-                           , position.y()
+                           , position.height()
                            - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
                               + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
     } else {
         // This calculates y as a distance from screen bottom
-        painter->translate(position.x() - (((float)bgrStrLen / 2) * cos(rotation * m_pi / 180.0f))
+        painter->translate(position.width() - (((float)bgrStrLen / 2) * cos(rotation * m_pi / 180.0f))
                            + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f))
-                           , painter->window().height() - position.y()
+                           , painter->window().height() - position.height()
                            - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
                               + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
     }
-    //qDebug() << painter->window().height() - position.y()
+    //qDebug() << painter->window().height() - position.height()
     //            - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
     //               + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f)));
     painter->rotate(rotation);

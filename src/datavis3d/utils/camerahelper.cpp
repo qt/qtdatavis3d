@@ -171,4 +171,10 @@ void CameraHelper::updateMousePos(const QPoint &mousePos)
     }
 }
 
+QPointF CameraHelper::getCameraRotations()
+{
+    QPointF rotations(m_xRotation, m_yRotation);
+    return rotations;
+}
+
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

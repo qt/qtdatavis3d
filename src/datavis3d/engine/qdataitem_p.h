@@ -44,7 +44,8 @@
 
 #include "qdatavis3dglobal.h"
 #include "qdataitem.h"
-#include <QPoint>
+#include <QOpenGLFunctions>
+#include <QSize>
 #include <QString>
 #include <QVector3D>
 
@@ -57,20 +58,23 @@ class QDataItemPrivate
             , const QString &label = QString());
     ~QDataItemPrivate();
 
-    void setPosition(const QPoint &position);
-    QPoint position();
+    void setLabelSize(const QSize &size);
+    QSize labelSize();
     void setTranslation(const QVector3D &translation);
+    void setTextureId(GLuint textureId);
     QVector3D translation();
     float value();
     QString valueStr(); // append value and label. If label has prepend -flag set, append label and value
+    GLuint textureId();
 
     private:
     QDataItem *q_ptr;
     float m_value;
     QString m_label;
     bool m_prependLabel;
-    QPoint m_position;
+    QSize m_size;
     QVector3D m_translation;
+    GLuint m_textureId;
     friend class QDataItem;
 };
 

@@ -74,7 +74,7 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &lab
     , m_value(value)
     , m_label(label)
     , m_prependLabel(false)
-    , m_position(QPoint(0, 0))
+    , m_size(QSize(0, 0))
     , m_translation(QVector3D(0, 0, 0))
 {
 }
@@ -83,14 +83,14 @@ QDataItemPrivate::~QDataItemPrivate()
 {
 }
 
-void QDataItemPrivate::setPosition(const QPoint &position)
+void QDataItemPrivate::setLabelSize(const QSize &size)
 {
-    m_position = position;
+    m_size = size;
 }
 
-QPoint QDataItemPrivate::position()
+QSize QDataItemPrivate::labelSize()
 {
-    return m_position;
+    return m_size;
 }
 
 void QDataItemPrivate::setTranslation(const QVector3D &translation)
@@ -120,6 +120,16 @@ QString QDataItemPrivate::valueStr()
         strVal.append(m_label);
     }
     return strVal;
+}
+
+void QDataItemPrivate::setTextureId(GLuint textureId)
+{
+    m_textureId = textureId;
+}
+
+GLuint QDataItemPrivate::textureId()
+{
+    return m_textureId;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

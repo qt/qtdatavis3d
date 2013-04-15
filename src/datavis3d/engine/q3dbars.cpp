@@ -183,7 +183,7 @@ void Q3DBars::render(QPainter *painter)
     QDataItem *data = d_ptr->m_selectedBar;
     if (d_ptr->m_selectionMode < ZoomRow && data) {
         glDisable(GL_DEPTH_TEST);
-        Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->position());
+        Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->labelSize()); // use size for screen position; this way we don't need 2 member variables in qdataitem
     } else if (d_ptr->m_zoomActivated) {
         glDisable(GL_DEPTH_TEST);
         float scale = 1.0f;
@@ -213,7 +213,7 @@ void Q3DBars::render(QPainter *painter)
             //float coordY = ((1.0f - item->d_ptr->translation().y())
             //                * d_ptr->m_zoomViewPort.height()) / 2.0f;
             // Use a fixed label distance from the bottom of the screen
-            QPoint screenCoords(coordX, 150.0f); // use coord Y for reducing from painter window height to avoid unwanted transformations
+            QSize screenCoords(coordX, 150.0f); // use coord Y for reducing from painter window height to avoid unwanted transformations
             Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, false, 60.0f, scale);
             //QPoint screenCoords(coordX, d_ptr->m_zoomViewPort.height() - 100.0f);
             // Use a label distance from the bottom of the screen based on bar height
@@ -455,10 +455,11 @@ void Q3DBars::drawZoomScene()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+        QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         //
         // TODO: Optimize! Create textures only when zoomselection changes! Store the texture id's into zoomselection
         //
-        QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
+        // ie. move this segment elsewhere...
         // Create labels
         // Print label into a QImage using QPainter
         QImage label = Utils::printTextToImage(d_ptr->m_font
@@ -467,75 +468,19 @@ void Q3DBars::drawZoomScene()
                                                , d_ptr->m_theme->m_textColor
                                                , d_ptr->m_labelTransparency);
 
+        // Set label size
+        item->d_ptr->setLabelSize(label.size());
         // Insert text texture into label
-        GLuint labelTexture = d_ptr->m_textureHelper->create2DTexture(label, true, true);
+        item->d_ptr->setTextureId(d_ptr->m_textureHelper->create2DTexture(label, true, true));
+        // ...ie. move this segment elsewhere
 
-        // TODO: Fix drawing of labels when in ZoomColumn -mode
+        drawLabel(*item, viewMatrix, projectionMatrix, false, -45.0f);
 
-        // Draw label
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
-        if (ZoomColumn == d_ptr->m_selectionMode) {
-            modelMatrix.translate(-(item->d_ptr->translation().z()) - zComp
-                                  , -1.5f//item->d_ptr->translation().y()
-                                  , zComp);
-        } else {
-            modelMatrix.translate(item->d_ptr->translation().x()
-                                  , -1.5f//item->d_ptr->translation().y()
-                                  , zComp);
-        }
-
-        // Rotate
-        modelMatrix.rotate(-45.0f, 0.0f, 0.0f, 1.0f);
-
-        // Calculate scale factor to get uniform font size
-        float scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
-        float scaleFactor = scaledFontSize / (float)label.height();
-
-        // Scale label based on text size
-        modelMatrix.scale(QVector3D((float)label.width() * scaleFactor
-                                    , scaledFontSize
-                                    , 0.0f));
-
-        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
-
-        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP()
-                                              , MVPMatrix);
-
-        // Activate texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, labelTexture);
-        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->texture()
-                                              , 0);
-
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_labelShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_labelShader->posAtt()
-                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 2nd attribute buffer : UVs
-        glEnableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->uvBuf());
-        glVertexAttribPointer(d_ptr->m_labelShader->uvAtt()
-                              , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_labelObj->elementBuf());
-
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_labelObj->indexCount()
-                       , GL_UNSIGNED_SHORT, (void*)0);
-
-        // Free buffers
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        glDisableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
-        glDisableVertexAttribArray(d_ptr->m_labelShader->posAtt());
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        // ie. move this segment elsewhere...
+        GLuint labelTexture = item->d_ptr->textureId();
         glDeleteTextures(1, &labelTexture);
+        item->d_ptr->setTextureId(0);
+        // ...ie. move this segment elsewhere
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -860,7 +805,13 @@ void Q3DBars::drawScene()
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!d_ptr->m_zoomActivated) {
                         d_ptr->m_selectedBar = item;
-                        d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
+#ifdef USE_PAINTER_TEXT
+                        QSize mousePositionAsSize = QSize(d_ptr->m_mousePos.x()
+                                                          , d_ptr->m_mousePos.y());
+                        d_ptr->m_selectedBar->d_ptr->setLabelSize(mousePositionAsSize);
+#else
+                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+#endif
                         barSelectionFound = true;
                         if (d_ptr->m_selectionMode >= ZoomRow) {
                             item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
@@ -954,13 +905,138 @@ void Q3DBars::drawScene()
         }
     } else if (d_ptr->m_selectionMode >= ZoomRow
              && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
+        // Activate zoom mode
         d_ptr->m_zoomActivated = true;
         d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
                                        , width() / 5, height() / 5);
+    } else {
+        // Print value of selected bar
+#ifndef USE_PAINTER_TEXT
+        d_ptr->m_labelShader->bind();
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
+        if (d_ptr->m_labelTransparency > TransparencyNone) {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+        // Create label
+        // Print label into a QImage using QPainter
+        QImage label = Utils::printTextToImage(d_ptr->m_font
+                                               , d_ptr->m_selectedBar->d_ptr->valueStr()
+                                               , d_ptr->m_theme->m_textBackgroundColor
+                                               , d_ptr->m_theme->m_textColor
+                                               , d_ptr->m_labelTransparency);
+
+        // Set label size
+        d_ptr->m_selectedBar->d_ptr->setLabelSize(label.size());
+        // Insert text texture into label
+        d_ptr->m_selectedBar->d_ptr->setTextureId(d_ptr->m_textureHelper->create2DTexture(label
+                                                                                          , true
+                                                                                          , true));
+
+        drawLabel(*d_ptr->m_selectedBar, viewMatrix, projectionMatrix, true);
+
+        GLuint labelTexture = d_ptr->m_selectedBar->d_ptr->textureId();
+        glDeleteTextures(1, &labelTexture);
+        d_ptr->m_selectedBar->d_ptr->setTextureId(0);
+
+        glDisable(GL_TEXTURE_2D);
+        if (d_ptr->m_labelTransparency > TransparencyNone)
+            glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+
+        // Release label shader
+        d_ptr->m_labelShader->release();
+#endif
     }
 
     // Release bar shader
     d_ptr->m_barShader->release();
+}
+
+// TODO: Move to a separate class, so that it can be used by other vis types as well (will need a lot more parameters..)
+void Q3DBars::drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
+                        , const QMatrix4x4 &projectionmatrix, bool useDepth, qreal rotation) // TODO: Add enum? for label position
+{
+    // TODO: Fix drawing of labels when in ZoomColumn -mode
+
+    // Draw label
+    QMatrix4x4 modelMatrix;
+    QMatrix4x4 MVPMatrix;
+    qreal yPosition = -1.5f;
+    if (useDepth) // replace with enum? or adjustable height
+        yPosition = item.d_ptr->translation().y()
+                + (item.d_ptr->value() / d_ptr->m_heightNormalizer);// / 2.0f;
+    qreal zPosition = zComp;
+    if (useDepth)
+        zPosition = item.d_ptr->translation().z();
+    if (ZoomColumn == d_ptr->m_selectionMode) {
+        modelMatrix.translate(-(item.d_ptr->translation().z()) - zComp
+                              , yPosition
+                              , zPosition);
+    } else {
+        modelMatrix.translate(item.d_ptr->translation().x()
+                              , yPosition
+                              , zPosition);
+    }
+
+    // Rotate
+    modelMatrix.rotate(rotation, 0.0f, 0.0f, 1.0f);
+
+    if (useDepth) {
+        // Apply negative camera rotations to keep labels facing camera
+        QPointF rotations = CameraHelper::getCameraRotations();
+        modelMatrix.rotate(-rotations.x(), 0.0f, 1.0f, 0.0f);
+        modelMatrix.rotate(-rotations.y(), 1.0f, 0.0f, 0.0f);
+    }
+
+    // Calculate scale factor to get uniform font size
+    float scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
+    float scaleFactor = scaledFontSize / (float)item.d_ptr->labelSize().height();
+
+    // Scale label based on text size
+    modelMatrix.scale(QVector3D((float)item.d_ptr->labelSize().width() * scaleFactor
+                                , scaledFontSize
+                                , 0.0f));
+
+    MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;
+
+    d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP()
+                                          , MVPMatrix);
+
+    // Activate texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, item.d_ptr->textureId());
+    d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->texture()
+                                          , 0);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(d_ptr->m_labelShader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->vertexBuf());
+    glVertexAttribPointer(d_ptr->m_labelShader->posAtt()
+                          , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // 2nd attribute buffer : UVs
+    glEnableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->uvBuf());
+    glVertexAttribPointer(d_ptr->m_labelShader->uvAtt()
+                          , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_labelObj->elementBuf());
+
+    // Draw the triangles
+    glDrawElements(GL_TRIANGLES, d_ptr->m_labelObj->indexCount()
+                   , GL_UNSIGNED_SHORT, (void*)0);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
+    glDisableVertexAttribArray(d_ptr->m_labelShader->posAtt());
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)

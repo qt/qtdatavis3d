@@ -58,6 +58,8 @@ public:
     static void setRotationSpeed(int speed);
     // Set camera rotation in degrees
     static void setCameraRotation(const QPointF &rotation);
+    // Get camera rotations
+    static QPointF getCameraRotations();
     // Set default camera orientation. Position's x and y should be 0.
     static void setDefaultCameraOrientation(const QVector3D &defaultPosition
                                      , const QVector3D &defaultTarget

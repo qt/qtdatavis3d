@@ -58,7 +58,7 @@ class Utils
 {
 public:
     static QVector3D vectorFromColor(const QColor &color);
-    static void printText(QPainter *painter, const QString &text, const QPoint &position
+    static void printText(QPainter *painter, const QString &text, const QSize &position
                           , bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
     static QImage printTextToImage(const QFont &font
                                    , const QString &text
