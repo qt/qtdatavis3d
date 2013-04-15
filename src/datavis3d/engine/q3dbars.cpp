@@ -126,14 +126,13 @@ void Q3DBars::initialize()
                                               , QVector3D(0.0f, 0.0f, zComp)
                                               , QVector3D(0.0f, 1.0f, 0.0f));
 
-    CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation
-                                            , d_ptr->m_verticalRotation));
-
     // Set view port
     glViewport(0, 0, width(), height());
 
     // Set initialized -flag
     d_ptr->m_isInitialized = true;
+
+    //qDebug("Initialized");
 }
 
 void Q3DBars::render()
@@ -1195,6 +1194,7 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
         , const QString &labelColumn, const QString &labelHeight)
 {
     d_ptr->m_sampleCount = sampleCount;
+    d_ptr->m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative
     d_ptr->m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
@@ -1208,107 +1208,7 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow
 
 void Q3DBars::setCameraPreset(CameraPreset preset)
 {
-    // TODO: This should be moved to CameraHelper to be directly usable by other vis types - just call directly a function there?
-    // TODO: Move these enums to namespace level?
-    switch (preset) {
-    case PresetFrontLow: {
-        qDebug("PresetFrontLow");
-        setCameraPosition(0.0f, 0.0f);
-        break;
-    }
-    case PresetFront: {
-        qDebug("PresetFront");
-        setCameraPosition(0.0f, 22.5f);
-        break;
-    }
-    case PresetFrontHigh: {
-        qDebug("PresetFrontHigh");
-        setCameraPosition(0.0f, 45.0f);
-        break;
-    }
-    case PresetLeftLow: {
-        qDebug("PresetLeftLow");
-        setCameraPosition(90.0f, 0.0f);
-        break;
-    }
-    case PresetLeft: {
-        qDebug("PresetLeft");
-        setCameraPosition(90.0f, 22.5f);
-        break;
-    }
-    case PresetLeftHigh: {
-        qDebug("PresetLeftHigh");
-        setCameraPosition(90.0f, 45.0f);
-        break;
-    }
-    case PresetRightLow: {
-        qDebug("PresetRightLow");
-        setCameraPosition(-90.0f, 0.0f);
-        break;
-    }
-    case PresetRight: {
-        qDebug("PresetRight");
-        setCameraPosition(-90.0f, 22.5f);
-        break;
-    }
-    case PresetRightHigh: {
-        qDebug("PresetRightHigh");
-        setCameraPosition(-90.0f, 45.0f);
-        break;
-    }
-    case PresetBehindLow: {
-        qDebug("PresetBehindLow");
-        setCameraPosition(180.0f, 0.0f);
-        break;
-    }
-    case PresetBehind: {
-        qDebug("PresetBehind");
-        setCameraPosition(180.0f, 22.5f);
-        break;
-    }
-    case PresetBehindHigh: {
-        qDebug("PresetBehindHigh");
-        setCameraPosition(180.0f, 45.0f);
-        break;
-    }
-    case PresetIsometricLeft: {
-        qDebug("PresetIsometricLeft");
-        setCameraPosition(45.0f, 22.5f);
-        break;
-    }
-    case PresetIsometricLeftHigh: {
-        qDebug("PresetIsometricLeftHigh");
-        setCameraPosition(45.0f, 45.0f);
-        break;
-    }
-    case PresetIsometricRight: {
-        qDebug("PresetIsometricRight");
-        setCameraPosition(-45.0f, 22.5f);
-        break;
-    }
-    case PresetIsometricRightHigh: {
-        qDebug("PresetIsometricRightHigh");
-        setCameraPosition(-45.0f, 45.0f);
-        break;
-    }
-    case PresetDirectlyAbove: {
-        qDebug("PresetDirectlyAbove");
-        setCameraPosition(0.0f, 90.0f);
-        break;
-    }
-    case PresetDirectlyAboveCW45: {
-        qDebug("PresetDirectlyAboveCW45");
-        setCameraPosition(-45.0f, 90.0f);
-        break;
-    }
-    case PresetDirectlyAboveCCW45: {
-        qDebug("PresetDirectlyAboveCCW45");
-        setCameraPosition(45.0f, 90.0f);
-        break;
-    }
-    default:
-        break;
-    }
+    CameraHelper::setCameraPreset(preset);
 }
 
 void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
@@ -1443,7 +1343,8 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
         row++;
     }
     d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
-    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    // Empty QStrings won't override already set axis labels
+    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
@@ -1467,7 +1368,8 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data
         row++;
     }
     d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
-    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn); // TODO: Copy axis names from sample space data
+    // Empty QStrings won't override already set axis labels
+    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 

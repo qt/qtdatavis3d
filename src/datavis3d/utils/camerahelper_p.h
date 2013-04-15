@@ -53,6 +53,7 @@
 #define CAMERAPOSITIONER_P_H
 
 #include "qdatavis3dglobal.h"
+#include "q3dbars.h"
 
 class QMatrix4x4;
 class QVector3D;
@@ -82,6 +83,7 @@ public:
     static QVector3D calculateLightPosition(const QVector3D &lightPosition
                                             , float fixedRotation = 0.0f);
     static void updateMousePos(const QPoint &mousePos);
+    static void setCameraPreset(Q3DBars::CameraPreset preset);
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

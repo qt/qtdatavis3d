@@ -177,4 +177,107 @@ QPointF CameraHelper::getCameraRotations()
     return rotations;
 }
 
+void CameraHelper::setCameraPreset(Q3DBars::CameraPreset preset)
+{
+    switch (preset) {
+    case Q3DBars::PresetFrontLow: {
+        qDebug("PresetFrontLow");
+        CameraHelper::setCameraRotation(QPointF(0.0f, 0.0f));
+        break;
+    }
+    case Q3DBars::PresetFront: {
+        qDebug("PresetFront");
+        CameraHelper::setCameraRotation(QPointF(0.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetFrontHigh: {
+        qDebug("PresetFrontHigh");
+        CameraHelper::setCameraRotation(QPointF(0.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetLeftLow: {
+        qDebug("PresetLeftLow");
+        CameraHelper::setCameraRotation(QPointF(90.0f, 0.0f));
+        break;
+    }
+    case Q3DBars::PresetLeft: {
+        qDebug("PresetLeft");
+        CameraHelper::setCameraRotation(QPointF(90.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetLeftHigh: {
+        qDebug("PresetLeftHigh");
+        CameraHelper::setCameraRotation(QPointF(90.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetRightLow: {
+        qDebug("PresetRightLow");
+        CameraHelper::setCameraRotation(QPointF(-90.0f, 0.0f));
+        break;
+    }
+    case Q3DBars::PresetRight: {
+        qDebug("PresetRight");
+        CameraHelper::setCameraRotation(QPointF(-90.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetRightHigh: {
+        qDebug("PresetRightHigh");
+        CameraHelper::setCameraRotation(QPointF(-90.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetBehindLow: {
+        qDebug("PresetBehindLow");
+        CameraHelper::setCameraRotation(QPointF(180.0f, 0.0f));
+        break;
+    }
+    case Q3DBars::PresetBehind: {
+        qDebug("PresetBehind");
+        CameraHelper::setCameraRotation(QPointF(180.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetBehindHigh: {
+        qDebug("PresetBehindHigh");
+        CameraHelper::setCameraRotation(QPointF(180.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetIsometricLeft: {
+        qDebug("PresetIsometricLeft");
+        CameraHelper::setCameraRotation(QPointF(45.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetIsometricLeftHigh: {
+        qDebug("PresetIsometricLeftHigh");
+        CameraHelper::setCameraRotation(QPointF(45.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetIsometricRight: {
+        qDebug("PresetIsometricRight");
+        CameraHelper::setCameraRotation(QPointF(-45.0f, 22.5f));
+        break;
+    }
+    case Q3DBars::PresetIsometricRightHigh: {
+        qDebug("PresetIsometricRightHigh");
+        CameraHelper::setCameraRotation(QPointF(-45.0f, 45.0f));
+        break;
+    }
+    case Q3DBars::PresetDirectlyAbove: {
+        qDebug("PresetDirectlyAbove");
+        CameraHelper::setCameraRotation(QPointF(0.0f, 90.0f));
+        break;
+    }
+    case Q3DBars::PresetDirectlyAboveCW45: {
+        qDebug("PresetDirectlyAboveCW45");
+        CameraHelper::setCameraRotation(QPointF(-45.0f, 90.0f));
+        break;
+    }
+    case Q3DBars::PresetDirectlyAboveCCW45: {
+        qDebug("PresetDirectlyAboveCCW45");
+        CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

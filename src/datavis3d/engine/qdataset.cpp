@@ -66,9 +66,14 @@ void QDataSet::setLabels(const QString &xAxis
                          , const QVector<QString> &labelsRow
                          , const QVector<QString> &labelsColumn)
 {
-    d_ptr->m_xAxis = xAxis;
-    d_ptr->m_zAxis = zAxis;
-    d_ptr->m_yAxis = yAxis;
+    QString empty;
+    // skip empty labels, keep the previous ones
+    if (xAxis != empty)
+        d_ptr->m_xAxis = xAxis;
+    if (zAxis != empty)
+        d_ptr->m_zAxis = zAxis;
+    if (yAxis != empty)
+        d_ptr->m_yAxis = yAxis;
     d_ptr->m_labelsRow = labelsRow;
     d_ptr->m_labelsColumn = labelsColumn;
 }
