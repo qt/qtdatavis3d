@@ -53,8 +53,8 @@
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 Q3DWindow::Q3DWindow(QWindow *parent)
-    : QWindow(parent)
-    , d_ptr(new Q3DWindowPrivate(this))
+    : QWindow(parent),
+      d_ptr(new Q3DWindowPrivate(this))
 {
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
@@ -177,11 +177,11 @@ QOpenGLPaintDevice *Q3DWindow::getDevice()
 }
 
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
-    : q_ptr(q)
-    , m_updatePending(false)
-    , m_animating(false)
-    , m_context(new QOpenGLContext(q))
-    , m_device(0)
+    : q_ptr(q),
+      m_updatePending(false),
+      m_animating(false),
+      m_context(new QOpenGLContext(q)),
+      m_device(0)
 {
 }
 

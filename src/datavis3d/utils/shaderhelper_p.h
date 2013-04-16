@@ -62,11 +62,11 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 class ShaderHelper
 {
     public:
-    ShaderHelper(QObject *parent
-                 , const QString &vertexShader = QString()
-                 , const QString &fragmentShader = QString()
-                 , const QString &texture = QString()
-                 , const QString &depthTexture = QString());
+    ShaderHelper(QObject *parent,
+                 const QString &vertexShader = QString(),
+                 const QString &fragmentShader = QString(),
+                 const QString &texture = QString(),
+                 const QString &depthTexture = QString());
     ~ShaderHelper();
 
     void setShaders(const QString &vertexShader, const QString &fragmentShader);

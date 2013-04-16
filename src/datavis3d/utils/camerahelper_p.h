@@ -64,7 +64,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class CameraHelper
 {
-public:
+    public:
     // How fast camera rotates when mouse is dragged. Default is 100.
     static void setRotationSpeed(int speed);
     // Set camera rotation in degrees
@@ -72,16 +72,16 @@ public:
     // Get camera rotations
     static QPointF getCameraRotations();
     // Set default camera orientation. Position's x and y should be 0.
-    static void setDefaultCameraOrientation(const QVector3D &defaultPosition
-                                     , const QVector3D &defaultTarget
-                                     , const QVector3D &defaultUp);
+    static void setDefaultCameraOrientation(const QVector3D &defaultPosition,
+                                            const QVector3D &defaultTarget,
+                                            const QVector3D &defaultUp);
     // Calculate view matrix based on rotation and zoom
-    static QMatrix4x4 calculateViewMatrix(const QPoint &mousePos, int zoom
-                                          , int screenWidth, int screenHeight);
+    static QMatrix4x4 calculateViewMatrix(const QPoint &mousePos, int zoom,
+                                          int screenWidth, int screenHeight);
     // Calcluate light position based on rotation. Call after calling calculateViewMatrix to get
     // up-to-date position
-    static QVector3D calculateLightPosition(const QVector3D &lightPosition
-                                            , float fixedRotation = 0.0f);
+    static QVector3D calculateLightPosition(const QVector3D &lightPosition,
+                                            float fixedRotation = 0.0f);
     static void updateMousePos(const QPoint &mousePos);
     static void setCameraPreset(Q3DBars::CameraPreset preset);
 };

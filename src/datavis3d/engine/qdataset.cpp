@@ -60,11 +60,11 @@ QDataSet::~QDataSet()
     //qDebug("~QDataSet");
 }
 
-void QDataSet::setLabels(const QString &xAxis
-                         , const QString &zAxis
-                         , const QString &yAxis
-                         , const QVector<QString> &labelsRow
-                         , const QVector<QString> &labelsColumn)
+void QDataSet::setLabels(const QString &xAxis,
+                         const QString &zAxis,
+                         const QString &yAxis,
+                         const QVector<QString> &labelsRow,
+                         const QVector<QString> &labelsColumn)
 {
     QString empty;
     // skip empty labels, keep the previous ones
@@ -84,13 +84,13 @@ void QDataSet::addRow(QDataRow *row)
 }
 
 QDataSetPrivate::QDataSetPrivate(QDataSet *q)
-    : q_ptr(q)
-    , m_set(QVector<QDataRow*>())
-    , m_xAxis(QString())
-    , m_zAxis(QString())
-    , m_yAxis(QString())
-    , m_labelsRow(QVector<QString>())
-    , m_labelsColumn(QVector<QString>())
+    : q_ptr(q),
+      m_set(QVector<QDataRow*>()),
+      m_xAxis(QString()),
+      m_zAxis(QString()),
+      m_yAxis(QString()),
+      m_labelsRow(QVector<QString>()),
+      m_labelsColumn(QVector<QString>())
 {
 }
 

@@ -45,17 +45,17 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-ShaderHelper::ShaderHelper(QObject *parent
-                           , const QString &vertexShader
-                           , const QString &fragmentShader
-                           , const QString &texture
-                           , const QString &depthTexture)
-    : m_caller(parent)
-    , m_program(0)
-    , m_vertexShaderFile(vertexShader)
-    , m_fragmentShaderFile(fragmentShader)
-    , m_textureFile(texture)
-    , m_depthTextureFile(depthTexture)
+ShaderHelper::ShaderHelper(QObject *parent,
+                           const QString &vertexShader,
+                           const QString &fragmentShader,
+                           const QString &texture,
+                           const QString &depthTexture)
+    : m_caller(parent),
+      m_program(0),
+      m_vertexShaderFile(vertexShader),
+      m_fragmentShaderFile(fragmentShader),
+      m_textureFile(texture),
+      m_depthTextureFile(depthTexture)
 {
 }
 
@@ -64,15 +64,15 @@ ShaderHelper::~ShaderHelper()
     delete m_program;
 }
 
-void ShaderHelper::setShaders(const QString &vertexShader
-                              , const QString &fragmentShader)
+void ShaderHelper::setShaders(const QString &vertexShader,
+                              const QString &fragmentShader)
 {
     m_vertexShaderFile = vertexShader;
     m_fragmentShaderFile = fragmentShader;
 }
 
-void ShaderHelper::setTextures(const QString &texture
-                               , const QString &depthTexture)
+void ShaderHelper::setTextures(const QString &texture,
+                               const QString &depthTexture)
 {
     m_textureFile = texture;
     m_depthTextureFile = depthTexture;
@@ -218,7 +218,5 @@ GLuint ShaderHelper::normalAtt()
         qFatal("Shader not initialized");
     return m_normalAttr;
 }
-
-// TODO: Add texture stuff
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

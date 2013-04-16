@@ -63,11 +63,11 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     glBindTexture(GL_TEXTURE_2D, textureId);
     if (convert) {
         QImage glTexture = convertToGLFormat(image);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height()
-                     , 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height()
-                     , 0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
     }
     if (useTrilinearFiltering) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -87,8 +87,8 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
     QImage glTexture = convertToGLFormat(image);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGBA, glTexture.width(), glTexture.height()
-                 , 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
+    glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGBA, glTexture.width(), glTexture.height(),
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
     if (useTrilinearFiltering) {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -108,8 +108,8 @@ QImage TextureHelper::convertToGLFormat(const QImage &srcImage)
     return res;
 }
 
-void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage
-                                            , GLenum texture_format)
+void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage,
+                                            GLenum texture_format)
 {
     Q_ASSERT(dstImage.depth() == 32);
     Q_ASSERT(srcImage.depth() == 32);

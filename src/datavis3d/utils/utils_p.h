@@ -66,15 +66,15 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Utils
 {
-public:
+    public:
     static QVector3D vectorFromColor(const QColor &color);
-    static void printText(QPainter *painter, const QString &text, const QSize &position
-                          , bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
-    static QImage printTextToImage(const QFont &font
-                                   , const QString &text
-                                   , const QColor &bgrColor
-                                   , const QColor &txtColor
-                                   , Q3DBars::LabelTransparency transparency);
+    static void printText(QPainter *painter, const QString &text, const QSize &position,
+                          bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
+    static QImage printTextToImage(const QFont &font,
+                                   const QString &text,
+                                   const QColor &bgrColor,
+                                   const QColor &txtColor,
+                                   Q3DBars::LabelTransparency transparency);
     static QVector3D getSelection(QPoint mousepos, int height);
 };
 

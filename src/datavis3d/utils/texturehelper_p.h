@@ -60,16 +60,16 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class TextureHelper: protected QOpenGLFunctions
 {
-public:
+    public:
     TextureHelper();
     ~TextureHelper();
 
     // Ownership of created texture is transferred to caller
-    GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false
-            , bool convert = true);
+    GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
+                           bool convert = true);
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
 
-private:
+    private:
     QImage convertToGLFormat(const QImage &srcImage);
     void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);

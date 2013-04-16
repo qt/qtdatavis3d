@@ -64,6 +64,7 @@ private:
     friend class Q3DBars;
     friend class Q3DBarsPrivate;
     friend class QDataRowPrivate;
+    friend class Drawer;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

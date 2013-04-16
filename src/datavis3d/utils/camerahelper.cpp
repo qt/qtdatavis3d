@@ -77,17 +77,17 @@ void CameraHelper::setCameraRotation(const QPointF &rotation)
     m_defaultYRotation = m_yRotation;
 }
 
-void CameraHelper::setDefaultCameraOrientation(const QVector3D &defaultPosition
-                                               , const QVector3D &defaultTarget
-                                               , const QVector3D &defaultUp)
+void CameraHelper::setDefaultCameraOrientation(const QVector3D &defaultPosition,
+                                               const QVector3D &defaultTarget,
+                                               const QVector3D &defaultUp)
 {
     m_position = defaultPosition;
     m_target = defaultTarget;
     m_up = defaultUp;
 }
 
-QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
-                                             , int screenWidth, int screenHeight)
+QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
+                                             int screenWidth, int screenHeight)
 {
     QMatrix4x4 viewMatrix;
 
@@ -108,11 +108,7 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom
         m_yRotation = 0;
 
     // Apply to view matrix
-    viewMatrix.lookAt(
-                m_position                  // Camera is here
-                , m_target                  // and looks here
-                , m_up                      // Head is up (set to 0,-1,0 to look upside-down)
-                );
+    viewMatrix.lookAt(m_position, m_target, m_up);
     // Compensate for translation (if m_target is off origin)
     viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
     // Apply rotations
@@ -154,9 +150,9 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, f
     float yPos = lightPosition.y() * sin(yAngle);
     // Keep light in the set position in relation to camera
     // TODO: Does not work perfectly yet; Light seems wrong when viewing scene from sides (or isometrically)
-    newLightPosition = QVector3D(-xPos + lightPosition.x()
-                                 , yPos + lightPosition.y()
-                                 , zPos + lightPosition.z());
+    newLightPosition = QVector3D(-xPos + lightPosition.x(),
+                                 yPos + lightPosition.y(),
+                                 zPos + lightPosition.z());
     //qDebug() << newLightPosition << xAngle << yAngle << fixedRotation;
     return newLightPosition;
 }

@@ -49,20 +49,20 @@
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 Theme::Theme()
-    : m_baseColor(QColor(Qt::gray))
-    , m_heightColor(QColor(Qt::white))
-    , m_depthColor(QColor(Qt::darkGray))
-    , m_backgroundColor(QColor(Qt::gray))
-    , m_windowColor(QColor(Qt::gray))
-    , m_textColor(QColor(Qt::white))
-    , m_textBackgroundColor(QColor(0x00, 0x00, 0x00, 0x80))
-    , m_highlightBarColor(QColor(Qt::red))
-    , m_highlightRowColor(QColor(Qt::darkRed))
-    , m_highlightColumnColor(QColor(Qt::darkMagenta))
-    , m_lightStrength(4.0f)
-    , m_ambientStrength(0.3f)
-    , m_highlightLightStrength(8.0f)
-    , m_uniformColor(true)
+    : m_baseColor(QColor(Qt::gray)),
+      m_heightColor(QColor(Qt::white)),
+      m_depthColor(QColor(Qt::darkGray)),
+      m_backgroundColor(QColor(Qt::gray)),
+      m_windowColor(QColor(Qt::gray)),
+      m_textColor(QColor(Qt::white)),
+      m_textBackgroundColor(QColor(0x00, 0x00, 0x00, 0x80)),
+      m_highlightBarColor(QColor(Qt::red)),
+      m_highlightRowColor(QColor(Qt::darkRed)),
+      m_highlightColumnColor(QColor(Qt::darkMagenta)),
+      m_lightStrength(4.0f),
+      m_ambientStrength(0.3f),
+      m_highlightLightStrength(8.0f),
+      m_uniformColor(true)
 {
 }
 

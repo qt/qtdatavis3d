@@ -70,6 +70,7 @@ public:
 private:
     friend class Q3DBars;
     friend class Q3DBarsPrivate;
+    friend class Drawer;
 
     QColor m_baseColor;
     QColor m_heightColor;

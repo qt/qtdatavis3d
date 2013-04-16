@@ -59,13 +59,13 @@ bool VertexIndexer::is_near(float v1, float v2)
 // Searches through all already-exported vertices
 // for a similar one.
 // Similar = same position + same UVs + same normal
-bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex
-                                          , const QVector2D &in_uv
-                                          , const QVector3D &in_normal
-                                          , QVector<QVector3D> &out_vertices
-                                          , QVector<QVector2D> &out_uvs
-                                          , QVector<QVector3D> &out_normals
-                                          , unsigned short &result)
+bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex,
+                                          const QVector2D &in_uv,
+                                          const QVector3D &in_normal,
+                                          QVector<QVector3D> &out_vertices,
+                                          QVector<QVector2D> &out_uvs,
+                                          QVector<QVector3D> &out_normals,
+                                          unsigned short &result)
 {
     // Lame linear search
     for (int i = 0; i < out_vertices.size(); i++) {
@@ -86,9 +86,9 @@ bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex
     return false;
 }
 
-bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed
-                                               , QMap<PackedVertex, unsigned short> &VertexToOutIndex
-                                               , unsigned short &result)
+bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed,
+                                               QMap<PackedVertex, unsigned short> &VertexToOutIndex,
+                                               unsigned short &result)
 {
     QMap<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
     if (it == VertexToOutIndex.end()) {
@@ -99,13 +99,13 @@ bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed
     }
 }
 
-void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices
-                             , const QVector<QVector2D> &in_uvs
-                             , const QVector<QVector3D> &in_normals
-                             , QVector<unsigned short> &out_indices
-                             , QVector<QVector3D> &out_vertices
-                             , QVector<QVector2D> &out_uvs
-                             , QVector<QVector3D> &out_normals)
+void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices,
+                             const QVector<QVector2D> &in_uvs,
+                             const QVector<QVector3D> &in_normals,
+                             QVector<unsigned short> &out_indices,
+                             QVector<QVector3D> &out_vertices,
+                             QVector<QVector2D> &out_uvs,
+                             QVector<QVector3D> &out_normals)
 {
     unique_vertices = 0;
     QMap<PackedVertex, unsigned short> VertexToOutIndex;
@@ -118,9 +118,9 @@ void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices
         unsigned short index;
         bool found = getSimilarVertexIndex_fast(packed, VertexToOutIndex, index);
 
-        if (found) { // A similar vertex is already in the VBO, use it instead !
+        if (found) {
             out_indices.append(index);
-        } else { // If not, it needs to be added in the output data.
+        } else {
             unique_vertices++;
             out_vertices.append(in_vertices[i]);
             out_uvs.append(in_uvs[i]);
@@ -133,17 +133,17 @@ void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices
     qDebug() << "unique vertices" << unique_vertices;
 }
 
-void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices
-                                 , const QVector<QVector2D> &in_uvs
-                                 , const QVector<QVector3D> &in_normals
-                                 , const QVector<QVector3D> &in_tangents
-                                 , const QVector<QVector3D> &in_bitangents
-                                 , QVector<unsigned short> &out_indices
-                                 , QVector<QVector3D> &out_vertices
-                                 , QVector<QVector2D> &out_uvs
-                                 , QVector<QVector3D> &out_normals
-                                 , QVector<QVector3D> &out_tangents
-                                 , QVector<QVector3D> &out_bitangents)
+void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
+                                 const QVector<QVector2D> &in_uvs,
+                                 const QVector<QVector3D> &in_normals,
+                                 const QVector<QVector3D> &in_tangents,
+                                 const QVector<QVector3D> &in_bitangents,
+                                 QVector<unsigned short> &out_indices,
+                                 QVector<QVector3D> &out_vertices,
+                                 QVector<QVector2D> &out_uvs,
+                                 QVector<QVector3D> &out_normals,
+                                 QVector<QVector3D> &out_tangents,
+                                 QVector<QVector3D> &out_bitangents)
 {
     unique_vertices = 0;
     // For each input vertex
@@ -151,16 +151,16 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices
 
         // Try to find a similar vertex in out_XXXX
         unsigned short index;
-        bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i]
-                                           , out_vertices, out_uvs, out_normals, index);
+        bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i],
+                                           out_vertices, out_uvs, out_normals, index);
 
-        if (found) { // A similar vertex is already in the VBO, use it instead !
+        if (found) {
             out_indices.append(index);
 
             // Average the tangents and the bitangents
             out_tangents[index] += in_tangents[i];
             out_bitangents[index] += in_bitangents[i];
-        } else { // If not, it needs to be added in the output data.
+        } else {
             unique_vertices++;
             out_vertices.append(in_vertices[i]);
             out_uvs.append(in_uvs[i]);

@@ -70,6 +70,7 @@ class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
 class Theme;
+class Drawer;
 
 class Q3DBarsPrivate
 {
@@ -151,6 +152,7 @@ public:
     Q3DBars::LabelTransparency m_labelTransparency;
     float m_fontSize;
     QFont m_font;
+    Drawer *m_drawer;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

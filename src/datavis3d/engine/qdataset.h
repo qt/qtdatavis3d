@@ -60,11 +60,11 @@ public:
     explicit QDataSet();
     ~QDataSet();
 
-    void setLabels(const QString &xAxis = QString()
-            , const QString &zAxis = QString()
-            , const QString &yAxis = QString()
-            , const QVector<QString> &labelsRow = QVector<QString>()
-            , const QVector<QString> &labelsColumn = QVector<QString>());
+    void setLabels(const QString &xAxis = QString(),
+                   const QString &zAxis = QString(),
+                   const QString &yAxis = QString(),
+                   const QVector<QString> &labelsRow = QVector<QString>(),
+                   const QVector<QString> &labelsColumn = QVector<QString>());
     void addRow(QDataRow *row);
 
 private:

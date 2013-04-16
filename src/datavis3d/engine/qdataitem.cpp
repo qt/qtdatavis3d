@@ -70,13 +70,13 @@ void QDataItem::setValue(float value)
 }
 
 QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)
-    : q_ptr(q)
-    , m_value(value)
-    , m_label(label)
-    , m_prependLabel(false)
-    , m_size(QSize(0, 0))
-    , m_translation(QVector3D(0, 0, 0))
-    , m_textureId(0)
+    : q_ptr(q),
+      m_value(value),
+      m_label(label),
+      m_prependLabel(false),
+      m_size(QSize(0, 0)),
+      m_translation(QVector3D(0, 0, 0)),
+      m_textureId(0)
 {
 }
 

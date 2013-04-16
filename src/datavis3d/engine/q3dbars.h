@@ -53,8 +53,6 @@ class Q3DBarsPrivate;
 class QDataItem;
 class QDataRow;
 class QDataSet;
-class ShaderHelper;
-class ObjectHelper;
 
 class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -116,6 +114,14 @@ public:
         ZoomColumn
     };
 
+    enum LabelPosition {
+        LabelBelow = 0,
+        LabelLow,
+        LabelMid,
+        LabelHigh,
+        LabelOver
+    };
+
 public:
     explicit Q3DBars();
     ~Q3DBars();
@@ -127,37 +133,37 @@ public:
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
     // TODO: Replace QVector<..> with a data row class (QDataRow)? Move labels to class.
-    void addDataRow(const QVector<float> &dataRow
-                    , const QString &labelRow = QString()
-                    , const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<float> &dataRow,
+                    const QString &labelRow = QString(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // TODO: Replace QVector<..> with a data row class (QDataRow)? Move labels to class.
     // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow
-                    , const QString &labelRow = QString()
-                    , const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<QDataItem*> &dataRow,
+                    const QString &labelRow = QString(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataRow is transferred
     void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
     // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
-    void addDataSet(const QVector< QVector<float> > &data
-                    , const QVector<QString> &labelsRow = QVector<QString>()
-                    , const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<float> > &data,
+                    const QVector<QString> &labelsRow = QVector<QString>(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
 
     // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
     // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data
-                    , const QVector<QString> &labelsRow = QVector<QString>()
-                    , const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<QDataItem*> > &data,
+                    const QVector<QString> &labelsRow = QVector<QString>(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataSet is transferred
     void addDataSet(QDataSet* dataSet);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QPointF thickness = QPointF(1.0f, 1.0f)
-            , QPointF spacing = QPointF(1.0f, 1.0f)
-            , bool relative = true);
+    void setBarSpecs(QPointF thickness = QPointF(1.0f, 1.0f),
+                     QPointF spacing = QPointF(1.0f, 1.0f),
+                     bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(BarStyle style, bool smooth = false);
@@ -166,8 +172,9 @@ public:
     void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(QPoint sampleCount, const QString &labelRow = QString()
-            , const QString &labelColumn = QString(), const QString &labelHeight = QString());
+    void setupSampleSpace(QPoint sampleCount, const QString &labelRow = QString(),
+                          const QString &labelColumn = QString(),
+                          const QString &labelHeight = QString());
 
     // Select preset camera placement
     void setCameraPreset(CameraPreset preset);
@@ -208,12 +215,9 @@ protected:
 private:
     void drawZoomScene();
     void drawScene();
-    void drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
-                   , const QMatrix4x4 &projectionmatrix, bool useDepth = false
-            , qreal rotation = 0.0f);
-    void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false
-            , GLuint textureId = 0);
-    void generateLabelTexture(QDataItem *item);
+    void drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x4 &viewmatrix,
+                   const QMatrix4x4 &projectionmatrix, bool useDepth = false,
+                   qreal rotation = 0.0f, Q3DBars::LabelPosition position = Q3DBars::LabelOver);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

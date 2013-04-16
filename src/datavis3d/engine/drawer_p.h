@@ -39,94 +39,53 @@
 **
 ****************************************************************************/
 
-#include "qdatarow.h"
-#include "qdatarow_p.h"
-#include "qdataitem.h"
-#include "qdataitem_p.h"
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include <QString>
+#ifndef DRAWER_P_H
+#define DRAWER_P_H
+
+#include "QtDataVis3D/qdatavis3dglobal.h"
+#include "q3dbars.h"
+#include "theme_p.h"
+#include <QFont>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-QDataRow::QDataRow(const QString &label)
-    : d_ptr(new QDataRowPrivate(this, label))
-{
-    //qDebug("QDataRow");
-}
+class QDataItem;
+class ShaderHelper;
+class ObjectHelper;
+class TextureHelper;
 
-QDataRow::~QDataRow()
+class Drawer : protected QOpenGLFunctions
 {
-    //qDebug("~QDataRow");
-}
+public:
+    explicit Drawer(const Theme &theme, const QFont &font, Q3DBars::LabelTransparency transparency);
+    ~Drawer();
 
-void QDataRow::setLabel(const QString &label)
-{
-    d_ptr->m_label = label;
-}
+    void setTheme(const Theme &theme);
+    void setFont(const QFont &font);
+    void setTransparency(Q3DBars::LabelTransparency transparency);
 
-void QDataRow::addItem(QDataItem *item)
-{
-    d_ptr->m_row.prepend(item);
-}
+    void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false,
+                    GLuint textureId = 0);
+    void generateLabelTexture(QDataItem *item);
+    GLuint generateLabelTexture(const QString &text, QSize &labelSize);
 
-QDataRowPrivate::QDataRowPrivate(QDataRow *q, const QString &label)
-    : q_ptr(q),
-      m_label(label)
-{
-}
-
-QDataRowPrivate::~QDataRowPrivate()
-{
-    for (int itemCount = 0; itemCount < m_row.size(); itemCount++)
-        delete m_row.at(itemCount);
-    m_row.clear();
-}
-
-QVector<QDataItem*> QDataRowPrivate::row()
-{
-    return m_row;
-}
-
-void QDataRowPrivate::clear()
-{
-    m_row.clear();
-}
-
-QDataItem *QDataRowPrivate::getItem(int itemIndex)
-{
-    QDataItem *item = NULL;
-    if (m_row.size() > itemIndex)
-        item = m_row.at(itemIndex);
-    return item;
-}
-
-void QDataRowPrivate::verifySize(int size)
-{
-    if (size > m_row.size()) {
-        // QVector's resize doesn't delete data contained in it
-        // Delete contents of items to be removed
-        int nbrToBeRemoved = m_row.size() - size;
-        for (int itemCount = 0; itemCount < nbrToBeRemoved; itemCount++) {
-            int itemToBeRemoved = m_row.size() - itemCount - 1; // -1 to compensate index 0
-            delete m_row.at(itemToBeRemoved);
-        }
-        // Resize vector
-        m_row.resize(size);
-    } else if (size < m_row.size()) {
-        qCritical("Check your sample space size! Your row is too short.");
-    }
-}
-
-float QDataRowPrivate::highestValue()
-{
-    float max = 0;
-    for (int i = 0; i < m_row.size(); i++) {
-        QDataItem *item = m_row.at(i);
-        float itemValue = item->d_ptr->value();
-        if (max < itemValue)
-            max = itemValue;
-    }
-    return max;
-}
+private:
+    Theme m_theme;
+    QFont m_font;
+    Q3DBars::LabelTransparency m_transparency;
+    TextureHelper *m_textureHelper;
+};
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+
+#endif
