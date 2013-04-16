@@ -145,21 +145,26 @@ void Q3DBars::render()
 {
     if (!d_ptr->m_isInitialized)
         return;
+
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
-    static QTime lastTime = QTime::currentTime();
-    static QTime lastFrameTime = lastTime;
+    static bool firstRender = true;
+    static QTime lastTime;
     static int nbFrames = 0;
+    if (firstRender) {
+        lastTime.start();
+        firstRender = false;
+    }
 
     // Measure speed (as milliseconds per frame)
-    lastFrameTime = QTime::currentTime();
     nbFrames++;
-    if (lastTime.msecsTo(lastFrameTime) >= 1000.0f) { // print only if last measurement was more than 1s ago
-        qDebug() << 1000.0f / double(nbFrames) << "ms/frame (=" << double(nbFrames) << "fps)";
+    if (lastTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
+        qDebug() << double(lastTime.elapsed()) / double(nbFrames) << "ms/frame (=" << double(nbFrames) << "fps)";
         nbFrames = 0;
-        lastTime = lastFrameTime;
+        lastTime.restart();
     }
 #endif
+
 #ifdef USE_PAINTER_TEXT
     if (d_ptr->m_paintDevice) {
         QPainter painter(d_ptr->m_paintDevice);
@@ -185,6 +190,7 @@ void Q3DBars::render()
 
 void Q3DBars::render(QPainter *painter)
 {
+#ifdef USE_PAINTER_TEXT
     painter->beginNativePainting();
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
@@ -243,6 +249,7 @@ void Q3DBars::render(QPainter *painter)
             //Utils::printText(painter, item->d_ptr->valueStr(), screenCoords, true, 60.0f);
         }
     }
+#endif
 }
 
 void Q3DBars::drawZoomScene()
@@ -357,49 +364,50 @@ void Q3DBars::drawZoomScene()
 
         float lightStrength = d_ptr->m_theme->m_lightStrength;
 #if 0 // TODO: Implement selection in zoom
-            if (d_ptr->m_selectionMode > None) {
-                Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
-                                                                                , selection);
-                switch (selectionType) {
-                case Q3DBarsPrivate::Bar:
-                {
-                    // highlight bar by inverting the color of the bar
-                    //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                    barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
-                    lightStrength = d_ptr->m_highlightLightStrength;
-                    //if (d_ptr->m_mousePressed) {
-                    //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                    //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
-                    //}
-                    // Insert data to QDataItem. We have no ownership, don't delete the previous one
-                    d_ptr->m_selectedBar = item;
-                    d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
-                    barSelectionFound = true;
-                    break;
-                }
-                case Q3DBarsPrivate::Row:
-                {
-                    // Current bar is on the same row as the selected bar
-                    barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
-                    lightStrength = d_ptr->m_highlightLightStrength;
-                    break;
-                }
-                case Q3DBarsPrivate::Column:
-                {
-                    // Current bar is on the same column as the selected bar
-                    barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
-                    lightStrength = d_ptr->m_highlightLightStrength;
-                    break;
-                }
-                case Q3DBarsPrivate::None:
-                {
-                    // Current bar is not selected, nor on a row or column
-                    // do nothing
-                    break;
-                }
-                }
+        if (d_ptr->m_selectionMode > None) {
+            Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar
+                                                                            , selection);
+            switch (selectionType) {
+            case Q3DBarsPrivate::Bar:
+            {
+                // highlight bar by inverting the color of the bar
+                //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
+                barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
+                lightStrength = d_ptr->m_highlightLightStrength;
+                //if (d_ptr->m_mousePressed) {
+                //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
+                //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
+                //}
+                // Insert data to QDataItem. We have no ownership, don't delete the previous one
+                d_ptr->m_selectedBar = item;
+                d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
+                barSelectionFound = true;
+                break;
             }
+            case Q3DBarsPrivate::Row:
+            {
+                // Current bar is on the same row as the selected bar
+                barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
+                lightStrength = d_ptr->m_highlightLightStrength;
+                break;
+            }
+            case Q3DBarsPrivate::Column:
+            {
+                // Current bar is on the same column as the selected bar
+                barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
+                lightStrength = d_ptr->m_highlightLightStrength;
+                break;
+            }
+            case Q3DBarsPrivate::None:
+            {
+                // Current bar is not selected, nor on a row or column
+                // do nothing
+                break;
+            }
+            }
+        }
 #endif
+        // Set shader bindings
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -411,51 +419,19 @@ void Q3DBars::drawZoomScene()
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS()
                                             , d_ptr->m_theme->m_ambientStrength);
 
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_barShader->posAtt()
-                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 2nd attribute buffer : normals
-        glEnableVertexAttribArray(d_ptr->m_barShader->normalAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->normalBuf());
-        glVertexAttribPointer(d_ptr->m_barShader->normalAtt()
-                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 3rd attribute buffer : UVs
-        //glEnableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
-        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->uvBuf());
-        //glVertexAttribPointer(d_ptr->m_barShader->m_uvAtt()
-        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
-
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
-                       , GL_UNSIGNED_SHORT, (void*)0);
-
-        // Free buffers
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        //glDisableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
-        glDisableVertexAttribArray(d_ptr->m_barShader->normalAtt());
-        glDisableVertexAttribArray(d_ptr->m_barShader->posAtt());
+        // Draw the object
+        drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
     }
 #if 0
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         d_ptr->m_selectedBar = NULL;
         if (d_ptr->m_zoomActivated && Q3DBarsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
-            qDebug() << "kukkuu";
             d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
             d_ptr->m_zoomActivated = false;
         }
     } else if (d_ptr->m_selectionMode >= ZoomRow
              && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
-        qDebug("hiihaa");
         d_ptr->m_zoomActivated = true;
         d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5
                                        , width() / 5, height() / 5);
@@ -686,6 +662,7 @@ void Q3DBars::drawScene()
 
         QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_theme->m_backgroundColor);
 
+        // Set shader bindings
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP()
                                                    , lightPos);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->view()
@@ -702,44 +679,10 @@ void Q3DBars::drawScene()
                                                    , d_ptr->m_theme->m_lightStrength);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS()
                                                    , d_ptr->m_theme->m_ambientStrength);
-        // Activate texture
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, bgrTexture);
-        //d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->texture()
-        //                                           , 0);
 
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->posAtt()
-                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 2nd attribute buffer : normals
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->normalBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt()
-                              , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 3rd attribute buffer : UVs
-        //glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
-        //glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt()
-        //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
-
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_backgroundObj->indexCount()
-                       , GL_UNSIGNED_SHORT, (void*)0);
-
-        // Free buffers
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        //glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
+        // Draw the object
+        drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
+        //drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true, bgrTexture);
     }
 
     // Disable textures
@@ -848,6 +791,7 @@ void Q3DBars::drawScene()
                 }
             }
 
+            // Set shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -859,38 +803,8 @@ void Q3DBars::drawScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS()
                                                 , d_ptr->m_theme->m_ambientStrength);
 
-            // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(d_ptr->m_barShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
-            glVertexAttribPointer(d_ptr->m_barShader->posAtt()
-                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-            // 2nd attribute buffer : normals
-            glEnableVertexAttribArray(d_ptr->m_barShader->normalAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->normalBuf());
-            glVertexAttribPointer(d_ptr->m_barShader->normalAtt()
-                                  , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-            // 3rd attribute buffer : UVs
-            //glEnableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
-            //glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->uvBuf());
-            //glVertexAttribPointer(d_ptr->m_barShader->m_uvAtt()
-            //                      , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-            // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
-
-            // Draw the triangles
-            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount()
-                           , GL_UNSIGNED_SHORT, (void*)0);
-
-            // Free buffers
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-            //glDisableVertexAttribArray(d_ptr->m_barShader->m_uvAtt());
-            glDisableVertexAttribArray(d_ptr->m_barShader->normalAtt());
-            glDisableVertexAttribArray(d_ptr->m_barShader->posAtt());
+            // Draw the object
+            drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
         }
     }
     if (!barSelectionFound) {
@@ -944,6 +858,53 @@ void Q3DBars::drawScene()
     d_ptr->m_barShader->release();
 }
 
+// TODO: Move to a separate class, so that it can be used by other vis types as well
+void Q3DBars::drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured
+                         , GLuint textureId)
+{
+    if (textured) {
+        // Activate texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        shader->setUniformValue(shader->texture(), 0);
+    }
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // 2nd attribute buffer : normals
+    glEnableVertexAttribArray(shader->normalAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
+    glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    if (textured) {
+        // 3rd attribute buffer : UVs
+        glEnableVertexAttribArray(shader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
+        glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
+
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
+
+    // Draw the triangles
+    glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_SHORT, (void*)0);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    if (textured) {
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisableVertexAttribArray(shader->uvAtt());
+    }
+    glDisableVertexAttribArray(shader->normalAtt());
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
+// TODO: Move to a separate class, so that it can be used by other vis types as well
 void Q3DBars::generateLabelTexture(QDataItem *item)
 {
     // Delete previous texture, if there is one
@@ -1011,42 +972,12 @@ void Q3DBars::drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
 
     MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;
 
+    // Set shader bindings
     d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP()
                                           , MVPMatrix);
 
-    // Activate texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, item.d_ptr->textureId());
-    d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->texture()
-                                          , 0);
-
-    // 1st attribute buffer : vertices
-    glEnableVertexAttribArray(d_ptr->m_labelShader->posAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->vertexBuf());
-    glVertexAttribPointer(d_ptr->m_labelShader->posAtt()
-                          , 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // 2nd attribute buffer : UVs
-    glEnableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_labelObj->uvBuf());
-    glVertexAttribPointer(d_ptr->m_labelShader->uvAtt()
-                          , 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    // Index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_labelObj->elementBuf());
-
-    // Draw the triangles
-    glDrawElements(GL_TRIANGLES, d_ptr->m_labelObj->indexCount()
-                   , GL_UNSIGNED_SHORT, (void*)0);
-
-    // Free buffers
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    glDisableVertexAttribArray(d_ptr->m_labelShader->uvAtt());
-    glDisableVertexAttribArray(d_ptr->m_labelShader->posAtt());
-
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // Draw the object
+    drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj, true, item.d_ptr->textureId());
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)

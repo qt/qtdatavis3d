@@ -53,6 +53,8 @@ class Q3DBarsPrivate;
 class QDataItem;
 class QDataRow;
 class QDataSet;
+class ShaderHelper;
+class ObjectHelper;
 
 class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -209,6 +211,8 @@ private:
     void drawLabel(const QDataItem &item, const QMatrix4x4 &viewmatrix
                    , const QMatrix4x4 &projectionmatrix, bool useDepth = false
             , qreal rotation = 0.0f);
+    void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false
+            , GLuint textureId = 0);
     void generateLabelTexture(QDataItem *item);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
