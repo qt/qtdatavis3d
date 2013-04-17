@@ -71,7 +71,8 @@ void QDataRow::addItem(QDataItem *item)
 
 QDataRowPrivate::QDataRowPrivate(QDataRow *q, const QString &label)
     : q_ptr(q),
-      m_label(label)
+      m_label(label),
+      m_labelItem(LabelItem())
 {
 }
 
@@ -127,6 +128,21 @@ float QDataRowPrivate::highestValue()
             max = itemValue;
     }
     return max;
+}
+
+QString QDataRowPrivate::label()
+{
+    return m_label;
+}
+
+void QDataRowPrivate::setLabelItem(const LabelItem &item)
+{
+    m_labelItem = item;
+}
+
+LabelItem QDataRowPrivate::labelItem()
+{
+    return m_labelItem;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -80,13 +80,13 @@ void QDataSet::setLabels(const QString &xAxis,
         d_ptr->m_zAxis = zAxis;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_zAxisItem, xAxis);
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_zAxisItem, zAxis);
     }
     if (yAxis != empty && d_ptr->m_yAxis != yAxis) {
         d_ptr->m_yAxis = yAxis;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_yAxisItem, xAxis);
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_yAxisItem, yAxis);
     }
     d_ptr->m_labelsRow = labelsRow;
     d_ptr->m_labelsColumn = labelsColumn;
@@ -251,9 +251,13 @@ void QDataSetPrivate::updateTextures()
     m_drawer->generateLabelItem(m_zAxisItem, m_zAxis);
     m_drawer->generateLabelItem(m_yAxisItem, m_yAxis);
     for (int itemCount = 0; itemCount < m_labelsColumn.size(); itemCount++) {
+        if (m_labelItemsColumn.size() < itemCount + 1)
+            m_labelItemsColumn.append(LabelItem());
         m_drawer->generateLabelItem(m_labelItemsColumn[itemCount], m_labelsColumn.at(itemCount));
     }
     for (int itemCount = 0; itemCount < m_labelsRow.size(); itemCount++) {
+        if (m_labelItemsRow.size() < itemCount + 1)
+            m_labelItemsRow.append(LabelItem());
         m_drawer->generateLabelItem(m_labelItemsRow[itemCount], m_labelsRow.at(itemCount));
     }
 }

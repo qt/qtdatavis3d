@@ -451,34 +451,55 @@ void Q3DBars::drawZoomScene()
     }
 
     // Draw labels for axes
-    // TODO: label of selected row/column above the bars
-    // TODO: label of selected column/row below the bar labels
+    QDataItem *dummyItem = NULL;
+    LabelItem x;
+    LabelItem z;
+    LabelItem y;
+    d_ptr->m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
+    LabelItem zoomSelectionLabel = d_ptr->m_zoomSelection->d_ptr->labelItem();
+    if (ZoomRow == d_ptr->m_selectionMode) {
+        drawLabel(*dummyItem, zoomSelectionLabel.textureId(), zoomSelectionLabel.size(), viewMatrix,
+                  projectionMatrix, false, 0.0f, LabelTop);
+        drawLabel(*dummyItem, z.textureId(), z.size(), viewMatrix, projectionMatrix, false, 0.0f,
+                  LabelBottom);
+    } else {
+        drawLabel(*dummyItem, x.textureId(), x.size(), viewMatrix, projectionMatrix, false, 0.0f,
+                  LabelBottom);
+        drawLabel(*dummyItem, zoomSelectionLabel.textureId(), zoomSelectionLabel.size(), viewMatrix,
+                  projectionMatrix, false, 0.0f, LabelTop);
+    }
+    drawLabel(*dummyItem, y.textureId(), y.size(), viewMatrix, projectionMatrix, false, 90.0f,
+              LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         // Draw values
         drawLabel(*item, item->d_ptr->textureId(), item->d_ptr->labelSize(), viewMatrix,
-                  projectionMatrix, false, 0.0f,
-                  LabelOver);
+                  projectionMatrix, false, 0.0f, LabelOver);
         // Draw labels
+        // TODO: If there are 0 -valued bars, labeling goes wrong. Fix it.
         LabelItem labelItem;
         if (ZoomRow == d_ptr->m_selectionMode) {
-            // TODO: Testi, piirrä axislabel kokeeksi
-//            LabelItem x, z, y;
-//            d_ptr->m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
-//            drawLabel(*item, x.textureId(), x.size(),
-//                      viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
-            if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > col)
-                labelItem = d_ptr->m_dataSet->d_ptr->columnLabelItems().at(col);
+            if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > col) {
+                // If draw order of bars is flipped, label draw order should be too
+                if (d_ptr->m_xFlipped) {
+                    labelItem = d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
+                                d_ptr->m_dataSet->d_ptr->columnLabelItems().size() - col - 1);
+                } else {
+                    labelItem = d_ptr->m_dataSet->d_ptr->columnLabelItems().at(col);
+                }
+            }
         } else {
-            // TODO: Testi, piirrä axislabel kokeeksi
-//            LabelItem x, z, y;
-//            d_ptr->m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
-//            drawLabel(*item, z.textureId(), z.size(),
-//                      viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
-            if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > col)
-                labelItem = d_ptr->m_dataSet->d_ptr->rowLabelItems().at(col);
+            if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > col) {
+                // If draw order of bars is flipped, label draw order should be too
+                if (d_ptr->m_zFlipped) {
+                    labelItem = d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
+                                d_ptr->m_dataSet->d_ptr->rowLabelItems().size() - col - 1);
+                } else {
+                    labelItem = d_ptr->m_dataSet->d_ptr->rowLabelItems().at(col);
+                }
+            }
         }
         // Check if there is a label before drawing
         if (labelItem.textureId() > 0) {
@@ -542,19 +563,23 @@ void Q3DBars::drawScene()
         startRow = 0;
         stopRow = d_ptr->m_sampleCount.y();
         stepRow = 1;
+        d_ptr->m_zFlipped = false;
     } else {
         startRow = d_ptr->m_sampleCount.y() - 1;
         stopRow = -1;
         stepRow = -1;
+        d_ptr->m_zFlipped = true;
     }
     if (viewMatrix.row(0).z() < 0) {
         startBar = 0;
         stopBar = d_ptr->m_sampleCount.x();
         stepBar = 1;
+        d_ptr->m_xFlipped = false;
     } else {
         startBar = d_ptr->m_sampleCount.x() - 1;
         stopBar = -1;
         stepBar = -1;
+        d_ptr->m_xFlipped = true;
     }
 
     // calculate background rotation based on view matrix rotation
@@ -801,6 +826,10 @@ void Q3DBars::drawScene()
                     if (!d_ptr->m_zoomActivated && ZoomRow == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
+                        d_ptr->m_zoomSelection->d_ptr->setLabelItem(
+                                    d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
+                                        d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
+                                        - row - 1));
                     }
                     break;
                 }
@@ -812,6 +841,10 @@ void Q3DBars::drawScene()
                     if (!d_ptr->m_zoomActivated && ZoomColumn == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
+                        d_ptr->m_zoomSelection->d_ptr->setLabelItem(
+                                    d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
+                                        d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
+                                        - bar - 1));
                     }
                     break;
                 }
@@ -900,7 +933,9 @@ void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, QSize textureSi
     // Draw label
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
-    qreal yPosition = -1.5f;
+    GLfloat xPosition;
+    GLfloat yPosition;
+    GLfloat zPosition = zComp;
     switch (position) {
     case Q3DBars::LabelBelow:
     {
@@ -933,14 +968,41 @@ void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, QSize textureSi
             yPosition -= 0.5f;
         break;
     }
+    case Q3DBars::LabelBottom:
+    {
+        yPosition = -2.0f; // TODO: Calculate from scene
+        xPosition = 0.0f;
+        break;
+    }
+    case Q3DBars::LabelTop:
+    {
+        yPosition = 0.75f; // TODO: Calculate from scene
+        xPosition = 0.0f;
+        break;
+    }
+    case Q3DBars::LabelLeft:
+    {
+        yPosition = -0.625f; // TODO: Calculate from scene
+        xPosition = -2.5f; // TODO: Calculate from scene
+        break;
+    }
+    case Q3DBars::LabelRight:
+    {
+        yPosition = -0.625f; // TODO: Calculate from scene
+        xPosition = 2.5f; // TODO: Calculate from scene
+        break;
+    }
     }
 
-    qreal zPosition = zComp;
-    qreal xPosition = item.d_ptr->translation().x();
-    if (useDepth)
-        zPosition = item.d_ptr->translation().z();
-    else if (ZoomColumn == d_ptr->m_selectionMode)
-        xPosition = -(item.d_ptr->translation().z()) + zComp; // flip first to left
+    if (position < LabelBottom) {
+        xPosition = item.d_ptr->translation().x();
+        if (useDepth)
+            zPosition = item.d_ptr->translation().z();
+        else if (ZoomColumn == d_ptr->m_selectionMode)
+            xPosition = -(item.d_ptr->translation().z()) + zComp; // flip first to left
+    }
+
+    // Position label
     modelMatrix.translate(xPosition, yPosition, zPosition);
 
     // Rotate
@@ -1386,7 +1448,9 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_labelTransparency(Q3DBars::TransparencyNone),
       m_fontSize(10.0f),
       m_font(QFont(QStringLiteral("Arial"))),
-      m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency))
+      m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
+      m_xFlipped(false),
+      m_zFlipped(false)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
 }

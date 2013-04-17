@@ -54,6 +54,7 @@
 
 #include "qdatavis3dglobal.h"
 #include "qdatarow.h"
+#include "labelitem_p.h"
 #include <QVector>
 #include <QString>
 
@@ -63,7 +64,7 @@ class QDataItem;
 
 class QDataRowPrivate
 {
-    public:
+public:
     explicit QDataRowPrivate(QDataRow *q, const QString &label = QString());
     ~QDataRowPrivate();
 
@@ -73,11 +74,15 @@ class QDataRowPrivate
     QDataItem *getItem(int itemIndex);
     void verifySize(int size);
     float highestValue();
+    QString label();
+    void setLabelItem(const LabelItem &item);
+    LabelItem labelItem();
 
-    private:
+private:
     QDataRow *q_ptr;
     QVector<QDataItem*> m_row;
     QString m_label;
+    LabelItem m_labelItem;
     friend class QDataRow;
 };
 

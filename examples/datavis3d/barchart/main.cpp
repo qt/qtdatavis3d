@@ -216,18 +216,18 @@ void ChartDataGenerator::addDataSet()
     QVector<QString> weeks;
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
-    // Set up data
-    float hours[5][7] = {{2, 1, 3, 0.25, 1, 5, 7}
-                        , {0.5, 1, 3, 1, 2, 2, 3}
-                        , {1, 1, 2, 1, 4, 4, 4}
-                        , {0, 0, 0, 0, 2, 2, 0.25}
-                        , {3, 3, 6, 2, 2, 1, 1}};
+    // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
+    float hours[5][7] = { {2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 7.0}       // week 1
+                        , {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0}       // week 2
+                        , {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0}       // week 3
+                        , {0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.3}       // week 4
+                        , {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
 
     // Create data set
     QDataSet *dataSet = new QDataSet();
 
     // Add labels
-    dataSet->setLabels("Day of week", "Week of year", "Hours doing something", weeks, days);
+    dataSet->setLabels("Week of year", "Day of week", "Hours playing banjo", weeks, days);
 
     // Create data rows
     QDataRow *dataRow;
@@ -236,7 +236,7 @@ void ChartDataGenerator::addDataSet()
         // Create data items
         for (int day = 0; day < days.size(); day++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(hours[week][day], "h, " + days.at(day)));
+            dataRow->addItem(new QDataItem(hours[week][day], "h"));//, " + days.at(day)));
         }
         // Add row to set
         dataSet->addRow(dataRow);

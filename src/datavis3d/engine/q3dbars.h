@@ -114,12 +114,17 @@ public:
         ZoomColumn
     };
 
+    // TODO: Should this be moved to Q3DBarsPrivate? Not for use via API directly?
     enum LabelPosition {
         LabelBelow = 0,
         LabelLow,
         LabelMid,
         LabelHigh,
-        LabelOver
+        LabelOver,
+        LabelBottom,    // Absolute positions from here onward, used for axes (QDataItem is ignored)
+        LabelTop,
+        LabelLeft,
+        LabelRight
     };
 
 public:

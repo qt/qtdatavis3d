@@ -153,6 +153,8 @@ public:
     GLfloat m_fontSize;
     QFont m_font;
     Drawer *m_drawer;
+    bool m_xFlipped;
+    bool m_zFlipped;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
