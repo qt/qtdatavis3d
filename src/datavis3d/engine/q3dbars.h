@@ -132,11 +132,9 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    // TODO: Replace QVector<..> with a data row class (QDataRow)? Move labels to class.
-    void addDataRow(const QVector<float> &dataRow,
+    void addDataRow(const QVector<GLfloat> &dataRow,
                     const QString &labelRow = QString(),
                     const QVector<QString> &labelsColumn = QVector<QString>());
-    // TODO: Replace QVector<..> with a data row class (QDataRow)? Move labels to class.
     // ownership of dataItems is transferred
     void addDataRow(const QVector<QDataItem*> &dataRow,
                     const QString &labelRow = QString(),
@@ -145,12 +143,10 @@ public:
     void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
-    void addDataSet(const QVector< QVector<float> > &data,
+    void addDataSet(const QVector< QVector<GLfloat> > &data,
                     const QVector<QString> &labelsRow = QVector<QString>(),
                     const QVector<QString> &labelsColumn = QVector<QString>());
 
-    // TODO: Replace QVector<QVector<..>> with a data set class (QDataSet)? Move labels to class.
     // ownership of dataItems is transferred
     void addDataSet(const QVector< QVector<QDataItem*> > &data,
                     const QVector<QString> &labelsRow = QVector<QString>(),
@@ -181,7 +177,7 @@ public:
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
-    void setCameraPosition(float horizontal, float vertical, int distance = 100);
+    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
     void setTheme(ColorTheme theme);
@@ -196,8 +192,8 @@ public:
     // Set window title
     void setWindowTitle(const QString &title);
 
-    // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just float?
-    void setFontSize(float fontsize);
+    // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
+    void setFontSize(GLfloat fontsize);
 
     // Set font
     void setFont(const QFont &font);
@@ -215,9 +211,10 @@ protected:
 private:
     void drawZoomScene();
     void drawScene();
-    void drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x4 &viewmatrix,
-                   const QMatrix4x4 &projectionmatrix, bool useDepth = false,
-                   qreal rotation = 0.0f, Q3DBars::LabelPosition position = Q3DBars::LabelOver);
+    void drawLabel(const QDataItem &item, GLuint textureId, QSize textureSize,
+                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
+                   bool useDepth = false, qreal rotation = 0.0f,
+                   Q3DBars::LabelPosition position = Q3DBars::LabelOver);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

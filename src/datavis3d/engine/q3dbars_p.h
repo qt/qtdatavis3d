@@ -103,7 +103,7 @@ public:
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
     void calculateSceneScalingFactors();
-    SelectionType isSelected(int row, int bar, const QVector3D &selection);
+    SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
 
     GLuint m_framebufferSelection;
 
@@ -121,21 +121,21 @@ public:
     QString m_objFile;
     MousePressType m_mousePressed;
     QPoint m_mousePos;
-    int m_zoomLevel;
-    float m_horizontalRotation;
-    float m_verticalRotation;
+    GLint m_zoomLevel;
+    GLfloat m_horizontalRotation;
+    GLfloat m_verticalRotation;
     QPointF m_barThickness;
     QPointF m_barSpacing;
-    float m_heightNormalizer;
-    float m_rowWidth;
-    float m_columnDepth;
-    float m_maxDimension;
-    float m_scaleX;
-    float m_scaleZ;
-    float m_scaleFactorX;
-    float m_scaleFactorZ;
-    float m_sceneScale;
-    float m_maxSceneSize;
+    GLfloat m_heightNormalizer;
+    GLfloat m_rowWidth;
+    GLfloat m_columnDepth;
+    GLfloat m_maxDimension;
+    GLfloat m_scaleX;
+    GLfloat m_scaleZ;
+    GLfloat m_scaleFactorX;
+    GLfloat m_scaleFactorZ;
+    GLfloat m_sceneScale;
+    GLfloat m_maxSceneSize;
     Theme *m_theme;
     bool m_isInitialized;
     Q3DBars::SelectionMode m_selectionMode;
@@ -150,7 +150,7 @@ public:
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
     Q3DBars::LabelTransparency m_labelTransparency;
-    float m_fontSize;
+    GLfloat m_fontSize;
     QFont m_font;
     Drawer *m_drawer;
 };

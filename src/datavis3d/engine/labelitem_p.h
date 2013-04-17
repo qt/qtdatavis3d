@@ -49,56 +49,29 @@
 //
 // We mean it.
 
-#ifndef QDATASET_P_H
-#define QDATASET_P_H
+#ifndef LABELITEM_P_H
+#define LABELITEM_P_H
 
 #include "qdatavis3dglobal.h"
-#include "qdataset.h"
-#include "drawer_p.h"
-#include "labelitem_p.h"
-#include <QVector>
-#include <QString>
+#include <QOpenGLFunctions>
+#include <QSize>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class QDataSetPrivate : public QObject
+class LabelItem
 {
-    Q_OBJECT
-
 public:
-    explicit QDataSetPrivate(QDataSet *q);
-    ~QDataSetPrivate();
+    explicit LabelItem();
+    ~LabelItem();
 
-    void setDrawer(Drawer *drawer);
-    QVector<QDataRow*> set();
-    QDataRow *getRow(int rowIndex);
-    QVector<QString> rowLabels();
-    QVector<QString> columnLabels();
-    QVector<LabelItem> rowLabelItems();
-    QVector<LabelItem> columnLabelItems();
-    void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
-    void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
-    void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
-    float highestValue();
-
-public Q_SLOTS:
-    void updateTextures();
+    void setSize(const QSize &size);
+    QSize size();
+    void setTextureId(GLuint textureId);
+    GLuint textureId();
 
 private:
-    QDataSet *q_ptr;
-    QVector<QDataRow*> m_set;
-    QString m_xAxis;
-    QString m_zAxis;
-    QString m_yAxis;
-    QVector<QString> m_labelsRow;
-    QVector<QString> m_labelsColumn;
-    LabelItem m_xAxisItem;
-    LabelItem m_zAxisItem;
-    LabelItem m_yAxisItem;
-    QVector<LabelItem> m_labelItemsRow;
-    QVector<LabelItem> m_labelItemsColumn;
-    Drawer *m_drawer;
-    friend class QDataSet;
+    QSize m_size;
+    GLuint m_textureId;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

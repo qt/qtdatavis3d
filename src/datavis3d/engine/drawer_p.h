@@ -55,6 +55,7 @@
 #include "QtDataVis3D/qdatavis3dglobal.h"
 #include "q3dbars.h"
 #include "theme_p.h"
+#include "labelitem_p.h"
 #include <QFont>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
@@ -64,8 +65,10 @@ class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
 
-class Drawer : protected QOpenGLFunctions
+class Drawer : public QObject, protected QOpenGLFunctions
 {
+    Q_OBJECT
+
 public:
     explicit Drawer(const Theme &theme, const QFont &font, Q3DBars::LabelTransparency transparency);
     ~Drawer();
@@ -77,7 +80,10 @@ public:
     void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false,
                     GLuint textureId = 0);
     void generateLabelTexture(QDataItem *item);
-    GLuint generateLabelTexture(const QString &text, QSize &labelSize);
+    void generateLabelItem(LabelItem &item, const QString &text);
+
+Q_SIGNALS:
+    void drawerChanged();
 
 private:
     Theme m_theme;

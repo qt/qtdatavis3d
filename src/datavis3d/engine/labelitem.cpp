@@ -39,68 +39,38 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef QDATASET_P_H
-#define QDATASET_P_H
-
-#include "qdatavis3dglobal.h"
-#include "qdataset.h"
-#include "drawer_p.h"
 #include "labelitem_p.h"
-#include <QVector>
-#include <QString>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class QDataSetPrivate : public QObject
+LabelItem::LabelItem()
+    : m_size(QSize(0, 0)),
+      m_textureId(0)
 {
-    Q_OBJECT
+}
 
-public:
-    explicit QDataSetPrivate(QDataSet *q);
-    ~QDataSetPrivate();
+LabelItem::~LabelItem()
+{
+}
 
-    void setDrawer(Drawer *drawer);
-    QVector<QDataRow*> set();
-    QDataRow *getRow(int rowIndex);
-    QVector<QString> rowLabels();
-    QVector<QString> columnLabels();
-    QVector<LabelItem> rowLabelItems();
-    QVector<LabelItem> columnLabelItems();
-    void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
-    void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
-    void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
-    float highestValue();
+void LabelItem::setSize(const QSize &size)
+{
+    m_size = size;
+}
 
-public Q_SLOTS:
-    void updateTextures();
+QSize LabelItem::size()
+{
+    return m_size;
+}
 
-private:
-    QDataSet *q_ptr;
-    QVector<QDataRow*> m_set;
-    QString m_xAxis;
-    QString m_zAxis;
-    QString m_yAxis;
-    QVector<QString> m_labelsRow;
-    QVector<QString> m_labelsColumn;
-    LabelItem m_xAxisItem;
-    LabelItem m_zAxisItem;
-    LabelItem m_yAxisItem;
-    QVector<LabelItem> m_labelItemsRow;
-    QVector<LabelItem> m_labelItemsColumn;
-    Drawer *m_drawer;
-    friend class QDataSet;
-};
+void LabelItem::setTextureId(GLuint textureId)
+{
+    m_textureId = textureId;
+}
+
+GLuint LabelItem::textureId()
+{
+    return m_textureId;
+}
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
-
-#endif

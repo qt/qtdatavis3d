@@ -51,9 +51,9 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 Drawer::Drawer(const Theme &theme, const QFont &font, Q3DBars::LabelTransparency transparency)
     : m_theme(theme),
-    m_font(font),
-    m_transparency(transparency),
-    m_textureHelper(new TextureHelper())
+      m_font(font),
+      m_transparency(transparency),
+      m_textureHelper(new TextureHelper())
 {
     initializeOpenGLFunctions();
 }
@@ -66,16 +66,19 @@ Drawer::~Drawer()
 void Drawer::setTheme(const Theme &theme)
 {
     m_theme = theme;
+    emit drawerChanged();
 }
 
 void Drawer::setFont(const QFont &font)
 {
     m_font = font;
+    emit drawerChanged();
 }
 
 void Drawer::setTransparency(Q3DBars::LabelTransparency transparency)
 {
     m_transparency = transparency;
+    emit drawerChanged();
 }
 
 void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured,
@@ -133,7 +136,6 @@ void Drawer::generateLabelTexture(QDataItem *item)
         // (basically we could create textures for all bars when data is added, but we
         // may not need them -> better to do it here dynamically)
         glDeleteTextures(1, &labelTexture);
-        item->d_ptr->setTextureId(0);
     }
 
     // Create labels
@@ -150,8 +152,13 @@ void Drawer::generateLabelTexture(QDataItem *item)
     item->d_ptr->setTextureId(m_textureHelper->create2DTexture(label, true, true));
 }
 
-GLuint Drawer::generateLabelTexture(const QString &text, QSize &labelSize)
+void Drawer::generateLabelItem(LabelItem &item, const QString &text)
 {
+    // Delete previous texture, if there is one
+    GLuint labelTexture = item.textureId();
+    if (labelTexture)
+        glDeleteTextures(1, &labelTexture);
+
     // Create labels
     // Print label into a QImage using QPainter
     QImage label = Utils::printTextToImage(m_font,
@@ -161,9 +168,9 @@ GLuint Drawer::generateLabelTexture(const QString &text, QSize &labelSize)
                                            m_transparency);
 
     // Set label size
-    labelSize = label.size();
+    item.setSize(label.size());
     // Insert text texture into label
-    return m_textureHelper->create2DTexture(label, true, true);
+    item.setTextureId(m_textureHelper->create2DTexture(label, true, true));
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

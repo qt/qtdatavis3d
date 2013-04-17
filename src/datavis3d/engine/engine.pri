@@ -4,7 +4,8 @@ SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/qdatarow.cpp \
            $$PWD/qdataset.cpp \
            $$PWD/theme.cpp \
-           $$PWD/drawer.cpp
+           $$PWD/drawer.cpp \
+           $$PWD/labelitem.cpp
 
 HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/q3dwindow.h \
@@ -17,6 +18,7 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/qdataset.h \
            $$PWD/qdataset_p.h \
            $$PWD/theme_p.h \
-           $$PWD/drawer_p.h
+           $$PWD/drawer_p.h \
+           $$PWD/labelitem_p.h
 
 RESOURCES += engine/engine.qrc

@@ -47,6 +47,8 @@
 #include <QPoint>
 #include <QString>
 
+//#include <QDebug>
+
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 QDataSet::QDataSet()
@@ -68,14 +70,39 @@ void QDataSet::setLabels(const QString &xAxis,
 {
     QString empty;
     // skip empty labels, keep the previous ones
-    if (xAxis != empty)
+    if (xAxis != empty && d_ptr->m_xAxis != xAxis) {
         d_ptr->m_xAxis = xAxis;
-    if (zAxis != empty)
+        // Generate axis label texture
+        if (d_ptr->m_drawer)
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_xAxisItem, xAxis);
+    }
+    if (zAxis != empty && d_ptr->m_zAxis != zAxis) {
         d_ptr->m_zAxis = zAxis;
-    if (yAxis != empty)
+        // Generate axis label texture
+        if (d_ptr->m_drawer)
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_zAxisItem, xAxis);
+    }
+    if (yAxis != empty && d_ptr->m_yAxis != yAxis) {
         d_ptr->m_yAxis = yAxis;
+        // Generate axis label texture
+        if (d_ptr->m_drawer)
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_yAxisItem, xAxis);
+    }
     d_ptr->m_labelsRow = labelsRow;
     d_ptr->m_labelsColumn = labelsColumn;
+    // Generate row and column label textures
+    if (d_ptr->m_drawer) {
+        for (int itemCount = 0; itemCount < labelsColumn.size(); itemCount++) {
+            d_ptr->m_labelItemsColumn.append(LabelItem());
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_labelItemsColumn[itemCount],
+                                               labelsColumn.at(itemCount));
+        }
+        for (int itemCount = 0; itemCount < labelsRow.size(); itemCount++) {
+            d_ptr->m_labelItemsRow.append(LabelItem());
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_labelItemsRow[itemCount],
+                                               labelsRow.at(itemCount));
+        }
+    }
 }
 
 void QDataSet::addRow(QDataRow *row)
@@ -90,7 +117,13 @@ QDataSetPrivate::QDataSetPrivate(QDataSet *q)
       m_zAxis(QString()),
       m_yAxis(QString()),
       m_labelsRow(QVector<QString>()),
-      m_labelsColumn(QVector<QString>())
+      m_labelsColumn(QVector<QString>()),
+      m_xAxisItem(LabelItem()),
+      m_zAxisItem(LabelItem()),
+      m_yAxisItem(LabelItem()),
+      m_labelItemsRow(QVector<LabelItem>()),
+      m_labelItemsColumn(QVector<LabelItem>()),
+      m_drawer(0)
 {
 }
 
@@ -99,6 +132,36 @@ QDataSetPrivate::~QDataSetPrivate()
     for (int itemCount = 0; itemCount < m_set.size(); itemCount++)
         delete m_set.at(itemCount);
     m_set.clear();
+    // Delete axis textures
+    GLuint textureid = m_xAxisItem.textureId();
+    if (textureid)
+        glDeleteTextures(1, &textureid);
+    textureid = m_zAxisItem.textureId();
+    if (textureid)
+        glDeleteTextures(1, &textureid);
+    textureid = m_yAxisItem.textureId();
+    if (textureid)
+        glDeleteTextures(1, &textureid);
+    // Delete row and column textures
+    for (int itemCount = 0; itemCount < m_labelItemsColumn.size(); itemCount++) {
+        LabelItem item = m_labelItemsColumn.at(itemCount);
+        textureid = item.textureId();
+        if (textureid)
+            glDeleteTextures(1, &textureid);
+    }
+    for (int itemCount = 0; itemCount < m_labelItemsRow.size(); itemCount++) {
+        LabelItem item = m_labelItemsRow.at(itemCount);
+        textureid = item.textureId();
+        if (textureid)
+            glDeleteTextures(1, &textureid);
+    }
+}
+
+void QDataSetPrivate::setDrawer(Drawer *drawer)
+{
+    m_drawer = drawer;
+    connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
+    updateTextures();
 }
 
 QVector<QDataRow*> QDataSetPrivate::set()
@@ -124,11 +187,29 @@ QVector<QString> QDataSetPrivate::columnLabels()
     return m_labelsColumn;
 }
 
+QVector<LabelItem> QDataSetPrivate::rowLabelItems()
+{
+    return m_labelItemsRow;
+}
+
+QVector<LabelItem> QDataSetPrivate::columnLabelItems()
+{
+    return m_labelItemsColumn;
+}
+
 void QDataSetPrivate::axisLabels(QString *xAxis, QString *zAxis, QString *yAxis)
 {
     *xAxis = m_xAxis;
     *zAxis = m_zAxis;
     *yAxis = m_yAxis;
+}
+
+void QDataSetPrivate::axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem,
+                                     LabelItem *yAxisItem)
+{
+    *xAxisItem = m_xAxisItem;
+    *zAxisItem = m_zAxisItem;
+    *yAxisItem = m_yAxisItem;
 }
 
 void QDataSetPrivate::verifySize(int colSize, int rowSize)
@@ -162,6 +243,19 @@ float QDataSetPrivate::highestValue()
             max = rowMax;
     }
     return max;
+}
+
+void QDataSetPrivate::updateTextures()
+{
+    m_drawer->generateLabelItem(m_xAxisItem, m_xAxis);
+    m_drawer->generateLabelItem(m_zAxisItem, m_zAxis);
+    m_drawer->generateLabelItem(m_yAxisItem, m_yAxis);
+    for (int itemCount = 0; itemCount < m_labelsColumn.size(); itemCount++) {
+        m_drawer->generateLabelItem(m_labelItemsColumn[itemCount], m_labelsColumn.at(itemCount));
+    }
+    for (int itemCount = 0; itemCount < m_labelsRow.size(); itemCount++) {
+        m_drawer->generateLabelItem(m_labelItemsRow[itemCount], m_labelsRow.at(itemCount));
+    }
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

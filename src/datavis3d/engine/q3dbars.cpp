@@ -62,7 +62,7 @@
 
 #include <QDebug>
 
-#define DISPLAY_RENDER_SPEED
+//#define DISPLAY_RENDER_SPEED
 
 #ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
@@ -73,7 +73,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 #define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 //#define USE_PAINTER_TEXT // Use QPainter labels or opengl labels
 
-const float zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
+const GLfloat zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
 
 Q3DBars::Q3DBars()
@@ -95,8 +95,8 @@ void Q3DBars::initialize()
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
                            QStringLiteral(":/shaders/fragment"));
     }
-    //    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
-    //                                 QStringLiteral(":/shaders/fragmentTexture"));
+    //d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
+    //                             QStringLiteral(":/shaders/fragmentTexture"));
     d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                                  QStringLiteral(":/shaders/fragment"));
 #ifndef USE_PAINTER_TEXT
@@ -151,7 +151,7 @@ void Q3DBars::render()
     // For speed computation
     static bool firstRender = true;
     static QTime lastTime;
-    static int nbFrames = 0;
+    static GLint nbFrames = 0;
     if (firstRender) {
         lastTime.start();
         firstRender = false;
@@ -212,7 +212,7 @@ void Q3DBars::render(QPainter *painter)
         Utils::printText(painter, data->d_ptr->valueStr(), data->d_ptr->labelSize()); // use size for screen position; this way we don't need 2 member variables in qdataitem
     } else if (d_ptr->m_zoomActivated) {
         glDisable(GL_DEPTH_TEST);
-        float scale = 1.0f;
+        GLfloat scale = 1.0f;
         //painter->setWindow(d_ptr->m_zoomViewPort); // Using these causes unwanted transformations
         //painter->setViewport(d_ptr->m_zoomViewPort); // Using these causes unwanted transformations
         //painter->setViewTransformEnabled(false); // Using these causes unwanted transformations
@@ -222,7 +222,7 @@ void Q3DBars::render(QPainter *painter)
             // we need to convert 3D coordinates to screen coordinates for printing
             // posX = (2 * X - W) / H   ->   coordX = (posX * H + W) / 2
             // posY = 1 - (2 * Y) / H   ->   coordY = ((1 - posY) * H) / 2
-            float coordX;
+            GLfloat coordX;
             if (ZoomColumn == d_ptr->m_selectionMode) {
                 coordX = (-(item->d_ptr->translation().z() - zComp) // flip front to left
                           * d_ptr->m_zoomViewPort.height() / 2.0f
@@ -233,8 +233,8 @@ void Q3DBars::render(QPainter *painter)
                           + d_ptr->m_zoomViewPort.width()) / 2.0f;
             }
             if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
-                scale = (float)d_ptr->m_zoomViewPort.width()
-                        / (float)d_ptr->m_zoomViewPort.height();
+                scale = (GLfloat)d_ptr->m_zoomViewPort.width()
+                        / (GLfloat)d_ptr->m_zoomViewPort.height();
             }
             //float coordY = ((1.0f - item->d_ptr->translation().y())
             //                * d_ptr->m_zoomViewPort.height()) / 2.0f;
@@ -265,10 +265,10 @@ void Q3DBars::drawZoomScene()
     if (!d_ptr->m_zoomActivated)
         return;
 
-    float barPosX = 0;
-    int startBar = 0;
-    int stopBar = d_ptr->m_zoomSelection->d_ptr->row().size();
-    int stepBar = 1;
+    GLfloat barPosX = 0;
+    GLint startBar = 0;
+    GLint stopBar = d_ptr->m_zoomSelection->d_ptr->row().size();
+    GLint stepBar = 1;
     QVector3D lightPos;
 
     // Specify viewport
@@ -277,8 +277,8 @@ void Q3DBars::drawZoomScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (float)d_ptr->m_zoomViewPort.width()
-                                 / (float)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (GLfloat)d_ptr->m_zoomViewPort.width()
+                                 / (GLfloat)d_ptr->m_zoomViewPort.height(), 0.1f, 100.0f);
 
 #ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
@@ -306,7 +306,7 @@ void Q3DBars::drawZoomScene()
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, d_ptr->m_scaleFactorX + zComp),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
-    float zoomwidth;
+    GLfloat zoomwidth;
     if (ZoomRow == d_ptr->m_selectionMode) {
         zoomwidth = d_ptr->m_zoomSelection->d_ptr->getItem(0)->d_ptr->translation().x()
                 - d_ptr->m_zoomSelection->d_ptr->getItem(d_ptr->m_zoomSelection->d_ptr->row().size()
@@ -322,8 +322,8 @@ void Q3DBars::drawZoomScene()
     viewMatrix.scale(0.5f / zoomwidth);
 #endif
     if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
-        viewMatrix.scale((float)d_ptr->m_zoomViewPort.width()
-                         / (float)d_ptr->m_zoomViewPort.height());
+        viewMatrix.scale((GLfloat)d_ptr->m_zoomViewPort.width()
+                         / (GLfloat)d_ptr->m_zoomViewPort.height());
         // TODO: Center shrunk view
     }
 
@@ -344,7 +344,7 @@ void Q3DBars::drawZoomScene()
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(bar);
         if (!item)
             continue;
-        float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+        GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         if (ZoomRow == d_ptr->m_selectionMode)
@@ -363,7 +363,7 @@ void Q3DBars::drawZoomScene()
 
         QVector3D barColor = baseColor + heightColor;
 
-        float lightStrength = d_ptr->m_theme->m_lightStrength;
+        GLfloat lightStrength = d_ptr->m_theme->m_lightStrength;
 #if 0 // TODO: Implement selection in zoom
         if (d_ptr->m_selectionMode > None) {
             Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
@@ -450,22 +450,40 @@ void Q3DBars::drawZoomScene()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
+    // Draw labels for axes
+    // TODO: label of selected row/column above the bars
+    // TODO: label of selected column/row below the bar labels
+
+    // Draw labels for bars
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         // Draw values
-        drawLabel(*item, item->d_ptr->textureId(), viewMatrix, projectionMatrix, false, 0.0f,
+        drawLabel(*item, item->d_ptr->textureId(), item->d_ptr->labelSize(), viewMatrix,
+                  projectionMatrix, false, 0.0f,
                   LabelOver);
-        // Draw labels // TODO: Generate label textures
+        // Draw labels
+        LabelItem labelItem;
         if (ZoomRow == d_ptr->m_selectionMode) {
-            drawLabel(*item, item->d_ptr->textureId(), viewMatrix, projectionMatrix, false, -45.0f,
-                      LabelBelow);
-            //            drawLabel(*item, d_ptr->m_dataSet->d_ptr->rowLabels().at(col), viewMatrix,
-            //                      projectionMatrix, false, -45.0f, LabelBelow);
+            // TODO: Testi, piirrä axislabel kokeeksi
+//            LabelItem x, z, y;
+//            d_ptr->m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
+//            drawLabel(*item, x.textureId(), x.size(),
+//                      viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
+            if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > col)
+                labelItem = d_ptr->m_dataSet->d_ptr->columnLabelItems().at(col);
         } else {
-            drawLabel(*item, item->d_ptr->textureId(), viewMatrix, projectionMatrix, false, -45.0f,
-                      LabelBelow);
-            //            drawLabel(*item, d_ptr->m_dataSet->d_ptr->columnLabels().at(col), viewMatrix,
-            //                      projectionMatrix, false, -45.0f, LabelBelow);
+            // TODO: Testi, piirrä axislabel kokeeksi
+//            LabelItem x, z, y;
+//            d_ptr->m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
+//            drawLabel(*item, z.textureId(), z.size(),
+//                      viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
+            if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > col)
+                labelItem = d_ptr->m_dataSet->d_ptr->rowLabelItems().at(col);
+        }
+        // Check if there is a label before drawing
+        if (labelItem.textureId() > 0) {
+            drawLabel(*item, labelItem.textureId(), labelItem.size(),
+                      viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
         }
     }
 
@@ -481,18 +499,18 @@ void Q3DBars::drawZoomScene()
 
 void Q3DBars::drawScene()
 {
-    int startBar = 0;
-    int stopBar = 0;
-    int stepBar = 0;
+    GLint startBar = 0;
+    GLint stopBar = 0;
+    GLint stepBar = 0;
 
-    int startRow = 0;
-    int stopRow = 0;
-    int stepRow = 0;
+    GLint startRow = 0;
+    GLint stopRow = 0;
+    GLint stepRow = 0;
 
-    float backgroundRotation = 0;
+    GLfloat backgroundRotation = 0;
 
-    float barPos = 0;
-    float rowPos = 0;
+    GLfloat barPos = 0;
+    GLfloat rowPos = 0;
 
     static QVector3D selection = QVector3D(0, 0, 0);
 
@@ -502,8 +520,8 @@ void Q3DBars::drawScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (float)d_ptr->m_sceneViewPort.width()
-                                 / (float)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (GLfloat)d_ptr->m_sceneViewPort.width()
+                                 / (GLfloat)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos,
@@ -511,8 +529,8 @@ void Q3DBars::drawScene()
                                                               d_ptr->m_sceneViewPort.width(),
                                                               d_ptr->m_sceneViewPort.height());
     if (d_ptr->m_sceneViewPort.height() > d_ptr->m_sceneViewPort.width()) {
-        viewMatrix.scale((float)d_ptr->m_sceneViewPort.width()
-                         / (float)d_ptr->m_sceneViewPort.height());
+        viewMatrix.scale((GLfloat)d_ptr->m_sceneViewPort.width()
+                         / (GLfloat)d_ptr->m_sceneViewPort.height());
         // TODO: Center shrunk view
     }
 
@@ -566,7 +584,7 @@ void Q3DBars::drawScene()
                 QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
                 if (!item)
                     continue;
-                float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+                GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
@@ -580,10 +598,10 @@ void Q3DBars::drawScene()
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
                 // add +2 to avoid black
-                QVector3D barColor = QVector3D((float)(row + 2)
-                                               / (float)(d_ptr->m_sampleCount.y() + 2),
-                                               (float)(bar + 2)
-                                               / (float)(d_ptr->m_sampleCount.x() + 2),
+                QVector3D barColor = QVector3D((GLfloat)(row + 2)
+                                               / (GLfloat)(d_ptr->m_sampleCount.y() + 2),
+                                               (GLfloat)(bar + 2)
+                                               / (GLfloat)(d_ptr->m_sampleCount.x() + 2),
                                                0.0f);
 
                 d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP(),
@@ -721,7 +739,7 @@ void Q3DBars::drawScene()
             QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
             if (!item)
                 continue;
-            float barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+            GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
             if (barHeight == 0)
                 continue;
             QMatrix4x4 modelMatrix;
@@ -740,11 +758,11 @@ void Q3DBars::drawScene()
             QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_theme->m_heightColor)
                     * barHeight;
             QVector3D depthColor = Utils::vectorFromColor(d_ptr->m_theme->m_depthColor)
-                    * (float(row) / float(d_ptr->m_sampleCount.y()));
+                    * (float(row) / GLfloat(d_ptr->m_sampleCount.y()));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
-            float lightStrength = d_ptr->m_theme->m_lightStrength;
+            GLfloat lightStrength = d_ptr->m_theme->m_lightStrength;
             if (d_ptr->m_selectionMode > None) {
                 Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar,
                                                                                 selection);
@@ -857,7 +875,8 @@ void Q3DBars::drawScene()
             prevItem = d_ptr->m_selectedBar;
         }
 
-        drawLabel(*d_ptr->m_selectedBar, d_ptr->m_selectedBar->d_ptr->textureId(), viewMatrix,
+        drawLabel(*d_ptr->m_selectedBar, d_ptr->m_selectedBar->d_ptr->textureId(),
+                  d_ptr->m_selectedBar->d_ptr->labelSize(), viewMatrix,
                   projectionMatrix, true);
 
         glDisable(GL_TEXTURE_2D);
@@ -874,9 +893,9 @@ void Q3DBars::drawScene()
     d_ptr->m_barShader->release();
 }
 
-void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x4 &viewmatrix,
-                        const QMatrix4x4 &projectionmatrix, bool useDepth, qreal rotation,
-                        Q3DBars::LabelPosition position)
+void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, QSize textureSize,
+                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
+                        bool useDepth, qreal rotation, Q3DBars::LabelPosition position)
 {
     // Draw label
     QMatrix4x4 modelMatrix;
@@ -886,6 +905,8 @@ void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x
     case Q3DBars::LabelBelow:
     {
         yPosition = -1.5f;
+        if (!useDepth)
+            yPosition -= 0.25f;
         break;
     }
     case Q3DBars::LabelLow:
@@ -933,11 +954,11 @@ void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x
     }
 
     // Calculate scale factor to get uniform font size
-    float scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
-    float scaleFactor = scaledFontSize / (float)item.d_ptr->labelSize().height();
+    GLfloat scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
+    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Scale label based on text size
-    modelMatrix.scale(QVector3D((float)item.d_ptr->labelSize().width() * scaleFactor
+    modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor
                                 , scaledFontSize
                                 , 0.0f));
 
@@ -953,7 +974,7 @@ void Q3DBars::drawLabel(const QDataItem &item, GLuint textureId, const QMatrix4x
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
     // TODO: for testing shaders
-    //static int shaderNo = 1;
+    //static GLint shaderNo = 1;
     //qDebug() << "mouse button pressed" << event->button();
     if (Qt::LeftButton == event->button()) {
         if (d_ptr->m_zoomActivated) {
@@ -1025,7 +1046,7 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
     //qDebug() << "mouse position in scene" << mouse3D;
 
     // TODO: Testi laske focal point
-    float focalPoint = tan(45.0f / 2.0f);
+    GLfloat focalPoint = tan(45.0f / 2.0f);
 
     // TODO: Testi - laske viewmatriisin kerroin
     QVector3D worldRay = QVector3D(0.0f, 0.0f, 0.0f)
@@ -1112,7 +1133,6 @@ void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow,
 {
     d_ptr->m_sampleCount = sampleCount;
     d_ptr->m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
-    // TODO: Generate axis textures and replace qstrings with texture ids in qdataset
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative
     d_ptr->m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
@@ -1129,7 +1149,7 @@ void Q3DBars::setCameraPreset(CameraPreset preset)
     CameraHelper::setCameraPreset(preset);
 }
 
-void Q3DBars::setCameraPosition(float horizontal, float vertical, int distance)
+void Q3DBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
     d_ptr->m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     d_ptr->m_verticalRotation = qBound(0.0f, vertical, 90.0f);
@@ -1248,8 +1268,16 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
                          const QVector<QString> &labelsColumn)
 {
+    // Copy axis labels
+    QString xAxis;
+    QString zAxis;
+    QString yAxis;
+    d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
+    // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
+    // Give drawer to data set
+    d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
@@ -1264,9 +1292,7 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
         row++;
     }
     d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
-    // Empty QStrings won't override already set axis labels
-    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn);
-    // TODO: generate label textures and replace qstring vectors with texture id (GLuint) vectors
+    d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
@@ -1274,8 +1300,16 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
                          const QVector<QString> &labelsRow,
                          const QVector<QString> &labelsColumn)
 {
+    // Copy axis labels
+    QString xAxis;
+    QString zAxis;
+    QString yAxis;
+    d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
+    // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
+    // Give drawer to data set
+    d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
@@ -1290,9 +1324,7 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
         row++;
     }
     d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
-    // Empty QStrings won't override already set axis labels
-    d_ptr->m_dataSet->setLabels(QString(), QString(), QString(), labelsRow, labelsColumn);
-    // TODO: generate label textures and replace qstring vectors with texture id (GLuint) vectors
+    d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
 }
 
@@ -1305,7 +1337,8 @@ void Q3DBars::addDataSet(QDataSet* dataSet)
     d_ptr->m_dataSet = dataSet;
     // Find highest value
     d_ptr->m_heightNormalizer = d_ptr->m_dataSet->d_ptr->highestValue();
-    // TODO: generate label textures and replace qstring vectors with texture id (GLuint) vectors
+    // Give drawer to data set
+    d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
@@ -1355,6 +1388,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency))
 {
+    m_dataSet->d_ptr->setDrawer(m_drawer);
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
@@ -1484,7 +1518,7 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     m_scaleX = m_barThickness.x() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
     m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
     m_sceneScale = qMin(m_scaleX, m_scaleZ);
-    float minThickness = qMin(m_barThickness.x(), m_barThickness.y());
+    GLfloat minThickness = qMin(m_barThickness.x(), m_barThickness.y());
     m_sceneScale = m_sceneScale / minThickness;
     m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
     m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
@@ -1494,15 +1528,16 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     //qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
 }
 
-Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(int row, int bar, const QVector3D &selection)
+Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(GLint row, GLint bar,
+                                                         const QVector3D &selection)
 {
     SelectionType isSelectedType = None;
     if (selection == Utils::vectorFromColor(m_theme->m_windowColor))
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)(((float)(row + 2) / (float)(m_sampleCount.y() + 2))
-                                            * 255.0),
-                                  (GLubyte)(((float)(bar + 2) / (float)(m_sampleCount.x() + 2))
-                                            * 255.0),
+    QVector3D current = QVector3D((GLubyte)(((GLfloat)(row + 2) / (GLfloat)(m_sampleCount.y() + 2))
+                                            * 255.0 + 0.49f), // +0.49 to fix rounding (there are conversions from unsigned short to GLfloat and back)
+                                  (GLubyte)(((GLfloat)(bar + 2) / (GLfloat)(m_sampleCount.x() + 2))
+                                            * 255.0 + 0.49f), // +0.49 to fix rounding (there are conversions from unsigned short to GLfloat and back)
                                   0);
     if (current == selection)
         isSelectedType = Bar;
