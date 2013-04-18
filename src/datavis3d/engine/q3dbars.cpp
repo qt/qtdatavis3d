@@ -345,9 +345,12 @@ void Q3DBars::drawZoomScene()
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(bar);
         if (!item)
             continue;
+
         GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+
         if (ZoomRow == d_ptr->m_selectionMode)
             barPosX = item->d_ptr->translation().x();
         else
@@ -408,20 +411,22 @@ void Q3DBars::drawZoomScene()
             }
         }
 #endif
-        // Set shader bindings
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                            modelMatrix.inverted().transposed());
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
-                                            d_ptr->m_theme->m_ambientStrength);
+        if (barHeight > 0) {
+            // Set shader bindings
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
+                                                d_ptr->m_theme->m_ambientStrength);
 
-        // Draw the object
-        d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+        }
     }
 #if 0
     if (!barSelectionFound) {
@@ -476,7 +481,6 @@ void Q3DBars::drawZoomScene()
         drawLabel(*item, item->d_ptr->label(), viewMatrix, projectionMatrix, false, 0.0f,
                   LabelOver);
         // Draw labels
-        // TODO: If there are 0 -valued bars, labeling goes wrong. Fix it.
         LabelItem labelItem;
         if (ZoomRow == d_ptr->m_selectionMode) {
             if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > col) {
@@ -605,11 +609,15 @@ void Q3DBars::drawScene()
                 QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
                 if (!item)
                     continue;
+
                 GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
+
                 barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
                 rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
+
                 modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
                                       barHeight - 1.0f,
                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ
@@ -760,9 +768,9 @@ void Q3DBars::drawScene()
             QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
             if (!item)
                 continue;
+
             GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
-            if (barHeight == 0)
-                continue;
+
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             // TODO: Laske rivi- ja sarakelabelien paikat (sijainnit: min-1 ja max+1) ja pistä johonki talteen?
@@ -858,20 +866,22 @@ void Q3DBars::drawScene()
                 }
             }
 
-            // Set shader bindings
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
-                                                d_ptr->m_theme->m_ambientStrength);
+            if (barHeight > 0) {
+                // Set shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                    modelMatrix.inverted().transposed());
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
+                                                    d_ptr->m_theme->m_ambientStrength);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+            }
         }
     }
     if (!barSelectionFound) {
