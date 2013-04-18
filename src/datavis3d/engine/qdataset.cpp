@@ -74,19 +74,19 @@ void QDataSet::setLabels(const QString &xAxis,
         d_ptr->m_xAxis = xAxis;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_xAxisItem, xAxis);
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_xAxisItem, xAxis);
     }
     if (zAxis != empty && d_ptr->m_zAxis != zAxis) {
         d_ptr->m_zAxis = zAxis;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_zAxisItem, zAxis);
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_zAxisItem, zAxis);
     }
     if (yAxis != empty && d_ptr->m_yAxis != yAxis) {
         d_ptr->m_yAxis = yAxis;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_yAxisItem, yAxis);
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_yAxisItem, yAxis);
     }
     d_ptr->m_labelsRow = labelsRow;
     d_ptr->m_labelsColumn = labelsColumn;
@@ -94,12 +94,12 @@ void QDataSet::setLabels(const QString &xAxis,
     if (d_ptr->m_drawer) {
         for (int itemCount = 0; itemCount < labelsColumn.size(); itemCount++) {
             d_ptr->m_labelItemsColumn.append(LabelItem());
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_labelItemsColumn[itemCount],
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_labelItemsColumn[itemCount],
                                                labelsColumn.at(itemCount));
         }
         for (int itemCount = 0; itemCount < labelsRow.size(); itemCount++) {
             d_ptr->m_labelItemsRow.append(LabelItem());
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_labelItemsRow[itemCount],
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_labelItemsRow[itemCount],
                                                labelsRow.at(itemCount));
         }
     }
@@ -247,18 +247,18 @@ float QDataSetPrivate::highestValue()
 
 void QDataSetPrivate::updateTextures()
 {
-    m_drawer->generateLabelItem(m_xAxisItem, m_xAxis);
-    m_drawer->generateLabelItem(m_zAxisItem, m_zAxis);
-    m_drawer->generateLabelItem(m_yAxisItem, m_yAxis);
+    m_drawer->generateLabelItem(&m_xAxisItem, m_xAxis);
+    m_drawer->generateLabelItem(&m_zAxisItem, m_zAxis);
+    m_drawer->generateLabelItem(&m_yAxisItem, m_yAxis);
     for (int itemCount = 0; itemCount < m_labelsColumn.size(); itemCount++) {
         if (m_labelItemsColumn.size() < itemCount + 1)
             m_labelItemsColumn.append(LabelItem());
-        m_drawer->generateLabelItem(m_labelItemsColumn[itemCount], m_labelsColumn.at(itemCount));
+        m_drawer->generateLabelItem(&m_labelItemsColumn[itemCount], m_labelsColumn.at(itemCount));
     }
     for (int itemCount = 0; itemCount < m_labelsRow.size(); itemCount++) {
         if (m_labelItemsRow.size() < itemCount + 1)
             m_labelItemsRow.append(LabelItem());
-        m_drawer->generateLabelItem(m_labelItemsRow[itemCount], m_labelsRow.at(itemCount));
+        m_drawer->generateLabelItem(&m_labelItemsRow[itemCount], m_labelsRow.at(itemCount));
     }
 }
 

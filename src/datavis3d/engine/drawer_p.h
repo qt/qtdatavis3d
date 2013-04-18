@@ -80,7 +80,7 @@ public:
     void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false,
                     GLuint textureId = 0);
     void generateLabelTexture(QDataItem *item);
-    void generateLabelItem(LabelItem &item, const QString &text);
+    void generateLabelItem(LabelItem *item, const QString &text);
 
 Q_SIGNALS:
     void drawerChanged();

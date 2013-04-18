@@ -54,6 +54,7 @@
 
 #include "qdatavis3dglobal.h"
 #include "qdataitem.h"
+#include "labelitem_p.h"
 #include <QOpenGLFunctions>
 #include <QSize>
 #include <QString>
@@ -68,23 +69,32 @@ class QDataItemPrivate
                               const QString &label = QString());
     ~QDataItemPrivate();
 
-    void setLabelSize(const QSize &size);
-    QSize labelSize();
+    // Position in 3D scene
     void setTranslation(const QVector3D &translation);
-    void setTextureId(GLuint textureId);
     QVector3D translation();
+    // Value of bar
     float value();
-    QString valueStr(); // append value and label. If label has prepend -flag set, append label and value
-    GLuint textureId();
+     // Value and label appended into a string. If label has prepend -flag set, append label and value
+    QString valueStr();
+    // Label item (containing valueStr as texture)
+    void setLabel(const LabelItem &label);
+    LabelItem label();
+    // Selection label item (containing specialar selection texture, if mode is activated)
+    void setSelectionLabel(const LabelItem &label);
+    LabelItem selectionLabel();
+    // Position in set QPoint(row, column)
+    void setPosition(const QPoint &position);
+    QPoint position();
 
     private:
     QDataItem *q_ptr;
     float m_value;
-    QString m_label;
+    QString m_labelString;
     bool m_prependLabel;
-    QSize m_size;
     QVector3D m_translation;
-    GLuint m_textureId;
+    LabelItem m_label;
+    LabelItem m_selectionLabel;
+    QPoint m_position;
     friend class QDataItem;
 };
 

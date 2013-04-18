@@ -53,6 +53,7 @@ class Q3DBarsPrivate;
 class QDataItem;
 class QDataRow;
 class QDataSet;
+class LabelItem;
 
 class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -216,7 +217,7 @@ protected:
 private:
     void drawZoomScene();
     void drawScene();
-    void drawLabel(const QDataItem &item, GLuint textureId, QSize textureSize,
+    void drawLabel(const QDataItem &item, const LabelItem &label,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    bool useDepth = false, qreal rotation = 0.0f,
                    Q3DBars::LabelPosition position = Q3DBars::LabelOver);

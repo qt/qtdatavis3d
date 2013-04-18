@@ -60,7 +60,7 @@ QDataItem::~QDataItem()
 
 void QDataItem::setLabel(const QString &label, bool prepend)
 {
-    d_ptr->m_label = label;
+    d_ptr->m_labelString = label;
     d_ptr->m_prependLabel = prepend;
 }
 
@@ -72,26 +72,16 @@ void QDataItem::setValue(float value)
 QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)
     : q_ptr(q),
       m_value(value),
-      m_label(label),
+      m_labelString(label),
       m_prependLabel(false),
-      m_size(QSize(0, 0)),
       m_translation(QVector3D(0, 0, 0)),
-      m_textureId(0)
+      m_label(LabelItem()),
+      m_selectionLabel(LabelItem())
 {
 }
 
 QDataItemPrivate::~QDataItemPrivate()
 {
-}
-
-void QDataItemPrivate::setLabelSize(const QSize &size)
-{
-    m_size = size;
-}
-
-QSize QDataItemPrivate::labelSize()
-{
-    return m_size;
 }
 
 void QDataItemPrivate::setTranslation(const QVector3D &translation)
@@ -113,24 +103,44 @@ QString QDataItemPrivate::valueStr()
 {
     QString strVal;
     if (m_prependLabel) {
-        strVal.append(m_label);
+        strVal.append(m_labelString);
         strVal.append(QStringLiteral(" "));
         strVal.setNum(m_value);
     } else {
         strVal.setNum(m_value);
-        strVal.append(m_label);
+        strVal.append(m_labelString);
     }
     return strVal;
 }
 
-void QDataItemPrivate::setTextureId(GLuint textureId)
+void QDataItemPrivate::setLabel(const LabelItem &label)
 {
-    m_textureId = textureId;
+    m_label = label;
 }
 
-GLuint QDataItemPrivate::textureId()
+LabelItem QDataItemPrivate::label()
 {
-    return m_textureId;
+    return m_label;
+}
+
+void QDataItemPrivate::setSelectionLabel(const LabelItem &label)
+{
+    m_selectionLabel = label;
+}
+
+LabelItem QDataItemPrivate::selectionLabel()
+{
+    return m_selectionLabel;
+}
+
+void QDataItemPrivate::setPosition(const QPoint &position)
+{
+    m_position = position;
+}
+
+QPoint QDataItemPrivate::position()
+{
+    return m_position;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
