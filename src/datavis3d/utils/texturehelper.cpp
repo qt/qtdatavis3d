@@ -43,7 +43,7 @@
 
 #include <QImage>
 
-//#include <QDebug>
+#include <QDebug>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -99,6 +99,95 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
     }
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;
+}
+
+GLuint TextureHelper::createSelectionBuffer(const QSize &size, GLuint &texture,
+                                            GLuint &depthTexture)
+{
+    GLuint framebuffer;
+
+    // Create frame buffer
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // Create texture for the selection buffer
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, NULL);
+
+    // Create texture object for the depth buffer
+    glGenTextures(1, &depthTexture);
+    glBindTexture(GL_TEXTURE_2D, depthTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width(), size.height(),
+                 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Attach texture to color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    // Attach texture to depth attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+    // Verify that the frame buffer is complete
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        qCritical() << "Frame buffer creation failed" << status;
+        return 0;
+    }
+
+    // Restore the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return framebuffer;
+}
+
+GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuffer,
+                                             GLuint &depthBuffer)
+{
+    GLuint textureid;
+
+    // Create texture for the selection buffer
+    glGenTextures(1, &textureid);
+    glBindTexture(GL_TEXTURE_2D, textureid);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.width(), size.height(), 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Create render buffer
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, size.width(), size.height());
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Create frame buffer
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    // Attach texture to color attachment
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureid, 0);
+    // Attach renderbuffer to depth attachment
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+    // Verify that the frame buffer is complete
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        qCritical() << "Frame buffer creation failed" << status;
+        return 0;
+    }
+
+    // Restore the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return textureid;
+}
+
+void TextureHelper::deleteTexture(const GLuint *texture)
+{
+    glDeleteTextures(1, texture);
 }
 
 QImage TextureHelper::convertToGLFormat(const QImage &srcImage)

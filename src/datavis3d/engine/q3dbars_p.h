@@ -105,8 +105,6 @@ public:
     void calculateSceneScalingFactors();
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
 
-    GLuint m_framebufferSelection;
-
     Q3DBars *q_ptr;
 
     QOpenGLPaintDevice *m_paintDevice;
@@ -155,6 +153,10 @@ public:
     Drawer *m_drawer;
     bool m_xFlipped;
     bool m_zFlipped;
+    GLuint m_selectionTexture;
+    //GLuint m_selectionDepthTexture;
+    GLuint m_selectionFrameBuffer;
+    GLuint m_selectionDepthBuffer;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

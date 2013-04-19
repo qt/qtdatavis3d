@@ -58,7 +58,7 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-class TextureHelper: protected QOpenGLFunctions
+class TextureHelper : protected QOpenGLFunctions
 {
     public:
     TextureHelper();
@@ -68,11 +68,18 @@ class TextureHelper: protected QOpenGLFunctions
     GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
                            bool convert = true);
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
+    // Returns selection framebuffer and inserts generated texture id to texture parameters
+    GLuint createSelectionBuffer(const QSize &size, GLuint &texture, GLuint &depthTexture);
+    // Returns selection texture and inserts generated framebuffers to fraembuffer parameters
+    GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    void deleteTexture(const GLuint *texture);
 
     private:
     QImage convertToGLFormat(const QImage &srcImage);
     void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
+
+    friend class Q3DBarsPrivate;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

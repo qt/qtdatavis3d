@@ -70,7 +70,7 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
+//#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 //#define USE_PAINTER_TEXT // Use QPainter labels or opengl labels
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
@@ -127,6 +127,9 @@ void Q3DBars::initialize()
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
@@ -139,8 +142,6 @@ void Q3DBars::initialize()
 
     // Set initialized -flag
     d_ptr->m_isInitialized = true;
-
-    //qDebug("Initialized");
 }
 
 void Q3DBars::render()
@@ -178,11 +179,6 @@ void Q3DBars::render()
         d_ptr->m_paintDevice = getDevice();
     }
 #else
-    // Set OpenGL features
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
     // If zoom selection is on, draw zoom scene
     drawZoomScene();
     // Draw bars scene
@@ -596,11 +592,17 @@ void Q3DBars::drawScene()
     QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
-    if (!d_ptr->m_zoomActivated) {
+    // Skip selection mode drawing if we're zoomed or have no selection mode
+    if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > None) {
         // Bind selection shader
         d_ptr->m_selectionShader->bind();
 
         // Draw bars to selection buffer
+#ifndef USE_HAX0R_SELECTION
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_selectionFrameBuffer);
+        glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
+#endif
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
@@ -657,10 +659,7 @@ void Q3DBars::drawScene()
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
                 glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
-#else // TODO: fix this - doesn't work yet
-                glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
-                //glReadBuffer(GL_COLOR_ATTACHMENT0);
-
+#else
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
@@ -671,18 +670,14 @@ void Q3DBars::drawScene()
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
                 // Draw the triangles
-                GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-                glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(),
-                               GL_UNSIGNED_SHORT, DrawBuffers);
-
-                glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
+                glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(), GL_UNSIGNED_SHORT,
+                               (void*)0);
 
                 // Free buffers
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-                //glReadBuffer(GL_NONE);
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glDisableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
 #endif
             }
         }
@@ -692,11 +687,35 @@ void Q3DBars::drawScene()
         if (Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed)
             selection = Utils::getSelection(d_ptr->m_mousePos, height());
 
+#ifndef USE_HAX0R_SELECTION
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+
         // Release selection shader
         d_ptr->m_selectionShader->release();
 
+#if 0 // Use this if you want to see what is being drawn to the framebuffer
+        d_ptr->m_labelShader->bind();
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 viewmatrix;
+        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.0f + zComp),
+                          QVector3D(0.0f, 0.0f, zComp),
+                          QVector3D(0.0f, 1.0f, 0.0f));
+        modelMatrix.translate(0.0, 0.0, zComp);
+        QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
+        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
+        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj, true,
+                                    d_ptr->m_selectionTexture);
+        glDisable(GL_TEXTURE_2D);
+        d_ptr->m_labelShader->release();
+#endif
+
+#ifdef USE_HAX0R_SELECTION
         // Clear after selection
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#endif
     }
 
     // Bind background shader
@@ -1485,7 +1504,10 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_xFlipped(false),
-      m_zFlipped(false)
+      m_zFlipped(false),
+      m_selectionFrameBuffer(0),
+      m_selectionDepthBuffer(0),
+      m_selectionTexture(0)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
 }
@@ -1493,6 +1515,12 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
     qDebug() << "Destroying Q3DBarsPrivate";
+#ifndef USE_HAX0R_SELECTION
+    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    m_textureHelper->deleteTexture(&m_selectionTexture);
+    //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
+#endif
     delete m_dataSet;
     if (m_zoomSelection) {
         m_zoomSelection->d_ptr->clear();
@@ -1505,12 +1533,6 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_backgroundObj;
     delete m_textureHelper;
     delete m_drawer;
-
-#ifndef USE_HAX0R_SELECTION
-    q_ptr->glDeleteFramebuffers(1, &m_framebufferSelection);
-    q_ptr->glDeleteTextures(1, &m_selectionTexture);
-    q_ptr->glDeleteTextures(1, &m_depthTexture);
-#endif
 }
 
 void Q3DBarsPrivate::loadBarMesh()
@@ -1556,38 +1578,10 @@ void Q3DBarsPrivate::initSelectionShader()
 
 void Q3DBarsPrivate::initSelectionBuffer()
 {
-#if 0
-    // Create frame buffer object
-    q_ptr->glGenFramebuffers(1, &m_framebufferSelection);
-    q_ptr->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferSelection);
-
-    // Create texture object for the primitive information buffer
-    q_ptr->glGenTextures(1, &m_selectionTexture);
-    q_ptr->glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
-    q_ptr->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, q_ptr->width(), q_ptr->height(),
-                        0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    q_ptr->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                  m_selectionTexture, 0);
-
-    // Create texture object for the depth buffer
-    q_ptr->glGenTextures(1, &m_depthTexture);
-    q_ptr->glBindTexture(GL_TEXTURE_2D, m_depthTexture);
-    q_ptr->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, q_ptr->width(), q_ptr->height(),
-                        0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    q_ptr->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                                  m_depthTexture, 0);
-
-    // Verify that the frame buffer is complete
-    GLenum status = q_ptr->glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return;
-    }
-
-    // Restore the default framebuffer
-    q_ptr->glBindTexture(GL_TEXTURE_2D, 0);
-    q_ptr->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#ifndef USE_HAX0R_SELECTION
+    m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
+                                                                 m_selectionFrameBuffer,
+                                                                 m_selectionDepthBuffer);
 #endif
 }
 

@@ -203,9 +203,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 QVector3D Utils::getSelection(QPoint mousepos, int height)
 {
     QVector3D selectedColor;
-#ifndef USE_HAX0R_SELECTION
-    //glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_framebufferSelection);
-#endif
+
     // This is the only one that works with ANGLE (ES 2.0)
     // Item count will be limited to 256*256*256
     GLubyte pixel[4];
@@ -215,21 +213,19 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     // These work with desktop OpenGL
     // They offer a lot higher possible object count and a possibility to use object id's
     //GLuint pixel2[3];
-    //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
     //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel2);
 
     //GLfloat pixel3[3];
-    //glReadPixels(d_ptr->m_mousePos.x(), height() - d_ptr->m_mousePos.y(), 1, 1,
+    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
     //             GL_RGB, GL_FLOAT, (void *)pixel3);
 
     //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
     //qDebug() << "rgba2" << pixel2[0] << pixel2[1] << pixel2[2];
     //qDebug() << "rgba3" << pixel3[0] << pixel3[1] << pixel3[2];
     selectedColor = QVector3D(pixel[0], pixel[1], pixel[2]);
-    //qDebug() << selection;
-#ifndef USE_HAX0R_SELECTION
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
+    //qDebug() << selectedColor;
+
     return selectedColor;
 }
 
