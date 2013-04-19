@@ -51,6 +51,8 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
+const QString empty;
+
 QDataSet::QDataSet()
     : d_ptr(new QDataSetPrivate(this))
 {
@@ -68,7 +70,6 @@ void QDataSet::setLabels(const QString &xAxis,
                          const QVector<QString> &labelsRow,
                          const QVector<QString> &labelsColumn)
 {
-    QString empty;
     // skip empty labels, keep the previous ones
     if (xAxis != empty && d_ptr->m_xAxis != xAxis) {
         d_ptr->m_xAxis = xAxis;
@@ -247,9 +248,12 @@ float QDataSetPrivate::highestValue()
 
 void QDataSetPrivate::updateTextures()
 {
-    m_drawer->generateLabelItem(&m_xAxisItem, m_xAxis);
-    m_drawer->generateLabelItem(&m_zAxisItem, m_zAxis);
-    m_drawer->generateLabelItem(&m_yAxisItem, m_yAxis);
+    if (m_xAxis != empty)
+        m_drawer->generateLabelItem(&m_xAxisItem, m_xAxis);
+    if (m_zAxis != empty)
+        m_drawer->generateLabelItem(&m_zAxisItem, m_zAxis);
+    if (m_yAxis != empty)
+        m_drawer->generateLabelItem(&m_yAxisItem, m_yAxis);
     for (int itemCount = 0; itemCount < m_labelsColumn.size(); itemCount++) {
         if (m_labelItemsColumn.size() < itemCount + 1)
             m_labelItemsColumn.append(LabelItem());

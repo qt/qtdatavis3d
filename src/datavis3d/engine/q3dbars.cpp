@@ -62,7 +62,7 @@
 
 #include <QDebug>
 
-//#define DISPLAY_RENDER_SPEED
+#define DISPLAY_RENDER_SPEED
 
 #ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
@@ -352,7 +352,7 @@ void Q3DBars::drawZoomScene()
         else
             barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX,
-                              item->d_ptr->translation().y() - 0.5f,// TODO: Needs a better system; calculate y position modifier somehow
+                              item->d_ptr->translation().y(), // TODO: Needs a better system; calculate y position modifier somehow (based on highest bar height?)
                               zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
@@ -499,9 +499,7 @@ void Q3DBars::drawZoomScene()
                 }
             }
         }
-        // Check if there is a label before drawing
-        if (labelItem.textureId() > 0)
-            drawLabel(*item, labelItem, viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
+        drawLabel(*item, labelItem, viewMatrix, projectionMatrix, false, -45.0f, LabelBelow);
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -826,11 +824,14 @@ void Q3DBars::drawScene()
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!d_ptr->m_zoomActivated) {
                         d_ptr->m_selectedBar = item;
-                        d_ptr->m_selectedBar->d_ptr->setPosition(
-                                    QPoint(d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
-                                           - row - 1,
-                                           d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
-                                           - bar - 1));
+                        if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > row
+                                && d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > bar) {
+                            d_ptr->m_selectedBar->d_ptr->setPosition(
+                                        QPoint(d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
+                                               - row - 1,
+                                               d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
+                                               - bar - 1));
+                        }
 #ifdef USE_PAINTER_TEXT
                         QSize mousePositionAsSize = QSize(d_ptr->m_mousePos.x(),
                                                           d_ptr->m_mousePos.y());
@@ -854,10 +855,12 @@ void Q3DBars::drawScene()
                     if (!d_ptr->m_zoomActivated && ZoomRow == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
-                        d_ptr->m_zoomSelection->d_ptr->setLabelItem(
-                                    d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
-                                        d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
-                                        - row - 1));
+                        if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > row) {
+                            d_ptr->m_zoomSelection->d_ptr->setLabelItem(
+                                        d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
+                                            d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
+                                            - row - 1));
+                        }
                     }
                     break;
                 }
@@ -869,10 +872,12 @@ void Q3DBars::drawScene()
                     if (!d_ptr->m_zoomActivated && ZoomColumn == d_ptr->m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         d_ptr->m_zoomSelection->addItem(item);
-                        d_ptr->m_zoomSelection->d_ptr->setLabelItem(
-                                    d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
-                                        d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
-                                        - bar - 1));
+                        if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > bar) {
+                            d_ptr->m_zoomSelection->d_ptr->setLabelItem(
+                                        d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
+                                            d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
+                                            - bar - 1));
+                        }
                     }
                     break;
                 }
@@ -947,14 +952,19 @@ void Q3DBars::drawScene()
         LabelItem labelItem = d_ptr->m_selectedBar->d_ptr->selectionLabel();
         if (firstSelection || prevItem != d_ptr->m_selectedBar) {
             QString labelText = d_ptr->m_selectedBar->d_ptr->valueStr();
-            labelText.append(QStringLiteral(" ("));
-            labelText.append(d_ptr->m_dataSet->d_ptr->rowLabels().at(
-                                 d_ptr->m_selectedBar->d_ptr->position().x()));
-            labelText.append(QStringLiteral(", "));
-            labelText.append(d_ptr->m_dataSet->d_ptr->columnLabels().at(
-                                 d_ptr->m_selectedBar->d_ptr->position().y()));
-            labelText.append(QStringLiteral(")"));
-            //qDebug() << labelText;
+            if ((d_ptr->m_dataSet->d_ptr->columnLabels().size()
+                 > d_ptr->m_selectedBar->d_ptr->position().y())
+                    && (d_ptr->m_dataSet->d_ptr->rowLabels().size()
+                        > d_ptr->m_selectedBar->d_ptr->position().x())) {
+                labelText.append(QStringLiteral(" ("));
+                labelText.append(d_ptr->m_dataSet->d_ptr->rowLabels().at(
+                                     d_ptr->m_selectedBar->d_ptr->position().x()));
+                labelText.append(QStringLiteral(", "));
+                labelText.append(d_ptr->m_dataSet->d_ptr->columnLabels().at(
+                                     d_ptr->m_selectedBar->d_ptr->position().y()));
+                labelText.append(QStringLiteral(")"));
+                //qDebug() << labelText;
+            }
             d_ptr->m_drawer->generateLabelItem(&labelItem, labelText);
             d_ptr->m_selectedBar->d_ptr->setSelectionLabel(labelItem);
             prevItem = d_ptr->m_selectedBar;
@@ -982,19 +992,23 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
                         bool useDepth, qreal rotation, Q3DBars::LabelPosition position)
 {
     // Draw label
+    LabelItem labelItem = label;
+    if (!labelItem.textureId())
+        return; // No texture, skip
+
+    QSize textureSize = labelItem.size();
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
     GLfloat xPosition;
     GLfloat yPosition;
     GLfloat zPosition = zComp;
-    LabelItem labelItem = label;
-    QSize textureSize = labelItem.size();
+
     switch (position) {
     case Q3DBars::LabelBelow:
     {
-        yPosition = -1.5f;
-        if (!useDepth)
-            yPosition -= 0.25f;
+        yPosition = -1.25f;
+        //if (!useDepth)
+        //  yPosition -= 0.25f;
         break;
     }
     case Q3DBars::LabelLow:
@@ -1017,31 +1031,31 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     {
         yPosition = item.d_ptr->translation().y()
                 + (item.d_ptr->value() / d_ptr->m_heightNormalizer) + 0.1f;
-        if (!useDepth)
-            yPosition -= 0.5f;
+        //if (!useDepth)
+        //  yPosition -= 0.25f;
         break;
     }
     case Q3DBars::LabelBottom:
     {
-        yPosition = -2.0f; // TODO: Calculate from scene
+        yPosition = -1.9f; // TODO: Calculate from scene
         xPosition = 0.0f;
         break;
     }
     case Q3DBars::LabelTop:
     {
-        yPosition = 0.75f; // TODO: Calculate from scene
+        yPosition = 1.5f; // TODO: Calculate from scene
         xPosition = 0.0f;
         break;
     }
     case Q3DBars::LabelLeft:
     {
-        yPosition = -0.625f; // TODO: Calculate from scene
+        yPosition = -0.2f; // TODO: Calculate from scene
         xPosition = -2.5f; // TODO: Calculate from scene
         break;
     }
     case Q3DBars::LabelRight:
     {
-        yPosition = -0.625f; // TODO: Calculate from scene
+        yPosition = -0.2f; // TODO: Calculate from scene
         xPosition = 2.5f; // TODO: Calculate from scene
         break;
     }
