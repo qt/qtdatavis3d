@@ -80,11 +80,11 @@ private:
 };
 
 MainApp::MainApp(Q3DBars *window)
-    : m_chart(window)
-    , m_engine(new Engine(this))
-    , m_restartTimer(new QTimer(this))
-    , m_lowFreq(SpectrumLowFreq)
-    , m_highFreq(SpectrumHighFreq)
+    : m_chart(window),
+      m_engine(new Engine(this)),
+      m_restartTimer(new QTimer(this)),
+      m_lowFreq(SpectrumLowFreq),
+      m_highFreq(SpectrumHighFreq)
 {
     m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*2));
 #if USE_CONES

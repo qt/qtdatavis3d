@@ -47,11 +47,11 @@
 
 using namespace QtDataVis3D;
 
-class ChartDataGenerator : public QObject
+class RainfallChart : public QObject
 {
 public:
-    explicit ChartDataGenerator(Q3DBars *rainfall);
-    ~ChartDataGenerator();
+    explicit RainfallChart(Q3DBars *rainfall);
+    ~RainfallChart();
 
     void addDataSet();
     void start();
@@ -62,25 +62,25 @@ private:
     int m_rowCount;
 };
 
-ChartDataGenerator::ChartDataGenerator(Q3DBars *rainfall)
-    : m_chart(rainfall)
-    , m_columnCount(12)
-    , m_rowCount(13)
+RainfallChart::RainfallChart(Q3DBars *rainfall)
+    : m_chart(rainfall),
+      m_columnCount(12),
+      m_rowCount(13)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
     m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.2f), true);
 
     // Set up sample space; make it match actual data size
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount)
-                              , QStringLiteral("year"), QStringLiteral("month")
-                              , QStringLiteral("rainfall (in mm)"));
+    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount),
+                              QStringLiteral("year"), QStringLiteral("month"),
+                              QStringLiteral("rainfall (in mm)"));
 
     // Set bar type to cylinder
     m_chart->setBarType(Q3DBars::Cylinders, false);
 
     // Set selection mode to bar and column
-//    m_chart->setSelectionMode(Q3DBars::BarAndColumn);
+    //m_chart->setSelectionMode(Q3DBars::BarAndColumn);
     m_chart->setSelectionMode(Q3DBars::ZoomColumn);
 
     // Set theme
@@ -93,17 +93,17 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *rainfall)
     m_chart->setWindowTitle(QStringLiteral("Monthly rainfall in Northern Finland (2000-2012)"));
 }
 
-ChartDataGenerator::~ChartDataGenerator()
+RainfallChart::~RainfallChart()
 {
     delete m_chart;
 }
 
-void ChartDataGenerator::start()
+void RainfallChart::start()
 {
     addDataSet();
 }
 
-void ChartDataGenerator::addDataSet()
+void RainfallChart::addDataSet()
 {
     // Fill in rainfall per month from 2000 to 2012 in Northern Finland (Sodankylä, Utsjoki, Kuusamo)
     QVector< QVector<QDataItem*> > data;
@@ -321,8 +321,8 @@ int main(int argc, char **argv)
     rainfall.setPosition(QPoint(10, 30));
     rainfall.show();
 
-    ChartDataGenerator *generator = new ChartDataGenerator(&rainfall);
-    generator->start();
+    RainfallChart *rainfallchart = new RainfallChart(&rainfall);
+    rainfallchart->start();
 
     return app.exec();
 }

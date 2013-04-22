@@ -3,7 +3,7 @@
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the documentation of the Qt Toolkit.
+** This file is part of the documentation of QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** You may use this file under the terms of the BSD license as follows:
@@ -38,67 +38,27 @@
 **
 ****************************************************************************/
 
-#include "q3dbars.h"
-#include "qdataset.h"
-
-#include <QGuiApplication>
-#include <QScreen>
-#include <QTimer>
-#include <QFont>
-#include <QDebug>
-
-//#define CYCLE_THROUGH_STYLES
-//#define CYCLE_THROUGH_PRESET_CAMERAS
-//#define CYCLE_THROUGH_THEMES
-#define USE_STATIC_DATA
+#include "chart.h"
 
 using namespace QtDataVis3D;
 
-class ChartDataGenerator : public QObject
-{
-public:
-    explicit ChartDataGenerator(Q3DBars *barchart);
-    ~ChartDataGenerator();
-
-    void addDataSet();
-    void addBars();
-    void changeStyle();
-    void changePresetCamera();
-    void changeTheme();
-    void start();
-
-private:
-    Q3DBars *m_chart;
-    QTimer *m_dataTimer;
-    QTimer *m_styleTimer;
-    QTimer *m_presetTimer;
-    QTimer *m_themeTimer;
-    int m_columnCount;
-    int m_rowCount;
-};
-
-ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
+ChartModifier::ChartModifier(Q3DBars *barchart)
     : m_chart(barchart),
       m_dataTimer(0),
-      m_styleTimer(0),
-      m_presetTimer(0),
-      m_themeTimer(0),
       m_columnCount(21),
       m_rowCount(21)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.1f, 0.1f), true);
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
     m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
 #endif
 
-    // Set bar type to smooth bar
-#ifndef CYCLE_THROUGH_STYLES
+    // Set bar type
     m_chart->setBarType(Q3DBars::Pyramids, false);
-#endif
 
 #ifndef USE_STATIC_DATA
     // Set selection mode to full
@@ -106,44 +66,26 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #else
     // Set selection mode to zoom row
     m_chart->setSelectionMode(Q3DBars::ZoomRow);
-    m_chart->setFont(QFont("Courier", 25));
+    m_chart->setFont(QFont("Times Roman", 20));
 #endif
 
-#ifndef CYCLE_THROUGH_THEMES
-    // Set bar colors
-    m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
-    //m_chart->setTheme(Q3DBars::ThemeSystem);
+    m_chart->setTheme(Q3DBars::ThemeSystem);
     m_chart->setLabelTransparency(Q3DBars::TransparencyFromTheme);
-#else
-    m_chart->setLabelTransparency(Q3DBars::TransparencyNone);
-#endif
 
     // Set preset camera position
     m_chart->setCameraPreset(Q3DBars::PresetFront);
 }
 
-ChartDataGenerator::~ChartDataGenerator()
+ChartModifier::~ChartModifier()
 {
     if (m_dataTimer) {
         m_dataTimer->stop();
         delete m_dataTimer;
     }
-    if (m_styleTimer) {
-        m_styleTimer->stop();
-        delete m_styleTimer;
-    }
-    if (m_presetTimer) {
-        m_presetTimer->stop();
-        delete m_presetTimer;
-    }
-    if (m_themeTimer) {
-        m_themeTimer->stop();
-        delete m_themeTimer;
-    }
     delete m_chart;
 }
 
-void ChartDataGenerator::start()
+void ChartModifier::start()
 {
 #ifndef USE_STATIC_DATA
     m_dataTimer = new QTimer();
@@ -154,37 +96,9 @@ void ChartDataGenerator::start()
 #else
     addDataSet();
 #endif
-
-#ifdef CYCLE_THROUGH_STYLES
-    // Change bar style every 10 seconds
-    m_styleTimer = new QTimer();
-    m_styleTimer->setTimerType(Qt::CoarseTimer);
-    m_styleTimer->setInterval(10000);
-    QObject::connect(m_styleTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
-    m_styleTimer->start(10000);
-#endif
-
-#ifdef CYCLE_THROUGH_PRESET_CAMERAS
-    // Change preset camera every 5 seconds
-    m_presetTimer = new QTimer();
-    m_presetTimer->setTimerType(Qt::CoarseTimer);
-    m_presetTimer->setInterval(5000);
-    QObject::connect(m_presetTimer, &QTimer::timeout, this,
-                     &ChartDataGenerator::changePresetCamera);
-    m_presetTimer->start(5000);
-#endif
-
-#ifdef CYCLE_THROUGH_THEMES
-    // Change theme every 2 seconds
-    m_themeTimer = new QTimer();
-    m_themeTimer->setTimerType(Qt::CoarseTimer);
-    m_themeTimer->setInterval(3000);//2000);
-    QObject::connect(m_themeTimer, &QTimer::timeout, this, &ChartDataGenerator::changeTheme);
-    m_themeTimer->start(3000);//2000);
-#endif
 }
 
-void ChartDataGenerator::addDataSet()
+void ChartModifier::addDataSet()
 {
 #if 0
     // Prepare data to be visualized
@@ -194,7 +108,7 @@ void ChartDataGenerator::addDataSet()
     // TODO: Keep here for testing
     for (int j = 0; j < m_rowCount; j++) {
         for (int i = 0; i < m_columnCount; i++) {
-            //row.prepend(((float)i / (float)m_columnCount) * 100 + (float)(rand() % 30));
+            //row.prepend(((float)i / (float)m_columnCount) * 100.0f + (float)(rand() % 30));
             row.append(1.0f);
         }
         data.append(row);
@@ -209,35 +123,35 @@ void ChartDataGenerator::addDataSet()
     // Use QDataSet adder
 
     // Set window title
-    m_chart->setWindowTitle(QStringLiteral("Hours playing banjo"));
+    m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2008-2012)"));
 
     // Set up row and column names
-    QVector<QString> days;
-    days << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
-    QVector<QString> weeks;
-    weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
+    QVector<QString> months;
+    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
+    QVector<QString> years;
+    years << "2008" << "2009" << "2010" << "2011" << "2012";
 
-    // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 7.0},      // week 1
-                         {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
-                         {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
-                         {0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
-                         {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
+    // Set up data
+    float temp[5][12] = {{-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},
+                         {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},
+                         {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},
+                         {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},
+                         {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};
 
     // Create data set
     QDataSet *dataSet = new QDataSet();
 
     // Add labels
-    dataSet->setLabels("Week of year", "Day of week", "Hours playing banjo", weeks, days);
+    dataSet->setLabels("Year", "Month", "Average temperature (C)", years, months);
 
     // Create data rows
     QDataRow *dataRow;
-    for (int week = 0; week < weeks.size(); week++) {
-        dataRow = new QDataRow(weeks.at(week));
+    for (int year = 0; year < years.size(); year++) {
+        dataRow = new QDataRow(years.at(year));
         // Create data items
-        for (int day = 0; day < days.size(); day++) {
+        for (int month = 0; month < months.size(); month++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(hours[week][day], "h"));//, " + days.at(day)));
+            dataRow->addItem(new QDataItem(temp[year][month], "C"));
         }
         // Add row to set
         dataSet->addRow(dataRow);
@@ -246,22 +160,22 @@ void ChartDataGenerator::addDataSet()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(QPoint(days.size(), weeks.size()));
+    m_chart->setupSampleSpace(QPoint(months.size(), years.size()));
 
     // Add data to chart
     m_chart->addDataSet(dataSet);
 #endif
 }
 
-void ChartDataGenerator::addBars()
+void ChartModifier::addBars()
 {
     QVector<float> data;
     for (int i = 0; i < m_columnCount; i++)
-        data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
+        data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
     m_chart->addDataRow(data);
 }
 
-void ChartDataGenerator::changeStyle()
+void ChartModifier::changeStyle()
 {
     static int model = 0;
     switch (model) {
@@ -295,7 +209,7 @@ void ChartDataGenerator::changeStyle()
         model = 0;
 }
 
-void ChartDataGenerator::changePresetCamera()
+void ChartModifier::changePresetCamera()
 {
     static int preset = 0;
 
@@ -305,7 +219,7 @@ void ChartDataGenerator::changePresetCamera()
         preset = 0;
 }
 
-void ChartDataGenerator::changeTheme()
+void ChartModifier::changeTheme()
 {
     static int theme = 0;
 
@@ -315,18 +229,7 @@ void ChartDataGenerator::changeTheme()
         theme = 0;
 }
 
-int main(int argc, char **argv)
+void ChartModifier::rotate(int rotation)
 {
-    QGuiApplication app(argc, argv);
-
-    Q3DBars barchart;
-    QSize screenSize = barchart.screen()->size();
-    barchart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
-    barchart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
-    barchart.show();
-
-    ChartDataGenerator *generator = new ChartDataGenerator(&barchart);
-    generator->start();
-
-    return app.exec();
+    m_chart->setCameraPosition(rotation, 0.0f);
 }

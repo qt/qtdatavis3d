@@ -344,6 +344,11 @@ void Q3DBars::drawZoomScene()
 
         GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
+        if (barHeight < 0)
+            glCullFace(GL_FRONT);
+        else
+            glCullFace(GL_BACK);
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
@@ -407,7 +412,7 @@ void Q3DBars::drawZoomScene()
             }
         }
 #endif
-        if (barHeight > 0) {
+        if (barHeight != 0) {
             // Set shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
@@ -447,6 +452,7 @@ void Q3DBars::drawZoomScene()
     d_ptr->m_labelShader->bind();
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
+    glCullFace(GL_BACK);
     if (d_ptr->m_labelTransparency > TransparencyNone) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -612,6 +618,11 @@ void Q3DBars::drawScene()
 
                 GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
+                if (barHeight < 0)
+                    glCullFace(GL_FRONT);
+                else
+                    glCullFace(GL_BACK);
+
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
@@ -619,12 +630,14 @@ void Q3DBars::drawScene()
                 rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
 
                 modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
-                                      barHeight - 1.0f,
+                                      barHeight - 1.0f, // TODO: Doesn't work right with negative values; calculate a variable based on bar heights instead of using -1.0f
                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ
                                       + zComp);
                 modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+                // TODO: Save position to qdataitem, so that we don't need to calculate it each time?
 
                 // add +2 to avoid black
                 QVector3D barColor = QVector3D((GLfloat)(row + 2)
@@ -716,61 +729,6 @@ void Q3DBars::drawScene()
 #endif
     }
 
-    // Bind background shader
-    d_ptr->m_backgroundShader->bind();
-
-    // TODO: If we want to use background texture, we should create it in initBackground instead of here and keep the texture id in d_ptr
-    // Create texture
-    //glEnable(GL_TEXTURE_2D);
-    //GLuint bgrTexture = d_ptr->m_textureHelper->create2DTexture(
-    //            QImage(QStringLiteral(":/textures/cubetex")), true);
-
-    // Draw background
-    if (d_ptr->m_backgroundObj) {
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
-        if (zComp != 0)
-            modelMatrix.translate(0.0f, 0.0f, zComp);
-        modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale,
-                                    1.0f,
-                                    d_ptr->m_columnDepth * d_ptr->m_sceneScale));
-        modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
-
-        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
-
-        QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_theme->m_backgroundColor);
-
-        // Set shader bindings
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP(),
-                                                   lightPos);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->view(),
-                                                   viewMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->model(),
-                                                   modelMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->nModel(),
-                                                   modelMatrix.inverted().transposed());
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP(),
-                                                   MVPMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
-                                                   backgroundColor);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                   d_ptr->m_theme->m_lightStrength);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
-                                                   d_ptr->m_theme->m_ambientStrength);
-
-        // Draw the object
-        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
-        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true, bgrTexture);
-    }
-
-    // Disable textures
-    //glBindTexture(GL_TEXTURE_2D, 0);
-    //glDeleteTextures(1, &bgrTexture);  // TODO: If we want to use background texture, we should create it in initBackground and delete on exit
-    //glDisable(GL_TEXTURE_2D);
-
-    // Release background shader
-    d_ptr->m_backgroundShader->release();
-
     // Bind bar shader
     d_ptr->m_barShader->bind();
 
@@ -788,13 +746,18 @@ void Q3DBars::drawScene()
 
             GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
+            if (barHeight < 0)
+                glCullFace(GL_FRONT);
+            else
+                glCullFace(GL_BACK);
+
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             // TODO: Laske rivi- ja sarakelabelien paikat (sijainnit: min-1 ja max+1) ja pistä johonki talteen?
             barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
             rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
-                                  barHeight - 1.0f,
+                                  barHeight - 1.0f, // TODO: Doesn't work right with negative values; calculate a variable based on bar heights instead of using -1.0f
                                   (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
@@ -890,7 +853,7 @@ void Q3DBars::drawScene()
                 }
             }
 
-            if (barHeight > 0) {
+            if (barHeight != 0) {
                 // Set shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
@@ -908,6 +871,68 @@ void Q3DBars::drawScene()
             }
         }
     }
+
+    // Release bar shader
+    d_ptr->m_barShader->release();
+
+    // Bind background shader
+    d_ptr->m_backgroundShader->bind();
+
+    // TODO: If we want to use background texture, we should create it in initBackground instead of here and keep the texture id in d_ptr
+    // Create texture
+    //glEnable(GL_TEXTURE_2D);
+    //GLuint bgrTexture = d_ptr->m_textureHelper->create2DTexture(
+    //            QImage(QStringLiteral(":/textures/cubetex")), true);
+
+    glCullFace(GL_BACK);
+
+    // Draw background
+    if (d_ptr->m_backgroundObj) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        if (zComp != 0)
+            modelMatrix.translate(0.0f, 0.0f, zComp);
+        modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale,
+                                    1.0f,
+                                    d_ptr->m_columnDepth * d_ptr->m_sceneScale));
+        modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
+
+        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+        QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_theme->m_backgroundColor);
+
+        // Set shader bindings
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP(),
+                                                   lightPos);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->view(),
+                                                   viewMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->model(),
+                                                   modelMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->nModel(),
+                                                   modelMatrix.inverted().transposed());
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP(),
+                                                   MVPMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
+                                                   backgroundColor);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
+                                                   d_ptr->m_theme->m_lightStrength);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
+                                                   d_ptr->m_theme->m_ambientStrength);
+
+        // Draw the object
+        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
+        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true, bgrTexture);
+    }
+
+    // Disable textures
+    //glBindTexture(GL_TEXTURE_2D, 0);
+    //glDeleteTextures(1, &bgrTexture);  // TODO: If we want to use background texture, we should create it in initBackground and delete on exit
+    //glDisable(GL_TEXTURE_2D);
+
+    // Release background shader
+    d_ptr->m_backgroundShader->release();
+
+    // Handle zoom activation and label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         d_ptr->m_selectedBar = NULL;
@@ -982,9 +1007,6 @@ void Q3DBars::drawScene()
         d_ptr->m_labelShader->release();
 #endif
     }
-
-    // Release bar shader
-    d_ptr->m_barShader->release();
 }
 
 void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,

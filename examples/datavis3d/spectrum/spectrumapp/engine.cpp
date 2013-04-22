@@ -67,33 +67,33 @@ const int    LevelWindowUs          = 0.1 * 1000000;
 //-----------------------------------------------------------------------------
 
 Engine::Engine(QObject *parent)
-    :   QObject(parent)
-    ,   m_mode(QAudio::AudioInput)
-    ,   m_state(QAudio::StoppedState)
-    ,   m_generateTone(false)
-    ,   m_file(0)
-    ,   m_analysisFile(0)
-    ,   m_availableAudioInputDevices
-            (QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
-    ,   m_audioInputDevice(QAudioDeviceInfo::defaultInputDevice())
-    ,   m_audioInput(0)
-    ,   m_audioInputIODevice(0)
-    ,   m_recordPosition(0)
-    ,   m_availableAudioOutputDevices
-            (QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
-    ,   m_audioOutputDevice(QAudioDeviceInfo::defaultOutputDevice())
-    ,   m_audioOutput(0)
-    ,   m_playPosition(0)
-    ,   m_bufferPosition(0)
-    ,   m_bufferLength(0)
-    ,   m_dataLength(0)
-    ,   m_levelBufferLength(0)
-    ,   m_rmsLevel(0.0)
-    ,   m_peakLevel(0.0)
-    ,   m_spectrumBufferLength(0)
-    ,   m_spectrumAnalyser()
-    ,   m_spectrumPosition(0)
-    ,   m_count(0)
+    : QObject(parent),
+      m_mode(QAudio::AudioInput),
+      m_state(QAudio::StoppedState),
+      m_generateTone(false),
+      m_file(0),
+      m_analysisFile(0),
+      m_availableAudioInputDevices
+      (QAudioDeviceInfo::availableDevices(QAudio::AudioInput)),
+      m_audioInputDevice(QAudioDeviceInfo::defaultInputDevice()),
+      m_audioInput(0),
+      m_audioInputIODevice(0),
+      m_recordPosition(0),
+      m_availableAudioOutputDevices
+      (QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)),
+      m_audioOutputDevice(QAudioDeviceInfo::defaultOutputDevice()),
+      m_audioOutput(0),
+      m_playPosition(0),
+      m_bufferPosition(0),
+      m_bufferLength(0),
+      m_dataLength(0),
+      m_levelBufferLength(0),
+      m_rmsLevel(0.0),
+      m_peakLevel(0.0),
+      m_spectrumBufferLength(0),
+      m_spectrumAnalyser(),
+      m_spectrumPosition(0),
+      m_count(0)
 {
     qRegisterMetaType<FrequencySpectrum>("FrequencySpectrum");
     qRegisterMetaType<WindowFunction>("WindowFunction");
@@ -157,7 +157,7 @@ void Engine::startRecording()
 {
     if (m_audioInput) {
         if (QAudio::AudioInput == m_mode &&
-            QAudio::SuspendedState == m_state) {
+                QAudio::SuspendedState == m_state) {
             m_audioInput->resume();
         } else {
             m_spectrumAnalyser.cancelCalculation();
@@ -185,7 +185,7 @@ void Engine::startPlayback()
 {
     if (m_audioOutput) {
         if (QAudio::AudioOutput == m_mode &&
-            QAudio::SuspendedState == m_state) {
+                QAudio::SuspendedState == m_state) {
 #ifdef Q_OS_WIN
             // The Windows backend seems to internally go back into ActiveState
             // while still returning SuspendedState, so to ensure that it doesn't
@@ -222,7 +222,7 @@ void Engine::startPlayback()
 void Engine::suspend()
 {
     if (QAudio::ActiveState == m_state ||
-        QAudio::IdleState == m_state) {
+            QAudio::IdleState == m_state) {
         switch (m_mode) {
         case QAudio::AudioInput:
             m_audioInput->suspend();
@@ -259,56 +259,56 @@ void Engine::audioNotify()
 {
     switch (m_mode) {
     case QAudio::AudioInput: {
-            const qint64 recordPosition = qMin(m_bufferLength, audioLength(m_format, m_audioInput->processedUSecs()));
-            setRecordPosition(recordPosition);
-            const qint64 levelPosition = m_dataLength - m_levelBufferLength;
-            if (levelPosition >= 0)
-                calculateLevel(levelPosition, m_levelBufferLength);
-            if (m_dataLength >= m_spectrumBufferLength) {
-                const qint64 spectrumPosition = m_dataLength - m_spectrumBufferLength;
-                calculateSpectrum(spectrumPosition);
-            }
-            emit bufferChanged(0, m_dataLength, m_buffer);
+        const qint64 recordPosition = qMin(m_bufferLength, audioLength(m_format, m_audioInput->processedUSecs()));
+        setRecordPosition(recordPosition);
+        const qint64 levelPosition = m_dataLength - m_levelBufferLength;
+        if (levelPosition >= 0)
+            calculateLevel(levelPosition, m_levelBufferLength);
+        if (m_dataLength >= m_spectrumBufferLength) {
+            const qint64 spectrumPosition = m_dataLength - m_spectrumBufferLength;
+            calculateSpectrum(spectrumPosition);
         }
+        emit bufferChanged(0, m_dataLength, m_buffer);
+    }
         break;
     case QAudio::AudioOutput: {
-            const qint64 playPosition = audioLength(m_format, m_audioOutput->processedUSecs());
-            setPlayPosition(qMin(bufferLength(), playPosition));
-            const qint64 levelPosition = playPosition - m_levelBufferLength;
-            const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
-            if (m_file) {
-                if (levelPosition > m_bufferPosition ||
+        const qint64 playPosition = audioLength(m_format, m_audioOutput->processedUSecs());
+        setPlayPosition(qMin(bufferLength(), playPosition));
+        const qint64 levelPosition = playPosition - m_levelBufferLength;
+        const qint64 spectrumPosition = playPosition - m_spectrumBufferLength;
+        if (m_file) {
+            if (levelPosition > m_bufferPosition ||
                     spectrumPosition > m_bufferPosition ||
                     qMax(m_levelBufferLength, m_spectrumBufferLength) > m_dataLength) {
-                    m_bufferPosition = 0;
-                    m_dataLength = 0;
-                    // Data needs to be read into m_buffer in order to be analysed
-                    const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
-                    const qint64 readEnd = qMin(m_analysisFile->size(), qMax(levelPosition + m_levelBufferLength, spectrumPosition + m_spectrumBufferLength));
-                    const qint64 readLen = readEnd - readPos + audioLength(m_format, WaveformWindowDuration);
-                    ENGINE_DEBUG << "Engine::audioNotify [1]"
+                m_bufferPosition = 0;
+                m_dataLength = 0;
+                // Data needs to be read into m_buffer in order to be analysed
+                const qint64 readPos = qMax(qint64(0), qMin(levelPosition, spectrumPosition));
+                const qint64 readEnd = qMin(m_analysisFile->size(), qMax(levelPosition + m_levelBufferLength, spectrumPosition + m_spectrumBufferLength));
+                const qint64 readLen = readEnd - readPos + audioLength(m_format, WaveformWindowDuration);
+                ENGINE_DEBUG << "Engine::audioNotify [1]"
                              << "analysisFileSize" << m_analysisFile->size()
                              << "readPos" << readPos
                              << "readLen" << readLen;
-                    if (m_analysisFile->seek(readPos + m_analysisFile->headerLength())) {
-                        m_buffer.resize(readLen);
-                        m_bufferPosition = readPos;
-                        m_dataLength = m_analysisFile->read(m_buffer.data(), readLen);
-                        ENGINE_DEBUG << "Engine::audioNotify [2]" << "bufferPosition" << m_bufferPosition << "dataLength" << m_dataLength;
-                    } else {
-                        ENGINE_DEBUG << "Engine::audioNotify [2]" << "file seek error";
-                    }
-                    emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
+                if (m_analysisFile->seek(readPos + m_analysisFile->headerLength())) {
+                    m_buffer.resize(readLen);
+                    m_bufferPosition = readPos;
+                    m_dataLength = m_analysisFile->read(m_buffer.data(), readLen);
+                    ENGINE_DEBUG << "Engine::audioNotify [2]" << "bufferPosition" << m_bufferPosition << "dataLength" << m_dataLength;
+                } else {
+                    ENGINE_DEBUG << "Engine::audioNotify [2]" << "file seek error";
                 }
-            } else {
-                if (playPosition >= m_dataLength)
-                    stopPlayback();
+                emit bufferChanged(m_bufferPosition, m_dataLength, m_buffer);
             }
-            if (levelPosition >= 0 && levelPosition + m_levelBufferLength < m_bufferPosition + m_dataLength)
-                calculateLevel(levelPosition, m_levelBufferLength);
-            if (spectrumPosition >= 0 && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength)
-                calculateSpectrum(spectrumPosition);
+        } else {
+            if (playPosition >= m_dataLength)
+                stopPlayback();
         }
+        if (levelPosition >= 0 && levelPosition + m_levelBufferLength < m_bufferPosition + m_dataLength)
+            calculateLevel(levelPosition, m_levelBufferLength);
+        if (spectrumPosition >= 0 && spectrumPosition + m_spectrumBufferLength < m_bufferPosition + m_dataLength)
+            calculateSpectrum(spectrumPosition);
+    }
         break;
     }
 }
@@ -349,8 +349,8 @@ void Engine::audioDataReady()
     const qint64 bytesToRead = qMin(bytesReady, bytesSpace);
 
     const qint64 bytesRead = m_audioInputIODevice->read(
-                                       m_buffer.data() + m_dataLength,
-                                       bytesToRead);
+                m_buffer.data() + m_dataLength,
+                bytesToRead);
 
     if (bytesRead) {
         m_dataLength += bytesRead;
@@ -452,12 +452,12 @@ bool Engine::selectFormat()
     } else {
 
         QList<int> sampleRatesList;
-    #ifdef Q_OS_WIN
+#ifdef Q_OS_WIN
         // The Windows audio backend does not correctly report format support
         // (see QTBUG-9100).  Furthermore, although the audio subsystem captures
         // at 11025Hz, the resulting audio is corrupted.
         sampleRatesList += 8000;
-    #endif
+#endif
 
         if (!m_generateTone)
             sampleRatesList += m_audioInputDevice.supportedSampleRates();
@@ -487,7 +487,7 @@ bool Engine::selectFormat()
             foreach (channels, channelsList) {
                 format.setChannelCount(channels);
                 const bool inputSupport = m_generateTone ||
-                                          m_audioInputDevice.isFormatSupported(format);
+                        m_audioInputDevice.isFormatSupported(format);
                 const bool outputSupport = m_audioOutputDevice.isFormatSupported(format);
                 ENGINE_DEBUG << "Engine::initialize checking " << format
                              << "input" << inputSupport
@@ -622,7 +622,7 @@ void Engine::setFormat(const QAudioFormat &format)
     m_format = format;
     m_levelBufferLength = audioLength(m_format, LevelWindowUs);
     m_spectrumBufferLength = SpectrumLengthSamples *
-                            (m_format.sampleSize() / 8) * m_format.channelCount();
+            (m_format.sampleSize() / 8) * m_format.channelCount();
     if (changed)
         emit formatChanged(m_format);
 }

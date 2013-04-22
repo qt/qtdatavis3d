@@ -48,17 +48,17 @@
 #include <QThread>
 
 SpectrumAnalyserThread::SpectrumAnalyserThread(QObject *parent)
-    :   QObject(parent)
-    ,   m_fft(new FFTRealWrapper)
-    ,   m_numSamples(SpectrumLengthSamples)
-    ,   m_windowFunction(DefaultWindowFunction)
-    ,   m_window(SpectrumLengthSamples, 0.0)
-    ,   m_input(SpectrumLengthSamples, 0.0)
-    ,   m_output(SpectrumLengthSamples, 0.0)
-    ,   m_spectrum(SpectrumLengthSamples)
-#ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
-    ,   m_thread(new QThread(this))
-#endif
+    : QObject(parent),
+      m_fft(new FFTRealWrapper),
+      m_numSamples(SpectrumLengthSamples),
+      m_windowFunction(DefaultWindowFunction),
+      m_window(SpectrumLengthSamples, 0.0),
+      m_input(SpectrumLengthSamples, 0.0),
+      m_output(SpectrumLengthSamples, 0.0),
+      m_spectrum(SpectrumLengthSamples)
+    #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
+    , m_thread(new QThread(this))
+    #endif
 {
 #ifdef SPECTRUM_ANALYSER_SEPARATE_THREAD
     // moveToThread() cannot be called on a QObject with a parent
@@ -101,8 +101,8 @@ void SpectrumAnalyserThread::calculateWindow()
 }
 
 void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
-                                                int inputFrequency,
-                                                int bytesPerSample)
+                                               int inputFrequency,
+                                               int bytesPerSample)
 {
     Q_ASSERT(buffer.size() == m_numSamples * bytesPerSample);
 
@@ -149,9 +149,9 @@ void SpectrumAnalyserThread::calculateSpectrum(const QByteArray &buffer,
 //=============================================================================
 
 SpectrumAnalyser::SpectrumAnalyser(QObject *parent)
-    :   QObject(parent)
-    ,   m_thread(new SpectrumAnalyserThread(this))
-    ,   m_state(Idle)
+    : QObject(parent),
+      m_thread(new SpectrumAnalyserThread(this)),
+      m_state(Idle)
 {
     CHECKED_CONNECT(m_thread, SIGNAL(calculationComplete(FrequencySpectrum)),
                     this, SLOT(calculationComplete(FrequencySpectrum)));
@@ -169,14 +169,14 @@ SpectrumAnalyser::~SpectrumAnalyser()
 void SpectrumAnalyser::setWindowFunction(WindowFunction type)
 {
     const bool b = QMetaObject::invokeMethod(m_thread, "setWindowFunction",
-                              Qt::AutoConnection,
-                              Q_ARG(WindowFunction, type));
+                                             Qt::AutoConnection,
+                                             Q_ARG(WindowFunction, type));
     Q_ASSERT(b);
     Q_UNUSED(b) // suppress warnings in release builds
 }
 
 void SpectrumAnalyser::calculate(const QByteArray &buffer,
-                         const QAudioFormat &format)
+                                 const QAudioFormat &format)
 {
     // QThread::currentThread is marked 'for internal use only', but
     // we're only using it for debug output here, so it's probably OK :)
@@ -197,10 +197,10 @@ void SpectrumAnalyser::calculate(const QByteArray &buffer,
         // Once the calculation is finished, a calculationChanged signal will be
         // emitted by m_thread.
         const bool b = QMetaObject::invokeMethod(m_thread, "calculateSpectrum",
-                                  Qt::AutoConnection,
-                                  Q_ARG(QByteArray, buffer),
-                                  Q_ARG(int, format.sampleRate()),
-                                  Q_ARG(int, bytesPerSample));
+                                                 Qt::AutoConnection,
+                                                 Q_ARG(QByteArray, buffer),
+                                                 Q_ARG(int, format.sampleRate()),
+                                                 Q_ARG(int, bytesPerSample));
         Q_ASSERT(b);
         Q_UNUSED(b) // suppress warnings in release builds
     }

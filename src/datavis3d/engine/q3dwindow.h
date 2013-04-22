@@ -54,7 +54,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DWindowPrivate;
 
-class Q3DWindow : public QWindow, protected QOpenGLFunctions
+class QTCOMMERCIALDATAVIS3D_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
@@ -74,7 +74,6 @@ public slots:
 
 protected:
     bool event(QEvent *event);
-
     void exposeEvent(QExposeEvent *event);
 //    void resizeEvent(QResizeEvent *event);
 
