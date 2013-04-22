@@ -72,40 +72,102 @@ int main(int argc, char **argv)
     hLayout->addWidget(container);
     hLayout->addLayout(vLayout);
 
+    QPushButton *dataButton = new QPushButton(widget);
+    dataButton->setText(QStringLiteral("Add a row of random data"));
+    dataButton->setEnabled(false);
+
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
+
+    QPushButton *labelButton = new QPushButton(widget);
+    labelButton->setText(QStringLiteral("Change label style"));
+
     QPushButton *styleButton = new QPushButton(widget);
     styleButton->setText(QStringLiteral("Change bar style"));
+
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
+
+    QPushButton *selectionButton = new QPushButton(widget);
+    selectionButton->setText(QStringLiteral("Change selection mode"));
+
     QCheckBox *rotationCheckBox = new QCheckBox(widget);
     rotationCheckBox->setText("Rotate with slider");
-    QSlider *rotationSlider = new QSlider(Qt::Horizontal);
-    rotationSlider->setTickInterval(1);
-    rotationSlider->setMinimum(-180);
-    rotationSlider->setValue(0);
-    rotationSlider->setMaximum(180);
-    rotationSlider->setEnabled(false);
 
+    QCheckBox *staticCheckBox = new QCheckBox(widget);
+    staticCheckBox->setText("Use dynamic data");
+    staticCheckBox->setChecked(false);
+
+    QSlider *rotationSliderX = new QSlider(Qt::Horizontal);
+    rotationSliderX->setTickInterval(1);
+    rotationSliderX->setMinimum(-180);
+    rotationSliderX->setValue(0);
+    rotationSliderX->setMaximum(180);
+    rotationSliderX->setEnabled(false);
+    QSlider *rotationSliderY = new QSlider(Qt::Horizontal);
+    rotationSliderY->setTickInterval(1);
+    rotationSliderY->setMinimum(0);
+    rotationSliderY->setValue(0);
+    rotationSliderY->setMaximum(90);
+    rotationSliderY->setEnabled(false);
+
+    QSlider *sizeSliderX = new QSlider(Qt::Horizontal);
+    sizeSliderX->setTickInterval(1);
+    sizeSliderX->setMinimum(1);
+    sizeSliderX->setValue(100);
+    sizeSliderX->setMaximum(200);
+    QSlider *sizeSliderZ = new QSlider(Qt::Horizontal);
+    sizeSliderZ->setTickInterval(1);
+    sizeSliderZ->setMinimum(1);
+    sizeSliderZ->setValue(100);
+    sizeSliderZ->setMaximum(200);
+
+    vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
-    vLayout->addWidget(rotationSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
+    vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
+    vLayout->addWidget(sizeSliderX, 0, Qt::AlignTop);
+    vLayout->addWidget(sizeSliderZ, 1, Qt::AlignTop);
+    vLayout->addWidget(dataButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
 
     widget->show();
 
     ChartModifier *modifier = new ChartModifier(widgetchart);
 
-    QObject::connect(rotationSlider, &QSlider::valueChanged, modifier, &ChartModifier::rotate);
+    QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &ChartModifier::rotateX);
+    QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &ChartModifier::rotateY);
+
+    QObject::connect(sizeSliderX, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsX);
+    QObject::connect(sizeSliderZ, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsZ);
+
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changePresetCamera);
     QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
-    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSlider,
+    QObject::connect(labelButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::changeTransparency);
+    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addBars);
+    QObject::connect(selectionButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::changeSelectionMode);
+
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);
-    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSlider,
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setValue);
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
+                     &QSlider::setEnabled);
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
+                     &QSlider::setValue);
+
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &ChartModifier::restart);
 
     modifier->start();
 

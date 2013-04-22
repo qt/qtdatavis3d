@@ -44,11 +44,8 @@
 #include "q3dbars.h"
 #include "qdataset.h"
 
-#include <QTimer>
 #include <QFont>
 #include <QDebug>
-
-#define USE_STATIC_DATA
 
 using namespace QtDataVis3D;
 
@@ -63,14 +60,24 @@ public:
     void changeStyle();
     void changePresetCamera();
     void changeTheme();
-    void rotate(int rotation);
+    void changeTransparency();
+    void changeSelectionMode();
+    void rotateX(int rotation);
+    void rotateY(int rotation);
+    void setSpecsX(int barwidth);
+    void setSpecsZ(int bardepth);
     void start();
+    void restart(bool dynamicData);
 
 private:
     Q3DBars *m_chart;
-    QTimer *m_dataTimer;
     int m_columnCount;
     int m_rowCount;
+    float m_xRotation;
+    float m_yRotation;
+    bool m_static;
+    float m_barWidth;
+    float m_barDepth;
 };
 
 #endif

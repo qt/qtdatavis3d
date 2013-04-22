@@ -44,58 +44,43 @@ using namespace QtDataVis3D;
 
 ChartModifier::ChartModifier(Q3DBars *barchart)
     : m_chart(barchart),
-      m_dataTimer(0),
       m_columnCount(21),
-      m_rowCount(21)
+      m_rowCount(21),
+      m_xRotation(0.0f),
+      m_yRotation(0.0f),
+      m_static(true),
+      m_barWidth(1.0f),
+      m_barDepth(1.0f)
 {
-    // Set up bar specifications; make the bars as wide as they are deep,
-    // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.1f, 0.1f), true);
-
-#ifndef USE_STATIC_DATA
-    // Set up sample space; make it as deep as it's wide
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
-#endif
-
-    // Set bar type
-    m_chart->setBarType(Q3DBars::Pyramids, false);
-
-#ifndef USE_STATIC_DATA
-    // Set selection mode to full
-    m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
-#else
-    // Set selection mode to zoom row
-    m_chart->setSelectionMode(Q3DBars::ZoomRow);
-    m_chart->setFont(QFont("Times Roman", 20));
-#endif
-
-    m_chart->setTheme(Q3DBars::ThemeSystem);
-    m_chart->setLabelTransparency(Q3DBars::TransparencyFromTheme);
-
-    // Set preset camera position
-    m_chart->setCameraPreset(Q3DBars::PresetFront);
+    // Don't set any styles or specifications, start from defaults
 }
 
 ChartModifier::~ChartModifier()
 {
-    if (m_dataTimer) {
-        m_dataTimer->stop();
-        delete m_dataTimer;
-    }
     delete m_chart;
 }
 
 void ChartModifier::start()
 {
-#ifndef USE_STATIC_DATA
-    m_dataTimer = new QTimer();
-    m_dataTimer->setTimerType(Qt::CoarseTimer);
-    m_dataTimer->setInterval(100);
-    QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addBars);
-    m_dataTimer->start(100);
-#else
-    addDataSet();
-#endif
+    if (m_static)
+        addDataSet();
+}
+
+void ChartModifier::restart(bool dynamicData)
+{
+    m_static = !dynamicData;
+
+    if (m_static) {
+        start();
+        // Set selection mode to zoom row
+        m_chart->setSelectionMode(Q3DBars::ZoomRow);
+        m_chart->setFont(QFont("Times Roman", 20));
+    } else {
+        // Set up sample space; make it as deep as it's wide
+        m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+        // Set selection mode to full
+        m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
+    }
 }
 
 void ChartModifier::addDataSet()
@@ -228,8 +213,46 @@ void ChartModifier::changeTheme()
     if (++theme > (int)Q3DBars::ThemeLight)
         theme = 0;
 }
-
-void ChartModifier::rotate(int rotation)
+void ChartModifier::changeTransparency()
 {
-    m_chart->setCameraPosition(rotation, 0.0f);
+    static int transparency = 0;
+
+    m_chart->setLabelTransparency((Q3DBars::LabelTransparency)transparency);
+
+    if (++transparency > (int)Q3DBars::TransparencyNoBackground)
+        transparency = 0;
+}
+
+void ChartModifier::changeSelectionMode()
+{
+    static int selectionMode = 0;
+
+    m_chart->setSelectionMode((Q3DBars::SelectionMode)selectionMode);
+
+    if (++selectionMode > (int)Q3DBars::ZoomColumn)
+        selectionMode = 0;
+}
+
+void ChartModifier::rotateX(int rotation)
+{
+    m_xRotation = rotation;
+    m_chart->setCameraPosition(m_xRotation, m_yRotation);
+}
+
+void ChartModifier::rotateY(int rotation)
+{
+    m_yRotation = rotation;
+    m_chart->setCameraPosition(m_xRotation, m_yRotation);
+}
+
+void ChartModifier::setSpecsX(int barwidth)
+{
+    m_barWidth = (float)barwidth / 100.0f;
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth));
+}
+
+void ChartModifier::setSpecsZ(int bardepth)
+{
+    m_barDepth = (float)bardepth / 100.0f;
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth));
 }

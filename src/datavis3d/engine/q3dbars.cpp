@@ -1283,6 +1283,9 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
 void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow,
                                const QString &labelColumn, const QString &labelHeight)
 {
+    // Delete previous data set
+    delete d_ptr->m_dataSet;
+    d_ptr->m_dataSet = new QDataSet();
     d_ptr->m_sampleCount = sampleCount;
     d_ptr->m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
     // TODO: Invent "idiotproof" max scene size formula..
@@ -1347,6 +1350,10 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 void Q3DBars::setSelectionMode(SelectionMode mode)
 {
     d_ptr->m_selectionMode = mode;
+    // Disable zoom if mode changes
+    d_ptr->m_zoomActivated = false;
+    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    // Create zoom selection if there isn't one
     if (mode >= ZoomRow && !d_ptr->m_zoomSelection)
         d_ptr->m_zoomSelection = new QDataRow();
 }
