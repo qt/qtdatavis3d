@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2008-2012)"));
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     hLayout->addWidget(container);
     hLayout->addLayout(vLayout);

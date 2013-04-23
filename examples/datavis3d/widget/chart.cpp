@@ -42,6 +42,8 @@
 
 using namespace QtDataVis3D;
 
+const QString celsiusString = QString(QChar(0xB0)) + "C";
+
 ChartModifier::ChartModifier(Q3DBars *barchart)
     : m_chart(barchart),
       m_columnCount(21),
@@ -87,49 +89,33 @@ void ChartModifier::restart(bool dynamicData)
 
 void ChartModifier::addDataSet()
 {
-#if 0
-    // Prepare data to be visualized
-    // Use float vector adder
-    QVector< QVector<float> > data;
-    QVector<float> row;
-    // TODO: Keep here for testing
-    for (int j = 0; j < m_rowCount; j++) {
-        for (int i = 0; i < m_columnCount; i++) {
-            //row.prepend(((float)i / (float)m_columnCount) * 100.0f + (float)(rand() % 30));
-            row.append(1.0f);
-        }
-        data.append(row);
-        row.clear();
-    }
-    // Set up sample space based on inserted data
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
-    // Add data to chart
-    m_chart->addDataSet(data);
-#else
     // Prepare data to be visualized
     // Use QDataSet adder
 
     // Set window title
-    m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2008-2012)"));
+    m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     // Set up row and column names
     QVector<QString> months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     QVector<QString> years;
-    years << "2008" << "2009" << "2010" << "2011" << "2012";
+    years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
     // Set up data
-    float temp[5][12] = {{-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},
-                         {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},
-                         {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},
-                         {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},
-                         {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};
+    float temp[7][12] = {{-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
+                         {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
+                         {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
+                         {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
+                         {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
+                         {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
+                         {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};    // 2012
 
     // Create data set
     QDataSet *dataSet = new QDataSet();
 
     // Add labels
-    dataSet->setLabels("Year", "Month", "Average temperature (C)", years, months);
+    dataSet->setLabels("Year", "Month", "Average temperature (" + celsiusString + ")",
+                       years, months);
 
     // Create data rows
     QDataRow *dataRow;
@@ -138,7 +124,7 @@ void ChartModifier::addDataSet()
         // Create data items
         for (int month = 0; month < months.size(); month++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(temp[year][month], "C"));
+            dataRow->addItem(new QDataItem(temp[year][month], celsiusString));
         }
         // Add row to set
         dataSet->addRow(dataRow);
@@ -151,14 +137,13 @@ void ChartModifier::addDataSet()
 
     // Add data to chart
     m_chart->addDataSet(dataSet);
-#endif
 }
 
 void ChartModifier::addBars()
 {
     QVector<float> data;
-    for (int i = 0; i < m_columnCount; i++)
-        data.append((((float)i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+    for (float i = 0; i < m_columnCount; i++)
+        data.append(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
     m_chart->addDataRow(data);
 }
 
