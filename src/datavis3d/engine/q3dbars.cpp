@@ -295,29 +295,11 @@ void Q3DBars::drawZoomScene()
 #else
     // Set view matrix
     QMatrix4x4 viewMatrix;
-#if 1
+
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 5.0f + zComp),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
-#else
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, d_ptr->m_scaleFactorX + zComp),
-                      QVector3D(0.0f, 0.0f, zComp),
-                      QVector3D(0.0f, 1.0f, 0.0f));
-    GLfloat zoomwidth;
-    if (ZoomRow == d_ptr->m_selectionMode) {
-        zoomwidth = d_ptr->m_zoomSelection->d_ptr->getItem(0)->d_ptr->translation().x()
-                - d_ptr->m_zoomSelection->d_ptr->getItem(d_ptr->m_zoomSelection->d_ptr->row().size()
-                                                         - 1)->d_ptr->translation().x();
-        zoomwidth *= d_ptr->m_scaleX;
-    } else {
-        zoomwidth = d_ptr->m_zoomSelection->d_ptr->getItem(0)->d_ptr->translation().z()
-                - d_ptr->m_zoomSelection->d_ptr->getItem(d_ptr->m_zoomSelection->d_ptr->row().size()
-                                                         - 1)->d_ptr->translation().z();
-        zoomwidth *= d_ptr->m_scaleZ;
-    }
-    qDebug() << "zoomwidth" << zoomwidth << "inverse / 2" << 0.5f / zoomwidth;
-    viewMatrix.scale(0.5f / zoomwidth);
-#endif
+
     if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
         viewMatrix.scale((GLfloat)d_ptr->m_zoomViewPort.width()
                          / (GLfloat)d_ptr->m_zoomViewPort.height());
@@ -335,7 +317,6 @@ void Q3DBars::drawZoomScene()
     d_ptr->m_barShader->bind();
 
     // Draw bars
-    //    bool barSelectionFound = false;
     // Draw the selected row / column
     for (int bar = startBar; bar != stopBar; bar += stepBar) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(bar);
@@ -352,13 +333,12 @@ void Q3DBars::drawZoomScene()
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
+        GLfloat barPosY = item->d_ptr->translation().y() - d_ptr->m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
         if (ZoomRow == d_ptr->m_selectionMode)
             barPosX = item->d_ptr->translation().x();
         else
             barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
-        modelMatrix.translate(barPosX,
-                              item->d_ptr->translation().y() - d_ptr->m_yAdjustment, // TODO: Needs more adjusting
-                              zComp);
+        modelMatrix.translate(barPosX, barPosY, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -369,49 +349,7 @@ void Q3DBars::drawZoomScene()
         QVector3D barColor = baseColor + heightColor;
 
         GLfloat lightStrength = d_ptr->m_theme->m_lightStrength;
-#if 0 // TODO: Implement selection in zoom
-        if (d_ptr->m_selectionMode > None) {
-            Q3DBarsPrivate::SelectionType selectionType = d_ptr->isSelected(row, bar, selection);
-            switch (selectionType) {
-            case Q3DBarsPrivate::Bar:
-            {
-                // highlight bar by inverting the color of the bar
-                //barColor = QVector3D(1.0f, 1.0f, 1.0f) - barColor;
-                barColor = Utils::vectorFromColor(d_ptr->m_highlightBarColor);
-                lightStrength = d_ptr->m_highlightLightStrength;
-                //if (d_ptr->m_mousePressed) {
-                //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                //    qDebug() /*<< barIndex*/ << "object position:" << modelMatrix.column(3).toVector3D();
-                //}
-                // Insert data to QDataItem. We have no ownership, don't delete the previous one
-                d_ptr->m_selectedBar = item;
-                d_ptr->m_selectedBar->d_ptr->setPosition(d_ptr->m_mousePos);
-                barSelectionFound = true;
-                break;
-            }
-            case Q3DBarsPrivate::Row:
-            {
-                // Current bar is on the same row as the selected bar
-                barColor = Utils::vectorFromColor(d_ptr->m_highlightRowColor);
-                lightStrength = d_ptr->m_highlightLightStrength;
-                break;
-            }
-            case Q3DBarsPrivate::Column:
-            {
-                // Current bar is on the same column as the selected bar
-                barColor = Utils::vectorFromColor(d_ptr->m_highlightColumnColor);
-                lightStrength = d_ptr->m_highlightLightStrength;
-                break;
-            }
-            case Q3DBarsPrivate::None:
-            {
-                // Current bar is not selected, nor on a row or column
-                // do nothing
-                break;
-            }
-            }
-        }
-#endif
+
         if (barHeight != 0) {
             // Set shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
@@ -429,21 +367,7 @@ void Q3DBars::drawZoomScene()
             d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
         }
     }
-#if 0
-    if (!barSelectionFound) {
-        // We have no ownership, don't delete. Just NULL the pointer.
-        d_ptr->m_selectedBar = NULL;
-        if (d_ptr->m_zoomActivated && Q3DBarsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
-            d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
-            d_ptr->m_zoomActivated = false;
-        }
-    } else if (d_ptr->m_selectionMode >= ZoomRow
-               && Q3DBarsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
-        d_ptr->m_zoomActivated = true;
-        d_ptr->m_sceneViewPort = QRect(0, height() - height() / 5,
-                                       width() / 5, height() / 5);
-    }
-#endif
+
     // Release bar shader
     d_ptr->m_barShader->release();
 
@@ -1033,56 +957,58 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     switch (position) {
     case Q3DBars::LabelBelow:
     {
-        yPosition = -1.25f;
-        //if (!useDepth)
-        //  yPosition -= 0.25f;
+        yPosition = -1.6f; // minus maximum negative height (+ some extra for label)
         break;
     }
     case Q3DBars::LabelLow:
     {
-        yPosition = 0.0f;
+        yPosition = -d_ptr->m_yAdjustment;
         break;
     }
     case Q3DBars::LabelMid:
     {
+        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
         yPosition = item.d_ptr->translation().y();
+        //yPosition = item.d_ptr->translation().y() + d_ptr->m_yAdjustment / 2.0f;
         break;
     }
     case Q3DBars::LabelHigh:
     {
-        yPosition = item.d_ptr->translation().y() + (item.d_ptr->value()
-                                                     / d_ptr->m_heightNormalizer) / 2.0f;
+        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
+        yPosition = item.d_ptr->translation().y()
+                + (item.d_ptr->value() / d_ptr->m_heightNormalizer) / 2.0f;
         break;
     }
     case Q3DBars::LabelOver:
     {
-        yPosition = item.d_ptr->translation().y()
-                + (item.d_ptr->value() / d_ptr->m_heightNormalizer) + 0.1f;
-        //if (!useDepth)
-        //  yPosition -= 0.25f;
+        float mod = 0.1f;
+        if (item.d_ptr->value() < 0)
+            mod = -0.1f;
+        yPosition = item.d_ptr->translation().y() - (d_ptr->m_yAdjustment / 2.0f - 0.2f)
+                + (item.d_ptr->value() / d_ptr->m_heightNormalizer) + mod;
         break;
     }
     case Q3DBars::LabelBottom:
     {
-        yPosition = -1.9f; // TODO: Calculate from scene
+        yPosition = -1.95f; // TODO: Calculate from scene
         xPosition = 0.0f;
         break;
     }
     case Q3DBars::LabelTop:
     {
-        yPosition = 1.5f; // TODO: Calculate from scene
+        yPosition = 1.95f; // TODO: Calculate from scene
         xPosition = 0.0f;
         break;
     }
     case Q3DBars::LabelLeft:
     {
-        yPosition = -0.2f; // TODO: Calculate from scene
+        yPosition = 0.0f;
         xPosition = -2.5f; // TODO: Calculate from scene
         break;
     }
     case Q3DBars::LabelRight:
     {
-        yPosition = -0.2f; // TODO: Calculate from scene
+        yPosition = 0.0f;
         xPosition = 2.5f; // TODO: Calculate from scene
         break;
     }

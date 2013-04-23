@@ -57,6 +57,7 @@
 #include <QFont>
 
 class QOpenGLPaintDevice;
+// TODO: Replace QPoints qith QPairs if they do not represent actual points
 class QPoint;
 class QPointF;
 
