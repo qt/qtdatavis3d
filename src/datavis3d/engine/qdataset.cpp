@@ -234,16 +234,18 @@ void QDataSetPrivate::verifySize(int colSize, int rowSize)
     }
 }
 
-float QDataSetPrivate::highestValue()
+QPointF QDataSetPrivate::limitValues()
 {
-    float max = 0;
-    float rowMax = 0;
+    QPointF limits = QPointF(100.0f, -100.0f);
+    QPointF rowLimits;
     for (int i = 0; i < m_set.size(); i++) {
-        rowMax = m_set.at(i)->d_ptr->highestValue();
-        if (max < rowMax)
-            max = rowMax;
+        rowLimits = m_set.at(i)->d_ptr->limitValues();
+        if (limits.y() < rowLimits.y())
+            limits.setY(rowLimits.y());
+        if (limits.x() > rowLimits.x())
+            limits.setX(rowLimits.x());
     }
-    return max;
+    return limits;
 }
 
 void QDataSetPrivate::updateTextures()

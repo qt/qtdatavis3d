@@ -118,16 +118,18 @@ void QDataRowPrivate::verifySize(int size)
     }
 }
 
-float QDataRowPrivate::highestValue()
+QPointF QDataRowPrivate::limitValues()
 {
-    float max = 0;
+    QPointF limits = QPointF(100.0f, -100.0f);
     for (int i = 0; i < m_row.size(); i++) {
         QDataItem *item = m_row.at(i);
         float itemValue = item->d_ptr->value();
-        if (max < itemValue)
-            max = itemValue;
+        if (limits.y() < itemValue)
+            limits.setY(itemValue);
+        else if (limits.x() > itemValue)
+            limits.setX(itemValue);
     }
-    return max;
+    return limits;
 }
 
 QString QDataRowPrivate::label()

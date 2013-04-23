@@ -103,6 +103,7 @@ public:
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
     void calculateSceneScalingFactors();
+    void calculateHeightAdjustment(const QPointF &limits);
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
 
     Q3DBars *q_ptr;
@@ -125,6 +126,7 @@ public:
     QPointF m_barThickness;
     QPointF m_barSpacing;
     GLfloat m_heightNormalizer;
+    GLfloat m_yAdjustment;
     GLfloat m_rowWidth;
     GLfloat m_columnDepth;
     GLfloat m_maxDimension;
