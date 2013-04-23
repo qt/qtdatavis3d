@@ -50,7 +50,9 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_yRotation(0.0f),
       m_static(true),
       m_barWidth(1.0f),
-      m_barDepth(1.0f)
+      m_barDepth(1.0f),
+      m_barSpacingX(0.1f),
+      m_barSpacingZ(0.1f)
 {
     // Don't set any styles or specifications, start from defaults
 }
@@ -156,7 +158,7 @@ void ChartModifier::addBars()
 {
     QVector<float> data;
     for (int i = 0; i < m_columnCount; i++)
-        data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
+        data.append((((float)i + 1) / (float)m_columnCount) * (float)(rand() % 100));
     m_chart->addDataRow(data);
 }
 
@@ -248,11 +250,35 @@ void ChartModifier::rotateY(int rotation)
 void ChartModifier::setSpecsX(int barwidth)
 {
     m_barWidth = (float)barwidth / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth));
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpecsZ(int bardepth)
 {
     m_barDepth = (float)bardepth / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth));
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+}
+
+void ChartModifier::setSpacingSpecsX(int spacing)
+{
+    m_barSpacingX = (float)spacing / 100.0f;
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+}
+
+void ChartModifier::setSpacingSpecsZ(int spacing)
+{
+    m_barSpacingZ = (float)spacing / 100.0f;
+    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+}
+
+void ChartModifier::setSampleCountX(int samples)
+{
+    m_columnCount = samples;
+    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+}
+
+void ChartModifier::setSampleCountZ(int samples)
+{
+    m_rowCount = samples;
+    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
 }

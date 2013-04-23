@@ -605,6 +605,7 @@ void Q3DBars::drawScene()
 #ifndef USE_HAX0R_SELECTION
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
 #endif
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
@@ -640,11 +641,11 @@ void Q3DBars::drawScene()
                 // TODO: Save position to qdataitem, so that we don't need to calculate it each time?
 
                 // add +2 to avoid black
-                QVector3D barColor = QVector3D((GLfloat)(row + 2)
-                                               / (GLfloat)(d_ptr->m_sampleCount.y() + 2),
-                                               (GLfloat)(bar + 2)
-                                               / (GLfloat)(d_ptr->m_sampleCount.x() + 2),
-                                               0.0f);
+                QVector3D barColor = QVector3D((GLdouble)(row + 2)
+                                               / (GLdouble)(d_ptr->m_sampleCount.y() + 2),
+                                               (GLdouble)(bar + 2)
+                                               / (GLdouble)(d_ptr->m_sampleCount.x() + 2),
+                                               0.0);
 
                 d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP(),
                                                           MVPMatrix);
@@ -706,6 +707,7 @@ void Q3DBars::drawScene()
         d_ptr->m_selectionShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
+        glCullFace(GL_BACK);
         d_ptr->m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -724,6 +726,9 @@ void Q3DBars::drawScene()
 #endif
 
 #ifdef USE_HAX0R_SELECTION
+        // Set clear color
+        QVector3D clearColor = Utils::vectorFromColor(d_ptr->m_theme->m_windowColor);
+        glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
         // Clear after selection
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #endif
@@ -1667,14 +1672,24 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
 Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(GLint row, GLint bar,
                                                          const QVector3D &selection)
 {
+    //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = None;
+#ifdef USE_HAX0R_SELECTION
     if (selection == Utils::vectorFromColor(m_theme->m_windowColor))
+#else
+    if (selection == Utils::vectorFromColor(Qt::white))
+#endif
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)(((GLfloat)(row + 2) / (GLfloat)(m_sampleCount.y() + 2))
-                                            * 255.0 + 0.49f), // +0.49 to fix rounding (there are conversions from unsigned short to GLfloat and back)
-                                  (GLubyte)(((GLfloat)(bar + 2) / (GLfloat)(m_sampleCount.x() + 2))
-                                            * 255.0 + 0.49f), // +0.49 to fix rounding (there are conversions from unsigned short to GLfloat and back)
+    QVector3D current = QVector3D((GLubyte)(((GLdouble)(row + 2) / (GLdouble)(m_sampleCount.y() + 2))
+                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
+                                  (GLubyte)(((GLdouble)(bar + 2) / (GLdouble)(m_sampleCount.x() + 2))
+                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
                                   0);
+    // TODO: For debugging
+    //if (selection != prevSel) {
+    //    qDebug() << selection.x() << selection .y() << selection.z();
+    //    prevSel = selection;
+    //}
     if (current == selection)
         isSelectedType = Bar;
     else if (current.y() == selection.y() && (m_selectionMode == Q3DBars::BarAndColumn

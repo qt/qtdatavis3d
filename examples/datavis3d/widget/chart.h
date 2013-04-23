@@ -66,6 +66,10 @@ public:
     void rotateY(int rotation);
     void setSpecsX(int barwidth);
     void setSpecsZ(int bardepth);
+    void setSpacingSpecsX(int spacing);
+    void setSpacingSpecsZ(int spacing);
+    void setSampleCountX(int samples);
+    void setSampleCountZ(int samples);
     void start();
     void restart(bool dynamicData);
 
@@ -78,6 +82,8 @@ private:
     bool m_static;
     float m_barWidth;
     float m_barDepth;
+    float m_barSpacingX;
+    float m_barSpacingZ;
 };
 
 #endif

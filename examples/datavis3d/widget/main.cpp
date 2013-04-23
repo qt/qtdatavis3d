@@ -122,13 +122,43 @@ int main(int argc, char **argv)
     sizeSliderZ->setValue(100);
     sizeSliderZ->setMaximum(200);
 
+    QSlider *spacingSliderX = new QSlider(Qt::Horizontal);
+    spacingSliderX->setTickInterval(1);
+    spacingSliderX->setMinimum(0);
+    spacingSliderX->setValue(10);
+    spacingSliderX->setMaximum(200);
+    QSlider *spacingSliderZ = new QSlider(Qt::Horizontal);
+    spacingSliderZ->setTickInterval(1);
+    spacingSliderZ->setMinimum(0);
+    spacingSliderZ->setValue(10);
+    spacingSliderZ->setMaximum(200);
+
+    QSlider *sampleSliderX = new QSlider(Qt::Horizontal);
+    sampleSliderX->setTickInterval(1);
+    sampleSliderX->setMinimum(2);
+    sampleSliderX->setValue(10);
+    sampleSliderX->setMaximum(100);
+    sampleSliderX->setEnabled(false);
+    QSlider *sampleSliderZ = new QSlider(Qt::Horizontal);
+    sampleSliderZ->setTickInterval(1);
+    sampleSliderZ->setMinimum(2);
+    sampleSliderZ->setValue(10);
+    sampleSliderZ->setMaximum(100);
+    sampleSliderZ->setEnabled(false);
+
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
     vLayout->addWidget(sizeSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(sizeSliderZ, 1, Qt::AlignTop);
+    vLayout->addWidget(sizeSliderZ, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")));
+    vLayout->addWidget(spacingSliderX, 0, Qt::AlignTop);
+    vLayout->addWidget(spacingSliderZ, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
+    vLayout->addWidget(sampleSliderX, 0, Qt::AlignTop);
+    vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
     vLayout->addWidget(dataButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
@@ -145,6 +175,16 @@ int main(int argc, char **argv)
 
     QObject::connect(sizeSliderX, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsX);
     QObject::connect(sizeSliderZ, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsZ);
+
+    QObject::connect(spacingSliderX, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setSpacingSpecsX);
+    QObject::connect(spacingSliderZ, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setSpacingSpecsZ);
+
+    QObject::connect(sampleSliderX, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setSampleCountX);
+    QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setSampleCountZ);
 
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
@@ -167,6 +207,10 @@ int main(int argc, char **argv)
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
                      &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderZ,
+                     &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &ChartModifier::restart);
 
     modifier->start();
