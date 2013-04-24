@@ -554,9 +554,9 @@ void Q3DBars::drawScene()
                 barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
                 rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
 
-                modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
+                modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                       barHeight - d_ptr->m_yAdjustment,
-                                      (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ
+                                      (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
                                       + zComp);
                 modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
@@ -685,9 +685,9 @@ void Q3DBars::drawScene()
             // TODO: Laske rivi- ja sarakelabelien paikat (sijainnit: min-1 ja max+1) ja pistä johonki talteen?
             barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
             rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
-            modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
+            modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                   barHeight - d_ptr->m_yAdjustment,
-                                  (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
+                                  (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -821,9 +821,9 @@ void Q3DBars::drawScene()
         QMatrix4x4 MVPMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D(d_ptr->m_rowWidth * d_ptr->m_sceneScale,
+        modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
                                     1.0f,
-                                    d_ptr->m_columnDepth * d_ptr->m_sceneScale));
+                                    d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -1475,9 +1475,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_maxDimension(0),
       m_scaleX(0),
       m_scaleZ(0),
-      m_scaleFactorX(0),
-      m_scaleFactorZ(0),
-      m_sceneScale(0),
+      m_scaleFactor(0),
       m_maxSceneSize(40.0),
       m_theme(new Theme()),
       m_isInitialized(false),
@@ -1603,17 +1601,11 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleX = m_barThickness.width() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
     m_scaleZ = m_barThickness.height() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
-    m_sceneScale = qMin(m_scaleX, m_scaleZ);
-    GLfloat minThickness = qMin(m_barThickness.width(), m_barThickness.height());
-    m_sceneScale = m_sceneScale / minThickness;
-    // TODO: This could be improved (we need only one scale factor, but we should probably check if we need to scale based on X or Z?)
-    m_scaleFactorX = m_sampleCount.first * (m_maxDimension / m_maxSceneSize);
-    //m_scaleFactorZ = m_sampleCount.second * (m_maxDimension / m_maxSceneSize);
-    m_scaleFactorZ = m_scaleFactorX;
-    //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactorX" << m_scaleFactorX;
-    //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactorZ" << m_scaleFactorZ;
+    m_scaleFactor = qMin((m_sampleCount.first * (m_maxDimension / m_maxSceneSize)),
+                         (m_sampleCount.second * (m_maxDimension / m_maxSceneSize)));
+    //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
+    //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
-    //qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
 }
 
 void Q3DBarsPrivate::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)

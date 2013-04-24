@@ -133,9 +133,7 @@ public:
     GLfloat m_maxDimension;
     GLfloat m_scaleX;
     GLfloat m_scaleZ;
-    GLfloat m_scaleFactorX;
-    GLfloat m_scaleFactorZ;
-    GLfloat m_sceneScale;
+    GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
     Theme *m_theme;
     bool m_isInitialized;
