@@ -73,7 +73,7 @@ class TextureHelper;
 class Theme;
 class Drawer;
 
-class Q3DBarsPrivate
+class Q3DBarsPrivate : public QObject
 {
 public:
     enum SelectionType {
@@ -103,6 +103,7 @@ public:
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
+    void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
@@ -158,6 +159,7 @@ public:
     //GLuint m_selectionDepthTexture;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
+    bool m_updateLabels;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

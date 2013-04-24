@@ -250,6 +250,7 @@ void Q3DBars::render(QPainter *painter)
 #endif
 }
 
+// TODO: Adjust overall zoom level (= view matrix scale) if aspect ratio is closer to 1:1 than 16:10
 void Q3DBars::drawZoomScene()
 {
     // Set clear color
@@ -442,6 +443,7 @@ void Q3DBars::drawZoomScene()
 #endif
 }
 
+// TODO: Adjust overall zoom level (= view matrix scale) if aspect ratio is closer to 1:1 than 16:10
 void Q3DBars::drawScene()
 {
     GLint startBar = 0;
@@ -480,8 +482,6 @@ void Q3DBars::drawScene()
     }
 
     // Calculate drawing order
-    //qDebug() << "viewMatrix z" << viewMatrix.row(0).z(); // jos negatiivinen, käännä bar -piirtojärjestys
-    //qDebug() << "viewMatrix x" << viewMatrix.row(0).x(); // jos negatiivinen, käännä row -piirtojärjestys
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
     if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
@@ -861,6 +861,15 @@ void Q3DBars::drawScene()
     // Release background shader
     d_ptr->m_backgroundShader->release();
 
+    // Generate label textures for zoom selection if m_updateLabels is set
+    if (d_ptr->m_zoomActivated && d_ptr->m_updateLabels) {
+        // Create label textures
+        for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
+            QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
+            d_ptr->m_drawer->generateLabelTexture(item);
+        }
+    }
+
     // Handle zoom activation and label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
@@ -893,7 +902,7 @@ void Q3DBars::drawScene()
         }
 #ifndef DISPLAY_FULL_DATA_ON_SELECTION
         // Draw just the value string of the selected bar
-        if (prevItem != d_ptr->m_selectedBar) {
+        if (prevItem != d_ptr->m_selectedBar || m_updateLabels) {
             d_ptr->m_drawer->generateLabelTexture(d_ptr->m_selectedBar);
             prevItem = d_ptr->m_selectedBar;
         }
@@ -904,7 +913,7 @@ void Q3DBars::drawScene()
         static bool firstSelection = true;
         // Draw the value string followed by row label and column label
         LabelItem labelItem = d_ptr->m_selectedBar->d_ptr->selectionLabel();
-        if (firstSelection || prevItem != d_ptr->m_selectedBar) {
+        if (firstSelection || prevItem != d_ptr->m_selectedBar || d_ptr->m_updateLabels) {
             QString labelText = d_ptr->m_selectedBar->d_ptr->valueStr();
             if ((d_ptr->m_dataSet->d_ptr->columnLabels().size()
                  > d_ptr->m_selectedBar->d_ptr->position().y())
@@ -934,6 +943,9 @@ void Q3DBars::drawScene()
 
         // Release label shader
         d_ptr->m_labelShader->release();
+
+        // Reset label update flag; they should have been updated when we get here
+        d_ptr->m_updateLabels = false;
 #endif
     }
 }
@@ -1297,6 +1309,7 @@ void Q3DBars::setWindowTitle(const QString &title)
 void Q3DBars::setFontSize(float fontsize)
 {
     d_ptr->m_fontSize = fontsize;
+    d_ptr->m_drawer->setFont(d_ptr->m_font);
 }
 
 void Q3DBars::setFont(const QFont &font)
@@ -1498,9 +1511,11 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_zFlipped(false),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
-      m_selectionTexture(0)
+      m_selectionTexture(0),
+      m_updateLabels(false)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
+    QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
@@ -1591,6 +1606,12 @@ void Q3DBarsPrivate::initLabelShaders(const QString &vertexShader, const QString
         delete m_labelShader;
     m_labelShader = new ShaderHelper(q_ptr, vertexShader, fragmentShader);
     m_labelShader->initialize();
+}
+
+void Q3DBarsPrivate::updateTextures()
+{
+    // Drawer has changed; this flag needs to be checked when checking if we need to update labels
+    m_updateLabels = true;
 }
 
 void Q3DBarsPrivate::calculateSceneScalingFactors()
