@@ -115,12 +115,12 @@ int main(int argc, char **argv)
     sizeSliderX->setTickInterval(1);
     sizeSliderX->setMinimum(1);
     sizeSliderX->setValue(100);
-    sizeSliderX->setMaximum(200);
+    sizeSliderX->setMaximum(100);
     QSlider *sizeSliderZ = new QSlider(Qt::Horizontal);
     sizeSliderZ->setTickInterval(1);
     sizeSliderZ->setMinimum(1);
     sizeSliderZ->setValue(100);
-    sizeSliderZ->setMaximum(200);
+    sizeSliderZ->setMaximum(100);
 
     QSlider *spacingSliderX = new QSlider(Qt::Horizontal);
     spacingSliderX->setTickInterval(1);

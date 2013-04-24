@@ -1599,10 +1599,10 @@ void Q3DBarsPrivate::calculateSceneScalingFactors()
     m_rowWidth = ((m_sampleCount.first + 1) * m_barSpacing.width()) / 2.0f;
     m_columnDepth = ((m_sampleCount.second + 1) * m_barSpacing.height()) / 2.0f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
-    m_scaleX = m_barThickness.width() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
-    m_scaleZ = m_barThickness.height() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
     m_scaleFactor = qMin((m_sampleCount.first * (m_maxDimension / m_maxSceneSize)),
                          (m_sampleCount.second * (m_maxDimension / m_maxSceneSize)));
+    m_scaleX = m_barThickness.width() / m_scaleFactor;
+    m_scaleZ = m_barThickness.height() / m_scaleFactor;
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
