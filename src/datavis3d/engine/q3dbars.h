@@ -163,8 +163,8 @@ public:
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QPointF thickness = QPointF(1.0f, 1.0f),
-                     QPointF spacing = QPointF(1.0f, 1.0f),
+    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+                     QSizeF spacing = QSizeF(1.0f, 1.0f),
                      bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
@@ -174,7 +174,7 @@ public:
     void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(QPoint sampleCount, const QString &labelRow = QString(),
+    void setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow = QString(),
                           const QString &labelColumn = QString(),
                           const QString &labelHeight = QString());
 

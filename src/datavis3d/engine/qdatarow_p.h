@@ -73,7 +73,7 @@ public:
     void clear();
     QDataItem *getItem(int itemIndex);
     void verifySize(int size);
-    QPointF limitValues();
+    QPair<GLfloat, GLfloat> limitValues();
     QString label();
     void setLabelItem(const LabelItem &item);
     LabelItem labelItem();

@@ -88,11 +88,11 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
 #endif
 
     // Set bar type to smooth bar
@@ -201,7 +201,7 @@ void ChartDataGenerator::addDataSet()
         row.clear();
     }
     // Set up sample space based on inserted data
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
     // Add data to chart
     m_chart->addDataSet(data);
 #else
@@ -246,7 +246,7 @@ void ChartDataGenerator::addDataSet()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(QPoint(days.size(), weeks.size()));
+    m_chart->setupSampleSpace(days.size(), weeks.size());
 
     // Add data to chart
     m_chart->addDataSet(dataSet);

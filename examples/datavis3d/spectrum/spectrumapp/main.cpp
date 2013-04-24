@@ -86,11 +86,11 @@ MainApp::MainApp(Q3DBars *window)
       m_lowFreq(SpectrumLowFreq),
       m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setupSampleSpace(QPoint(SpectrumNumBands, SpectrumNumBands*2));
+    m_chart->setupSampleSpace(SpectrumNumBands, SpectrumNumBands * 2);
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
-    m_chart->setBarSpecs(QPointF(1.0f, 0.75f), QPointF(0.2f, -0.75f));
+    m_chart->setBarSpecs(QSizeF(1.0f, 0.75f), QSizeF(0.2f, -0.75f));
     // Set bar type, smooth cones
     m_chart->setBarType(Q3DBars::Cones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
@@ -98,7 +98,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
 #else
     // Set bar specifications; make them twice as wide as they're deep
-    m_chart->setBarSpecs(QPointF(1.0f, 0.5f), QPointF(0.0f, 0.0f));
+    m_chart->setBarSpecs(QSizeF(1.0f, 0.5f), QSizeF(0.0f, 0.0f));
     // Set bar type, flat bars
     m_chart->setBarType(Q3DBars::Bars, false);
     // Adjust camera position

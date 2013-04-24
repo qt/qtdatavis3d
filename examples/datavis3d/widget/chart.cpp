@@ -81,7 +81,7 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setFont(QFont("Times Roman", 20));
     } else {
         // Set up sample space; make it as deep as it's wide
-        m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+        m_chart->setupSampleSpace(m_columnCount, m_rowCount);
         // Set selection mode to full
         m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
     }
@@ -133,7 +133,7 @@ void ChartModifier::addDataSet()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(QPoint(months.size(), years.size()));
+    m_chart->setupSampleSpace(months.size(), years.size());
 
     // Add data to chart
     m_chart->addDataSet(dataSet);
@@ -235,35 +235,35 @@ void ChartModifier::rotateY(int rotation)
 void ChartModifier::setSpecsX(int barwidth)
 {
     m_barWidth = (float)barwidth / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpecsZ(int bardepth)
 {
     m_barDepth = (float)bardepth / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsX(int spacing)
 {
     m_barSpacingX = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(QPointF(m_barWidth, m_barDepth), QPointF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount));
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
 }

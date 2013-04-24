@@ -485,22 +485,22 @@ void Q3DBars::drawScene()
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
     if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
-        stopRow = d_ptr->m_sampleCount.y();
+        stopRow = d_ptr->m_sampleCount.second;
         stepRow = 1;
         d_ptr->m_zFlipped = false;
     } else {
-        startRow = d_ptr->m_sampleCount.y() - 1;
+        startRow = d_ptr->m_sampleCount.second - 1;
         stopRow = -1;
         stepRow = -1;
         d_ptr->m_zFlipped = true;
     }
     if (viewMatrix.row(0).z() < 0) {
         startBar = 0;
-        stopBar = d_ptr->m_sampleCount.x();
+        stopBar = d_ptr->m_sampleCount.first;
         stepBar = 1;
         d_ptr->m_xFlipped = false;
     } else {
-        startBar = d_ptr->m_sampleCount.x() - 1;
+        startBar = d_ptr->m_sampleCount.first - 1;
         stopBar = -1;
         stepBar = -1;
         d_ptr->m_xFlipped = true;
@@ -551,8 +551,8 @@ void Q3DBars::drawScene()
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
-                rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
+                barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
+                rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
 
                 modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
                                       barHeight - d_ptr->m_yAdjustment,
@@ -566,9 +566,9 @@ void Q3DBars::drawScene()
 
                 // add +2 to avoid black
                 QVector3D barColor = QVector3D((GLdouble)(row + 2)
-                                               / (GLdouble)(d_ptr->m_sampleCount.y() + 2),
+                                               / (GLdouble)(d_ptr->m_sampleCount.second + 2),
                                                (GLdouble)(bar + 2)
-                                               / (GLdouble)(d_ptr->m_sampleCount.x() + 2),
+                                               / (GLdouble)(d_ptr->m_sampleCount.first + 2),
                                                0.0);
 
                 d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP(),
@@ -683,8 +683,8 @@ void Q3DBars::drawScene()
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             // TODO: Laske rivi- ja sarakelabelien paikat (sijainnit: min-1 ja max+1) ja pistä johonki talteen?
-            barPos = (bar + 1) * (d_ptr->m_barSpacing.x());
-            rowPos = (row + 1) * (d_ptr->m_barSpacing.y());
+            barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
+            rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactorX,
                                   barHeight - d_ptr->m_yAdjustment,
                                   (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactorZ + zComp);
@@ -696,7 +696,7 @@ void Q3DBars::drawScene()
             QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_theme->m_heightColor)
                     * barHeight;
             QVector3D depthColor = Utils::vectorFromColor(d_ptr->m_theme->m_depthColor)
-                    * (float(row) / GLfloat(d_ptr->m_sampleCount.y()));
+                    * (float(row) / GLfloat(d_ptr->m_sampleCount.second));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
@@ -1165,12 +1165,12 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     d_ptr->m_zoomViewPort = QRect(0, 0, width(), height());
 }
 
-void Q3DBars::setBarSpecs(QPointF thickness, QPointF spacing, bool relative)
+void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
     d_ptr->m_barThickness = thickness;
     if (relative) {
-        d_ptr->m_barSpacing.setX((thickness.x() * 2) * (spacing.x() + 1.0f));
-        d_ptr->m_barSpacing.setY((thickness.y() * 2) * (spacing.y() + 1.0f));
+        d_ptr->m_barSpacing.setWidth((thickness.width() * 2) * (spacing.width() + 1.0f));
+        d_ptr->m_barSpacing.setHeight((thickness.height() * 2) * (spacing.height() + 1.0f));
     } else {
         d_ptr->m_barSpacing = thickness * 2 + spacing * 2;
     }
@@ -1211,17 +1211,17 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
     d_ptr->m_objFile = objFileName;
 }
 
-void Q3DBars::setupSampleSpace(QPoint sampleCount, const QString &labelRow,
+void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
                                const QString &labelColumn, const QString &labelHeight)
 {
     // Delete previous data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
-    d_ptr->m_sampleCount = sampleCount;
+    d_ptr->m_sampleCount = qMakePair(samplesRow, samplesColumn);
     d_ptr->m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
     // TODO: Invent "idiotproof" max scene size formula..
-    // This seems to work ok if spacing is not negative
-    d_ptr->m_maxSceneSize = 2 * qSqrt(sampleCount.x() * sampleCount.y());
+    // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
+    d_ptr->m_maxSceneSize = 2 * qSqrt(samplesRow * samplesColumn);
     //qDebug() << "maxSceneSize" << d_ptr->m_maxSceneSize;
     // Calculate here and at setting bar specs
     d_ptr->calculateSceneScalingFactors();
@@ -1319,15 +1319,15 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(new QDataItem(dataRow.at(i)));
-    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
     d_ptr->m_dataSet->addRow(row);
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
-    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
 
 void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
@@ -1337,30 +1337,30 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(dataRow.at(i));
-    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
     d_ptr->m_dataSet->addRow(row);
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
-    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
 
 void Q3DBars::addDataRow(QDataRow *dataRow)
 {
     QDataRow *row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
-    row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+    row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
     // With each new row, the previous data row must be moved back
     // ie. we need as many vectors as we have rows in the sample space
     d_ptr->m_dataSet->addRow(row);
     // if the added data pushed us over sample space, remove the oldest data set
-    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
 }
 
@@ -1386,16 +1386,16 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
             row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
-        row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+        row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
         d_ptr->m_dataSet->addRow(row);
         row++;
     }
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
@@ -1421,29 +1421,29 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
             row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(data.at(rowNr).at(colNr));
-        row->d_ptr->verifySize(d_ptr->m_sampleCount.x());
+        row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
         d_ptr->m_dataSet->addRow(row);
         row++;
     }
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y());
+    d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
 
 void Q3DBars::addDataSet(QDataSet* dataSet)
 {
     delete d_ptr->m_dataSet;
     // Check sizes
-    dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.y(), d_ptr->m_sampleCount.x());
+    dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second, d_ptr->m_sampleCount.first);
     // Take ownership of given set
     d_ptr->m_dataSet = dataSet;
     // Find highest value
     // Get the limits
-    QPointF limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.y()), qFabs(limits.x()));
+    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
+    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
     // Give drawer to data set
     d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
@@ -1459,14 +1459,14 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_barObj(0),
       m_backgroundObj(0),
       m_labelObj(0),
-      m_sampleCount(QPoint(0, 0)),
+      m_sampleCount(0, 0),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
       m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_zoomLevel(100),
       m_horizontalRotation(-45.0f),
       m_verticalRotation(15.0f),
-      m_barThickness(QPointF(0.75f, 0.75f)),
+      m_barThickness(QSizeF(0.75f, 0.75f)),
       m_barSpacing(m_barThickness * 3.0f),
       m_heightNormalizer(0.0f),
       m_yAdjustment(0.0f),
@@ -1598,25 +1598,28 @@ void Q3DBarsPrivate::initLabelShaders(const QString &vertexShader, const QString
 void Q3DBarsPrivate::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
-    m_rowWidth = ((m_sampleCount.x() + 1) * m_barSpacing.x()) / 2.0f;
-    m_columnDepth = ((m_sampleCount.y() + 1) * m_barSpacing.y()) / 2.0f;
+    m_rowWidth = ((m_sampleCount.first + 1) * m_barSpacing.width()) / 2.0f;
+    m_columnDepth = ((m_sampleCount.second + 1) * m_barSpacing.height()) / 2.0f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
-    m_scaleX = m_barThickness.x() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
-    m_scaleZ = m_barThickness.y() / m_sampleCount.x() * (m_maxSceneSize / m_maxDimension);
+    m_scaleX = m_barThickness.width() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
+    m_scaleZ = m_barThickness.height() / m_sampleCount.first * (m_maxSceneSize / m_maxDimension);
     m_sceneScale = qMin(m_scaleX, m_scaleZ);
-    GLfloat minThickness = qMin(m_barThickness.x(), m_barThickness.y());
+    GLfloat minThickness = qMin(m_barThickness.width(), m_barThickness.height());
     m_sceneScale = m_sceneScale / minThickness;
-    m_scaleFactorX = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
-    m_scaleFactorZ = m_sampleCount.x() * (m_maxDimension / m_maxSceneSize);
+    // TODO: This could be improved (we need only one scale factor, but we should probably check if we need to scale based on X or Z?)
+    m_scaleFactorX = m_sampleCount.first * (m_maxDimension / m_maxSceneSize);
+    //m_scaleFactorZ = m_sampleCount.second * (m_maxDimension / m_maxSceneSize);
+    m_scaleFactorZ = m_scaleFactorX;
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactorX" << m_scaleFactorX;
     //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactorZ" << m_scaleFactorZ;
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
     //qDebug() << m_rowWidth * m_sceneScale << m_columnDepth * m_sceneScale;
 }
 
-void Q3DBarsPrivate::calculateHeightAdjustment(const QPointF &limits)
+void Q3DBarsPrivate::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
 {
-    m_yAdjustment = 2.0f - ((limits.y() - limits.x()) / m_heightNormalizer);
+    // 2.0f = max difference between minimum and maximum value after scaling with m_heightNormalizer
+    m_yAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
     //qDebug() << m_yAdjustment;
 }
 
@@ -1631,9 +1634,9 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(GLint row, GLint bar,
     if (selection == Utils::vectorFromColor(Qt::white))
 #endif
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)(((GLdouble)(row + 2) / (GLdouble)(m_sampleCount.y() + 2))
+    QVector3D current = QVector3D((GLubyte)(((GLdouble)(row + 2) / (GLdouble)(m_sampleCount.second + 2))
                                             * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
-                                  (GLubyte)(((GLdouble)(bar + 2) / (GLdouble)(m_sampleCount.x() + 2))
+                                  (GLubyte)(((GLdouble)(bar + 2) / (GLdouble)(m_sampleCount.first + 2))
                                             * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
                                   0);
     // TODO: For debugging

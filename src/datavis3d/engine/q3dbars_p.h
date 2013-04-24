@@ -57,9 +57,9 @@
 #include <QFont>
 
 class QOpenGLPaintDevice;
-// TODO: Replace QPoints qith QPairs if they do not represent actual points
+
 class QPoint;
-class QPointF;
+class QSizeF;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -104,7 +104,7 @@ public:
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
     void calculateSceneScalingFactors();
-    void calculateHeightAdjustment(const QPointF &limits);
+    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
 
     Q3DBars *q_ptr;
@@ -117,15 +117,15 @@ public:
     ObjectHelper *m_barObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_labelObj;
-    QPoint m_sampleCount;
+    QPair<int, int> m_sampleCount;
     QString m_objFile;
     MousePressType m_mousePressed;
     QPoint m_mousePos;
     GLint m_zoomLevel;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
-    QPointF m_barThickness;
-    QPointF m_barSpacing;
+    QSizeF m_barThickness;
+    QSizeF m_barSpacing;
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_rowWidth;

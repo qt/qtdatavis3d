@@ -118,16 +118,16 @@ void QDataRowPrivate::verifySize(int size)
     }
 }
 
-QPointF QDataRowPrivate::limitValues()
+QPair<GLfloat, GLfloat> QDataRowPrivate::limitValues()
 {
-    QPointF limits = QPointF(100.0f, -100.0f);
+    QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
     for (int i = 0; i < m_row.size(); i++) {
         QDataItem *item = m_row.at(i);
         float itemValue = item->d_ptr->value();
-        if (limits.y() < itemValue)
-            limits.setY(itemValue);
-        else if (limits.x() > itemValue)
-            limits.setX(itemValue);
+        if (limits.second < itemValue)
+            limits.second = itemValue;
+        else if (limits.first > itemValue)
+            limits.first = itemValue;
     }
     return limits;
 }

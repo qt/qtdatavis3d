@@ -79,8 +79,8 @@ public:
     void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
     void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
     void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
-    // x = min, y = max
-    QPointF limitValues();
+    // first = min, second = max
+    QPair<GLfloat, GLfloat> limitValues();
 
 public Q_SLOTS:
     void updateTextures();

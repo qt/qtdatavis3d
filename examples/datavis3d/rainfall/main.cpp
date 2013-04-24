@@ -69,10 +69,10 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QPointF(1.0f, 1.0f), QPointF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
 
     // Set up sample space; make it match actual data size
-    m_chart->setupSampleSpace(QPoint(m_columnCount, m_rowCount),
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount,
                               QStringLiteral("year"), QStringLiteral("month"),
                               QStringLiteral("rainfall (in mm)"));
 

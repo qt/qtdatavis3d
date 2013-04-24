@@ -234,16 +234,16 @@ void QDataSetPrivate::verifySize(int colSize, int rowSize)
     }
 }
 
-QPointF QDataSetPrivate::limitValues()
+QPair<GLfloat, GLfloat> QDataSetPrivate::limitValues()
 {
-    QPointF limits = QPointF(100.0f, -100.0f);
-    QPointF rowLimits;
+    QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
+    QPair<GLfloat, GLfloat> rowLimits;
     for (int i = 0; i < m_set.size(); i++) {
         rowLimits = m_set.at(i)->d_ptr->limitValues();
-        if (limits.y() < rowLimits.y())
-            limits.setY(rowLimits.y());
-        if (limits.x() > rowLimits.x())
-            limits.setX(rowLimits.x());
+        if (limits.second < rowLimits.second)
+            limits.second = rowLimits.second;
+        if (limits.first > rowLimits.first)
+            limits.first = rowLimits.first;
     }
     return limits;
 }
