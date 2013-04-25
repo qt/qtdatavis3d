@@ -1118,7 +1118,7 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     modelMatrix.rotate(rotationY, 0.0f, 1.0f, 0.0f);
     modelMatrix.rotate(rotationX, 1.0f, 0.0f, 0.0f);
 
-    if (!rotateAlong) {
+    if (useDepth && !rotateAlong) {
         // Apply negative camera rotations to keep labels facing camera
         QPointF rotations = CameraHelper::getCameraRotations();
         modelMatrix.rotate(-rotations.x(), 0.0f, 1.0f, 0.0f);
@@ -1258,8 +1258,11 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     GLfloat zoomAdjustment;
     div = qMin(width(), height());
     zoomAdjustment = defaultRatio * ((width() / div) / (height() / div));
-    qDebug() << "zoom adjustment" << zoomAdjustment;
+    //qDebug() << "zoom adjustment" << zoomAdjustment;
     d_ptr->m_zoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
+
+    // Re-init selection buffer
+    d_ptr->initSelectionBuffer();
 }
 
 void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1671,6 +1674,12 @@ void Q3DBarsPrivate::initSelectionShader()
 void Q3DBarsPrivate::initSelectionBuffer()
 {
 #ifndef USE_HAX0R_SELECTION
+    if (m_selectionTexture) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
+    }
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
