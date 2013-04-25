@@ -123,6 +123,7 @@ public:
     MousePressType m_mousePressed;
     QPoint m_mousePos;
     GLint m_zoomLevel;
+    GLfloat m_zoomAdjustment;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     QSizeF m_barThickness;

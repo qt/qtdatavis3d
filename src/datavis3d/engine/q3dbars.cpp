@@ -76,6 +76,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 const GLfloat zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
+const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -250,7 +251,6 @@ void Q3DBars::render(QPainter *painter)
 #endif
 }
 
-// TODO: Adjust overall zoom level (= view matrix scale) if aspect ratio is closer to 1:1 than 16:10
 void Q3DBars::drawZoomScene()
 {
     // Set clear color
@@ -281,7 +281,8 @@ void Q3DBars::drawZoomScene()
 #ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos,
-                                                              d_ptr->m_zoomLevel,
+                                                              d_ptr->m_zoomLevel
+                                                              * d_ptr->m_zoomAdjustment,
                                                               d_ptr->m_zoomViewPort.width(),
                                                               d_ptr->m_zoomViewPort.height());
 
@@ -301,11 +302,8 @@ void Q3DBars::drawZoomScene()
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
-    if (d_ptr->m_zoomViewPort.height() > d_ptr->m_zoomViewPort.width()) {
-        viewMatrix.scale((GLfloat)d_ptr->m_zoomViewPort.width()
-                         / (GLfloat)d_ptr->m_zoomViewPort.height());
-        // TODO: Center shrunk view
-    }
+    // Adjust scaling (zoom rate based on aspect ratio)
+    viewMatrix.scale(d_ptr->m_zoomAdjustment);
 
     // Set light position a bit above the camera (depends on do we have row or column zoom)
     if (ZoomColumn == d_ptr->m_selectionMode)
@@ -443,7 +441,6 @@ void Q3DBars::drawZoomScene()
 #endif
 }
 
-// TODO: Adjust overall zoom level (= view matrix scale) if aspect ratio is closer to 1:1 than 16:10
 void Q3DBars::drawScene()
 {
     GLint startBar = 0;
@@ -472,14 +469,10 @@ void Q3DBars::drawScene()
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos,
-                                                              d_ptr->m_zoomLevel,
+                                                              d_ptr->m_zoomLevel
+                                                              * d_ptr->m_zoomAdjustment,
                                                               d_ptr->m_sceneViewPort.width(),
                                                               d_ptr->m_sceneViewPort.height());
-    if (d_ptr->m_sceneViewPort.height() > d_ptr->m_sceneViewPort.width()) {
-        viewMatrix.scale((GLfloat)d_ptr->m_sceneViewPort.width()
-                         / (GLfloat)d_ptr->m_sceneViewPort.height());
-        // TODO: Center shrunk view
-    }
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -1175,6 +1168,14 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     else
         d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
     d_ptr->m_zoomViewPort = QRect(0, 0, width(), height());
+
+    // Calculate zoom level based on aspect ratio
+    GLfloat div;
+    GLfloat zoomAdjustment;
+    div = qMin(width(), height());
+    zoomAdjustment = defaultRatio * ((width() / div) / (height() / div));
+    qDebug() << "zoom adjustment" << zoomAdjustment;
+    d_ptr->m_zoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 }
 
 void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1477,6 +1478,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_zoomLevel(100),
+      m_zoomAdjustment(1.0f),
       m_horizontalRotation(-45.0f),
       m_verticalRotation(15.0f),
       m_barThickness(QSizeF(0.75f, 0.75f)),
