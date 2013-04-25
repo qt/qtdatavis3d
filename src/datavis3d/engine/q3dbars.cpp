@@ -390,21 +390,23 @@ void Q3DBars::drawZoomScene()
     LabelItem zoomSelectionLabel = d_ptr->m_zoomSelection->d_ptr->labelItem();
     if (ZoomRow == d_ptr->m_selectionMode) {
         drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix, false, false, 0.0f,
-                  LabelTop);
-        drawLabel(*dummyItem, z, viewMatrix, projectionMatrix, false, false, 0.0f, LabelBottom);
+                  0.0f, 0.0f, LabelTop);
+        drawLabel(*dummyItem, z, viewMatrix, projectionMatrix, false, false, 0.0f, 0.0f, 0.0f,
+                  LabelBottom);
     } else {
-        drawLabel(*dummyItem, x, viewMatrix, projectionMatrix, false, false, 0.0f, LabelBottom);
+        drawLabel(*dummyItem, x, viewMatrix, projectionMatrix, false, false, 0.0f, 0.0f, 0.0f,
+                  LabelBottom);
         drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix, false, false, 0.0f,
-                  LabelTop);
+                  0.0f, 0.0f, LabelTop);
     }
-    drawLabel(*dummyItem, y, viewMatrix, projectionMatrix, false, false, 90.0f, LabelLeft);
+    drawLabel(*dummyItem, y, viewMatrix, projectionMatrix, false, false, 0.0f, 0.0f, 90.0f,
+              LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < d_ptr->m_zoomSelection->d_ptr->row().size(); col++) {
         QDataItem *item = d_ptr->m_zoomSelection->d_ptr->getItem(col);
         // Draw values
-        drawLabel(*item, item->d_ptr->label(), viewMatrix, projectionMatrix, false, false, 0.0f,
-                  LabelOver);
+        drawLabel(*item, item->d_ptr->label(), viewMatrix, projectionMatrix);
         // Draw labels
         LabelItem labelItem;
         if (ZoomRow == d_ptr->m_selectionMode) {
@@ -428,7 +430,8 @@ void Q3DBars::drawZoomScene()
                 }
             }
         }
-        drawLabel(*item, labelItem, viewMatrix, projectionMatrix, false, false, -45.0f, LabelBelow);
+        drawLabel(*item, labelItem, viewMatrix, projectionMatrix, false, false, 0.0f, 0.0f, -45.0f,
+                  LabelBelow);
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -943,17 +946,30 @@ void Q3DBars::drawScene()
     }
 
     // TODO: Calculations done temporarily here. When optimizing, move to after data set addition? Keep drawing of the labels here.
+    // Bind label shader
+    d_ptr->m_labelShader->bind();
+
+    glEnable(GL_TEXTURE_2D);
+    if (d_ptr->m_labelTransparency > TransparencyNone) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
     // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
     for (int row = 0; row != d_ptr->m_sampleCount.second; row += 1) {
         // Go through all rows and get position of max+1 or min-1 column, depending on x flip
         // We need only positions for them, labels have already been generated at QDataSet. Just add LabelItems
         rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
         barPos = 0;
+        GLfloat rotLabelX = -90.0f;
+        GLfloat rotLabelY = 0.0f;
+        if (d_ptr->m_zFlipped)
+            rotLabelY = 180.0f;
         if (d_ptr->m_xFlipped)
             barPos = (d_ptr->m_sampleCount.first + 1) * (d_ptr->m_barSpacing.width());
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
-                                       /*barHeight*/ -d_ptr->m_yAdjustment,
-                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
+                                       -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
+                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
+                                       + zComp);
 
         // TODO: Try it; draw the label here
 
@@ -965,37 +981,26 @@ void Q3DBars::drawScene()
 
         //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->rowLabels().at(row);
 
-        d_ptr->m_labelShader->bind();
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_TEXTURE_2D);
-        if (d_ptr->m_labelTransparency > TransparencyNone) {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        // TODO: Flip the textures when z is flipped
-        drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true);
+        drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true,
+                  rotLabelX, rotLabelY, 0.0f, LabelMid);
 
         delete label;
-
-        glDisable(GL_TEXTURE_2D);
-        glEnable(GL_CULL_FACE);
-        if (d_ptr->m_labelTransparency > TransparencyNone)
-            glDisable(GL_BLEND);
-
-        // Release label shader
-        d_ptr->m_labelShader->release();
     }
     for (int bar = 0; bar != d_ptr->m_sampleCount.first; bar += 1) {
         // Go through all columns and get position of max+1 or min-1 row, depending on z flip
         // We need only positions for them, labels have already been generated at QDataSet. Just add LabelItems
         barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
         rowPos = 0;
+        GLfloat rotLabelX = -90.0f;
+        GLfloat rotLabelY = 90.0f;
+        if (d_ptr->m_xFlipped)
+            rotLabelY = -90.0f;
         if (d_ptr->m_zFlipped)
             rowPos = (d_ptr->m_sampleCount.second + 1) * (d_ptr->m_barSpacing.height());
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
-                                       /*barHeight*/ -d_ptr->m_yAdjustment,
-                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
+                                       -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
+                                       (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
+                                       + zComp);
 
         // TODO: Try it; draw the label here
 
@@ -1007,32 +1012,23 @@ void Q3DBars::drawScene()
 
         //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->columnLabels().at(bar);
 
-        d_ptr->m_labelShader->bind();
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_TEXTURE_2D);
-        if (d_ptr->m_labelTransparency > TransparencyNone) {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        // TODO: Flip the textures when z is flipped
-        drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true);
+        drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true,
+                  rotLabelX, rotLabelY, 0.0f, LabelMid);
 
         delete label;
-
-        glDisable(GL_TEXTURE_2D);
-        glEnable(GL_CULL_FACE);
-        if (d_ptr->m_labelTransparency > TransparencyNone)
-            glDisable(GL_BLEND);
-
-        // Release label shader
-        d_ptr->m_labelShader->release();
     }
+    glDisable(GL_TEXTURE_2D);
+    if (d_ptr->m_labelTransparency > TransparencyNone)
+        glDisable(GL_BLEND);
+
+    // Release label shader
+    d_ptr->m_labelShader->release();
 }
 
 void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
                         const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                        bool useDepth, bool rotateAlong, qreal rotation,
+                        bool useDepth, bool rotateAlong, GLfloat rotationX,
+                        GLfloat rotationY, GLfloat rotationZ,
                         Q3DBars::LabelPosition position)
 {
     // Draw label
@@ -1060,9 +1056,8 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     }
     case Q3DBars::LabelMid:
     {
-        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
+        // Use this for positioning with absolute item y position value
         yPosition = item.d_ptr->translation().y();
-        //yPosition = item.d_ptr->translation().y() + d_ptr->m_yAdjustment / 2.0f;
         break;
     }
     case Q3DBars::LabelHigh:
@@ -1119,7 +1114,9 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     modelMatrix.translate(xPosition, yPosition, zPosition);
 
     // Rotate
-    modelMatrix.rotate(rotation, 0.0f, 0.0f, 1.0f);
+    modelMatrix.rotate(rotationZ, 0.0f, 0.0f, 1.0f);
+    modelMatrix.rotate(rotationY, 0.0f, 1.0f, 0.0f);
+    modelMatrix.rotate(rotationX, 1.0f, 0.0f, 0.0f);
 
     if (!rotateAlong) {
         // Apply negative camera rotations to keep labels facing camera
@@ -1127,7 +1124,6 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
         modelMatrix.rotate(-rotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-rotations.y(), 1.0f, 0.0f, 0.0f);
     }
-
     // Calculate scale factor to get uniform font size
     GLfloat scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
