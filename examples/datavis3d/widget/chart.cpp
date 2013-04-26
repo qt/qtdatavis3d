@@ -54,7 +54,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_barWidth(1.0f),
       m_barDepth(1.0f),
       m_barSpacingX(0.1f),
-      m_barSpacingZ(0.1f)
+      m_barSpacingZ(0.1f),
+      m_fontSize(20)
 {
     // Don't set any styles or specifications, start from defaults
 }
@@ -218,6 +219,19 @@ void ChartModifier::changeSelectionMode()
 
     if (++selectionMode > (int)Q3DBars::ZoomColumn)
         selectionMode = 0;
+}
+
+void ChartModifier::changeFont(const QFont &font)
+{
+    QFont newFont = font;
+    newFont.setPixelSize(m_fontSize);
+    m_chart->setFont(newFont);
+}
+
+void ChartModifier::changeFontSize(int fontsize)
+{
+    m_fontSize = fontsize;
+    m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
 void ChartModifier::rotateX(int rotation)

@@ -47,8 +47,10 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QSlider>
+#include <QFontComboBox>
 #include <QLabel>
 #include <QScreen>
+#include <QFontDatabase>
 
 int main(int argc, char **argv)
 {
@@ -146,6 +148,14 @@ int main(int argc, char **argv)
     sampleSliderZ->setMaximum(100);
     sampleSliderZ->setEnabled(false);
 
+    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal);
+    fontSizeSlider->setTickInterval(1);
+    fontSizeSlider->setMinimum(1);
+    fontSizeSlider->setValue(20);
+    fontSizeSlider->setMaximum(100);
+
+    QFontComboBox *fontList = new QFontComboBox();
+
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -165,6 +175,11 @@ int main(int argc, char **argv)
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout->addWidget(fontList);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
+    vLayout->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    // TODO: Add example for setMeshFileName
 
     widget->show();
 
@@ -186,6 +201,9 @@ int main(int argc, char **argv)
     QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
                      &ChartModifier::setSampleCountZ);
 
+    QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
+                     &ChartModifier::changeFontSize);
+
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changePresetCamera);
@@ -195,6 +213,9 @@ int main(int argc, char **argv)
     QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addBars);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
+
+    QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
+                     &ChartModifier::changeFont);
 
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);

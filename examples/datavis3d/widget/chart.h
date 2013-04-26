@@ -51,6 +51,7 @@ using namespace QtDataVis3D;
 
 class ChartModifier : public QObject
 {
+    Q_OBJECT
 public:
     explicit ChartModifier(Q3DBars *barchart);
     ~ChartModifier();
@@ -62,6 +63,8 @@ public:
     void changeTheme();
     void changeTransparency();
     void changeSelectionMode();
+    void changeFont(const QFont &font);
+    void changeFontSize(int fontsize);
     void rotateX(int rotation);
     void rotateY(int rotation);
     void setSpecsX(int barwidth);
@@ -84,6 +87,7 @@ private:
     float m_barDepth;
     float m_barSpacingX;
     float m_barSpacingZ;
+    int m_fontSize;
 };
 
 #endif
