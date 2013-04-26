@@ -800,6 +800,8 @@ void Q3DBars::drawScene()
     // Release bar shader
     d_ptr->m_barShader->release();
 
+    // TODO: Grid lines to background
+
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
@@ -954,6 +956,8 @@ void Q3DBars::drawScene()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+    // TODO: Handle issues with long labels being covered by bars (align left or right side of label instead of center, depending on flip direction)
+    // TODO: -> add alignment enum to drawLabel
     // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
     for (int row = 0; row != d_ptr->m_sampleCount.second; row += 1) {
         // Go through all rows and get position of max+1 or min-1 column, depending on x flip
@@ -976,8 +980,10 @@ void Q3DBars::drawScene()
         // Create a data item
         QDataItem *label = new QDataItem();
         label->d_ptr->setTranslation(labelPos);
-        label->d_ptr->setLabel(d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
-                                   d_ptr->m_dataSet->d_ptr->rowLabelItems().size() - row - 1));
+        if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > row) {
+            label->d_ptr->setLabel(d_ptr->m_dataSet->d_ptr->rowLabelItems().at(
+                                       d_ptr->m_dataSet->d_ptr->rowLabelItems().size() - row - 1));
+        }
 
         //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->rowLabels().at(row);
 
@@ -1007,8 +1013,11 @@ void Q3DBars::drawScene()
         // Create a data item
         QDataItem *label = new QDataItem();
         label->d_ptr->setTranslation(labelPos);
-        label->d_ptr->setLabel(d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
-                                   d_ptr->m_dataSet->d_ptr->columnLabelItems().size() - bar - 1));
+        if (d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > bar) {
+            label->d_ptr->setLabel(d_ptr->m_dataSet->d_ptr->columnLabelItems().at(
+                                       d_ptr->m_dataSet->d_ptr->columnLabelItems().size()
+                                       - bar - 1));
+        }
 
         //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->columnLabels().at(bar);
 
