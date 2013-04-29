@@ -77,6 +77,8 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 const GLfloat zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
 const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
+// TODO: Move this to a header, as we use it in several places
+const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -956,8 +958,7 @@ void Q3DBars::drawScene()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-    // TODO: Handle issues with long labels being covered by bars (align left or right side of label instead of center, depending on flip direction)
-    // TODO: -> add alignment enum to drawLabel
+
     // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
     for (int row = 0; row != d_ptr->m_sampleCount.second; row += 1) {
         // Go through all rows and get position of max+1 or min-1 column, depending on x flip
@@ -966,10 +967,13 @@ void Q3DBars::drawScene()
         barPos = 0;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 0.0f;
+        Qt::AlignmentFlag alignment = Qt::AlignRight;
         if (d_ptr->m_zFlipped)
             rotLabelY = 180.0f;
-        if (d_ptr->m_xFlipped)
+        if (d_ptr->m_xFlipped) {
             barPos = (d_ptr->m_sampleCount.first + 1) * (d_ptr->m_barSpacing.width());
+            alignment = Qt::AlignLeft;
+        }
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                        -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                        (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
@@ -988,7 +992,7 @@ void Q3DBars::drawScene()
         //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->rowLabels().at(row);
 
         drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true,
-                  rotLabelX, rotLabelY, 0.0f, LabelMid);
+                  rotLabelX, rotLabelY, 0.0f, LabelMid, alignment);
 
         delete label;
     }
@@ -999,10 +1003,13 @@ void Q3DBars::drawScene()
         rowPos = 0;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 90.0f;
+        Qt::AlignmentFlag alignment = Qt::AlignLeft;
         if (d_ptr->m_xFlipped)
             rotLabelY = -90.0f;
-        if (d_ptr->m_zFlipped)
+        if (d_ptr->m_zFlipped) {
             rowPos = (d_ptr->m_sampleCount.second + 1) * (d_ptr->m_barSpacing.height());
+            alignment = Qt::AlignRight;
+        }
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                        -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                        (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
@@ -1022,7 +1029,7 @@ void Q3DBars::drawScene()
         //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << d_ptr->m_dataSet->d_ptr->columnLabels().at(bar);
 
         drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix, true, true,
-                  rotLabelX, rotLabelY, 0.0f, LabelMid);
+                  rotLabelX, rotLabelY, 0.0f, LabelMid, alignment);
 
         delete label;
     }
@@ -1038,7 +1045,7 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
                         const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                         bool useDepth, bool rotateAlong, GLfloat rotationX,
                         GLfloat rotationY, GLfloat rotationZ,
-                        Q3DBars::LabelPosition position)
+                        Q3DBars::LabelPosition position, Qt::AlignmentFlag alignment)
 {
     // Draw label
     LabelItem labelItem = label;
@@ -1111,6 +1118,36 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     }
     }
 
+    // Calculate scale factor to get uniform font size
+    GLfloat scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
+    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
+
+    // Apply alignment
+    GLfloat xAlignment = 0.0f;
+    GLfloat zAlignment = 0.0f;
+    switch (alignment) {
+    case Qt::AlignLeft:
+    {
+        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(cos(rotationY * m_pi / 180.0f));
+        zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(sin(rotationY * m_pi / 180.0f));
+        break;
+    }
+    case Qt::AlignRight:
+    {
+        xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(cos(rotationY * m_pi / 180.0f));
+        zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(sin(rotationY * m_pi / 180.0f));
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+
     if (position < LabelBottom) {
         xPosition = item.d_ptr->translation().x();
         if (useDepth)
@@ -1120,7 +1157,7 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
     }
 
     // Position label
-    modelMatrix.translate(xPosition, yPosition, zPosition);
+    modelMatrix.translate(xPosition + xAlignment, yPosition, zPosition + zAlignment);
 
     // Rotate
     modelMatrix.rotate(rotationZ, 0.0f, 0.0f, 1.0f);
@@ -1133,9 +1170,6 @@ void Q3DBars::drawLabel(const QDataItem &item, const LabelItem &label,
         modelMatrix.rotate(-rotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-rotations.y(), 1.0f, 0.0f, 0.0f);
     }
-    // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + d_ptr->m_fontSize / 500.0f;
-    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Scale label based on text size
     modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor

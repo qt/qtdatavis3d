@@ -221,7 +221,8 @@ private:
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    bool useDepth = false, bool rotateAlong = false, GLfloat rotationX = 0.0f,
                    GLfloat rotationY = 0.0f, GLfloat rotationZ = 0.0f,
-                   Q3DBars::LabelPosition position = Q3DBars::LabelOver);
+                   Q3DBars::LabelPosition position = Q3DBars::LabelOver,
+                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };
