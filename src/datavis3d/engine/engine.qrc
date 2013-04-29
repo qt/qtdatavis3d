@@ -24,7 +24,5 @@
         <file alias="fragmentLabel">shaders/fragmentShaderLabel</file>
         <file alias="vertexLabel">shaders/vertexShaderLabel</file>
     </qresource>
-    <qresource prefix="/textures">
-        <file alias="cubetex">textures/cube.png</file>
-    </qresource>
+    <qresource prefix="/textures"/>
 </RCC>

@@ -87,6 +87,8 @@ MainApp::MainApp(Q3DBars *window)
       m_highFreq(SpectrumHighFreq)
 {
     m_chart->setupSampleSpace(SpectrumNumBands, SpectrumNumBands * 2);
+    // Disable grid
+    m_chart->setGridEnabled(false);
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other

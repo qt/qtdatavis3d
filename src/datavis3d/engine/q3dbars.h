@@ -207,6 +207,9 @@ public:
     // Label transparency adjustment
     void setLabelTransparency(LabelTransparency transparency);
 
+    // Enable or disable background grid
+    void setGridEnabled(bool enable);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

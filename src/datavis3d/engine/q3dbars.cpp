@@ -79,6 +79,7 @@ const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
 const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 // TODO: Move this to a header, as we use it in several places
 const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
+const GLfloat gridLineWidth = 0.005f;
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -119,6 +120,9 @@ void Q3DBars::initialize()
 
     // Load background mesh
     d_ptr->loadBackgroundMesh();
+
+    // Load grid line mesh
+    d_ptr->loadGridLineMesh();
 
 #ifndef USE_PAINTER_TEXT
     // Load label mesh
@@ -802,8 +806,6 @@ void Q3DBars::drawScene()
     // Release bar shader
     d_ptr->m_barShader->release();
 
-    // TODO: Grid lines to background
-
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
@@ -811,7 +813,7 @@ void Q3DBars::drawScene()
     // Create texture
     //glEnable(GL_TEXTURE_2D);
     //GLuint bgrTexture = d_ptr->m_textureHelper->create2DTexture(
-    //            QImage(QStringLiteral(":/textures/cubetex")), true);
+    //            QImage(QStringLiteral(":/textures/background")), true, true);
 
     glCullFace(GL_BACK);
 
@@ -850,7 +852,8 @@ void Q3DBars::drawScene()
 
         // Draw the object
         d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
-        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true, bgrTexture);
+        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true,
+        //                            bgrTexture);
     }
 
     // Disable textures
@@ -860,6 +863,134 @@ void Q3DBars::drawScene()
 
     // Release background shader
     d_ptr->m_backgroundShader->release();
+
+    // Draw grid lines
+    if (d_ptr->m_gridEnabled) {
+        // Bind bar shader
+        d_ptr->m_barShader->bind();
+
+        // Set unchanging shader bindings
+        QVector3D barColor = Utils::vectorFromColor(Qt::black);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                            d_ptr->m_theme->m_lightStrength);
+        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
+                                            d_ptr->m_theme->m_ambientStrength);
+
+        // Floor lines: rows
+        for (GLfloat row = 0.0f; row <= d_ptr->m_sampleCount.second; row++) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+
+            rowPos = (row + 0.5f) * (d_ptr->m_barSpacing.height());
+            modelMatrix.translate(0.0f, -d_ptr->m_yAdjustment,
+                                  (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
+            modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
+                                        gridLineWidth));
+
+            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+        }
+
+        // Floor lines: columns
+        for (GLfloat bar = 0.0f; bar <= d_ptr->m_sampleCount.first; bar++) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+
+            barPos = (bar + 0.5f) * (d_ptr->m_barSpacing.width());
+            modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
+                                  -d_ptr->m_yAdjustment, zComp);
+            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                        d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
+
+            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+        }
+
+        // Wall lines: back wall
+        GLfloat heightStep = d_ptr->m_heightNormalizer / 2.5; // TODO: Replace 2.5 with a dynamic number deduced from scene?
+        for (GLfloat barHeight = heightStep; barHeight <= d_ptr->m_heightNormalizer * 2.0f;
+             barHeight += heightStep) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+
+            if (d_ptr->m_zFlipped) {
+                modelMatrix.translate(0.0f,
+                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      d_ptr->m_columnDepth / d_ptr->m_scaleFactor + zComp);
+            } else {
+                modelMatrix.translate(0.0f,
+                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      -d_ptr->m_columnDepth / d_ptr->m_scaleFactor + zComp);
+            }
+            modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
+                                        gridLineWidth));
+
+            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+        }
+
+        // Wall lines: side wall
+        for (GLfloat barHeight = heightStep; barHeight <= d_ptr->m_heightNormalizer * 2.0f;
+             barHeight += heightStep) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+
+            if (d_ptr->m_xFlipped) {
+                modelMatrix.translate(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
+                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      zComp);
+            } else {
+                modelMatrix.translate(-d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
+                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      zComp);
+            }
+            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                        d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
+
+            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
+                                                modelMatrix.inverted().transposed());
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+        }
+
+        // Release bar shader
+        d_ptr->m_barShader->release();
+    }
+
+    // TODO: Draw y labels
 
     // Generate label textures for zoom selection if m_updateLabels is set
     if (d_ptr->m_zoomActivated && d_ptr->m_updateLabels) {
@@ -1456,6 +1587,11 @@ void Q3DBars::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_drawer->setTransparency(transparency);
 }
 
+void Q3DBars::setGridEnabled(bool enable)
+{
+    d_ptr->m_gridEnabled = enable;
+}
+
 void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
                          const QVector<QString> &labelsColumn)
 {
@@ -1602,6 +1738,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_labelShader(0),
       m_barObj(0),
       m_backgroundObj(0),
+      m_gridLineObj(0),
       m_labelObj(0),
       m_sampleCount(0, 0),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
@@ -1644,7 +1781,8 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_selectionTexture(0),
-      m_updateLabels(false)
+      m_updateLabels(false),
+      m_gridEnabled(true)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);
@@ -1669,6 +1807,7 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_backgroundShader;
     delete m_barObj;
     delete m_backgroundObj;
+    delete m_gridLineObj;
     delete m_textureHelper;
     delete m_drawer;
 }
@@ -1687,6 +1826,14 @@ void Q3DBarsPrivate::loadBackgroundMesh()
         delete m_backgroundObj;
     m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
     m_backgroundObj->load();
+}
+
+void Q3DBarsPrivate::loadGridLineMesh()
+{
+    if (m_gridLineObj)
+        delete m_gridLineObj;
+    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
+    m_gridLineObj->load();
 }
 
 void Q3DBarsPrivate::loadLabelMesh()

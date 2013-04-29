@@ -93,6 +93,10 @@ int main(int argc, char **argv)
     QPushButton *selectionButton = new QPushButton(widget);
     selectionButton->setText(QStringLiteral("Change selection mode"));
 
+    QCheckBox *gridCheckBox = new QCheckBox(widget);
+    gridCheckBox->setText(QStringLiteral("Show grid"));
+    gridCheckBox->setChecked(true);
+
     QCheckBox *rotationCheckBox = new QCheckBox(widget);
     rotationCheckBox->setText("Rotate with slider");
 
@@ -100,61 +104,61 @@ int main(int argc, char **argv)
     staticCheckBox->setText("Use dynamic data");
     staticCheckBox->setChecked(false);
 
-    QSlider *rotationSliderX = new QSlider(Qt::Horizontal);
+    QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(1);
     rotationSliderX->setMinimum(-180);
     rotationSliderX->setValue(0);
     rotationSliderX->setMaximum(180);
     rotationSliderX->setEnabled(false);
-    QSlider *rotationSliderY = new QSlider(Qt::Horizontal);
+    QSlider *rotationSliderY = new QSlider(Qt::Horizontal, widget);
     rotationSliderY->setTickInterval(1);
     rotationSliderY->setMinimum(0);
     rotationSliderY->setValue(0);
     rotationSliderY->setMaximum(90);
     rotationSliderY->setEnabled(false);
 
-    QSlider *sizeSliderX = new QSlider(Qt::Horizontal);
+    QSlider *sizeSliderX = new QSlider(Qt::Horizontal, widget);
     sizeSliderX->setTickInterval(1);
     sizeSliderX->setMinimum(1);
     sizeSliderX->setValue(100);
     sizeSliderX->setMaximum(100);
-    QSlider *sizeSliderZ = new QSlider(Qt::Horizontal);
+    QSlider *sizeSliderZ = new QSlider(Qt::Horizontal, widget);
     sizeSliderZ->setTickInterval(1);
     sizeSliderZ->setMinimum(1);
     sizeSliderZ->setValue(100);
     sizeSliderZ->setMaximum(100);
 
-    QSlider *spacingSliderX = new QSlider(Qt::Horizontal);
+    QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
     spacingSliderX->setTickInterval(1);
     spacingSliderX->setMinimum(0);
     spacingSliderX->setValue(10);
     spacingSliderX->setMaximum(200);
-    QSlider *spacingSliderZ = new QSlider(Qt::Horizontal);
+    QSlider *spacingSliderZ = new QSlider(Qt::Horizontal, widget);
     spacingSliderZ->setTickInterval(1);
     spacingSliderZ->setMinimum(0);
     spacingSliderZ->setValue(10);
     spacingSliderZ->setMaximum(200);
 
-    QSlider *sampleSliderX = new QSlider(Qt::Horizontal);
+    QSlider *sampleSliderX = new QSlider(Qt::Horizontal, widget);
     sampleSliderX->setTickInterval(1);
     sampleSliderX->setMinimum(2);
     sampleSliderX->setValue(10);
     sampleSliderX->setMaximum(100);
     sampleSliderX->setEnabled(false);
-    QSlider *sampleSliderZ = new QSlider(Qt::Horizontal);
+    QSlider *sampleSliderZ = new QSlider(Qt::Horizontal, widget);
     sampleSliderZ->setTickInterval(1);
     sampleSliderZ->setMinimum(2);
     sampleSliderZ->setValue(10);
     sampleSliderZ->setMaximum(100);
     sampleSliderZ->setEnabled(false);
 
-    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal);
+    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
     fontSizeSlider->setMinimum(1);
     fontSizeSlider->setValue(20);
     fontSizeSlider->setMaximum(100);
 
-    QFontComboBox *fontList = new QFontComboBox();
+    QFontComboBox *fontList = new QFontComboBox(widget);
 
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -175,6 +179,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
+    vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
@@ -216,6 +221,9 @@ int main(int argc, char **argv)
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);
+
+    QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ChartModifier::setGridEnabled);
 
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);

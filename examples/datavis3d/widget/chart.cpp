@@ -234,6 +234,11 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
+void ChartModifier::setGridEnabled(int enabled)
+{
+    m_chart->setGridEnabled((bool)enabled);
+}
+
 void ChartModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;

@@ -67,6 +67,7 @@ public:
     void changeFontSize(int fontsize);
     void rotateX(int rotation);
     void rotateY(int rotation);
+    void setGridEnabled(int enabled);
     void setSpecsX(int barwidth);
     void setSpecsZ(int bardepth);
     void setSpacingSpecsX(int spacing);

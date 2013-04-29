@@ -97,6 +97,7 @@ public:
 
     void loadBarMesh();
     void loadBackgroundMesh();
+    void loadGridLineMesh();
     void loadLabelMesh();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShader();
@@ -117,6 +118,7 @@ public:
     ShaderHelper *m_labelShader;
     ObjectHelper *m_barObj;
     ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
     QPair<int, int> m_sampleCount;
     QString m_objFile;
@@ -161,6 +163,7 @@ public:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
+    bool m_gridEnabled;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

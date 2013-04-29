@@ -89,6 +89,9 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     // Set preset camera position
     m_chart->setCameraPreset(Q3DBars::PresetFront);
 
+    // Disable grid
+    m_chart->setGridEnabled(false);
+
     // Set window title
     m_chart->setWindowTitle(QStringLiteral("Monthly rainfall in Northern Finland (2000-2012)"));
 }
