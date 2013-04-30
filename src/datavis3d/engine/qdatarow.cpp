@@ -126,7 +126,7 @@ QPair<GLfloat, GLfloat> QDataRowPrivate::limitValues()
         float itemValue = item->d_ptr->value();
         if (limits.second < itemValue)
             limits.second = itemValue;
-        else if (limits.first > itemValue)
+        if (limits.first > itemValue)
             limits.first = itemValue;
     }
     return limits;
