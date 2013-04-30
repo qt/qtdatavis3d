@@ -46,6 +46,8 @@
 #include <QScopedPointer>
 #include <QString>
 
+class QPointF;
+
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItemPrivate;
@@ -58,6 +60,7 @@ public:
 
     void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
     void setValue(float value);
+    void setPosition(const QPointF &position);
 
 private:
     QScopedPointer<QDataItemPrivate> d_ptr;

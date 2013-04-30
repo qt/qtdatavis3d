@@ -48,7 +48,6 @@
 #include <QOpenGLFunctions>
 
 class QPainter;
-class QOpenGLPaintDevice;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 

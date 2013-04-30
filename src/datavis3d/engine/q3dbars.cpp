@@ -73,9 +73,6 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 //#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
-const GLfloat zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
-const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
-const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 const GLfloat gridLineWidth = 0.005f;
 
 Q3DBars::Q3DBars()
@@ -656,7 +653,7 @@ void Q3DBars::drawScene()
                         d_ptr->m_selectedBar = item;
                         if (d_ptr->m_dataSet->d_ptr->rowLabelItems().size() > row
                                 && d_ptr->m_dataSet->d_ptr->columnLabelItems().size() > bar) {
-                            d_ptr->m_selectedBar->d_ptr->setPosition(
+                            d_ptr->m_selectedBar->setPosition(
                                         QPoint(d_ptr->m_dataSet->d_ptr->rowLabelItems().size()
                                                - row - 1,
                                                d_ptr->m_dataSet->d_ptr->columnLabelItems().size()

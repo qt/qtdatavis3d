@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 SUBDIRS += barchart \
            rainfall \
            spectrum \
-           widget
+           widget \
+           mapdata

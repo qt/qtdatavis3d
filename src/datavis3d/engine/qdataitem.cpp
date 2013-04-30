@@ -69,6 +69,11 @@ void QDataItem::setValue(float value)
     d_ptr->m_value = value;
 }
 
+void QDataItem::setPosition(const QPointF &position)
+{
+    d_ptr->m_position = position;
+}
+
 QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)
     : q_ptr(q),
       m_value(value),
@@ -133,12 +138,7 @@ LabelItem QDataItemPrivate::selectionLabel()
     return m_selectionLabel;
 }
 
-void QDataItemPrivate::setPosition(const QPoint &position)
-{
-    m_position = position;
-}
-
-QPoint QDataItemPrivate::position()
+QPointF QDataItemPrivate::position()
 {
     return m_position;
 }

@@ -82,9 +82,7 @@ class QDataItemPrivate
     // Selection label item (containing specialar selection texture, if mode is activated)
     void setSelectionLabel(const LabelItem &label);
     LabelItem selectionLabel();
-    // Position in set QPoint(row, column)
-    void setPosition(const QPoint &position);
-    QPoint position();
+    QPointF position();
 
     private:
     QDataItem *q_ptr;
@@ -94,7 +92,7 @@ class QDataItemPrivate
     QVector3D m_translation;
     LabelItem m_label;
     LabelItem m_selectionLabel;
-    QPoint m_position;
+    QPointF m_position;
     friend class QDataItem;
 };
 
