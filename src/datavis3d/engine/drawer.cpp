@@ -39,17 +39,21 @@
 **
 ****************************************************************************/
 
+#include "qdatavis3namespace.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "camerahelper_p.h"
 #include "qdataitem.h"
 #include "qdataitem_p.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
+#include <QMatrix4x4>
+#include <qmath.h>
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-Drawer::Drawer(const Theme &theme, const QFont &font, Q3DBars::LabelTransparency transparency)
+Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency)
     : m_theme(theme),
       m_font(font),
       m_transparency(transparency),
@@ -75,7 +79,7 @@ void Drawer::setFont(const QFont &font)
     emit drawerChanged();
 }
 
-void Drawer::setTransparency(Q3DBars::LabelTransparency transparency)
+void Drawer::setTransparency(LabelTransparency transparency)
 {
     m_transparency = transparency;
     emit drawerChanged();
@@ -124,6 +128,139 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, bool texture
     }
     glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
+}
+
+void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
+                       const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
+                       const QVector3D &positionComp, const QVector3D &rotation,
+                       GLfloat maxHeight, SelectionMode mode,
+                       ShaderHelper *shader, ObjectHelper *object, bool useDepth, bool rotateAlong,
+                       LabelPosition position, Qt::AlignmentFlag alignment)
+{
+    // Draw label
+    LabelItem labelItem = label;
+    if (!labelItem.textureId())
+        return; // No texture, skip
+
+    QSize textureSize = labelItem.size();
+    QMatrix4x4 modelMatrix;
+    QMatrix4x4 MVPMatrix;
+    GLfloat xPosition;
+    GLfloat yPosition;
+    GLfloat zPosition = positionComp.z();
+
+    switch (position) {
+    case LabelBelow: {
+        yPosition = -1.6f; // minus maximum negative height (+ some extra for label)
+        break;
+    }
+    case LabelLow: {
+        yPosition = -positionComp.y();
+        break;
+    }
+    case LabelMid: {
+        // Use this for positioning with absolute item y position value
+        yPosition = item.d_ptr->translation().y();
+        break;
+    }
+    case LabelHigh: {
+        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
+        yPosition = item.d_ptr->translation().y() + (item.d_ptr->value() / maxHeight) / 2.0f;
+        break;
+    }
+    case LabelOver: {
+        float mod = 0.1f;
+        if (item.d_ptr->value() < 0)
+            mod = -0.1f;
+        yPosition = item.d_ptr->translation().y() - (positionComp.y() / 2.0f - 0.2f)
+                + (item.d_ptr->value() / maxHeight) + mod;
+        break;
+    }
+    case LabelBottom: {
+        yPosition = -1.95f; // TODO: Calculate from scene
+        xPosition = 0.0f;
+        break;
+    }
+    case LabelTop: {
+        yPosition = 1.95f; // TODO: Calculate from scene
+        xPosition = 0.0f;
+        break;
+    }
+    case LabelLeft: {
+        yPosition = 0.0f;
+        xPosition = -2.5f; // TODO: Calculate from scene
+        break;
+    }
+    case LabelRight: {
+        yPosition = 0.0f;
+        xPosition = 2.5f; // TODO: Calculate from scene
+        break;
+    }
+    }
+
+    // Calculate scale factor to get uniform font size
+    GLfloat scaledFontSize = 0.05f + m_font.pointSizeF() / 500.0f;
+    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
+
+    // Apply alignment
+    GLfloat xAlignment = 0.0f;
+    GLfloat zAlignment = 0.0f;
+    switch (alignment) {
+    case Qt::AlignLeft: {
+        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+        zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+        break;
+    }
+    case Qt::AlignRight: {
+        xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+        zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
+
+    if (position < LabelBottom) {
+        xPosition = item.d_ptr->translation().x();
+        if (useDepth)
+            zPosition = item.d_ptr->translation().z();
+        else if (ModeZoomColumn == mode)
+            xPosition = -(item.d_ptr->translation().z()) + positionComp.z(); // flip first to left
+    }
+
+    // Position label
+    modelMatrix.translate(xPosition + xAlignment, yPosition, zPosition + zAlignment);
+
+    // Rotate
+    modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
+    modelMatrix.rotate(rotation.y(), 0.0f, 1.0f, 0.0f);
+    modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);
+
+    if (useDepth && !rotateAlong) {
+        // Apply negative camera rotations to keep labels facing camera
+        QPointF camRotations = CameraHelper::getCameraRotations();
+        modelMatrix.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
+        modelMatrix.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
+    }
+
+    // Scale label based on text size
+    modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,
+                                scaledFontSize,
+                                0.0f));
+
+    MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;
+
+    // Set shader bindings
+    shader->setUniformValue(shader->MVP(), MVPMatrix);
+
+    // Draw the object
+    drawObject(shader, object, true, labelItem.textureId());
 }
 
 void Drawer::generateLabelTexture(QDataItem *item)

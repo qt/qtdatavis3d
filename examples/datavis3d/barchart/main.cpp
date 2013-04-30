@@ -97,29 +97,29 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 
     // Set bar type to smooth bar
 #ifndef CYCLE_THROUGH_STYLES
-    m_chart->setBarType(Q3DBars::Pyramids, false);
+    m_chart->setBarType(Pyramids, false);
 #endif
 
 #ifndef USE_STATIC_DATA
     // Set selection mode to full
-    m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
+    m_chart->setSelectionMode(ModeBarRowAndColumn);
 #else
     // Set selection mode to zoom row
-    m_chart->setSelectionMode(Q3DBars::ZoomRow);
+    m_chart->setSelectionMode(ModeZoomRow);
     m_chart->setFont(QFont("Courier", 25));
 #endif
 
 #ifndef CYCLE_THROUGH_THEMES
     // Set bar colors
     m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
-    //m_chart->setTheme(Q3DBars::ThemeSystem);
-    m_chart->setLabelTransparency(Q3DBars::TransparencyFromTheme);
+    //m_chart->setTheme(ThemeSystem);
+    m_chart->setLabelTransparency(TransparencyFromTheme);
 #else
-    m_chart->setLabelTransparency(Q3DBars::TransparencyNone);
+    m_chart->setLabelTransparency(TransparencyNone);
 #endif
 
     // Set preset camera position
-    m_chart->setCameraPreset(Q3DBars::PresetFront);
+    m_chart->setCameraPreset(PresetFront);
 }
 
 ChartDataGenerator::~ChartDataGenerator()
@@ -194,8 +194,8 @@ void ChartDataGenerator::addDataSet()
     // TODO: Keep here for testing
     for (int j = 0; j < m_rowCount; j++) {
         for (int i = 0; i < m_columnCount; i++) {
-            //row.prepend(((float)i / (float)m_columnCount) * 100 + (float)(rand() % 30));
-            row.append(1.0f);
+            row.prepend(((float)i / (float)m_columnCount) * 100 + (float)(rand() % 30));
+            //row.append(1.0f);
         }
         data.append(row);
         row.clear();
@@ -218,11 +218,11 @@ void ChartDataGenerator::addDataSet()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 7.0},      // week 1
-                         {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
-                         {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
-                         {0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
-                         {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
+    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 7.0f},      // week 1
+                         {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
+                         {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
+                         {0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
+                         {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
 
     // Create data set
     QDataSet *dataSet = new QDataSet();
@@ -266,28 +266,28 @@ void ChartDataGenerator::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Q3DBars::Cylinders, false);
+        m_chart->setBarType(Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Q3DBars::Cylinders, true);
+        m_chart->setBarType(Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Q3DBars::Cones, false);
+        m_chart->setBarType(Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Q3DBars::Cones, true);
+        m_chart->setBarType(Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Q3DBars::Bars, false);
+        m_chart->setBarType(Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Q3DBars::Bars, true);
+        m_chart->setBarType(Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Q3DBars::Pyramids, false);
+        m_chart->setBarType(Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Q3DBars::Pyramids, true);
+        m_chart->setBarType(Pyramids, true);
         break;
     }
     model++;
@@ -299,9 +299,9 @@ void ChartDataGenerator::changePresetCamera()
 {
     static int preset = 0;
 
-    m_chart->setCameraPreset((Q3DBars::CameraPreset)preset);
+    m_chart->setCameraPreset((CameraPreset)preset);
 
-    if (++preset > (int)Q3DBars::PresetDirectlyAboveCCW45)
+    if (++preset > (int)PresetDirectlyAboveCCW45)
         preset = 0;
 }
 
@@ -309,9 +309,9 @@ void ChartDataGenerator::changeTheme()
 {
     static int theme = 0;
 
-    m_chart->setTheme((Q3DBars::ColorTheme)theme);
+    m_chart->setTheme((ColorTheme)theme);
 
-    if (++theme > (int)Q3DBars::ThemeLight)
+    if (++theme > (int)ThemeLight)
         theme = 0;
 }
 

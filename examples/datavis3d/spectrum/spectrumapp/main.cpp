@@ -59,8 +59,7 @@ public:
     void start(QString fileName);
 
 public slots:
-    void spectrumChanged(qint64 position, qint64 length,
-                         const FrequencySpectrum &spectrum);
+    void spectrumChanged(qint64 position, qint64 length, const FrequencySpectrum &spectrum);
     void stateChanged(QAudio::Mode mode, QAudio::State state);
 
 private slots:
@@ -94,7 +93,7 @@ MainApp::MainApp(Q3DBars *window)
     // inside each other
     m_chart->setBarSpecs(QSizeF(1.0f, 0.75f), QSizeF(0.2f, -0.75f));
     // Set bar type, smooth cones
-    m_chart->setBarType(Q3DBars::Cones, true);
+    m_chart->setBarType(Cones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpecs)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
@@ -102,14 +101,14 @@ MainApp::MainApp(Q3DBars *window)
     // Set bar specifications; make them twice as wide as they're deep
     m_chart->setBarSpecs(QSizeF(1.0f, 0.5f), QSizeF(0.0f, 0.0f));
     // Set bar type, flat bars
-    m_chart->setBarType(Q3DBars::Bars, false);
+    m_chart->setBarType(Bars, false);
     // Adjust camera position
     m_chart->setCameraPosition(10.0f, 7.5f, 75);
 #endif
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
     // Disable selection
-    m_chart->setSelectionMode(Q3DBars::None);
+    m_chart->setSelectionMode(ModeNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);

@@ -43,6 +43,7 @@
 #define Q3DBARS_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
+#include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dwindow.h"
 
 class QOpenGLShaderProgram;
@@ -59,82 +60,11 @@ class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
 public:
-    enum BarStyle {
-        Bars = 0,
-        Pyramids,
-        Cones,
-        Cylinders
-    };
-
-    enum CameraPreset {
-        PresetFrontLow = 0,
-        PresetFront,
-        PresetFrontHigh,
-        PresetLeftLow,
-        PresetLeft,
-        PresetLeftHigh,
-        PresetRightLow,
-        PresetRight,
-        PresetRightHigh,
-        PresetBehindLow,
-        PresetBehind,
-        PresetBehindHigh,
-        PresetIsometricLeft,
-        PresetIsometricLeftHigh,
-        PresetIsometricRight,
-        PresetIsometricRightHigh,
-        PresetDirectlyAbove,
-        PresetDirectlyAboveCW45,
-        PresetDirectlyAboveCCW45
-    };
-
-    enum ColorTheme {
-        ThemeSystem = 0,
-        ThemeBlueCerulean,
-        ThemeBlueIcy,
-        ThemeBlueNcs,
-        ThemeBrownSand,
-        ThemeDark,
-        ThemeHighContrast,
-        ThemeLight
-    };
-
-    enum LabelTransparency {
-        TransparencyNone = 0,       // Full solid, using colors from theme
-        TransparencyFromTheme,      // Use colors and transparencies from theme
-        TransparencyNoBackground    // Draw just text on transparent background
-    };
-
-    enum SelectionMode {
-        None = 0,
-        Bar,
-        BarAndRow,
-        BarAndColumn,
-        BarRowAndColumn,
-        ZoomRow,
-        ZoomColumn
-    };
-
-    // TODO: Should this be moved to Q3DBarsPrivate? Not for use via API directly?
-    enum LabelPosition {
-        LabelBelow = 0,
-        LabelLow,
-        LabelMid,
-        LabelHigh,
-        LabelOver,
-        LabelBottom,    // Absolute positions from here onward, used for axes (QDataItem is ignored)
-        LabelTop,
-        LabelLeft,
-        LabelRight
-    };
-
-public:
     explicit Q3DBars();
     ~Q3DBars();
 
     void initialize();
     void render();
-    void render(QPainter *painter);
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -220,12 +150,6 @@ protected:
 private:
     void drawZoomScene();
     void drawScene();
-    void drawLabel(const QDataItem &item, const LabelItem &label,
-                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   bool useDepth = false, bool rotateAlong = false, GLfloat rotationX = 0.0f,
-                   GLfloat rotationY = 0.0f, GLfloat rotationZ = 0.0f,
-                   Q3DBars::LabelPosition position = Q3DBars::LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

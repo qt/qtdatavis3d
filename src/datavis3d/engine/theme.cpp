@@ -70,10 +70,10 @@ Theme::~Theme()
 {
 }
 
-void Theme::useTheme(Q3DBars::ColorTheme theme)
+void Theme::useTheme(ColorTheme theme)
 {
     switch (theme) {
-    case Q3DBars::ThemeSystem: {
+    case ThemeSystem: {
 #ifdef Q_OS_WIN
         DWORD colorHighlight;
         colorHighlight = GetSysColor(COLOR_HIGHLIGHT);
@@ -152,7 +152,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeSystem");
         break;
     }
-    case Q3DBars::ThemeBlueCerulean: {
+    case ThemeBlueCerulean: {
         m_baseColor = QColor(QRgb(0xc7e85b));
         m_heightColor = QColor(QRgb(0xee7392));
         m_depthColor = QColor(Qt::black);
@@ -170,7 +170,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeBlueCerulean");
         break;
     }
-    case Q3DBars::ThemeBlueIcy: {
+    case ThemeBlueIcy: {
         m_baseColor = QRgb(0x3daeda);
         m_heightColor = QRgb(0x2fa3b4);
         m_depthColor = QColor(Qt::lightGray);
@@ -188,7 +188,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeBlueIcy");
         break;
     }
-    case Q3DBars::ThemeBlueNcs: {
+    case ThemeBlueNcs: {
         m_baseColor = QColor(QRgb(0x1db0da));
         m_heightColor = QColor(QRgb(0x398ca3));
         m_depthColor = QColor(Qt::lightGray);
@@ -206,7 +206,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeBlueNcs");
         break;
     }
-    case Q3DBars::ThemeBrownSand: {
+    case ThemeBrownSand: {
         m_baseColor = QColor(QRgb(0xb39b72));
         m_heightColor = QColor(QRgb(0x494345));
         m_depthColor = QColor(Qt::darkYellow);
@@ -224,7 +224,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeBrownSand");
         break;
     }
-    case Q3DBars::ThemeDark: {
+    case ThemeDark: {
         m_baseColor = QColor(QRgb(0x38ad6b));
         m_heightColor = QColor(QRgb(0xbf593e));
         m_depthColor = QColor(Qt::black);
@@ -242,7 +242,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeDark");
         break;
     }
-    case Q3DBars::ThemeHighContrast: {
+    case ThemeHighContrast: {
         m_baseColor = QColor(QRgb(0x202020));
         m_heightColor = QColor(QRgb(0xff4a41));
         m_depthColor = QColor(Qt::red);
@@ -260,7 +260,7 @@ void Theme::useTheme(Q3DBars::ColorTheme theme)
         qDebug("ThemeHighContrast");
         break;
     }
-    case Q3DBars::ThemeLight: {
+    case ThemeLight: {
         m_baseColor = QColor(QRgb(0x209fdf));
         m_heightColor = QColor(QRgb(0xbf593e));
         m_depthColor = QColor(Qt::lightGray);

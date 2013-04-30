@@ -53,6 +53,7 @@
 #define Q3DBARS_p_H
 
 #include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include <QOpenGLFunctions>
 #include <QFont>
 
@@ -77,10 +78,10 @@ class Q3DBarsPrivate : public QObject
 {
 public:
     enum SelectionType {
-        None = 0,
-        Bar,
-        Row,
-        Column
+        SelectionNone = 0,
+        SelectionBar,
+        SelectionRow,
+        SelectionColumn
     };
 
     enum MousePressType {
@@ -141,7 +142,7 @@ public:
     GLfloat m_maxSceneSize;
     Theme *m_theme;
     bool m_isInitialized;
-    Q3DBars::SelectionMode m_selectionMode;
+    SelectionMode m_selectionMode;
     QDataItem *m_selectedBar;
     QDataRow *m_zoomSelection;
     QDataSet *m_dataSet;
@@ -152,7 +153,7 @@ public:
     QRect m_zoomViewPort;
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
-    Q3DBars::LabelTransparency m_labelTransparency;
+    LabelTransparency m_labelTransparency;
     GLfloat m_fontSize;
     QFont m_font;
     Drawer *m_drawer;

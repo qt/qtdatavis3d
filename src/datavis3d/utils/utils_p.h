@@ -53,6 +53,7 @@
 #define UTILS_P_H
 
 #include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "q3dbars.h"
 
 class QVector3D;
@@ -74,7 +75,7 @@ class Utils
                                    const QString &text,
                                    const QColor &bgrColor,
                                    const QColor &txtColor,
-                                   Q3DBars::LabelTransparency transparency);
+                                   LabelTransparency transparency);
     static QVector3D getSelection(QPoint mousepos, int height);
 };
 

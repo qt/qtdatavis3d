@@ -3,7 +3,7 @@
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of QtDataVis3D.
+** This file is part of QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -42,104 +42,85 @@
 #ifndef QVIS3DNAMESPACE_H
 #define QVIS3DNAMESPACE_H
 
-#include <QtCore/qglobal.h>
+#include "qdatavis3dglobal.h"
 
-namespace QVis3D
-{
-//    enum VertexAttribute {
-//        Position,
-//        Normal,
-//        Color,
-//        TextureCoord0,
-//        TextureCoord1,
-//        TextureCoord2,
-//        CustomVertex0,
-//        CustomVertex1,
-//        UserVertex
-//    };
+QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-//    enum Face
-//    {
-//        FrontFaces                  = 0x0404, // GL_FRONT
-//        BackFaces                   = 0x0405, // GL_BACK
-//        AllFaces                    = 0x0408  // GL_FRONT_AND_BACK
-//    };
+// Constants used in several files
+const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 
-//    enum DrawingMode
-//    {
-//        Points                      = 0x0000, // GL_POINTS
-//        Lines                       = 0x0001, // GL_LINES
-//        LineLoop                    = 0x0002, // GL_LINE_LOOP
-//        LineStrip                   = 0x0003, // GL_LINE_STRIP
-//        Triangles                   = 0x0004, // GL_TRIANGLES
-//        TriangleStrip               = 0x0005, // GL_TRIANGLE_STRIP
-//        TriangleFan                 = 0x0006, // GL_TRIANGLE_FAN
-//        LinesAdjacency              = 0x000A, // GL_LINES_ADJACENCY
-//        LineStripAdjacency          = 0x000B, // GL_LINE_STRIP_ADJACENCY
-//        TrianglesAdjacency          = 0x000C, // GL_TRIANGLES_ADJACENCY
-//        TriangleStripAdjacency      = 0x000D  // GL_TRIANGLE_STRIP_ADJACENCY
-//    };
-
-//    enum StandardEffect
-//    {
-//        FlatColor,
-//        FlatPerVertexColor,
-//        FlatReplaceTexture2D,
-//        FlatDecalTexture2D,
-//        LitMaterial,
-//        LitDecalTexture2D,
-//        LitModulateTexture2D
-//    };
-
-//    enum TextureWrap
-//    {
-//        Repeat                      = 0x2901,   // GL_REPEAT
-//        ClampToEdge                 = 0x812F    // GL_CLAMP_TO_EDGE
-//    };
-
-//    enum Eye
-//    {
-//        NoEye,
-//        LeftEye,
-//        RightEye
-//    };
-
-//    enum Smoothing
-//    {
-//        NoSmoothing,
-//        Smooth,
-//        Faceted
-//    };
-
-//    enum Mouse3DKeys
-//    {
-//        Key_Fit                 = 0x01200002,
-//        Key_TopView             = 0x01200003,
-//        Key_LeftView            = 0x01200004,
-//        Key_RightView           = 0x01200005,
-//        Key_FrontView           = 0x01200006,
-//        Key_BottomView          = 0x01200007,
-//        Key_BackView            = 0x01200008,
-//        Key_RotateCW90          = 0x01200009,
-//        Key_RotateCCW90         = 0x0120000a,
-//        Key_ISO1                = 0x0120000b,
-//        Key_ISO2                = 0x0120000c,
-//        Key_Button1             = 0x0120000d,
-//        Key_Button2             = 0x0120000e,
-//        Key_Button3             = 0x0120000f,
-//        Key_Button4             = 0x01200010,
-//        Key_Button5             = 0x01200011,
-//        Key_Button6             = 0x01200012,
-//        Key_Button7             = 0x01200013,
-//        Key_Button8             = 0x01200014,
-//        Key_Button9             = 0x01200015,
-//        Key_Button10            = 0x01200016,
-//        Key_Rotations           = 0x0120001b,
-//        Key_Translations        = 0x0120001c,
-//        Key_DominantAxis        = 0x0120001d,
-//        Key_IncreaseSensitivity = 0x0120001e,
-//        Key_DecreaseSensitivity = 0x0120001f
-//    };
+// Enums used in several files
+enum BarStyle {
+    Bars = 0,
+    Pyramids,
+    Cones,
+    Cylinders
 };
+
+enum CameraPreset {
+    PresetFrontLow = 0,
+    PresetFront,
+    PresetFrontHigh,
+    PresetLeftLow,
+    PresetLeft,
+    PresetLeftHigh,
+    PresetRightLow,
+    PresetRight,
+    PresetRightHigh,
+    PresetBehindLow,
+    PresetBehind,
+    PresetBehindHigh,
+    PresetIsometricLeft,
+    PresetIsometricLeftHigh,
+    PresetIsometricRight,
+    PresetIsometricRightHigh,
+    PresetDirectlyAbove,
+    PresetDirectlyAboveCW45,
+    PresetDirectlyAboveCCW45
+};
+
+enum ColorTheme {
+    ThemeSystem = 0,
+    ThemeBlueCerulean,
+    ThemeBlueIcy,
+    ThemeBlueNcs,
+    ThemeBrownSand,
+    ThemeDark,
+    ThemeHighContrast,
+    ThemeLight
+};
+
+enum LabelTransparency {
+    TransparencyNone = 0,       // Full solid, using colors from theme
+    TransparencyFromTheme,      // Use colors and transparencies from theme
+    TransparencyNoBackground    // Draw just text on transparent background
+};
+
+// TODO: Will this be used in other vis types than q3dbars?
+enum SelectionMode {
+    ModeNone = 0,
+    ModeBar,
+    ModeBarAndRow,
+    ModeBarAndColumn,
+    ModeBarRowAndColumn,
+    ModeZoomRow,
+    ModeZoomColumn
+};
+
+// TODO: Should this be moved to Q3DBarsPrivate? Not for use via API directly?
+enum LabelPosition {
+    LabelBelow = 0,
+    LabelLow,
+    LabelMid,
+    LabelHigh,
+    LabelOver,
+    LabelBottom,    // Absolute positions from here onward, used for axes (QDataItem is ignored)
+    LabelTop,
+    LabelLeft,
+    LabelRight
+};
+
+
+QTCOMMERCIALDATAVIS3D_END_NAMESPACE
 
 #endif

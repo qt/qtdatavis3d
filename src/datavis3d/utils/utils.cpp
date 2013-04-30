@@ -53,8 +53,6 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
-
 QVector3D Utils::vectorFromColor(const QColor &color)
 {
     return QVector3D(color.redF(), color.greenF(), color.blueF());
@@ -135,8 +133,7 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor,
-                               Q3DBars::LabelTransparency transparency)
+                               const QColor &txtColor, LabelTransparency transparency)
 {
     // Calculate text dimensions
     QFont valueFont = font;
@@ -145,7 +142,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     int valueStrWidth = valueFM.width(text);
     int valueStrHeight = valueFM.height();
     QSize labelSize;
-    if (Q3DBars::TransparencyNoBackground == transparency)
+    if (TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
         labelSize = QSize(valueStrWidth + 30, valueStrHeight + 30);
@@ -160,8 +157,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     switch (transparency) {
-    case Q3DBars::TransparencyNoBackground:
-    {
+    case TransparencyNoBackground: {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
         painter.drawText(0, 0,
@@ -170,8 +166,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case Q3DBars::TransparencyFromTheme:
-    {
+    case TransparencyFromTheme: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
@@ -183,8 +178,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case Q3DBars::TransparencyNone:
-    {
+    case TransparencyNone: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());

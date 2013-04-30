@@ -77,17 +77,17 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
                               QStringLiteral("rainfall (in mm)"));
 
     // Set bar type to cylinder
-    m_chart->setBarType(Q3DBars::Cylinders, false);
+    m_chart->setBarType(Cylinders, false);
 
     // Set selection mode to bar and column
-    //m_chart->setSelectionMode(Q3DBars::BarAndColumn);
-    m_chart->setSelectionMode(Q3DBars::ZoomColumn);
+    //m_chart->setSelectionMode(ModeBarAndColumn);
+    m_chart->setSelectionMode(ModeZoomColumn);
 
     // Set theme
-    m_chart->setTheme(Q3DBars::ThemeBlueNcs);
+    m_chart->setTheme(ThemeBlueNcs);
 
     // Set preset camera position
-    m_chart->setCameraPreset(Q3DBars::PresetFront);
+    m_chart->setCameraPreset(PresetFront);
 
     // Disable grid
     m_chart->setGridEnabled(false);
@@ -111,6 +111,7 @@ void RainfallChart::addDataSet()
     // Fill in rainfall per month from 2000 to 2012 in Northern Finland (Sodankylä, Utsjoki, Kuusamo)
     QVector< QVector<QDataItem*> > data;
     QVector<QDataItem*> row;
+    // TODO: Change this example to load data from file
     // 2000
     row.append(new QDataItem(72, "mm")); //January 2000
     row.append(new QDataItem(47, "mm")); //February 2000

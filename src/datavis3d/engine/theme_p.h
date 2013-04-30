@@ -53,6 +53,7 @@
 #define THEME_P_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
+#include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dbars.h"
 
 class QColor;
@@ -65,11 +66,13 @@ public:
     explicit Theme();
     ~Theme();
 
-    void useTheme(Q3DBars::ColorTheme theme);
+    void useTheme(ColorTheme theme);
 
 private:
     friend class Q3DBars;
     friend class Q3DBarsPrivate;
+    friend class Q3DMaps;
+    friend class Q3DMapsPrivate;
     friend class Drawer;
 
     QColor m_baseColor;

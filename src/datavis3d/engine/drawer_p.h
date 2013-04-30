@@ -53,6 +53,7 @@
 #define DRAWER_P_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
+#include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dbars.h"
 #include "theme_p.h"
 #include "labelitem_p.h"
@@ -70,15 +71,23 @@ class Drawer : public QObject, protected QOpenGLFunctions
     Q_OBJECT
 
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, Q3DBars::LabelTransparency transparency);
+    explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
     ~Drawer();
 
     void setTheme(const Theme &theme);
     void setFont(const QFont &font);
-    void setTransparency(Q3DBars::LabelTransparency transparency);
+    void setTransparency(LabelTransparency transparency);
 
     void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false,
                     GLuint textureId = 0);
+    void drawLabel(const QDataItem &item, const LabelItem &label,
+                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
+                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat maxHeight,
+                   SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
+                   bool useDepth = false, bool rotateAlong = false,
+                   LabelPosition position = LabelOver,
+                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
+
     void generateLabelTexture(QDataItem *item);
     void generateLabelItem(LabelItem *item, const QString &text);
 
@@ -88,7 +97,7 @@ Q_SIGNALS:
 private:
     Theme m_theme;
     QFont m_font;
-    Q3DBars::LabelTransparency m_transparency;
+    LabelTransparency m_transparency;
     TextureHelper *m_textureHelper;
 };
 

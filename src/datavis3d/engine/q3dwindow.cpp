@@ -80,11 +80,6 @@ Q3DWindow::~Q3DWindow()
 {
 }
 
-void Q3DWindow::render(QPainter *painter)
-{
-    Q_UNUSED(painter);
-}
-
 void Q3DWindow::initialize()
 {
     qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
@@ -124,14 +119,6 @@ void Q3DWindow::exposeEvent(QExposeEvent *event)
         renderNow();
 }
 
-//void Q3DWindow::resizeEvent(QResizeEvent *event)
-//{
-//    Q_UNUSED(event);
-
-//    if (isExposed())
-//        renderLater();
-//}
-
 void Q3DWindow::renderNow()
 {
     if (!isExposed())
@@ -147,7 +134,6 @@ void Q3DWindow::renderNow()
 #if defined(Q_OS_MAC)
         initializeOpenGLFunctions();
 #endif
-        getDevice();
         initialize();
         needsInit = false;
     }
@@ -168,20 +154,11 @@ void Q3DWindow::setAnimating(bool animating)
         renderLater();
 }
 
-QOpenGLPaintDevice *Q3DWindow::getDevice()
-{
-    if (!d_ptr->m_device)
-        d_ptr->m_device = new QOpenGLPaintDevice;
-    d_ptr->m_device->setSize(size());
-    return d_ptr->m_device;
-}
-
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
     : q_ptr(q),
       m_updatePending(false),
       m_animating(false),
-      m_context(new QOpenGLContext(q)),
-      m_device(0)
+      m_context(new QOpenGLContext(q))
 {
 }
 

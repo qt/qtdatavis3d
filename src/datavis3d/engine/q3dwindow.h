@@ -61,7 +61,6 @@ public:
     explicit Q3DWindow(QWindow *parent = 0);
     ~Q3DWindow();
 
-    virtual void render(QPainter *painter);
     virtual void render();
 
     virtual void initialize();
@@ -75,11 +74,8 @@ public slots:
 protected:
     bool event(QEvent *event);
     void exposeEvent(QExposeEvent *event);
-//    void resizeEvent(QResizeEvent *event);
 
 private:
-    QOpenGLPaintDevice *getDevice();
-
     QScopedPointer<Q3DWindowPrivate> d_ptr;
 
     friend class Q3DBarsPrivate;

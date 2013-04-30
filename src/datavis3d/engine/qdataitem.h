@@ -63,6 +63,8 @@ private:
     QScopedPointer<QDataItemPrivate> d_ptr;
     friend class Q3DBars;
     friend class Q3DBarsPrivate;
+    friend class Q3DMaps;
+    friend class Q3DMapsPrivate;
     friend class QDataRowPrivate;
     friend class Drawer;
 };

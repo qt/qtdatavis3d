@@ -78,13 +78,13 @@ void ChartModifier::restart(bool dynamicData)
     if (m_static) {
         start();
         // Set selection mode to zoom row
-        m_chart->setSelectionMode(Q3DBars::ZoomRow);
+        m_chart->setSelectionMode(ModeZoomRow);
         m_chart->setFont(QFont("Times Roman", 20));
     } else {
         // Set up sample space; make it as deep as it's wide
         m_chart->setupSampleSpace(m_columnCount, m_rowCount);
         // Set selection mode to full
-        m_chart->setSelectionMode(Q3DBars::BarRowAndColumn);
+        m_chart->setSelectionMode(ModeBarRowAndColumn);
     }
 }
 
@@ -153,28 +153,28 @@ void ChartModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Q3DBars::Cylinders, false);
+        m_chart->setBarType(Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Q3DBars::Cylinders, true);
+        m_chart->setBarType(Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Q3DBars::Cones, false);
+        m_chart->setBarType(Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Q3DBars::Cones, true);
+        m_chart->setBarType(Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Q3DBars::Bars, false);
+        m_chart->setBarType(Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Q3DBars::Bars, true);
+        m_chart->setBarType(Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Q3DBars::Pyramids, false);
+        m_chart->setBarType(Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Q3DBars::Pyramids, true);
+        m_chart->setBarType(Pyramids, true);
         break;
     }
     model++;
@@ -186,9 +186,9 @@ void ChartModifier::changePresetCamera()
 {
     static int preset = 0;
 
-    m_chart->setCameraPreset((Q3DBars::CameraPreset)preset);
+    m_chart->setCameraPreset((CameraPreset)preset);
 
-    if (++preset > (int)Q3DBars::PresetDirectlyAboveCCW45)
+    if (++preset > (int)PresetDirectlyAboveCCW45)
         preset = 0;
 }
 
@@ -196,18 +196,18 @@ void ChartModifier::changeTheme()
 {
     static int theme = 0;
 
-    m_chart->setTheme((Q3DBars::ColorTheme)theme);
+    m_chart->setTheme((ColorTheme)theme);
 
-    if (++theme > (int)Q3DBars::ThemeLight)
+    if (++theme > (int)ThemeLight)
         theme = 0;
 }
 void ChartModifier::changeTransparency()
 {
     static int transparency = 0;
 
-    m_chart->setLabelTransparency((Q3DBars::LabelTransparency)transparency);
+    m_chart->setLabelTransparency((LabelTransparency)transparency);
 
-    if (++transparency > (int)Q3DBars::TransparencyNoBackground)
+    if (++transparency > (int)TransparencyNoBackground)
         transparency = 0;
 }
 
@@ -215,9 +215,9 @@ void ChartModifier::changeSelectionMode()
 {
     static int selectionMode = 0;
 
-    m_chart->setSelectionMode((Q3DBars::SelectionMode)selectionMode);
+    m_chart->setSelectionMode((SelectionMode)selectionMode);
 
-    if (++selectionMode > (int)Q3DBars::ZoomColumn)
+    if (++selectionMode > (int)ModeZoomColumn)
         selectionMode = 0;
 }
 

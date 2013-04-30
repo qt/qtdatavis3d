@@ -80,6 +80,7 @@ class TextureHelper : protected QOpenGLFunctions
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
     friend class Q3DBarsPrivate;
+    friend class Q3DMapsPrivate;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -74,7 +74,6 @@ public:
     bool m_animating;
 
     QOpenGLContext *m_context;
-    QOpenGLPaintDevice *m_device;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

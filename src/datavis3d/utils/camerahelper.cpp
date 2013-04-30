@@ -59,7 +59,6 @@ float m_yRotation = 0;
 float m_defaultXRotation = 0;
 float m_defaultYRotation = 0;
 
-const float m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 float m_rotationSpeed = 100;
 
 // FUNCTIONS
@@ -113,9 +112,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
     // Apply rotations
     // Handle x and z rotation when y -angle is other than 0
-    viewMatrix.rotate(m_xRotation, 0, cos(m_yRotation*m_pi/180), sin(m_yRotation*m_pi/180));
+    viewMatrix.rotate(m_xRotation, 0, cos(m_yRotation * m_pi / 180.0f),
+                      sin(m_yRotation * m_pi / 180.0f));
     // y rotation is always "clean"
-    viewMatrix.rotate(m_yRotation, 1.0f, 0, 0);
+    viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
     // handle zoom by scaling
     viewMatrix.scale((float)zoom / 100.0f);
     // Compensate for translation (if m_target is off origin)
@@ -138,10 +138,10 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, f
     float xAngle;
     float yAngle;
     if (!fixedRotation) {
-        xAngle = m_xRotation * m_pi / 180;
-        yAngle = m_yRotation * m_pi / 180;
+        xAngle = m_xRotation * m_pi / 180.0f;
+        yAngle = m_yRotation * m_pi / 180.0f;
     } else {
-        xAngle = fixedRotation * m_pi / 180;
+        xAngle = fixedRotation * m_pi / 180.0f;
         yAngle = 0;
     }
     float radius = lightPosition.y() * 2.0f; // set radius to match the highest height of the light
@@ -173,100 +173,100 @@ QPointF CameraHelper::getCameraRotations()
     return rotations;
 }
 
-void CameraHelper::setCameraPreset(Q3DBars::CameraPreset preset)
+void CameraHelper::setCameraPreset(CameraPreset preset)
 {
     switch (preset) {
-    case Q3DBars::PresetFrontLow: {
+    case PresetFrontLow: {
         qDebug("PresetFrontLow");
         CameraHelper::setCameraRotation(QPointF(0.0f, 0.0f));
         break;
     }
-    case Q3DBars::PresetFront: {
+    case PresetFront: {
         qDebug("PresetFront");
         CameraHelper::setCameraRotation(QPointF(0.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetFrontHigh: {
+    case PresetFrontHigh: {
         qDebug("PresetFrontHigh");
         CameraHelper::setCameraRotation(QPointF(0.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetLeftLow: {
+    case PresetLeftLow: {
         qDebug("PresetLeftLow");
         CameraHelper::setCameraRotation(QPointF(90.0f, 0.0f));
         break;
     }
-    case Q3DBars::PresetLeft: {
+    case PresetLeft: {
         qDebug("PresetLeft");
         CameraHelper::setCameraRotation(QPointF(90.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetLeftHigh: {
+    case PresetLeftHigh: {
         qDebug("PresetLeftHigh");
         CameraHelper::setCameraRotation(QPointF(90.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetRightLow: {
+    case PresetRightLow: {
         qDebug("PresetRightLow");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 0.0f));
         break;
     }
-    case Q3DBars::PresetRight: {
+    case PresetRight: {
         qDebug("PresetRight");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetRightHigh: {
+    case PresetRightHigh: {
         qDebug("PresetRightHigh");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetBehindLow: {
+    case PresetBehindLow: {
         qDebug("PresetBehindLow");
         CameraHelper::setCameraRotation(QPointF(180.0f, 0.0f));
         break;
     }
-    case Q3DBars::PresetBehind: {
+    case PresetBehind: {
         qDebug("PresetBehind");
         CameraHelper::setCameraRotation(QPointF(180.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetBehindHigh: {
+    case PresetBehindHigh: {
         qDebug("PresetBehindHigh");
         CameraHelper::setCameraRotation(QPointF(180.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetIsometricLeft: {
+    case PresetIsometricLeft: {
         qDebug("PresetIsometricLeft");
         CameraHelper::setCameraRotation(QPointF(45.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetIsometricLeftHigh: {
+    case PresetIsometricLeftHigh: {
         qDebug("PresetIsometricLeftHigh");
         CameraHelper::setCameraRotation(QPointF(45.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetIsometricRight: {
+    case PresetIsometricRight: {
         qDebug("PresetIsometricRight");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 22.5f));
         break;
     }
-    case Q3DBars::PresetIsometricRightHigh: {
+    case PresetIsometricRightHigh: {
         qDebug("PresetIsometricRightHigh");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 45.0f));
         break;
     }
-    case Q3DBars::PresetDirectlyAbove: {
+    case PresetDirectlyAbove: {
         qDebug("PresetDirectlyAbove");
         CameraHelper::setCameraRotation(QPointF(0.0f, 90.0f));
         break;
     }
-    case Q3DBars::PresetDirectlyAboveCW45: {
+    case PresetDirectlyAboveCW45: {
         qDebug("PresetDirectlyAboveCW45");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 90.0f));
         break;
     }
-    case Q3DBars::PresetDirectlyAboveCCW45: {
+    case PresetDirectlyAboveCCW45: {
         qDebug("PresetDirectlyAboveCCW45");
         CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
         break;
