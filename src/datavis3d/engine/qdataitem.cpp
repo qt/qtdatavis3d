@@ -107,12 +107,14 @@ float QDataItemPrivate::value()
 QString QDataItemPrivate::valueStr()
 {
     QString strVal;
+    QString numStr;
+    numStr.setNum(m_value);
     if (m_prependLabel) {
         strVal.append(m_labelString);
         strVal.append(QStringLiteral(" "));
-        strVal.setNum(m_value);
+        strVal.append(numStr);
     } else {
-        strVal.setNum(m_value);
+        strVal.append(numStr);
         strVal.append(m_labelString);
     }
     return strVal;
