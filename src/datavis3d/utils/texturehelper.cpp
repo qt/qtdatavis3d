@@ -58,6 +58,9 @@ TextureHelper::~TextureHelper()
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering, bool convert)
 {
+    if (image.isNull())
+        return 0;
+
     GLuint textureId;
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
@@ -83,6 +86,9 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
 GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinearFiltering)
 {
+    if (image.isNull())
+        return 0;
+
     GLuint textureId;
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
