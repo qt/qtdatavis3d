@@ -956,7 +956,7 @@ void Q3DBars::drawScene()
         }
 #ifndef DISPLAY_FULL_DATA_ON_SELECTION
         // Draw just the value string of the selected bar
-        if (prevItem != d_ptr->m_selectedBar || m_updateLabels) {
+        if (prevItem != d_ptr->m_selectedBar || d_ptr->m_updateLabels) {
             d_ptr->m_drawer->generateLabelTexture(d_ptr->m_selectedBar);
             prevItem = d_ptr->m_selectedBar;
         }
