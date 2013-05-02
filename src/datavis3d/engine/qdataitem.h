@@ -60,6 +60,7 @@ public:
 
     void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
     void setValue(float value);
+    // Has no effect in Q3DBars
     void setPosition(const QPointF &position);
 
 private:

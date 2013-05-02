@@ -129,6 +129,9 @@ void Q3DMaps::initialize()
                                               QVector3D(0.0f, 0.0f, zComp),
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
+    // Adjust to default rotation
+    setCameraPosition(d_ptr->m_horizontalRotation, d_ptr->m_verticalRotation, d_ptr->m_zoomLevel);
+
     // Set view port
     glViewport(0, 0, width(), height());
 
@@ -196,6 +199,56 @@ void Q3DMaps::drawScene()
     QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
+    // Map adjustment direction to model matrix scaling
+    GLfloat heightMultiplier = 0.0f;
+    GLfloat widthMultiplier = 0.0f;
+    GLfloat depthMultiplier = 0.0f;
+    GLfloat heightScaler = 0.0f;
+    GLfloat widthScaler = 0.0f;
+    GLfloat depthScaler = 0.0f;
+    switch (d_ptr->m_adjustDirection) {
+    case AdjustHeight:
+        widthMultiplier = 0.0f;
+        heightMultiplier = 1.0f;
+        depthMultiplier = 0.0f;
+        widthScaler = d_ptr->m_barThickness.x() / d_ptr->m_scaleFactor;
+        heightScaler = 0.0f;
+        depthScaler = d_ptr->m_barThickness.z() / d_ptr->m_scaleFactor;
+        break;
+    case AdjustWidth:
+        widthMultiplier = 1.0f;
+        heightMultiplier = 0.0f;
+        depthMultiplier = 0.0f;
+        widthScaler = 0.0f;
+        heightScaler = d_ptr->m_barThickness.y() / d_ptr->m_scaleFactor;
+        depthScaler = d_ptr->m_barThickness.z() / d_ptr->m_scaleFactor;
+        break;
+    case AdjustDepth:
+        widthMultiplier = 0.0f;
+        heightMultiplier = 0.0f;
+        depthMultiplier = 1.0f;
+        widthScaler = d_ptr->m_barThickness.x() / d_ptr->m_scaleFactor;
+        heightScaler = d_ptr->m_barThickness.y() / d_ptr->m_scaleFactor;
+        depthScaler = 0.0f;
+        break;
+    case AdjustRadius:
+        widthMultiplier = 1.0f;
+        heightMultiplier = 0.0f;
+        depthMultiplier = 1.0f;
+        widthScaler = 0.0f;
+        heightScaler = d_ptr->m_barThickness.y() / d_ptr->m_scaleFactor;
+        depthScaler = 0.0f;
+        break;
+    case AdjustAll:
+        widthMultiplier = 1.0f;
+        heightMultiplier = 1.0f;
+        depthMultiplier = 1.0f;
+        widthScaler = 0.0f;
+        heightScaler = 0.0f;
+        depthScaler = 0.0f;
+        break;
+    }
+
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
         // Bind selection shader
@@ -204,7 +257,7 @@ void Q3DMaps::drawScene()
         // Draw bars to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set clear color to black
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int bar = 0; bar < d_ptr->m_data->d_ptr->row().size(); bar++) {
@@ -214,27 +267,22 @@ void Q3DMaps::drawScene()
 
             GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
-            if (barHeight < 0)
-                glCullFace(GL_FRONT);
-            else
-                glCullFace(GL_BACK);
-
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
 
-            modelMatrix.translate(item->d_ptr->translation().x() / d_ptr->m_scaleFactor,
-                                  barHeight - d_ptr->m_yAdjustment,
-                                  item->d_ptr->translation().z() / d_ptr->m_scaleFactor
-                                  + zComp);
-            // TODO: Scale to whatever dimension was set as the expanding one
-            modelMatrix.scale(QVector3D(d_ptr->m_barThickness.x(), barHeight,
-                                        d_ptr->m_barThickness.z()));
+            modelMatrix.translate(item->d_ptr->translation().x(),
+                                  heightMultiplier * barHeight + heightScaler
+                                  - d_ptr->m_yAdjustment,
+                                  item->d_ptr->translation().z() + zComp);
+            modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
+                                        heightMultiplier * barHeight + heightScaler,
+                                        depthMultiplier * barHeight + depthScaler));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
             // add +2 to avoid black
-            QVector3D barColor = QVector3D(1.0f - ((GLdouble)(bar + 2)
-                                           / (GLdouble)(d_ptr->m_data->d_ptr->row().size() + 2)),
+            QVector3D barColor = QVector3D((GLdouble)(bar + 2)
+                                           / (GLdouble)(d_ptr->m_data->d_ptr->row().size() + 2),
                                            (GLdouble)(bar + 2)
                                            / (GLdouble)(d_ptr->m_data->d_ptr->row().size() + 2),
                                            0.0);
@@ -275,7 +323,6 @@ void Q3DMaps::drawScene()
         d_ptr->m_selectionShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
-        glCullFace(GL_BACK);
         d_ptr->m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -309,21 +356,15 @@ void Q3DMaps::drawScene()
 
         GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
-        if (barHeight < 0)
-            glCullFace(GL_FRONT);
-        else
-            glCullFace(GL_BACK);
-
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(item->d_ptr->translation().x() / d_ptr->m_scaleFactor,
-                              barHeight - d_ptr->m_yAdjustment,
-                              item->d_ptr->translation().z() / d_ptr->m_scaleFactor
-                              + zComp);
-        // TODO: Scale to whatever dimension was set as the expanding one
-        modelMatrix.scale(QVector3D(d_ptr->m_barThickness.x(), barHeight,
-                                    d_ptr->m_barThickness.z()));
+        modelMatrix.translate(item->d_ptr->translation().x(),
+                              heightMultiplier * barHeight + heightScaler - d_ptr->m_yAdjustment,
+                              item->d_ptr->translation().z() + zComp);
+        modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
+                                    heightMultiplier * barHeight + heightScaler,
+                                    depthMultiplier * barHeight + depthScaler));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -338,6 +379,7 @@ void Q3DMaps::drawScene()
             Q3DMapsPrivate::SelectionType selectionType = d_ptr->isSelected(bar, selection);
             switch (selectionType) {
             case Q3DMapsPrivate::SelectionBar: {
+                qDebug() << "selected";
                 barColor = Utils::vectorFromColor(d_ptr->m_theme->m_highlightBarColor);
                 lightStrength = d_ptr->m_theme->m_highlightLightStrength;
                 // Insert data to QDataItem. We have no ownership, don't delete the previous one
@@ -386,14 +428,13 @@ void Q3DMaps::drawScene()
 
     // Enable texture
     glEnable(GL_TEXTURE_2D);
-    glCullFace(GL_BACK);
 
     // Draw background
     if (d_ptr->m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp);
+        modelMatrix.translate(0.0f, -d_ptr->m_yAdjustment, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_areaSize.width() / d_ptr->m_scaleFactor,
                                     1.0f,
                                     d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
@@ -417,9 +458,9 @@ void Q3DMaps::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
                                                    backgroundColor);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                   d_ptr->m_theme->m_lightStrength);
+                                                   d_ptr->m_theme->m_lightStrength / 5.0f);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
-                                                   d_ptr->m_theme->m_ambientStrength);
+                                                   d_ptr->m_theme->m_ambientStrength * 3.0f);
 
         // Draw the object
         d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true,
@@ -609,19 +650,19 @@ void Q3DMaps::drawScene()
         LabelItem labelItem = d_ptr->m_selectedBar->d_ptr->selectionLabel();
         if (firstSelection || prevItem != d_ptr->m_selectedBar || d_ptr->m_updateLabels) {
             QString labelText = d_ptr->m_selectedBar->d_ptr->valueStr();
-//            if ((d_ptr->m_data->d_ptr->columnLabels().size()
-//                 > d_ptr->m_selectedBar->d_ptr->position().y())
-//                    && (d_ptr->m_data->d_ptr->rowLabels().size()
-//                        > d_ptr->m_selectedBar->d_ptr->position().x())) {
-//                labelText.append(QStringLiteral(" ("));
-//                labelText.append(d_ptr->m_data->d_ptr->rowLabels().at(
-//                                     d_ptr->m_selectedBar->d_ptr->position().x()));
-//                labelText.append(QStringLiteral(", "));
-//                labelText.append(d_ptr->m_data->d_ptr->columnLabels().at(
-//                                     d_ptr->m_selectedBar->d_ptr->position().y()));
-//                labelText.append(QStringLiteral(")"));
-//                //qDebug() << labelText;
-//            }
+            //            if ((d_ptr->m_data->d_ptr->columnLabels().size()
+            //                 > d_ptr->m_selectedBar->d_ptr->position().y())
+            //                    && (d_ptr->m_data->d_ptr->rowLabels().size()
+            //                        > d_ptr->m_selectedBar->d_ptr->position().x())) {
+            //                labelText.append(QStringLiteral(" ("));
+            //                labelText.append(d_ptr->m_data->d_ptr->rowLabels().at(
+            //                                     d_ptr->m_selectedBar->d_ptr->position().x()));
+            //                labelText.append(QStringLiteral(", "));
+            //                labelText.append(d_ptr->m_data->d_ptr->columnLabels().at(
+            //                                     d_ptr->m_selectedBar->d_ptr->position().y()));
+            //                labelText.append(QStringLiteral(")"));
+            //                //qDebug() << labelText;
+            //            }
             d_ptr->m_drawer->generateLabelItem(&labelItem, labelText);
             d_ptr->m_selectedBar->d_ptr->setSelectionLabel(labelItem);
             prevItem = d_ptr->m_selectedBar;
@@ -847,9 +888,10 @@ void Q3DMaps::resizeEvent(QResizeEvent *event)
     d_ptr->initSelectionBuffer();
 }
 
-void Q3DMaps::setBarSpecs(const QVector3D &thickness)
+void Q3DMaps::setBarSpecs(const QVector3D &thickness, AdjustmentDirection direction)
 {
     d_ptr->m_barThickness = thickness;
+    d_ptr->m_adjustDirection = direction;
 }
 
 void Q3DMaps::setBarType(BarStyle style, bool smooth)
@@ -951,14 +993,13 @@ void Q3DMaps::setWindowTitle(const QString &title)
 
 void Q3DMaps::setFontSize(float fontsize)
 {
-    d_ptr->m_fontSize = fontsize;
+    d_ptr->m_font.setPointSizeF(fontsize);
     d_ptr->m_drawer->setFont(d_ptr->m_font);
 }
 
 void Q3DMaps::setFont(const QFont &font)
 {
     d_ptr->m_font = font;
-    d_ptr->m_fontSize = font.pointSizeF();
     d_ptr->m_drawer->setFont(font);
 }
 
@@ -973,52 +1014,99 @@ void Q3DMaps::setGridEnabled(bool enable)
     d_ptr->m_gridEnabled = enable;
 }
 
-void Q3DMaps::addDataItem(QDataItem* dataItem)
+bool Q3DMaps::addDataItem(QDataItem* dataItem)
 {
+    // Check validity
+    if (!d_ptr->isValid(*dataItem))
+        return false;
+    // Convert position to translation
+    d_ptr->calculateTranslation(dataItem);
+    // Add item
     d_ptr->m_data->addItem(dataItem);
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_data->d_ptr->limitValues();
     d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
+    return true;
 }
 
-void Q3DMaps::addData(const QVector<QDataItem*> &data)
+bool Q3DMaps::addData(const QVector<QDataItem*> &data)
 {
     // Convert to QDataRow
-    for (int i = 0; i < data.size(); i++)
-        d_ptr->m_data->addItem(data.at(i));
+    for (int i = 0; i < data.size(); i++) {
+        QDataItem *item = data.at(i);
+        // Check validity
+        if (!d_ptr->isValid(*item)) {
+            return false;
+        } else {
+            // Convert position to translation
+            d_ptr->calculateTranslation(item);
+            // Add item
+            d_ptr->m_data->addItem(item);
+        }
+    }
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_data->d_ptr->limitValues();
     d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
+    return true;
 }
 
-void Q3DMaps::addData(const QDataRow &dataRow)
+bool Q3DMaps::addData(const QDataRow &dataRow)
 {
-    for (int itemIdx = 0; itemIdx < dataRow.d_ptr->row().size(); itemIdx++)
-        d_ptr->m_data->addItem(dataRow.d_ptr->getItem(itemIdx));
+    for (int itemIdx = 0; itemIdx < dataRow.d_ptr->row().size(); itemIdx++) {
+        QDataItem *item = dataRow.d_ptr->getItem(itemIdx);
+        // Check validity
+        if (!d_ptr->isValid(*item)) {
+            return false;
+        } else {
+            // Convert position to translation
+            d_ptr->calculateTranslation(item);
+            // Add item
+            d_ptr->m_data->addItem(item);
+        }
+    }
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_data->d_ptr->limitValues();
     d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
+    return true;
 }
 
-void Q3DMaps::setData(const QVector<QDataItem*> &dataRow)
+bool Q3DMaps::setData(const QVector<QDataItem*> &dataRow)
 {
     // Delete previous data
     delete d_ptr->m_data;
     // Convert to QDataRow
     d_ptr->m_data = new QDataRow();
-    for (int i = 0; i < dataRow.size(); i++)
-        d_ptr->m_data->addItem(dataRow.at(i));
+    for (int i = 0; i < dataRow.size(); i++) {
+        QDataItem *item = dataRow.at(i);
+        // Check validity
+        if (!d_ptr->isValid(*item)) {
+            return false;
+        } else {
+            // Convert position to translation
+            d_ptr->calculateTranslation(item);
+            // Add item
+            d_ptr->m_data->addItem(item);
+        }
+    }
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_data->d_ptr->limitValues();
     d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
+    return true;
 }
 
-void Q3DMaps::setData(QDataRow *dataRow)
+bool Q3DMaps::setData(QDataRow *dataRow)
 {
+    // Check validity
+    for (int i = 0; i < dataRow->d_ptr->row().size(); i++) {
+        if (!d_ptr->isValid(*dataRow->d_ptr->row().at(i)))
+            return false;
+        else
+            d_ptr->calculateTranslation(dataRow->d_ptr->row()[i]);
+    }
     // Delete previous data
     delete d_ptr->m_data;
     // Set give data as new data
@@ -1027,6 +1115,7 @@ void Q3DMaps::setData(QDataRow *dataRow)
     QPair<GLfloat, GLfloat> limits = d_ptr->m_data->d_ptr->limitValues();
     d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
     d_ptr->calculateHeightAdjustment(limits);
+    return true;
 }
 
 void Q3DMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
@@ -1058,8 +1147,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_mousePos(QPoint(0, 0)),
       m_zoomLevel(100),
       m_zoomAdjustment(1.0f),
-      m_horizontalRotation(-45.0f),
-      m_verticalRotation(15.0f),
+      m_horizontalRotation(0.0f),
+      m_verticalRotation(45.0f),
       m_barThickness(QVector3D(1.0f, 0.0f, 1.0f)),
       m_heightNormalizer(0.0f),
       m_yAdjustment(0.0f),
@@ -1077,11 +1166,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
       m_labelTransparency(TransparencyNone),
-      m_fontSize(10.0f),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
-      m_xFlipped(false),
-      m_zFlipped(false),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_areaSize(QSizeF(1.0f, 1.0f)),
@@ -1212,14 +1298,27 @@ void Q3DMapsPrivate::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &li
     //qDebug() << m_yAdjustment;
 }
 
+void Q3DMapsPrivate::calculateTranslation(QDataItem *item)
+{
+    // We need to convert position (which is in coordinates), to translation (which has origin in the center and is scaled)
+    // -> move pos(center, center) to trans(0, 0) and pos(0, 0) to trans(left, top)
+    GLfloat xTrans = 2.0f * (item->d_ptr->position().x() - (m_areaSize.width() / 2.0f))
+            / m_scaleFactor;
+    GLfloat zTrans = 2.0f * (item->d_ptr->position().y() - (m_areaSize.height() / 2.0f))
+            / m_scaleFactor;
+    //qDebug() << "x, y" << item->d_ptr->position().x() << item->d_ptr->position().y();
+    item->d_ptr->setTranslation(QVector3D(xTrans, 0.0f, zTrans));
+    //qDebug() << item->d_ptr->translation();
+}
+
 Q3DMapsPrivate::SelectionType Q3DMapsPrivate::isSelected(GLint bar, const QVector3D &selection)
 {
     //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = SelectionNone;
-    if (selection == Utils::vectorFromColor(Qt::white))
+    if (selection == Utils::vectorFromColor(Qt::black))
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)(1.0f - ((GLdouble)(bar + 2)
-                                                    / (GLdouble)(m_data->d_ptr->row().size() + 2))
+    QVector3D current = QVector3D((GLubyte)((GLdouble)(bar + 2)
+                                            / (GLdouble)(m_data->d_ptr->row().size() + 2)
                                             * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
                                   (GLubyte)(((GLdouble)(bar + 2)
                                              / (GLdouble)(m_data->d_ptr->row().size() + 2))
@@ -1232,15 +1331,25 @@ Q3DMapsPrivate::SelectionType Q3DMapsPrivate::isSelected(GLint bar, const QVecto
     //}
     if (current == selection)
         isSelectedType = SelectionBar;
-//    else if (current.y() == selection.y() && (m_selectionMode == ModeBarAndColumn
-//                                              || m_selectionMode == ModeBarRowAndColumn
-//                                              || m_selectionMode == ModeZoomColumn))
-//        isSelectedType = SelectionColumn;
-//    else if (current.x() == selection.x() && (m_selectionMode == ModeBarAndRow
-//                                              || m_selectionMode == ModeBarRowAndColumn
-//                                              || m_selectionMode == ModeZoomRow))
-//        isSelectedType = SelectionRow;
     return isSelectedType;
+}
+
+bool Q3DMapsPrivate::isValid(const QDataItem &item)
+{
+    bool retval = true;
+    if (item.d_ptr->value() < 0) {
+        qCritical("Data item value out of range");
+        retval = false;
+    }
+    else if (item.d_ptr->position().x() < 0 || item.d_ptr->position().x() > m_areaSize.width()) {
+        qCritical("Data item x position out of range");
+        retval = false;
+    }
+    else if (item.d_ptr->position().y() < 0 || item.d_ptr->position().y() > m_areaSize.height()) {
+        qCritical("Data item y position out of range");
+        retval = false;
+    }
+    return retval;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

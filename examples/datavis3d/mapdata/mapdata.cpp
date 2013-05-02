@@ -46,21 +46,15 @@ using namespace QtDataVis3D;
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
 MapsModifier::MapsModifier(Q3DMaps *maps)
-    : m_chart(maps)/*,
-      m_columnCount(21),
-      m_rowCount(21),
-      m_xRotation(0.0f),
-      m_yRotation(0.0f),
-      m_static(true),
-      m_barWidth(1.0f),
-      m_barDepth(1.0f),
-      m_barSpacingX(0.1f),
-      m_barSpacingZ(0.1f),
-      m_fontSize(20)*/
+    : m_chart(maps),
+      m_imageRect(QRect())
 {
-    // Don't set any styles or specifications, start from defaults
-    QImage image = QImage(QStringLiteral(":/textures/defaultImage"));
-    m_chart->setAreaSpecs(image.rect(), image);
+    m_chart->setTheme(ThemeSystem);
+    m_chart->setBarSpecs(QVector3D(30.0f, 10.0f, 30.0f), Q3DMaps::AdjustHeight);
+    QImage image = QImage(QStringLiteral(":/images/suomi"));
+    m_imageRect = image.rect();
+    m_chart->setAreaSpecs(m_imageRect, image);
+    m_chart->setBarType(Cones, false);
 }
 
 MapsModifier::~MapsModifier()
@@ -75,10 +69,47 @@ void MapsModifier::start()
 
 void MapsModifier::addData()
 {
+#if 0
     QDataItem *item = new QDataItem();
     item->setValue(10.0f);
     item->setPosition(QPointF(0.0f, 0.0f));
     m_chart->addDataItem(item);
+
+    QDataItem *item2 = new QDataItem();
+    item2->setValue(5.0f);
+    item2->setPosition(QPointF(m_imageRect.width(), m_imageRect.height()));
+    m_chart->addDataItem(item2);
+
+    QDataItem *item3 = new QDataItem();
+    item3->setValue(7.0f);
+    item3->setPosition(QPointF(m_imageRect.width() / 2.0f, m_imageRect.height() / 2.0f));
+    m_chart->addDataItem(item3);
+#else
+    QDataItem *item;
+    item = new QDataItem();
+    item->setValue(191050.0f);
+    item->setLabel("Oulu ", true);
+    item->setPosition(QPointF(438.0f, 510.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(22274.0f);
+    item->setLabel("Kemi ", true);
+    item->setPosition(QPointF(412.0f, 445.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(60887.0f);
+    item->setLabel("Rovaniemi ", true);
+    item->setPosition(QPointF(451.0f, 363.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(16176.0f);
+    item->setLabel("Kuusamo ", true);
+    item->setPosition(QPointF(587.0f, 419.0f));
+    m_chart->addDataItem(item);
+#endif
 }
 
 //void MapsModifier::restart(bool dynamicData)

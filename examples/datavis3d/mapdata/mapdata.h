@@ -44,7 +44,6 @@
 #include "q3dmaps.h"
 #include "qdataset.h"
 
-#include <QFont>
 #include <QDebug>
 
 using namespace QtDataVis3D;
@@ -79,16 +78,7 @@ public:
 
 private:
     Q3DMaps *m_chart;
-//    int m_columnCount;
-//    int m_rowCount;
-//    float m_xRotation;
-//    float m_yRotation;
-//    bool m_static;
-//    float m_barWidth;
-//    float m_barDepth;
-//    float m_barSpacingX;
-//    float m_barSpacingZ;
-//    int m_fontSize;
+    QRect m_imageRect;
 };
 
 #endif

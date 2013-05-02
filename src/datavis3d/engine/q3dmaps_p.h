@@ -108,7 +108,9 @@ public:
     void updateTextures();
     void calculateSceneScalingFactors(const QRect &areaRect);
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
+    void calculateTranslation(QDataItem *item);
     SelectionType isSelected(GLint bar, const QVector3D &selection);
+    bool isValid(const QDataItem &item);
 
     Q3DMaps *q_ptr;
 
@@ -145,11 +147,8 @@ public:
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
     LabelTransparency m_labelTransparency;
-    GLfloat m_fontSize;
     QFont m_font;
     Drawer *m_drawer;
-    bool m_xFlipped;
-    bool m_zFlipped;
     QSizeF m_areaSize;
     GLuint m_bgrTexture;
     GLuint m_selectionTexture;
@@ -158,6 +157,7 @@ public:
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
     bool m_gridEnabled;
+    Q3DMaps::AdjustmentDirection m_adjustDirection;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -61,6 +61,14 @@ class LabelItem;
 class QTCOMMERCIALDATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
     Q_OBJECT
+public:
+    enum AdjustmentDirection {
+        AdjustHeight = 0,   // map value to y
+        AdjustWidth,        // map value to x
+        AdjustDepth,        // map value to z
+        AdjustRadius,       // map value to x and z
+        AdjustAll           // map value to all (x, y, z)
+    };
 
 public:
     explicit Q3DMaps();
@@ -72,22 +80,23 @@ public:
 
     // Add data item. New data item is appended to old data.
     // ownership of data is transferred
-    void addDataItem(QDataItem *dataItem);
+    bool addDataItem(QDataItem *dataItem);
 
     // Add data set. New data is appended to old data.
     // ownership of data is transferred
-    void addData(const QVector<QDataItem*> &data);
+    bool addData(const QVector<QDataItem*> &data);
     // ownership of data is transferred
-    void addData(const QDataRow &data);
+    bool addData(const QDataRow &data);
 
     // Add data set. Old data is deleted.
     // ownership of data is transferred
-    void setData(const QVector<QDataItem*> &data);
+    bool setData(const QVector<QDataItem*> &data);
     // ownership of data is transferred
-    void setData(QDataRow *data);
+    bool setData(QDataRow *data);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
-    void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 0.0f, 1.0f));//, joku enumi);
+    void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 0.0f, 1.0f),
+                     AdjustmentDirection direction = AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
     void setBarType(BarStyle style, bool smooth = false);
