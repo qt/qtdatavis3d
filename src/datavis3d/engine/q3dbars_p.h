@@ -154,7 +154,6 @@ public:
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
     LabelTransparency m_labelTransparency;
-    GLfloat m_fontSize;
     QFont m_font;
     Drawer *m_drawer;
     bool m_xFlipped;

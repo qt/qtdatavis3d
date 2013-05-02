@@ -1361,14 +1361,13 @@ void Q3DBars::setWindowTitle(const QString &title)
 
 void Q3DBars::setFontSize(float fontsize)
 {
-    d_ptr->m_fontSize = fontsize;
+    d_ptr->m_font.setPointSizeF(fontsize);
     d_ptr->m_drawer->setFont(d_ptr->m_font);
 }
 
 void Q3DBars::setFont(const QFont &font)
 {
     d_ptr->m_font = font;
-    d_ptr->m_fontSize = font.pointSizeF();
     d_ptr->m_drawer->setFont(font);
 }
 
@@ -1564,7 +1563,6 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
       m_labelTransparency(TransparencyNone),
-      m_fontSize(10.0f),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_xFlipped(false),
