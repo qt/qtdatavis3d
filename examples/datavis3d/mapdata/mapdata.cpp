@@ -43,13 +43,13 @@
 
 using namespace QtDataVis3D;
 
-const QString celsiusString = QString(QChar(0xB0)) + "C";
-
 MapsModifier::MapsModifier(Q3DMaps *maps)
     : m_chart(maps),
-      m_imageRect(QRect())
+      m_imageRect(QRect()),
+      m_fontSize(20.0f),
+      m_barSpecs(QVector3D(30.0f, 30.0f, 30.0f))
 {
-    m_chart->setBarSpecs(QVector3D(30.0f, 10.0f, 30.0f), Q3DMaps::AdjustHeight);
+    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustHeight);
     QImage image = QImage(QStringLiteral(":/images/suomi"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
@@ -72,73 +72,109 @@ void MapsModifier::addData()
     item = new QDataItem();
     item->setValue(191050);
     item->setLabel("Oulu", true);
-    item->setPosition(QPointF(438.0f, 510.0f));
+    item->setPosition(QPoint(438, 510));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(22274);
     item->setLabel("Kemi", true);
-    item->setPosition(QPointF(412.0f, 445.0f));
+    item->setPosition(QPoint(412, 445));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(60887);
     item->setLabel("Rovaniemi", true);
-    item->setPosition(QPointF(451.0f, 363.0f));
+    item->setPosition(QPoint(451, 363));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(16176);
     item->setLabel("Kuusamo", true);
-    item->setPosition(QPointF(587.0f, 419.0f));
+    item->setPosition(QPoint(587, 419));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(3998);
     item->setLabel("Ivalo", true);
-    item->setPosition(QPointF(525.0f, 156.0f));
+    item->setPosition(QPoint(525, 156));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(37978);
     item->setLabel("Kajaani", true);
-    item->setPosition(QPointF(577.0f, 596.0f));
+    item->setPosition(QPoint(577, 596));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(46809);
     item->setLabel("Kokkola", true);
-    item->setPosition(QPointF(333.0f, 624.0f));
+    item->setPosition(QPoint(333, 624));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(105236);
     item->setLabel("Kuopio", true);
-    item->setPosition(QPointF(560.0f, 706.0f));
+    item->setPosition(QPoint(560, 706));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(133557);
     item->setLabel("Jyväskylä", true);
-    item->setPosition(QPointF(472.0f, 754.0f));
+    item->setPosition(QPoint(472, 754));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(65771);
     item->setLabel("Vaasa", true);
-    item->setPosition(QPointF(259.0f, 702.0f));
+    item->setPosition(QPoint(259, 702));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(217603);
     item->setLabel("Tampere", true);
-    item->setPosition(QPointF(365.0f, 826.0f));
+    item->setPosition(QPoint(365, 826));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(180350);
     item->setLabel("Turku", true);
-    item->setPosition(QPointF(270.0f, 951.0f));
+    item->setPosition(QPoint(270, 951));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(605022);
+    item->setLabel("Helsinki", true);
+    item->setPosition(QPoint(399, 971));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(72400);
+    item->setLabel("Lappeenranta", true);
+    item->setPosition(QPoint(543, 897));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(14754);
+    item->setLabel("Tammisaari", true);
+    item->setPosition(QPoint(325, 1004));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(1879);
+    item->setLabel("Enontekiö", true);
+    item->setPosition(QPoint(380, 175));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(36624);
+    item->setLabel("Savonlinna", true);
+    item->setPosition(QPoint(587, 812));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(54887);
+    item->setLabel("Kotka", true);
+    item->setPosition(QPoint(497, 948));
     m_chart->addDataItem(item);
 }
 
@@ -170,9 +206,15 @@ void MapsModifier::changeStyle()
     case 7:
         m_chart->setBarType(Pyramids, true);
         break;
+    case 8:
+        m_chart->setBarType(Spheres, false);
+        break;
+    case 9:
+        m_chart->setBarType(Spheres, true);
+        break;
     }
     model++;
-    if (model > 7)
+    if (model > 9)
         model = 0;
 }
 
@@ -214,6 +256,11 @@ void MapsModifier::changeTransparency()
 
     if (++transparency > TransparencyNoBackground)
         transparency = TransparencyNone;
+}
+
+void MapsModifier::changeValueDimension(int dimension)
+{
+    m_chart->setBarSpecs(m_barSpecs, (Q3DMaps::AdjustmentDirection)dimension);
 }
 
 void MapsModifier::changeFont(const QFont &font)

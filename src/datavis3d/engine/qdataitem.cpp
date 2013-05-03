@@ -69,9 +69,19 @@ void QDataItem::setValue(float value)
     d_ptr->m_value = value;
 }
 
+void QDataItem::setValue(int value)
+{
+    d_ptr->m_value = (float)value;
+}
+
 void QDataItem::setPosition(const QPointF &position)
 {
     d_ptr->m_position = position;
+}
+
+void QDataItem::setPosition(const QPoint &position)
+{
+    d_ptr->m_position = (QPointF)position;
 }
 
 QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)

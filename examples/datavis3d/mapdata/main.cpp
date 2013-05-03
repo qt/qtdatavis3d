@@ -47,6 +47,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QSlider>
+#include <QComboBox>
 #include <QFontComboBox>
 #include <QLabel>
 #include <QScreen>
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Blablaa"));
+    widget->setWindowTitle(QStringLiteral("Population of a few cities in Finland"));
 
     hLayout->addWidget(container);
     hLayout->addLayout(vLayout);
@@ -124,13 +125,21 @@ int main(int argc, char **argv)
 //    sizeSliderZ->setValue(100);
 //    sizeSliderZ->setMaximum(100);
 
+    QComboBox *valueDimension = new QComboBox(widget);
+    valueDimension->addItem(QStringLiteral("Height"));
+    valueDimension->addItem(QStringLiteral("Width"));
+    valueDimension->addItem(QStringLiteral("Depth"));
+    valueDimension->addItem(QStringLiteral("Radius"));
+    valueDimension->addItem(QStringLiteral("All"));
+    valueDimension->setCurrentIndex(0);
+
+    QFontComboBox *fontList = new QFontComboBox(widget);
+
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
     fontSizeSlider->setMinimum(1);
     fontSizeSlider->setValue(20);
     fontSizeSlider->setMaximum(200);
-
-    QFontComboBox *fontList = new QFontComboBox(widget);
 
 //    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
 //    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -143,6 +152,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Apply value to:")));
+    vLayout->addWidget(valueDimension, 0, Qt::AlignTop);
 //    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
 //    vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
@@ -173,6 +184,9 @@ int main(int argc, char **argv)
 //    QObject::connect(dataButton, &QPushButton::clicked, modifier, &MapsModifier::addBars);
 //    QObject::connect(selectionButton, &QPushButton::clicked, modifier,
 //                     &MapsModifier::changeSelectionMode);
+
+    QObject::connect(valueDimension, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeValueDimension(int)));
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &MapsModifier::changeFont);

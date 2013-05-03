@@ -47,6 +47,7 @@
 #include <QString>
 
 class QPointF;
+class QPoint;
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
@@ -60,8 +61,10 @@ public:
 
     void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
     void setValue(float value);
+    void setValue(int value);
     // Has no effect in Q3DBars
     void setPosition(const QPointF &position);
+    void setPosition(const QPoint &position);
 
 private:
     QScopedPointer<QDataItemPrivate> d_ptr;

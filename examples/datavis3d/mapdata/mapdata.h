@@ -71,10 +71,14 @@ public:
 //    void setSpecsZ(int bardepth);
     void start();
 
+public slots:
+    void changeValueDimension(int dimension);
+
 private:
     Q3DMaps *m_chart;
     QRect m_imageRect;
     int m_fontSize;
+    QVector3D m_barSpecs;
 };
 
 #endif

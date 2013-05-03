@@ -95,7 +95,10 @@ public:
     bool setData(QDataRow *data);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
-    void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 0.0f, 1.0f),
+    // TODO: Start using thickness also in adjustment direction; use it as a relative value.
+    // For example, in AdjustAll mode setting thickness to (0.1f, 1.0f, 0.5f) would apply value to
+    // x at 10%, y at 100% and z at 50%. If a dimension is not included, given thickness states its absolute value.
+    void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
                      AdjustmentDirection direction = AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
