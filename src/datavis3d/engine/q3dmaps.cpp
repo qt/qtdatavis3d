@@ -70,7 +70,7 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
-#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
+//#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
 const GLfloat gridLineWidth = 0.005f;
 
@@ -273,7 +273,7 @@ void Q3DMaps::drawScene()
             modelMatrix.translate(item->d_ptr->translation().x(),
                                   heightMultiplier * barHeight + heightScaler
                                   - d_ptr->m_yAdjustment,
-                                  item->d_ptr->translation().z() + zComp);
+                                  item->d_ptr->translation().z());
             modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
                                         heightMultiplier * barHeight + heightScaler,
                                         depthMultiplier * barHeight + depthScaler));
@@ -361,7 +361,7 @@ void Q3DMaps::drawScene()
 
         modelMatrix.translate(item->d_ptr->translation().x(),
                               heightMultiplier * barHeight + heightScaler - d_ptr->m_yAdjustment,
-                              item->d_ptr->translation().z() + zComp);
+                              item->d_ptr->translation().z());
         modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
                                     heightMultiplier * barHeight + heightScaler,
                                     depthMultiplier * barHeight + depthScaler));
@@ -379,7 +379,6 @@ void Q3DMaps::drawScene()
             Q3DMapsPrivate::SelectionType selectionType = d_ptr->isSelected(bar, selection);
             switch (selectionType) {
             case Q3DMapsPrivate::SelectionBar: {
-                qDebug() << "selected";
                 barColor = Utils::vectorFromColor(d_ptr->m_theme->m_highlightBarColor);
                 lightStrength = d_ptr->m_theme->m_highlightLightStrength;
                 // Insert data to QDataItem. We have no ownership, don't delete the previous one
@@ -606,10 +605,10 @@ void Q3DMaps::drawScene()
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         d_ptr->m_selectedBar = NULL;
-        if (d_ptr->m_zoomActivated && Q3DMapsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
-            d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
-            d_ptr->m_zoomActivated = false;
-        }
+        //if (d_ptr->m_zoomActivated && Q3DMapsPrivate::MouseOnOverview == d_ptr->m_mousePressed) {
+            //d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+            //d_ptr->m_zoomActivated = false;
+        //}
     } /*else if (d_ptr->m_selectionMode >= ModeZoomRow
                && Q3DMapsPrivate::MouseOnScene == d_ptr->m_mousePressed) {
         // Activate zoom mode
@@ -633,7 +632,7 @@ void Q3DMaps::drawScene()
         }
 #ifndef DISPLAY_FULL_DATA_ON_SELECTION
         // Draw just the value string of the selected bar
-        if (prevItem != d_ptr->m_selectedBar || m_updateLabels) {
+        if (prevItem != d_ptr->m_selectedBar || d_ptr->m_updateLabels) {
             d_ptr->m_drawer->generateLabelTexture(d_ptr->m_selectedBar);
             prevItem = d_ptr->m_selectedBar;
         }
@@ -642,7 +641,7 @@ void Q3DMaps::drawScene()
                                    viewMatrix, projectionMatrix,
                                    QVector3D(0.0f, d_ptr->m_yAdjustment, zComp),
                                    QVector3D(0.0f, 0.0f, 0.0f), d_ptr->m_heightNormalizer,
-                                   d_ptr->m_font, d_ptr->m_selectionMode, d_ptr->m_labelShader,
+                                   d_ptr->m_selectionMode, d_ptr->m_labelShader,
                                    d_ptr->m_labelObj, true);
 #else
         static bool firstSelection = true;
@@ -1307,7 +1306,7 @@ void Q3DMapsPrivate::calculateTranslation(QDataItem *item)
     GLfloat zTrans = 2.0f * (item->d_ptr->position().y() - (m_areaSize.height() / 2.0f))
             / m_scaleFactor;
     //qDebug() << "x, y" << item->d_ptr->position().x() << item->d_ptr->position().y();
-    item->d_ptr->setTranslation(QVector3D(xTrans, 0.0f, zTrans));
+    item->d_ptr->setTranslation(QVector3D(xTrans, 0.0f, zTrans + zComp));
     //qDebug() << item->d_ptr->translation();
 }
 
@@ -1340,12 +1339,10 @@ bool Q3DMapsPrivate::isValid(const QDataItem &item)
     if (item.d_ptr->value() < 0) {
         qCritical("Data item value out of range");
         retval = false;
-    }
-    else if (item.d_ptr->position().x() < 0 || item.d_ptr->position().x() > m_areaSize.width()) {
+    } else if (item.d_ptr->position().x() < 0 || item.d_ptr->position().x() > m_areaSize.width()) {
         qCritical("Data item x position out of range");
         retval = false;
-    }
-    else if (item.d_ptr->position().y() < 0 || item.d_ptr->position().y() > m_areaSize.height()) {
+    } else if (item.d_ptr->position().y() < 0 || item.d_ptr->position().y() > m_areaSize.height()) {
         qCritical("Data item y position out of range");
         retval = false;
     }

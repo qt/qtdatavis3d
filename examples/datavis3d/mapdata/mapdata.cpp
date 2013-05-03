@@ -88,25 +88,25 @@ void MapsModifier::addData()
     QDataItem *item;
     item = new QDataItem();
     item->setValue(191050.0f);
-    item->setLabel("Oulu ", true);
+    item->setLabel("Oulu", true);
     item->setPosition(QPointF(438.0f, 510.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(22274.0f);
-    item->setLabel("Kemi ", true);
+    item->setLabel("Kemi", true);
     item->setPosition(QPointF(412.0f, 445.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(60887.0f);
-    item->setLabel("Rovaniemi ", true);
+    item->setLabel("Rovaniemi", true);
     item->setPosition(QPointF(451.0f, 363.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
     item->setValue(16176.0f);
-    item->setLabel("Kuusamo ", true);
+    item->setLabel("Kuusamo", true);
     item->setPosition(QPointF(587.0f, 419.0f));
     m_chart->addDataItem(item);
 #endif
