@@ -58,7 +58,7 @@ bool MeshLoader::loadOBJ(const QString &path,
                          QVector<QVector2D> &out_uvs,
                          QVector<QVector3D> &out_normals)
 {
-    qDebug() << "Loading OBJ file" << path;
+    //qDebug() << "Loading OBJ file" << path;
 
     QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
     QVector<QVector3D> temp_vertices;

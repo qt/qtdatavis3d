@@ -220,8 +220,7 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
                 * qFabs(sin(rotation.y() * m_pi / 180.0f));
         break;
     }
-    default:
-    {
+    default: {
         break;
     }
     }

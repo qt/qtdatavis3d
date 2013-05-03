@@ -84,7 +84,7 @@ void Q3DWindow::initialize()
 {
     qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
     qDebug() << "OpenGL renderer" << format().renderableType();
-    qDebug() << "OpenGL swapBehavior" << format().swapBehavior();
+    //qDebug() << "OpenGL swapBehavior" << format().swapBehavior();
     setAnimating(true);
 }
 

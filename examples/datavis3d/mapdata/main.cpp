@@ -78,17 +78,17 @@ int main(int argc, char **argv)
 //    dataButton->setText(QStringLiteral("Add a row of random data"));
 //    dataButton->setEnabled(false);
 
-//    QPushButton *themeButton = new QPushButton(widget);
-//    themeButton->setText(QStringLiteral("Change theme"));
+    QPushButton *themeButton = new QPushButton(widget);
+    themeButton->setText(QStringLiteral("Change theme"));
 
-//    QPushButton *labelButton = new QPushButton(widget);
-//    labelButton->setText(QStringLiteral("Change label style"));
+    QPushButton *labelButton = new QPushButton(widget);
+    labelButton->setText(QStringLiteral("Change label style"));
 
-//    QPushButton *styleButton = new QPushButton(widget);
-//    styleButton->setText(QStringLiteral("Change bar style"));
+    QPushButton *styleButton = new QPushButton(widget);
+    styleButton->setText(QStringLiteral("Change bar style"));
 
-//    QPushButton *cameraButton = new QPushButton(widget);
-//    cameraButton->setText(QStringLiteral("Change camera preset"));
+    QPushButton *cameraButton = new QPushButton(widget);
+    cameraButton->setText(QStringLiteral("Change camera preset"));
 
 //    QPushButton *selectionButton = new QPushButton(widget);
 //    selectionButton->setText(QStringLiteral("Change selection mode"));
@@ -99,10 +99,6 @@ int main(int argc, char **argv)
 
 //    QCheckBox *rotationCheckBox = new QCheckBox(widget);
 //    rotationCheckBox->setText("Rotate with slider");
-
-//    QCheckBox *staticCheckBox = new QCheckBox(widget);
-//    staticCheckBox->setText("Use dynamic data");
-//    staticCheckBox->setChecked(false);
 
 //    QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
 //    rotationSliderX->setTickInterval(1);
@@ -128,62 +124,31 @@ int main(int argc, char **argv)
 //    sizeSliderZ->setValue(100);
 //    sizeSliderZ->setMaximum(100);
 
-//    QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
-//    spacingSliderX->setTickInterval(1);
-//    spacingSliderX->setMinimum(0);
-//    spacingSliderX->setValue(10);
-//    spacingSliderX->setMaximum(200);
-//    QSlider *spacingSliderZ = new QSlider(Qt::Horizontal, widget);
-//    spacingSliderZ->setTickInterval(1);
-//    spacingSliderZ->setMinimum(0);
-//    spacingSliderZ->setValue(10);
-//    spacingSliderZ->setMaximum(200);
+    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
+    fontSizeSlider->setTickInterval(1);
+    fontSizeSlider->setMinimum(1);
+    fontSizeSlider->setValue(20);
+    fontSizeSlider->setMaximum(200);
 
-//    QSlider *sampleSliderX = new QSlider(Qt::Horizontal, widget);
-//    sampleSliderX->setTickInterval(1);
-//    sampleSliderX->setMinimum(2);
-//    sampleSliderX->setValue(10);
-//    sampleSliderX->setMaximum(100);
-//    sampleSliderX->setEnabled(false);
-//    QSlider *sampleSliderZ = new QSlider(Qt::Horizontal, widget);
-//    sampleSliderZ->setTickInterval(1);
-//    sampleSliderZ->setMinimum(2);
-//    sampleSliderZ->setValue(10);
-//    sampleSliderZ->setMaximum(100);
-//    sampleSliderZ->setEnabled(false);
+    QFontComboBox *fontList = new QFontComboBox(widget);
 
-//    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
-//    fontSizeSlider->setTickInterval(1);
-//    fontSizeSlider->setMinimum(1);
-//    fontSizeSlider->setValue(20);
-//    fontSizeSlider->setMaximum(100);
-
-//    QFontComboBox *fontList = new QFontComboBox(widget);
-
-//    vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
 //    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
 //    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
 //    vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
 //    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
 //    vLayout->addWidget(sizeSliderX, 0, Qt::AlignTop);
 //    vLayout->addWidget(sizeSliderZ, 0, Qt::AlignTop);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")));
-//    vLayout->addWidget(spacingSliderX, 0, Qt::AlignTop);
-//    vLayout->addWidget(spacingSliderZ, 0, Qt::AlignTop);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
-//    vLayout->addWidget(sampleSliderX, 0, Qt::AlignTop);
-//    vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
 //    vLayout->addWidget(dataButton, 0, Qt::AlignTop);
-//    vLayout->addWidget(themeButton, 0, Qt::AlignTop);
-//    vLayout->addWidget(labelButton, 0, Qt::AlignTop);
-//    vLayout->addWidget(styleButton, 0, Qt::AlignTop);
-//    vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(themeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(labelButton, 0, Qt::AlignTop);
+    vLayout->addWidget(styleButton, 0, Qt::AlignTop);
+    vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
 //    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
 //    vLayout->addWidget(gridCheckBox);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-//    vLayout->addWidget(fontList);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-//    vLayout->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout->addWidget(fontList);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
+    vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
 //    // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -196,31 +161,21 @@ int main(int argc, char **argv)
 //    QObject::connect(sizeSliderX, &QSlider::valueChanged, modifier, &MapsModifier::setSpecsX);
 //    QObject::connect(sizeSliderZ, &QSlider::valueChanged, modifier, &MapsModifier::setSpecsZ);
 
-//    QObject::connect(spacingSliderX, &QSlider::valueChanged, modifier,
-//                     &MapsModifier::setSpacingSpecsX);
-//    QObject::connect(spacingSliderZ, &QSlider::valueChanged, modifier,
-//                     &MapsModifier::setSpacingSpecsZ);
+    QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
+                     &MapsModifier::changeFontSize);
 
-//    QObject::connect(sampleSliderX, &QSlider::valueChanged, modifier,
-//                     &MapsModifier::setSampleCountX);
-//    QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
-//                     &MapsModifier::setSampleCountZ);
-
-//    QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
-//                     &MapsModifier::changeFontSize);
-
-//    QObject::connect(styleButton, &QPushButton::clicked, modifier, &MapsModifier::changeStyle);
-//    QObject::connect(cameraButton, &QPushButton::clicked, modifier,
-//                     &MapsModifier::changePresetCamera);
-//    QObject::connect(themeButton, &QPushButton::clicked, modifier, &MapsModifier::changeTheme);
-//    QObject::connect(labelButton, &QPushButton::clicked, modifier,
-//                     &MapsModifier::changeTransparency);
+    QObject::connect(styleButton, &QPushButton::clicked, modifier, &MapsModifier::changeStyle);
+    QObject::connect(cameraButton, &QPushButton::clicked, modifier,
+                     &MapsModifier::changePresetCamera);
+    QObject::connect(themeButton, &QPushButton::clicked, modifier, &MapsModifier::changeTheme);
+    QObject::connect(labelButton, &QPushButton::clicked, modifier,
+                     &MapsModifier::changeTransparency);
 //    QObject::connect(dataButton, &QPushButton::clicked, modifier, &MapsModifier::addBars);
 //    QObject::connect(selectionButton, &QPushButton::clicked, modifier,
 //                     &MapsModifier::changeSelectionMode);
 
-//    QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
-//                     &MapsModifier::changeFont);
+    QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
+                     &MapsModifier::changeFont);
 
 //    QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
 //                     &MapsModifier::setGridEnabled);
@@ -233,14 +188,6 @@ int main(int argc, char **argv)
 //                     &QSlider::setEnabled);
 //    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
 //                     &QSlider::setValue);
-
-//    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
-//                     &QPushButton::setEnabled);
-//    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
-//                     &QSlider::setEnabled);
-//    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderZ,
-//                     &QSlider::setEnabled);
-//    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &MapsModifier::restart);
 
     modifier->start();
 

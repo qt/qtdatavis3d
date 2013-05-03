@@ -88,7 +88,7 @@ void ObjectHelper::load()
     if (!loadOk)
         qFatal("loading failed");
 
-    qDebug() << "vertex count" << vertices.size();;
+    //qDebug() << "vertex count" << vertices.size();;
 
     // Index vertices
     QVector<unsigned short> indices;

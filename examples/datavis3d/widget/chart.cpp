@@ -184,41 +184,42 @@ void ChartModifier::changeStyle()
 
 void ChartModifier::changePresetCamera()
 {
-    static int preset = 0;
+    static int preset = PresetFrontLow;
 
     m_chart->setCameraPreset((CameraPreset)preset);
 
-    if (++preset > (int)PresetDirectlyAboveCCW45)
-        preset = 0;
+    if (++preset > PresetDirectlyAboveCCW45)
+        preset = PresetFrontLow;
 }
 
 void ChartModifier::changeTheme()
 {
-    static int theme = 0;
+    static int theme = ThemeSystem;
 
     m_chart->setTheme((ColorTheme)theme);
 
-    if (++theme > (int)ThemeLight)
-        theme = 0;
+    if (++theme > ThemeLight)
+        theme = ThemeSystem;
 }
+
 void ChartModifier::changeTransparency()
 {
-    static int transparency = 0;
+    static int transparency = TransparencyFromTheme;
 
     m_chart->setLabelTransparency((LabelTransparency)transparency);
 
-    if (++transparency > (int)TransparencyNoBackground)
-        transparency = 0;
+    if (++transparency > TransparencyNoBackground)
+        transparency = TransparencyNone;
 }
 
 void ChartModifier::changeSelectionMode()
 {
-    static int selectionMode = 0;
+    static int selectionMode = ModeNone;
 
     m_chart->setSelectionMode((SelectionMode)selectionMode);
 
-    if (++selectionMode > (int)ModeZoomColumn)
-        selectionMode = 0;
+    if (++selectionMode > ModeZoomColumn)
+        selectionMode = ModeNone;
 }
 
 void ChartModifier::changeFont(const QFont &font)

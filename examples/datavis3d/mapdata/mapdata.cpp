@@ -49,7 +49,6 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     : m_chart(maps),
       m_imageRect(QRect())
 {
-    m_chart->setTheme(ThemeSystem);
     m_chart->setBarSpecs(QVector3D(30.0f, 10.0f, 30.0f), Q3DMaps::AdjustHeight);
     QImage image = QImage(QStringLiteral(":/images/suomi"));
     m_imageRect = image.rect();
@@ -69,188 +68,133 @@ void MapsModifier::start()
 
 void MapsModifier::addData()
 {
-#if 0
-    QDataItem *item = new QDataItem();
-    item->setValue(10.0f);
-    item->setPosition(QPointF(0.0f, 0.0f));
-    m_chart->addDataItem(item);
-
-    QDataItem *item2 = new QDataItem();
-    item2->setValue(5.0f);
-    item2->setPosition(QPointF(m_imageRect.width(), m_imageRect.height()));
-    m_chart->addDataItem(item2);
-
-    QDataItem *item3 = new QDataItem();
-    item3->setValue(7.0f);
-    item3->setPosition(QPointF(m_imageRect.width() / 2.0f, m_imageRect.height() / 2.0f));
-    m_chart->addDataItem(item3);
-#else
     QDataItem *item;
     item = new QDataItem();
-    item->setValue(191050.0f);
+    item->setValue(191050);
     item->setLabel("Oulu", true);
     item->setPosition(QPointF(438.0f, 510.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
-    item->setValue(22274.0f);
+    item->setValue(22274);
     item->setLabel("Kemi", true);
     item->setPosition(QPointF(412.0f, 445.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
-    item->setValue(60887.0f);
+    item->setValue(60887);
     item->setLabel("Rovaniemi", true);
     item->setPosition(QPointF(451.0f, 363.0f));
     m_chart->addDataItem(item);
 
     item = new QDataItem();
-    item->setValue(16176.0f);
+    item->setValue(16176);
     item->setLabel("Kuusamo", true);
     item->setPosition(QPointF(587.0f, 419.0f));
     m_chart->addDataItem(item);
-#endif
+
+    item = new QDataItem();
+    item->setValue(3998);
+    item->setLabel("Ivalo", true);
+    item->setPosition(QPointF(525.0f, 156.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(37978);
+    item->setLabel("Kajaani", true);
+    item->setPosition(QPointF(577.0f, 596.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(46809);
+    item->setLabel("Kokkola", true);
+    item->setPosition(QPointF(333.0f, 624.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(105236);
+    item->setLabel("Kuopio", true);
+    item->setPosition(QPointF(560.0f, 706.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(133557);
+    item->setLabel("Jyväskylä", true);
+    item->setPosition(QPointF(472.0f, 754.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(65771);
+    item->setLabel("Vaasa", true);
+    item->setPosition(QPointF(259.0f, 702.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(217603);
+    item->setLabel("Tampere", true);
+    item->setPosition(QPointF(365.0f, 826.0f));
+    m_chart->addDataItem(item);
+
+    item = new QDataItem();
+    item->setValue(180350);
+    item->setLabel("Turku", true);
+    item->setPosition(QPointF(270.0f, 951.0f));
+    m_chart->addDataItem(item);
 }
 
-//void MapsModifier::restart(bool dynamicData)
-//{
-//    m_static = !dynamicData;
+void MapsModifier::changeStyle()
+{
+    static int model = 0;
+    switch (model) {
+    case 0:
+        m_chart->setBarType(Cylinders, false);
+        break;
+    case 1:
+        m_chart->setBarType(Cylinders, true);
+        break;
+    case 2:
+        m_chart->setBarType(Cones, false);
+        break;
+    case 3:
+        m_chart->setBarType(Cones, true);
+        break;
+    case 4:
+        m_chart->setBarType(Bars, false);
+        break;
+    case 5:
+        m_chart->setBarType(Bars, true);
+        break;
+    case 6:
+        m_chart->setBarType(Pyramids, false);
+        break;
+    case 7:
+        m_chart->setBarType(Pyramids, true);
+        break;
+    }
+    model++;
+    if (model > 7)
+        model = 0;
+}
 
-//    if (m_static) {
-//        start();
-//        // Set selection mode to zoom row
-//        m_chart->setSelectionMode(ModeZoomRow);
-//        m_chart->setFont(QFont("Times Roman", 20));
-//    } else {
-//        // Set up sample space; make it as deep as it's wide
-//        m_chart->setupSampleSpace(m_columnCount, m_rowCount);
-//        // Set selection mode to full
-//        m_chart->setSelectionMode(ModeBarRowAndColumn);
-//    }
-//}
+void MapsModifier::changePresetCamera()
+{
+    static int preset = PresetFrontLow;
 
-//void MapsModifier::addDataSet()
-//{
-//    // Prepare data to be visualized
-//    // Use QDataSet adder
+    m_chart->setCameraPreset((CameraPreset)preset);
 
-//    // Set window title
-//    m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    if (++preset > PresetDirectlyAboveCCW45)
+        preset = PresetFrontLow;
+}
 
-//    // Set up row and column names
-//    QVector<QString> months;
-//    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-//    QVector<QString> years;
-//    years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
+void MapsModifier::changeTheme()
+{
+    static int theme = ThemeSystem;
 
-//    // Set up data
-//    float temp[7][12] = {{-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
-//                         {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
-//                         {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
-//                         {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
-//                         {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
-//                         {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
-//                         {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};    // 2012
+    m_chart->setTheme((ColorTheme)theme);
 
-//    // Create data set
-//    QDataSet *dataSet = new QDataSet();
-
-//    // Add labels
-//    dataSet->setLabels("Year", "Month", "Average temperature (" + celsiusString + ")",
-//                       years, months);
-
-//    // Create data rows
-//    QDataRow *dataRow;
-//    for (int year = 0; year < years.size(); year++) {
-//        dataRow = new QDataRow(years.at(year));
-//        // Create data items
-//        for (int month = 0; month < months.size(); month++) {
-//            // Add data to rows
-//            dataRow->addItem(new QDataItem(temp[year][month], celsiusString));
-//        }
-//        // Add row to set
-//        dataSet->addRow(dataRow);
-//        // Get next pointer
-//        dataRow++;
-//    }
-
-//    // Set up sample space based on prepared data
-//    m_chart->setupSampleSpace(months.size(), years.size());
-
-//    // Add data to chart
-//    m_chart->addDataSet(dataSet);
-//}
-
-//void MapsModifier::addBars()
-//{
-//    QVector<float> data;
-//    for (float i = 0; i < m_columnCount; i++)
-//        data.append(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
-//    m_chart->addDataRow(data);
-//}
-
-//void MapsModifier::changeStyle()
-//{
-//    static int model = 0;
-//    switch (model) {
-//    case 0:
-//        m_chart->setBarType(Cylinders, false);
-//        break;
-//    case 1:
-//        m_chart->setBarType(Cylinders, true);
-//        break;
-//    case 2:
-//        m_chart->setBarType(Cones, false);
-//        break;
-//    case 3:
-//        m_chart->setBarType(Cones, true);
-//        break;
-//    case 4:
-//        m_chart->setBarType(Bars, false);
-//        break;
-//    case 5:
-//        m_chart->setBarType(Bars, true);
-//        break;
-//    case 6:
-//        m_chart->setBarType(Pyramids, false);
-//        break;
-//    case 7:
-//        m_chart->setBarType(Pyramids, true);
-//        break;
-//    }
-//    model++;
-//    if (model > 7)
-//        model = 0;
-//}
-
-//void MapsModifier::changePresetCamera()
-//{
-//    static int preset = 0;
-
-//    m_chart->setCameraPreset((CameraPreset)preset);
-
-//    if (++preset > (int)PresetDirectlyAboveCCW45)
-//        preset = 0;
-//}
-
-//void MapsModifier::changeTheme()
-//{
-//    static int theme = 0;
-
-//    m_chart->setTheme((ColorTheme)theme);
-
-//    if (++theme > (int)ThemeLight)
-//        theme = 0;
-//}
-//void MapsModifier::changeTransparency()
-//{
-//    static int transparency = 0;
-
-//    m_chart->setLabelTransparency((LabelTransparency)transparency);
-
-//    if (++transparency > (int)TransparencyNoBackground)
-//        transparency = 0;
-//}
+    if (++theme > ThemeLight)
+        theme = ThemeSystem;
+}
 
 //void MapsModifier::changeSelectionMode()
 //{
@@ -262,18 +206,29 @@ void MapsModifier::addData()
 //        selectionMode = 0;
 //}
 
-//void MapsModifier::changeFont(const QFont &font)
-//{
-//    QFont newFont = font;
-//    newFont.setPixelSize(m_fontSize);
-//    m_chart->setFont(newFont);
-//}
+void MapsModifier::changeTransparency()
+{
+    static int transparency = TransparencyFromTheme;
 
-//void MapsModifier::changeFontSize(int fontsize)
-//{
-//    m_fontSize = fontsize;
-//    m_chart->setFontSize((GLfloat)m_fontSize);
-//}
+    m_chart->setLabelTransparency((LabelTransparency)transparency);
+
+    if (++transparency > TransparencyNoBackground)
+        transparency = TransparencyNone;
+}
+
+void MapsModifier::changeFont(const QFont &font)
+{
+    QFont newFont = font;
+    newFont.setPointSizeF(m_fontSize);
+    qDebug() << newFont << newFont.style();
+    m_chart->setFont(newFont);
+}
+
+void MapsModifier::changeFontSize(int fontsize)
+{
+    m_fontSize = fontsize;
+    m_chart->setFontSize((GLfloat)m_fontSize);
+}
 
 //void MapsModifier::setGridEnabled(int enabled)
 //{
@@ -302,28 +257,4 @@ void MapsModifier::addData()
 //{
 //    m_barDepth = (float)bardepth / 100.0f;
 //    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}
-
-//void MapsModifier::setSpacingSpecsX(int spacing)
-//{
-//    m_barSpacingX = (float)spacing / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}
-
-//void MapsModifier::setSpacingSpecsZ(int spacing)
-//{
-//    m_barSpacingZ = (float)spacing / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}
-
-//void MapsModifier::setSampleCountX(int samples)
-//{
-//    m_columnCount = samples;
-//    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
-//}
-
-//void MapsModifier::setSampleCountZ(int samples)
-//{
-//    m_rowCount = samples;
-//    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
 //}

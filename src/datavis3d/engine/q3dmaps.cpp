@@ -958,6 +958,7 @@ void Q3DMaps::setTheme(ColorTheme theme)
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
                            QStringLiteral(":/shaders/fragment"));
     }
+    d_ptr->m_updateLabels = true;
 }
 
 void Q3DMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
@@ -994,18 +995,21 @@ void Q3DMaps::setFontSize(float fontsize)
 {
     d_ptr->m_font.setPointSizeF(fontsize);
     d_ptr->m_drawer->setFont(d_ptr->m_font);
+    d_ptr->m_updateLabels = true;
 }
 
 void Q3DMaps::setFont(const QFont &font)
 {
     d_ptr->m_font = font;
     d_ptr->m_drawer->setFont(font);
+    d_ptr->m_updateLabels = true;
 }
 
 void Q3DMaps::setLabelTransparency(LabelTransparency transparency)
 {
     d_ptr->m_labelTransparency = transparency;
     d_ptr->m_drawer->setTransparency(transparency);
+    d_ptr->m_updateLabels = true;
 }
 
 void Q3DMaps::setGridEnabled(bool enable)
@@ -1172,7 +1176,7 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_areaSize(QSizeF(1.0f, 1.0f)),
       m_bgrTexture(0),
       m_selectionTexture(0),
-      m_updateLabels(false),
+      m_updateLabels(true),
       m_gridEnabled(true)
 {
     //m_data->d_ptr->setDrawer(m_drawer);

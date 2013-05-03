@@ -44,6 +44,7 @@
 #include "q3dmaps.h"
 #include "qdataset.h"
 
+#include <QFont>
 #include <QDebug>
 
 using namespace QtDataVis3D;
@@ -56,29 +57,24 @@ public:
     ~MapsModifier();
 
     void addData();
-//    void addBars();
-//    void changeStyle();
-//    void changePresetCamera();
-//    void changeTheme();
-//    void changeTransparency();
+    void changeStyle();
+    void changePresetCamera();
+    void changeTheme();
 //    void changeSelectionMode();
-//    void changeFont(const QFont &font);
-//    void changeFontSize(int fontsize);
+    void changeTransparency();
+    void changeFont(const QFont &font);
+    void changeFontSize(int fontsize);
 //    void rotateX(int rotation);
 //    void rotateY(int rotation);
 //    void setGridEnabled(int enabled);
 //    void setSpecsX(int barwidth);
 //    void setSpecsZ(int bardepth);
-//    void setSpacingSpecsX(int spacing);
-//    void setSpacingSpecsZ(int spacing);
-//    void setSampleCountX(int samples);
-//    void setSampleCountZ(int samples);
     void start();
-//    void restart(bool dynamicData);
 
 private:
     Q3DMaps *m_chart;
     QRect m_imageRect;
+    int m_fontSize;
 };
 
 #endif

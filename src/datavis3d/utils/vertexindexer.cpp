@@ -130,7 +130,7 @@ void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices,
             VertexToOutIndex[packed] = newindex;
         }
     }
-    qDebug() << "unique vertices" << unique_vertices;
+    //qDebug() << "unique vertices" << unique_vertices;
 }
 
 void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
@@ -170,7 +170,7 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
             out_indices.append((unsigned short)out_vertices.size() - 1);
         }
     }
-    qDebug() << "unique vertices" << unique_vertices;
+    //qDebug() << "unique vertices" << unique_vertices;
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
