@@ -3,4 +3,7 @@
         <file alias="suomi">suomi2.jpg</file>
         <file alias="finland">suomi.jpg</file>
     </qresource>
+    <qresource prefix="/meshes">
+        <file alias="weirdthing">weirdthing.obj</file>
+    </qresource>
 </RCC>

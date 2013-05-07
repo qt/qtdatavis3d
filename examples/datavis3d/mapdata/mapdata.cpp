@@ -40,6 +40,7 @@
 
 #include "mapdata.h"
 #include <QImage>
+#include <QFile>
 
 using namespace QtDataVis3D;
 
@@ -53,7 +54,8 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     QImage image = QImage(QStringLiteral(":/images/suomi"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
-    m_chart->setBarType(Cones, false);
+    //m_chart->setBarType(Cones, false);
+    m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
 }
 
 MapsModifier::~MapsModifier()
