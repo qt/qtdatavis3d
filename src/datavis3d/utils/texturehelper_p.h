@@ -70,8 +70,10 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection framebuffer and inserts generated texture id to texture parameters
     GLuint createSelectionBuffer(const QSize &size, GLuint &texture, GLuint &depthTexture);
-    // Returns selection texture and inserts generated framebuffers to fraembuffer parameters
+    // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    // Returns depth texture and inserts generated framebuffer to parameter
+    GLuint createDepthTexture(const QSize &size, GLuint &frameBuffer);
     void deleteTexture(const GLuint *texture);
 
     private:

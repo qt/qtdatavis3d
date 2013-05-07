@@ -92,11 +92,13 @@ void ShaderHelper::initialize()
     m_viewMatrixUniform = m_program->uniformLocation("V");
     m_modelMatrixUniform = m_program->uniformLocation("M");
     m_invTransModelMatrixUniform = m_program->uniformLocation("itM");
+    m_depthBiasMatrixUniform = m_program->uniformLocation("depthBiasMVP");
     m_lightPositionUniform = m_program->uniformLocation("lightPosition_wrld");
     m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
     m_ambientStrengthUniform = m_program->uniformLocation("ambientStrength");
     m_colorUniform = m_program->uniformLocation("color_mdl");
     m_textureUniform = m_program->uniformLocation("textureSampler");
+    m_shadowUniform = m_program->uniformLocation("shadowMap");
 
     m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
     m_uvAttr = m_program->attributeLocation("vertexUV");
@@ -163,6 +165,13 @@ GLuint ShaderHelper::nModel()
     return m_invTransModelMatrixUniform;
 }
 
+GLuint ShaderHelper::depth()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_depthBiasMatrixUniform;
+}
+
 GLuint ShaderHelper::lightP()
 {
     if (!m_initialized)
@@ -196,6 +205,13 @@ GLuint ShaderHelper::texture()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_textureUniform;
+}
+
+GLuint ShaderHelper::shadow()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_shadowUniform;
 }
 
 GLuint ShaderHelper::posAtt()

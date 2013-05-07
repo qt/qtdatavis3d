@@ -25,6 +25,12 @@
         <file alias="vertexTexture">shaders/vertexShaderTexture</file>
         <file alias="fragmentLabel">shaders/fragmentShaderLabel</file>
         <file alias="vertexLabel">shaders/vertexShaderLabel</file>
+        <file alias="fragmentDepth">shaders/fragmentShaderDepth</file>
+        <file alias="vertexDepth">shaders/vertexShaderDepth</file>
+        <file alias="testDepthFrag">shaders/fragmentDepthTest</file>
+        <file alias="testDepthVert">shaders/vertexDepthTest</file>
+        <file alias="fragmentShadow">shaders/fragmentShadow</file>
+        <file alias="vertexShadow">shaders/vertexShadow</file>
     </qresource>
     <qresource prefix="/textures"/>
 </RCC>

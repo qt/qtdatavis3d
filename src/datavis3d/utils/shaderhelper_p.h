@@ -84,11 +84,13 @@ class ShaderHelper
     GLuint view();
     GLuint model();
     GLuint nModel();
+    GLuint depth();
     GLuint lightP();
     GLuint lightS();
     GLuint ambientS();
     GLuint color();
     GLuint texture();
+    GLuint shadow();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -112,13 +114,13 @@ class ShaderHelper
     GLuint m_viewMatrixUniform;
     GLuint m_modelMatrixUniform;
     GLuint m_invTransModelMatrixUniform;
+    GLuint m_depthBiasMatrixUniform;
     GLuint m_mvpMatrixUniform;
     GLuint m_lightPositionUniform;
     GLuint m_lightStrengthUniform;
     GLuint m_ambientStrengthUniform;
     GLuint m_textureUniform;
-
-    //GLuint m_depthTexture; // currently unused
+    GLuint m_shadowUniform;
 
     GLboolean m_initialized;
 };
