@@ -78,8 +78,8 @@ public:
     void setFont(const QFont &font);
     void setTransparency(LabelTransparency transparency);
 
-    void drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured = false,
-                    GLuint textureId = 0);
+    void drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId = 0,
+                    GLuint depthTextureId = 0);
     void drawLabel(const QDataItem &item, const LabelItem &label,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat maxHeight,

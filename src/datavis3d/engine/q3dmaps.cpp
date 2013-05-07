@@ -96,8 +96,6 @@ void Q3DMaps::initialize()
     }
     d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                                  QStringLiteral(":/shaders/fragmentShadow"));
-//    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
-//                                 QStringLiteral(":/shaders/fragmentTexture"));
     d_ptr->initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                             QStringLiteral(":/shaders/fragmentLabel"));
     d_ptr->initSelectionShader();
@@ -132,7 +130,7 @@ void Q3DMaps::initialize()
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 3.0f * zComp),
+    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 1.0f + 2.9f * zComp),
                                               QVector3D(0.0f, 0.0f, zComp),
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
@@ -273,7 +271,7 @@ void Q3DMaps::drawScene()
     depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp),
                            QVector3D(0.0f, 1.0f, 0.0f));
     QMatrix4x4 depthProjectionMatrix;
-    depthProjectionMatrix.ortho(-10,10,-10,10,-10,20);
+    depthProjectionMatrix.ortho(-10, 10, -10, 10, -10, 20);
 #if 0
     // Draw background to depth buffer
     if (d_ptr->m_backgroundObj) {
@@ -359,6 +357,7 @@ void Q3DMaps::drawScene()
     d_ptr->m_depthShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
+    // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper
     d_ptr->m_labelShader->bind();
     glEnable(GL_TEXTURE_2D);
     QMatrix4x4 modelMatrix;
@@ -369,7 +368,7 @@ void Q3DMaps::drawScene()
     modelMatrix.translate(0.0, 0.0, zComp);
     QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
     d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
-    d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj, true,
+    d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
                                 d_ptr->m_depthTexture);
     glDisable(GL_TEXTURE_2D);
     d_ptr->m_labelShader->release();
@@ -460,7 +459,7 @@ void Q3DMaps::drawScene()
         modelMatrix.translate(0.0, 0.0, zComp);
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
-        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj, true,
+        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
                                     d_ptr->m_selectionTexture);
         glDisable(GL_TEXTURE_2D);
         d_ptr->m_labelShader->release();
@@ -579,7 +578,8 @@ void Q3DMaps::drawScene()
 
         // Set shader bindings
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightP(),
-                                                   QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp) - lightPos);
+                                                   QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp)
+                                                   - lightPos);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->view(),
                                                    viewMatrix);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->model(),
@@ -595,52 +595,9 @@ void Q3DMaps::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
                                                    d_ptr->m_theme->m_ambientStrength * 3.0f);
 
-        // TODO: Add parameter to drawObject to allow using shadow mapping
-//        // Draw the object
-//        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true,
-//                                    d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
-
-        // TODO: Done here for now
-        // Activate texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, d_ptr->m_bgrTexture);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->texture(), 0);
-
-        // Activate depth texture
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, d_ptr->m_depthTexture);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->shadow(), 1);
-
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 2nd attribute buffer : normals
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->normalBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // 3rd attribute buffer : UVs
-        glEnableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->uvBuf());
-        glVertexAttribPointer(d_ptr->m_backgroundShader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
-
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_backgroundObj->indexCount(), GL_UNSIGNED_SHORT, (void*)0);
-
-        // Free buffers
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->uvAtt());
-
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->normalAtt());
-        glDisableVertexAttribArray(d_ptr->m_backgroundShader->posAtt());
+        // Draw the object
+        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
+                                    d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
     }
 
     // Disable textures

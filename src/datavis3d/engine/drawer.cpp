@@ -85,14 +85,21 @@ void Drawer::setTransparency(LabelTransparency transparency)
     emit drawerChanged();
 }
 
-void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, bool textured,
-                        GLuint textureId)
+void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId,
+                        GLuint depthTextureId)
 {
-    if (textured) {
+    if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
         shader->setUniformValue(shader->texture(), 0);
+    }
+
+    if (depthTextureId) {
+        // Activate depth texture
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, depthTextureId);
+        shader->setUniformValue(shader->shadow(), 1);
     }
 
     // 1st attribute buffer : vertices
@@ -105,7 +112,7 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, bool texture
     glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
     glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    if (textured) {
+    if (textureId || depthTextureId) {
         // 3rd attribute buffer : UVs
         glEnableVertexAttribArray(shader->uvAtt());
         glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
@@ -122,7 +129,7 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, bool texture
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    if (textured) {
+    if (textureId || depthTextureId) {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDisableVertexAttribArray(shader->uvAtt());
     }
@@ -259,7 +266,7 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     shader->setUniformValue(shader->MVP(), MVPMatrix);
 
     // Draw the object
-    drawObject(shader, object, true, labelItem.textureId());
+    drawObject(shader, object, labelItem.textureId());
 }
 
 void Drawer::generateLabelTexture(QDataItem *item)
