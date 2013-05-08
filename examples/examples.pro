@@ -1,2 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS += datavis3d
+SUBDIRS += barchart \
+           rainfall \
+           spectrum \
+           widget \
+           mapdata
