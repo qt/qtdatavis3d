@@ -92,7 +92,7 @@ void ShaderHelper::initialize()
     m_viewMatrixUniform = m_program->uniformLocation("V");
     m_modelMatrixUniform = m_program->uniformLocation("M");
     m_invTransModelMatrixUniform = m_program->uniformLocation("itM");
-    m_depthBiasMatrixUniform = m_program->uniformLocation("depthBiasMVP");
+    m_depthMatrixUniform = m_program->uniformLocation("depthMVP");
     m_lightPositionUniform = m_program->uniformLocation("lightPosition_wrld");
     m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
     m_ambientStrengthUniform = m_program->uniformLocation("ambientStrength");
@@ -169,7 +169,7 @@ GLuint ShaderHelper::depth()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
-    return m_depthBiasMatrixUniform;
+    return m_depthMatrixUniform;
 }
 
 GLuint ShaderHelper::lightP()

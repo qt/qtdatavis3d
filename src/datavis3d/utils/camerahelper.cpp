@@ -54,12 +54,12 @@ QVector3D m_up = QVector3D(0, 1, 0);
 
 QPoint m_previousMousePos(0, 0);
 
-float m_xRotation = 0;
-float m_yRotation = 0;
-float m_defaultXRotation = 0;
-float m_defaultYRotation = 0;
+GLfloat m_xRotation = 0;
+GLfloat m_yRotation = 0;
+GLfloat m_defaultXRotation = 0;
+GLfloat m_defaultYRotation = 0;
 
-float m_rotationSpeed = 100;
+GLfloat m_rotationSpeed = 100;
 
 // FUNCTIONS
 void CameraHelper::setRotationSpeed(int speed)
@@ -91,9 +91,9 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     QMatrix4x4 viewMatrix;
 
     // Calculate mouse movement since last frame
-    float mouseMoveX = float(m_previousMousePos.x() - mousePos.x())
+    GLfloat mouseMoveX = GLfloat(m_previousMousePos.x() - mousePos.x())
             / (screenWidth / m_rotationSpeed);
-    float mouseMoveY = float(m_previousMousePos.y() - mousePos.y())
+    GLfloat mouseMoveY = GLfloat(m_previousMousePos.y() - mousePos.y())
             / (screenHeight / m_rotationSpeed);
     // Apply to rotations
     m_xRotation -= mouseMoveX;
@@ -117,7 +117,7 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     // y rotation is always "clean"
     viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
     // handle zoom by scaling
-    viewMatrix.scale((float)zoom / 100.0f);
+    viewMatrix.scale((GLfloat)zoom / 100.0f);
     // Compensate for translation (if m_target is off origin)
     viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
     //qDebug() << m_xRotation << m_yRotation;
@@ -131,12 +131,14 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     return viewMatrix;
 }
 
-QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, float fixedRotation)
+QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition,
+                                               GLfloat fixedRotation, GLfloat distanceModifier)
 {
     // Move light with camera
     QVector3D newLightPosition;
-    float xAngle;
-    float yAngle;
+    GLfloat radiusFactor = lightPosition.z() * (1.5f + distanceModifier); // for making sure light is outside the scene at its lowest point
+    GLfloat xAngle;
+    GLfloat yAngle;
     if (!fixedRotation) {
         xAngle = m_xRotation * m_pi / 180.0f;
         yAngle = m_yRotation * m_pi / 180.0f;
@@ -144,10 +146,10 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition, f
         xAngle = fixedRotation * m_pi / 180.0f;
         yAngle = 0;
     }
-    float radius = lightPosition.y() * 2.0f; // set radius to match the highest height of the light
-    float zPos = radius * cos(xAngle) * cos(yAngle);
-    float xPos = radius * sin(xAngle) * cos(yAngle);
-    float yPos = lightPosition.y() * sin(yAngle);
+    GLfloat radius = (radiusFactor + lightPosition.y()); // set radius to match the highest height of the light
+    GLfloat zPos = radius * cos(xAngle) * cos(yAngle);
+    GLfloat xPos = radius * sin(xAngle) * cos(yAngle);
+    GLfloat yPos = (radiusFactor + lightPosition.y()) * sin(yAngle);
     // Keep light in the set position in relation to camera
     // TODO: Does not work perfectly yet; Light seems wrong when viewing scene from sides (or isometrically)
     newLightPosition = QVector3D(-xPos + lightPosition.x(),

@@ -517,14 +517,14 @@ void Q3DBars::drawScene()
                 glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
                 glVertexAttribPointer(d_ptr->m_selectionShader->posAtt(),
-                                      3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+                                      3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
                 // Index buffer
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
                 // Draw the triangles
                 glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(),
-                               GL_UNSIGNED_SHORT, (void*)0);
+                               GL_UNSIGNED_SHORT, (void *)0);
 
                 // Free buffers
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -536,14 +536,14 @@ void Q3DBars::drawScene()
                 glEnableVertexAttribArray(d_ptr->m_selectionShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
                 glVertexAttribPointer(d_ptr->m_selectionShader->posAtt(),
-                                      3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+                                      3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
                 // Index buffer
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
                 // Draw the triangles
                 glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(), GL_UNSIGNED_SHORT,
-                               (void*)0);
+                               (void *)0);
 
                 // Free buffers
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

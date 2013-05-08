@@ -50,8 +50,11 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 // Constants used in several files
 const GLfloat m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
-const GLfloat zComp = 10.0f; // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
-const QVector3D defaultLightPos = QVector3D(0.0f, 3.0f, zComp);
+// Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
+const GLfloat zComp = 10.0f;
+// Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
+// y position is added to the minimum height (or can be thought to be that much above or below the camera)
+const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, zComp);
 const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 
 // Enums used in several files

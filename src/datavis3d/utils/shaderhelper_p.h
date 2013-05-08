@@ -114,7 +114,7 @@ class ShaderHelper
     GLuint m_viewMatrixUniform;
     GLuint m_modelMatrixUniform;
     GLuint m_invTransModelMatrixUniform;
-    GLuint m_depthBiasMatrixUniform;
+    GLuint m_depthMatrixUniform;
     GLuint m_mvpMatrixUniform;
     GLuint m_lightPositionUniform;
     GLuint m_lightStrengthUniform;

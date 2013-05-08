@@ -82,7 +82,8 @@ class CameraHelper
     // Calcluate light position based on rotation. Call after calling calculateViewMatrix to get
     // up-to-date position
     static QVector3D calculateLightPosition(const QVector3D &lightPosition,
-                                            float fixedRotation = 0.0f);
+                                            GLfloat fixedRotation = 0.0f,
+                                            GLfloat distanceModifier = 0.0f);
     static void updateMousePos(const QPoint &mousePos);
     static void setCameraPreset(CameraPreset preset);
 };

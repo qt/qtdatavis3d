@@ -7,18 +7,36 @@ varying highp vec3 lightDirection_cmr;
 
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
-uniform highp vec3 lightPosition_wrld;
 uniform sampler2D textureSampler;
-uniform sampler2DShadow shadowMap;
+//uniform sampler2DShadow shadowMap; // use with version 2
+uniform sampler2D shadowMap; // use with version 1
 
-//float random(vec3 seed, int i){
-//    vec4 seed4 = vec4(seed,i);
-//    float dot_product = dot(seed4, vec4(12.9898, 78.233, 45.164, 94.673));
-//    return fract(sin(dot_product) * 43758.5453);
-//}
+// Version 1: Use this to see the shadow map
 
 void main() {
-    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
+    float shadowFactor = 1.0; // default to '1' meaning "no shadow"
+    float epsilon = 0.1; // increase value to remove little artifacts
+    vec4 shadCoordsPD = shadowCoord / shadowCoord.w;
+    if (shadowCoord.w <= 0.0) { // ignore negative projection
+        shadowFactor = 1.0;
+    } else if (shadCoordsPD.x < 0.0 || shadCoordsPD.y < 0.0) { // outside light frustum, ignore
+        shadowFactor = 1.0;
+    } else if (shadCoordsPD.x >= 1.0 || shadCoordsPD.y >= 1.0) { // outside light frustum, ignore
+        shadowFactor = 1.0;
+    } else {
+        float shadow = texture2D(shadowMap, shadCoordsPD.xy).x;
+        if (shadow + epsilon < shadCoordsPD.z) {
+            shadowFactor = 0.0;
+        }
+    }
+    // shadow is dark gray, other parts bright yellow
+    gl_FragColor = vec4(0.8, 0.8, 0.0, 1.0) * shadowFactor + vec4(0.2, 0.2, 0.2, 1.0);
+}
+
+// Version 2: Use this normally
+/*
+void main() {
+    highp vec3 materialDiffuseColor = vec3(0.8, 0.8, 0.0);//texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
 
@@ -36,26 +54,12 @@ void main() {
 
     highp float visibility = 1.0;
     highp float bias = 0.005;
-    //highp bias = 0.005 * tan(acos(cosTheta));
+
+    //highp float bias = 0.005 * tan(acos(cosTheta));
     //if (bias < 0.0) { bias = 0.0; }
     //if (bias > 0.01) { bias = 0.01; }
 
-    //for (int i = 0; i < 4; i++) {
-        // use either :
-        //  - Always the same samples.
-        //    Gives a fixed pattern in the shadow, but no noise
-        //int index = i;
-        //  - A random sample, based on the pixel's screen location.
-        //    No banding, but the shadow moves with the camera, which looks weird.
-        // int index = int(16.0*random(gl_FragCoord.xyy, i))%16;
-        //  - A random sample, based on the pixel's position in world space.
-        //    The position is rounded to the millimeter to avoid too much aliasing
-        // int index = int(16.0*random(floor(Position_worldspace.xyz*1000.0), i))%16;
-
-        // being fully in the shadow will eat up 4*0.2 = 0.8
-        // 0.2 potentially remain, which is quite dark.
-        visibility -= 0.8 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
-    //}
+    visibility -= 0.8 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
 
     gl_FragColor.rgb =
         materialAmbientColor +
@@ -63,3 +67,4 @@ void main() {
         visibility * materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha);
     gl_FragColor.a = 1.0;
 }
+*/
