@@ -159,7 +159,6 @@ public:
     bool m_xFlipped;
     bool m_zFlipped;
     GLuint m_selectionTexture;
-    //GLuint m_selectionDepthTexture;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;

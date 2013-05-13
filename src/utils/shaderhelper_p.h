@@ -79,6 +79,7 @@ class ShaderHelper
     void setUniformValue(GLuint uniform, const QVector4D &value);
     void setUniformValue(GLuint uniform, const QMatrix4x4 &value);
     void setUniformValue(GLuint uniform, GLfloat value);
+    void setUniformValue(GLuint uniform, GLint value);
 
     GLuint MVP();
     GLuint view();

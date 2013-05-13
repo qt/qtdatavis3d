@@ -1,3 +1,11 @@
+#version 130
+
+uniform highp float lightStrength;
+uniform highp float ambientStrength;
+uniform highp sampler2D textureSampler;
+//uniform highp sampler2DShadow shadowMap; // use with version 2
+uniform highp sampler2D shadowMap; // use with version 1
+
 varying highp vec4 shadowCoord;
 varying highp vec2 UV;
 varying highp vec3 position_wrld;
@@ -5,18 +13,13 @@ varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 
-uniform highp float lightStrength;
-uniform highp float ambientStrength;
-uniform sampler2D textureSampler;
-//uniform sampler2DShadow shadowMap; // use with version 2
-uniform sampler2D shadowMap; // use with version 1
-
-// Version 1: Use this to see the shadow map
-
+// Version 1: This works
 void main() {
     float shadowFactor = 1.0; // default to '1' meaning "no shadow"
-    float epsilon = 0.1; // increase value to remove little artifacts
-    vec4 shadCoordsPD = shadowCoord / shadowCoord.w;
+    //float epsilon = 0.01; // increase value to remove little artifacts
+    vec4 shadCoordsPD = shadowCoord;
+    shadCoordsPD.z += 0.005;
+    shadCoordsPD /= shadowCoord.w;
     if (shadowCoord.w <= 0.0) { // ignore negative projection
         shadowFactor = 1.0;
     } else if (shadCoordsPD.x < 0.0 || shadCoordsPD.y < 0.0) { // outside light frustum, ignore
@@ -24,47 +27,72 @@ void main() {
     } else if (shadCoordsPD.x >= 1.0 || shadCoordsPD.y >= 1.0) { // outside light frustum, ignore
         shadowFactor = 1.0;
     } else {
-        float shadow = texture2D(shadowMap, shadCoordsPD.xy).x;
-        if (shadow + epsilon < shadCoordsPD.z) {
-            shadowFactor = 0.0;
-        }
-    }
-    // shadow is dark gray, other parts bright yellow
-    gl_FragColor = vec4(0.8, 0.8, 0.0, 1.0) * shadowFactor + vec4(0.2, 0.2, 0.2, 1.0);
-}
 
-// Version 2: Use this normally
-/*
-void main() {
-    highp vec3 materialDiffuseColor = vec3(0.8, 0.8, 0.0);//texture2D(textureSampler, UV).rgb;
+        // Requires at least #version 130
+        float shadow = 0.0;
+        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, 1));
+        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, 1));
+        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, -1));
+        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, -1));
+        shadow *= 0.25;
+        shadowFactor = shadow;
+        //float shadow = texture2D(shadowMap, shadCoordsPD.xy).x;
+        //if (shadow + epsilon < shadCoordsPD.z) {
+        //    shadowFactor = 0.0;
+        //}
+    }
+    // shadow is dark gray, other parts light gray
+    //gl_FragColor = vec4(0.8, 0.8, 0.8, 1.0) * shadowFactor;// + vec4(0.2, 0.2, 0.2, 1.0);
+    // simple shadows with no effect from light
+    //gl_FragColor = texture2D(textureSampler, UV) * shadowFactor;
+
+    // shadows including effects from light
+    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialSpecularColor = vec3(0.2, 0.2, 0.2);
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);
-    highp float cosTheta = dot(n, l);
-    if (cosTheta < 0.0) { cosTheta = 0.0; }
-    if (cosTheta > 1.0) { cosTheta = 1.0; }
+    highp float cosTheta = clamp(dot(n, l), 0.0, 1.0);
 
     highp vec3 E = normalize(eyeDirection_cmr);
     highp vec3 R = reflect(-l, n);
-    highp float cosAlpha = dot(E, R);
-    if (cosAlpha < 0.0) { cosAlpha = 0.0; }
-    if (cosAlpha > 1.0) { cosAlpha = 1.0; }
+    highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
+
+    gl_FragColor.rgb =
+        shadowFactor * materialAmbientColor +
+        shadowFactor * materialDiffuseColor * lightStrength * cosTheta +
+        shadowFactor * materialSpecularColor * lightStrength * pow(cosAlpha, 10);
+    gl_FragColor.a = 1.0;
+}
+
+// Version 2: This does not work yet..
+/*
+void main() {
+    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
+    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
+    highp vec3 materialSpecularColor = vec3(0.2, 0.2, 0.2);
+
+    highp vec3 n = normalize(normal_cmr);
+    highp vec3 l = normalize(lightDirection_cmr);
+    highp float cosTheta = clamp(dot(n, l), 0.0, 1.0);
+
+    highp vec3 E = normalize(eyeDirection_cmr);
+    highp vec3 R = reflect(-l, n);
+    highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
     highp float visibility = 1.0;
-    highp float bias = 0.005;
+    //highp float bias = 0.005;
 
-    //highp float bias = 0.005 * tan(acos(cosTheta));
-    //if (bias < 0.0) { bias = 0.0; }
-    //if (bias > 0.01) { bias = 0.01; }
+    highp float bias = 0.005 * tan(acos(cosTheta));
+    bias = clamp(bias, 0.0, 0.01);
 
     visibility -= 0.8 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
 
     gl_FragColor.rgb =
         materialAmbientColor +
         visibility * materialDiffuseColor * lightStrength * cosTheta +
-        visibility * materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha);
+        visibility * materialSpecularColor * lightStrength * pow(cosAlpha, 10);
     gl_FragColor.a = 1.0;
 }
 */

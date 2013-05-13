@@ -88,6 +88,11 @@ void ShaderHelper::initialize()
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
         qFatal("Compiling Fragment shader failed");
     m_program->link();
+
+    m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
+    m_normalAttr = m_program->attributeLocation("vertexNormal_mdl");
+    m_uvAttr = m_program->attributeLocation("vertexUV");
+
     m_mvpMatrixUniform = m_program->uniformLocation("MVP");
     m_viewMatrixUniform = m_program->uniformLocation("V");
     m_modelMatrixUniform = m_program->uniformLocation("M");
@@ -99,10 +104,6 @@ void ShaderHelper::initialize()
     m_colorUniform = m_program->uniformLocation("color_mdl");
     m_textureUniform = m_program->uniformLocation("textureSampler");
     m_shadowUniform = m_program->uniformLocation("shadowMap");
-
-    m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
-    m_uvAttr = m_program->attributeLocation("vertexUV");
-    m_normalAttr = m_program->attributeLocation("vertexNormal_mdl");
 
     m_initialized = true;
 }
@@ -133,6 +134,11 @@ void ShaderHelper::setUniformValue(GLuint uniform, const QMatrix4x4 &value)
 }
 
 void ShaderHelper::setUniformValue(GLuint uniform, GLfloat value)
+{
+    m_program->setUniformValue(uniform, value);
+}
+
+void ShaderHelper::setUniformValue(GLuint uniform, GLint value)
 {
     m_program->setUniformValue(uniform, value);
 }

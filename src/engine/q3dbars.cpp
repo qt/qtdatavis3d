@@ -1584,7 +1584,6 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
-    //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
 #endif
     delete m_dataSet;
     if (m_zoomSelection) {
@@ -1657,7 +1656,6 @@ void Q3DBarsPrivate::initSelectionBuffer()
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->deleteTexture(&m_selectionTexture);
-        //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
     }
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
                                                                  m_selectionFrameBuffer,

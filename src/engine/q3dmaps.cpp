@@ -284,7 +284,7 @@ void Q3DMaps::drawScene()
 #ifdef USE_WIDER_SHADOWS
     // Use this for a bit exaggerated shadows
     depthProjectionMatrix.perspective(60.0f, (GLfloat)d_ptr->m_sceneViewPort.width()
-                                      / (GLfloat)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
+                                      / (GLfloat)d_ptr->m_sceneViewPort.height(), 3.0f, 100.0f);
 #else
     // Use these for normal shadows, with the light further away
     depthProjectionMatrix = projectionMatrix;
@@ -498,6 +498,7 @@ void Q3DMaps::drawScene()
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+        QMatrix4x4 depthMVPMatrix;
 
         modelMatrix.translate(item->d_ptr->translation().x(),
                               heightMultiplier * barHeight + heightScaler - d_ptr->m_yAdjustment,
@@ -606,15 +607,11 @@ void Q3DMaps::drawScene()
                                                    d_ptr->m_theme->m_ambientStrength * 3.0f);
 
         // Draw the object
-        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
-        //                            d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
-        // TODO: Hack until everything works
         d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
-                                    d_ptr->m_depthTexture, d_ptr->m_depthTexture);
+                                    d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
     }
 
     // Disable textures
-    glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
 
     // Release background shader
@@ -1342,7 +1339,6 @@ Q3DMapsPrivate::~Q3DMapsPrivate()
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
-    //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
     m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_data;
     delete m_barShader;
@@ -1419,7 +1415,6 @@ void Q3DMapsPrivate::initSelectionBuffer()
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->deleteTexture(&m_selectionTexture);
-        //m_textureHelper->deleteTexture(&m_selectionDepthTexture);
     }
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
                                                                  m_selectionFrameBuffer,
