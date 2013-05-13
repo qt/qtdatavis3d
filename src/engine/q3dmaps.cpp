@@ -1336,6 +1336,7 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
 
 Q3DMapsPrivate::~Q3DMapsPrivate()
 {
+    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);

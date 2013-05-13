@@ -62,6 +62,14 @@
 
 #include <QDebug>
 
+// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
+// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
+#define USE_WIDER_SHADOWS
+
+// You can verify that depth buffer drawing works correctly by uncommenting this.
+// You should see the scene from  where the light is
+//#define SHOW_DEPTH_TEXTURE_SCENE
+
 //#define DISPLAY_RENDER_SPEED
 
 #ifdef DISPLAY_RENDER_SPEED
@@ -91,16 +99,18 @@ void Q3DBars::initialize()
         d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
                            QStringLiteral(":/shaders/fragmentColorOnY"));
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragment"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
     }
-    //d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
-    //                             QStringLiteral(":/shaders/fragmentTexture"));
-    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                                 QStringLiteral(":/shaders/fragment"));
+    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                 QStringLiteral(":/shaders/fragmentShadowNoTex"));
     d_ptr->initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                             QStringLiteral(":/shaders/fragmentLabel"));
     d_ptr->initSelectionShader();
+    d_ptr->initDepthShader();
+
+    // Init the depth buffer
+    d_ptr->initDepthBuffer();
 
 #ifndef USE_HAX0R_SELECTION
     // Init the selection buffer
@@ -456,6 +466,115 @@ void Q3DBars::drawScene()
     QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
+    // Skip depth rendering if we're in zoom mode
+    QMatrix4x4 depthViewMatrix;
+    QMatrix4x4 depthProjectionMatrix;
+    if (!d_ptr->m_zoomActivated) {
+        // Render scene into a depth texture for using with shadow mapping
+        // Bind depth shader
+        d_ptr->m_depthShader->bind();
+
+        // Enable drawing to framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Get the depth view matrix
+        // It may be possible to hack lightPos here if we want to make some tweaks to shadow
+        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp),
+                               QVector3D(0.0f, 1.0f, 0.0f));
+        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
+        //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
+        // Set the depth projection matrix
+#ifdef USE_WIDER_SHADOWS
+        // Use this for a bit exaggerated shadows
+        depthProjectionMatrix.perspective(20.0f, (GLfloat)d_ptr->m_sceneViewPort.width()
+                                          / (GLfloat)d_ptr->m_sceneViewPort.height(), 3.0f, 100.0f);
+#else
+        // Use these for normal shadows, with the light further away
+        depthProjectionMatrix = projectionMatrix;
+#endif
+        // Draw bars to depth buffer
+        for (int row = startRow; row != stopRow; row += stepRow) {
+            for (int bar = startBar; bar != stopBar; bar += stepBar) {
+                if (!d_ptr->m_dataSet->d_ptr->getRow(row))
+                    continue;
+                QDataItem *item = d_ptr->m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
+                if (!item)
+                    continue;
+
+                GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+                // skip shadows for barHeight < 0 (for now)
+                // skip shadows for 0 -height bars
+                if (barHeight <= 0)
+                    continue;
+
+                //if (barHeight < 0)
+                //    glCullFace(GL_FRONT);
+                //else
+                //    glCullFace(GL_BACK);
+
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+
+                barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
+                rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
+
+                modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
+                                      barHeight - d_ptr->m_yAdjustment,
+                                      (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor
+                                      + zComp);
+                modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
+
+                MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+
+                d_ptr->m_depthShader->setUniformValue(d_ptr->m_depthShader->MVP(), MVPMatrix);
+
+                // 1st attribute buffer : vertices
+                glEnableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+                glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
+                glVertexAttribPointer(d_ptr->m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                      (void *)0);
+
+                // Index buffer
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+
+                // Draw the triangles
+                glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(), GL_UNSIGNED_SHORT,
+                               (void *)0);
+
+                // Free buffers
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                glDisableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+            }
+        }
+
+        // Disable drawing to framebuffer (= enable drawing to screen)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Release depth shader
+        d_ptr->m_depthShader->release();
+
+#if 0 // Use this if you want to see what is being drawn to the framebuffer
+        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
+        d_ptr->m_labelShader->bind();
+        glEnable(GL_TEXTURE_2D);
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 viewmatrix;
+        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
+                          QVector3D(0.0f, 0.0f, zComp),
+                          QVector3D(0.0f, 1.0f, 0.0f));
+        modelMatrix.translate(0.0, 0.0, zComp);
+        QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
+        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
+        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
+                                    d_ptr->m_depthTexture);
+        glDisable(GL_TEXTURE_2D);
+        d_ptr->m_labelShader->release();
+#endif
+    }
+#if 1
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
         // Bind selection shader
@@ -597,6 +716,9 @@ void Q3DBars::drawScene()
     // Bind bar shader
     d_ptr->m_barShader->bind();
 
+    // Enable texturing
+    glEnable(GL_TEXTURE_2D);
+
     // Draw bars
     if (!d_ptr->m_zoomActivated && d_ptr->m_zoomSelection)
         d_ptr->m_zoomSelection->d_ptr->clear();
@@ -618,6 +740,7 @@ void Q3DBars::drawScene()
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 depthMVPMatrix;
 
             barPos = (bar + 1) * (d_ptr->m_barSpacing.width());
             rowPos = (row + 1) * (d_ptr->m_barSpacing.height());
@@ -626,7 +749,12 @@ void Q3DBars::drawScene()
                                   (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+            MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+#else
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+#endif
+            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             QVector3D baseColor = Utils::vectorFromColor(d_ptr->m_theme->m_baseColor);
             QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_theme->m_heightColor)
@@ -716,16 +844,23 @@ void Q3DBars::drawScene()
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
                                                     modelMatrix.inverted().transposed());
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+                d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                           depthMVPMatrix);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength
+                                                    / 10.0f);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
                                                     d_ptr->m_theme->m_ambientStrength);
 
                 // Draw the object
-                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj, 0,
+                                            d_ptr->m_depthTexture);
             }
         }
     }
+
+    // Disable texturing
+    //glDisable(GL_TEXTURE_2D);
 
     // Release bar shader
     d_ptr->m_barShader->release();
@@ -733,11 +868,8 @@ void Q3DBars::drawScene()
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
-    // TODO: If we want to use background texture, we should create it in initBackground instead of here and keep the texture id in d_ptr
-    // Create texture
+    // Enable texturing
     //glEnable(GL_TEXTURE_2D);
-    //GLuint bgrTexture = d_ptr->m_textureHelper->create2DTexture(
-    //            QImage(QStringLiteral(":/textures/background")), true, true);
 
     glCullFace(GL_BACK);
 
@@ -745,6 +877,7 @@ void Q3DBars::drawScene()
     if (d_ptr->m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+        QMatrix4x4 depthMVPMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
@@ -752,7 +885,13 @@ void Q3DBars::drawScene()
                                     d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
 
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+        MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+#else
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+#endif
+        depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+
 
         QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_theme->m_backgroundColor);
 
@@ -767,23 +906,22 @@ void Q3DBars::drawScene()
                                                    modelMatrix.inverted().transposed());
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP(),
                                                    MVPMatrix);
+        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->depth(),
+                                                   depthMVPMatrix);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
                                                    backgroundColor);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                   d_ptr->m_theme->m_lightStrength);
+                                                   d_ptr->m_theme->m_lightStrength / 5.0f);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
                                                    d_ptr->m_theme->m_ambientStrength);
 
         // Draw the object
-        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
-        //d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, true,
-        //                            bgrTexture);
+        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj, 0,
+                                    d_ptr->m_depthTexture);
     }
 
     // Disable textures
-    //glBindTexture(GL_TEXTURE_2D, 0);
-    //glDeleteTextures(1, &bgrTexture);  // TODO: If we want to use background texture, we should create it in initBackground and delete on exit
-    //glDisable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
 
     // Release background shader
     d_ptr->m_backgroundShader->release();
@@ -1106,6 +1244,7 @@ void Q3DBars::drawScene()
 
     // Release label shader
     d_ptr->m_labelShader->release();
+#endif
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
@@ -1228,6 +1367,9 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
 
     // Re-init selection buffer
     d_ptr->initSelectionBuffer();
+
+    // Re-init depth buffer
+    d_ptr->initDepthBuffer();
 }
 
 void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1523,6 +1665,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : q_ptr(q),
       m_paintDevice(0),
       m_barShader(0),
+      m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
@@ -1567,9 +1710,12 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_xFlipped(false),
       m_zFlipped(false),
+      m_bgrTexture(0),
+      m_depthTexture(0),
+      m_selectionTexture(0),
+      m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
-      m_selectionTexture(0),
       m_updateLabels(false),
       m_gridEnabled(true)
 {
@@ -1585,12 +1731,15 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
 #endif
+    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+    m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_dataSet;
     if (m_zoomSelection) {
         m_zoomSelection->d_ptr->clear();
         delete m_zoomSelection;
     }
     delete m_barShader;
+    delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_barObj;
@@ -1649,6 +1798,15 @@ void Q3DBarsPrivate::initSelectionShader()
     m_selectionShader->initialize();
 }
 
+void Q3DBarsPrivate::initDepthShader()
+{
+    if (m_depthShader)
+        delete m_depthShader;
+    m_depthShader = new ShaderHelper(q_ptr, QStringLiteral(":/shaders/vertexDepth"),
+                                     QStringLiteral(":/shaders/fragmentDepth"));
+    m_depthShader->initialize();
+}
+
 void Q3DBarsPrivate::initSelectionBuffer()
 {
 #ifndef USE_HAX0R_SELECTION
@@ -1661,6 +1819,15 @@ void Q3DBarsPrivate::initSelectionBuffer()
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 #endif
+}
+
+void Q3DBarsPrivate::initDepthBuffer()
+{
+    if (m_depthTexture) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        m_textureHelper->deleteTexture(&m_depthTexture);
+    }
+    m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer);
 }
 
 void Q3DBarsPrivate::initBackgroundShaders(const QString &vertexShader,

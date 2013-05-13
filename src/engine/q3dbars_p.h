@@ -104,7 +104,9 @@ public:
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initDepthShader();
     void initSelectionBuffer();
+    void initDepthBuffer();
     void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
@@ -114,6 +116,7 @@ public:
 
     QOpenGLPaintDevice *m_paintDevice;
     ShaderHelper *m_barShader;
+    ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
@@ -158,7 +161,10 @@ public:
     Drawer *m_drawer;
     bool m_xFlipped;
     bool m_zFlipped;
+    GLuint m_bgrTexture;
+    GLuint m_depthTexture;
     GLuint m_selectionTexture;
+    GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
