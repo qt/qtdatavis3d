@@ -467,9 +467,10 @@ void Q3DBars::drawScene()
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
     // Skip depth rendering if we're in zoom mode
+    // TODO: Fix this, causes problems if depth rendering is off in zoom mode
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
-    if (!d_ptr->m_zoomActivated) {
+    /*if (!d_ptr->m_zoomActivated)*/ {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
         d_ptr->m_depthShader->bind();
