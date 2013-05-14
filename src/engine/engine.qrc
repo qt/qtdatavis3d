@@ -32,6 +32,7 @@
         <file alias="fragmentShadow">shaders/fragmentShadow</file>
         <file alias="vertexShadow">shaders/vertexShadow</file>
         <file alias="fragmentShadowNoTex">shaders/fragmentShadowNoTex</file>
+        <file alias="fragmentShadowNoTexColorOnY">shaders/fragmentShadowNoTexColorOnY</file>
     </qresource>
     <qresource prefix="/textures"/>
 </RCC>

@@ -6,7 +6,6 @@ uniform highp vec3 color_mdl;
 uniform highp sampler2D shadowMap;
 
 varying highp vec4 shadowCoord;
-varying highp vec2 UV;
 varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
@@ -36,7 +35,7 @@ void main() {
         shadowFactor = shadow;
     }
 
-    highp vec3 materialDiffuseColor = color_mdl.rgb;
+    highp vec3 materialDiffuseColor = vec3(vertexPosition_mdl.y * color_mdl.x, vertexPosition_mdl.y * color_mdl.y, vertexPosition_mdl.y * color_mdl.z);
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
 

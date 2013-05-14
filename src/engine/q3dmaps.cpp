@@ -96,11 +96,11 @@ void Q3DMaps::initialize()
 {
     // Initialize shaders
     if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragmentColorOnY"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragment"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
     }
     d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                                  QStringLiteral(":/shaders/fragmentShadow"));
@@ -389,6 +389,7 @@ void Q3DMaps::drawScene()
     d_ptr->m_labelShader->release();
 #endif
 #if 1
+
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
         // Bind selection shader
@@ -484,6 +485,9 @@ void Q3DMaps::drawScene()
     // Bind bar shader
     d_ptr->m_barShader->bind();
 
+    // Enable texture
+    glEnable(GL_TEXTURE_2D);
+
     // Draw bars
     // TODO: Handle zoom by camera transformations
     //if (!d_ptr->m_zoomActivated)
@@ -512,6 +516,7 @@ void Q3DMaps::drawScene()
 #else
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 #endif
+        depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
         QVector3D baseColor = Utils::vectorFromColor(d_ptr->m_theme->m_baseColor);
         QVector3D heightColor = Utils::vectorFromColor(d_ptr->m_theme->m_heightColor)
@@ -554,13 +559,16 @@ void Q3DMaps::drawScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
                                                 modelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                       depthMVPMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength / 10.0f);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
                                                 d_ptr->m_theme->m_ambientStrength);
 
             // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj,
+                                        0, d_ptr->m_depthTexture);
         }
     }
 
@@ -569,9 +577,6 @@ void Q3DMaps::drawScene()
 #if 1
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
-
-    // Enable texture
-    glEnable(GL_TEXTURE_2D);
 
     // Draw background
     if (d_ptr->m_backgroundObj) {

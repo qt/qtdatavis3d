@@ -96,8 +96,8 @@ void Q3DBars::initialize()
 {
     // Initialize shaders
     if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragmentColorOnY"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
     } else {
         d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
                            QStringLiteral(":/shaders/fragmentShadowNoTex"));
@@ -478,6 +478,8 @@ void Q3DBars::drawScene()
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
 
+        //glCullFace(GL_FRONT);
+
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp),
@@ -573,7 +575,9 @@ void Q3DBars::drawScene()
         glDisable(GL_TEXTURE_2D);
         d_ptr->m_labelShader->release();
 #endif
+        //glCullFace(GL_BACK);
     }
+
 #if 1
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
@@ -859,17 +863,11 @@ void Q3DBars::drawScene()
         }
     }
 
-    // Disable texturing
-    //glDisable(GL_TEXTURE_2D);
-
     // Release bar shader
     d_ptr->m_barShader->release();
 
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
-
-    // Enable texturing
-    //glEnable(GL_TEXTURE_2D);
 
     glCullFace(GL_BACK);
 

@@ -27,7 +27,7 @@ void main() {
     } else if (shadCoordsPD.x >= 1.0 || shadCoordsPD.y >= 1.0) { // outside light frustum, ignore
         shadowFactor = 1.0;
     } else {
-
+        // This does not work perfectly. It causes self-shadowing, which we should get rid of.
         // Requires at least #version 130
         float shadow = 0.0;
         shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, 1));
@@ -59,16 +59,16 @@ void main() {
     highp vec3 R = reflect(-l, n);
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
+    // Shadow strength can be adjusted by using pow(shadowFactor, strength), but it causes self-shadowing issues that need to be solved
     gl_FragColor.rgb =
-        shadowFactor * materialAmbientColor +
-        shadowFactor * materialDiffuseColor * lightStrength * cosTheta +
-        shadowFactor * materialSpecularColor * lightStrength * pow(cosAlpha, 10);
+        shadowFactor * (materialAmbientColor +
+        materialDiffuseColor * lightStrength * cosTheta +
+        materialSpecularColor * lightStrength * pow(cosAlpha, 10));
     gl_FragColor.a = 1.0;
 }
 
-// Version 2: This does not work yet..
-/*
-void main() {
+// Version 2: This does not work yet.. FIX IT, it might work better than version 1
+/*void main() {
     highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(0.2, 0.2, 0.2);
@@ -87,12 +87,11 @@ void main() {
     highp float bias = 0.005 * tan(acos(cosTheta));
     bias = clamp(bias, 0.0, 0.01);
 
-    visibility -= 0.8 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
+    visibility -= 1.0 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
 
     gl_FragColor.rgb =
-        materialAmbientColor +
-        visibility * materialDiffuseColor * lightStrength * cosTheta +
-        visibility * materialSpecularColor * lightStrength * pow(cosAlpha, 10);
-    gl_FragColor.a = 1.0;
-}
-*/
+        pow(visibility, 5) * (materialAmbientColor +
+        materialDiffuseColor * lightStrength * cosTheta +
+        materialSpecularColor * lightStrength * pow(cosAlpha, 10));
+    //gl_FragColor.a = 1.0;
+}*/
