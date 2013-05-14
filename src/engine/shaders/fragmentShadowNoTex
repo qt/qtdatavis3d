@@ -1,9 +1,11 @@
-#version 130
+#version 120
+//#version 130 // use with version 1
 
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp vec3 color_mdl;
-uniform highp sampler2D shadowMap;
+uniform highp sampler2DShadow shadowMap; // use with version 2
+//uniform highp sampler2D shadowMap; // use with version 1
 
 varying highp vec4 shadowCoord;
 varying highp vec2 UV;
@@ -12,7 +14,8 @@ varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 
-void main() {
+// Version 1: Causes self-shadowing, but shadows are smooth
+/*void main() {
     float shadowFactor = 1.0; // default to '1' meaning "no shadow"
     vec4 shadCoordsPD = shadowCoord;
     shadCoordsPD.z += 0.005;
@@ -53,5 +56,34 @@ void main() {
         shadowFactor * (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 20));
+    gl_FragColor.a = 1.0;
+}*/
+
+// Version 2: Shadows are a bit rugged (may be fixed with poisson disk?)
+void main() {
+    highp vec3 materialDiffuseColor = color_mdl.rgb;
+    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
+    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+
+    highp vec3 n = normalize(normal_cmr);
+    highp vec3 l = normalize(lightDirection_cmr);
+    highp float cosTheta = clamp(dot(n, l), 0.0, 1.0);
+
+    highp vec3 E = normalize(eyeDirection_cmr);
+    highp vec3 R = reflect(-l, n);
+    highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
+
+    highp float bias = 0.005 * tan(acos(cosTheta));
+    bias = clamp(bias, 0.0, 0.01);
+
+    vec4 shadCoordsPD = shadowCoord;
+    shadCoordsPD.z -= bias;
+    // adjust shadow strength by increasing the multiplier and lowering the addition (their sum must be 1)
+    highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoordsPD).r + 0.25;
+
+    gl_FragColor.rgb =
+        visibility * (materialAmbientColor +
+        materialDiffuseColor * lightStrength * cosTheta +
+        materialSpecularColor * lightStrength * pow(cosAlpha, 10));
     gl_FragColor.a = 1.0;
 }

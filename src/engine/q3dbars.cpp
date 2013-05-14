@@ -474,11 +474,16 @@ void Q3DBars::drawScene()
         // Bind depth shader
         d_ptr->m_depthShader->bind();
 
+        // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
+        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+                   d_ptr->m_sceneViewPort.width() * 2, d_ptr->m_sceneViewPort.height() * 2);
+
         // Enable drawing to framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        //glCullFace(GL_FRONT);
+        // Set front face culling to reduce self-shadowing issues
+        glCullFace(GL_FRONT);
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
@@ -575,7 +580,12 @@ void Q3DBars::drawScene()
         glDisable(GL_TEXTURE_2D);
         d_ptr->m_labelShader->release();
 #endif
-        //glCullFace(GL_BACK);
+        // Reset culling to normal
+        glCullFace(GL_BACK);
+
+        // Revert to original viewport
+        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+                   d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
     }
 
 #if 1
@@ -1456,11 +1466,11 @@ void Q3DBars::setTheme(ColorTheme theme)
     d_ptr->m_drawer->setTheme(*d_ptr->m_theme);
     // Re-initialize shaders
     if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragmentColorOnY"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragment"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
     }
 }
 
@@ -1473,11 +1483,11 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
     if (d_ptr->m_theme->m_uniformColor != uniform) {
         // Re-initialize shaders
         if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragmentColorOnY"));
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragment"));
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
         }
     }
     d_ptr->m_theme->m_uniformColor = uniform;

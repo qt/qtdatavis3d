@@ -268,9 +268,16 @@ void Q3DMaps::drawScene()
     // Bind depth shader
     d_ptr->m_depthShader->bind();
 
+    // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
+    glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+               d_ptr->m_sceneViewPort.width() * 2, d_ptr->m_sceneViewPort.height() * 2);
+
     // Enable drawing to framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
     glClear(GL_DEPTH_BUFFER_BIT);
+
+    // Set front face culling to reduce self-shadowing issues
+    glCullFace(GL_FRONT);
 
     // Get the depth view matrix
     QMatrix4x4 depthViewMatrix;
@@ -368,6 +375,9 @@ void Q3DMaps::drawScene()
     // Disable drawing to framebuffer (= enable drawing to screen)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Reset culling to normal
+    glCullFace(GL_BACK);
+
     // Release depth shader
     d_ptr->m_depthShader->release();
 
@@ -389,6 +399,10 @@ void Q3DMaps::drawScene()
     d_ptr->m_labelShader->release();
 #endif
 #if 1
+
+    // Revert to original viewport
+    glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+               d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
 
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
@@ -1105,11 +1119,11 @@ void Q3DMaps::setTheme(ColorTheme theme)
     d_ptr->m_drawer->setTheme(*d_ptr->m_theme);
     // Re-initialize shaders
     if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragmentColorOnY"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                           QStringLiteral(":/shaders/fragment"));
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
     }
     d_ptr->m_updateLabels = true;
 }
@@ -1121,11 +1135,11 @@ void Q3DMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
     if (d_ptr->m_theme->m_uniformColor != uniform) {
         // Re-initialize shaders
         if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragmentColorOnY"));
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragment"));
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
         }
     }
     d_ptr->m_theme->m_uniformColor = uniform;

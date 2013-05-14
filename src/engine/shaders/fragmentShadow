@@ -1,10 +1,11 @@
-#version 130
+#version 120
+//#version 130 // use with version 1
 
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp sampler2D textureSampler;
-//uniform highp sampler2DShadow shadowMap; // use with version 2
-uniform highp sampler2D shadowMap; // use with version 1
+uniform highp sampler2DShadow shadowMap; // use with version 2
+//uniform highp sampler2D shadowMap; // use with version 1
 
 varying highp vec4 shadowCoord;
 varying highp vec2 UV;
@@ -13,8 +14,8 @@ varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 
-// Version 1: This works
-void main() {
+// Version 1: Causes self-shadowing, but shadows are smooth
+/*void main() {
     float shadowFactor = 1.0; // default to '1' meaning "no shadow"
     //float epsilon = 0.01; // increase value to remove little artifacts
     vec4 shadCoordsPD = shadowCoord;
@@ -30,11 +31,12 @@ void main() {
         // This does not work perfectly. It causes self-shadowing, which we should get rid of.
         // Requires at least #version 130
         float shadow = 0.0;
+        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(0, 0));
         shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, 1));
         shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, 1));
         shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, -1));
         shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, -1));
-        shadow *= 0.25;
+        shadow *= 0.2;
         shadowFactor = shadow;
         //float shadow = texture2D(shadowMap, shadCoordsPD.xy).x;
         //if (shadow + epsilon < shadCoordsPD.z) {
@@ -65,10 +67,10 @@ void main() {
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
     gl_FragColor.a = 1.0;
-}
+}*/
 
-// Version 2: This does not work yet.. FIX IT, it might work better than version 1
-/*void main() {
+// Version 2: Shadows are a bit rugged (may be fixed with poisson disk?)
+void main() {
     highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(0.2, 0.2, 0.2);
@@ -81,17 +83,17 @@ void main() {
     highp vec3 R = reflect(-l, n);
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
-    highp float visibility = 1.0;
-    //highp float bias = 0.005;
-
     highp float bias = 0.005 * tan(acos(cosTheta));
     bias = clamp(bias, 0.0, 0.01);
 
-    visibility -= 1.0 * (1.0 - shadow2D(shadowMap, vec3(shadowCoord.xy, (shadowCoord.z - bias) / shadowCoord.w)).r);
+    vec4 shadCoordsPD = shadowCoord;
+    shadCoordsPD.z -= bias;
+    // adjust shadow strength by increasing the multiplier and lowering the addition (their sum must be 1)
+    highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoordsPD).r + 0.25;
 
     gl_FragColor.rgb =
-        pow(visibility, 5) * (materialAmbientColor +
+        visibility * (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
-    //gl_FragColor.a = 1.0;
-}*/
+    gl_FragColor.a = 1.0;
+}

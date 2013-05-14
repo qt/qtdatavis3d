@@ -17,6 +17,7 @@ varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 varying highp vec4 shadowCoord;
+varying highp vec2 coords_mdl;
 
 const highp mat4 bias = mat4(0.5, 0.0, 0.0, 0.0,
                              0.0, 0.5, 0.0, 0.0,
@@ -25,6 +26,7 @@ const highp mat4 bias = mat4(0.5, 0.0, 0.0, 0.0,
 
 void main() {
     gl_Position = MVP * vec4(vertexPosition_mdl, 1.0);
+    coords_mdl = vertexPosition_mdl.xy;
     shadowCoord = bias * depthMVP * vec4(vertexPosition_mdl, 1.0);
     position_wrld = (M * vec4(vertexPosition_mdl, 1.0)).xyz;
     vec3 vertexPosition_cmr = (V * M * vec4(vertexPosition_mdl, 1.0)).xyz;
