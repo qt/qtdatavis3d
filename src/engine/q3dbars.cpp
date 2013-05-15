@@ -883,8 +883,10 @@ void Q3DBars::drawScene()
 
                 if (d_ptr->m_shadowQuality > ShadowNone) {
                     // Set shadow shader bindings
-                    d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
-                                                               depthMVPMatrix);
+                    d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                        d_ptr->m_shadowQualityToShader);
+                    d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                        depthMVPMatrix);
                     d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                         lightStrength / 10.0f);
 
@@ -951,18 +953,20 @@ void Q3DBars::drawScene()
 
         if (d_ptr->m_shadowQuality > ShadowNone) {
             // Set shadow shader bindings
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->shadowQ(),
+                                                       d_ptr->m_shadowQualityToShader);
             d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->depth(),
                                                        depthMVPMatrix);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                d_ptr->m_theme->m_lightStrength / 10.0f);
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
+                                                       d_ptr->m_theme->m_lightStrength / 10.0f);
 
             // Draw the object
             d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
                                         0, d_ptr->m_depthTexture);
         } else {
             // Set shadowless shader bindings
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                d_ptr->m_theme->m_lightStrength);
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
+                                                       d_ptr->m_theme->m_lightStrength);
 
             // Draw the object
             d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj);
@@ -1577,6 +1581,20 @@ void Q3DBars::setGridEnabled(bool enable)
 void Q3DBars::setShadowQuality(ShadowQuality quality)
 {
     d_ptr->m_shadowQuality = quality;
+    switch (quality) {
+    case ShadowLow:
+        d_ptr->m_shadowQualityToShader = 33.3f;
+        break;
+    case ShadowMedium:
+        d_ptr->m_shadowQualityToShader = 66.7f;
+        break;
+    case ShadowHigh:
+        d_ptr->m_shadowQualityToShader = 100.0f;
+        break;
+    default:
+        d_ptr->m_shadowQualityToShader = 0.0f;
+        break;
+    }
     if (d_ptr->m_shadowQuality > ShadowNone) {
         // Re-init depth buffer
         d_ptr->initDepthBuffer();
@@ -1798,7 +1816,8 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_selectionDepthBuffer(0),
       m_updateLabels(false),
       m_gridEnabled(true),
-      m_shadowQuality(ShadowLow)
+      m_shadowQuality(ShadowLow),
+      m_shadowQualityToShader(33.3f)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);

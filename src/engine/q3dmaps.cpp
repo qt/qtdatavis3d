@@ -599,8 +599,10 @@ void Q3DMaps::drawScene()
 
             if (d_ptr->m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
-                                                           depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                    d_ptr->m_shadowQualityToShader);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                    depthMVPMatrix);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                     lightStrength / 10.0f);
 
@@ -649,16 +651,30 @@ void Q3DMaps::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->nModel(),
                                                    modelMatrix.inverted().transposed());
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP(), MVPMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->depth(),
-                                                   depthMVPMatrix);
-        d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
-                                                   d_ptr->m_theme->m_lightStrength / 5.0f);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
                                                    d_ptr->m_theme->m_ambientStrength * 3.0f);
 
-        // Draw the object
-        d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
-                                    d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
+        if (d_ptr->m_shadowQuality > ShadowNone) {
+            // Set shadow shader bindings
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->shadowQ(),
+                                                       d_ptr->m_shadowQualityToShader);
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->depth(),
+                                                       depthMVPMatrix);
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
+                                                       d_ptr->m_theme->m_lightStrength / 5.0f);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
+                                        d_ptr->m_bgrTexture, d_ptr->m_depthTexture);
+        } else {
+            // Set shadowless shader bindings
+            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
+                                                       d_ptr->m_theme->m_lightStrength);
+
+            // Draw the object
+            d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
+                                        d_ptr->m_bgrTexture);
+        }
     }
 
     // Disable textures
@@ -1335,6 +1351,23 @@ void Q3DMaps::setImage(const QImage &image)
 void Q3DMaps::setShadowQuality(ShadowQuality quality)
 {
     d_ptr->m_shadowQuality = quality;
+    switch (quality) {
+    case ShadowLow:
+        qDebug() << "ShadowLow";
+        d_ptr->m_shadowQualityToShader = 33.3f;
+        break;
+    case ShadowMedium:
+        qDebug() << "ShadowMedium";
+        d_ptr->m_shadowQualityToShader = 66.7f;
+        break;
+    case ShadowHigh:
+        qDebug() << "ShadowHigh";
+        d_ptr->m_shadowQualityToShader = 100.0f;
+        break;
+    default:
+        d_ptr->m_shadowQualityToShader = 0.0f;
+        break;
+    }
     if (d_ptr->m_shadowQuality > ShadowNone) {
         // Re-init depth buffer
         d_ptr->initDepthBuffer();
@@ -1409,7 +1442,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_areaSize(QSizeF(1.0f, 1.0f)),
       m_updateLabels(true),
       m_gridEnabled(true),
-      m_shadowQuality(ShadowLow)
+      m_shadowQuality(ShadowLow),
+      m_shadowQualityToShader(33.3f)
 {
     //m_data->d_ptr->setDrawer(m_drawer);
     //QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DMapsPrivate::updateTextures);

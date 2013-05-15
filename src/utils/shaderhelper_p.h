@@ -89,6 +89,7 @@ class ShaderHelper
     GLuint lightP();
     GLuint lightS();
     GLuint ambientS();
+    GLuint shadowQ();
     GLuint color();
     GLuint texture();
     GLuint shadow();
@@ -120,6 +121,7 @@ class ShaderHelper
     GLuint m_lightPositionUniform;
     GLuint m_lightStrengthUniform;
     GLuint m_ambientStrengthUniform;
+    GLuint m_shadowQualityUniform;
     GLuint m_textureUniform;
     GLuint m_shadowUniform;
 

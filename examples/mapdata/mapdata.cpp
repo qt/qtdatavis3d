@@ -281,7 +281,19 @@ void MapsModifier::changeFontSize(int fontsize)
 
 void MapsModifier::changeShadowQuality(int quality)
 {
-    m_chart->setShadowQuality((ShadowQuality)quality);
+    ShadowQuality sq = ShadowNone;
+    switch (quality) {
+    case 1:
+        sq = ShadowLow;
+        break;
+    case 2:
+        sq = ShadowMedium;
+        break;
+    case 3:
+        sq = ShadowHigh;
+        break;
+    }
+    m_chart->setShadowQuality(sq);
 }
 
 //void MapsModifier::setGridEnabled(int enabled)

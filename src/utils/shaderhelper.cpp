@@ -101,6 +101,7 @@ void ShaderHelper::initialize()
     m_lightPositionUniform = m_program->uniformLocation("lightPosition_wrld");
     m_lightStrengthUniform = m_program->uniformLocation("lightStrength");
     m_ambientStrengthUniform = m_program->uniformLocation("ambientStrength");
+    m_shadowQualityUniform = m_program->uniformLocation("shadowQuality");
     m_colorUniform = m_program->uniformLocation("color_mdl");
     m_textureUniform = m_program->uniformLocation("textureSampler");
     m_shadowUniform = m_program->uniformLocation("shadowMap");
@@ -197,6 +198,13 @@ GLuint ShaderHelper::ambientS()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_ambientStrengthUniform;
+}
+
+GLuint ShaderHelper::shadowQ()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_shadowQualityUniform;
 }
 
 GLuint ShaderHelper::color()

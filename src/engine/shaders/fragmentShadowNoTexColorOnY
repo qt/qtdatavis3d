@@ -3,6 +3,7 @@
 
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
+uniform highp float shadowQuality;
 uniform highp vec3 color_mdl;
 uniform highp sampler2DShadow shadowMap; // use with version 2
 //uniform highp sampler2D shadowMap; // use with version 1
@@ -108,7 +109,8 @@ void main() {
     highp float visibility = 0.2;
     for (int i = 0; i < 15; i++) {
         vec4 shadCoordsPD = shadCoords;
-        shadCoordsPD.xy += poissonDisk[i] / 100.0;
+        shadCoordsPD.x += cos(poissonDisk[i].x) / shadowQuality;
+        shadCoordsPD.y += sin(poissonDisk[i].y) / shadowQuality;
         visibility += 0.05 * shadow2DProj(shadowMap, shadCoordsPD).r;
     }
     /*for (int i = 0; i < 15; i++) {

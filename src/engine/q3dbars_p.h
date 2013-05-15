@@ -170,6 +170,7 @@ public:
     bool m_updateLabels;
     bool m_gridEnabled;
     ShadowQuality m_shadowQuality;
+    GLfloat m_shadowQualityToShader;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
