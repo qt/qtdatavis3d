@@ -77,6 +77,9 @@ public:
     void start();
     void restart(bool dynamicData);
 
+public slots:
+    void changeShadowQuality(int quality);
+
 private:
     Q3DBars *m_chart;
     int m_columnCount;

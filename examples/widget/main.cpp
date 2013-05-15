@@ -160,6 +160,13 @@ int main(int argc, char **argv)
 
     QFontComboBox *fontList = new QFontComboBox(widget);
 
+    QComboBox *shadowQuality = new QComboBox(widget);
+    shadowQuality->addItem(QStringLiteral("None"));
+    shadowQuality->addItem(QStringLiteral("Low"));
+    shadowQuality->addItem(QStringLiteral("Medium"));
+    shadowQuality->addItem(QStringLiteral("High"));
+    shadowQuality->setCurrentIndex(1);
+
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -180,6 +187,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(gridCheckBox);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
@@ -205,6 +214,9 @@ int main(int argc, char **argv)
                      &ChartModifier::setSampleCountX);
     QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
                      &ChartModifier::setSampleCountZ);
+
+    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeShadowQuality(int)));
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ChartModifier::changeFontSize);

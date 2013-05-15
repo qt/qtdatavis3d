@@ -162,6 +162,7 @@ public:
     bool m_updateLabels;
     bool m_gridEnabled;
     Q3DMaps::AdjustmentDirection m_adjustDirection;
+    ShadowQuality m_shadowQuality;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

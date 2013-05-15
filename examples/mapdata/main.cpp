@@ -133,6 +133,13 @@ int main(int argc, char **argv)
     valueDimension->addItem(QStringLiteral("All"));
     valueDimension->setCurrentIndex(0);
 
+    QComboBox *shadowQuality = new QComboBox(widget);
+    shadowQuality->addItem(QStringLiteral("None"));
+    shadowQuality->addItem(QStringLiteral("Low"));
+    shadowQuality->addItem(QStringLiteral("Medium"));
+    shadowQuality->addItem(QStringLiteral("High"));
+    shadowQuality->setCurrentIndex(1);
+
     QFontComboBox *fontList = new QFontComboBox(widget);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
@@ -156,6 +163,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(valueDimension, 0, Qt::AlignTop);
 //    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
 //    vLayout->addWidget(gridCheckBox);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
@@ -187,6 +196,9 @@ int main(int argc, char **argv)
 
     QObject::connect(valueDimension, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeValueDimension(int)));
+
+    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeShadowQuality(int)));
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &MapsModifier::changeFont);

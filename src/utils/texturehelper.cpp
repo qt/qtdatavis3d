@@ -191,7 +191,7 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     return textureid;
 }
 
-GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer)
+GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
 {
     GLuint depthtextureid;
 
@@ -205,8 +205,8 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     // Use the following line if using shader's version 2 of shadowing, comment out if not
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, size.width() * 2, size.height() * 2, 0,
-                 GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, size.width() * textureSize,
+                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create frame buffer

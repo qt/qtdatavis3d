@@ -95,22 +95,37 @@ Q3DMaps::~Q3DMaps()
 void Q3DMaps::initialize()
 {
     // Initialize shaders
-    if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+    if (d_ptr->m_shadowQuality > ShadowNone) {
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                     QStringLiteral(":/shaders/fragmentShadow"));
+        // Init the depth buffer (for shadows)
+        d_ptr->initDepthBuffer();
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragmentColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragment"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                     QStringLiteral(":/shaders/fragmentTexture"));
     }
-    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                 QStringLiteral(":/shaders/fragmentShadow"));
     d_ptr->initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                             QStringLiteral(":/shaders/fragmentLabel"));
-    d_ptr->initSelectionShader();
+
+    // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
     d_ptr->initDepthShader();
 
-    // Init the depth buffer
-    d_ptr->initDepthBuffer();
+    // Init selection shader
+    d_ptr->initSelectionShader();
 
     // Init the selection buffer
     d_ptr->initSelectionBuffer();
@@ -264,145 +279,150 @@ void Q3DMaps::drawScene()
         break;
     }
 
-    // Render scene into a depth texture for using with shadow mapping
-    // Bind depth shader
-    d_ptr->m_depthShader->bind();
-
-    // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-    glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
-               d_ptr->m_sceneViewPort.width() * 2, d_ptr->m_sceneViewPort.height() * 2);
-
-    // Enable drawing to framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    // Set front face culling to reduce self-shadowing issues
-    glCullFace(GL_FRONT);
-
-    // Get the depth view matrix
+    // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;
-    // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-    depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp),
-                           QVector3D(0.0f, 1.0f, 0.0f));
-    // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
-    //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
-    // Set the depth projection matrix
     QMatrix4x4 depthProjectionMatrix;
+
+    if (d_ptr->m_shadowQuality > ShadowNone) {
+        // Render scene into a depth texture for using with shadow mapping
+        // Bind depth shader
+        d_ptr->m_depthShader->bind();
+
+        // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
+        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+                   d_ptr->m_sceneViewPort.width() * d_ptr->m_shadowQuality,
+                   d_ptr->m_sceneViewPort.height() * d_ptr->m_shadowQuality);
+
+        // Enable drawing to framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Set front face culling to reduce self-shadowing issues
+        glCullFace(GL_FRONT);
+
+        // Get the depth view matrix
+        // It may be possible to hack lightPos here if we want to make some tweaks to shadow
+        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp),
+                               QVector3D(0.0f, 1.0f, 0.0f));
+        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
+        //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
+        // Set the depth projection matrix
 #ifdef USE_WIDER_SHADOWS
-    // Use this for a bit exaggerated shadows
-    depthProjectionMatrix.perspective(60.0f, (GLfloat)d_ptr->m_sceneViewPort.width()
-                                      / (GLfloat)d_ptr->m_sceneViewPort.height(), 3.0f, 100.0f);
+        // Use this for a bit exaggerated shadows
+        depthProjectionMatrix.perspective(60.0f, (GLfloat)d_ptr->m_sceneViewPort.width()
+                                          / (GLfloat)d_ptr->m_sceneViewPort.height(), 3.0f, 100.0f);
 #else
-    // Use these for normal shadows, with the light further away
-    depthProjectionMatrix = projectionMatrix;
+        // Use these for normal shadows, with the light further away
+        depthProjectionMatrix = projectionMatrix;
 #endif
 #if 0
-    // Draw background to depth buffer (You don't want to do this, except maybe for debugging purposes)
-    if (d_ptr->m_backgroundObj) {
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
+        // Draw background to depth buffer (You don't want to do this, except maybe for debugging purposes)
+        if (d_ptr->m_backgroundObj) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(0.0f, -d_ptr->m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D(d_ptr->m_areaSize.width() / d_ptr->m_scaleFactor,
-                                    1.0f,
-                                    d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
-        modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+            modelMatrix.translate(0.0f, -d_ptr->m_yAdjustment, zComp);
+            modelMatrix.scale(QVector3D(d_ptr->m_areaSize.width() / d_ptr->m_scaleFactor,
+                                        1.0f,
+                                        d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
+            modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
 
-        MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+            MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-        d_ptr->m_depthShader->setUniformValue(d_ptr->m_depthShader->MVP(), MVPMatrix);
+            d_ptr->m_depthShader->setUniformValue(d_ptr->m_depthShader->MVP(), MVPMatrix);
 
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_depthShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+            // 1st attribute buffer : vertices
+            glEnableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_backgroundObj->vertexBuf());
+            glVertexAttribPointer(d_ptr->m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
+            // Index buffer
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_backgroundObj->elementBuf());
 
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_backgroundObj->indexCount(), GL_UNSIGNED_SHORT,
-                       (void *)0);
+            // Draw the triangles
+            glDrawElements(GL_TRIANGLES, d_ptr->m_backgroundObj->indexCount(), GL_UNSIGNED_SHORT,
+                           (void *)0);
 
-        // Free buffers
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // Free buffers
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glDisableVertexAttribArray(d_ptr->m_depthShader->posAtt());
-    }
+            glDisableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+        }
 #endif
-    // Draw bars to depth buffer
-    for (int bar = 0; bar < d_ptr->m_data->d_ptr->row().size(); bar++) {
-        QDataItem *item = d_ptr->m_data->d_ptr->getItem(bar);
-        if (!item)
-            continue;
+        // Draw bars to depth buffer
+        for (int bar = 0; bar < d_ptr->m_data->d_ptr->row().size(); bar++) {
+            QDataItem *item = d_ptr->m_data->d_ptr->getItem(bar);
+            if (!item)
+                continue;
 
-        GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
+            GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
 
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(item->d_ptr->translation().x(),
-                              heightMultiplier * barHeight + heightScaler
-                              - d_ptr->m_yAdjustment,
-                              item->d_ptr->translation().z());
-        modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                    heightMultiplier * barHeight + heightScaler,
-                                    depthMultiplier * barHeight + depthScaler));
+            modelMatrix.translate(item->d_ptr->translation().x(),
+                                  heightMultiplier * barHeight + heightScaler
+                                  - d_ptr->m_yAdjustment,
+                                  item->d_ptr->translation().z());
+            modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
+                                        heightMultiplier * barHeight + heightScaler,
+                                        depthMultiplier * barHeight + depthScaler));
 
-        MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+            MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-        d_ptr->m_depthShader->setUniformValue(d_ptr->m_depthShader->MVP(), MVPMatrix);
+            d_ptr->m_depthShader->setUniformValue(d_ptr->m_depthShader->MVP(), MVPMatrix);
 
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(d_ptr->m_depthShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
-        glVertexAttribPointer(d_ptr->m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+            // 1st attribute buffer : vertices
+            glEnableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+            glBindBuffer(GL_ARRAY_BUFFER, d_ptr->m_barObj->vertexBuf());
+            glVertexAttribPointer(d_ptr->m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
+            // Index buffer
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ptr->m_barObj->elementBuf());
 
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+            // Draw the triangles
+            glDrawElements(GL_TRIANGLES, d_ptr->m_barObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
 
-        // Free buffers
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // Free buffers
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glDisableVertexAttribArray(d_ptr->m_depthShader->posAtt());
-    }
+            glDisableVertexAttribArray(d_ptr->m_depthShader->posAtt());
+        }
 
-    // Disable drawing to framebuffer (= enable drawing to screen)
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Disable drawing to framebuffer (= enable drawing to screen)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Reset culling to normal
-    glCullFace(GL_BACK);
+        // Reset culling to normal
+        glCullFace(GL_BACK);
 
-    // Release depth shader
-    d_ptr->m_depthShader->release();
+        // Release depth shader
+        d_ptr->m_depthShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
-    // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
-    d_ptr->m_labelShader->bind();
-    glEnable(GL_TEXTURE_2D);
-    QMatrix4x4 modelMatrix;
-    QMatrix4x4 viewmatrix;
-    viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
-                      QVector3D(0.0f, 0.0f, zComp),
-                      QVector3D(0.0f, 1.0f, 0.0f));
-    modelMatrix.translate(0.0, 0.0, zComp);
-    QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
-    d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
-    d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
-                                d_ptr->m_depthTexture);
-    glDisable(GL_TEXTURE_2D);
-    d_ptr->m_labelShader->release();
+        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
+        d_ptr->m_labelShader->bind();
+        glEnable(GL_TEXTURE_2D);
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 viewmatrix;
+        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
+                          QVector3D(0.0f, 0.0f, zComp),
+                          QVector3D(0.0f, 1.0f, 0.0f));
+        modelMatrix.translate(0.0, 0.0, zComp);
+        QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
+        d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
+        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
+                                    d_ptr->m_depthTexture);
+        glDisable(GL_TEXTURE_2D);
+        d_ptr->m_labelShader->release();
 #endif
 #if 1
 
-    // Revert to original viewport
-    glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
-               d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
+        // Revert to original viewport
+        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+                   d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
+    }
 
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
@@ -573,16 +593,27 @@ void Q3DMaps::drawScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
                                                 modelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
-            d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
-                                                       depthMVPMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-            d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength / 10.0f);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
                                                 d_ptr->m_theme->m_ambientStrength);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj,
-                                        0, d_ptr->m_depthTexture);
+            if (d_ptr->m_shadowQuality > ShadowNone) {
+                // Set shadow shader bindings
+                d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                           depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    lightStrength / 10.0f);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj,
+                                            0, d_ptr->m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj);
+            }
         }
     }
 
@@ -1301,6 +1332,36 @@ void Q3DMaps::setImage(const QImage &image)
     d_ptr->m_bgrTexture = d_ptr->m_textureHelper->create2DTexture(image, true, true);
 }
 
+void Q3DMaps::setShadowQuality(ShadowQuality quality)
+{
+    d_ptr->m_shadowQuality = quality;
+    if (d_ptr->m_shadowQuality > ShadowNone) {
+        // Re-init depth buffer
+        d_ptr->initDepthBuffer();
+        // Re-init shaders
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                     QStringLiteral(":/shaders/fragmentShadow"));
+    } else {
+        // Re-init shaders
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragmentColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragment"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                     QStringLiteral(":/shaders/fragmentTexture"));
+    }
+}
+
 Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
     : q_ptr(q),
       m_paintDevice(0),
@@ -1347,7 +1408,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_selectionDepthBuffer(0),
       m_areaSize(QSizeF(1.0f, 1.0f)),
       m_updateLabels(true),
-      m_gridEnabled(true)
+      m_gridEnabled(true),
+      m_shadowQuality(ShadowLow)
 {
     //m_data->d_ptr->setDrawer(m_drawer);
     //QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DMapsPrivate::updateTextures);
@@ -1447,7 +1509,8 @@ void Q3DMapsPrivate::initDepthBuffer()
         m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->deleteTexture(&m_depthTexture);
     }
-    m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer);
+    m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer,
+                                                         m_shadowQuality);
 }
 
 void Q3DMapsPrivate::initBackgroundShaders(const QString &vertexShader,

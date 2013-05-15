@@ -140,6 +140,9 @@ public:
     // Enable or disable background grid
     void setGridEnabled(bool enable);
 
+    // Adjust shadow quality
+    void setShadowQuality(ShadowQuality quality);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

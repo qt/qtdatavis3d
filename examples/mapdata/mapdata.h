@@ -73,6 +73,7 @@ public:
 
 public slots:
     void changeValueDimension(int dimension);
+    void changeShadowQuality(int quality);
 
 private:
     Q3DMaps *m_chart;

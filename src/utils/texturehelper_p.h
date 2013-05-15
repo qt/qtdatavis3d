@@ -73,7 +73,7 @@ class TextureHelper : protected QOpenGLFunctions
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
     // Returns depth texture and inserts generated framebuffer to parameter
-    GLuint createDepthTexture(const QSize &size, GLuint &frameBuffer);
+    GLuint createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize = 1);
     void deleteTexture(const GLuint *texture);
 
     private:

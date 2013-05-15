@@ -169,6 +169,7 @@ public:
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
     bool m_gridEnabled;
+    ShadowQuality m_shadowQuality;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

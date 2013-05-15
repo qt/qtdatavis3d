@@ -235,6 +235,11 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
+void ChartModifier::changeShadowQuality(int quality)
+{
+    m_chart->setShadowQuality((ShadowQuality)quality);
+}
+
 void ChartModifier::setGridEnabled(int enabled)
 {
     m_chart->setGridEnabled((bool)enabled);

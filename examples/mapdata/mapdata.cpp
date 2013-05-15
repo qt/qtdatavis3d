@@ -54,8 +54,8 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     QImage image = QImage(QStringLiteral(":/images/suomi"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
-    //m_chart->setBarType(Cones, false);
-    m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
+    m_chart->setBarType(Cones, false);
+    //m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
 }
 
 MapsModifier::~MapsModifier()
@@ -277,6 +277,11 @@ void MapsModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
     m_chart->setFontSize((GLfloat)m_fontSize);
+}
+
+void MapsModifier::changeShadowQuality(int quality)
+{
+    m_chart->setShadowQuality((ShadowQuality)quality);
 }
 
 //void MapsModifier::setGridEnabled(int enabled)
