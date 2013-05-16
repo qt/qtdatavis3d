@@ -996,8 +996,6 @@ void Q3DBars::drawScene()
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
-        d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
-                                            d_ptr->m_theme->m_lightStrength);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
                                             d_ptr->m_theme->m_ambientStrength);
 
@@ -1005,6 +1003,7 @@ void Q3DBars::drawScene()
         for (GLfloat row = 0.0f; row <= d_ptr->m_sampleCount.second; row++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
             rowPos = (row + 0.5f) * (d_ptr->m_barSpacing.height());
@@ -1016,6 +1015,7 @@ void Q3DBars::drawScene()
                                           gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -1023,14 +1023,33 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            if (d_ptr->m_shadowQuality > ShadowNone) {
+                // Set shadow shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                    d_ptr->m_shadowQualityToShader);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                    depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength / 10.0f);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
+                                            0, d_ptr->m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            }
         }
 
         // Floor lines: columns
         for (GLfloat bar = 0.0f; bar <= d_ptr->m_sampleCount.first; bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
             barPos = (bar + 0.5f) * (d_ptr->m_barSpacing.width());
@@ -1042,6 +1061,7 @@ void Q3DBars::drawScene()
                                           d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -1049,8 +1069,26 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            if (d_ptr->m_shadowQuality > ShadowNone) {
+                // Set shadow shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                    d_ptr->m_shadowQualityToShader);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                    depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength / 10.0f);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
+                                            0, d_ptr->m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            }
         }
 
         // Wall lines: back wall
@@ -1059,6 +1097,7 @@ void Q3DBars::drawScene()
              barHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
             if (d_ptr->m_zFlipped) {
@@ -1076,6 +1115,7 @@ void Q3DBars::drawScene()
                                           gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -1083,8 +1123,26 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            if (d_ptr->m_shadowQuality > ShadowNone) {
+                // Set shadow shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                    d_ptr->m_shadowQualityToShader);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                    depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength / 10.0f);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
+                                            0, d_ptr->m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            }
         }
 
         // Wall lines: side wall
@@ -1092,6 +1150,7 @@ void Q3DBars::drawScene()
              barHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
             if (d_ptr->m_xFlipped) {
@@ -1109,6 +1168,7 @@ void Q3DBars::drawScene()
                                           d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
@@ -1116,8 +1176,26 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
-            // Draw the object
-            d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            if (d_ptr->m_shadowQuality > ShadowNone) {
+                // Set shadow shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
+                                                    d_ptr->m_shadowQualityToShader);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->depth(),
+                                                    depthMVPMatrix);
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength / 10.0f);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
+                                            0, d_ptr->m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
+                                                    d_ptr->m_theme->m_lightStrength);
+
+                // Draw the object
+                d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj);
+            }
         }
 
         // Release bar shader
