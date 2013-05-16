@@ -1234,16 +1234,16 @@ void Q3DMaps::setShadowQuality(ShadowQuality quality)
     d_ptr->m_shadowQuality = quality;
     switch (quality) {
     case ShadowLow:
-        qDebug() << "ShadowLow";
+        //qDebug() << "ShadowLow";
         d_ptr->m_shadowQualityToShader = 33.3f;
         break;
     case ShadowMedium:
-        qDebug() << "ShadowMedium";
-        d_ptr->m_shadowQualityToShader = 66.7f;
+        //qDebug() << "ShadowMedium";
+        d_ptr->m_shadowQualityToShader = 100.0f;
         break;
     case ShadowHigh:
-        qDebug() << "ShadowHigh";
-        d_ptr->m_shadowQualityToShader = 100.0f;
+        //qDebug() << "ShadowHigh";
+        d_ptr->m_shadowQualityToShader = 200.0f;
         break;
     default:
         d_ptr->m_shadowQualityToShader = 0.0f;

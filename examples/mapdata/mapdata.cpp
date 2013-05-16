@@ -50,12 +50,12 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
       m_fontSize(20.0f),
       m_barSpecs(QVector3D(30.0f, 30.0f, 30.0f))
 {
-    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustHeight);
+    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustAll);
     QImage image = QImage(QStringLiteral(":/images/suomi"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
-    m_chart->setBarType(Cones, false);
-    //m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
+    //m_chart->setBarType(Cones, false);
+    m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
 }
 
 MapsModifier::~MapsModifier()

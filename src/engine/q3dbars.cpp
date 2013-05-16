@@ -1605,10 +1605,10 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
         d_ptr->m_shadowQualityToShader = 33.3f;
         break;
     case ShadowMedium:
-        d_ptr->m_shadowQualityToShader = 66.7f;
+        d_ptr->m_shadowQualityToShader = 100.0f;
         break;
     case ShadowHigh:
-        d_ptr->m_shadowQualityToShader = 100.0f;
+        d_ptr->m_shadowQualityToShader = 200.0f;
         break;
     default:
         d_ptr->m_shadowQualityToShader = 0.0f;

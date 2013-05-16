@@ -50,8 +50,8 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 Theme::Theme()
     : m_baseColor(QColor(Qt::gray)),
-      m_heightColor(QColor(Qt::white)),
-      m_depthColor(QColor(Qt::darkGray)),
+      m_heightColor(QColor(Qt::black)),
+      m_depthColor(QColor(Qt::black)),
       m_backgroundColor(QColor(Qt::gray)),
       m_windowColor(QColor(Qt::gray)),
       m_textColor(QColor(Qt::white)),
