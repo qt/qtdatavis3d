@@ -992,7 +992,7 @@ void Q3DBars::drawScene()
         d_ptr->m_barShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D barColor = Utils::vectorFromColor(Qt::black);
+        QVector3D barColor = Utils::vectorFromColor(d_ptr->m_theme->m_gridLine);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightP(), lightPos);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
         d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);

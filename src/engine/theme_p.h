@@ -82,6 +82,7 @@ private:
     QColor m_windowColor;
     QColor m_textColor;
     QColor m_textBackgroundColor;
+    QColor m_gridLine;
     QColor m_highlightBarColor;
     QColor m_highlightRowColor;
     QColor m_highlightColumnColor;
