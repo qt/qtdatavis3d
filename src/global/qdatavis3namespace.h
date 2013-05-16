@@ -132,8 +132,8 @@ enum LabelPosition {
 enum ShadowQuality {
     ShadowNone = 0,
     ShadowLow = 1,
-    ShadowMedium = 3,   // TODO: Find out good values for these
-    ShadowHigh = 5     // TODO: Find out good values for these
+    ShadowMedium = 3,
+    ShadowHigh = 5
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

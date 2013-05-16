@@ -13,7 +13,7 @@ uniform highp float lightStrength;
 uniform highp float ambientStrength;
 
 void main() {
-    highp vec3 materialDiffuseColor = color_mdl;
+    highp vec3 materialDiffuseColor = color_mdl.rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
 
@@ -29,8 +29,8 @@ void main() {
 
     gl_FragColor.rgb =
         materialAmbientColor +
-        materialDiffuseColor * lightStrength * (cosTheta * cosTheta) / distance +
-        materialSpecularColor * lightStrength * pow(cosAlpha, 9) / (distance * distance);
+        materialDiffuseColor * lightStrength * pow(cosTheta, 2) / distance +
+        materialSpecularColor * lightStrength * pow(cosAlpha, 10) / distance;
     gl_FragColor.a = 1.0;
 }
 

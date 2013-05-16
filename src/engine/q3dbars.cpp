@@ -276,6 +276,7 @@ void Q3DBars::drawZoomScene()
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+        QMatrix4x4 itModelMatrix;
 
         GLfloat barPosY = item->d_ptr->translation().y() - d_ptr->m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
         if (ModeZoomRow == d_ptr->m_selectionMode)
@@ -284,6 +285,7 @@ void Q3DBars::drawZoomScene()
             barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX, barPosY, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
+        itModelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -300,7 +302,7 @@ void Q3DBars::drawZoomScene()
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
+                                                itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(), lightStrength);
@@ -772,6 +774,7 @@ void Q3DBars::drawScene()
                 glCullFace(GL_BACK);
 
             QMatrix4x4 modelMatrix;
+            QMatrix4x4 itModelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
 
@@ -781,7 +784,7 @@ void Q3DBars::drawScene()
                                   barHeight - d_ptr->m_yAdjustment,
                                   (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
-
+            itModelMatrix.scale(QVector3D(d_ptr->m_scaleX, barHeight, d_ptr->m_scaleZ));
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 #else
@@ -875,7 +878,7 @@ void Q3DBars::drawScene()
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->view(), viewMatrix);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                    modelMatrix.inverted().transposed());
+                                                    itModelMatrix.transposed().inverted());
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->color(), barColor);
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
@@ -918,12 +921,16 @@ void Q3DBars::drawScene()
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 depthMVPMatrix;
+        QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp);
         modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
                                     1.0f,
                                     d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
+        itModelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
+                                      1.0f,
+                                      d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -943,7 +950,7 @@ void Q3DBars::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->model(),
                                                    modelMatrix);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->nModel(),
-                                                   modelMatrix.inverted().transposed());
+                                                   itModelMatrix.inverted().transposed());
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->MVP(),
                                                    MVPMatrix);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
@@ -998,19 +1005,22 @@ void Q3DBars::drawScene()
         for (GLfloat row = 0.0f; row <= d_ptr->m_sampleCount.second; row++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
 
             rowPos = (row + 0.5f) * (d_ptr->m_barSpacing.height());
             modelMatrix.translate(0.0f, -d_ptr->m_yAdjustment,
                                   (d_ptr->m_columnDepth - rowPos) / d_ptr->m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
                                         gridLineWidth));
+            itModelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
+                                          gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
+                                                itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
             // Draw the object
@@ -1021,19 +1031,22 @@ void Q3DBars::drawScene()
         for (GLfloat bar = 0.0f; bar <= d_ptr->m_sampleCount.first; bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
 
             barPos = (bar + 0.5f) * (d_ptr->m_barSpacing.width());
             modelMatrix.translate((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                   -d_ptr->m_yAdjustment, zComp);
             modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
                                         d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
+            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                          d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
+                                                itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
             // Draw the object
@@ -1046,6 +1059,7 @@ void Q3DBars::drawScene()
              barHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
 
             if (d_ptr->m_zFlipped) {
                 modelMatrix.translate(0.0f,
@@ -1058,13 +1072,15 @@ void Q3DBars::drawScene()
             }
             modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
                                         gridLineWidth));
+            itModelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
+                                          gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
+                                                itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
             // Draw the object
@@ -1076,6 +1092,7 @@ void Q3DBars::drawScene()
              barHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
 
             if (d_ptr->m_xFlipped) {
                 modelMatrix.translate(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
@@ -1088,13 +1105,15 @@ void Q3DBars::drawScene()
             }
             modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
                                         d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
+            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                          d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->model(), modelMatrix);
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->nModel(),
-                                                modelMatrix.inverted().transposed());
+                                                itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
             // Draw the object
@@ -1502,7 +1521,7 @@ void Q3DBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint dist
     d_ptr->m_zoomLevel = qBound(10, distance, 500);
     CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation,
                                             d_ptr->m_verticalRotation));
-    qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
+    //qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
 }
 
 void Q3DBars::setTheme(ColorTheme theme)
