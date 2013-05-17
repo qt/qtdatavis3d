@@ -250,11 +250,13 @@ void Q3DBars::drawZoomScene()
     // Adjust scaling (zoom rate based on aspect ratio)
     viewMatrix.scale(d_ptr->m_zoomAdjustment);
 
-    // Set light position a bit above the camera (depends on do we have row or column zoom)
+    // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
+    QVector3D zoomLightPos = defaultLightPos;
+    zoomLightPos.setY(-10.0f);
     if (ModeZoomColumn == d_ptr->m_selectionMode)
-        lightPos = CameraHelper::calculateLightPosition(defaultLightPos, -85.0f);
+        lightPos = CameraHelper::calculateLightPosition(zoomLightPos, -85.0f);
     else
-        lightPos = CameraHelper::calculateLightPosition(defaultLightPos, 5.0f);
+        lightPos = CameraHelper::calculateLightPosition(zoomLightPos, 5.0f);
 #endif
 
     // Bind bar shader
