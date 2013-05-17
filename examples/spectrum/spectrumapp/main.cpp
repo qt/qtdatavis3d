@@ -88,6 +88,9 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setupSampleSpace(SpectrumNumBands, SpectrumNumBands * 2);
     // Disable grid
     m_chart->setGridEnabled(false);
+    // Disable auto-scaling of height by defining tick count and step, even though we don't draw grid
+    // By setting count to 1 and step to the max we can get, we lock the scale of the bars.
+    m_chart->setTickCount(1, 1.0f);
     // Disable shadows
     m_chart->setShadowQuality(ShadowNone);
 #if USE_CONES

@@ -224,6 +224,9 @@ void ChartDataGenerator::addDataSet()
                          {0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
                          {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
 
+    // Set tick count and step, we want a line every hour -> 7 ticks, step 1 hour
+    m_chart->setTickCount(7, 1.0f);
+
     // Create data set
     QDataSet *dataSet = new QDataSet();
 

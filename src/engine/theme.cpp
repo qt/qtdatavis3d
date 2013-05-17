@@ -265,7 +265,7 @@ void Theme::useTheme(ColorTheme theme)
         m_highlightRowColor = QColor(QRgb(0x038e9b));
         m_highlightColumnColor = QColor(QRgb(0x038e9b));
         m_lightStrength = 8.0f;
-        m_ambientStrength = 0.5f;
+        m_ambientStrength = 0.3f;
         m_highlightLightStrength = 10.0f;
         m_uniformColor = false;
         qDebug("ThemeHighContrast");
@@ -283,9 +283,9 @@ void Theme::useTheme(ColorTheme theme)
         m_highlightBarColor = QColor(QRgb(0xf6a625));
         m_highlightRowColor = QColor(QRgb(0x6d5fd5));
         m_highlightColumnColor = QColor(QRgb(0x6d5fd5));
-        m_lightStrength = 3.0f;
-        m_ambientStrength = 0.5f;
-        m_highlightLightStrength = 6.0f;
+        m_lightStrength = 6.0f;
+        m_ambientStrength = 0.3f;
+        m_highlightLightStrength = 7.0f;
         m_uniformColor = true;
         qDebug("ThemeLight");
         break;

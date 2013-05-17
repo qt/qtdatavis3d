@@ -24,5 +24,5 @@ void main() {
     eyeDirection_cmr = vec3(0.0, 0.0, 0.0) - vertexPosition_cmr;
     vec3 lightPosition_cmr = (V * vec4(lightPosition_wrld, 1.0)).xyz;
     lightDirection_cmr = lightPosition_cmr + eyeDirection_cmr;
-    normal_cmr = (V * itM * vec4(vertexNormal_mdl, 0.0)).xyz; // Use modelMatrix's transposed inverse, as it's scaled
+    normal_cmr = (V * itM * vec4(vertexNormal_mdl, 0.0)).xyz;
 }

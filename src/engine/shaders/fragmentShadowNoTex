@@ -128,15 +128,6 @@ void main() {
         vec4 shadCoordsPD = shadCoords;
         shadCoordsPD.x += cos(poissonDisk[i].x) / shadowQuality;
         shadCoordsPD.y += sin(poissonDisk[i].y) / shadowQuality;
-        // good for low shadow quality
-        //shadCoordsPD.x += cos(poissonDisk[i].x) / 33.3;
-        //shadCoordsPD.y += sin(poissonDisk[i].y) / 33.3;
-        // good for medium shadow quality
-        //shadCoordsPD.x += cos(poissonDisk[i].x) / 66.7;
-        //shadCoordsPD.y += sin(poissonDisk[i].y) / 66.7;
-        // good for high shadow quality
-        //shadCoordsPD.x += cos(poissonDisk[i].x) / 100;
-        //shadCoordsPD.y += sin(poissonDisk[i].y) / 100;
         visibility += 0.05 * shadow2DProj(shadowMap, shadCoordsPD).r;
     }
     // stratified poisson; produces noise but hides pixel edges well

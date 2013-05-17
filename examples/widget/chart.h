@@ -92,6 +92,9 @@ private:
     float m_barSpacingX;
     float m_barSpacingZ;
     int m_fontSize;
+    int m_ticks;
+    float m_tickStep;
+    float m_minval;
 };
 
 #endif

@@ -609,7 +609,6 @@ void Q3DBars::drawScene()
                    d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
     }
 
-#if 1
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
         // Bind selection shader
@@ -1092,9 +1091,13 @@ void Q3DBars::drawScene()
         }
 
         // Wall lines: back wall
-        GLfloat heightStep = d_ptr->m_heightNormalizer / 2.5; // TODO: Replace 2.5 with a dynamic number deduced from scene?
-        for (GLfloat barHeight = heightStep; barHeight <= d_ptr->m_heightNormalizer * 2.0f;
-             barHeight += heightStep) {
+        GLfloat heightStep = d_ptr->m_heightNormalizer / 5.0f; // default to 5 lines
+
+        if (d_ptr->m_tickCount > 0)
+            heightStep = d_ptr->m_tickStep;
+
+        for (GLfloat lineHeight = heightStep; lineHeight <= d_ptr->m_heightNormalizer;
+             lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -1102,11 +1105,13 @@ void Q3DBars::drawScene()
 
             if (d_ptr->m_zFlipped) {
                 modelMatrix.translate(0.0f,
-                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      2.0f * lineHeight / d_ptr->m_heightNormalizer
+                                      - d_ptr->m_yAdjustment,
                                       d_ptr->m_columnDepth / d_ptr->m_scaleFactor + zComp);
             } else {
                 modelMatrix.translate(0.0f,
-                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      2.0f * lineHeight / d_ptr->m_heightNormalizer
+                                      - d_ptr->m_yAdjustment,
                                       -d_ptr->m_columnDepth / d_ptr->m_scaleFactor + zComp);
             }
             modelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
@@ -1146,8 +1151,8 @@ void Q3DBars::drawScene()
         }
 
         // Wall lines: side wall
-        for (GLfloat barHeight = heightStep; barHeight <= d_ptr->m_heightNormalizer * 2.0f;
-             barHeight += heightStep) {
+        for (GLfloat lineHeight = heightStep; lineHeight <= d_ptr->m_heightNormalizer;
+             lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -1155,11 +1160,13 @@ void Q3DBars::drawScene()
 
             if (d_ptr->m_xFlipped) {
                 modelMatrix.translate(d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
-                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      2.0f * lineHeight / d_ptr->m_heightNormalizer
+                                      - d_ptr->m_yAdjustment,
                                       zComp);
             } else {
                 modelMatrix.translate(-d_ptr->m_rowWidth / d_ptr->m_scaleFactor,
-                                      barHeight / d_ptr->m_heightNormalizer - d_ptr->m_yAdjustment,
+                                      2.0f * lineHeight / d_ptr->m_heightNormalizer
+                                      - d_ptr->m_yAdjustment,
                                       zComp);
             }
             modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
@@ -1394,17 +1401,12 @@ void Q3DBars::drawScene()
 
     // Release label shader
     d_ptr->m_labelShader->release();
-#endif
 }
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
-    // TODO: for testing shaders
-    //static GLint shaderNo = 1;
-    //qDebug() << "mouse button pressed" << event->button();
     if (Qt::LeftButton == event->button()) {
         if (d_ptr->m_zoomActivated) {
-            //qDebug() << event->pos().x() << event->pos().y() << d_ptr->m_sceneViewPort << d_ptr->m_zoomViewPort;
             if (event->pos().x() <= d_ptr->m_sceneViewPort.width()
                     && event->pos().y() <= d_ptr->m_sceneViewPort.height()) {
                 d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnOverview;
@@ -1426,31 +1428,12 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
         d_ptr->m_mousePressed = Q3DBarsPrivate::MouseRotating;
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
-
-        // TODO: testing shaders
-        //        if (++shaderNo > 3)
-        //            shaderNo = 1;
-        //        switch (shaderNo) {
-        //        case 1:
-        //            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-        //                               , QStringLiteral(":/shaders/fragment"));
-        //            break;
-        //        case 2:
-        //            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-        //                               , QStringLiteral(":/shaders/fragmentColorOnY"));
-        //            break;
-        //        case 3:
-        //            d_ptr->initShaders(QStringLiteral(":/shaders/vertex")
-        //                               , QStringLiteral(":/shaders/fragmentAmbient"));
-        //            break;
-        //        }
     }
     CameraHelper::updateMousePos(d_ptr->m_mousePos);
 }
 
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    //qDebug() << "mouse button released" << event->button();
     if (Q3DBarsPrivate::MouseRotating == d_ptr->m_mousePressed) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
@@ -1461,25 +1444,8 @@ void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    if (Q3DBarsPrivate::MouseRotating == d_ptr->m_mousePressed) {
-        //qDebug() << "mouse moved while pressed" << event->pos();
+    if (Q3DBarsPrivate::MouseRotating == d_ptr->m_mousePressed)
         d_ptr->m_mousePos = event->pos();
-    }
-#if 0
-    // TODO: Testi - laske kursorin sijainti scenessä
-    QPointF mouse3D((2.0f * event->pos().x() - width()) / height(),
-                    1.0f - (2.0f * event->pos().y()) / height());
-    //qDebug() << "mouse position in scene" << mouse3D;
-
-    // TODO: Testi laske focal point
-    GLfloat focalPoint = tan(45.0f / 2.0f);
-
-    // TODO: Testi - laske viewmatriisin kerroin
-    QVector3D worldRay = QVector3D(0.0f, 0.0f, 0.0f)
-            - QVector3D(mouse3D.x(), mouse3D.y(), -focalPoint);
-    //qDebug() << "worldRay" << worldRay;
-    // multiply viewmatrix with this to get something?
-#endif
 }
 
 void Q3DBars::wheelEvent(QWheelEvent *event)
@@ -1674,6 +1640,15 @@ void Q3DBars::setGridEnabled(bool enable)
     d_ptr->m_gridEnabled = enable;
 }
 
+void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+{
+    d_ptr->m_tickCount = tickCount;
+    d_ptr->m_tickStep = step;
+    if (tickCount > 0 && step > 0) {
+        d_ptr->m_heightNormalizer = tickCount * step;
+        d_ptr->calculateHeightAdjustment(QPair<float, float>(minimum, d_ptr->m_heightNormalizer));
+    }
+}
 
 void Q3DBars::setShadowQuality(ShadowQuality quality)
 {
@@ -1730,8 +1705,11 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
     d_ptr->m_dataSet->addRow(row);
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
@@ -1748,8 +1726,11 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
     d_ptr->m_dataSet->addRow(row);
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
@@ -1767,8 +1748,11 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
@@ -1799,8 +1783,11 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
     }
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
@@ -1834,8 +1821,11 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
     }
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
@@ -1850,8 +1840,11 @@ void Q3DBars::addDataSet(QDataSet* dataSet)
     // Find highest value
     // Get the limits
     QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    d_ptr->calculateHeightAdjustment(limits);
+    // Don't auto-adjust height if tick count is set
+    if (d_ptr->m_tickCount == 0) {
+        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        d_ptr->calculateHeightAdjustment(limits);
+    }
     // Give drawer to data set
     d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
 }
@@ -1914,7 +1907,9 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_updateLabels(false),
       m_gridEnabled(true),
       m_shadowQuality(ShadowLow),
-      m_shadowQualityToShader(33.3f)
+      m_shadowQualityToShader(33.3f),
+      m_tickCount(0),
+      m_tickStep(0)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);

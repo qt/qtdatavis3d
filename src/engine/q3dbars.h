@@ -143,6 +143,11 @@ public:
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
 
+    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data set.
+    // Minimum is the absolute minimum possible value a bar can have. This is especially important to
+    // set if values can be negative.
+    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

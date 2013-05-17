@@ -171,6 +171,8 @@ public:
     bool m_gridEnabled;
     ShadowQuality m_shadowQuality;
     GLfloat m_shadowQualityToShader;
+    GLint m_tickCount;
+    GLfloat m_tickStep;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

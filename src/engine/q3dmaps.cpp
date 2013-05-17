@@ -400,6 +400,10 @@ void Q3DMaps::drawScene()
         // Release depth shader
         d_ptr->m_depthShader->release();
 
+        // Revert to original viewport
+        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
+                   d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
+
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
         d_ptr->m_labelShader->bind();
@@ -417,13 +421,8 @@ void Q3DMaps::drawScene()
         glDisable(GL_TEXTURE_2D);
         d_ptr->m_labelShader->release();
 #endif
-#if 1
-
-        // Revert to original viewport
-        glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
-                   d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
     }
-
+#if 1
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
         // Bind selection shader
