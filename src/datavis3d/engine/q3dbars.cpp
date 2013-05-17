@@ -243,12 +243,13 @@ void Q3DBars::drawZoomScene()
     // Set view matrix
     QMatrix4x4 viewMatrix;
 
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 5.0f + zComp),
+    // Adjust scaling (zoom rate based on aspect ratio)
+    GLfloat camPosZoomed = 5.0f / d_ptr->m_zoomAdjustment + zComp;
+
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camPosZoomed),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
-    // Adjust scaling (zoom rate based on aspect ratio)
-    viewMatrix.scale(d_ptr->m_zoomAdjustment);
 
     // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
     QVector3D zoomLightPos = defaultLightPos;

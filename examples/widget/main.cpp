@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 
     widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
-    hLayout->addWidget(container);
+    hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
     QPushButton *dataButton = new QPushButton(widget);

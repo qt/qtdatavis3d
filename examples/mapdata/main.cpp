@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     widget->setWindowTitle(QStringLiteral("Population of a few cities in Finland"));
 
-    hLayout->addWidget(container);
+    hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
 //    QPushButton *dataButton = new QPushButton(widget);
