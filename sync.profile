@@ -1,5 +1,5 @@
 %modules = ( # path to module name map
-    "QtDataVis3D" => "$basedir/src",
+    "QtDataVis3D" => "$basedir/src/datavis3d",
 );
 %moduleheaders = ( # restrict the module headers to those found in relative path
 );
