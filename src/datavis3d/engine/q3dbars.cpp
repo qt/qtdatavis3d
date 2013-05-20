@@ -1488,7 +1488,8 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     d_ptr->initSelectionBuffer();
 
     // Re-init depth buffer
-    d_ptr->initDepthBuffer();
+    if (d_ptr->m_isInitialized && d_ptr->m_shadowQuality > ShadowNone)
+        d_ptr->initDepthBuffer();
 }
 
 void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1670,30 +1671,32 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
         d_ptr->m_shadowQualityToShader = 0.0f;
         break;
     }
-    if (d_ptr->m_shadowQuality > ShadowNone) {
-        // Re-init depth buffer
-        d_ptr->initDepthBuffer();
-        // Re-init shaders
-        if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+    if (d_ptr->m_isInitialized) {
+        if (d_ptr->m_shadowQuality > ShadowNone) {
+            // Re-init depth buffer
+            d_ptr->initDepthBuffer();
+            // Re-init shaders
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            }
+            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                         QStringLiteral(":/shaders/fragmentShadowNoTex"));
         } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            // Re-init shaders
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragmentColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragment"));
+            }
+            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
+                                         QStringLiteral(":/shaders/fragment"));
         }
-        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                     QStringLiteral(":/shaders/fragmentShadowNoTex"));
-    } else {
-        // Re-init shaders
-        if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragment"));
-        }
-        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragment"));
     }
 }
 
