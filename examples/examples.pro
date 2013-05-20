@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 SUBDIRS += barchart \
            rainfall \
-           spectrum \
            widget \
            mapdata
+
+qtHaveModule(multimedia): SUBDIRS += spectrum
