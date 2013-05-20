@@ -242,3 +242,5 @@ qtc-qmldbg
 *.map
 work
 
+.obj/
+
