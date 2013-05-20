@@ -68,11 +68,9 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 
     d_ptr->m_context->setFormat(requestedFormat());
     d_ptr->m_context->create();
-#if !defined(Q_OS_MAC)
-    // These are required here for windows (and linux?), but cause errors on mac
     d_ptr->m_context->makeCurrent(this);
     initializeOpenGLFunctions();
-#endif
+
     initialize();
 }
 
@@ -131,9 +129,6 @@ void Q3DWindow::renderNow()
     d_ptr->m_context->makeCurrent(this);
 
     if (needsInit) {
-#if defined(Q_OS_MAC)
-        initializeOpenGLFunctions();
-#endif
         initialize();
         needsInit = false;
     }
