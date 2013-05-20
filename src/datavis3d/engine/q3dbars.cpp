@@ -958,7 +958,7 @@ void Q3DBars::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->color(),
                                                    backgroundColor);
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
-                                                   d_ptr->m_theme->m_ambientStrength);
+                                                   d_ptr->m_theme->m_ambientStrength * 2.0f);
 
         if (d_ptr->m_shadowQuality > ShadowNone) {
             // Set shadow shader bindings
@@ -1896,7 +1896,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_zoomViewPort(0, 0, q->width(), q->height()),
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
-      m_labelTransparency(TransparencyNone),
+      m_labelTransparency(TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_xFlipped(false),

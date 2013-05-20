@@ -1310,7 +1310,7 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_zoomViewPort(0, 0, q->width(), q->height()),
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
-      m_labelTransparency(TransparencyNone),
+      m_labelTransparency(TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_bgrTexture(0),

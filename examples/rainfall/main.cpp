@@ -42,8 +42,8 @@
 #include "qdataitem.h"
 
 #include <QGuiApplication>
-#include <QTimer>
-#include <QDebug>
+#include <QFont>
+//#include <QDebug>
 
 using namespace QtDataVis3D;
 
@@ -79,6 +79,12 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     // Set bar type to cylinder
     m_chart->setBarType(Cylinders, false);
 
+    // Set shadows to medium
+    m_chart->setShadowQuality(ShadowMedium);
+
+    // Set font
+    m_chart->setFont(QFont("Century Gothic", 40));
+
     // Set selection mode to bar and column
     //m_chart->setSelectionMode(ModeBarAndColumn);
     m_chart->setSelectionMode(ModeZoomColumn);
@@ -87,7 +93,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setTheme(ThemeBlueNcs);
 
     // Set preset camera position
-    m_chart->setCameraPreset(PresetFront);
+    m_chart->setCameraPreset(PresetIsometricRightHigh);
 
     // Disable grid
     m_chart->setGridEnabled(false);

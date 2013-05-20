@@ -240,24 +240,14 @@ void MapsModifier::changeTheme()
         theme = ThemeSystem;
 }
 
-//void MapsModifier::changeSelectionMode()
-//{
-//    static int selectionMode = 0;
-
-//    m_chart->setSelectionMode((SelectionMode)selectionMode);
-
-//    if (++selectionMode > (int)ModeZoomColumn)
-//        selectionMode = 0;
-//}
-
 void MapsModifier::changeTransparency()
 {
-    static int transparency = TransparencyFromTheme;
+    static int transparency = TransparencyNone;
 
     m_chart->setLabelTransparency((LabelTransparency)transparency);
 
     if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyNone;
+        transparency = TransparencyFromTheme;
 }
 
 void MapsModifier::changeValueDimension(int dimension)
@@ -269,7 +259,7 @@ void MapsModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    qDebug() << newFont << newFont.style();
+    //qDebug() << newFont << newFont.style();
     m_chart->setFont(newFont);
 }
 

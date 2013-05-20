@@ -215,12 +215,12 @@ void ChartModifier::changeTheme()
 
 void ChartModifier::changeTransparency()
 {
-    static int transparency = TransparencyFromTheme;
+    static int transparency = TransparencyNone;
 
     m_chart->setLabelTransparency((LabelTransparency)transparency);
 
     if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyNone;
+        transparency = TransparencyFromTheme;
 }
 
 void ChartModifier::changeSelectionMode()
@@ -236,7 +236,8 @@ void ChartModifier::changeSelectionMode()
 void ChartModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
-    newFont.setPixelSize(m_fontSize);
+    newFont.setPointSize(m_fontSize);
+    //qDebug() << newFont << newFont.style();
     m_chart->setFont(newFont);
 }
 

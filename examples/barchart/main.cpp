@@ -112,8 +112,6 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #ifndef CYCLE_THROUGH_THEMES
     // Set bar colors
     m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
-    //m_chart->setTheme(ThemeSystem);
-    m_chart->setLabelTransparency(TransparencyFromTheme);
 #else
     m_chart->setLabelTransparency(TransparencyNone);
 #endif

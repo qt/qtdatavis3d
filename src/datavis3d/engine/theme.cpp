@@ -202,7 +202,7 @@ void Theme::useTheme(ColorTheme theme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0xff);
+        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
         m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0x88d41e));
         m_highlightRowColor = QColor(QRgb(0xff8e1a));
