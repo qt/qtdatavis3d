@@ -209,14 +209,20 @@ void MapsModifier::changeStyle()
         m_chart->setBarType(Pyramids, true);
         break;
     case 8:
-        m_chart->setBarType(Spheres, false);
+        m_chart->setBarType(BevelBars, false);
         break;
     case 9:
+        m_chart->setBarType(BevelBars, true);
+        break;
+    case 10:
+        m_chart->setBarType(Spheres, false);
+        break;
+    case 11:
         m_chart->setBarType(Spheres, true);
         break;
     }
     model++;
-    if (model > 9)
+    if (model > 11)
         model = 0;
 }
 

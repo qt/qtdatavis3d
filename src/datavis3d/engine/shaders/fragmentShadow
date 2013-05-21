@@ -1,12 +1,10 @@
 #version 120
-//#version 130 // use with version 1
 
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp float shadowQuality;
 uniform highp sampler2D textureSampler;
-uniform highp sampler2DShadow shadowMap; // use with version 2
-//uniform highp sampler2D shadowMap; // use with version 1
+uniform highp sampler2DShadow shadowMap;
 
 varying highp vec4 shadowCoord;
 varying highp vec2 UV;
@@ -38,62 +36,6 @@ const highp vec2 poissonDisk[16] = vec2[](vec2(-0.94201624, -0.39906216),
     return fract(sin(dot_product) * 43758.5453);
 }*/
 
-// Version 1: Causes self-shadowing, but shadows are smooth
-/*void main() {
-    float shadowFactor = 1.0; // default to '1' meaning "no shadow"
-    //float epsilon = 0.01; // increase value to remove little artifacts
-    vec4 shadCoordsPD = shadowCoord;
-    shadCoordsPD.z += 0.005;
-    shadCoordsPD /= shadowCoord.w;
-    if (shadowCoord.w <= 0.0) { // ignore negative projection
-        shadowFactor = 1.0;
-    } else if (shadCoordsPD.x < 0.0 || shadCoordsPD.y < 0.0) { // outside light frustum, ignore
-        shadowFactor = 1.0;
-    } else if (shadCoordsPD.x >= 1.0 || shadCoordsPD.y >= 1.0) { // outside light frustum, ignore
-        shadowFactor = 1.0;
-    } else {
-        // This does not work perfectly. It causes self-shadowing, which we should get rid of.
-        // Requires at least #version 130
-        float shadow = 0.0;
-        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(0, 0));
-        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, 1));
-        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, 1));
-        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(-1, -1));
-        shadow += textureProjOffset(shadowMap, shadCoordsPD, ivec2(1, -1));
-        shadow *= 0.2;
-        shadowFactor = shadow;
-        //float shadow = texture2D(shadowMap, shadCoordsPD.xy).x;
-        //if (shadow + epsilon < shadCoordsPD.z) {
-        //    shadowFactor = 0.0;
-        //}
-    }
-    // shadow is dark gray, other parts light gray
-    //gl_FragColor = vec4(0.8, 0.8, 0.8, 1.0) * shadowFactor;// + vec4(0.2, 0.2, 0.2, 1.0);
-    // simple shadows with no effect from light
-    //gl_FragColor = texture2D(textureSampler, UV) * shadowFactor;
-
-    // shadows including effects from light
-    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(0.2, 0.2, 0.2);
-
-    highp vec3 n = normalize(normal_cmr);
-    highp vec3 l = normalize(lightDirection_cmr);
-    highp float cosTheta = clamp(dot(n, l), 0.0, 1.0);
-
-    highp vec3 E = normalize(eyeDirection_cmr);
-    highp vec3 R = reflect(-l, n);
-    highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
-
-    // Shadow strength can be adjusted by using pow(shadowFactor, strength), but it causes self-shadowing issues that need to be solved
-    gl_FragColor.rgb =
-        shadowFactor * (materialAmbientColor +
-        materialDiffuseColor * lightStrength * cosTheta +
-        materialSpecularColor * lightStrength * pow(cosAlpha, 10));
-    gl_FragColor.a = 1.0;
-}*/
-
-// Version 2: Shadows are a bit rugged (may be fixed with poisson disk?)
 void main() {
     highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
@@ -116,12 +58,12 @@ void main() {
     // direct method; needs large shadow texture to look good
     //highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoords).r + 0.25;
     // poisson disk sampling; smoothes edges
-    highp float visibility = 0.2;
+    highp float visibility = 0.4;
     for (int i = 0; i < 15; i++) {
         vec4 shadCoordsPD = shadCoords;
         shadCoordsPD.x += cos(poissonDisk[i].x) / shadowQuality;
         shadCoordsPD.y += sin(poissonDisk[i].y) / shadowQuality;
-        visibility += 0.05 * shadow2DProj(shadowMap, shadCoordsPD).r;
+        visibility += 0.025 * shadow2DProj(shadowMap, shadCoordsPD).r;
     }
     // stratified poisson; produces noise but hides pixel edges well
     /*for (int i = 0; i < 15; i++) {

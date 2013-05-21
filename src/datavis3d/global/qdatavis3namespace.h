@@ -63,6 +63,7 @@ enum BarStyle {
     Pyramids,
     Cones,
     Cylinders,
+    BevelBars,
     Spheres
 };
 

@@ -13,6 +13,8 @@
         <file alias="label">meshes/plane.obj</file>
         <file alias="sphere">meshes/sphere.obj</file>
         <file alias="sphereSmooth">meshes/sphereSmooth.obj</file>
+        <file alias="bevelbar">meshes/barFlat.obj</file>
+        <file alias="bevelbarSmooth">meshes/barSmooth.obj</file>
     </qresource>
     <qresource prefix="/shaders">
         <file alias="fragment">shaders/fragmentShader</file>

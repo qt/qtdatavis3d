@@ -545,8 +545,8 @@ void Q3DMaps::drawScene()
                                     heightMultiplier * barHeight + heightScaler,
                                     depthMultiplier * barHeight + depthScaler));
         itModelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                    heightMultiplier * barHeight + heightScaler,
-                                    depthMultiplier * barHeight + depthScaler));
+                                      heightMultiplier * barHeight + heightScaler,
+                                      depthMultiplier * barHeight + depthScaler));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -641,8 +641,8 @@ void Q3DMaps::drawScene()
                                     d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
         modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
         itModelMatrix.scale(QVector3D(d_ptr->m_areaSize.width() / d_ptr->m_scaleFactor,
-                                    1.0f,
-                                    d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
+                                      1.0f,
+                                      d_ptr->m_areaSize.height() / d_ptr->m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1010,6 +1010,11 @@ void Q3DMaps::setBarType(BarStyle style, bool smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
         else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
+    } else if (style == BevelBars) {
+        if (smooth)
+            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
+        else
+            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/bevelbar");
     } else if (style == Spheres) {
         if (smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");

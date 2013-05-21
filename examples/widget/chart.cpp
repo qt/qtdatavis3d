@@ -187,9 +187,15 @@ void ChartModifier::changeStyle()
     case 7:
         m_chart->setBarType(Pyramids, true);
         break;
+    case 8:
+        m_chart->setBarType(BevelBars, false);
+        break;
+    case 9:
+        m_chart->setBarType(BevelBars, true);
+        break;
     }
     model++;
-    if (model > 7)
+    if (model > 9)
         model = 0;
 }
 

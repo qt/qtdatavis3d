@@ -1527,6 +1527,11 @@ void Q3DBars::setBarType(BarStyle style, bool smooth)
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
         else
             d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
+    } else if (style == BevelBars) {
+        if (smooth)
+            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
+        else
+            d_ptr->m_objFile = QStringLiteral(":/defaultMeshes/bevelbar");
     }
     // Reload mesh data
     if (d_ptr->m_isInitialized)
