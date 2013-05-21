@@ -164,6 +164,7 @@ public:
     Q3DMaps::AdjustmentDirection m_adjustDirection;
     ShadowQuality m_shadowQuality;
     GLfloat m_shadowQualityToShader;
+    bool m_bgrHasAlpha;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

@@ -82,6 +82,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 const GLfloat gridLineWidth = 0.005f;
 GLfloat distanceMod = 0.0f;
+static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Q3DMaps::Q3DMaps()
     : d_ptr(new Q3DMapsPrivate(this))
@@ -208,7 +209,7 @@ void Q3DMaps::drawScene()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    static QVector3D selection = QVector3D(0, 0, 0);
+    static QVector3D selection = skipColor;
 
     // Specify viewport
     glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
@@ -431,10 +432,13 @@ void Q3DMaps::drawScene()
         // Draw bars to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set clear color to black
+        glClearColor(skipColor.x() / 255, skipColor.y() / 255, skipColor.z() / 255, 1.0f); // Set clear color to white (= skipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-        for (int bar = 0; bar < d_ptr->m_data->d_ptr->row().size(); bar++) {
+        GLint barIdxRed = 0;
+        GLint barIdxGreen = 0;
+        GLint barIdxBlue = 0;
+        for (int bar = 0; bar < d_ptr->m_data->d_ptr->row().size(); bar++, barIdxRed++) {
             QDataItem *item = d_ptr->m_data->d_ptr->getItem(bar);
             if (!item)
                 continue;
@@ -454,12 +458,20 @@ void Q3DMaps::drawScene()
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            // add +2 to avoid black
-            QVector3D barColor = QVector3D((GLdouble)(bar + 2)
-                                           / (GLdouble)(d_ptr->m_data->d_ptr->row().size() + 2),
-                                           (GLdouble)(bar + 2)
-                                           / (GLdouble)(d_ptr->m_data->d_ptr->row().size() + 2),
-                                           0.0);
+            if (barIdxRed > 0 && barIdxRed % 256 == 0) {
+                barIdxRed = 0;
+                barIdxGreen++;
+            }
+            if (barIdxGreen > 0 && barIdxGreen % 256 == 0) {
+                barIdxGreen = 0;
+                barIdxBlue++;
+            }
+            if (barIdxBlue > 255)
+                qFatal("Too many objects");
+
+            QVector3D barColor = QVector3D((GLfloat)barIdxRed / 255.0f,
+                                           (GLfloat)barIdxGreen / 255.0f,
+                                           (GLfloat)barIdxBlue / 255.0f);
 
             d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP(),
                                                       MVPMatrix);
@@ -627,6 +639,10 @@ void Q3DMaps::drawScene()
 #if 1
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
+    if (d_ptr->m_bgrHasAlpha) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
 
     // Draw background
     if (d_ptr->m_backgroundObj) {
@@ -686,6 +702,8 @@ void Q3DMaps::drawScene()
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
+    if (d_ptr->m_bgrHasAlpha)
+        glDisable(GL_BLEND);
 
     // Release background shader
     d_ptr->m_backgroundShader->release();
@@ -1229,6 +1247,7 @@ void Q3DMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
 
 void Q3DMaps::setImage(const QImage &image)
 {
+    d_ptr->m_bgrHasAlpha = image.hasAlphaChannel();
     if (d_ptr->m_bgrTexture)
         glDeleteTextures(1, &d_ptr->m_bgrTexture);
     d_ptr->m_bgrTexture = d_ptr->m_textureHelper->create2DTexture(image, true, true);
@@ -1331,7 +1350,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_updateLabels(true),
       m_gridEnabled(true),
       m_shadowQuality(ShadowLow),
-      m_shadowQualityToShader(33.3f)
+      m_shadowQualityToShader(33.3f),
+      m_bgrHasAlpha(false)
 {
     //m_data->d_ptr->setDrawer(m_drawer);
     //QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DMapsPrivate::updateTextures);
@@ -1493,24 +1513,37 @@ void Q3DMapsPrivate::calculateTranslation(QDataItem *item)
 
 Q3DMapsPrivate::SelectionType Q3DMapsPrivate::isSelected(GLint bar, const QVector3D &selection)
 {
+    GLubyte barIdxRed = 0;
+    GLubyte barIdxGreen = 0;
+    GLubyte barIdxBlue = 0;
     //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = SelectionNone;
-    if (selection == Utils::vectorFromColor(Qt::black))
+
+    if (selection == skipColor)
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)((GLdouble)(bar + 2)
-                                            / (GLdouble)(m_data->d_ptr->row().size() + 2)
-                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
-                                  (GLubyte)(((GLdouble)(bar + 2)
-                                             / (GLdouble)(m_data->d_ptr->row().size() + 2))
-                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
-                                  0);
+
+    if (bar <= 255) {
+        barIdxRed = bar;
+    } else if (bar <= 65535) {
+        barIdxGreen = bar / 256;
+        barIdxRed = bar % 256;
+    } else {
+        barIdxBlue = bar / 65535;
+        barIdxGreen = bar % 65535;
+        barIdxRed = bar % 256;
+    }
+
+    QVector3D current = QVector3D(barIdxRed, barIdxGreen, barIdxBlue);
+
     // TODO: For debugging
     //if (selection != prevSel) {
     //    qDebug() << selection.x() << selection .y() << selection.z();
     //    prevSel = selection;
     //}
+
     if (current == selection)
         isSelectedType = SelectionBar;
+
     return isSelectedType;
 }
 
