@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     valueDimension->addItem(QStringLiteral("Depth"));
     valueDimension->addItem(QStringLiteral("Radius"));
     valueDimension->addItem(QStringLiteral("All"));
-    valueDimension->setCurrentIndex(0);
+    valueDimension->setCurrentIndex(4);
 
     QComboBox *shadowQuality = new QComboBox(widget);
     shadowQuality->addItem(QStringLiteral("None"));

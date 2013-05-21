@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/images">
-        <file alias="suomi">suomi2.jpg</file>
-        <file alias="finland">suomi.jpg</file>
+        <file alias="finland">Suomi.karttapohja.svg</file>
     </qresource>
     <qresource prefix="/meshes">
         <file alias="weirdthing">weirdthing.obj</file>
