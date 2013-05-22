@@ -166,7 +166,11 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     // Create render buffer
     glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+#if !defined(QT_OPENGL_ES_2)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.width(), size.height());
+#else
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.width(), size.height());
+#endif
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create frame buffer
@@ -191,6 +195,7 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     return textureid;
 }
 
+#if !defined(QT_OPENGL_ES_2)
 GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
 {
     GLuint depthtextureid;
@@ -231,6 +236,7 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
 
     return depthtextureid;
 }
+#endif
 
 void TextureHelper::deleteTexture(const GLuint *texture)
 {
@@ -284,7 +290,11 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
         const uint *p = (const uint*) srcImage.scanLine(srcImage.height() - 1);
         uint *q = (uint*) dstImage.scanLine(0);
 
+#if !defined(QT_OPENGL_ES_2)
         if (texture_format == GL_BGRA) {
+#else
+        if (texture_format == GL_BGRA8_EXT) {
+#endif
             if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
                 // mirror + swizzle
                 for (int i=0; i < height; ++i) {
@@ -335,7 +345,11 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
 
 QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format)
 {
+#if !defined(QT_OPENGL_ES_2)
     if (texture_format == GL_BGRA) {
+#else
+    if (texture_format == GL_BGRA8_EXT) {
+#endif
         if (QSysInfo::ByteOrder == QSysInfo::BigEndian) {
             return ((src_pixel << 24) & 0xff000000)
                     | ((src_pixel >> 24) & 0x000000ff)

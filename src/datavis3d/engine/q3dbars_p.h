@@ -104,9 +104,11 @@ public:
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initDepthShader();
     void initSelectionBuffer();
+#if !defined(QT_OPENGL_ES_2)
+    void initDepthShader();
     void initDepthBuffer();
+#endif
     void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);

@@ -95,6 +95,7 @@ Q3DBars::~Q3DBars()
 void Q3DBars::initialize()
 {
     // Initialize shaders
+#if !defined(QT_OPENGL_ES_2)
     if (d_ptr->m_shadowQuality > ShadowNone) {
         if (!d_ptr->m_theme->m_uniformColor) {
             d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -118,11 +119,25 @@ void Q3DBars::initialize()
         d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragment"));
     }
+#else
+    if (!d_ptr->m_theme->m_uniformColor) {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                           QStringLiteral(":/shaders/fragmentColorOnYES2"));
+    } else {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                           QStringLiteral(":/shaders/fragmentES2"));
+    }
+    d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
+                                 QStringLiteral(":/shaders/fragmentES2"));
+#endif
+
     d_ptr->initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                             QStringLiteral(":/shaders/fragmentLabel"));
 
+#if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
     d_ptr->initDepthShader();
+#endif
 
     // Init selection shader
     d_ptr->initSelectionShader();
@@ -149,9 +164,12 @@ void Q3DBars::initialize()
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+
+#if !defined(QT_OPENGL_ES_2)
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+#endif
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
@@ -492,6 +510,7 @@ void Q3DBars::drawScene()
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
 
+#if !defined(QT_OPENGL_ES_2)
     if (d_ptr->m_shadowQuality > ShadowNone/*!d_ptr->m_zoomActivated*/) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
@@ -611,6 +630,7 @@ void Q3DBars::drawScene()
         glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
                    d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
     }
+#endif
 
     // Skip selection mode drawing if we're zoomed or have no selection mode
     if (!d_ptr->m_zoomActivated && d_ptr->m_selectionMode > ModeNone) {
@@ -886,6 +906,7 @@ void Q3DBars::drawScene()
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->ambientS(),
                                                     d_ptr->m_theme->m_ambientStrength);
 
+#if !defined(QT_OPENGL_ES_2)
                 if (d_ptr->m_shadowQuality > ShadowNone) {
                     // Set shadow shader bindings
                     d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
@@ -898,7 +919,9 @@ void Q3DBars::drawScene()
                     // Draw the object
                     d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_barObj,
                                                 0, d_ptr->m_depthTexture);
-                } else {
+                } else
+#endif
+                {
                     // Set shadowless shader bindings
                     d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                         lightStrength);
@@ -960,6 +983,7 @@ void Q3DBars::drawScene()
         d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->ambientS(),
                                                    d_ptr->m_theme->m_ambientStrength * 2.0f);
 
+#if !defined(QT_OPENGL_ES_2)
         if (d_ptr->m_shadowQuality > ShadowNone) {
             // Set shadow shader bindings
             d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->shadowQ(),
@@ -972,7 +996,9 @@ void Q3DBars::drawScene()
             // Draw the object
             d_ptr->m_drawer->drawObject(d_ptr->m_backgroundShader, d_ptr->m_backgroundObj,
                                         0, d_ptr->m_depthTexture);
-        } else {
+        } else
+#endif
+        {
             // Set shadowless shader bindings
             d_ptr->m_backgroundShader->setUniformValue(d_ptr->m_backgroundShader->lightS(),
                                                        d_ptr->m_theme->m_lightStrength);
@@ -1025,6 +1051,7 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
+#if !defined(QT_OPENGL_ES_2)
             if (d_ptr->m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
@@ -1037,7 +1064,9 @@ void Q3DBars::drawScene()
                 // Draw the object
                 d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
                                             0, d_ptr->m_depthTexture);
-            } else {
+            } else
+#endif
+            {
                 // Set shadowless shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                     d_ptr->m_theme->m_lightStrength);
@@ -1071,6 +1100,7 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
+#if !defined(QT_OPENGL_ES_2)
             if (d_ptr->m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
@@ -1083,7 +1113,9 @@ void Q3DBars::drawScene()
                 // Draw the object
                 d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
                                             0, d_ptr->m_depthTexture);
-            } else {
+            } else
+#endif
+            {
                 // Set shadowless shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                     d_ptr->m_theme->m_lightStrength);
@@ -1131,6 +1163,7 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
+#if !defined(QT_OPENGL_ES_2)
             if (d_ptr->m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
@@ -1143,7 +1176,9 @@ void Q3DBars::drawScene()
                 // Draw the object
                 d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
                                             0, d_ptr->m_depthTexture);
-            } else {
+            } else
+#endif
+            {
                 // Set shadowless shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                     d_ptr->m_theme->m_lightStrength);
@@ -1186,6 +1221,7 @@ void Q3DBars::drawScene()
                                                 itModelMatrix.inverted().transposed());
             d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->MVP(), MVPMatrix);
 
+#if !defined(QT_OPENGL_ES_2)
             if (d_ptr->m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->shadowQ(),
@@ -1198,7 +1234,9 @@ void Q3DBars::drawScene()
                 // Draw the object
                 d_ptr->m_drawer->drawObject(d_ptr->m_barShader, d_ptr->m_gridLineObj,
                                             0, d_ptr->m_depthTexture);
-            } else {
+            } else
+#endif
+            {
                 // Set shadowless shader bindings
                 d_ptr->m_barShader->setUniformValue(d_ptr->m_barShader->lightS(),
                                                     d_ptr->m_theme->m_lightStrength);
@@ -1487,9 +1525,11 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     // Re-init selection buffer
     d_ptr->initSelectionBuffer();
 
+#if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
     if (d_ptr->m_isInitialized && d_ptr->m_shadowQuality > ShadowNone)
         d_ptr->initDepthBuffer();
+#endif
 }
 
 void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1582,13 +1622,33 @@ void Q3DBars::setTheme(ColorTheme theme)
     d_ptr->m_theme->useTheme(theme);
     d_ptr->m_drawer->setTheme(*d_ptr->m_theme);
     // Re-initialize shaders
-    if (!d_ptr->m_theme->m_uniformColor) {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                           QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+#if !defined(QT_OPENGL_ES_2)
+    if (d_ptr->m_shadowQuality > ShadowNone) {
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        }
     } else {
-        d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                           QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragmentColorOnY"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                               QStringLiteral(":/shaders/fragment"));
+        }
     }
+#else
+    if (!d_ptr->m_theme->m_uniformColor) {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                           QStringLiteral(":/shaders/fragmentColorOnYES2"));
+    } else {
+        d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                           QStringLiteral(":/shaders/fragmentES2"));
+    }
+#endif
 }
 
 void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
@@ -1598,14 +1658,33 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
     d_ptr->m_theme->m_depthColor = depthColor;
     //qDebug() << "colors:" << d_ptr->m_baseColor << d_ptr->m_heightColor << d_ptr->m_depthColor;
     if (d_ptr->m_theme->m_uniformColor != uniform) {
-        // Re-initialize shaders
-        if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+#if !defined(QT_OPENGL_ES_2)
+        if (d_ptr->m_shadowQuality > ShadowNone) {
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            }
         } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragmentColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragment"));
+            }
         }
+#else
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentES2"));
+        }
+#endif
     }
     d_ptr->m_theme->m_uniformColor = uniform;
 }
@@ -1677,6 +1756,7 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
         break;
     }
     if (d_ptr->m_isInitialized) {
+#if !defined(QT_OPENGL_ES_2)
         if (d_ptr->m_shadowQuality > ShadowNone) {
             // Re-init depth buffer
             d_ptr->initDepthBuffer();
@@ -1702,6 +1782,17 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
             d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                                          QStringLiteral(":/shaders/fragment"));
         }
+#else
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentES2"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
+                                     QStringLiteral(":/shaders/fragmentES2"));
+#endif
     }
 }
 
@@ -2001,15 +2092,6 @@ void Q3DBarsPrivate::initSelectionShader()
     m_selectionShader->initialize();
 }
 
-void Q3DBarsPrivate::initDepthShader()
-{
-    if (m_depthShader)
-        delete m_depthShader;
-    m_depthShader = new ShaderHelper(q_ptr, QStringLiteral(":/shaders/vertexDepth"),
-                                     QStringLiteral(":/shaders/fragmentDepth"));
-    m_depthShader->initialize();
-}
-
 void Q3DBarsPrivate::initSelectionBuffer()
 {
 #ifndef USE_HAX0R_SELECTION
@@ -2024,6 +2106,16 @@ void Q3DBarsPrivate::initSelectionBuffer()
 #endif
 }
 
+#if !defined(QT_OPENGL_ES_2)
+void Q3DBarsPrivate::initDepthShader()
+{
+    if (m_depthShader)
+        delete m_depthShader;
+    m_depthShader = new ShaderHelper(q_ptr, QStringLiteral(":/shaders/vertexDepth"),
+                                     QStringLiteral(":/shaders/fragmentDepth"));
+    m_depthShader->initialize();
+}
+
 void Q3DBarsPrivate::initDepthBuffer()
 {
     if (m_depthTexture) {
@@ -2033,6 +2125,7 @@ void Q3DBarsPrivate::initDepthBuffer()
     m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer,
                                                          m_shadowQuality);
 }
+#endif
 
 void Q3DBarsPrivate::initBackgroundShaders(const QString &vertexShader,
                                            const QString &fragmentShader)
