@@ -467,7 +467,7 @@ void Q3DBars::drawScene()
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
-    if (viewMatrix.row(0).x() >= 0) {
+    if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
         stopRow = d_ptr->m_sampleCount.second;
         stepRow = 1;
@@ -491,13 +491,13 @@ void Q3DBars::drawScene()
     }
 
     // calculate background rotation based on view matrix rotation
-    if (viewMatrix.row(0).x() >= 0 && viewMatrix.row(0).z() <= 0)
+    if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 270.0f;
     else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0)
         backgroundRotation = 180.0f;
-    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() >= 0)
+    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() > 0)
         backgroundRotation = 90.0f;
-    else if (viewMatrix.row(0).x() < 0 && viewMatrix.row(0).z() < 0)
+    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 0.0f;
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
