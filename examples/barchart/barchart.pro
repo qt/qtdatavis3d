@@ -1,5 +1,9 @@
 SOURCES += main.cpp
 QT += datavis3d
 
-target.path = $$[QT_INSTALL_EXAMPLES]/datavis3d/barchart
+android {
+    target.path = /libs/$$ANDROID_TARGET_ARCH
+} else {
+    target.path = $$[QT_INSTALL_EXAMPLES]/datavis3d/barchart
+}
 INSTALLS += target

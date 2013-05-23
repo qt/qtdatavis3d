@@ -51,6 +51,17 @@
 #include <QMatrix4x4>
 #include <qmath.h>
 
+// Resources need to be explicitly initialized when building as static library
+class StaticLibInitializer
+{
+public:
+    StaticLibInitializer()
+    {
+        Q_INIT_RESOURCE(engine);
+    }
+};
+StaticLibInitializer staticLibInitializer;
+
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
 Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency)
