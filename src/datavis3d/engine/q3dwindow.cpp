@@ -84,8 +84,16 @@ Q3DWindow::~Q3DWindow()
 
 void Q3DWindow::initialize()
 {
-    qDebug() << "OpenGL version" << format().majorVersion() << format().minorVersion();
-    qDebug() << "OpenGL renderer" << format().renderableType();
+    const GLubyte* version = glGetString(GL_VERSION);
+    qDebug() << "OpenGL version:" << (const char *)version;
+    version = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    qDebug() << "GLSL version:" << (const char *)version;
+#if !defined(QT_OPENGL_ES_2)
+    // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
+    QStringList splitversionstr = QString((const char *)version).split(" ");
+    if (splitversionstr[0].toFloat() < 1.2)
+        qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
+#endif
     setAnimating(true);
 }
 
