@@ -135,6 +135,8 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
                                const QColor &txtColor, LabelTransparency transparency)
 {
+    GLuint paddingWidth = 15;
+    GLuint paddingHeight = 15;
     // Calculate text dimensions
     QFont valueFont = font;
     valueFont.setPointSize(30);
@@ -142,10 +144,38 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     int valueStrWidth = valueFM.width(text);
     int valueStrHeight = valueFM.height();
     QSize labelSize;
+
+#if defined(Q_OS_ANDROID)
+    // Android can't handle textures with dimensions not in power of 2. Resize labels accordingly.
+    bool widthPadded = false;
+    bool heightPadded = false;
+
+    // TODO: Add some padding before power-of-2 -padding to power of 2 to avoid labels with no "breathing-room"?
+    labelSize = QSize(valueStrWidth, valueStrHeight);
+    //qDebug() << "label size before padding" << labelSize;
+
+    for (int i = 5;; i++) {
+        GLint newDimension = qPow(2, i);
+        if (!heightPadded && newDimension >= labelSize.height()) {
+            paddingHeight = (newDimension - labelSize.height()) / 2;
+            labelSize.setHeight(newDimension);
+            heightPadded = true;
+        }
+        if (!widthPadded && newDimension >= labelSize.width()) {
+            paddingWidth = (newDimension - labelSize.width()) / 2;
+            labelSize.setWidth(newDimension);
+            widthPadded = true;
+        }
+        if (widthPadded && heightPadded)
+            break;
+    }
+    //qDebug() << "label size after padding" << labelSize;
+#else
     if (TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
-        labelSize = QSize(valueStrWidth + 30, valueStrHeight + 30);
+        labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
+#endif
 
     // Create image
     QImage image = QImage(labelSize, QImage::Format_ARGB32);
@@ -157,6 +187,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     switch (transparency) {
+    // TODO: Texture size padding fix for Android f**ks this up for axis labels. Fix or disable for android.
     case TransparencyNoBackground: {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
@@ -172,7 +203,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
         painter.setFont(valueFont);
         painter.setPen(txtColor);
-        painter.drawText(15, 15,
+        painter.drawText(paddingWidth, paddingHeight,
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
@@ -184,7 +215,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());
         painter.setFont(valueFont);
         painter.setPen(txtColor);
-        painter.drawText(15, 15,
+        painter.drawText(paddingWidth, paddingHeight,
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
