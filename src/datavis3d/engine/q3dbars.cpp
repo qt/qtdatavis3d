@@ -82,6 +82,7 @@ QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
 const GLfloat gridLineWidth = 0.005f;
+static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this))
@@ -447,7 +448,7 @@ void Q3DBars::drawScene()
     GLfloat barPos = 0;
     GLfloat rowPos = 0;
 
-    static QVector3D selection = QVector3D(0, 0, 0);
+    static QVector3D selection = skipColor;
 
     // Specify viewport
     glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
@@ -641,7 +642,7 @@ void Q3DBars::drawScene()
 #ifndef USE_HAX0R_SELECTION
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white
+        glClearColor(skipColor.x() / 255, skipColor.y() / 255, skipColor.z() / 255, 1.0f); // Set clear color to white (= skipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
 #endif
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
@@ -676,12 +677,15 @@ void Q3DBars::drawScene()
 
                 // TODO: Save position to qdataitem, so that we don't need to calculate it each time?
 
-                // add +2 to avoid black
-                QVector3D barColor = QVector3D((GLdouble)(row + 2)
-                                               / (GLdouble)(d_ptr->m_sampleCount.second + 2),
-                                               (GLdouble)(bar + 2)
-                                               / (GLdouble)(d_ptr->m_sampleCount.first + 2),
+//#if !defined(QT_OPENGL_ES_2)
+//                QVector3D barColor = QVector3D((GLdouble)row / 32767.0,
+//                                               (GLdouble)bar / 32767.0,
+//                                               0.0);
+//#else
+                QVector3D barColor = QVector3D((GLdouble)row / 255.0,
+                                               (GLdouble)bar / 255.0,
                                                0.0);
+//#endif
 
                 d_ptr->m_selectionShader->setUniformValue(d_ptr->m_selectionShader->MVP(),
                                                           MVPMatrix);
@@ -830,10 +834,6 @@ void Q3DBars::drawScene()
                 case Q3DBarsPrivate::SelectionBar: {
                     barColor = Utils::vectorFromColor(d_ptr->m_theme->m_highlightBarColor);
                     lightStrength = d_ptr->m_theme->m_highlightLightStrength;
-                    //if (d_ptr->m_mousePressed) {
-                    //    qDebug() << "selected object:" << barIndex << "( row:" << row + 1 << ", column:" << bar + 1 << ")";
-                    //    qDebug() << "object position:" << modelMatrix.column(3).toVector3D();
-                    //}
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!d_ptr->m_zoomActivated) {
                         d_ptr->m_selectedBar = item;
@@ -1015,7 +1015,7 @@ void Q3DBars::drawScene()
     d_ptr->m_backgroundShader->release();
 
     // Draw grid lines
-    if (d_ptr->m_gridEnabled) {
+    if (d_ptr->m_gridEnabled && d_ptr->m_heightNormalizer) {
         // Bind bar shader
         d_ptr->m_barShader->bind();
 
@@ -2180,17 +2180,20 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(GLint row, GLint bar,
 #ifdef USE_HAX0R_SELECTION
     if (selection == Utils::vectorFromColor(m_theme->m_windowColor))
 #else
-    if (selection == Utils::vectorFromColor(Qt::white))
+    if (selection == skipColor)
 #endif
         return isSelectedType; // skip window
-    QVector3D current = QVector3D((GLubyte)(((GLdouble)(row + 2) / (GLdouble)(m_sampleCount.second + 2))
-                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
-                                  (GLubyte)(((GLdouble)(bar + 2) / (GLdouble)(m_sampleCount.first + 2))
-                                            * 255.0 + 0.49), // +0.49 to fix rounding (there are conversions from unsigned short to GLdouble and back)
-                                  0);
+
+//#if !defined(QT_OPENGL_ES_2)
+//    QVector3D current = QVector3D((GLuint)row, (GLuint)bar, 0);
+//#else
+    QVector3D current = QVector3D((GLubyte)row, (GLubyte)bar, 0);
+//#endif
+
     // TODO: For debugging
     //if (selection != prevSel) {
-    //    qDebug() << selection.x() << selection .y() << selection.z();
+    //    qDebug() << "current" << current.x() << current .y() << current.z();
+    //    qDebug() << "selection" << selection.x() << selection .y() << selection.z();
     //    prevSel = selection;
     //}
     if (current == selection)
