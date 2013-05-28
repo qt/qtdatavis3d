@@ -1453,6 +1453,35 @@ void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
         d_ptr->m_mousePos = event->pos();
     }
 }
+
+void Q3DBars::touchEvent(QTouchEvent *event)
+{
+    static int prevDistance = 0;
+
+    QList<QTouchEvent::TouchPoint> points;
+    points = event->touchPoints();
+
+    if (points.count() == 2) {
+        d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnPinch;
+
+        QPointF distance = points.at(0).pos() - points.at(1).pos();
+        int newDistance = distance.manhattanLength();
+        int zoomRate = 1;
+        if (d_ptr->m_zoomLevel > 100)
+            zoomRate = 5;
+        if (newDistance > prevDistance)
+            d_ptr->m_zoomLevel += zoomRate;
+        else
+            d_ptr->m_zoomLevel -= zoomRate;
+        if (d_ptr->m_zoomLevel > 500)
+            d_ptr->m_zoomLevel = 500;
+        else if (d_ptr->m_zoomLevel < 10)
+            d_ptr->m_zoomLevel = 10;
+        prevDistance = newDistance;
+        //qDebug() << "distance" << distance.manhattanLength();
+    }
+}
+
 #endif
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)

@@ -89,7 +89,8 @@ public:
         MouseOnScene,
         MouseOnOverview,
         MouseOnZoom,
-        MouseRotating
+        MouseRotating,
+        MouseOnPinch
     };
 
 public:
