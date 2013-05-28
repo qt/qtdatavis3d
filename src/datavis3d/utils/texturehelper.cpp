@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "texturehelper_p.h"
+#include "utils_p.h"
 
 #include <QImage>
 
@@ -61,16 +62,32 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     if (image.isNull())
         return 0;
 
+    QImage texImage;
+
+#if defined(Q_OS_ANDROID)
+    GLuint temp;
+    //qDebug() << "old size" << image.size();
+    GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
+    //qDebug() << "new width" << imageWidth << "padding" << temp;
+    GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
+    //qDebug() << "new height" << imageHeight << "padding" << temp;
+    texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio,
+                            Qt::SmoothTransformation);
+    //qDebug() << "new size" << texImage.size();
+#else
+    texImage = image;
+#endif
+
     GLuint textureId;
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
     if (convert) {
-        QImage glTexture = convertToGLFormat(image);
+        QImage glTexture = convertToGLFormat(texImage);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height(),
                      0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(),
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texImage.width(), texImage.height(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, texImage.bits());
     }
     if (useTrilinearFiltering) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

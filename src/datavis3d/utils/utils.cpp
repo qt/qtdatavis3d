@@ -53,6 +53,17 @@
 
 QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
 
+#define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
+#define MIN_POWER 32
+
+GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
+{
+    GLuint powOfTwoValue = MIN_POWER;
+    NUM_IN_POWER(powOfTwoValue, value);
+    padding = powOfTwoValue - value;
+    return powOfTwoValue;
+}
+
 QVector3D Utils::vectorFromColor(const QColor &color)
 {
     return QVector3D(color.redF(), color.greenF(), color.blueF());
@@ -147,29 +158,17 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 
 #if defined(Q_OS_ANDROID)
     // Android can't handle textures with dimensions not in power of 2. Resize labels accordingly.
-    bool widthPadded = false;
-    bool heightPadded = false;
-
-    // TODO: Add some padding before power-of-2 -padding to power of 2 to avoid labels with no "breathing-room"?
-    labelSize = QSize(valueStrWidth, valueStrHeight);
+    // Add some padding before converting to power of two to avoid too tight fit
+    GLuint prePadding = 10;
+    labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
     //qDebug() << "label size before padding" << labelSize;
-
-    for (int i = 5;; i++) {
-        GLint newDimension = qPow(2, i);
-        if (!heightPadded && newDimension >= labelSize.height()) {
-            paddingHeight = (newDimension - labelSize.height()) / 2;
-            labelSize.setHeight(newDimension);
-            heightPadded = true;
-        }
-        if (!widthPadded && newDimension >= labelSize.width()) {
-            paddingWidth = (newDimension - labelSize.width()) / 2;
-            labelSize.setWidth(newDimension);
-            widthPadded = true;
-        }
-        if (widthPadded && heightPadded)
-            break;
-    }
-    //qDebug() << "label size after padding" << labelSize;
+    labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
+    labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
+    paddingWidth += prePadding;
+    paddingHeight += prePadding;
+    paddingWidth /= 2;
+    paddingHeight /= 2;
+    //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
     if (TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
@@ -229,26 +228,26 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
 {
     QVector3D selectedColor;
 
-//#if defined(QT_OPENGL_ES_2)
+    //#if defined(QT_OPENGL_ES_2)
     // This is the only one that works with ANGLE (ES 2.0)
     // Item count will be limited to 256*256*256
     GLubyte pixel[4];
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
                  GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
     //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
-//#else
-//    // These work with desktop OpenGL
-//    // They offer a lot higher possible object count and a possibility to use object ids
-//    GLuint pixel[3];
-//    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
-//                 GL_RGB, GL_UNSIGNED_INT, (void *)pixel);
-//    qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
+    //#else
+    //// These work with desktop OpenGL
+    //// They offer a lot higher possible object count and a possibility to use object ids
+    //GLuint pixel[3];
+    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
+    //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel);
+    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
 
-//    GLfloat pixel3[3];
-//    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
-//                 GL_RGB, GL_FLOAT, (void *)pixel3);
-//    qDebug() << "rgba" << pixel3[0] << pixel3[1] << pixel3[2];// << pixel[3];
-//#endif
+    //GLfloat pixel3[3];
+    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
+    //             GL_RGB, GL_FLOAT, (void *)pixel3);
+    //qDebug() << "rgba" << pixel3[0] << pixel3[1] << pixel3[2];// << pixel[3];
+    //#endif
     selectedColor = QVector3D(pixel[0], pixel[1], pixel[2]);
     //qDebug() << selectedColor;
 
