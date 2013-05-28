@@ -47,15 +47,23 @@ using namespace QtDataVis3D;
 MapsModifier::MapsModifier(Q3DMaps *maps)
     : m_chart(maps),
       m_imageRect(QRect()),
-      m_fontSize(20.0f),
+      m_fontSize(80.0f),
       m_barSpecs(QVector3D(30.0f, 30.0f, 30.0f))
 {
-    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustAll);
     QImage image = QImage(QStringLiteral(":/images/finland"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
-    //m_chart->setBarType(Cones, false);
+    m_chart->setFontSize(m_fontSize);
+
+#if 0
+    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustHeight);
+    m_chart->setBarType(BevelBars, true);
+    m_chart->setTheme(ThemeBlueIcy);
+    m_chart->setShadowQuality(ShadowMedium);
+#else
+    m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustAll);
     m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
+#endif
 }
 
 MapsModifier::~MapsModifier()

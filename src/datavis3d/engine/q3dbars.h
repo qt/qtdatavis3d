@@ -149,6 +149,9 @@ public:
     void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
 protected:
+#if defined(Q_OS_ANDROID)
+    void mouseDoubleClickEvent(QMouseEvent *event);
+#endif
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

@@ -921,6 +921,17 @@ void Q3DMaps::drawScene()
 #endif
 }
 
+#if defined(Q_OS_ANDROID)
+void Q3DMaps::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!d_ptr->m_zoomActivated) {
+        d_ptr->m_mousePressed = Q3DMapsPrivate::MouseOnScene;
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        d_ptr->m_mousePos = event->pos();
+    }
+}
+#endif
+
 void Q3DMaps::mousePressEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
@@ -935,7 +946,11 @@ void Q3DMaps::mousePressEvent(QMouseEvent *event)
                 //qDebug() << "Mouse pressed on zoom";
             }
         } else {
+#if !defined(Q_OS_ANDROID)
             d_ptr->m_mousePressed = Q3DMapsPrivate::MouseOnScene;
+#else
+            d_ptr->m_mousePressed = Q3DMapsPrivate::MouseRotating;
+#endif
             // update mouse positions to prevent jumping when releasing or repressing a button
             d_ptr->m_mousePos = event->pos();
             //qDebug() << "Mouse pressed on scene";

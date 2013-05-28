@@ -1444,6 +1444,17 @@ void Q3DBars::drawScene()
     d_ptr->m_labelShader->release();
 }
 
+#if defined(Q_OS_ANDROID)
+void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!d_ptr->m_zoomActivated) {
+        d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnScene;
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        d_ptr->m_mousePos = event->pos();
+    }
+}
+#endif
+
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
@@ -1457,7 +1468,11 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
                 //qDebug() << "Mouse pressed on zoom";
             }
         } else {
+#if !defined(Q_OS_ANDROID)
             d_ptr->m_mousePressed = Q3DBarsPrivate::MouseOnScene;
+#else
+            d_ptr->m_mousePressed = Q3DBarsPrivate::MouseRotating;
+#endif
             // update mouse positions to prevent jumping when releasing or repressing a button
             d_ptr->m_mousePos = event->pos();
             //qDebug() << "Mouse pressed on scene";

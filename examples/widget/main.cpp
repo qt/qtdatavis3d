@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
-    QVBoxLayout *vLayout = new QVBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
 
     Q3DBars *widgetchart = new Q3DBars();
     QSize screenSize = widgetchart->screen()->size();

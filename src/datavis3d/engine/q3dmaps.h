@@ -149,6 +149,9 @@ public:
     void setShadowQuality(ShadowQuality quality);
 
 protected:
+#if defined(Q_OS_ANDROID)
+    void mouseDoubleClickEvent(QMouseEvent *event);
+#endif
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

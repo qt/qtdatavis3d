@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
-    QVBoxLayout *vLayout = new QVBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
 
     Q3DMaps *chart = new Q3DMaps();
     QSize screenSize = chart->screen()->size();
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
     fontSizeSlider->setMinimum(1);
-    fontSizeSlider->setValue(20);
+    fontSizeSlider->setValue(80);
     fontSizeSlider->setMaximum(200);
 
 //    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
