@@ -1481,7 +1481,6 @@ void Q3DBars::touchEvent(QTouchEvent *event)
         //qDebug() << "distance" << distance.manhattanLength();
     }
 }
-
 #endif
 
 void Q3DBars::mousePressEvent(QMouseEvent *event)
