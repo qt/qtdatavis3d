@@ -959,7 +959,11 @@ void Q3DMaps::mousePressEvent(QMouseEvent *event)
         // reset rotations
         d_ptr->m_mousePos = QPoint(0, 0);
     } else if (Qt::RightButton == event->button()) {
+#if !defined(Q_OS_ANDROID)
         d_ptr->m_mousePressed = Q3DMapsPrivate::MouseRotating;
+#else
+        d_ptr->m_mousePressed = Q3DMapsPrivate::MouseOnScene;
+#endif
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
     }
