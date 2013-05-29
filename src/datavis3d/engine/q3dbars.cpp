@@ -464,7 +464,8 @@ void Q3DBars::drawScene()
                                                               d_ptr->m_zoomLevel
                                                               * d_ptr->m_zoomAdjustment,
                                                               d_ptr->m_sceneViewPort.width(),
-                                                              d_ptr->m_sceneViewPort.height());
+                                                              d_ptr->m_sceneViewPort.height(),
+                                                              d_ptr->m_negativeValues);
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -939,7 +940,10 @@ void Q3DBars::drawScene()
     // Bind background shader
     d_ptr->m_backgroundShader->bind();
 
-    glCullFace(GL_BACK);
+    if (d_ptr->m_negativeValues)
+        glDisable(GL_CULL_FACE);
+    else
+        glCullFace(GL_BACK);
 
     // Draw background
     if (d_ptr->m_backgroundObj) {
@@ -1014,6 +1018,13 @@ void Q3DBars::drawScene()
     // Release background shader
     d_ptr->m_backgroundShader->release();
 
+    // Reset culling
+    if (d_ptr->m_negativeValues) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
+    // TODO: Flip floor grid lines when viewing from below
     // Draw grid lines
     if (d_ptr->m_gridEnabled && d_ptr->m_heightNormalizer) {
         // Bind bar shader
@@ -1128,6 +1139,7 @@ void Q3DBars::drawScene()
         // Wall lines: back wall
         GLfloat heightStep = d_ptr->m_heightNormalizer / 5.0f; // default to 5 lines
 
+        // TODO: Draw ticks underneath as well if we have negative values
         if (d_ptr->m_tickCount > 0)
             heightStep = d_ptr->m_tickStep;
 
@@ -1350,6 +1362,7 @@ void Q3DBars::drawScene()
     // Bind label shader
     d_ptr->m_labelShader->bind();
 
+    // TODO: Flip labels when viewing from below
     glEnable(GL_TEXTURE_2D);
     if (d_ptr->m_labelTransparency > TransparencyNone) {
         glEnable(GL_BLEND);
@@ -1634,8 +1647,7 @@ void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString 
                                const QString &labelColumn, const QString &labelHeight)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    d_ptr->m_zoomActivated = false;
-    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    d_ptr->closeZoomMode();
     // Delete previous data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1742,9 +1754,8 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 void Q3DBars::setSelectionMode(SelectionMode mode)
 {
     d_ptr->m_selectionMode = mode;
-    // Disable zoom if mode changes
-    d_ptr->m_zoomActivated = false;
-    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    // Disable zoom if selection mode changes
+    d_ptr->closeZoomMode();
     // Create zoom selection if there isn't one
     if (mode >= ModeZoomRow && !d_ptr->m_zoomSelection)
         d_ptr->m_zoomSelection = new QDataRow();
@@ -1855,13 +1866,7 @@ void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
         row->addItem(new QDataItem(dataRow.at(i)));
     row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
     d_ptr->m_dataSet->addRow(row);
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
@@ -1876,13 +1881,7 @@ void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labe
         row->addItem(dataRow.at(i));
     row->d_ptr->verifySize(d_ptr->m_sampleCount.first);
     d_ptr->m_dataSet->addRow(row);
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
     d_ptr->m_dataSet->setLabels(d_ptr->m_axisLabelX, d_ptr->m_axisLabelZ, d_ptr->m_axisLabelY,
                                 QVector<QString>(), labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
@@ -1898,13 +1897,7 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
     d_ptr->m_dataSet->addRow(row);
     // if the added data pushed us over sample space, remove the oldest data set
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
 }
 
 void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
@@ -1916,8 +1909,7 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
     QString yAxis;
     d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    d_ptr->m_zoomActivated = false;
-    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    d_ptr->closeZoomMode();
     // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1936,13 +1928,7 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
         d_ptr->m_dataSet->addRow(row);
         row++;
     }
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
@@ -1957,8 +1943,7 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
     QString yAxis;
     d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    d_ptr->m_zoomActivated = false;
-    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    d_ptr->closeZoomMode();
     // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1977,13 +1962,7 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
         d_ptr->m_dataSet->addRow(row);
         row++;
     }
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
     d_ptr->m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     d_ptr->m_dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second);
 }
@@ -1991,22 +1970,14 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
 void Q3DBars::addDataSet(QDataSet* dataSet)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    d_ptr->m_zoomActivated = false;
-    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    d_ptr->closeZoomMode();
     // Delete old data set
     delete d_ptr->m_dataSet;
     // Check sizes
     dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second, d_ptr->m_sampleCount.first);
     // Take ownership of given set
     d_ptr->m_dataSet = dataSet;
-    // Find highest value
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = d_ptr->m_dataSet->d_ptr->limitValues();
-    // Don't auto-adjust height if tick count is set
-    if (d_ptr->m_tickCount == 0) {
-        d_ptr->m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        d_ptr->calculateHeightAdjustment(limits);
-    }
+    d_ptr->handleLimitChange();
     // Give drawer to data set
     d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
 }
@@ -2071,7 +2042,8 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_tickCount(0),
-      m_tickStep(0)
+      m_tickStep(0),
+      m_negativeValues(false)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);
@@ -2115,7 +2087,10 @@ void Q3DBarsPrivate::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
-    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
+    if (m_negativeValues)
+        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
+    else
+        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
     m_backgroundObj->load();
 }
 
@@ -2267,6 +2242,38 @@ Q3DBarsPrivate::SelectionType Q3DBarsPrivate::isSelected(GLint row, GLint bar,
                                               || m_selectionMode == ModeZoomRow))
         isSelectedType = SelectionRow;
     return isSelectedType;
+}
+
+void Q3DBarsPrivate::handleLimitChange()
+{
+    // Get the limits
+    QPair<GLfloat, GLfloat> limits = m_dataSet->d_ptr->limitValues();
+
+    // Check if we have negative values
+    if (limits.first < 0 && !m_negativeValues) {
+        qDebug() << "Got negatives";
+        m_negativeValues = true;
+        // Reload background
+        loadBackgroundMesh();
+        // TODO: What else is needed here?
+    } else if (limits.first >= 0 && m_negativeValues) {
+        m_negativeValues = false;
+        // Reload background
+        loadBackgroundMesh();
+        // TODO: What else is needed here?
+    }
+
+    // Don't auto-adjust height if tick count is set
+    if (m_tickCount == 0) {
+        m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+        calculateHeightAdjustment(limits);
+    }
+}
+
+void Q3DBarsPrivate::closeZoomMode()
+{
+    m_zoomActivated = false;
+    m_sceneViewPort = QRect(0, 0, q_ptr->width(), q_ptr->height());
 }
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE

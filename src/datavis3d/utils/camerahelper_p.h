@@ -78,7 +78,8 @@ class CameraHelper
                                             const QVector3D &defaultUp);
     // Calculate view matrix based on rotation and zoom
     static QMatrix4x4 calculateViewMatrix(const QPoint &mousePos, int zoom,
-                                          int screenWidth, int screenHeight);
+                                          int screenWidth, int screenHeight,
+                                          bool showUnder = false);
     // Calcluate light position based on rotation. Call after calling calculateViewMatrix to get
     // up-to-date position
     static QVector3D calculateLightPosition(const QVector3D &lightPosition,

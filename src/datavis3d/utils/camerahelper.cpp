@@ -86,9 +86,13 @@ void CameraHelper::setDefaultCameraOrientation(const QVector3D &defaultPosition,
 }
 
 QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
-                                             int screenWidth, int screenHeight)
+                                             int screenWidth, int screenHeight, bool showUnder)
 {
     QMatrix4x4 viewMatrix;
+    GLint lowerLimit = 0;
+
+    if (showUnder)
+        lowerLimit = -90;
 
     // Calculate mouse movement since last frame
     GLfloat mouseMoveX = GLfloat(m_previousMousePos.x() - mousePos.x())
@@ -103,8 +107,8 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
         m_xRotation = 0;
     if (m_yRotation >= 90)
         m_yRotation = 90;
-    else if (m_yRotation <= 0)
-        m_yRotation = 0;
+    else if (m_yRotation <= lowerLimit)
+        m_yRotation = lowerLimit;
 
     // Apply to view matrix
     viewMatrix.lookAt(m_position, m_target, m_up);

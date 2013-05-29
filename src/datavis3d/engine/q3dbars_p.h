@@ -114,6 +114,8 @@ public:
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
+    void handleLimitChange();
+    void closeZoomMode();
 
     Q3DBars *q_ptr;
 
@@ -176,6 +178,7 @@ public:
     GLfloat m_shadowQualityToShader;
     GLint m_tickCount;
     GLfloat m_tickStep;
+    bool m_negativeValues;
 };
 
 QTCOMMERCIALDATAVIS3D_END_NAMESPACE
