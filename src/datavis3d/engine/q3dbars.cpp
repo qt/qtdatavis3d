@@ -1150,12 +1150,17 @@ void Q3DBars::drawScene()
 
         // Wall lines: back wall
         GLfloat heightStep = d_ptr->m_heightNormalizer / 5.0f; // default to 5 lines
+        GLfloat startLine;
 
-        // TODO: Draw ticks underneath as well if we have negative values
         if (d_ptr->m_tickCount > 0)
             heightStep = d_ptr->m_tickStep;
 
-        for (GLfloat lineHeight = heightStep; lineHeight <= d_ptr->m_heightNormalizer;
+        if (d_ptr->m_negativeValues)
+            startLine = -d_ptr->m_heightNormalizer;
+        else
+            startLine = heightStep;
+
+        for (GLfloat lineHeight = startLine; lineHeight <= d_ptr->m_heightNormalizer;
              lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -1213,7 +1218,7 @@ void Q3DBars::drawScene()
         }
 
         // Wall lines: side wall
-        for (GLfloat lineHeight = heightStep; lineHeight <= d_ptr->m_heightNormalizer;
+        for (GLfloat lineHeight = startLine; lineHeight <= d_ptr->m_heightNormalizer;
              lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
