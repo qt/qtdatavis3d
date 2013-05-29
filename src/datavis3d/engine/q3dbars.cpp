@@ -1633,6 +1633,9 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
 void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
                                const QString &labelColumn, const QString &labelHeight)
 {
+    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
+    d_ptr->m_zoomActivated = false;
+    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
     // Delete previous data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1912,6 +1915,9 @@ void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QS
     QString zAxis;
     QString yAxis;
     d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
+    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
+    d_ptr->m_zoomActivated = false;
+    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
     // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1950,6 +1956,9 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
     QString zAxis;
     QString yAxis;
     d_ptr->m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
+    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
+    d_ptr->m_zoomActivated = false;
+    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
     // Delete old data set
     delete d_ptr->m_dataSet;
     d_ptr->m_dataSet = new QDataSet();
@@ -1981,6 +1990,10 @@ void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
 
 void Q3DBars::addDataSet(QDataSet* dataSet)
 {
+    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
+    d_ptr->m_zoomActivated = false;
+    d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
+    // Delete old data set
     delete d_ptr->m_dataSet;
     // Check sizes
     dataSet->d_ptr->verifySize(d_ptr->m_sampleCount.second, d_ptr->m_sampleCount.first);
