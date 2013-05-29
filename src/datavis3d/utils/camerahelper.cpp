@@ -277,6 +277,7 @@ void CameraHelper::setCameraPreset(CameraPreset preset)
         CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
         break;
     }
+    // TODO: Add camera preset below (to be usable only when we have negatives)
     default:
         break;
     }

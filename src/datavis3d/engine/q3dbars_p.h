@@ -166,6 +166,7 @@ public:
     Drawer *m_drawer;
     bool m_xFlipped;
     bool m_zFlipped;
+    bool m_yFlipped;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;

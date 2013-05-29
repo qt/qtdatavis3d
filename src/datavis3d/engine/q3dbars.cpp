@@ -492,6 +492,12 @@ void Q3DBars::drawScene()
         d_ptr->m_xFlipped = true;
     }
 
+    // Check if we're viewing the scene from below
+    if (viewMatrix.row(2).y() < 0)
+        d_ptr->m_yFlipped = true;
+    else
+        d_ptr->m_yFlipped = false;
+
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 270.0f;
@@ -1024,7 +1030,6 @@ void Q3DBars::drawScene()
         glCullFace(GL_BACK);
     }
 
-    // TODO: Flip floor grid lines when viewing from below
     // Draw grid lines
     if (d_ptr->m_gridEnabled && d_ptr->m_heightNormalizer) {
         // Bind bar shader
@@ -1052,6 +1057,9 @@ void Q3DBars::drawScene()
                                         gridLineWidth));
             itModelMatrix.scale(QVector3D(d_ptr->m_rowWidth / d_ptr->m_scaleFactor, gridLineWidth,
                                           gridLineWidth));
+            // If we're viewing from below, grid line object must be flipped
+            if (d_ptr->m_yFlipped)
+                modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1101,6 +1109,10 @@ void Q3DBars::drawScene()
                                         d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
             itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
                                           d_ptr->m_columnDepth / d_ptr->m_scaleFactor));
+
+            // If we're viewing from below, grid line object must be flipped
+            if (d_ptr->m_yFlipped)
+                modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1362,7 +1374,6 @@ void Q3DBars::drawScene()
     // Bind label shader
     d_ptr->m_labelShader->bind();
 
-    // TODO: Flip labels when viewing from below
     glEnable(GL_TEXTURE_2D);
     if (d_ptr->m_labelTransparency > TransparencyNone) {
         glEnable(GL_BLEND);
@@ -1377,12 +1388,20 @@ void Q3DBars::drawScene()
         barPos = 0;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 0.0f;
+        GLfloat rotLabelZ = 0.0f;
         Qt::AlignmentFlag alignment = Qt::AlignRight;
         if (d_ptr->m_zFlipped)
             rotLabelY = 180.0f;
         if (d_ptr->m_xFlipped) {
             barPos = (d_ptr->m_sampleCount.first + 1) * (d_ptr->m_barSpacing.width());
             alignment = Qt::AlignLeft;
+        }
+        if (d_ptr->m_yFlipped) {
+            if (d_ptr->m_zFlipped)
+                rotLabelY = 0.0f;
+            else
+                rotLabelY = 180.0f;
+            rotLabelZ = 180.0f;
         }
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                        -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
@@ -1403,9 +1422,10 @@ void Q3DBars::drawScene()
 
         d_ptr->m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
                                    QVector3D(0.0f, d_ptr->m_yAdjustment, zComp),
-                                   QVector3D(rotLabelX, rotLabelY, 0.0f), d_ptr->m_heightNormalizer,
-                                   d_ptr->m_selectionMode, d_ptr->m_labelShader,
-                                   d_ptr->m_labelObj, true, true, LabelMid, alignment);
+                                   QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                   d_ptr->m_heightNormalizer, d_ptr->m_selectionMode,
+                                   d_ptr->m_labelShader, d_ptr->m_labelObj, true, true, LabelMid,
+                                   alignment);
 
         delete label;
     }
@@ -1416,12 +1436,20 @@ void Q3DBars::drawScene()
         rowPos = 0;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 90.0f;
+        GLfloat rotLabelZ = 0.0f;
         Qt::AlignmentFlag alignment = Qt::AlignLeft;
         if (d_ptr->m_xFlipped)
             rotLabelY = -90.0f;
         if (d_ptr->m_zFlipped) {
             rowPos = (d_ptr->m_sampleCount.second + 1) * (d_ptr->m_barSpacing.height());
             alignment = Qt::AlignRight;
+        }
+        if (d_ptr->m_yFlipped) {
+            if (d_ptr->m_xFlipped)
+                rotLabelY = -90.0f;
+            else
+                rotLabelY = 90.0f;
+            rotLabelZ = 180.0f;
         }
         QVector3D labelPos = QVector3D((d_ptr->m_rowWidth - barPos) / d_ptr->m_scaleFactor,
                                        -d_ptr->m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
@@ -1443,9 +1471,10 @@ void Q3DBars::drawScene()
 
         d_ptr->m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
                                    QVector3D(0.0f, d_ptr->m_yAdjustment, zComp),
-                                   QVector3D(rotLabelX, rotLabelY, 0.0f), d_ptr->m_heightNormalizer,
-                                   d_ptr->m_selectionMode, d_ptr->m_labelShader,
-                                   d_ptr->m_labelObj, true, true, LabelMid, alignment);
+                                   QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                   d_ptr->m_heightNormalizer, d_ptr->m_selectionMode,
+                                   d_ptr->m_labelShader, d_ptr->m_labelObj, true, true, LabelMid,
+                                   alignment);
 
         delete label;
     }
@@ -2031,6 +2060,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_xFlipped(false),
       m_zFlipped(false),
+      m_yFlipped(false),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),
@@ -2251,7 +2281,6 @@ void Q3DBarsPrivate::handleLimitChange()
 
     // Check if we have negative values
     if (limits.first < 0 && !m_negativeValues) {
-        qDebug() << "Got negatives";
         m_negativeValues = true;
         // Reload background
         loadBackgroundMesh();
