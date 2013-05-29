@@ -277,7 +277,31 @@ void CameraHelper::setCameraPreset(CameraPreset preset)
         CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
         break;
     }
-    // TODO: Add camera preset below (to be usable only when we have negatives)
+    case PresetFrontBelow: {
+        qDebug("PresetFrontBelow");
+        CameraHelper::setCameraRotation(QPointF(0.0f, -45.0f));
+        break;
+    }
+    case PresetLeftBelow: {
+        qDebug("PresetLeftBelow");
+        CameraHelper::setCameraRotation(QPointF(90.0f, -45.0f));
+        break;
+    }
+    case PresetRightBelow: {
+        qDebug("PresetRightBelow");
+        CameraHelper::setCameraRotation(QPointF(-90.0f, -45.0f));
+        break;
+    }
+    case PresetBehindBelow: {
+        qDebug("PresetBehindBelow");
+        CameraHelper::setCameraRotation(QPointF(180.0f, -45.0f));
+        break;
+    }
+    case PresetDirectlyBelow: {
+        qDebug("PresetDirectlyBelow");
+        CameraHelper::setCameraRotation(QPointF(0.0f, -90.0f));
+        break;
+    }
     default:
         break;
     }

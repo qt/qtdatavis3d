@@ -86,7 +86,12 @@ enum CameraPreset {
     PresetIsometricRightHigh,
     PresetDirectlyAbove,
     PresetDirectlyAboveCW45,
-    PresetDirectlyAboveCCW45
+    PresetDirectlyAboveCCW45,
+    PresetFrontBelow,           // These work only for graphs including negative values.
+    PresetLeftBelow,            // They act as Preset...Low for positive-only values.
+    PresetRightBelow,
+    PresetBehindBelow,
+    PresetDirectlyBelow
 };
 
 enum ColorTheme {

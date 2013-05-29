@@ -205,7 +205,7 @@ void ChartModifier::changePresetCamera()
 
     m_chart->setCameraPreset((CameraPreset)preset);
 
-    if (++preset > PresetDirectlyAboveCCW45)
+    if (++preset > PresetDirectlyBelow)
         preset = PresetFrontLow;
 }
 
