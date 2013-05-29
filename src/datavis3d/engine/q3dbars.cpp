@@ -533,12 +533,9 @@ void Q3DBars::drawScene()
         glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_depthFrameBuffer);
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Set front face culling to reduce self-shadowing issues
-        glCullFace(GL_FRONT);
-
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 1.0f - d_ptr->m_yAdjustment, zComp),
+        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -d_ptr->m_yAdjustment, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
         //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
@@ -561,15 +558,17 @@ void Q3DBars::drawScene()
                     continue;
 
                 GLfloat barHeight = item->d_ptr->value() / d_ptr->m_heightNormalizer;
-                // skip shadows for barHeight < 0 (for now)
+
                 // skip shadows for 0 -height bars
-                if (barHeight <= 0)
+                if (barHeight == 0)
                     continue;
 
-                //if (barHeight < 0)
-                //    glCullFace(GL_FRONT);
-                //else
-                //    glCullFace(GL_BACK);
+                // Set front face culling for positive valued bars and back face culling for
+                // negative valued bars to reduce self-shadowing issues
+                if (barHeight < 0)
+                    glCullFace(GL_BACK);
+                else
+                    glCullFace(GL_FRONT);
 
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -2284,17 +2283,17 @@ void Q3DBarsPrivate::handleLimitChange()
     // Get the limits
     QPair<GLfloat, GLfloat> limits = m_dataSet->d_ptr->limitValues();
 
+    // TODO: What if we have only negative values?
+
     // Check if we have negative values
     if (limits.first < 0 && !m_negativeValues) {
         m_negativeValues = true;
         // Reload background
         loadBackgroundMesh();
-        // TODO: What else is needed here?
     } else if (limits.first >= 0 && m_negativeValues) {
         m_negativeValues = false;
         // Reload background
         loadBackgroundMesh();
-        // TODO: What else is needed here?
     }
 
     // Don't auto-adjust height if tick count is set
