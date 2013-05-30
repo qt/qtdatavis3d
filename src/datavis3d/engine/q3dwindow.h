@@ -49,11 +49,11 @@
 
 class QPainter;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DWindowPrivate;
 
-class QTCOMMERCIALDATAVIS3D_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
+class QTENTERPRISE_DATAVIS3D_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
@@ -81,6 +81,6 @@ private:
     friend class Q3DBars;
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

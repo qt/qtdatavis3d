@@ -58,7 +58,7 @@
 #include <QVector2D>
 #include <QVector3D>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class VertexIndexer
 {
@@ -106,6 +106,6 @@ class VertexIndexer
                                            unsigned short &result);
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

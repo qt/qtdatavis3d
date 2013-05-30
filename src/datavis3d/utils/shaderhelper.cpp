@@ -43,7 +43,7 @@
 
 #include <QOpenGLShader>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 ShaderHelper::ShaderHelper(QObject *parent,
                            const QString &vertexShader,
@@ -249,4 +249,4 @@ GLuint ShaderHelper::normalAtt()
     return m_normalAttr;
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

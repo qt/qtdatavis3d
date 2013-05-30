@@ -7,13 +7,27 @@ TARGET = $$qtLibraryTarget($$TARGET)
 uri = com.digia.QtDataVis3D
 
 # Input
+INCLUDEPATH += ../datavis3d/engine
+
 SOURCES += \
     datavis3dqml2_plugin.cpp \
     datavisview.cpp
 
+    #declarative3dbars.cpp \
+    #declarative3dmaps.cpp \
+    #declarativedataitem.cpp \
+    #declarativedatarow.cpp \
+    #declarativedataset.cpp
+
 HEADERS += \
     datavis3dqml2_plugin.h \
     datavisview.h
+
+    #declarative3dbars.h \
+    #declarative3dmaps.h \
+    #declarativedataitem.h \
+    #declarativedatarow.h \
+    #declarativedataset.h
 
 OTHER_FILES = qmldir
 

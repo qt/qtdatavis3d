@@ -62,7 +62,7 @@ public:
 };
 StaticLibInitializer staticLibInitializer;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency)
     : m_theme(theme),
@@ -308,4 +308,4 @@ void Drawer::generateLabelItem(LabelItem *item, const QString &text)
     item->setTextureId(m_textureHelper->create2DTexture(label, true, true));
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -55,7 +55,7 @@
 #include "qdatavis3dglobal.h"
 #include <QOpenGLFunctions>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class ObjectHelper: protected QOpenGLFunctions
 {
@@ -86,6 +86,6 @@ class ObjectHelper: protected QOpenGLFunctions
     GLboolean m_meshDataLoaded;
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

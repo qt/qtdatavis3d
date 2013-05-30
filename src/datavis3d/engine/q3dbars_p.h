@@ -62,7 +62,7 @@ class QOpenGLPaintDevice;
 class QPoint;
 class QSizeF;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
 class QDataItem;
@@ -182,6 +182,6 @@ public:
     bool m_negativeValues;
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

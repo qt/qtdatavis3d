@@ -45,26 +45,37 @@
 #include "QtDataVis3D/qdatavis3dglobal.h"
 #include <QScopedPointer>
 #include <QString>
+#include <QObject>
+#include <QPointF>
 
-class QPointF;
 class QPoint;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItemPrivate;
 
-class QTCOMMERCIALDATAVIS3D_EXPORT QDataItem
+class QTENTERPRISE_DATAVIS3D_EXPORT QDataItem : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(QString label READ label WRITE setLabel)
+    Q_PROPERTY(float value READ value WRITE setValue)
+    Q_PROPERTY(int value READ value WRITE setValue)
+    Q_PROPERTY(int value READ value WRITE setValue)
+    Q_PROPERTY(QPointF position READ position WRITE setPosition)
+
 public:
     explicit QDataItem(float value = 0.0f, const QString &label = QString());
     ~QDataItem();
 
     void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
+    QString label();
     void setValue(float value);
     void setValue(int value);
+    float value();
     // Has no effect in Q3DBars
     void setPosition(const QPointF &position);
     void setPosition(const QPoint &position);
+    QPointF position();
 
 private:
     QScopedPointer<QDataItemPrivate> d_ptr;
@@ -76,6 +87,6 @@ private:
     friend class Drawer;
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

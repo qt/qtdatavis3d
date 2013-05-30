@@ -42,7 +42,34 @@
 #ifndef DATAVIS3DQML2_PLUGIN_H
 #define DATAVIS3DQML2_PLUGIN_H
 
+#include "QtDataVis3D/qdatavis3dglobal.h"
+#include "q3dbars.h"
+#include "q3dmaps.h"
+#include "qdataitem.h"
+#include "qdatarow.h"
+#include "qdataset.h"
+
+//#include "declarative3dbars.h"
+//#include "declarative3dmaps.h"
+//#include "declarativedataitem.h"
+//#include "declarativedatarow.h"
+//#include "declarativedataset.h"
+
 #include <QQmlExtensionPlugin>
+
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+
+//Q_DECLARE_METATYPE(Declarative3DBars *)
+//Q_DECLARE_METATYPE(Declarative3DMaps *)
+//Q_DECLARE_METATYPE(DeclarativeDataItem *)
+//Q_DECLARE_METATYPE(DeclarativeDataRow *)
+//Q_DECLARE_METATYPE(DeclarativeDataSet *)
+
+Q_DECLARE_METATYPE(Q3DBars *)
+Q_DECLARE_METATYPE(Q3DMaps *)
+Q_DECLARE_METATYPE(QDataItem *)
+Q_DECLARE_METATYPE(QDataRow *)
+Q_DECLARE_METATYPE(QDataSet *)
 
 class Datavis3dqml2Plugin : public QQmlExtensionPlugin
 {
@@ -52,6 +79,8 @@ class Datavis3dqml2Plugin : public QQmlExtensionPlugin
 public:
     void registerTypes(const char *uri);
 };
+
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif // DATAVIS3DQML2_PLUGIN_H
 

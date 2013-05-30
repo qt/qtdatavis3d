@@ -63,7 +63,7 @@ class QString;
 class QPoint;
 class QImage;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Utils
 {
@@ -80,6 +80,6 @@ class Utils
     static QVector3D getSelection(QPoint mousepos, int height);
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

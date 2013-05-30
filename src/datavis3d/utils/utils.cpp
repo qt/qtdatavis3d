@@ -51,7 +51,7 @@
 
 #include <QDebug>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 32
@@ -254,4 +254,4 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     return selectedColor;
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -48,7 +48,7 @@
 
 class QOpenGLShaderProgram;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 class QDataItem;
@@ -56,7 +56,7 @@ class QDataRow;
 class QDataSet;
 class LabelItem;
 
-class QTCOMMERCIALDATAVIS3D_EXPORT Q3DBars : public Q3DWindow
+class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
 public:
@@ -166,6 +166,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

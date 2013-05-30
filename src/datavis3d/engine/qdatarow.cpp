@@ -46,22 +46,25 @@
 
 #include <QString>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 QDataRow::QDataRow(const QString &label)
     : d_ptr(new QDataRowPrivate(this, label))
 {
-    //qDebug("QDataRow");
 }
 
 QDataRow::~QDataRow()
 {
-    //qDebug("~QDataRow");
 }
 
 void QDataRow::setLabel(const QString &label)
 {
     d_ptr->m_label = label;
+}
+
+QString QDataRow::label()
+{
+    return d_ptr->m_label;
 }
 
 void QDataRow::addItem(QDataItem *item)
@@ -147,4 +150,4 @@ LabelItem QDataRowPrivate::labelItem()
     return m_labelItem;
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

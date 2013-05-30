@@ -46,7 +46,7 @@
 
 #include <QDebug>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 int unique_vertices = 0;
 
@@ -173,4 +173,4 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
     //qDebug() << "unique vertices" << unique_vertices;
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

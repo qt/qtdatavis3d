@@ -57,7 +57,7 @@
 class QVector2D;
 class QVector3D;
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class MeshLoader
 {
@@ -69,6 +69,6 @@ class MeshLoader
     // TODO: add loaders for other formats?
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif

@@ -45,23 +45,26 @@
 #include <QPoint>
 #include <QString>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 QDataItem::QDataItem(float value, const QString &label)
     : d_ptr(new QDataItemPrivate(this, value, label))
 {
-    //qDebug("QDataItem");
 }
 
 QDataItem::~QDataItem()
 {
-    //qDebug("~QDataItem");
 }
 
 void QDataItem::setLabel(const QString &label, bool prepend)
 {
     d_ptr->m_labelString = label;
     d_ptr->m_prependLabel = prepend;
+}
+
+QString QDataItem::label()
+{
+    return d_ptr->m_labelString;
 }
 
 void QDataItem::setValue(float value)
@@ -74,6 +77,11 @@ void QDataItem::setValue(int value)
     d_ptr->m_value = (float)value;
 }
 
+float QDataItem::value()
+{
+    return d_ptr->m_value;
+}
+
 void QDataItem::setPosition(const QPointF &position)
 {
     d_ptr->m_position = position;
@@ -82,6 +90,11 @@ void QDataItem::setPosition(const QPointF &position)
 void QDataItem::setPosition(const QPoint &position)
 {
     d_ptr->m_position = (QPointF)position;
+}
+
+QPointF QDataItem::position()
+{
+    return d_ptr->m_position;
 }
 
 QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &label)
@@ -155,4 +168,4 @@ QPointF QDataItemPrivate::position()
     return m_position;
 }
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -45,20 +45,25 @@
 #include "QtDataVis3D/qdatavis3dglobal.h"
 #include <QScopedPointer>
 #include <QString>
+#include <QObject>
 
-QTCOMMERCIALDATAVIS3D_BEGIN_NAMESPACE
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataRowPrivate;
 class QDataItem;
 
-class QTCOMMERCIALDATAVIS3D_EXPORT QDataRow
+class QTENTERPRISE_DATAVIS3D_EXPORT QDataRow : public QObject
 {
+    Q_OBJECT
+    Q_PROPERTY(QString label READ label WRITE setLabel)
+
 public:
     explicit QDataRow(const QString &label = QString());
     ~QDataRow();
 
     void setLabel(const QString &label); // label for value, unit for example
-    void addItem(QDataItem *item);
+    QString label();
+    Q_INVOKABLE void addItem(QDataItem *item);
 
 private:
     QScopedPointer<QDataRowPrivate> d_ptr;
@@ -69,6 +74,6 @@ private:
     friend class QDataSetPrivate;
 };
 
-QTCOMMERCIALDATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif
