@@ -68,85 +68,87 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<GLfloat> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    Q_INVOKABLE void addDataRow(const QVector<GLfloat> &dataRow,
+                                const QString &labelRow = QString(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    Q_INVOKABLE void addDataRow(const QVector<QDataItem*> &dataRow,
+                                const QString &labelRow = QString(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataRow is transferred
-    void addDataRow(QDataRow *dataRow);
+    Q_INVOKABLE void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<GLfloat> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    Q_INVOKABLE void addDataSet(const QVector< QVector<GLfloat> > &data,
+                                const QVector<QString> &labelsRow = QVector<QString>(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
 
     // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    Q_INVOKABLE void addDataSet(const QVector< QVector<QDataItem*> > &data,
+                                const QVector<QString> &labelsRow = QVector<QString>(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataSet is transferred
-    void addDataSet(QDataSet* dataSet);
+    Q_INVOKABLE void addDataSet(QDataSet* dataSet);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                     QSizeF spacing = QSizeF(1.0f, 1.0f),
-                     bool relative = true);
+    Q_INVOKABLE void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+                                 QSizeF spacing = QSizeF(1.0f, 1.0f),
+                                 bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
 
     // override bar type with own mesh
-    void setMeshFileName(const QString &objFileName);
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow = QString(),
-                          const QString &labelColumn = QString(),
-                          const QString &labelHeight = QString());
+    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
+                                      const QString &labelRow = QString(),
+                                      const QString &labelColumn = QString(),
+                                      const QString &labelHeight = QString());
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
-    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
-    void setTheme(ColorTheme theme);
+    Q_INVOKABLE void setTheme(ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform = true);
+    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                 bool uniform = true);
 
     // TODO: valon siirto / asetus
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
+    Q_INVOKABLE void setSelectionMode(SelectionMode mode);
 
     // Set window title
-    void setWindowTitle(const QString &title);
+    Q_INVOKABLE void setWindowTitle(const QString &title);
 
     // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
-    void setFontSize(GLfloat fontsize);
+    Q_INVOKABLE void setFontSize(GLfloat fontsize);
 
     // Set font
-    void setFont(const QFont &font);
+    Q_INVOKABLE void setFont(const QFont &font);
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
+    Q_INVOKABLE void setLabelTransparency(LabelTransparency transparency);
 
     // Enable or disable background grid
-    void setGridEnabled(bool enable);
+    Q_INVOKABLE void setGridEnabled(bool enable);
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    Q_INVOKABLE void setShadowQuality(ShadowQuality quality);
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data set.
     // Minimum is the absolute minimum possible value a bar can have. This is especially important to
     // set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
 protected:
 #if defined(Q_OS_ANDROID)

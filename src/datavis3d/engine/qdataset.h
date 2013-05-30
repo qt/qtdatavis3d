@@ -62,12 +62,12 @@ public:
     explicit QDataSet();
     ~QDataSet();
 
-    void setLabels(const QString &xAxis = QString(),
-                   const QString &zAxis = QString(),
-                   const QString &yAxis = QString(),
-                   const QVector<QString> &labelsRow = QVector<QString>(),
-                   const QVector<QString> &labelsColumn = QVector<QString>());
-    void addRow(QDataRow *row);
+    Q_INVOKABLE void setLabels(const QString &xAxis = QString(),
+                               const QString &zAxis = QString(),
+                               const QString &yAxis = QString(),
+                               const QVector<QString> &labelsRow = QVector<QString>(),
+                               const QVector<QString> &labelsColumn = QVector<QString>());
+    Q_INVOKABLE void addRow(QDataRow *row);
 
 private:
     QScopedPointer<QDataSetPrivate> d_ptr;

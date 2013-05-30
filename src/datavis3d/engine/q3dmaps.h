@@ -80,73 +80,73 @@ public:
 
     // Add data item. New data item is appended to old data.
     // ownership of data is transferred
-    bool addDataItem(QDataItem *dataItem);
+    Q_INVOKABLE bool addDataItem(QDataItem *dataItem);
 
     // Add data set. New data is appended to old data.
     // ownership of data is transferred
-    bool addData(const QVector<QDataItem*> &data);
+    Q_INVOKABLE bool addData(const QVector<QDataItem*> &data);
     // ownership of data is transferred
-    bool addData(const QDataRow &data);
+    Q_INVOKABLE bool addData(const QDataRow &data);
 
     // Add data set. Old data is deleted.
     // ownership of data is transferred
-    bool setData(const QVector<QDataItem*> &data);
+    Q_INVOKABLE bool setData(const QVector<QDataItem*> &data);
     // ownership of data is transferred
-    bool setData(QDataRow *data);
+    Q_INVOKABLE bool setData(QDataRow *data);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.
     // For example, in AdjustAll mode setting thickness to (0.1f, 1.0f, 0.5f) would apply value to
     // x at 10%, y at 100% and z at 50%. If a dimension is not included, given thickness states its absolute value.
-    void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
-                     AdjustmentDirection direction = AdjustHeight);
+    Q_INVOKABLE void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
+                                 AdjustmentDirection direction = AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
 
     // override bar type with own mesh
-    void setMeshFileName(const QString &objFileName);
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
-    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
-    void setTheme(ColorTheme theme);
+    Q_INVOKABLE void setTheme(ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
+    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
 
     // TODO: valon siirto / asetus
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
+    Q_INVOKABLE void setSelectionMode(SelectionMode mode);
 
     // Set window title
-    void setWindowTitle(const QString &title);
+    Q_INVOKABLE void setWindowTitle(const QString &title);
 
     // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
-    void setFontSize(GLfloat fontsize);
+    Q_INVOKABLE void setFontSize(GLfloat fontsize);
 
     // Set font
-    void setFont(const QFont &font);
+    Q_INVOKABLE void setFont(const QFont &font);
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
+    Q_INVOKABLE void setLabelTransparency(LabelTransparency transparency);
 
     // Enable or disable background grid
-    void setGridEnabled(bool enable);
+    Q_INVOKABLE void setGridEnabled(bool enable);
 
     // Set area specs
-    void setAreaSpecs(const QRect &areaRect, const QImage &image);
+    Q_INVOKABLE void setAreaSpecs(const QRect &areaRect, const QImage &image);
 
     // Set area image
-    void setImage(const QImage &image);
+    Q_INVOKABLE void setImage(const QImage &image);
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    Q_INVOKABLE void setShadowQuality(ShadowQuality quality);
 
 protected:
 #if defined(Q_OS_ANDROID)

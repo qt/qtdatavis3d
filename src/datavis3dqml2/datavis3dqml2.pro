@@ -1,10 +1,12 @@
 TEMPLATE = lib
 TARGET = datavis3dqml2
-QT += qml quick
+QT += qml quick datavis3d
 CONFIG += qt plugin
 
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = com.digia.QtDataVis3D
+
+staticlib:DEFINES+=QTENTERPRISE_DATAVIS3D_STATICLIB
 
 # Input
 INCLUDEPATH += ../datavis3d/engine
