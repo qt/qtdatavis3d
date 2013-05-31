@@ -46,6 +46,8 @@
 #include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dwindow.h"
 
+#include <QFont>
+
 class QOpenGLShaderProgram;
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
@@ -59,6 +61,14 @@ class LabelItem;
 class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
+    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+
 public:
     explicit Q3DBars();
     ~Q3DBars();
@@ -125,25 +135,32 @@ public:
 
     // TODO: valon siirto / asetus
     // Change selection mode; single bar, bar and row, bar and column, or all
-    Q_INVOKABLE void setSelectionMode(SelectionMode mode);
+    void setSelectionMode(SelectionMode mode);
+    SelectionMode selectionMode();
 
     // Set window title
-    Q_INVOKABLE void setWindowTitle(const QString &title);
+    void setWindowTitle(const QString &title);
+    QString windowTitle();
 
     // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
-    Q_INVOKABLE void setFontSize(GLfloat fontsize);
+    void setFontSize(float fontsize);
+    float fontSize();
 
     // Set font
-    Q_INVOKABLE void setFont(const QFont &font);
+    void setFont(const QFont &font);
+    QFont font();
 
     // Label transparency adjustment
-    Q_INVOKABLE void setLabelTransparency(LabelTransparency transparency);
+    void setLabelTransparency(LabelTransparency transparency);
+    LabelTransparency labelTransparency();
 
     // Enable or disable background grid
-    Q_INVOKABLE void setGridEnabled(bool enable);
+    void setGridEnabled(bool enable);
+    bool gridEnabled();
 
     // Adjust shadow quality
-    Q_INVOKABLE void setShadowQuality(ShadowQuality quality);
+    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality shadowQuality();
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data set.
     // Minimum is the absolute minimum possible value a bar can have. This is especially important to

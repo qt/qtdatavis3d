@@ -1794,9 +1794,19 @@ void Q3DBars::setSelectionMode(SelectionMode mode)
         d_ptr->m_zoomSelection = new QDataRow();
 }
 
+SelectionMode Q3DBars::selectionMode()
+{
+    return d_ptr->m_selectionMode;
+}
+
 void Q3DBars::setWindowTitle(const QString &title)
 {
     setTitle(title);
+}
+
+QString Q3DBars::windowTitle()
+{
+    return title();
 }
 
 void Q3DBars::setFontSize(float fontsize)
@@ -1805,10 +1815,20 @@ void Q3DBars::setFontSize(float fontsize)
     d_ptr->m_drawer->setFont(d_ptr->m_font);
 }
 
+float Q3DBars::fontSize()
+{
+    return d_ptr->m_font.pointSizeF();
+}
+
 void Q3DBars::setFont(const QFont &font)
 {
     d_ptr->m_font = font;
     d_ptr->m_drawer->setFont(font);
+}
+
+QFont Q3DBars::font()
+{
+    return d_ptr->m_font;
 }
 
 void Q3DBars::setLabelTransparency(LabelTransparency transparency)
@@ -1817,19 +1837,19 @@ void Q3DBars::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_drawer->setTransparency(transparency);
 }
 
+LabelTransparency Q3DBars::labelTransparency()
+{
+    return d_ptr->m_labelTransparency;
+}
+
 void Q3DBars::setGridEnabled(bool enable)
 {
     d_ptr->m_gridEnabled = enable;
 }
 
-void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+bool Q3DBars::gridEnabled()
 {
-    d_ptr->m_tickCount = tickCount;
-    d_ptr->m_tickStep = step;
-    if (tickCount > 0 && step > 0) {
-        d_ptr->m_heightNormalizer = tickCount * step;
-        d_ptr->calculateHeightAdjustment(QPair<float, float>(minimum, d_ptr->m_heightNormalizer));
-    }
+    return d_ptr->m_gridEnabled;
 }
 
 void Q3DBars::setShadowQuality(ShadowQuality quality)
@@ -1887,6 +1907,21 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
         d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
                                      QStringLiteral(":/shaders/fragmentES2"));
 #endif
+    }
+}
+
+ShadowQuality Q3DBars::shadowQuality()
+{
+    return d_ptr->m_shadowQuality;
+}
+
+void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+{
+    d_ptr->m_tickCount = tickCount;
+    d_ptr->m_tickStep = step;
+    if (tickCount > 0 && step > 0) {
+        d_ptr->m_heightNormalizer = tickCount * step;
+        d_ptr->calculateHeightAdjustment(QPair<float, float>(minimum, d_ptr->m_heightNormalizer));
     }
 }
 

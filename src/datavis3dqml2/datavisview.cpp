@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "datavisview.h"
+#include <QDebug>
 
 DataVisView::DataVisView(QQuickItem *parent):
     QQuickItem(parent)
@@ -48,10 +49,19 @@ DataVisView::DataVisView(QQuickItem *parent):
     // QQuickItem to create a visual item, you will need to uncomment the
     // following line and re-implement updatePaintNode()
 
-    // setFlag(ItemHasContents, true);
+    setFlag(ItemHasContents, true);
 }
 
 DataVisView::~DataVisView()
 {
+}
+
+QSGNode *DataVisView::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
+{
+    //qDebug() << "updatePaintNode" << node << data;
+
+    // TODO: Do stuff
+
+    return node;
 }
 

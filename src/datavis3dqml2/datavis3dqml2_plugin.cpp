@@ -50,8 +50,8 @@ void Datavis3dqml2Plugin::registerTypes(const char *uri)
 {
     // @uri com.digia.QtDataVis3D
     qmlRegisterType<DataVisView>(uri, 1, 0, "DataVisView");
-    qmlRegisterType<Q3DBars>(uri, 1, 0, "3DBars");
-    qmlRegisterType<Q3DMaps>(uri, 1, 0, "3DMaps");
+    qmlRegisterType<Q3DBars>(uri, 1, 0, "Bars");
+    qmlRegisterType<Q3DMaps>(uri, 1, 0, "Maps");
     qmlRegisterType<QDataItem>(uri, 1, 0, "DataItem");
     qmlRegisterType<QDataRow>(uri, 1, 0, "DataRow");
     qmlRegisterType<QDataSet>(uri, 1, 0, "DataSet");
