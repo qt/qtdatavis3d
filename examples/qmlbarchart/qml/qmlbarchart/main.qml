@@ -22,6 +22,7 @@ import QtQuick 2.0
 import com.digia.QtDataVis3D 1.0
 
 DataVisView {
+    id: view
     width: 360
     height: 360
 
@@ -34,13 +35,15 @@ DataVisView {
         id: testrow
         function addData() {
             testrow.addItem(testitem);
+            testrow.addItem(testitem);
         }
     }
     Bars {
         id: testchart
         visible: true
-        //width: parent.width
-        //height: parent.height
+        width: view.width
+        height: view.height
+        //anchors.fill: view
 
         grid: false
         shadowQuality: DataVisView.ShadowNone
@@ -51,15 +54,15 @@ DataVisView {
             //console.log(parent)
             //console.log(parent.width)
             //console.log(parent.height)
-            testchart.setupSampleSpace(1, 1);
+            testchart.setupSampleSpace(2, 1);
             testchart.addDataRow(testrow);
         }
     }
 
-    Text {
-        text: testitem.label
-        anchors.centerIn: parent
-    }
+//    Text {
+//        text: testitem.label
+//        anchors.centerIn: parent
+//    }
     MouseArea {
         anchors.fill: parent
         onClicked: {

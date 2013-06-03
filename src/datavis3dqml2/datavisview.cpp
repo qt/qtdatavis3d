@@ -39,12 +39,25 @@
 **
 ****************************************************************************/
 
+//#define TEST1
+//#define TEST2
+
 #include "datavisview.h"
 #include "scenerenderernode_p.h"
 
 #include <QDebug>
 
+#ifdef TEST1
+#include "q3dbars.h"
+#include <QtQuick/QQuickWindow>
+#endif
+
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+
+#ifdef TEST1
+Q3DBars *test_scene;
+QQuickWindow *test_window;
+#endif
 
 DataVisView::DataVisView(QQuickItem *parent):
     QQuickItem(parent)
@@ -62,6 +75,34 @@ DataVisView::~DataVisView()
 
 QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
+#ifdef TEST1
+    static bool done = false;
+    if (!done) {
+        qDebug() << "create scene";
+        test_scene = new Q3DBars();
+        //test_scene->initialize();
+
+        // TODO: For testing. Add some data to scene.
+        QVector< QVector<float> > data;
+        QVector<float> row;
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i < 2; i++)
+                row.append(1.0f);
+            data.append(row);
+            row.clear();
+        }
+        // Set up sample space based on inserted data
+        test_scene->setupSampleSpace(2, 2);
+        // Add data to chart
+        test_scene->addDataSet(data);
+
+        test_window = window();
+        QObject::connect(test_window, &QQuickWindow::beforeRendering, test_scene, &Q3DBars::renderNow,
+                         Qt::DirectConnection);
+        test_window->update();
+        done = true;
+    }
+#elif TEST2
     // Delete old node and recreate it. This function gets called when window geometry changes.
     if (oldNode)
         delete oldNode;
@@ -71,6 +112,9 @@ QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     node->setRect(boundingRect());
 
     return node;
+#else
+    return NULL;
+#endif
 }
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

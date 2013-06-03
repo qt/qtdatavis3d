@@ -43,7 +43,7 @@
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
-//#include "q3dbars.h"
+#include "q3dbars.h"
 //#include "q3dmaps.h"
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
@@ -51,8 +51,8 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 SceneRendererNode::SceneRendererNode(QQuickWindow *window)
     : m_fbo(0),
       m_texture(0),
-      m_window(window)//,
-    //m_scene(0)
+      m_window(window),
+      m_scene(0)
 {
     connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()));
 }
@@ -61,7 +61,7 @@ SceneRendererNode::~SceneRendererNode()
 {
     delete m_texture;
     delete m_fbo;
-    //delete m_scene;
+    delete m_scene;
 }
 
 void SceneRendererNode::render()
@@ -78,7 +78,23 @@ void SceneRendererNode::render()
         // TODO: If we create the vis3d this way, how do we connect it with QML?
         // Should we create it at QML and give it to DataVisView using a property (setVisualizer or similar)?
         // DataVisView can then give it here as an argument in constructor?
-        //m_scene = new Q3DBars();
+
+        m_scene = new Q3DBars();
+
+        // TODO: For testing. Add some data to scene.
+        QVector< QVector<float> > data;
+        QVector<float> row;
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i < 2; i++)
+                row.append(1.0f);
+            data.append(row);
+            row.clear();
+        }
+        // Set up sample space based on inserted data
+        m_scene->setupSampleSpace(2, 2);
+        // Add data to chart
+        m_scene->addDataSet(data);
+
         //m_scene = new Q3DMaps();
         setTexture(m_texture);
     }
@@ -86,7 +102,7 @@ void SceneRendererNode::render()
     m_fbo->bind();
 
     // TODO: Render here, or "capture" the rendering we do at Q3DBars/Q3DMaps
-    //m_scene->render();
+    m_scene->renderNow();
 
     m_fbo->bindDefault();
 

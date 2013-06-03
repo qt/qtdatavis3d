@@ -37,13 +37,16 @@ contains(TARGET, qml.*) {
             src_lib = $${lib_name}.dll
         }
     } else {
-        CONFIG(debug, release|debug) {
-            src_dir = .
-            src_lib = lib$${lib_name}_debug.dylib
-        }
-        CONFIG(release, release|debug){
-            src_dir = .
-            src_lib = lib$${lib_name}.dylib
+        src_dir = .
+        mac {
+            CONFIG(debug, release|debug) {
+                src_lib = lib$${lib_name}_debug.dylib
+            }
+            CONFIG(release, release|debug){
+                src_lib = lib$${lib_name}.dylib
+            }
+        } else {
+            src_lib = $${lib_name}.so
         }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib

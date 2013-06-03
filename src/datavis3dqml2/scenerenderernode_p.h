@@ -63,7 +63,7 @@ class QQuickWindow;
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-//class Q3DBars;
+class Q3DBars;
 //class Q3DMaps;
 
 // TODO: If we use texture node, our rendering is done into a texture that is then drawn to the
@@ -84,7 +84,7 @@ private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    //Q3DBars *m_scene;
+    Q3DBars *m_scene;
     //Q3DMaps *m_scene;
 };
 

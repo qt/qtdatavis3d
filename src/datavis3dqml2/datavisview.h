@@ -44,6 +44,7 @@
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
 
+#include <QtQuick/QQuickItem>
 #include <QQuickItem>
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
@@ -57,9 +58,6 @@ class DataVisView : public QQuickItem
     Q_ENUMS(LabelTransparency)
 
 public:
-    DataVisView(QQuickItem *parent = 0);
-    ~DataVisView();
-
     enum SelectionMode {
         ModeNone = 0,
         ModeBar,
@@ -83,14 +81,20 @@ public:
         TransparencyNoBackground    // Draw just text on transparent background
     };
 
+public:
+    DataVisView(QQuickItem *parent = 0);
+    ~DataVisView();
+
 protected:
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 };
 
-QML_DECLARE_TYPE(DataVisView)
-
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+
+QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
+
+QML_DECLARE_TYPE(DataVisView)
 
 #endif // DATAVISVIEW_H
 
