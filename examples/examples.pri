@@ -37,7 +37,14 @@ contains(TARGET, qml.*) {
             src_lib = $${lib_name}.dll
         }
     } else {
-        src_lib = $${lib_name}.so
+        CONFIG(debug, release|debug) {
+            src_dir = .
+            src_lib = lib$${lib_name}_debug.dylib
+        }
+        CONFIG(release, release|debug){
+            src_dir = .
+            src_lib = lib$${lib_name}.dylib
+        }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib
     copy_lib.depends = $$OUT_PWD/../../src/$$lib_name/$$src_dir/$$src_lib
