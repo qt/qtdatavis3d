@@ -39,38 +39,60 @@
 **
 ****************************************************************************/
 
-#include "datavisview.h"
 #include "scenerenderernode_p.h"
 
-#include <QDebug>
+#include <QtQuick/QQuickWindow>
+#include <QtGui/QOpenGLFramebufferObject>
+//#include "q3dbars.h"
+//#include "q3dmaps.h"
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-DataVisView::DataVisView(QQuickItem *parent):
-    QQuickItem(parent)
+SceneRendererNode::SceneRendererNode(QQuickWindow *window)
+    : m_fbo(0),
+      m_texture(0),
+      m_window(window)//,
+    //m_scene(0)
 {
-    // By default, QQuickItem does not draw anything. If you subclass
-    // QQuickItem to create a visual item, you will need to uncomment the
-    // following line and re-implement updatePaintNode()
-
-    setFlag(ItemHasContents, true);
+    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()));
 }
 
-DataVisView::~DataVisView()
+SceneRendererNode::~SceneRendererNode()
 {
+    delete m_texture;
+    delete m_fbo;
+    //delete m_scene;
 }
 
-QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+void SceneRendererNode::render()
 {
-    // Delete old node and recreate it. This function gets called when window geometry changes.
-    if (oldNode)
-        delete oldNode;
+    //qDebug("render");
 
-    // We need to create a node class that does the rendering (ie. a node that "captures" the rendering we do)
-    SceneRendererNode *node = new SceneRendererNode(window());
-    node->setRect(boundingRect());
+    QSize size = rect().size().toSize();
 
-    return node;
+    if (!m_fbo) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        m_fbo = new QOpenGLFramebufferObject(size, format);
+        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+        // TODO: If we create the vis3d this way, how do we connect it with QML?
+        // Should we create it at QML and give it to DataVisView using a property (setVisualizer or similar)?
+        // DataVisView can then give it here as an argument in constructor?
+        //m_scene = new Q3DBars();
+        //m_scene = new Q3DMaps();
+        setTexture(m_texture);
+    }
+
+    m_fbo->bind();
+
+    // TODO: Render here, or "capture" the rendering we do at Q3DBars/Q3DMaps
+    //m_scene->render();
+
+    m_fbo->bindDefault();
+
+    m_window->update();
 }
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+
+

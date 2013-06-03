@@ -42,7 +42,11 @@
 #ifndef DATAVISVIEW_H
 #define DATAVISVIEW_H
 
+#include "QtDataVis3D/qdatavis3dglobal.h"
+
 #include <QQuickItem>
+
+QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class DataVisView : public QQuickItem
 {
@@ -55,8 +59,6 @@ class DataVisView : public QQuickItem
 public:
     DataVisView(QQuickItem *parent = 0);
     ~DataVisView();
-
-    QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *data);
 
     enum SelectionMode {
         ModeNone = 0,
@@ -80,9 +82,15 @@ public:
         TransparencyFromTheme,      // Use colors and transparencies from theme
         TransparencyNoBackground    // Draw just text on transparent background
     };
+
+protected:
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+
 };
 
 QML_DECLARE_TYPE(DataVisView)
+
+QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
 #endif // DATAVISVIEW_H
 

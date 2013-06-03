@@ -39,38 +39,56 @@
 **
 ****************************************************************************/
 
-#include "datavisview.h"
-#include "scenerenderernode_p.h"
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include <QDebug>
+#ifndef SCENERENDERERNODE_P_H
+#define SCENERENDERERNODE_P_H
+
+#include "QtDataVis3D/qdatavis3dglobal.h"
+
+#include <QObject>
+#include <qsgsimpletexturenode.h>
+
+class QOpenGLFramebufferObject;
+class QSGTexture;
+class QQuickWindow;
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-DataVisView::DataVisView(QQuickItem *parent):
-    QQuickItem(parent)
+//class Q3DBars;
+//class Q3DMaps;
+
+// TODO: If we use texture node, our rendering is done into a texture that is then drawn to the
+// qquickwindow -> selection will not work
+// TODO: Check if better ones are available
+class SceneRendererNode : public QObject, public QSGSimpleTextureNode
 {
-    // By default, QQuickItem does not draw anything. If you subclass
-    // QQuickItem to create a visual item, you will need to uncomment the
-    // following line and re-implement updatePaintNode()
+    Q_OBJECT
 
-    setFlag(ItemHasContents, true);
-}
+public:
+    SceneRendererNode(QQuickWindow *window);
+    ~SceneRendererNode();
 
-DataVisView::~DataVisView()
-{
-}
+public slots:
+    void render();
 
-QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-    // Delete old node and recreate it. This function gets called when window geometry changes.
-    if (oldNode)
-        delete oldNode;
-
-    // We need to create a node class that does the rendering (ie. a node that "captures" the rendering we do)
-    SceneRendererNode *node = new SceneRendererNode(window());
-    node->setRect(boundingRect());
-
-    return node;
-}
+private:
+    QOpenGLFramebufferObject *m_fbo;
+    QSGTexture *m_texture;
+    QQuickWindow *m_window;
+    //Q3DBars *m_scene;
+    //Q3DMaps *m_scene;
+};
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+
+#endif
+
