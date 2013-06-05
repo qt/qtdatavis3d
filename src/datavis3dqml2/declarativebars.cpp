@@ -39,34 +39,48 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVISVIEW_H
-#define DATAVISVIEW_H
+#include "declarativebars.h"
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-
-#include <QQuickItem>
+#include <QDebug>
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class DataVisView : public QQuickItem
+DeclarativeBars::DeclarativeBars()
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(DataVisView)
+}
 
-public:
-    DataVisView(QQuickItem *parent = 0);
-    ~DataVisView();
+DeclarativeBars::~DeclarativeBars()
+{
+}
 
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+void DeclarativeBars::setSelMode(DeclarativeBars::SelectionMode mode)
+{
+    setSelectionMode(QtDataVis3D::SelectionMode(mode));
+}
 
-};
+DeclarativeBars::SelectionMode DeclarativeBars::selMode()
+{
+    return DeclarativeBars::SelectionMode(selectionMode());
+}
+
+void DeclarativeBars::setTransparency(DeclarativeBars::LabelTransparency transparency)
+{
+    setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
+}
+
+DeclarativeBars::LabelTransparency DeclarativeBars::transparency()
+{
+    return DeclarativeBars::LabelTransparency(labelTransparency());
+}
+
+void DeclarativeBars::setShadow(DeclarativeBars::ShadowQuality quality)
+{
+    setShadowQuality(QtDataVis3D::ShadowQuality(quality));
+}
+
+DeclarativeBars::ShadowQuality DeclarativeBars::shadow()
+{
+    return DeclarativeBars::ShadowQuality(shadowQuality());
+}
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
-
-QML_DECLARE_TYPE(DataVisView)
-
-#endif // DATAVISVIEW_H
-

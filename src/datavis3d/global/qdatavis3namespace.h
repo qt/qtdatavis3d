@@ -105,23 +105,6 @@ enum ColorTheme {
     ThemeLight
 };
 
-enum LabelTransparency {
-    TransparencyNone = 0,       // Full solid, using colors from theme
-    TransparencyFromTheme,      // Use colors and transparencies from theme
-    TransparencyNoBackground    // Draw just text on transparent background
-};
-
-// TODO: Will this be used in other vis types than q3dbars?
-enum SelectionMode {
-    ModeNone = 0,
-    ModeBar,
-    ModeBarAndRow,
-    ModeBarAndColumn,
-    ModeBarRowAndColumn,
-    ModeZoomRow,
-    ModeZoomColumn
-};
-
 // TODO: Should this be moved to Q3DBarsPrivate? Not for use via API directly?
 enum LabelPosition {
     LabelBelow = 0,
@@ -135,11 +118,28 @@ enum LabelPosition {
     LabelRight
 };
 
+// TODO: Will these be used from other vis types than Q3DBars?
+enum SelectionMode {
+    ModeNone = 0,
+    ModeBar,
+    ModeBarAndRow,
+    ModeBarAndColumn,
+    ModeBarRowAndColumn,
+    ModeZoomRow,
+    ModeZoomColumn
+};
+
 enum ShadowQuality {
     ShadowNone = 0,
     ShadowLow = 1,
     ShadowMedium = 3,
     ShadowHigh = 5
+};
+
+enum LabelTransparency {
+    TransparencyNone = 0,       // Full solid, using colors from theme
+    TransparencyFromTheme,      // Use colors and transparencies from theme
+    TransparencyNoBackground    // Draw just text on transparent background
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -97,7 +97,8 @@ QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         test_scene->addDataSet(data);
 
         test_window = window();
-        QObject::connect(test_window, &QQuickWindow::beforeRendering, test_scene, &Q3DBars::renderNow,
+        QObject::connect(test_window, &QQuickWindow::beforeRendering,
+                         test_scene, &Q3DBars::renderNow,
                          Qt::DirectConnection);
         test_window->update();
         done = true;

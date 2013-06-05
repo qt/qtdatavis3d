@@ -39,34 +39,67 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVISVIEW_H
-#define DATAVISVIEW_H
+#ifndef DECLARATIVEBARS_H
+#define DECLARATIVEBARS_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-
-#include <QQuickItem>
+#include "QtDataVis3D/qdatavis3namespace.h"
+#include "q3dbars.h"
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class DataVisView : public QQuickItem
+class DeclarativeBars : public Q3DBars
 {
     Q_OBJECT
-    Q_DISABLE_COPY(DataVisView)
+    Q_PROPERTY(SelectionMode selectionMode READ selMode WRITE setSelMode)
+    Q_PROPERTY(LabelTransparency labelTransparency READ transparency WRITE setTransparency)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadow WRITE setShadow)
+    Q_ENUMS(SelectionMode)
+    Q_ENUMS(ShadowQuality)
+    Q_ENUMS(LabelTransparency)
 
 public:
-    DataVisView(QQuickItem *parent = 0);
-    ~DataVisView();
+    // Duplicated here to be able to use the same enums
+    enum SelectionMode {
+        ModeNone = 0,
+        ModeBar,
+        ModeBarAndRow,
+        ModeBarAndColumn,
+        ModeBarRowAndColumn,
+        ModeZoomRow,
+        ModeZoomColumn
+    };
 
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    enum ShadowQuality {
+        ShadowNone = 0,
+        ShadowLow = 1,
+        ShadowMedium = 3,
+        ShadowHigh = 5
+    };
 
+    enum LabelTransparency {
+        TransparencyNone = 0,       // Full solid, using colors from theme
+        TransparencyFromTheme,      // Use colors and transparencies from theme
+        TransparencyNoBackground    // Draw just text on transparent background
+    };
+
+public:
+    explicit DeclarativeBars();
+    ~DeclarativeBars();
+
+    // Change selection mode; single bar, bar and row, bar and column, or all
+    void setSelMode(DeclarativeBars::SelectionMode mode);
+    DeclarativeBars::SelectionMode selMode();
+
+    // Label transparency adjustment
+    void setTransparency(DeclarativeBars::LabelTransparency transparency);
+    DeclarativeBars::LabelTransparency transparency();
+
+    // Adjust shadow quality
+    void setShadow(DeclarativeBars::ShadowQuality quality);
+    DeclarativeBars::ShadowQuality shadow();
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
-
-QML_DECLARE_TYPE(DataVisView)
-
-#endif // DATAVISVIEW_H
-
+#endif

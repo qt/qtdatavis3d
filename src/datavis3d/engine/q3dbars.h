@@ -61,13 +61,10 @@ class LabelItem;
 class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
-    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
 
 public:
     explicit Q3DBars();
@@ -123,17 +120,26 @@ public:
     Q_INVOKABLE void setCameraPreset(CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) angles and distance in percentage (10...500))
+    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
+    // percentage (10...500))
     Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
+    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
+    // colors are affected)
     Q_INVOKABLE void setTheme(ColorTheme theme);
 
-    // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
+    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
+    // color to change from bottom to top
     Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                                  bool uniform = true);
 
-    // TODO: valon siirto / asetus
+    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
+    // important to set if values can be negative.
+    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+
+    // TODO: light placement API
+
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
     SelectionMode selectionMode();
@@ -142,7 +148,7 @@ public:
     void setWindowTitle(const QString &title);
     QString windowTitle();
 
-    // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
+    // Font size adjustment
     void setFontSize(float fontsize);
     float fontSize();
 
@@ -161,11 +167,6 @@ public:
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
-
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data set.
-    // Minimum is the absolute minimum possible value a bar can have. This is especially important to
-    // set if values can be negative.
-    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
 protected:
 #if defined(Q_OS_ANDROID)

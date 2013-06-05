@@ -14,9 +14,8 @@ INCLUDEPATH += ../datavis3d/engine
 SOURCES += \
     datavis3dqml2_plugin.cpp \
     datavisview.cpp \
-    scenerenderernode.cpp
-
-    #declarative3dbars.cpp \
+    scenerenderernode.cpp \
+    declarativebars.cpp #\
     #declarative3dmaps.cpp \
     #declarativedataitem.cpp \
     #declarativedatarow.cpp \
@@ -25,9 +24,8 @@ SOURCES += \
 HEADERS += \
     datavis3dqml2_plugin.h \
     datavisview.h \
-    scenerenderernode_p.h
-
-    #declarative3dbars.h \
+    scenerenderernode_p.h \
+    declarativebars.h #\
     #declarative3dmaps.h \
     #declarativedataitem.h \
     #declarativedatarow.h \

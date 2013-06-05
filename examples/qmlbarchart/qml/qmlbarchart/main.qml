@@ -19,60 +19,78 @@
 ****************************************************************************/
 
 import QtQuick 2.0
+import QtQuick.Window 2.1
 import com.digia.QtDataVis3D 1.0
 
-DataVisView {
-    id: view
-    width: 360
-    height: 360
+Item {
+    id: container
+    anchors.fill: parent
 
-    DataItem {
-        id: testitem
-        label: "Test"
-        value: 10
-    }
-    DataRow {
-        id: testrow
-        function addData() {
-            testrow.addItem(testitem);
-            testrow.addItem(testitem);
+    DataVisView {
+        id: mainview
+        width: 360
+        height: 360
+
+        DataItem {
+            id: testitem
+            label: "Test"
+            value: 10
         }
-    }
-    Bars {
-        id: testchart
-        visible: true
-        width: view.width
-        height: view.height
-        //anchors.fill: view
-
-        grid: false
-        shadowQuality: DataVisView.ShadowNone
-        selectionMode: DataVisView.ModeNone
-        labelTransparency: DataVisView.TransparencyNone
-        windowTitle: "QmlTest3DBars"
-        function setUpBars() {
-            //console.log(parent)
-            //console.log(parent.width)
-            //console.log(parent.height)
-            testchart.setupSampleSpace(2, 1);
-            testchart.addDataRow(testrow);
+        DataItem {
+            id: testitem2
+            label: "Test2"
+            value: -10
         }
-    }
+        DataRow {
+            id: testrow
+            function addData() {
+                testrow.addItem(testitem);
+                testrow.addItem(testitem2);
+            }
+        }
+        Bars {
+            id: testchart
+            visible: true
+            width: mainview.width
+            height: mainview.height
+            //x: mainview.x + mainview.width
+            //y: mainview.y
 
-//    Text {
-//        text: testitem.label
-//        anchors.centerIn: parent
-//    }
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            //console.log("onClicked")
+            grid: false
+            shadowQuality: Bars.ShadowNone
+            selectionMode: Bars.ModeNone
+            labelTransparency: Bars.TransparencyNone
+            windowTitle: "QmlTest3DBars"
+
+            function setUpBars() {
+                /*console.log(parent)
+                console.log(container.x)
+                console.log(container.y)
+                console.log(Window.x)
+                console.log(Window.y)
+                console.log(Screen.desktopAvailableHeight)
+                console.log(Screen.desktopAvailableWidth)
+                console.log(mainview.x)
+                console.log(mainview.y)
+                console.log(x)
+                console.log(y)*/
+                testchart.setupSampleSpace(2, 1);
+                testchart.addDataRow(testrow);
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                testchart.destroy();
+                testchart.close();
+                Qt.quit();
+            }
+        }
+
+        Component.onCompleted: {
             testrow.addData();
             testchart.setUpBars();
         }
-    }
-
-    onHeightChanged: {
-        //console.log("onHeightChanged")
     }
 }
