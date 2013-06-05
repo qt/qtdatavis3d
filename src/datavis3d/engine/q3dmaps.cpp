@@ -1213,6 +1213,20 @@ void Q3DMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
     d_ptr->m_theme->m_uniformColor = uniform;
 }
 
+void Q3DMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
+{
+    d_ptr->calculateSceneScalingFactors(areaRect);
+    setImage(image);
+}
+
+void Q3DMaps::setImage(const QImage &image)
+{
+    d_ptr->m_bgrHasAlpha = image.hasAlphaChannel();
+    if (d_ptr->m_bgrTexture)
+        glDeleteTextures(1, &d_ptr->m_bgrTexture);
+    d_ptr->m_bgrTexture = d_ptr->m_textureHelper->create2DTexture(image, true, true);
+}
+
 void Q3DMaps::setSelectionMode(SelectionMode mode)
 {
     d_ptr->m_selectionMode = mode;
@@ -1221,9 +1235,19 @@ void Q3DMaps::setSelectionMode(SelectionMode mode)
     //d_ptr->m_sceneViewPort = QRect(0, 0, width(), height());
 }
 
+SelectionMode Q3DMaps::selectionMode()
+{
+    return d_ptr->m_selectionMode;
+}
+
 void Q3DMaps::setWindowTitle(const QString &title)
 {
     setTitle(title);
+}
+
+QString Q3DMaps::windowTitle()
+{
+    return title();
 }
 
 void Q3DMaps::setFontSize(float fontsize)
@@ -1233,11 +1257,21 @@ void Q3DMaps::setFontSize(float fontsize)
     d_ptr->m_updateLabels = true;
 }
 
+float Q3DMaps::fontSize()
+{
+    return d_ptr->m_font.pointSizeF();
+}
+
 void Q3DMaps::setFont(const QFont &font)
 {
     d_ptr->m_font = font;
     d_ptr->m_drawer->setFont(font);
     d_ptr->m_updateLabels = true;
+}
+
+QFont Q3DMaps::font()
+{
+    return d_ptr->m_font;
 }
 
 void Q3DMaps::setLabelTransparency(LabelTransparency transparency)
@@ -1247,9 +1281,75 @@ void Q3DMaps::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_updateLabels = true;
 }
 
-void Q3DMaps::setGridEnabled(bool enable)
+LabelTransparency Q3DMaps::labelTransparency()
 {
-    d_ptr->m_gridEnabled = enable;
+    return d_ptr->m_labelTransparency;
+}
+
+void Q3DMaps::setShadowQuality(ShadowQuality quality)
+{
+    d_ptr->m_shadowQuality = quality;
+    switch (quality) {
+    case ShadowLow:
+        //qDebug() << "ShadowLow";
+        d_ptr->m_shadowQualityToShader = 33.3f;
+        break;
+    case ShadowMedium:
+        //qDebug() << "ShadowMedium";
+        d_ptr->m_shadowQualityToShader = 100.0f;
+        break;
+    case ShadowHigh:
+        //qDebug() << "ShadowHigh";
+        d_ptr->m_shadowQualityToShader = 200.0f;
+        break;
+    default:
+        d_ptr->m_shadowQualityToShader = 0.0f;
+        break;
+    }
+    if (d_ptr->m_isInitialized) {
+#if !defined(QT_OPENGL_ES_2)
+        if (d_ptr->m_shadowQuality > ShadowNone) {
+            // Re-init depth buffer
+            d_ptr->initDepthBuffer();
+            // Re-init shaders
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            }
+            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                         QStringLiteral(":/shaders/fragmentShadow"));
+        } else {
+            // Re-init shaders
+            if (!d_ptr->m_theme->m_uniformColor) {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragmentColorOnY"));
+            } else {
+                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
+                                   QStringLiteral(":/shaders/fragment"));
+            }
+            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                         QStringLiteral(":/shaders/fragmentTexture"));
+        }
+#else
+        if (!d_ptr->m_theme->m_uniformColor) {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
+        } else {
+            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
+                               QStringLiteral(":/shaders/fragmentES2"));
+        }
+        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"), // Same vertex shader ok for ES2
+                                     QStringLiteral(":/shaders/fragmentTextureES2"));
+#endif
+    }
+}
+
+ShadowQuality Q3DMaps::shadowQuality()
+{
+    return d_ptr->m_shadowQuality;
 }
 
 bool Q3DMaps::addDataItem(QDataItem* dataItem)
@@ -1356,81 +1456,6 @@ bool Q3DMaps::setData(QDataRow *dataRow)
     return true;
 }
 
-void Q3DMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
-{
-    d_ptr->calculateSceneScalingFactors(areaRect);
-    setImage(image);
-}
-
-void Q3DMaps::setImage(const QImage &image)
-{
-    d_ptr->m_bgrHasAlpha = image.hasAlphaChannel();
-    if (d_ptr->m_bgrTexture)
-        glDeleteTextures(1, &d_ptr->m_bgrTexture);
-    d_ptr->m_bgrTexture = d_ptr->m_textureHelper->create2DTexture(image, true, true);
-}
-
-void Q3DMaps::setShadowQuality(ShadowQuality quality)
-{
-    d_ptr->m_shadowQuality = quality;
-    switch (quality) {
-    case ShadowLow:
-        //qDebug() << "ShadowLow";
-        d_ptr->m_shadowQualityToShader = 33.3f;
-        break;
-    case ShadowMedium:
-        //qDebug() << "ShadowMedium";
-        d_ptr->m_shadowQualityToShader = 100.0f;
-        break;
-    case ShadowHigh:
-        //qDebug() << "ShadowHigh";
-        d_ptr->m_shadowQualityToShader = 200.0f;
-        break;
-    default:
-        d_ptr->m_shadowQualityToShader = 0.0f;
-        break;
-    }
-    if (d_ptr->m_isInitialized) {
-#if !defined(QT_OPENGL_ES_2)
-        if (d_ptr->m_shadowQuality > ShadowNone) {
-            // Re-init depth buffer
-            d_ptr->initDepthBuffer();
-            // Re-init shaders
-            if (!d_ptr->m_theme->m_uniformColor) {
-                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-            } else {
-                d_ptr->initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
-            }
-            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                         QStringLiteral(":/shaders/fragmentShadow"));
-        } else {
-            // Re-init shaders
-            if (!d_ptr->m_theme->m_uniformColor) {
-                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragmentColorOnY"));
-            } else {
-                d_ptr->initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragment"));
-            }
-            d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
-                                         QStringLiteral(":/shaders/fragmentTexture"));
-        }
-#else
-        if (!d_ptr->m_theme->m_uniformColor) {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
-        } else {
-            d_ptr->initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentES2"));
-        }
-        d_ptr->initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"), // Same vertex shader ok for ES2
-                                     QStringLiteral(":/shaders/fragmentTextureES2"));
-#endif
-    }
-}
-
 Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
     : q_ptr(q),
       m_paintDevice(0),
@@ -1477,7 +1502,6 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_updateLabels(true),
-      m_gridEnabled(true),
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_bgrHasAlpha(false)

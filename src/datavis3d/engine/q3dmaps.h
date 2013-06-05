@@ -46,6 +46,8 @@
 #include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dwindow.h"
 
+#include <QFont>
+
 class QOpenGLShaderProgram;
 class QImage;
 class QRect;
@@ -61,6 +63,10 @@ class LabelItem;
 class QTENTERPRISE_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
+
 public:
     enum AdjustmentDirection {
         AdjustHeight = 0,   // map value to y
@@ -120,33 +126,37 @@ public:
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
 
-    // TODO: valon siirto / asetus
-    // Change selection mode; single bar, bar and row, bar and column, or all
-    Q_INVOKABLE void setSelectionMode(SelectionMode mode);
-
-    // Set window title
-    Q_INVOKABLE void setWindowTitle(const QString &title);
-
-    // Font size adjustment (should it be in enum (smallest, smaller, small, normal, large, larger, largest), or just GLfloat?
-    Q_INVOKABLE void setFontSize(GLfloat fontsize);
-
-    // Set font
-    Q_INVOKABLE void setFont(const QFont &font);
-
-    // Label transparency adjustment
-    Q_INVOKABLE void setLabelTransparency(LabelTransparency transparency);
-
-    // Enable or disable background grid
-    Q_INVOKABLE void setGridEnabled(bool enable);
-
     // Set area specs
     Q_INVOKABLE void setAreaSpecs(const QRect &areaRect, const QImage &image);
 
     // Set area image
     Q_INVOKABLE void setImage(const QImage &image);
 
+    // TODO: light placement API
+
+    // Change selection mode; single bar, bar and row, bar and column, or all
+    void setSelectionMode(SelectionMode mode);
+    SelectionMode selectionMode();
+
+    // Set window title
+    void setWindowTitle(const QString &title);
+    QString windowTitle();
+
+    // Font size adjustment
+    void setFontSize(float fontsize);
+    float fontSize();
+
+    // Set font
+    void setFont(const QFont &font);
+    QFont font();
+
+    // Label transparency adjustment
+    void setLabelTransparency(LabelTransparency transparency);
+    LabelTransparency labelTransparency();
+
     // Adjust shadow quality
-    Q_INVOKABLE void setShadowQuality(ShadowQuality quality);
+    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality shadowQuality();
 
 protected:
 #if defined(Q_OS_ANDROID)

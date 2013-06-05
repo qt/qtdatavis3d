@@ -39,48 +39,67 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVIS3DQML2_PLUGIN_H
-#define DATAVIS3DQML2_PLUGIN_H
+#ifndef DECLARATIVEMAPS_H
+#define DECLARATIVEMAPS_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
 #include "QtDataVis3D/qdatavis3namespace.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-#include "qdataset.h"
-
-#include "declarativebars.h"
-#include "declarativemaps.h"
-//#include "declarativedataitem.h"
-//#include "declarativedatarow.h"
-//#include "declarativedataset.h"
-
-#include <QQmlExtensionPlugin>
-
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
-
-//Q_DECLARE_METATYPE(DeclarativeDataItem *)
-//Q_DECLARE_METATYPE(DeclarativeDataRow *)
-//Q_DECLARE_METATYPE(DeclarativeDataSet *)
-
-Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeMaps *)
-
-Q_DECLARE_METATYPE(QDataItem *)
-Q_DECLARE_METATYPE(QDataRow *)
-Q_DECLARE_METATYPE(QDataSet *)
+#include "q3dmaps.h"
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class Datavis3dqml2Plugin : public QQmlExtensionPlugin
+class DeclarativeMaps : public Q3DMaps
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
+    Q_PROPERTY(SelectionMode selectionMode READ selMode WRITE setSelMode)
+    Q_PROPERTY(LabelTransparency labelTransparency READ transparency WRITE setTransparency)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadow WRITE setShadow)
+    Q_ENUMS(SelectionMode)
+    Q_ENUMS(ShadowQuality)
+    Q_ENUMS(LabelTransparency)
 
 public:
-    void registerTypes(const char *uri);
+    // Duplicated here to be able to use the same enums
+    enum SelectionMode {
+        ModeNone = 0,
+        ModeBar,
+        ModeBarAndRow,
+        ModeBarAndColumn,
+        ModeBarRowAndColumn,
+        ModeZoomRow,
+        ModeZoomColumn
+    };
+
+    enum ShadowQuality {
+        ShadowNone = 0,
+        ShadowLow = 1,
+        ShadowMedium = 3,
+        ShadowHigh = 5
+    };
+
+    enum LabelTransparency {
+        TransparencyNone = 0,       // Full solid, using colors from theme
+        TransparencyFromTheme,      // Use colors and transparencies from theme
+        TransparencyNoBackground    // Draw just text on transparent background
+    };
+
+public:
+    explicit DeclarativeMaps();
+    ~DeclarativeMaps();
+
+    // Change selection mode; single bar, bar and row, bar and column, or all
+    void setSelMode(DeclarativeMaps::SelectionMode mode);
+    DeclarativeMaps::SelectionMode selMode();
+
+    // Label transparency adjustment
+    void setTransparency(DeclarativeMaps::LabelTransparency transparency);
+    DeclarativeMaps::LabelTransparency transparency();
+
+    // Adjust shadow quality
+    void setShadow(DeclarativeMaps::ShadowQuality quality);
+    DeclarativeMaps::ShadowQuality shadow();
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
 
-#endif // DATAVIS3DQML2_PLUGIN_H
-
+#endif

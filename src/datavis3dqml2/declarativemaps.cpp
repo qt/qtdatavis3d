@@ -39,48 +39,48 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVIS3DQML2_PLUGIN_H
-#define DATAVIS3DQML2_PLUGIN_H
-
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-#include "qdataset.h"
-
-#include "declarativebars.h"
 #include "declarativemaps.h"
-//#include "declarativedataitem.h"
-//#include "declarativedatarow.h"
-//#include "declarativedataset.h"
 
-#include <QQmlExtensionPlugin>
-
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
-
-//Q_DECLARE_METATYPE(DeclarativeDataItem *)
-//Q_DECLARE_METATYPE(DeclarativeDataRow *)
-//Q_DECLARE_METATYPE(DeclarativeDataSet *)
-
-Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeMaps *)
-
-Q_DECLARE_METATYPE(QDataItem *)
-Q_DECLARE_METATYPE(QDataRow *)
-Q_DECLARE_METATYPE(QDataSet *)
+#include <QDebug>
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class Datavis3dqml2Plugin : public QQmlExtensionPlugin
+DeclarativeMaps::DeclarativeMaps()
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
+}
 
-public:
-    void registerTypes(const char *uri);
-};
+DeclarativeMaps::~DeclarativeMaps()
+{
+}
+
+void DeclarativeMaps::setSelMode(DeclarativeMaps::SelectionMode mode)
+{
+    setSelectionMode(QtDataVis3D::SelectionMode(mode));
+}
+
+DeclarativeMaps::SelectionMode DeclarativeMaps::selMode()
+{
+    return DeclarativeMaps::SelectionMode(selectionMode());
+}
+
+void DeclarativeMaps::setTransparency(DeclarativeMaps::LabelTransparency transparency)
+{
+    setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
+}
+
+DeclarativeMaps::LabelTransparency DeclarativeMaps::transparency()
+{
+    return DeclarativeMaps::LabelTransparency(labelTransparency());
+}
+
+void DeclarativeMaps::setShadow(DeclarativeMaps::ShadowQuality quality)
+{
+    setShadowQuality(QtDataVis3D::ShadowQuality(quality));
+}
+
+DeclarativeMaps::ShadowQuality DeclarativeMaps::shadow()
+{
+    return DeclarativeMaps::ShadowQuality(shadowQuality());
+}
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-
-#endif // DATAVIS3DQML2_PLUGIN_H
-
