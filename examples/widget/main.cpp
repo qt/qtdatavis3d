@@ -93,6 +93,10 @@ int main(int argc, char **argv)
     QPushButton *selectionButton = new QPushButton(widget);
     selectionButton->setText(QStringLiteral("Change selection mode"));
 
+    QCheckBox *backgroundCheckBox = new QCheckBox(widget);
+    backgroundCheckBox->setText(QStringLiteral("Show background"));
+    backgroundCheckBox->setChecked(true);
+
     QCheckBox *gridCheckBox = new QCheckBox(widget);
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
@@ -186,6 +190,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
+    vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout->addWidget(shadowQuality);
@@ -234,6 +239,8 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);
 
+    QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ChartModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ChartModifier::setGridEnabled);
 

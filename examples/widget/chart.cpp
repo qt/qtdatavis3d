@@ -270,6 +270,11 @@ void ChartModifier::changeShadowQuality(int quality)
     m_chart->setShadowQuality(sq);
 }
 
+void ChartModifier::setBackgroundEnabled(int enabled)
+{
+    m_chart->setBackgroundEnabled((bool)enabled);
+}
+
 void ChartModifier::setGridEnabled(int enabled)
 {
     m_chart->setGridEnabled((bool)enabled);

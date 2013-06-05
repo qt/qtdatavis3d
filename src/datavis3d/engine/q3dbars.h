@@ -65,6 +65,7 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
+    Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
 
 public:
     explicit Q3DBars();
@@ -163,6 +164,10 @@ public:
     // Enable or disable background grid
     void setGridEnabled(bool enable);
     bool gridEnabled();
+
+    // Enable or disable background mesh
+    void setBackgroundEnabled(bool enable);
+    bool backgroundEnabled();
 
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);

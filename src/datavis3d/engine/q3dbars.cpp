@@ -951,7 +951,7 @@ void Q3DBars::drawScene()
         glCullFace(GL_BACK);
 
     // Draw background
-    if (d_ptr->m_backgroundObj) {
+    if (d_ptr->m_bgrEnabled && d_ptr->m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 depthMVPMatrix;
@@ -1852,6 +1852,17 @@ bool Q3DBars::gridEnabled()
     return d_ptr->m_gridEnabled;
 }
 
+void Q3DBars::setBackgroundEnabled(bool enable)
+{
+    d_ptr->m_bgrEnabled = enable;
+    // TODO: If disabled (and we have negative values), we need bar objects with bottoms
+}
+
+bool Q3DBars::backgroundEnabled()
+{
+    return d_ptr->m_bgrEnabled;
+}
+
 void Q3DBars::setShadowQuality(ShadowQuality quality)
 {
     d_ptr->m_shadowQuality = quality;
@@ -2108,6 +2119,7 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_selectionDepthBuffer(0),
       m_updateLabels(false),
       m_gridEnabled(true),
+      m_bgrEnabled(true),
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_tickCount(0),

@@ -175,6 +175,7 @@ public:
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
     bool m_gridEnabled;
+    bool m_bgrEnabled;
     ShadowQuality m_shadowQuality;
     GLfloat m_shadowQualityToShader;
     GLint m_tickCount;
