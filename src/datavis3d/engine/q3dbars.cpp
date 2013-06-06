@@ -179,7 +179,11 @@ void Q3DBars::initialize()
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set view port
+#ifdef USE_QML2_VERSION
+    glViewport(0, 0, 800, 500);
+#else
     glViewport(0, 0, width(), height());
+#endif
 
     // Set initialized -flag
     d_ptr->m_isInitialized = true;
@@ -187,6 +191,14 @@ void Q3DBars::initialize()
 
 void Q3DBars::render()
 {
+#ifdef USE_QML2_VERSION
+    glDepthMask(true);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+#endif
+
     if (!d_ptr->m_isInitialized)
         return;
 
@@ -268,7 +280,6 @@ void Q3DBars::drawZoomScene()
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camPosZoomed),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
-
 
     // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
     QVector3D zoomLightPos = defaultLightPos;
@@ -450,6 +461,10 @@ void Q3DBars::drawScene()
 
     static QVector3D selection = skipColor;
 
+#ifdef USE_QML2_VERSION
+    d_ptr->m_sceneViewPort = QRect(0, 0, 800, 500);
+#endif
+
     // Specify viewport
     glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
                d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
@@ -460,6 +475,14 @@ void Q3DBars::drawScene()
                                  / (GLfloat)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
+#ifdef USE_QML2_VERSION
+    static int rot = 0;
+    rot += 5;
+    if (rot > 2870)
+        rot = 0;
+    d_ptr->m_mousePos.setX(rot);
+    d_ptr->m_mousePos.setY(100);
+#endif
     QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos,
                                                               d_ptr->m_zoomLevel
                                                               * d_ptr->m_zoomAdjustment,
@@ -972,7 +995,6 @@ void Q3DBars::drawScene()
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 #endif
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
-
 
         QVector3D backgroundColor = Utils::vectorFromColor(d_ptr->m_theme->m_backgroundColor);
 
@@ -2104,7 +2126,11 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_axisLabelX(QStringLiteral("X")),
       m_axisLabelZ(QStringLiteral("Z")),
       m_axisLabelY(QStringLiteral("Y")),
+      #ifdef USE_QML2_VERSION
+      m_sceneViewPort(0, 0, 800, 500),
+      #else
       m_sceneViewPort(0, 0, q->width(), q->height()),
+      #endif
       m_zoomViewPort(0, 0, q->width(), q->height()),
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),

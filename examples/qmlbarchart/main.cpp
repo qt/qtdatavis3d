@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
                                                           QString::fromLatin1("qml")));
 #endif
     viewer.setMainQmlFile(QStringLiteral("qml/qmlbarchart/main.qml"));
-    viewer.showExpanded();
+    viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+    viewer.show();
 
     return app.exec();
 }

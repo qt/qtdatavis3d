@@ -66,8 +66,6 @@ SceneRendererNode::~SceneRendererNode()
 
 void SceneRendererNode::render()
 {
-    //qDebug("render");
-
     QSize size = rect().size().toSize();
 
     if (!m_fbo) {
@@ -80,20 +78,25 @@ void SceneRendererNode::render()
         // DataVisView can then give it here as an argument in constructor?
 
         m_scene = new Q3DBars();
+        m_scene->setSelectionMode(ModeNone);
+        m_scene->setShadowQuality(ShadowNone);
+        m_scene->setTheme(ThemeSystem);
+        m_scene->initialize();
 
         // TODO: For testing. Add some data to scene.
         QVector< QVector<float> > data;
         QVector<float> row;
-        for (int j = 0; j < 2; j++) {
-            for (int i = 0; i < 2; i++)
-                row.append(1.0f);
+        for (float j = 0.0f; j < 5.0f; j++) {
+            for (float i = 0.0f; i < 5.0f; i++)
+                row.append(j / 10.0f + i / 10.0f);
             data.append(row);
             row.clear();
         }
         // Set up sample space based on inserted data
-        m_scene->setupSampleSpace(2, 2);
+        m_scene->setupSampleSpace(5, 5);
         // Add data to chart
         m_scene->addDataSet(data);
+        m_scene->setBarType(Cones);
 
         //m_scene = new Q3DMaps();
         setTexture(m_texture);
@@ -102,7 +105,7 @@ void SceneRendererNode::render()
     m_fbo->bind();
 
     // TODO: Render here, or "capture" the rendering we do at Q3DBars/Q3DMaps
-    m_scene->renderNow();
+    m_scene->render();
 
     m_fbo->bindDefault();
 
