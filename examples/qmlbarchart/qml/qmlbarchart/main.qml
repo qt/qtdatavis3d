@@ -24,12 +24,14 @@ import com.digia.QtDataVis3D 1.0
 
 Item {
     id: container
-    anchors.fill: parent
+    //anchors.fill: parent
+    width: 800
+    height: 500
 
     DataVisView {
         id: mainview
-        width: 360
-        height: 360
+        anchors.fill: parent
+        antialiasing: true
 
         DataItem {
             id: testitem
@@ -48,49 +50,49 @@ Item {
                 testrow.addItem(testitem2);
             }
         }
-        Bars {
-            id: testchart
-            visible: true
-            width: mainview.width
-            height: mainview.height
-            //x: mainview.x + mainview.width
-            //y: mainview.y
+//        Bars {
+//            id: testchart
+//            visible: true
+//            width: mainview.width
+//            height: mainview.height
+//            //x: mainview.x + mainview.width
+//            //y: mainview.y
 
-            grid: false
-            shadowQuality: Bars.ShadowNone
-            selectionMode: Bars.ModeNone
-            labelTransparency: Bars.TransparencyNone
-            windowTitle: "QmlTest3DBars"
+//            grid: false
+//            shadowQuality: Bars.ShadowNone
+//            selectionMode: Bars.ModeNone
+//            labelTransparency: Bars.TransparencyNone
+//            windowTitle: "QmlTest3DBars"
 
-            function setUpBars() {
-                /*console.log(parent)
-                console.log(container.x)
-                console.log(container.y)
-                console.log(Window.x)
-                console.log(Window.y)
-                console.log(Screen.desktopAvailableHeight)
-                console.log(Screen.desktopAvailableWidth)
-                console.log(mainview.x)
-                console.log(mainview.y)
-                console.log(x)
-                console.log(y)*/
-                testchart.setupSampleSpace(2, 1);
-                testchart.addDataRow(testrow);
-            }
-        }
+//            function setUpBars() {
+//                /*console.log(parent)
+//                console.log(container.x)
+//                console.log(container.y)
+//                console.log(Window.x)
+//                console.log(Window.y)
+//                console.log(Screen.desktopAvailableHeight)
+//                console.log(Screen.desktopAvailableWidth)
+//                console.log(mainview.x)
+//                console.log(mainview.y)
+//                console.log(x)
+//                console.log(y)*/
+//                testchart.setupSampleSpace(2, 1);
+//                testchart.addDataRow(testrow);
+//            }
+//        }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                testchart.destroy();
-                testchart.close();
+//                testchart.destroy();
+//                testchart.close();
                 Qt.quit();
             }
         }
 
-        Component.onCompleted: {
-            testrow.addData();
-            testchart.setUpBars();
-        }
+//        Component.onCompleted: {
+//            testrow.addData();
+//            testchart.setUpBars();
+//        }
     }
 }
