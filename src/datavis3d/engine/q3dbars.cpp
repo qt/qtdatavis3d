@@ -1854,8 +1854,11 @@ bool Q3DBars::gridEnabled()
 
 void Q3DBars::setBackgroundEnabled(bool enable)
 {
-    d_ptr->m_bgrEnabled = enable;
-    // TODO: If disabled (and we have negative values), we need bar objects with bottoms
+    if (d_ptr->m_bgrEnabled != enable) {
+        d_ptr->m_bgrEnabled = enable;
+        // Load changed bar type
+        d_ptr->loadBarMesh();
+    }
 }
 
 bool Q3DBars::backgroundEnabled()
@@ -2158,9 +2161,13 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
 
 void Q3DBarsPrivate::loadBarMesh()
 {
+    QString objectFileName = m_objFile;
     if (m_barObj)
         delete m_barObj;
-    m_barObj = new ObjectHelper(m_objFile);
+    // If background is disabled, load full version of bar mesh
+    if (!m_bgrEnabled)
+        objectFileName.append(QStringLiteral("Full"));
+    m_barObj = new ObjectHelper(objectFileName);
     m_barObj->load();
 }
 
