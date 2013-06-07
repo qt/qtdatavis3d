@@ -159,7 +159,6 @@ void SceneRendererNode::render()
 
     m_fbo->bind();
 
-    // TODO: Render here, or "capture" the rendering we do at Q3DBars/Q3DMaps
     m_scene->render();
 
     m_fbo->bindDefault();

@@ -56,7 +56,6 @@ DataVisView::DataVisView(QQuickItem *parent):
     // following line and re-implement updatePaintNode()
 
     setFlag(ItemHasContents, true);
-    setRotation(180.0);
     setAntialiasing(true);
     setSmooth(true);
 }

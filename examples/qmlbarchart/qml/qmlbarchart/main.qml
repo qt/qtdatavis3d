@@ -32,6 +32,15 @@ Item {
         id: mainview
         anchors.fill: parent
         antialiasing: true
+        // This allows us to flip the texture to be displayed correctly in scene graph
+        // TODO: Find a way to do it in code..
+        transform: [
+            Rotation {
+                id: rotation;
+                axis.x: 1; axis.z: 0; axis.y: 0; angle: 0;
+                origin.x: width / 2; origin.y: height / 2;
+            }
+        ]
 
         DataItem {
             id: testitem
@@ -90,9 +99,13 @@ Item {
             }
         }
 
-//        Component.onCompleted: {
+        Component.onCompleted: {
+            // This allows us to flip the texture to be displayed correctly in scene graph
+            // TODO: Find a way to do it in code..
+            rotation.angle = 180
+            console.log("kukkuu")
 //            testrow.addData();
 //            testchart.setUpBars();
-//        }
+        }
     }
 }
