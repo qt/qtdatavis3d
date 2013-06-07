@@ -84,8 +84,8 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
-Q3DBars::Q3DBars()
-    : d_ptr(new Q3DBarsPrivate(this))
+Q3DBars::Q3DBars(GLuint fbohandle, const QSize &windowsize)
+    : d_ptr(new Q3DBarsPrivate(this, fbohandle, windowsize))
 {
 }
 
@@ -179,11 +179,8 @@ void Q3DBars::initialize()
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set view port
-#ifdef USE_QML2_VERSION
-    glViewport(0, 0, 800, 500);
-#else
-    glViewport(0, 0, width(), height());
-#endif
+    glViewport(d_ptr->m_zoomViewPort.x(), d_ptr->m_zoomViewPort.y(),
+               d_ptr->m_zoomViewPort.width(), d_ptr->m_zoomViewPort.height());
 
     // Set initialized -flag
     d_ptr->m_isInitialized = true;
@@ -461,10 +458,6 @@ void Q3DBars::drawScene()
 
     static QVector3D selection = skipColor;
 
-#ifdef USE_QML2_VERSION
-    d_ptr->m_sceneViewPort = QRect(0, 0, 800, 500);
-#endif
-
     // Specify viewport
     glViewport(d_ptr->m_sceneViewPort.x(), d_ptr->m_sceneViewPort.y(),
                d_ptr->m_sceneViewPort.width(), d_ptr->m_sceneViewPort.height());
@@ -631,7 +624,7 @@ void Q3DBars::drawScene()
         }
 
         // Disable drawing to framebuffer (= enable drawing to screen)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_fbohandle);
 
         // Release depth shader
         d_ptr->m_depthShader->release();
@@ -639,6 +632,7 @@ void Q3DBars::drawScene()
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
         d_ptr->m_labelShader->bind();
+        glCullFace(GL_BACK);
         glEnable(GL_TEXTURE_2D);
         QMatrix4x4 modelMatrix;
         QMatrix4x4 viewmatrix;
@@ -769,7 +763,7 @@ void Q3DBars::drawScene()
             selection = Utils::getSelection(d_ptr->m_mousePos, height());
 
 #ifndef USE_HAX0R_SELECTION
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, d_ptr->m_fbohandle);
 #endif
 
         // Release selection shader
@@ -788,7 +782,7 @@ void Q3DBars::drawScene()
         modelMatrix.translate(0.0, 0.0, zComp);
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         d_ptr->m_labelShader->setUniformValue(d_ptr->m_labelShader->MVP(), MVPMatrix);
-        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj, true,
+        d_ptr->m_drawer->drawObject(d_ptr->m_labelShader, d_ptr->m_labelObj,
                                     d_ptr->m_selectionTexture);
         glDisable(GL_TEXTURE_2D);
         d_ptr->m_labelShader->release();
@@ -2086,7 +2080,7 @@ void Q3DBars::addDataSet(QDataSet* dataSet)
     d_ptr->m_dataSet->d_ptr->setDrawer(d_ptr->m_drawer);
 }
 
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
+Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, GLuint fbohandle, const QSize &windowsize)
     : q_ptr(q),
       m_paintDevice(0),
       m_barShader(0),
@@ -2127,11 +2121,12 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_axisLabelZ(QStringLiteral("Z")),
       m_axisLabelY(QStringLiteral("Y")),
       #ifdef USE_QML2_VERSION
-      m_sceneViewPort(0, 0, 800, 500),
+      m_sceneViewPort(0, 0, windowsize.width(), windowsize.height()),
+      m_zoomViewPort(0, 0, windowsize.width(), windowsize.height()),
       #else
       m_sceneViewPort(0, 0, q->width(), q->height()),
-      #endif
       m_zoomViewPort(0, 0, q->width(), q->height()),
+      #endif
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
       m_labelTransparency(TransparencyFromTheme),
@@ -2153,7 +2148,9 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
       m_shadowQualityToShader(33.3f),
       m_tickCount(0),
       m_tickStep(0),
-      m_negativeValues(false)
+      m_negativeValues(false),
+      m_fbohandle(fbohandle),
+      m_windowSize(windowsize)
 {
     m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DBarsPrivate::updateTextures);
@@ -2249,9 +2246,15 @@ void Q3DBarsPrivate::initSelectionBuffer()
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->deleteTexture(&m_selectionTexture);
     }
+#ifndef USE_QML2_VERSION
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
+#else
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_sceneViewPort.size(),
+                                                                 m_selectionFrameBuffer,
+                                                                 m_selectionDepthBuffer);
+#endif
 #endif
 }
 
@@ -2271,8 +2274,14 @@ void Q3DBarsPrivate::initDepthBuffer()
         m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->deleteTexture(&m_depthTexture);
     }
+#ifndef USE_QML2_VERSION
     m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer,
                                                          m_shadowQuality);
+#else
+    m_depthTexture = m_textureHelper->createDepthTexture(m_sceneViewPort.size(),
+                                                         m_depthFrameBuffer,
+                                                         m_shadowQuality);
+#endif
 }
 #endif
 
@@ -2386,7 +2395,11 @@ void Q3DBarsPrivate::handleLimitChange()
 void Q3DBarsPrivate::closeZoomMode()
 {
     m_zoomActivated = false;
+#ifndef USE_QML2_VERSION
     m_sceneViewPort = QRect(0, 0, q_ptr->width(), q_ptr->height());
+#else
+    m_sceneViewPort = QRect(0, 0, m_windowSize.width(), m_windowSize.height());
+#endif
 }
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

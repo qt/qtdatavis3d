@@ -94,7 +94,7 @@ public:
     };
 
 public:
-    Q3DBarsPrivate(Q3DBars *q);
+    Q3DBarsPrivate(Q3DBars *q, GLuint fbohandle = 0, const QSize &windowsize = QSize());
     ~Q3DBarsPrivate();
 
     void loadBarMesh();
@@ -181,6 +181,8 @@ public:
     GLint m_tickCount;
     GLfloat m_tickStep;
     bool m_negativeValues;
+    GLuint m_fbohandle;
+    QSize m_windowSize;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -46,6 +46,8 @@
 #include "q3dbars.h"
 //#include "q3dmaps.h"
 
+#include "qdataset.h"
+
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 SceneRendererNode::SceneRendererNode(QQuickWindow *window)
@@ -77,13 +79,13 @@ void SceneRendererNode::render()
         // Should we create it at QML and give it to DataVisView using a property (setVisualizer or similar)?
         // DataVisView can then give it here as an argument in constructor?
 
-        m_scene = new Q3DBars();
+        m_scene = new Q3DBars(m_fbo->handle(), size);
         m_scene->setSelectionMode(ModeNone);
-        m_scene->setShadowQuality(ShadowNone);
         m_scene->setTheme(ThemeSystem);
         m_scene->initialize();
 
         // TODO: For testing. Add some data to scene.
+        /*
         QVector< QVector<float> > data;
         QVector<float> row;
         for (float j = 0.0f; j < 5.0f; j++) {
@@ -97,6 +99,59 @@ void SceneRendererNode::render()
         // Add data to chart
         m_scene->addDataSet(data);
         m_scene->setBarType(Cones);
+        */
+
+        // Prepare data to be visualized
+        // Use QDataSet adder
+
+        // Set window title
+        m_scene->setWindowTitle(QStringLiteral("Hours playing banjo"));
+
+        // Set up row and column names
+        QVector<QString> days;
+        days << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
+        QVector<QString> weeks;
+        weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
+
+        // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
+        float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 7.0f},      // week 1
+                             {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
+                             {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
+                             {0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
+                             {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
+
+        // Set tick count and step, we want a line every hour -> 7 ticks, step 1 hour
+        m_scene->setTickCount(7, 1.0f);
+
+        // Create data set
+        QDataSet *dataSet = new QDataSet();
+
+        // Add labels
+        dataSet->setLabels("Week of year", "Day of week", "Hours playing banjo", weeks, days);
+
+        // Create data rows
+        QDataRow *dataRow;
+        for (int week = 0; week < weeks.size(); week++) {
+            dataRow = new QDataRow(weeks.at(week));
+            // Create data items
+            for (int day = 0; day < days.size(); day++) {
+                // Add data to rows
+                dataRow->addItem(new QDataItem(hours[week][day], "h"));//, " + days.at(day)));
+            }
+            // Add row to set
+            dataSet->addRow(dataRow);
+            // Get next pointer
+            dataRow++;
+        }
+
+        m_scene->setFontSize(50.0f);
+
+        // Set up sample space based on prepared data
+        m_scene->setupSampleSpace(days.size(), weeks.size());
+
+        // Add data to chart
+        m_scene->addDataSet(dataSet);
+
 
         //m_scene = new Q3DMaps();
         setTexture(m_texture);

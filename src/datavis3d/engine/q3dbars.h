@@ -68,7 +68,7 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
 
 public:
-    explicit Q3DBars();
+    explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
     ~Q3DBars();
 
     void initialize();
