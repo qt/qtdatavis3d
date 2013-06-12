@@ -39,34 +39,6 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVISVIEW_H
-#define DATAVISVIEW_H
-
-#include "QtDataVis3D/qdatavis3dglobal.h"
-
-#include <QQuickItem>
-
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
-
-class DataVisView : public QQuickItem
-{
-    Q_OBJECT
-    Q_DISABLE_COPY(DataVisView)
-
-public:
-    DataVisView(QQuickItem *parent = 0);
-    ~DataVisView();
-
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
-
-};
-
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
-
-QML_DECLARE_TYPE(DataVisView)
-
-#endif // DATAVISVIEW_H
-
+#! [0]
+QT += datavis3d
+#! [0]

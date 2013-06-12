@@ -60,13 +60,13 @@ class QTENTERPRISE_DATAVIS3D_EXPORT QDataItem : public QObject
     Q_PROPERTY(QString label READ label WRITE setLabel)
     Q_PROPERTY(float value READ value WRITE setValue)
     Q_PROPERTY(int value READ value WRITE setValue)
-    Q_PROPERTY(int value READ value WRITE setValue)
     Q_PROPERTY(QPointF position READ position WRITE setPosition)
 
 public:
     explicit QDataItem(float value = 0.0f, const QString &label = QString());
     ~QDataItem();
 
+    // TODO: Provide a Q_INVOKABLE version of this, or move prepend to it's own property.
     void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
     QString label();
     void setValue(float value);
@@ -79,8 +79,7 @@ public:
 
 private:
     QScopedPointer<QDataItemPrivate> d_ptr;
-    friend class Q3DBars;
-    friend class Q3DBarsPrivate;
+    friend class Bars3dShared;
     friend class Q3DMaps;
     friend class Q3DMapsPrivate;
     friend class QDataRowPrivate;

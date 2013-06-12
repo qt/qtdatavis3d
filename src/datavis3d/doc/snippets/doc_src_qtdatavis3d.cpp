@@ -39,47 +39,6 @@
 **
 ****************************************************************************/
 
-#define TEST1
-
-#include "datavisview.h"
-#include "scenerenderernode_p.h"
-
-#include <QDebug>
-
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
-
-DataVisView::DataVisView(QQuickItem *parent):
-    QQuickItem(parent)
-{
-    // By default, QQuickItem does not draw anything. If you subclass
-    // QQuickItem to create a visual item, you will need to uncomment the
-    // following line and re-implement updatePaintNode()
-
-    setFlag(ItemHasContents, true);
-    setRotation(180.0);
-    setAntialiasing(true);
-    setSmooth(true);
-}
-
-DataVisView::~DataVisView()
-{
-}
-
-QSGNode *DataVisView::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-#ifdef TEST1
-    // Delete old node and recreate it. This function gets called when window geometry changes.
-    if (oldNode)
-        delete oldNode;
-
-    // We need to create a node class that does the rendering (ie. a node that "captures" the rendering we do)
-    SceneRendererNode *node = new SceneRendererNode(window());
-    node->setRect(boundingRect());
-
-    return node;
-#else
-    return NULL;
-#endif
-}
-
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+//! [0]
+#include <QtDataVis3D>
+//! [0]

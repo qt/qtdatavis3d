@@ -56,21 +56,20 @@ class Q3DWindowPrivate;
 class QTENTERPRISE_DATAVIS3D_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
+
 public:
     explicit Q3DWindow(QWindow *parent = 0);
     ~Q3DWindow();
 
-    virtual void render();
-
-    virtual void initialize();
-
-    void setAnimating(bool animating);
-
-public slots:
+private slots:
     void renderLater();
     void renderNow();
 
 protected:
+    virtual void render();
+    virtual void initialize();
+
+    void setAnimating(bool animating);
     bool event(QEvent *event);
     void exposeEvent(QExposeEvent *event);
 

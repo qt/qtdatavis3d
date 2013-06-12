@@ -69,8 +69,7 @@ public:
     void useTheme(ColorTheme theme);
 
 private:
-    friend class Q3DBars;
-    friend class Q3DBarsPrivate;
+    friend class Bars3dShared;
     friend class Q3DMaps;
     friend class Q3DMapsPrivate;
     friend class Drawer;

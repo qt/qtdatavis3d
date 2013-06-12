@@ -42,21 +42,37 @@
 #ifndef DECLARATIVEBARS_H
 #define DECLARATIVEBARS_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
-#include "q3dbars.h"
+#include "bars3dshared_p.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
+#include "declarativebars_p.h"
+
+#include <qsgsimpletexturenode.h>
+#include <QQuickItem>
+#include <QObject>
+
+class QOpenGLFramebufferObject;
+class QSGTexture;
+class QQuickWindow;
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class DeclarativeBars : public Q3DBars
+class DeclarativeBars : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(SelectionMode selectionMode READ selMode WRITE setSelMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ transparency WRITE setTransparency)
+    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadow WRITE setShadow)
+    Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
+    Q_PROPERTY(int width READ width WRITE setWidth)
+    Q_PROPERTY(int height READ height WRITE setHeight)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelTransparency)
+
+protected:
+    Bars3dShared *m_shared;
+    DeclarativeBarsCachedStatePrivate *m_cachedState;
 
 public:
     // Duplicated here to be able to use the same enums
@@ -84,22 +100,134 @@ public:
     };
 
 public:
-    explicit DeclarativeBars();
+    explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
+    // Add a row of data. Each new row is added to the front of the sample space, moving previous
+    // rows back (if sample space is more than one row deep)
+    Q_INVOKABLE void addDataRow(const QVector<GLfloat> &dataRow,
+                                const QString &labelRow = QString(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
+    // ownership of dataItems is transferred
+    Q_INVOKABLE void addDataRow(const QVector<QDataItem*> &dataRow,
+                                const QString &labelRow = QString(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
+    // ownership of dataRow is transferred
+    Q_INVOKABLE void addDataRow(QDataRow *dataRow);
+
+    // Add complete data set at a time, as a vector of data rows
+    Q_INVOKABLE void addDataSet(const QVector< QVector<GLfloat> > &data,
+                                const QVector<QString> &labelsRow = QVector<QString>(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
+
+    // ownership of dataItems is transferred
+    Q_INVOKABLE void addDataSet(const QVector< QVector<QDataItem*> > &data,
+                                const QVector<QString> &labelsRow = QVector<QString>(),
+                                const QVector<QString> &labelsColumn = QVector<QString>());
+    // ownership of dataSet is transferred
+    Q_INVOKABLE void addDataSet(QDataSet* dataSet);
+
+    // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
+    // y -component sets the thickness/spacing of z -direction
+    // With relative 0.0f means side-to-side, 1.0f = one thickness in between
+    Q_INVOKABLE void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+                                 QSizeF spacing = QSizeF(1.0f, 1.0f),
+                                 bool relative = true);
+
+    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
+    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
+
+    // override bar type with own mesh
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
+
+    // how many samples per row and column, and names for axes
+    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
+                                      const QString &labelRow = QString(),
+                                      const QString &labelColumn = QString(),
+                                      const QString &labelHeight = QString());
+
+    // Select preset camera placement
+    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
+
+    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
+    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
+    // percentage (10...500))
+    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+
+    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
+    // colors are affected)
+    Q_INVOKABLE void setTheme(ColorTheme theme);
+
+    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
+    // color to change from bottom to top
+    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                 bool uniform = true);
+
+    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
+    // important to set if values can be negative.
+    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+
+    // TODO: light placement API
+
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelMode(DeclarativeBars::SelectionMode mode);
-    DeclarativeBars::SelectionMode selMode();
+    void setSelectionMode(SelectionMode mode);
+    SelectionMode selectionMode();
+
+    // Font size adjustment
+    void setFontSize(float fontsize);
+    float fontSize();
+
+    // Set font
+    void setFont(const QFont &font);
+    QFont font();
 
     // Label transparency adjustment
-    void setTransparency(DeclarativeBars::LabelTransparency transparency);
-    DeclarativeBars::LabelTransparency transparency();
+    void setLabelTransparency(LabelTransparency transparency);
+    LabelTransparency labelTransparency();
+
+    // Enable or disable background grid
+    void setGridEnabled(bool enable);
+    bool gridEnabled();
+
+    // Enable or disable background mesh
+    void setBackgroundEnabled(bool enable);
+    bool backgroundEnabled();
+
+    // Adjust shadow quality
+    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality shadowQuality();
 
     // Adjust shadow quality
     void setShadow(DeclarativeBars::ShadowQuality quality);
     DeclarativeBars::ShadowQuality shadow();
+
+    protected:
+        QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+
+};
+
+// TODO: If we use texture node, our rendering is done into a texture that is then drawn to the
+// qquickwindow -> selection will not work
+class DeclarativeBarsRenderer : public QObject, public QSGSimpleTextureNode
+{
+    Q_OBJECT
+
+public:
+    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dShared *shared);
+    ~DeclarativeBarsRenderer();
+
+public slots:
+    void render();
+
+private:
+    QOpenGLFramebufferObject *m_fbo;
+    QSGTexture *m_texture;
+    QQuickWindow *m_window;
+    Bars3dShared *m_barsRenderer;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
 
 #endif

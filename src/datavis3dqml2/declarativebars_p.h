@@ -49,46 +49,48 @@
 //
 // We mean it.
 
-#ifndef SCENERENDERERNODE_P_H
-#define SCENERENDERERNODE_P_H
+#ifndef DECLARATIVEBARS_P_H
+#define DECLARATIVEBARS_P_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-
-#include <QObject>
-#include <qsgsimpletexturenode.h>
-
-class QOpenGLFramebufferObject;
-class QSGTexture;
-class QQuickWindow;
+#include "QtDataVis3D/qdatavis3namespace.h"
+#include <QString>
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class Q3DBars;
-//class Q3DMaps;
+class QDataRow;
 
-// TODO: If we use texture node, our rendering is done into a texture that is then drawn to the
-// qquickwindow -> selection will not work
-// TODO: Check if better ones are available
-class SceneRendererNode : public QObject, public QSGSimpleTextureNode
+class DeclarativeBarsCachedStatePrivate
 {
-    Q_OBJECT
-
 public:
-    SceneRendererNode(QQuickWindow *window);
-    ~SceneRendererNode();
+    explicit DeclarativeBarsCachedStatePrivate();
+    ~DeclarativeBarsCachedStatePrivate();
 
-public slots:
-    void render();
+    bool m_isSampleSpaceSet;
+    int m_cachedState;
+    int m_samplesRow;
+    int m_samplesColumn;
+    QString m_labelRow;
+    QString m_labelColumn;
+    QString m_labelHeight;
 
-private:
-    QOpenGLFramebufferObject *m_fbo;
-    QSGTexture *m_texture;
-    QQuickWindow *m_window;
-    Q3DBars *m_scene;
-    //Q3DMaps *m_scene;
+    QDataRow *m_dataRow;
+
+    bool m_isSelectionModeSet;
+    SelectionMode m_selectionMode;
+
+    bool m_isLabelTransparencySet;
+    LabelTransparency m_labelTransparency;
+
+    bool m_isShadowQualitySet;
+    ShadowQuality m_shadowQuality;
+
+
+    bool m_isGridSet;
+    bool m_isGridEnabled;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
 
-#endif
-
+#endif // DECLARATIVEBARS_P_H

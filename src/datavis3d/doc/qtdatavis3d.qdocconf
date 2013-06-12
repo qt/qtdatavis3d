@@ -1,47 +1,33 @@
 include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
 
-# Name of the project which must match the outputdir. Determines the .index file
-project = qtdatavis3d
+project             = QtDataVis3D
+description         = Qt Data Visualization 3D Reference Documentation
+version             = 1.0.0
 
-# Directories in which to search for files to document and images.
-# By default set to the root directory of the project for sources
-# and headers and qdoc will therefore generate output for each file.
-# Images should be placed in <rootdir>/dic/images and examples in
-# <rootdir>/examples.
-# Paths are relative to the  location of this file.
 exampledirs += ../../../examples \
                snippets
 
 headerdirs += ..
-imagedirs += images
+imagedirs  += ../images \
+              images
 sourcedirs += ..
 
-depends += qtcore qtgui
+depends += qtcore \
+           qtgui
 
-# The following parameters are for creating a qhp file, the qhelpgenerator
-# program can convert the qhp file into a qch file which can be opened in
-# Qt Assistant and/or Qt Creator.
+qhp.projects                    = QtDataVis3D
 
-# Defines the name of the project. You cannot use operators (+, =, -) in
-# the name. Properties for this project are set using a qhp.<projectname>.property
-# format.
-qhp.projects = qtdatavis3d
+qhp.qtdatavis3d.file            = qtdatavis3d.qhp
+qhp.qtdatavis3d.namespace       = org.qt-project.qtdatavis3d.1.0.0
+qhp.qtdatavis3d.virtualFolder   = qtdatavis3d
+qhp.qtdatavis3d.indexTitle      = Qt Data Visualization 3D
+qhp.qtdatavis3d.indexRoot       =
 
-# Sets the name of the output qhp file.
-qhp.qtdatavis3d.file = qtdatavis3d.qhp
-
-# Namespace for the output file. This namespace is used to distinguish between
-# different documentation files in Creator/Assistant.
-qhp.qtdatavis3d.namespace = org.qt-project.qtdatavis3d.501
-
-# Title for the package, will be the main title for the package in
-# Assistant/Creator.
-qhp.qtdatavis3d.indexTitle = Qt Data Visualization 3D
-
-# Only update the name of the project for the next variables.
-qhp.qtdatavis3d.virtualFolder  = qtdatavis3d
-qhp.qtdatavis3d.subprojects = classes
-qhp.qtdatavis3d.subprojects.classes.title = C++ Classes
-qhp.qtdatavis3d.subprojects.classes.indexTitle = Qt Data Visualization 3D C++ Classes
-qhp.qtdatavis3d.subprojects.classes.selectors = class fake:headerfile
-qhp.qtdatavis3d.subprojects.classes.sortPages = true
+qhp.qtdatavis3d.filterAttributes                    = qtdatavis3d 1.0.0 qtrefdoc
+qhp.qtdatavis3d.customFilters.Qt.name               = QtDataVis3D 1.0.0
+qhp.qtdatavis3d.customFilters.Qt.filterAttributes   = qtdatavis3d 1.0.0
+qhp.qtdatavis3d.subprojects                         = classes
+qhp.qtdatavis3d.subprojects.classes.title           = C++ Classes
+qhp.qtdatavis3d.subprojects.classes.indexTitle      = Qt Data Visualization 3D C++ Classes
+qhp.qtdatavis3d.subprojects.classes.selectors       = class fake:headerfile
+qhp.qtdatavis3d.subprojects.classes.sortPages       = true

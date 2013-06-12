@@ -13,20 +13,17 @@ INCLUDEPATH += ../datavis3d/engine
 
 SOURCES += \
     datavis3dqml2_plugin.cpp \
-    datavisview.cpp \
-    scenerenderernode.cpp \
     declarativebars.cpp \
-    declarativemaps.cpp #\
+    declarativemaps.cpp  #\
     #declarativedataitem.cpp \
     #declarativedatarow.cpp \
     #declarativedataset.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
-    datavisview.h \
-    scenerenderernode_p.h \
     declarativebars.h \
-    declarativemaps.h #\
+    declarativemaps.h \  #\
+    declarativebars_p.h
     #declarativedataitem.h \
     #declarativedatarow.h \
     #declarativedataset.h

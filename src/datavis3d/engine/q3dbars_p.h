@@ -52,10 +52,8 @@
 #ifndef Q3DBARS_p_H
 #define Q3DBARS_p_H
 
-#include "qdatavis3dglobal.h"
+#include "bars3dshared_p.h"
 #include "qdatavis3namespace.h"
-#include <QOpenGLFunctions>
-#include <QFont>
 
 class QOpenGLPaintDevice;
 
@@ -65,122 +63,15 @@ class QSizeF;
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
-class QDataItem;
-class QDataRow;
-class QDataSet;
-class ShaderHelper;
-class ObjectHelper;
-class TextureHelper;
-class Theme;
-class Drawer;
 
 class Q3DBarsPrivate : public QObject
 {
 public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
-public:
-    Q3DBarsPrivate(Q3DBars *q);
+    Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle);
     ~Q3DBarsPrivate();
 
-    void loadBarMesh();
-    void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadLabelMesh();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionShader();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
-    void initDepthShader();
-    void initDepthBuffer();
-#endif
-    void updateTextures();
-    void calculateSceneScalingFactors();
-    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
-    SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
-    void handleLimitChange();
-    void closeZoomMode();
-
     Q3DBars *q_ptr;
-
-    QOpenGLPaintDevice *m_paintDevice;
-    ShaderHelper *m_barShader;
-    ShaderHelper *m_depthShader;
-    ShaderHelper *m_selectionShader;
-    ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
-    ObjectHelper *m_backgroundObj;
-    ObjectHelper *m_gridLineObj;
-    ObjectHelper *m_labelObj;
-    QPair<int, int> m_sampleCount;
-    QString m_objFile;
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    GLint m_zoomLevel;
-    GLfloat m_zoomAdjustment;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
-    QSizeF m_barThickness;
-    QSizeF m_barSpacing;
-    GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
-    GLfloat m_rowWidth;
-    GLfloat m_columnDepth;
-    GLfloat m_maxDimension;
-    GLfloat m_scaleX;
-    GLfloat m_scaleZ;
-    GLfloat m_scaleFactor;
-    GLfloat m_maxSceneSize;
-    Theme *m_theme;
-    bool m_isInitialized;
-    SelectionMode m_selectionMode;
-    QDataItem *m_selectedBar;
-    QDataRow *m_zoomSelection;
-    QDataSet *m_dataSet;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
-    QRect m_sceneViewPort;
-    QRect m_zoomViewPort;
-    bool m_zoomActivated;
-    TextureHelper *m_textureHelper;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    Drawer *m_drawer;
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
-    GLuint m_bgrTexture;
-    GLuint m_depthTexture;
-    GLuint m_selectionTexture;
-    GLuint m_depthFrameBuffer;
-    GLuint m_selectionFrameBuffer;
-    GLuint m_selectionDepthBuffer;
-    bool m_updateLabels;
-    bool m_gridEnabled;
-    bool m_bgrEnabled;
-    ShadowQuality m_shadowQuality;
-    GLfloat m_shadowQualityToShader;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    bool m_negativeValues;
+    Bars3dShared *m_shared;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

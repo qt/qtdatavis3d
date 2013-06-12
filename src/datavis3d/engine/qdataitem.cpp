@@ -47,15 +47,46 @@
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QDataItem
+ * \inmodule QtDataVis3D
+ * \brief The QDataItem class provides a container for data to be added to graphs.
+ * \since 1.0.0
+ *
+ * A QDataItem holds data for a single bar in a Q3DMaps or Q3DBars graph.
+ *
+ * \sa QDataRow, QDataSet, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * \a value A float value of the data item.
+ *
+ * \a label A QString label for the item.
+ *
+ * Constructs QDataItem.
+ */
 QDataItem::QDataItem(float value, const QString &label)
     : d_ptr(new QDataItemPrivate(this, value, label))
 {
 }
 
+/*!
+ * Destroys QDataItem.
+ */
 QDataItem::~QDataItem()
 {
 }
 
+/*!
+ * \property QDataItem::label
+ *
+ * \a label A QString label for the data item. Unit, for example.
+ *
+ * \a prepend A flag to indicate if the label is to be prepended or appended to the value.
+ * \c false by default.
+ *
+ * Sets label for the data item.
+ */
 void QDataItem::setLabel(const QString &label, bool prepend)
 {
     d_ptr->m_labelString = label;
@@ -67,11 +98,25 @@ QString QDataItem::label()
     return d_ptr->m_labelString;
 }
 
+/*!
+ * \property QDataItem::value
+ *
+ * \a value A float value for the data item.
+ *
+ * Sets value for the data item.
+ */
 void QDataItem::setValue(float value)
 {
     d_ptr->m_value = value;
 }
 
+/*!
+ * \overload QDataItem::value
+ *
+ * \a value An int value for the data item.
+ *
+ * Sets value for the data item.
+ */
 void QDataItem::setValue(int value)
 {
     d_ptr->m_value = (float)value;
@@ -82,11 +127,25 @@ float QDataItem::value()
     return d_ptr->m_value;
 }
 
+/*!
+ * \property QDataItem::position
+ *
+ * \a position A QPointF position for the data item.
+ *
+ * Sets position for the data item. Has no effect in Q3DBars.
+ */
 void QDataItem::setPosition(const QPointF &position)
 {
     d_ptr->m_position = position;
 }
 
+/*!
+ * \overload QDataItem::position
+ *
+ * \a position A QPoint position for the data item.
+ *
+ * Sets position for the data item. Has no effect in Q3DBars.
+ */
 void QDataItem::setPosition(const QPoint &position)
 {
     d_ptr->m_position = (QPointF)position;

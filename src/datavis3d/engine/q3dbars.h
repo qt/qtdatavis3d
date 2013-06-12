@@ -48,8 +48,6 @@
 
 #include <QFont>
 
-class QOpenGLShaderProgram;
-
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
@@ -68,15 +66,12 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
 
 public:
-    explicit Q3DBars();
+    explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
     ~Q3DBars();
-
-    void initialize();
-    void render();
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    Q_INVOKABLE void addDataRow(const QVector<GLfloat> &dataRow,
+    Q_INVOKABLE void addDataRow(const QVector<float> &dataRow,
                                 const QString &labelRow = QString(),
                                 const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataItems is transferred
@@ -87,7 +82,7 @@ public:
     Q_INVOKABLE void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    Q_INVOKABLE void addDataSet(const QVector< QVector<GLfloat> > &data,
+    Q_INVOKABLE void addDataSet(const QVector< QVector<float> > &data,
                                 const QVector<QString> &labelsRow = QVector<QString>(),
                                 const QVector<QString> &labelsColumn = QVector<QString>());
 
@@ -107,9 +102,6 @@ public:
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
-
-    // override bar type with own mesh
-    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
     Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
@@ -139,6 +131,8 @@ public:
     // important to set if values can be negative.
     Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
+    // override bar type with own mesh
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
@@ -165,6 +159,11 @@ public:
     void setGridEnabled(bool enable);
     bool gridEnabled();
 
+    // TODO: Do these need to be public? Where are they called from?
+    // Size
+    void setWidth(const int width);
+    void setHeight(const int height);
+
     // Enable or disable background mesh
     void setBackgroundEnabled(bool enable);
     bool backgroundEnabled();
@@ -174,6 +173,9 @@ public:
     ShadowQuality shadowQuality();
 
 protected:
+    void initialize();
+    void render();
+
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);

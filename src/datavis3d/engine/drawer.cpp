@@ -68,14 +68,20 @@ Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transpar
     : m_theme(theme),
       m_font(font),
       m_transparency(transparency),
-      m_textureHelper(new TextureHelper())
+      m_textureHelper(0)
 {
-    initializeOpenGLFunctions();
 }
 
 Drawer::~Drawer()
 {
+}
 
+void Drawer::initializeOpenGL()
+{
+    if (!m_textureHelper) {
+        initializeOpenGLFunctions();
+        m_textureHelper = new TextureHelper();
+    }
 }
 
 void Drawer::setTheme(const Theme &theme)
@@ -289,6 +295,8 @@ void Drawer::generateLabelTexture(QDataItem *item)
 
 void Drawer::generateLabelItem(LabelItem *item, const QString &text)
 {
+    initializeOpenGL();
+
     // Delete previous texture, if there is one
     GLuint labelTexture = item->textureId();
     if (labelTexture)

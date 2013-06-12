@@ -52,6 +52,7 @@
 #include "utils_p.h"
 #include "drawer_p.h"
 
+#include <QOpenGLFunctions>
 #include <QMatrix4x4>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
@@ -84,15 +85,39 @@ const GLfloat gridLineWidth = 0.005f;
 GLfloat distanceMod = 0.0f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
+/*!
+ * \class Q3DMaps
+ * \inmodule QtDataVis3D
+ * \brief The Q3DMaps class provides methods for rendering 3D bars on maps or other planes.
+ * \since 1.0.0
+ *
+ * This class enables developers to render bars or objects on maps or other planes in 3D and to
+ * view them by rotating the scene freely. Methods are provided for changing object types, themes
+ * and so on.
+ *
+ * See methods themselves for more complete description.
+ *
+ * \sa Q3DBars, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * Constructs Q3DMaps.
+ */
 Q3DMaps::Q3DMaps()
     : d_ptr(new Q3DMapsPrivate(this))
 {
 }
 
+/*!
+ * Destructs Q3DMaps.
+ */
 Q3DMaps::~Q3DMaps()
 {
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::initialize()
 {
     // Initialize shaders
@@ -184,12 +209,17 @@ void Q3DMaps::initialize()
     // Set initialized -flag
     d_ptr->m_isInitialized = true;
 
+    d_ptr->m_drawer->initializeOpenGL();
+
     // Update default light position
 #ifndef USE_WIDER_SHADOWS
     distanceMod = 1.0f;
 #endif
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::render()
 {
     if (!d_ptr->m_isInitialized)
@@ -218,6 +248,9 @@ void Q3DMaps::render()
     drawScene();
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::drawScene()
 {
     // Set clear color
@@ -922,6 +955,9 @@ void Q3DMaps::drawScene()
 }
 
 #if defined(Q_OS_ANDROID)
+/*!
+ * \internal
+ */
 void Q3DMaps::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!d_ptr->m_zoomActivated) {
@@ -931,6 +967,9 @@ void Q3DMaps::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::touchEvent(QTouchEvent *event)
 {
     static int prevDistance = 0;
@@ -960,6 +999,9 @@ void Q3DMaps::touchEvent(QTouchEvent *event)
 }
 #endif
 
+/*!
+ * \internal
+ */
 void Q3DMaps::mousePressEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
@@ -998,6 +1040,9 @@ void Q3DMaps::mousePressEvent(QMouseEvent *event)
     CameraHelper::updateMousePos(d_ptr->m_mousePos);
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::mouseReleaseEvent(QMouseEvent *event)
 {
     //qDebug() << "mouse button released" << event->button();
@@ -1009,6 +1054,9 @@ void Q3DMaps::mouseReleaseEvent(QMouseEvent *event)
     d_ptr->m_mousePressed = Q3DMapsPrivate::MouseNone;
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::mouseMoveEvent(QMouseEvent *event)
 {
     if (Q3DMapsPrivate::MouseRotating == d_ptr->m_mousePressed) {
@@ -1032,6 +1080,9 @@ void Q3DMaps::mouseMoveEvent(QMouseEvent *event)
 #endif
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::wheelEvent(QWheelEvent *event)
 {
     if (d_ptr->m_zoomLevel > 100)
@@ -1046,6 +1097,9 @@ void Q3DMaps::wheelEvent(QWheelEvent *event)
         d_ptr->m_zoomLevel = 10;
 }
 
+/*!
+ * \internal
+ */
 void Q3DMaps::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
@@ -1580,6 +1634,7 @@ void Q3DMapsPrivate::initSelectionShader()
 void Q3DMapsPrivate::initSelectionBuffer()
 {
     if (m_selectionTexture) {
+
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->deleteTexture(&m_selectionTexture);

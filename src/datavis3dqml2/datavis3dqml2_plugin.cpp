@@ -40,21 +40,21 @@
 ****************************************************************************/
 
 #include "datavis3dqml2_plugin.h"
-#include "datavisview.h"
 
 #include <qqml.h>
-
+#include <QDebug>
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 void Datavis3dqml2Plugin::registerTypes(const char *uri)
 {
+    qDebug() << "Datavis3dqml2Plugin::registerTypes()";
+
     // @uri com.digia.QtDataVis3D
-    qmlRegisterType<DataVisView>(uri, 1, 0, "DataVisView");
-    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps");
     qmlRegisterType<QDataItem>(uri, 1, 0, "DataItem");
     qmlRegisterType<QDataRow>(uri, 1, 0, "DataRow");
     qmlRegisterType<QDataSet>(uri, 1, 0, "DataSet");
+
+    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
 }
 
 //#include "moc_datavis3dqml2_plugin.cpp"
