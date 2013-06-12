@@ -215,48 +215,53 @@ void Bars3dShared::initializeOpenGL()
     if (m_isInitialized)
         return;
 
+    initializeOpenGLFunctions();
+
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
+
+    // Resize in case we've missed resize events
+    resizeNotify();
 
     // Initialize shaders
 #if !defined(QT_OPENGL_ES_2)
     if (m_shadowQuality > ShadowNone) {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
         }
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                     QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                              QStringLiteral(":/shaders/fragmentShadowNoTex"));
         // Init the depth buffer (for shadows)
         initDepthBuffer();
     } else {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragmentColorOnY"));
+                        QStringLiteral(":/shaders/fragmentColorOnY"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragment"));
+                        QStringLiteral(":/shaders/fragment"));
         }
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragment"));
+                              QStringLiteral(":/shaders/fragment"));
     }
 #else
     if (!m_theme->m_uniformColor) {
         initShaders(QStringLiteral(":/shaders/vertexES2"),
-                           QStringLiteral(":/shaders/fragmentColorOnYES2"));
+                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
     } else {
         initShaders(QStringLiteral(":/shaders/vertexES2"),
-                           QStringLiteral(":/shaders/fragmentES2"));
+                    QStringLiteral(":/shaders/fragmentES2"));
     }
     initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
-                                 QStringLiteral(":/shaders/fragmentES2"));
+                          QStringLiteral(":/shaders/fragmentES2"));
 #endif
 
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
-                            QStringLiteral(":/shaders/fragmentLabel"));
+                     QStringLiteral(":/shaders/fragmentLabel"));
 
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
@@ -419,12 +424,12 @@ void Bars3dShared::drawZoomScene()
             m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
+                                         itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
             m_barShader->setUniformValue(m_barShader->color(), barColor);
             m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
             m_barShader->setUniformValue(m_barShader->ambientS(),
-                                                m_theme->m_ambientStrength);
+                                         m_theme->m_ambientStrength);
 
             // Draw the object
             m_drawer->drawObject(m_barShader, m_barObj);
@@ -453,42 +458,42 @@ void Bars3dShared::drawZoomScene()
     LabelItem zoomSelectionLabel = m_zoomSelection->d_ptr->labelItem();
     if (ModeZoomRow == m_selectionMode) {
         m_drawer->drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, false, false, LabelTop);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, false, false, LabelTop);
         m_drawer->drawLabel(*dummyItem, z, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, false, false, LabelBottom);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, false, false, LabelBottom);
     } else {
         m_drawer->drawLabel(*dummyItem, x, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, false, false, LabelBottom);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, false, false, LabelBottom);
         m_drawer->drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, false, false, LabelTop);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, false, false, LabelTop);
     }
     m_drawer->drawLabel(*dummyItem, y, viewMatrix, projectionMatrix,
-                               QVector3D(0.0f, m_yAdjustment, zComp),
-                               QVector3D(0.0f, 0.0f, 90.0f), m_heightNormalizer,
-                               m_selectionMode, m_labelShader,
-                               m_labelObj, false, false, LabelLeft);
+                        QVector3D(0.0f, m_yAdjustment, zComp),
+                        QVector3D(0.0f, 0.0f, 90.0f), m_heightNormalizer,
+                        m_selectionMode, m_labelShader,
+                        m_labelObj, false, false, LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < m_zoomSelection->d_ptr->row().size(); col++) {
         QDataItem *item = m_zoomSelection->d_ptr->getItem(col);
         // Draw values
         m_drawer->drawLabel(*item, item->d_ptr->label(), viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj);
         // Draw labels
         LabelItem labelItem;
         if (ModeZoomRow == m_selectionMode) {
@@ -513,10 +518,10 @@ void Bars3dShared::drawZoomScene()
             }
         }
         m_drawer->drawLabel(*item, labelItem, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, -45.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, false, false, LabelBelow);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, -45.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, false, false, LabelBelow);
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -722,7 +727,7 @@ void Bars3dShared::drawScene()
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj,
-                                    m_depthTexture);
+                             m_depthTexture);
         glDisable(GL_TEXTURE_2D);
         m_labelShader->release();
 #endif
@@ -779,20 +784,20 @@ void Bars3dShared::drawScene()
 
                 // TODO: Save position to qdataitem, so that we don't need to calculate it each time?
 
-//#if !defined(QT_OPENGL_ES_2)
-//                QVector3D barColor = QVector3D((GLdouble)row / 32767.0,
-//                                               (GLdouble)bar / 32767.0,
-//                                               0.0);
-//#else
+                //#if !defined(QT_OPENGL_ES_2)
+                //                QVector3D barColor = QVector3D((GLdouble)row / 32767.0,
+                //                                               (GLdouble)bar / 32767.0,
+                //                                               0.0);
+                //#else
                 QVector3D barColor = QVector3D((GLdouble)row / 255.0,
                                                (GLdouble)bar / 255.0,
                                                0.0);
-//#endif
+                //#endif
 
                 m_selectionShader->setUniformValue(m_selectionShader->MVP(),
-                                                          MVPMatrix);
+                                                   MVPMatrix);
                 m_selectionShader->setUniformValue(m_selectionShader->color(),
-                                                          barColor);
+                                                   barColor);
 
 #ifdef USE_HAX0R_SELECTION
                 // 1st attribute buffer : vertices
@@ -862,7 +867,7 @@ void Bars3dShared::drawScene()
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj,
-                                    m_selectionTexture);
+                             m_selectionTexture);
         glDisable(GL_TEXTURE_2D);
         m_labelShader->release();
 #endif
@@ -931,7 +936,7 @@ void Bars3dShared::drawScene()
             GLfloat lightStrength = m_theme->m_lightStrength;
             if (m_selectionMode > ModeNone) {
                 Bars3dShared::SelectionType selectionType = isSelected(row, bar,
-                                                                                selection);
+                                                                       selection);
                 switch (selectionType) {
                 case Bars3dShared::SelectionBar: {
                     barColor = Utils::vectorFromColor(m_theme->m_highlightBarColor);
@@ -1002,31 +1007,31 @@ void Bars3dShared::drawScene()
                 m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
                 m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
                 m_barShader->setUniformValue(m_barShader->nModel(),
-                                                    itModelMatrix.transposed().inverted());
+                                             itModelMatrix.transposed().inverted());
                 m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
                 m_barShader->setUniformValue(m_barShader->color(), barColor);
                 m_barShader->setUniformValue(m_barShader->ambientS(),
-                                                    m_theme->m_ambientStrength);
+                                             m_theme->m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_shadowQuality > ShadowNone) {
                     // Set shadow shader bindings
                     m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                                        m_shadowQualityToShader);
+                                                 m_shadowQualityToShader);
                     m_barShader->setUniformValue(m_barShader->depth(),
-                                                        depthMVPMatrix);
+                                                 depthMVPMatrix);
                     m_barShader->setUniformValue(m_barShader->lightS(),
-                                                        lightStrength / 10.0f);
+                                                 lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(m_barShader, m_barObj,
-                                                0, m_depthTexture);
+                                         0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
                     m_barShader->setUniformValue(m_barShader->lightS(),
-                                                        lightStrength);
+                                                 lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_barShader, m_barObj);
@@ -1073,39 +1078,39 @@ void Bars3dShared::drawScene()
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(),
-                                                   lightPos);
+                                            lightPos);
         m_backgroundShader->setUniformValue(m_backgroundShader->view(),
-                                                   viewMatrix);
+                                            viewMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->model(),
-                                                   modelMatrix);
+                                            modelMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                                   itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(),
-                                                   MVPMatrix);
+                                            MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(),
-                                                   backgroundColor);
+                                            backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                                   m_theme->m_ambientStrength * 2.0f);
+                                            m_theme->m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_shadowQuality > ShadowNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
-                                                       m_shadowQualityToShader);
+                                                m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(),
-                                                       depthMVPMatrix);
+                                                depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                       m_theme->m_lightStrength / 10.0f);
+                                                m_theme->m_lightStrength / 10.0f);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj,
-                                        0, m_depthTexture);
+                                 0, m_depthTexture);
         } else
 #endif
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                       m_theme->m_lightStrength);
+                                                m_theme->m_lightStrength);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
@@ -1135,7 +1140,7 @@ void Bars3dShared::drawScene()
         m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
         m_barShader->setUniformValue(m_barShader->color(), barColor);
         m_barShader->setUniformValue(m_barShader->ambientS(),
-                                            m_theme->m_ambientStrength);
+                                     m_theme->m_ambientStrength);
 
         // Floor lines: rows
         for (GLfloat row = 0.0f; row <= m_sampleCount.second; row++) {
@@ -1161,28 +1166,28 @@ void Bars3dShared::drawScene()
             // Set the rest of the shader bindings
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
+                                         itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                                    m_shadowQualityToShader);
+                                             m_shadowQualityToShader);
                 m_barShader->setUniformValue(m_barShader->depth(),
-                                                    depthMVPMatrix);
+                                             depthMVPMatrix);
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength / 10.0f);
+                                             m_theme->m_lightStrength / 10.0f);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj,
-                                            0, m_depthTexture);
+                                     0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength);
+                                             m_theme->m_lightStrength);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj);
@@ -1214,28 +1219,28 @@ void Bars3dShared::drawScene()
             // Set the rest of the shader bindings
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
+                                         itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                                    m_shadowQualityToShader);
+                                             m_shadowQualityToShader);
                 m_barShader->setUniformValue(m_barShader->depth(),
-                                                    depthMVPMatrix);
+                                             depthMVPMatrix);
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength / 10.0f);
+                                             m_theme->m_lightStrength / 10.0f);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj,
-                                            0, m_depthTexture);
+                                     0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength);
+                                             m_theme->m_lightStrength);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj);
@@ -1283,28 +1288,28 @@ void Bars3dShared::drawScene()
             // Set the rest of the shader bindings
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
+                                         itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                                    m_shadowQualityToShader);
+                                             m_shadowQualityToShader);
                 m_barShader->setUniformValue(m_barShader->depth(),
-                                                    depthMVPMatrix);
+                                             depthMVPMatrix);
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength / 10.0f);
+                                             m_theme->m_lightStrength / 10.0f);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj,
-                                            0, m_depthTexture);
+                                     0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength);
+                                             m_theme->m_lightStrength);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj);
@@ -1341,28 +1346,28 @@ void Bars3dShared::drawScene()
             // Set the rest of the shader bindings
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
+                                         itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
                 m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                                    m_shadowQualityToShader);
+                                             m_shadowQualityToShader);
                 m_barShader->setUniformValue(m_barShader->depth(),
-                                                    depthMVPMatrix);
+                                             depthMVPMatrix);
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength / 10.0f);
+                                             m_theme->m_lightStrength / 10.0f);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj,
-                                            0, m_depthTexture);
+                                     0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
                 m_barShader->setUniformValue(m_barShader->lightS(),
-                                                    m_theme->m_lightStrength);
+                                             m_theme->m_lightStrength);
 
                 // Draw the object
                 m_drawer->drawObject(m_barShader, m_gridLineObj);
@@ -1421,11 +1426,11 @@ void Bars3dShared::drawScene()
         }
 
         m_drawer->drawLabel(*m_selectedBar, m_selectedBar->label(),
-                                   viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, true);
+                            viewMatrix, projectionMatrix,
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, true);
 #else
         static bool firstSelection = true;
         // Draw the value string followed by row label and column label
@@ -1452,10 +1457,10 @@ void Bars3dShared::drawScene()
         }
 
         m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
-                                   m_selectionMode, m_labelShader,
-                                   m_labelObj, true, false);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            m_selectionMode, m_labelShader,
+                            m_labelObj, true, false);
 #endif
         glDisable(GL_TEXTURE_2D);
         if (m_labelTransparency > TransparencyNone)
@@ -1520,11 +1525,11 @@ void Bars3dShared::drawScene()
         //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_dataSet->d_ptr->rowLabels().at(row);
 
         m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(rotLabelX, rotLabelY, rotLabelZ),
-                                   m_heightNormalizer, m_selectionMode,
-                                   m_labelShader, m_labelObj, true, true, LabelMid,
-                                   alignment);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                            m_heightNormalizer, m_selectionMode,
+                            m_labelShader, m_labelObj, true, true, LabelMid,
+                            alignment);
 
         delete label;
     }
@@ -1569,11 +1574,11 @@ void Bars3dShared::drawScene()
         //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << m_dataSet->d_ptr->columnLabels().at(bar);
 
         m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
-                                   QVector3D(0.0f, m_yAdjustment, zComp),
-                                   QVector3D(rotLabelX, rotLabelY, rotLabelZ),
-                                   m_heightNormalizer, m_selectionMode,
-                                   m_labelShader, m_labelObj, true, true, LabelMid,
-                                   alignment);
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                            m_heightNormalizer, m_selectionMode,
+                            m_labelShader, m_labelObj, true, true, LabelMid,
+                            alignment);
 
         delete label;
     }
@@ -1694,6 +1699,7 @@ void Bars3dShared::wheelEvent(QWheelEvent *event)
 void Bars3dShared::resizeNotify()
 {
     qDebug() << "Bars3dShared::resizeEvent " << width() << "x" <<height();
+
     // Set view port
     if (m_zoomActivated)
         m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
@@ -1771,7 +1777,7 @@ void Bars3dShared::setMeshFileName(const QString &objFileName)
 }
 
 void Bars3dShared::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                               const QString &labelColumn, const QString &labelHeight)
+                                    const QString &labelColumn, const QString &labelHeight)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     closeZoomMode();
@@ -1815,32 +1821,33 @@ void Bars3dShared::setTheme(ColorTheme theme)
     if (m_shadowQuality > ShadowNone) {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
         }
     } else {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragmentColorOnY"));
+                        QStringLiteral(":/shaders/fragmentColorOnY"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertex"),
-                               QStringLiteral(":/shaders/fragment"));
+                        QStringLiteral(":/shaders/fragment"));
         }
     }
 #else
     if (!m_theme->m_uniformColor) {
         initShaders(QStringLiteral(":/shaders/vertexES2"),
-                           QStringLiteral(":/shaders/fragmentColorOnYES2"));
+                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
     } else {
         initShaders(QStringLiteral(":/shaders/vertexES2"),
-                           QStringLiteral(":/shaders/fragmentES2"));
+                    QStringLiteral(":/shaders/fragmentES2"));
     }
 #endif
 }
 
-void Bars3dShared::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+void Bars3dShared::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                               bool uniform)
 {
     m_theme->m_baseColor = baseColor;
     m_theme->m_heightColor = heightColor;
@@ -1851,27 +1858,27 @@ void Bars3dShared::setBarColor(QColor baseColor, QColor heightColor, QColor dept
         if (m_shadowQuality > ShadowNone) {
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                            QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
             } else {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                            QStringLiteral(":/shaders/fragmentShadowNoTex"));
             }
         } else {
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragmentColorOnY"));
+                            QStringLiteral(":/shaders/fragmentColorOnY"));
             } else {
                 initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragment"));
+                            QStringLiteral(":/shaders/fragment"));
             }
         }
 #else
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
+                        QStringLiteral(":/shaders/fragmentColorOnYES2"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentES2"));
+                        QStringLiteral(":/shaders/fragmentES2"));
         }
 #endif
     }
@@ -1975,35 +1982,35 @@ void Bars3dShared::setShadowQuality(ShadowQuality quality)
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                            QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
             } else {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                            QStringLiteral(":/shaders/fragmentShadowNoTex"));
             }
             initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                         QStringLiteral(":/shaders/fragmentShadowNoTex"));
+                                  QStringLiteral(":/shaders/fragmentShadowNoTex"));
         } else {
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragmentColorOnY"));
+                            QStringLiteral(":/shaders/fragmentColorOnY"));
             } else {
                 initShaders(QStringLiteral(":/shaders/vertex"),
-                                   QStringLiteral(":/shaders/fragment"));
+                            QStringLiteral(":/shaders/fragment"));
             }
             initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                                         QStringLiteral(":/shaders/fragment"));
+                                  QStringLiteral(":/shaders/fragment"));
         }
 #else
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentColorOnYES2"));
+                        QStringLiteral(":/shaders/fragmentColorOnYES2"));
         } else {
             initShaders(QStringLiteral(":/shaders/vertexES2"),
-                               QStringLiteral(":/shaders/fragmentES2"));
+                        QStringLiteral(":/shaders/fragmentES2"));
         }
         initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
-                                     QStringLiteral(":/shaders/fragmentES2"));
+                              QStringLiteral(":/shaders/fragmentES2"));
 #endif
     }
 }
@@ -2024,7 +2031,7 @@ void Bars3dShared::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 }
 
 void Bars3dShared::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+                              const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2034,12 +2041,12 @@ void Bars3dShared::addDataRow(const QVector<float> &dataRow, const QString &labe
     m_dataSet->addRow(row);
     handleLimitChange();
     m_dataSet->setLabels(m_axisLabelX, m_axisLabelZ, m_axisLabelY,
-                                QVector<QString>(), labelsColumn);
+                         QVector<QString>(), labelsColumn);
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
 void Bars3dShared::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+                              const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2049,7 +2056,7 @@ void Bars3dShared::addDataRow(const QVector<QDataItem*> &dataRow, const QString 
     m_dataSet->addRow(row);
     handleLimitChange();
     m_dataSet->setLabels(m_axisLabelX, m_axisLabelZ, m_axisLabelY,
-                                QVector<QString>(), labelsColumn);
+                         QVector<QString>(), labelsColumn);
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
@@ -2066,8 +2073,9 @@ void Bars3dShared::addDataRow(QDataRow *dataRow)
     handleLimitChange();
 }
 
-void Bars3dShared::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+void Bars3dShared::addDataSet(const QVector< QVector<float> > &data,
+                              const QVector<QString> &labelsRow,
+                              const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2100,8 +2108,8 @@ void Bars3dShared::addDataSet(const QVector< QVector<float> > &data, const QVect
 }
 
 void Bars3dShared::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                         const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+                              const QVector<QString> &labelsRow,
+                              const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2165,7 +2173,7 @@ void Bars3dShared::setBoundingRect(const QRect boundingRect)
 
 void Bars3dShared::setWidth(const int width)
 {
-    m_boundingRect.setWidth( width );
+    m_boundingRect.setWidth(width);
 }
 
 int Bars3dShared::width()
@@ -2175,7 +2183,7 @@ int Bars3dShared::width()
 
 void Bars3dShared::setHeight(const int height)
 {
-    m_boundingRect.setHeight( height );
+    m_boundingRect.setHeight(height);
 }
 
 int Bars3dShared::height()
@@ -2298,7 +2306,7 @@ void Bars3dShared::initDepthBuffer()
 #endif
 
 void Bars3dShared::initBackgroundShaders(const QString &vertexShader,
-                                           const QString &fragmentShader)
+                                         const QString &fragmentShader)
 {
     if (m_backgroundShader)
         delete m_backgroundShader;
@@ -2343,7 +2351,7 @@ void Bars3dShared::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limi
 }
 
 Bars3dShared::SelectionType Bars3dShared::isSelected(GLint row, GLint bar,
-                                                         const QVector3D &selection)
+                                                     const QVector3D &selection)
 {
     //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = SelectionNone;
@@ -2354,11 +2362,11 @@ Bars3dShared::SelectionType Bars3dShared::isSelected(GLint row, GLint bar,
 #endif
         return isSelectedType; // skip window
 
-//#if !defined(QT_OPENGL_ES_2)
-//    QVector3D current = QVector3D((GLuint)row, (GLuint)bar, 0);
-//#else
+    //#if !defined(QT_OPENGL_ES_2)
+    //    QVector3D current = QVector3D((GLuint)row, (GLuint)bar, 0);
+    //#else
     QVector3D current = QVector3D((GLubyte)row, (GLubyte)bar, 0);
-//#endif
+    //#endif
 
     // TODO: For debugging
     //if (selection != prevSel) {

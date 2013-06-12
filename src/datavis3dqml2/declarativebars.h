@@ -45,7 +45,6 @@
 #include "bars3dshared_p.h"
 #include "qdatavis3dglobal.h"
 #include "qdatavis3namespace.h"
-#include "q3dbarsshared.h"
 #include "declarativebars_p.h"
 
 #include <qsgsimpletexturenode.h>
@@ -57,8 +56,6 @@ class QSGTexture;
 class QQuickWindow;
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
-
-
 
 class DeclarativeBars : public QQuickItem
 {

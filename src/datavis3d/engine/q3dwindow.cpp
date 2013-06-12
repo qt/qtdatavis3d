@@ -52,6 +52,24 @@
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class Q3DWindow
+ * \inmodule QtDataVis3D
+ * \brief The Q3DWindow class provides a window and render loop.
+ * \since 1.0.0
+ *
+ * This class creates a QWindow and provides render loop for visualization types inheriting it.
+ * \warning This class is not intended to be used directly by developers.
+ *
+ * \sa Q3DBars, Q3DMaps, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * \a parent A QWindow parent.
+ *
+ * Constructs Q3DWindow. It creates a QWindow and an OpenGL context. It also sets surface
+ * format and initializes OpenGL functions for use.
+ */
 Q3DWindow::Q3DWindow(QWindow *parent)
     : QWindow(parent),
       d_ptr(new Q3DWindowPrivate(this))
@@ -80,13 +98,19 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     initialize();
 }
 
+/*!
+ * Destroys Q3DWindow.
+ */
 Q3DWindow::~Q3DWindow()
 {
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::initialize()
 {
-    const GLubyte* version = glGetString(GL_VERSION);
+    const GLubyte *version = glGetString(GL_VERSION);
     qDebug() << "OpenGL version:" << (const char *)version;
     version = glGetString(GL_SHADING_LANGUAGE_VERSION);
     qDebug() << "GLSL version:" << (const char *)version;
@@ -99,10 +123,16 @@ void Q3DWindow::initialize()
     setAnimating(true);
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::render()
 {
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::renderLater()
 {
     if (!d_ptr->m_updatePending) {
@@ -111,6 +141,9 @@ void Q3DWindow::renderLater()
     }
 }
 
+/*!
+ * \internal
+ */
 bool Q3DWindow::event(QEvent *event)
 {
     switch (event->type()) {
@@ -122,6 +155,9 @@ bool Q3DWindow::event(QEvent *event)
     }
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::exposeEvent(QExposeEvent *event)
 {
     Q_UNUSED(event);
@@ -130,6 +166,9 @@ void Q3DWindow::exposeEvent(QExposeEvent *event)
         renderNow();
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::renderNow()
 {
     if (!isExposed())
@@ -154,6 +193,9 @@ void Q3DWindow::renderNow()
         renderLater();
 }
 
+/*!
+ * \internal
+ */
 void Q3DWindow::setAnimating(bool animating)
 {
     d_ptr->m_animating = animating;

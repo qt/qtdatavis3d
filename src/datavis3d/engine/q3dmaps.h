@@ -80,10 +80,6 @@ public:
     explicit Q3DMaps();
     ~Q3DMaps();
 
-    void initialize();
-    void render();
-    void render(QPainter *painter);
-
     // Add data item. New data item is appended to old data.
     // ownership of data is transferred
     Q_INVOKABLE bool addDataItem(QDataItem *dataItem);
@@ -159,6 +155,9 @@ public:
     ShadowQuality shadowQuality();
 
 protected:
+    void initialize();
+    void render();
+
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);

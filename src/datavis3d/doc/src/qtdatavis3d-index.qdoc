@@ -1,0 +1,68 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+** Contact: http://www.qt-project.org/legal
+**
+** This file is part of the documentation of the QtDataVis3D module.
+**
+** $QT_BEGIN_LICENSE:FDL$
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.  For licensing terms and
+** conditions see http://qt.digia.com/licensing.  For further information
+** use the contact form at http://qt.digia.com/contact-us.
+**
+** GNU Free Documentation License Usage
+** Alternatively, this file may be used under the terms of the GNU Free
+** Documentation License version 1.3 as published by the Free Software
+** Foundation and appearing in the file included in the packaging of
+** this file.  Please review the following information to ensure
+** the GNU Free Documentation License version 1.3 requirements
+** will be met: http://www.gnu.org/copyleft/fdl.html.
+** $QT_END_LICENSE$
+**
+****************************************************************************/
+
+/*!
+    \title Qt Data Visualization 3D
+    \page qtdatavis3d-index.html
+    \brief QtDataVis3D module provides functionality for 3D visualization.
+
+    Qt Data Visualization module provides a way to visualize data in 3D.
+    It uses OpneGL for the data rendering.
+
+    \section1 Getting Started
+
+    Qt Data Visualization provides classes for rendering 3D data. To include
+    the definitions of the module's classes, use the following directive:
+
+    \snippet doc_src_qtdatavis3d.cpp 0
+
+    To link against the module, add this line to your \l qmake \c
+    .pro file:
+
+    \snippet doc_src_qtdatavis3d.pro 0
+
+    \section1 Articles
+    \list
+    \li \l{Qt Data Visualization 3D License Information}{License Information}
+    \endlist
+
+    \section1 References
+    \list
+        \li \l{Qt Data Visualization 3D C++ Classes}
+    \endlist
+
+    Qt Data Visualization 3D comes with the following examples:
+
+    \list
+        \li \l{Barchart Example}
+        \li \l{Mapdata Example}
+        \li \l{Qt Quick 2 Barchart Example}
+        \li \l{Rainfall Example}
+        \li \l{Spectrum Example}
+        \li \l{Widget Example}
+    \endlist
+*/

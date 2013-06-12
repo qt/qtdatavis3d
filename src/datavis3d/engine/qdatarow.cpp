@@ -48,15 +48,44 @@
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QDataRow
+ * \inmodule QtDataVis3D
+ * \brief The QDataRow class provides a container for data items to be added to graphs.
+ * \since 1.0.0
+ *
+ * A QDataRow is a container for all data to be added to a Q3DMaps instance, or a single row to
+ * be added to a QDataSet. It holds instances of QDataItem and has no knowledge of possible
+ * sample space sizes set for a Q3DBars instance. The ownership of QDataItem added is transferred
+ * to QDataRow.
+ *
+ * \sa QDataItem, QDataSet, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * \a label A QString label for the row.
+ *
+ * Constructs QDataRow.
+ */
 QDataRow::QDataRow(const QString &label)
     : d_ptr(new QDataRowPrivate(this, label))
 {
 }
 
+/*!
+ * Destroys QDataRow and all instances of QDataItem it may hold.
+ */
 QDataRow::~QDataRow()
 {
 }
 
+/*!
+ * \property QDataRow::label
+ *
+ * \a label A QString label for the row.
+ *
+ * Sets a label for the row.
+ */
 void QDataRow::setLabel(const QString &label)
 {
     d_ptr->m_label = label;
@@ -67,6 +96,11 @@ QString QDataRow::label()
     return d_ptr->m_label;
 }
 
+/*!
+ * \a item A QDataItem instance.
+ *
+ * Adds a QDataItem to the QDataRow. Ownership of QDataItem is transferred to QDataRow.
+ */
 void QDataRow::addItem(QDataItem *item)
 {
     d_ptr->m_row.prepend(item);

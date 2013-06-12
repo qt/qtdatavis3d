@@ -53,17 +53,47 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 const QString empty;
 
+/*!
+ * \class QDataSet
+ * \inmodule QtDataVis3D
+ * \brief The QDataSet class provides a container for data rows to be added to graphs.
+ * \since 1.0.0
+ *
+ * A QDataSet is a container for data to be added into a Q3DBars instance. It holds instances of
+ * QDataRow and has no knowledge of sample space size set for Q3DBars. The ownership of QDataRow
+ * added is transferred to QDataSet.
+ *
+ * \sa QDataItem, QDataRow, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * Constructs QDataSet.
+ */
 QDataSet::QDataSet()
     : d_ptr(new QDataSetPrivate(this))
 {
-    //qDebug("QDataSet");
 }
 
+/*!
+ * Destroys QDataSet, including all QDataRow instances it may hold.
+ */
 QDataSet::~QDataSet()
 {
-    //qDebug("~QDataSet");
 }
 
+/*!
+ * \a xAxis A QString label for x axis.
+ *
+ * \a zAxis A QString label for z axis.
+ *
+ * \a yAxis A QString label for y axis.
+ *
+ * \a labelsRow A QVector of QStrings, one for each row.
+ *
+ * \a labelsColumn A QVector of QStrings, one for each column.
+ *
+ * Sets labels for the QDataSet.
+ */
 void QDataSet::setLabels(const QString &xAxis,
                          const QString &zAxis,
                          const QString &yAxis,
@@ -106,6 +136,12 @@ void QDataSet::setLabels(const QString &xAxis,
     }
 }
 
+/*!
+ * \a row A QDataRow instance.
+ *
+ * Adds a QDataRow instance to QDataSet. Ownership of the QDataRow instance is transferred to
+ * QDataSet.
+ */
 void QDataSet::addRow(QDataRow *row)
 {
     d_ptr->m_set.prepend(row);

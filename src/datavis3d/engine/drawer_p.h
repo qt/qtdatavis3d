@@ -66,7 +66,7 @@ class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
 
-class Drawer : public QObject
+class Drawer : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
 

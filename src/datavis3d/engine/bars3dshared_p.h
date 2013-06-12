@@ -80,7 +80,7 @@ class Drawer;
 class LabelItem;
 class Bars3dSharedPrivate;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT Bars3dShared : public QObject
+class QTENTERPRISE_DATAVIS3D_EXPORT Bars3dShared : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
 

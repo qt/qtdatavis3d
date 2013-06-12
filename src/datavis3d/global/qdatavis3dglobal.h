@@ -18,8 +18,8 @@
 **
 ****************************************************************************/
 
-#ifndef QVIS3DGLOBAL_H
-#define QVIS3DGLOBAL_H
+#ifndef QDATAVIS3DGLOBAL_H
+#define QDATAVIS3DGLOBAL_H
 
 #include <qglobal.h>
 

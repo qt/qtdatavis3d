@@ -60,16 +60,10 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
-
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
     Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
-
-protected:
-
-    void initialize();
-    void render();
 
 public:
     explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
@@ -77,7 +71,7 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    Q_INVOKABLE void addDataRow(const QVector<GLfloat> &dataRow,
+    Q_INVOKABLE void addDataRow(const QVector<float> &dataRow,
                                 const QString &labelRow = QString(),
                                 const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataItems is transferred
@@ -88,7 +82,7 @@ public:
     Q_INVOKABLE void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    Q_INVOKABLE void addDataSet(const QVector< QVector<GLfloat> > &data,
+    Q_INVOKABLE void addDataSet(const QVector< QVector<float> > &data,
                                 const QVector<QString> &labelsRow = QVector<QString>(),
                                 const QVector<QString> &labelsColumn = QVector<QString>());
 
@@ -165,6 +159,7 @@ public:
     void setGridEnabled(bool enable);
     bool gridEnabled();
 
+    // TODO: Do these need to be public? Where are they called from?
     // Size
     void setWidth(const int width);
     void setHeight(const int height);
@@ -178,6 +173,9 @@ public:
     ShadowQuality shadowQuality();
 
 protected:
+    void initialize();
+    void render();
+
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);

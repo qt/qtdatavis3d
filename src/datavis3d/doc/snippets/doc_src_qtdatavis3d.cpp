@@ -39,58 +39,6 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the Qt API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef THEME_P_H
-#define THEME_P_H
-
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
-#include "q3dbars.h"
-
-class QColor;
-
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
-
-class Theme
-{
-public:
-    explicit Theme();
-    ~Theme();
-
-    void useTheme(ColorTheme theme);
-
-private:
-    friend class Bars3dShared;
-    friend class Q3DMaps;
-    friend class Q3DMapsPrivate;
-    friend class Drawer;
-
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-};
-
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-
-#endif
+//! [0]
+#include <QtDataVis3D>
+//! [0]
