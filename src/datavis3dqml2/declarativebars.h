@@ -71,7 +71,7 @@ class DeclarativeBars : public QQuickItem
     Q_ENUMS(LabelTransparency)
 
 protected:
-    Bars3dShared *m_shared;
+    Bars3dRenderer *m_shared;
     DeclarativeBarsCachedStatePrivate *m_cachedState;
 
 public:
@@ -214,7 +214,7 @@ class DeclarativeBarsRenderer : public QObject, public QSGSimpleTextureNode
     Q_OBJECT
 
 public:
-    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dShared *shared);
+    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dRenderer *shared);
     ~DeclarativeBarsRenderer();
 
 public slots:
@@ -224,7 +224,7 @@ private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    Bars3dShared *m_barsRenderer;
+    Bars3dRenderer *m_barsRenderer;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

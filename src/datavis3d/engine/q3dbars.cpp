@@ -321,8 +321,7 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
     d_ptr->m_shared->setWidth(width());
     d_ptr->m_shared->setHeight(height());
-    if (d_ptr->m_shared->m_isInitialized)
-        d_ptr->m_shared->resizeNotify();
+    d_ptr->m_shared->resizeNotify();
 }
 
 // TODO: Document
@@ -712,7 +711,7 @@ void Q3DBars::addDataSet(QDataSet *dataSet)
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle)
     : q_ptr(q),
-      m_shared(new Bars3dShared(rect, fbohandle))
+      m_shared(new Bars3dRenderer(rect, fbohandle))
 {
 }
 

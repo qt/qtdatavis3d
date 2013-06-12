@@ -67,7 +67,7 @@ public:
 
 private:
     QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dShared;
+    friend class Bars3dRenderer;
     friend class Q3DMaps;
     friend class Q3DMapsPrivate;
     friend class QDataSetPrivate;

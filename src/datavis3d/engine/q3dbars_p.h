@@ -71,7 +71,7 @@ public:
     ~Q3DBarsPrivate();
 
     Q3DBars *q_ptr;
-    Bars3dShared *m_shared;
+    Bars3dRenderer *m_shared;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE

@@ -78,9 +78,15 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class LabelItem;
-class Bars3dSharedPrivate;
+class Bars3dRenderer;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT Bars3dShared : public QObject, public QOpenGLFunctions
+class Bars3dModel : public QObject
+{
+    Q_OBJECT
+
+};
+
+class QTENTERPRISE_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -101,8 +107,49 @@ public:
         MouseOnPinch
     };
 
+    // TODO: Filter to the set of attributes to be moved to the model object.
+    // * All GL rendering only related attribs should be moved out of this public set.
+    // * All attribs that are modifiable from QML need to e in this set.
+
+    // Interaction related parameters
+    MousePressType m_mousePressed;
+    QPoint m_mousePos;
+    SelectionMode m_selectionMode;
+
+    // Visual parameters
     QRect m_boundingRect;
+    QString m_objFile;
+    Theme *m_theme;
+    LabelTransparency m_labelTransparency;
+    QFont m_font;
+    bool m_gridEnabled;
+    bool m_bgrEnabled;
+    ShadowQuality m_shadowQuality;
+
+    // Data parameters
+    QPair<int, int> m_sampleCount;
+    QDataItem *m_selectedBar;
+    QDataSet *m_dataSet;
+    QString m_axisLabelX;
+    QString m_axisLabelZ;
+    QString m_axisLabelY;
+    QDataRow *m_zoomSelection;
+    GLint m_tickCount;
+    GLfloat m_tickStep;
+    bool m_negativeValues;
+
+private:
+
+    // Internal attributes purely related to how the scene is drawn with GL.
+    bool m_xFlipped;
+    bool m_zFlipped;
+    bool m_yFlipped;
+    QRect m_sceneViewPort;
+    QRect m_zoomViewPort;
+    bool m_zoomActivated;
     QOpenGLPaintDevice *m_paintDevice;
+    bool m_updateLabels;
+    bool m_isInitialized;
     ShaderHelper *m_barShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
@@ -112,10 +159,16 @@ public:
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
-    QPair<int, int> m_sampleCount;
-    QString m_objFile;
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
+    TextureHelper *m_textureHelper;
+    Drawer *m_drawer;
+    GLuint m_bgrTexture;
+    GLuint m_depthTexture;
+    GLuint m_selectionTexture;
+    GLuint m_depthFrameBuffer;
+    GLuint m_selectionFrameBuffer;
+    GLuint m_selectionDepthBuffer;
+    GLfloat m_shadowQualityToShader;
+    GLuint m_fbohandle;
     GLint m_zoomLevel;
     GLfloat m_zoomAdjustment;
     GLfloat m_horizontalRotation;
@@ -131,45 +184,10 @@ public:
     GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
-    Theme *m_theme;
-    bool m_isInitialized;
-    SelectionMode m_selectionMode;
-    QDataItem *m_selectedBar;
-    QDataRow *m_zoomSelection;
-    QDataSet *m_dataSet;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
-    QRect m_sceneViewPort;
-    QRect m_zoomViewPort;
-    bool m_zoomActivated;
-    TextureHelper *m_textureHelper;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    Drawer *m_drawer;
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
-    GLuint m_bgrTexture;
-    GLuint m_depthTexture;
-    GLuint m_selectionTexture;
-    GLuint m_depthFrameBuffer;
-    GLuint m_selectionFrameBuffer;
-    GLuint m_selectionDepthBuffer;
-    bool m_updateLabels;
-    bool m_gridEnabled;
-    bool m_bgrEnabled;
-    ShadowQuality m_shadowQuality;
-    GLfloat m_shadowQualityToShader;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    bool m_negativeValues;
-    GLuint m_fbohandle;
-    QSize m_size;
 
 public:
-    explicit Bars3dShared(QRect rect, GLuint fbohandle=0);
-    ~Bars3dShared();
+    explicit Bars3dRenderer(QRect rect, GLuint fbohandle=0);
+    ~Bars3dRenderer();
 
     void initializeOpenGL();
     void render();
@@ -315,7 +333,7 @@ public:
 private:
     void drawZoomScene();
     void drawScene();
-    Q_DISABLE_COPY(Bars3dShared)
+    Q_DISABLE_COPY(Bars3dRenderer)
 
     friend class DeclarativeBars;
     friend class DeclarativeBarsRenderer;
