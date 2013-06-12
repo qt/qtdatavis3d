@@ -25,9 +25,6 @@
 
 //#define ROTATE_ZOOM_SELECTION
 
-// Uncomment this if you want to try hardcoded QML2 -integration h4x0r version of the engine
-//#define USE_QML2_VERSION
-
 #define QTENTERPRISE_DATAVIS3D_VERSION_STR   "0.0.1"
 /*
    QTENTERPRISE_DATAVIS3D_VERSION is (major << 16) + (minor << 8) + patch.

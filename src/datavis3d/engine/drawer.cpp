@@ -68,14 +68,18 @@ Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transpar
     : m_theme(theme),
       m_font(font),
       m_transparency(transparency),
-      m_textureHelper(new TextureHelper())
+      m_textureHelper(0)
 {
-    initializeOpenGLFunctions();
 }
 
 Drawer::~Drawer()
 {
 
+}
+
+void Drawer::initializeOpenGL()
+{
+    m_textureHelper = new TextureHelper();
 }
 
 void Drawer::setTheme(const Theme &theme)

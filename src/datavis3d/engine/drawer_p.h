@@ -66,13 +66,15 @@ class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
 
-class Drawer : public QObject, protected QOpenGLFunctions
+class Drawer : public QObject
 {
     Q_OBJECT
 
 public:
     explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
     ~Drawer();
+
+    void initializeOpenGL();
 
     void setTheme(const Theme &theme);
     void setFont(const QFont &font);

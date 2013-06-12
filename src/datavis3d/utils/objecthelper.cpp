@@ -56,7 +56,6 @@ ObjectHelper::ObjectHelper(const QString &objectFile)
       m_indexCount(0),
       m_meshDataLoaded(false)
 {
-    initializeOpenGLFunctions();
 }
 
 ObjectHelper::~ObjectHelper()
@@ -74,6 +73,7 @@ void ObjectHelper::setObjectFile(const QString &objectFile)
 
 void ObjectHelper::load()
 {
+    initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);

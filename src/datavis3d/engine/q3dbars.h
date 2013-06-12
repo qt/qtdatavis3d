@@ -48,8 +48,6 @@
 
 #include <QFont>
 
-class QOpenGLShaderProgram;
-
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
@@ -62,17 +60,20 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
+
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
     Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
 
-public:
-    explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
-    ~Q3DBars();
+protected:
 
     void initialize();
     void render();
+
+public:
+    explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
+    ~Q3DBars();
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -108,9 +109,6 @@ public:
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
 
-    // override bar type with own mesh
-    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
-
     // how many samples per row and column, and names for axes
     Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
                                       const QString &labelRow = QString(),
@@ -139,6 +137,8 @@ public:
     // important to set if values can be negative.
     Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
+    // override bar type with own mesh
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
@@ -164,6 +164,10 @@ public:
     // Enable or disable background grid
     void setGridEnabled(bool enable);
     bool gridEnabled();
+
+    // Size
+    void setWidth(const int width);
+    void setHeight(const int height);
 
     // Enable or disable background mesh
     void setBackgroundEnabled(bool enable);

@@ -52,6 +52,7 @@
 #include "utils_p.h"
 #include "drawer_p.h"
 
+#include <QOpenGLFunctions>
 #include <QMatrix4x4>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
@@ -1512,9 +1513,9 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
 
 Q3DMapsPrivate::~Q3DMapsPrivate()
 {
-    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    glDeleteFramebuffers(1, &m_depthFrameBuffer);
+    glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+    glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_data;
@@ -1580,8 +1581,9 @@ void Q3DMapsPrivate::initSelectionShader()
 void Q3DMapsPrivate::initSelectionBuffer()
 {
     if (m_selectionTexture) {
-        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+
+        glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+        glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->deleteTexture(&m_selectionTexture);
     }
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
@@ -1602,7 +1604,7 @@ void Q3DMapsPrivate::initDepthShader()
 void Q3DMapsPrivate::initDepthBuffer()
 {
     if (m_depthTexture) {
-        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->deleteTexture(&m_depthTexture);
     }
     m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer,

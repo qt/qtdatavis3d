@@ -70,17 +70,14 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 
     create();
 
-#ifndef USE_QML2_VERSION
     d_ptr->m_context->setFormat(requestedFormat());
     d_ptr->m_context->create();
     d_ptr->m_context->makeCurrent(this);
-#endif
 
+    qDebug() << "initializeOpenGLFunctions()";
     initializeOpenGLFunctions();
 
-#ifndef USE_QML2_VERSION
     initialize();
-#endif
 }
 
 Q3DWindow::~Q3DWindow()

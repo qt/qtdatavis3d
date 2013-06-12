@@ -23,24 +23,16 @@ import QtQuick.Window 2.1
 import com.digia.QtDataVis3D 1.0
 
 Item {
-    id: container
-    //anchors.fill: parent
-    width: 800
-    height: 500
+    id: mainview
+    //title: "My MainWindow"
+    width: 640
+    height: 480
+    visible: true
 
-    DataVisView {
-        id: mainview
-        anchors.fill: parent
-        antialiasing: true
-        // This allows us to flip the texture to be displayed correctly in scene graph
-        // TODO: Find a way to do it in code..
-        transform: [
-            Rotation {
-                id: rotation;
-                axis.x: 1; axis.z: 0; axis.y: 0; angle: 0;
-                origin.x: width / 2; origin.y: height / 2;
-            }
-        ]
+    Bars3D {
+        id: testchart
+        width: mainview.width
+        height: mainview.height
 
         DataItem {
             id: testitem
@@ -52,60 +44,78 @@ Item {
             label: "Test2"
             value: -10
         }
+        DataItem {
+            id: testitem3
+            label: "Test3"
+            value: 5
+        }
+
+        DataItem {
+            id: testitem4
+            label: "Test4"
+            value: -7
+        }
+        DataItem {
+            id: testitem5
+            label: "Test5"
+            value: 8
+        }
+        DataItem {
+            id: testitem6
+            label: "Test6"
+            value: 1
+        }
+
         DataRow {
-            id: testrow
+            id: testrow1
             function addData() {
-                testrow.addItem(testitem);
-                testrow.addItem(testitem2);
-            }
-        }
-//        Bars {
-//            id: testchart
-//            visible: true
-//            width: mainview.width
-//            height: mainview.height
-//            //x: mainview.x + mainview.width
-//            //y: mainview.y
-
-//            grid: false
-//            shadowQuality: Bars.ShadowNone
-//            selectionMode: Bars.ModeNone
-//            labelTransparency: Bars.TransparencyNone
-//            windowTitle: "QmlTest3DBars"
-
-//            function setUpBars() {
-//                /*console.log(parent)
-//                console.log(container.x)
-//                console.log(container.y)
-//                console.log(Window.x)
-//                console.log(Window.y)
-//                console.log(Screen.desktopAvailableHeight)
-//                console.log(Screen.desktopAvailableWidth)
-//                console.log(mainview.x)
-//                console.log(mainview.y)
-//                console.log(x)
-//                console.log(y)*/
-//                testchart.setupSampleSpace(2, 1);
-//                testchart.addDataRow(testrow);
-//            }
-//        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-//                testchart.destroy();
-//                testchart.close();
-                Qt.quit();
+                testrow1.addItem(testitem);
+                testrow1.addItem(testitem2);
+                testrow1.addItem(testitem3);
+                testrow1.addItem(testitem4);
+                testrow1.addItem(testitem5);
+                testrow1.addItem(testitem6);
             }
         }
 
-        Component.onCompleted: {
-            // This allows us to flip the texture to be displayed correctly in scene graph
-            // TODO: Find a way to do it in code..
-            rotation.angle = 180
-            console.log("kukkuu")
-//            testrow.addData();
-//            testchart.setUpBars();
+        //visible: true
+        //x: mainview.x + mainview.width
+        //y: mainview.y
+
+        grid: false
+        shadowQuality: Bars3D.ShadowNone
+        selectionMode: Bars3D.ModeNone
+        labelTransparency: Bars3D.TransparencyNone
+
+        function setUpBars3D() {
+            /*console.log(parent)
+            console.log(container.x)
+            console.log(container.y)
+            console.log(Window.x)
+            console.log(Window.y)
+            console.log(Screen.desktopAvailableHeight)
+            console.log(Screen.desktopAvailableWidth)
+            console.log(mainview.x)
+            console.log(mainview.y)
+            console.log(x)
+            console.log(y)*/
+            testchart.setupSampleSpace(6, 1);
+            testchart.addDataRow(testrow1);
         }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            Qt.quit();
+        }
+    }
+
+    Component.onCompleted: {
+        // This allows us to flip the texture to be displayed correctly in scene graph
+        // TODO: Find a way to do it in code..
+        //rotation.angle = 180
+        testrow1.addData();
+        testchart.setUpBars3D();
     }
 }

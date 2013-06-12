@@ -39,34 +39,58 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVISVIEW_H
-#define DATAVISVIEW_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef DECLARATIVEBARS_P_H
+#define DECLARATIVEBARS_P_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-
-#include <QQuickItem>
+#include "QtDataVis3D/qdatavis3namespace.h"
+#include <QString>
 
 QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 
-class DataVisView : public QQuickItem
+class QDataRow;
+
+class DeclarativeBarsCachedStatePrivate
 {
-    Q_OBJECT
-    Q_DISABLE_COPY(DataVisView)
-
 public:
-    DataVisView(QQuickItem *parent = 0);
-    ~DataVisView();
+    explicit DeclarativeBarsCachedStatePrivate();
+    ~DeclarativeBarsCachedStatePrivate();
 
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    bool m_isSampleSpaceSet;
+    int m_cachedState;
+    int m_samplesRow;
+    int m_samplesColumn;
+    QString m_labelRow;
+    QString m_labelColumn;
+    QString m_labelHeight;
 
+    QDataRow *m_dataRow;
+
+    bool m_isSelectionModeSet;
+    SelectionMode m_selectionMode;
+
+    bool m_isLabelTransparencySet;
+    LabelTransparency m_labelTransparency;
+
+    bool m_isShadowQualitySet;
+    ShadowQuality m_shadowQuality;
+
+
+    bool m_isGridSet;
+    bool m_isGridEnabled;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-
 QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
 
-QML_DECLARE_TYPE(DataVisView)
-
-#endif // DATAVISVIEW_H
-
+#endif // DECLARATIVEBARS_P_H
