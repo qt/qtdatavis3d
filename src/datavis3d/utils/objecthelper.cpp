@@ -45,7 +45,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile),
@@ -162,4 +162,4 @@ GLuint ObjectHelper::indexCount()
     return m_indexCount;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

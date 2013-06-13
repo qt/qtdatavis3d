@@ -46,7 +46,7 @@
 #include "QtDataVis3D/qdatavis3namespace.h"
 #include "q3dmaps.h"
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class DeclarativeMaps : public Q3DMaps
 {
@@ -100,6 +100,6 @@ public:
     DeclarativeMaps::ShadowQuality shadow();
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

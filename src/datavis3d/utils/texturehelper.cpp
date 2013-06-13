@@ -46,7 +46,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 TextureHelper::TextureHelper()
 {
@@ -395,4 +395,4 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
     }
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

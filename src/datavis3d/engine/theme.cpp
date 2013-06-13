@@ -46,7 +46,7 @@
 #include <stdio.h>
 #endif
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Theme::Theme()
     : m_baseColor(QColor(Qt::gray)),
@@ -295,4 +295,4 @@ void Theme::useTheme(ColorTheme theme)
     }
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

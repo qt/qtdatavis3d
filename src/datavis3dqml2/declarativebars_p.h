@@ -56,7 +56,7 @@
 #include "QtDataVis3D/qdatavis3namespace.h"
 #include <QString>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataRow;
 
@@ -89,6 +89,6 @@ public:
     bool m_isGridEnabled;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif // DECLARATIVEBARS_P_H

@@ -1,7 +1,7 @@
 TARGET = QtDataVis3D
 QT = core gui opengl #qml
 
-DEFINES += QTENTERPRISE_DATAVIS3D_LIBRARY
+DEFINES += QT_DATAVIS3D_LIBRARY
 
 QMAKE_DOCS = $$PWD/doc/qtdatavis3d.qdocconf
 

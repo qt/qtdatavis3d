@@ -50,11 +50,11 @@
 #include <QVector>
 #include <QString>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataSetPrivate;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT QDataSet : public QObject
+class QT_DATAVIS3D_EXPORT QDataSet : public QObject
 {
     Q_OBJECT
 
@@ -76,6 +76,6 @@ private:
     friend class Q3DMapsPrivate;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

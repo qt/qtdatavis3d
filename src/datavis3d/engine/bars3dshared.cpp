@@ -75,7 +75,7 @@
 #include <QTime>
 #endif
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 //#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
@@ -2420,4 +2420,4 @@ void Bars3dRenderer::closeZoomMode()
     m_sceneViewPort = QRect(0, 0, this->width(), this->height());
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

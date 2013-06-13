@@ -47,12 +47,12 @@
 #include <QString>
 #include <QObject>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataRowPrivate;
 class QDataItem;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT QDataRow : public QObject
+class QT_DATAVIS3D_EXPORT QDataRow : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString label READ label WRITE setLabel)
@@ -73,6 +73,6 @@ private:
     friend class QDataSetPrivate;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

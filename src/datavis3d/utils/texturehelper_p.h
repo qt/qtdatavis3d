@@ -56,7 +56,7 @@
 #include <QOpenGLFunctions>
 #include <QRgb>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class TextureHelper : protected QOpenGLFunctions
 {
@@ -87,6 +87,6 @@ class TextureHelper : protected QOpenGLFunctions
     friend class Q3DMapsPrivate;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

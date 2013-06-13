@@ -49,7 +49,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 QString slashTag = QStringLiteral("/");
 
@@ -145,4 +145,4 @@ bool MeshLoader::loadOBJ(const QString &path,
     return true;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

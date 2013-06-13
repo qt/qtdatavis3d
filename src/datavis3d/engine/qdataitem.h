@@ -50,11 +50,11 @@
 
 class QPoint;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItemPrivate;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT QDataItem : public QObject
+class QT_DATAVIS3D_EXPORT QDataItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString label READ label WRITE setLabel)
@@ -86,6 +86,6 @@ private:
     friend class Drawer;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

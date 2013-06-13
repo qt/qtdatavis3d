@@ -48,7 +48,7 @@
 
 #include <QFont>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 class QDataItem;
@@ -56,9 +56,12 @@ class QDataRow;
 class QDataSet;
 class LabelItem;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
+class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
@@ -193,6 +196,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

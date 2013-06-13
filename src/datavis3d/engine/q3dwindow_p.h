@@ -57,7 +57,7 @@
 class QOpenGLContext;
 class QOpenGLPaintDevice;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DWindow;
 
@@ -76,6 +76,6 @@ public:
     QOpenGLContext *m_context;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

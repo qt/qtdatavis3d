@@ -49,7 +49,7 @@
 #include <QThread>
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent): QQuickItem(parent), m_cachedState(new DeclarativeBarsCachedStatePrivate()), m_shared(0)
 {
@@ -377,4 +377,4 @@ DeclarativeBarsCachedStatePrivate::~DeclarativeBarsCachedStatePrivate()
 }
 
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

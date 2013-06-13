@@ -57,7 +57,7 @@
 
 class QOpenGLShaderProgram;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class ShaderHelper
 {
@@ -128,6 +128,6 @@ class ShaderHelper
     GLboolean m_initialized;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

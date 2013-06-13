@@ -43,7 +43,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 DeclarativeMaps::DeclarativeMaps()
 {
@@ -83,4 +83,4 @@ DeclarativeMaps::ShadowQuality DeclarativeMaps::shadow()
     return DeclarativeMaps::ShadowQuality(shadowQuality());
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

@@ -59,7 +59,7 @@
 #include <QVector>
 #include <QString>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataSetPrivate : public QObject
 {
@@ -102,6 +102,6 @@ private:
     friend class QDataSet;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

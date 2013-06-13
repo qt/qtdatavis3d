@@ -56,7 +56,7 @@
 
 #include <QQmlExtensionPlugin>
 
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
+QT_DATAVIS3D_USE_NAMESPACE
 
 //Q_DECLARE_METATYPE(DeclarativeDataItem *)
 //Q_DECLARE_METATYPE(DeclarativeDataRow *)
@@ -69,7 +69,7 @@ Q_DECLARE_METATYPE(QDataItem *)
 Q_DECLARE_METATYPE(QDataRow *)
 Q_DECLARE_METATYPE(QDataSet *)
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Datavis3dqml2Plugin : public QQmlExtensionPlugin
 {
@@ -80,7 +80,7 @@ public:
     void registerTypes(const char *uri);
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif // DATAVIS3DQML2_PLUGIN_H
 

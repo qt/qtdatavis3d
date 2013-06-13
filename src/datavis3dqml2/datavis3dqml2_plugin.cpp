@@ -43,7 +43,7 @@
 
 #include <qqml.h>
 #include <QDebug>
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 void Datavis3dqml2Plugin::registerTypes(const char *uri)
 {
@@ -59,5 +59,5 @@ void Datavis3dqml2Plugin::registerTypes(const char *uri)
 
 //#include "moc_datavis3dqml2_plugin.cpp"
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 

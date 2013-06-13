@@ -67,7 +67,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItem;
 class QDataRow;
@@ -86,7 +86,7 @@ class Bars3dModel : public QObject
 
 };
 
-class QTENTERPRISE_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -339,6 +339,6 @@ private:
     friend class DeclarativeBarsRenderer;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

@@ -77,7 +77,7 @@
 #include <QTime>
 #endif
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 //#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
@@ -1773,4 +1773,4 @@ bool Q3DMapsPrivate::isValid(const QDataItem &item)
     return retval;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

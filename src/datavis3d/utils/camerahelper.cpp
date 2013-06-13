@@ -45,7 +45,7 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 // Initial camera position
 QVector3D m_position = QVector3D(0, 0.25, 3);
@@ -307,4 +307,4 @@ void CameraHelper::setCameraPreset(CameraPreset preset)
     }
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

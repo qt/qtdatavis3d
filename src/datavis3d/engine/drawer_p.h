@@ -59,7 +59,7 @@
 #include "labelitem_p.h"
 #include <QFont>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItem;
 class ShaderHelper;
@@ -103,6 +103,6 @@ private:
     TextureHelper *m_textureHelper;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

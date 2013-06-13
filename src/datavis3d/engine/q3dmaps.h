@@ -52,7 +52,7 @@ class QOpenGLShaderProgram;
 class QImage;
 class QRect;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DMapsPrivate;
 class QDataItem;
@@ -60,7 +60,7 @@ class QDataRow;
 class QDataSet;
 class LabelItem;
 
-class QTENTERPRISE_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
+class QT_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
@@ -174,6 +174,6 @@ private:
     Q_DISABLE_COPY(Q3DMaps);
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

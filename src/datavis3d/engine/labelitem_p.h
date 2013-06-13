@@ -56,7 +56,7 @@
 #include <QOpenGLFunctions>
 #include <QSize>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class LabelItem
 {
@@ -74,6 +74,6 @@ private:
     GLuint m_textureId;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

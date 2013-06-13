@@ -52,7 +52,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DBars
@@ -446,6 +446,8 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 }
 
 /*!
+ * \property Q3DBars::selectionMode
+ *
  * \a mode Set bar selection mode from \c SelectionMode. \c ModeBar by default.
  *
  * Sets bar selection mode to be used.
@@ -455,11 +457,6 @@ void Q3DBars::setSelectionMode(SelectionMode mode)
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-/*!
- * \return \c SelectionMode.
- *
- * Returns selection mode.
- */
 SelectionMode Q3DBars::selectionMode()
 {
     return d_ptr->m_shared->selectionMode();
@@ -528,6 +525,8 @@ QFont Q3DBars::font()
 }
 
 /*!
+ * \property Q3DBars::labelTransparency
+ *
  * \a transparency Transparency level of labels from \c LabelTransparency.
  * \c TransparencyFromTheme by default.
  *
@@ -538,11 +537,6 @@ void Q3DBars::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-/*!
- * \return \c LabelTransparency.
- *
- * Returns label transparency.
- */
 LabelTransparency Q3DBars::labelTransparency()
 {
     return d_ptr->m_shared->labelTransparency();
@@ -583,6 +577,8 @@ bool Q3DBars::isBackgroundVisible()
 }
 
 /*!
+ * \property Q3DBars::shadowQuality
+ *
  * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
  *
  * Sets shadow quality.
@@ -592,11 +588,6 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
     d_ptr->m_shared->setShadowQuality(quality);
 }
 
-/*!
- * \return \c ShadowQuality.
- *
- * Returns shadow quality.
- */
 ShadowQuality Q3DBars::shadowQuality()
 {
     return d_ptr->m_shared->shadowQuality();
@@ -723,4 +714,4 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_shared;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

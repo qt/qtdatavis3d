@@ -61,7 +61,7 @@ class QVector3D;
 class QPoint;
 class QPointF;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class CameraHelper
 {
@@ -89,6 +89,6 @@ class CameraHelper
     static void setCameraPreset(CameraPreset preset);
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

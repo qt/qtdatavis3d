@@ -60,7 +60,7 @@ class QOpenGLPaintDevice;
 class QPoint;
 class QSizeF;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;
 
@@ -74,6 +74,6 @@ public:
     Bars3dRenderer *m_shared;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

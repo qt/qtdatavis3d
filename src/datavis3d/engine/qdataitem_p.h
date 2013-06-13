@@ -61,7 +61,7 @@
 #include <QString>
 #include <QVector3D>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItemPrivate
 {
@@ -97,6 +97,6 @@ class QDataItemPrivate
     friend class QDataItem;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif

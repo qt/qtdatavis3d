@@ -41,7 +41,7 @@
 
 #include "labelitem_p.h"
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 LabelItem::LabelItem()
     : m_size(QSize(0, 0)),
@@ -73,4 +73,4 @@ GLuint LabelItem::textureId()
     return m_textureId;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

@@ -62,7 +62,7 @@ class QOpenGLPaintDevice;
 class QPoint;
 class QSizeF;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DMaps;
 class QDataItem;
@@ -169,6 +169,6 @@ public:
     bool m_bgrHasAlpha;
 };
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE
 
 #endif
