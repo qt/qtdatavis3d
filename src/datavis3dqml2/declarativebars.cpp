@@ -51,7 +51,10 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-DeclarativeBars::DeclarativeBars(QQuickItem *parent): QQuickItem(parent), m_cachedState(new DeclarativeBarsCachedStatePrivate()), m_shared(0)
+DeclarativeBars::DeclarativeBars(QQuickItem *parent)
+    : QQuickItem(parent),
+      m_shared(0),
+      m_cachedState(new DeclarativeBarsCachedStatePrivate())
 {
     setFlags(QQuickItem::ItemHasContents);
 

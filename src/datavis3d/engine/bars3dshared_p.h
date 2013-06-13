@@ -83,7 +83,52 @@ class Bars3dRenderer;
 class Bars3dModel : public QObject
 {
     Q_OBJECT
+public:
+    enum SelectionType {
+        SelectionNone = 0,
+        SelectionBar,
+        SelectionRow,
+        SelectionColumn
+    };
 
+    enum MousePressType {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating,
+        MouseOnPinch
+    };
+
+    // Interaction related parameters
+    MousePressType m_mousePressed;
+    QPoint m_mousePos;
+    SelectionMode m_selectionMode;
+
+    // Visual parameters
+    QRect m_boundingRect;
+    QString m_objFile;
+    Theme *m_theme;
+    LabelTransparency m_labelTransparency;
+    QFont m_font;
+    bool m_gridEnabled;
+    bool m_bgrEnabled;
+    ShadowQuality m_shadowQuality;
+
+    // Data parameters
+    QPair<int, int> m_sampleCount;
+    QDataItem *m_selectedBar;
+    QDataSet *m_dataSet;
+    QString m_axisLabelX;
+    QString m_axisLabelZ;
+    QString m_axisLabelY;
+    QDataRow *m_zoomSelection;
+    GLint m_tickCount;
+    GLfloat m_tickStep;
+    bool m_negativeValues;
+
+    explicit Bars3dModel(QRect boundingRect);
+    ~Bars3dModel();
 };
 
 class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
