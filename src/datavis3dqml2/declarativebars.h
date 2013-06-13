@@ -62,8 +62,12 @@ class DeclarativeBars : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadow WRITE setShadow)
-    Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    //Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(int width READ width WRITE setWidth)
     Q_PROPERTY(int height READ height WRITE setHeight)
     Q_ENUMS(SelectionMode)
@@ -187,23 +191,19 @@ public:
     LabelTransparency labelTransparency();
 
     // Enable or disable background grid
-    void setGridEnabled(bool enable);
-    bool gridEnabled();
+    void setGridVisible(bool visible);
+    bool isGridVisible();
 
     // Enable or disable background mesh
-    void setBackgroundEnabled(bool enable);
-    bool backgroundEnabled();
+    void setBackgroundVisible(bool visible);
+    bool isBackgroundVisible();
 
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
-    // Adjust shadow quality
-    void setShadow(DeclarativeBars::ShadowQuality quality);
-    DeclarativeBars::ShadowQuality shadow();
-
-    protected:
-        QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+protected:
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 };
 
@@ -228,6 +228,5 @@ private:
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
 
 #endif

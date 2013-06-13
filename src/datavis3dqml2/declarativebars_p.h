@@ -85,12 +85,10 @@ public:
     bool m_isShadowQualitySet;
     ShadowQuality m_shadowQuality;
 
-
     bool m_isGridSet;
     bool m_isGridEnabled;
 };
 
 QTENTERPRISE_DATAVIS3D_END_NAMESPACE
-QTENTERPRISE_DATAVIS3D_USE_NAMESPACE
 
 #endif // DECLARATIVEBARS_P_H

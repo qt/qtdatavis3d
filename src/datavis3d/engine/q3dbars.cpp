@@ -225,7 +225,7 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 */
 
 /*!
- * Constructs a new 3D bar window. Parameters are not used unless instantiating from Qt Quick 2.
+ * Constructs a new 3D bar window.
  */
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry(), 0))
@@ -457,6 +457,8 @@ void Q3DBars::setSelectionMode(SelectionMode mode)
 
 /*!
  * \return \c SelectionMode.
+ *
+ * Returns selection mode.
  */
 SelectionMode Q3DBars::selectionMode()
 {
@@ -538,6 +540,8 @@ void Q3DBars::setLabelTransparency(LabelTransparency transparency)
 
 /*!
  * \return \c LabelTransparency.
+ *
+ * Returns label transparency.
  */
 LabelTransparency Q3DBars::labelTransparency()
 {
@@ -545,41 +549,43 @@ LabelTransparency Q3DBars::labelTransparency()
 }
 
 /*!
- * \property Q3DBars::grid
+ * \property Q3DBars::gridVisible
  *
- * \a enable Flag to enable or disable grid. \c true by default.
+ * \a visible Flag to enable or disable grid. \c true by default.
  *
  * Sets grid drawing on or off.
  */
-void Q3DBars::setGridEnabled(bool enable)
+void Q3DBars::setGridVisible(bool visible)
 {
-    d_ptr->m_shared->setGridEnabled(enable);
+    d_ptr->m_shared->setGridEnabled(visible);
 }
 
-bool Q3DBars::gridEnabled()
+bool Q3DBars::isGridVisible()
 {
     return d_ptr->m_shared->gridEnabled();
 }
 
 /*!
- * \property Q3DBars::background
+ * \property Q3DBars::backgroundVisible
  *
- * \a enable Flag to enable or disable background. \c true by default.
+ * \a visible Flag to enable or disable background. \c true by default.
  *
  * Sets backround rendering on or off.
  */
-void Q3DBars::setBackgroundEnabled(bool enable)
+void Q3DBars::setBackgroundVisible(bool visible)
 {
-    d_ptr->m_shared->setBackgroundEnabled(enable);
+    d_ptr->m_shared->setBackgroundEnabled(visible);
 }
 
-bool Q3DBars::backgroundEnabled()
+bool Q3DBars::isBackgroundVisible()
 {
     return d_ptr->m_shared->backgroundEnabled();
 }
 
 /*!
  * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
+ *
+ * Sets shadow quality.
  */
 void Q3DBars::setShadowQuality(ShadowQuality quality)
 {
@@ -588,6 +594,8 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
 
 /*!
  * \return \c ShadowQuality.
+ *
+ * Returns shadow quality.
  */
 ShadowQuality Q3DBars::shadowQuality()
 {

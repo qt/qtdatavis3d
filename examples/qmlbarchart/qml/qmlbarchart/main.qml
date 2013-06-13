@@ -82,7 +82,7 @@ Item {
         //x: mainview.x + mainview.width
         //y: mainview.y
 
-        grid: false
+        gridVisible: false
         shadowQuality: Bars3D.ShadowNone
         selectionMode: Bars3D.ModeNone
         labelTransparency: Bars3D.TransparencyNone

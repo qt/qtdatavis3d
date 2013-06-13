@@ -194,23 +194,23 @@ DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
     return DeclarativeBars::LabelTransparency(m_shared->labelTransparency());
 }
 
-void DeclarativeBars::setGridEnabled(bool enable)
+void DeclarativeBars::setGridVisible(bool visible)
 {
-    m_cachedState->m_isGridEnabled = enable;
+    m_cachedState->m_isGridEnabled = visible;
     m_cachedState->m_isGridSet = true;
 }
 
-bool DeclarativeBars::gridEnabled()
+bool DeclarativeBars::isGridVisible()
 {
     return m_shared->gridEnabled();
 }
 
-void DeclarativeBars::setBackgroundEnabled(bool enable)
+void DeclarativeBars::setBackgroundVisible(bool visible)
 {
-    m_shared->setBackgroundEnabled(enable);
+    m_shared->setBackgroundEnabled(visible);
 }
 
-bool DeclarativeBars::backgroundEnabled()
+bool DeclarativeBars::isBackgroundVisible()
 {
     return m_shared->backgroundEnabled();
 }
@@ -269,13 +269,13 @@ DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
     return DeclarativeBars::SelectionMode(m_shared->selectionMode());
 }
 
-void DeclarativeBars::setShadow(DeclarativeBars::ShadowQuality quality)
+void DeclarativeBars::setShadowQuality(DeclarativeBars::ShadowQuality quality)
 {
     m_cachedState->m_shadowQuality = QtDataVis3D::ShadowQuality(quality);
     m_cachedState->m_isShadowQualitySet = true;
 }
 
-DeclarativeBars::ShadowQuality DeclarativeBars::shadow()
+DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
 {
     return DeclarativeBars::ShadowQuality(m_shared->shadowQuality());
 }

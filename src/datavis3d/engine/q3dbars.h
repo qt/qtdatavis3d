@@ -62,8 +62,8 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
-    Q_PROPERTY(bool grid READ gridEnabled WRITE setGridEnabled)
-    Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
 
 public:
     explicit Q3DBars();
@@ -71,68 +71,68 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    Q_INVOKABLE void addDataRow(const QVector<float> &dataRow,
-                                const QString &labelRow = QString(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<float> &dataRow,
+                    const QString &labelRow = QString(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataItems is transferred
-    Q_INVOKABLE void addDataRow(const QVector<QDataItem*> &dataRow,
-                                const QString &labelRow = QString(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<QDataItem*> &dataRow,
+                    const QString &labelRow = QString(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataRow is transferred
-    Q_INVOKABLE void addDataRow(QDataRow *dataRow);
+    void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    Q_INVOKABLE void addDataSet(const QVector< QVector<float> > &data,
-                                const QVector<QString> &labelsRow = QVector<QString>(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<float> > &data,
+                    const QVector<QString> &labelsRow = QVector<QString>(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
 
     // ownership of dataItems is transferred
-    Q_INVOKABLE void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                const QVector<QString> &labelsRow = QVector<QString>(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<QDataItem*> > &data,
+                    const QVector<QString> &labelsRow = QVector<QString>(),
+                    const QVector<QString> &labelsColumn = QVector<QString>());
     // ownership of dataSet is transferred
-    Q_INVOKABLE void addDataSet(QDataSet* dataSet);
+    void addDataSet(QDataSet* dataSet);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    Q_INVOKABLE void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                                 QSizeF spacing = QSizeF(1.0f, 1.0f),
-                                 bool relative = true);
+    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+                     QSizeF spacing = QSizeF(1.0f, 1.0f),
+                     bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
+    void setBarType(BarStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
-    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
-                                      const QString &labelRow = QString(),
-                                      const QString &labelColumn = QString(),
-                                      const QString &labelHeight = QString());
+    void setupSampleSpace(int samplesRow, int samplesColumn,
+                          const QString &labelRow = QString(),
+                          const QString &labelColumn = QString(),
+                          const QString &labelHeight = QString());
 
     // Select preset camera placement
-    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
     // percentage (10...500))
-    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    Q_INVOKABLE void setTheme(ColorTheme theme);
+    void setTheme(ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                 bool uniform = true);
+    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                     bool uniform = true);
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
     // override bar type with own mesh
-    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
+    void setMeshFileName(const QString &objFileName);
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
@@ -156,8 +156,8 @@ public:
     LabelTransparency labelTransparency();
 
     // Enable or disable background grid
-    void setGridEnabled(bool enable);
-    bool gridEnabled();
+    void setGridVisible(bool visible);
+    bool isGridVisible();
 
     // TODO: Do these need to be public? Where are they called from?
     // Size
@@ -165,8 +165,8 @@ public:
     void setHeight(const int height);
 
     // Enable or disable background mesh
-    void setBackgroundEnabled(bool enable);
-    bool backgroundEnabled();
+    void setBackgroundVisible(bool visible);
+    bool isBackgroundVisible();
 
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);

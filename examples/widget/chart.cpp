@@ -272,12 +272,12 @@ void ChartModifier::changeShadowQuality(int quality)
 
 void ChartModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->setBackgroundEnabled((bool)enabled);
+    m_chart->setBackgroundVisible((bool)enabled);
 }
 
 void ChartModifier::setGridEnabled(int enabled)
 {
-    m_chart->setGridEnabled((bool)enabled);
+    m_chart->setGridVisible((bool)enabled);
 }
 
 void ChartModifier::rotateX(int rotation)
