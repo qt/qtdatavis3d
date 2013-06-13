@@ -66,7 +66,7 @@ class QTENTERPRISE_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool background READ backgroundEnabled WRITE setBackgroundEnabled)
 
 public:
-    explicit Q3DBars(GLuint fbohandle = 0, const QSize &windowsize = QSize());
+    explicit Q3DBars();
     ~Q3DBars();
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous

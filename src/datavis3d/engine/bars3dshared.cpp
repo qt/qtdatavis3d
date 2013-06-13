@@ -219,9 +219,6 @@ void Bars3dRenderer::initializeOpenGL()
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
-    // Resize in case we've missed resize events
-    resizeNotify();
-
     // Initialize shaders
 #if !defined(QT_OPENGL_ES_2)
     if (m_shadowQuality > ShadowNone) {
@@ -310,6 +307,9 @@ void Bars3dRenderer::initializeOpenGL()
 
     // Set initialized -flag
     m_isInitialized = true;
+
+    // Resize in case we've missed resize events
+    resizeNotify();
 
     // Load background mesh
     loadBackgroundMesh();
@@ -935,7 +935,7 @@ void Bars3dRenderer::drawScene()
             GLfloat lightStrength = m_theme->m_lightStrength;
             if (m_selectionMode > ModeNone) {
                 Bars3dRenderer::SelectionType selectionType = isSelected(row, bar,
-                                                                       selection);
+                                                                         selection);
                 switch (selectionType) {
                 case Bars3dRenderer::SelectionBar: {
                     barColor = Utils::vectorFromColor(m_theme->m_highlightBarColor);
@@ -1779,7 +1779,7 @@ void Bars3dRenderer::setMeshFileName(const QString &objFileName)
 }
 
 void Bars3dRenderer::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                                    const QString &labelColumn, const QString &labelHeight)
+                                      const QString &labelColumn, const QString &labelHeight)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     closeZoomMode();
@@ -1849,7 +1849,7 @@ void Bars3dRenderer::setTheme(ColorTheme theme)
 }
 
 void Bars3dRenderer::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                               bool uniform)
+                                 bool uniform)
 {
     m_theme->m_baseColor = baseColor;
     m_theme->m_heightColor = heightColor;
@@ -2033,7 +2033,7 @@ void Bars3dRenderer::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum
 }
 
 void Bars3dRenderer::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                              const QVector<QString> &labelsColumn)
+                                const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2048,7 +2048,7 @@ void Bars3dRenderer::addDataRow(const QVector<float> &dataRow, const QString &la
 }
 
 void Bars3dRenderer::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                              const QVector<QString> &labelsColumn)
+                                const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2076,8 +2076,8 @@ void Bars3dRenderer::addDataRow(QDataRow *dataRow)
 }
 
 void Bars3dRenderer::addDataSet(const QVector< QVector<float> > &data,
-                              const QVector<QString> &labelsRow,
-                              const QVector<QString> &labelsColumn)
+                                const QVector<QString> &labelsRow,
+                                const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2110,8 +2110,8 @@ void Bars3dRenderer::addDataSet(const QVector< QVector<float> > &data,
 }
 
 void Bars3dRenderer::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                              const QVector<QString> &labelsRow,
-                              const QVector<QString> &labelsColumn)
+                                const QVector<QString> &labelsRow,
+                                const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2308,7 +2308,7 @@ void Bars3dRenderer::initDepthBuffer()
 #endif
 
 void Bars3dRenderer::initBackgroundShaders(const QString &vertexShader,
-                                         const QString &fragmentShader)
+                                           const QString &fragmentShader)
 {
     if (m_backgroundShader)
         delete m_backgroundShader;
@@ -2353,7 +2353,7 @@ void Bars3dRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &li
 }
 
 Bars3dRenderer::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar,
-                                                     const QVector3D &selection)
+                                                         const QVector3D &selection)
 {
     //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = SelectionNone;

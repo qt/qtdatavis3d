@@ -225,16 +225,10 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
 */
 
 /*!
- * \a fbohandle Handle to QML2 scene graph's framebuffer object. Developers should not need to
- * ever use this directly. Not used when using C++ API.
- *
- * \a windowsize QML2 window size Developers should not need to ever use this directly. Not
- * used when using C++ API.
- *
  * Constructs a new 3D bar window. Parameters are not used unless instantiating from Qt Quick 2.
  */
-Q3DBars::Q3DBars(GLuint fbohandle, const QSize &windowsize)
-    : d_ptr(new Q3DBarsPrivate(this, geometry(), fbohandle))
+Q3DBars::Q3DBars()
+    : d_ptr(new Q3DBarsPrivate(this, geometry(), 0))
 {
 }
 
