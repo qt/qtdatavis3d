@@ -41,6 +41,7 @@
 
 #include "declarativebars.h"
 #include "bars3dshared_p.h"
+#include "qdataset.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
@@ -228,6 +229,19 @@ void DeclarativeBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimu
     m_shared->setTickCount(tickCount, step, minimum);
 }
 
+void DeclarativeBars::addData(QAbstractItemModel *data)
+{
+    QDataSet *dataset = new QDataSet();
+    // TODO: Maps data in QAbstractItemModel to qdatarows and qdataset
+    m_shared->addDataSet(dataset);
+}
+
+QAbstractItemModel *DeclarativeBars::data()
+{
+    // TODO: Map back from qdataset, or store as QAbstractItemModel as well?
+    return NULL;
+}
+
 void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
                                  const QVector<QString> &labelsColumn)
 {
@@ -252,7 +266,7 @@ void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
                                  const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
-    m_shared->addDataSet(data, labelsRow,labelsColumn);
+    m_shared->addDataSet(data, labelsRow, labelsColumn);
 }
 
 void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem*> > &data,

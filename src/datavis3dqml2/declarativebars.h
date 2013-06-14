@@ -48,6 +48,7 @@
 #include "declarativebars_p.h"
 
 #include <qsgsimpletexturenode.h>
+#include <QAbstractItemModel>
 #include <QQuickItem>
 #include <QObject>
 
@@ -60,6 +61,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeBars : public QQuickItem
 {
     Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel *addData READ data WRITE addData)
     Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -106,6 +108,16 @@ public:
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
+
+    // TODO: We need to provide another way to pass row and column labels when using addData(QAbstractItemModel *data)
+
+    // TODO: Map qml listitemmodel to qabstractitemmodel
+    // Add whole data set.
+    void addData(QAbstractItemModel *data);
+    QAbstractItemModel *data();
+
+    // TODO: Are we going to offer only addData(QAbstractItemModel *data) for QML2?
+    // If so, all these adds can be removed, as well as metatypes for dataset and datarow
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)

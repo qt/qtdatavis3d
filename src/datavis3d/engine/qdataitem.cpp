@@ -71,6 +71,18 @@ QDataItem::QDataItem(float value, const QString &label)
 }
 
 /*!
+ * \overload QDataItem::QDataItem
+ *
+ * \a item A float value of the data item.
+ *
+ * Constructs QDataItem.
+ */
+QDataItem::QDataItem(QDataItem &item)
+    : d_ptr(new QDataItemPrivate(&item))
+{
+}
+
+/*!
  * Destroys QDataItem.
  */
 QDataItem::~QDataItem()
@@ -160,6 +172,17 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &lab
     : q_ptr(q),
       m_value(value),
       m_labelString(label),
+      m_prependLabel(false),
+      m_translation(QVector3D(0, 0, 0)),
+      m_label(LabelItem()),
+      m_selectionLabel(LabelItem())
+{
+}
+
+QDataItemPrivate::QDataItemPrivate(QDataItem *q)
+    : q_ptr(q),
+      m_value(q->value()),
+      m_labelString(q->label()),
       m_prependLabel(false),
       m_translation(QVector3D(0, 0, 0)),
       m_label(LabelItem()),

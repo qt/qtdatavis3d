@@ -65,9 +65,9 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItemPrivate
 {
-    public:
-    explicit QDataItemPrivate(QDataItem *q, float value = 0.0f,
-                              const QString &label = QString());
+public:
+    QDataItemPrivate(QDataItem *q, float value, const QString &label);
+    QDataItemPrivate(QDataItem *q);
     ~QDataItemPrivate();
 
     // Position in 3D scene
@@ -75,7 +75,7 @@ class QDataItemPrivate
     QVector3D translation();
     // Value of bar
     float value();
-     // Value and label appended into a string. If label has prepend -flag set, append label and value
+    // Value and label appended into a string. If label has prepend -flag set, append label and value
     QString valueStr();
     // Label item (containing valueStr as texture)
     void setLabel(const LabelItem &label);
@@ -85,7 +85,7 @@ class QDataItemPrivate
     LabelItem selectionLabel();
     QPointF position();
 
-    private:
+private:
     QDataItem *q_ptr;
     float m_value;
     QString m_labelString;

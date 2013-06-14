@@ -63,7 +63,8 @@ class QT_DATAVIS3D_EXPORT QDataItem : public QObject
     Q_PROPERTY(QPointF position READ position WRITE setPosition)
 
 public:
-    explicit QDataItem(float value = 0.0f, const QString &label = QString());
+    QDataItem(float value = 0.0f, const QString &label = QString());
+    QDataItem(QDataItem &item);
     ~QDataItem();
 
     // TODO: Provide a Q_INVOKABLE version of this, or move prepend to it's own property.
