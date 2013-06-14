@@ -229,10 +229,18 @@ void DeclarativeBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimu
     m_shared->setTickCount(tickCount, step, minimum);
 }
 
-void DeclarativeBars::addData(QAbstractItemModel *data)
+void DeclarativeBars::setData(QAbstractItemModel *data)
 {
     QDataSet *dataset = new QDataSet();
+
+    // Get sample space size from data, and set it
+    m_shared->setupSampleSpace(data->rowCount(), data->columnCount());
+
     // TODO: Maps data in QAbstractItemModel to qdatarows and qdataset
+
+    qDebug() << data;
+
+    // Add data to scene
     m_shared->addDataSet(dataset);
 }
 

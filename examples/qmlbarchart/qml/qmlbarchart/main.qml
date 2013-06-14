@@ -29,76 +29,69 @@ Item {
     height: 480
     visible: true
 
+    DataItem {
+        id: testitem1
+        label: "Test"
+        value: 10
+    }
+    DataItem {
+        id: testitem2
+        label: "Test2"
+        value: -10
+    }
+    DataItem {
+        id: testitem3
+        label: "Test3"
+        value: 5
+    }
+
+    DataItem {
+        id: testitem4
+        label: "Test4"
+        value: -7
+    }
+    DataItem {
+        id: testitem5
+        label: "Test5"
+        value: 8
+    }
+    DataItem {
+        id: testitem6
+        label: "Test6"
+        value: 1
+    }
+
+    DataRow {
+        id: testrow1
+        function addData() {
+            testrow1.addItem(testitem1);
+            testrow1.addItem(testitem2);
+            testrow1.addItem(testitem3);
+            testrow1.addItem(testitem4);
+            testrow1.addItem(testitem5);
+            testrow1.addItem(testitem6);
+        }
+    }
+/*
+    ListModel {
+        id: testdata1
+        ListElement{ column1: testitem1 ; column2: testitem2 ; column3: testitem3 }
+        ListElement{ column1: testitem4 ; column2: testitem6 ; column3: testitem6 }
+    }
+*/
     Bars3D {
         id: testchart
         width: mainview.width
         height: mainview.height
 
-        DataItem {
-            id: testitem
-            label: "Test"
-            value: 10
-        }
-        DataItem {
-            id: testitem2
-            label: "Test2"
-            value: -10
-        }
-        DataItem {
-            id: testitem3
-            label: "Test3"
-            value: 5
-        }
+        //data: testdata1
 
-        DataItem {
-            id: testitem4
-            label: "Test4"
-            value: -7
-        }
-        DataItem {
-            id: testitem5
-            label: "Test5"
-            value: 8
-        }
-        DataItem {
-            id: testitem6
-            label: "Test6"
-            value: 1
-        }
-
-        DataRow {
-            id: testrow1
-            function addData() {
-                testrow1.addItem(testitem);
-                testrow1.addItem(testitem2);
-                testrow1.addItem(testitem3);
-                testrow1.addItem(testitem4);
-                testrow1.addItem(testitem5);
-                testrow1.addItem(testitem6);
-            }
-        }
-
-        //visible: true
-        //x: mainview.x + mainview.width
-        //y: mainview.y
-
-        gridVisible: false
-        shadowQuality: Bars3D.ShadowNone
+        gridVisible: true
+        shadowQuality: Bars3D.ShadowLow
         selectionMode: Bars3D.ModeNone
         labelTransparency: Bars3D.TransparencyNone
 
         function setUpBars3D() {
-            /*console.log(parent)
-            console.log(container.x)
-            console.log(container.y)
-            console.log(Window.x)
-            console.log(Window.y)
-            console.log(Screen.desktopAvailableHeight)
-            console.log(Screen.desktopAvailableWidth)
-            console.log(mainview.x)
-            console.log(mainview.y)
-            console.log(x)
-            console.log(y)*/
             testchart.setupSampleSpace(6, 1);
             testchart.addDataRow(testrow1);
         }

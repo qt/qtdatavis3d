@@ -61,7 +61,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeBars : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel *addData READ data WRITE addData)
+    Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -113,7 +113,7 @@ public:
 
     // TODO: Map qml listitemmodel to qabstractitemmodel
     // Add whole data set.
-    void addData(QAbstractItemModel *data);
+    void setData(QAbstractItemModel *data);
     QAbstractItemModel *data();
 
     // TODO: Are we going to offer only addData(QAbstractItemModel *data) for QML2?
