@@ -148,6 +148,8 @@ void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn, const 
     m_cachedState->m_labelColumn = labelColumn;
     m_cachedState->m_labelHeight = labelHeight;
     m_cachedState->m_isSampleSpaceSet = true;
+
+    update();
 }
 
 void DeclarativeBars::setCameraPreset(CameraPreset preset)
@@ -196,6 +198,8 @@ void DeclarativeBars::setLabelTransparency(DeclarativeBars::LabelTransparency tr
 {
     m_cachedState->m_labelTransparency = QtDataVis3D::LabelTransparency(transparency);
     m_cachedState->m_isLabelTransparencySet = true;
+
+    update();
 }
 
 DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
@@ -207,6 +211,8 @@ void DeclarativeBars::setGridVisible(bool visible)
 {
     m_cachedState->m_isGridEnabled = visible;
     m_cachedState->m_isGridSet = true;
+
+    update();
 }
 
 bool DeclarativeBars::isGridVisible()
@@ -268,6 +274,7 @@ void DeclarativeBars::addDataRow(QDataRow *dataRow)
 {
     qDebug() << "Enter DeclarativeBars::addDataRow(QDataRow *dataRow)";
     m_cachedState->m_dataRow = dataRow;
+    update();
 }
 
 void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
@@ -293,6 +300,7 @@ void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
 {
     m_cachedState->m_selectionMode = QtDataVis3D::SelectionMode(mode);
     m_cachedState->m_isSelectionModeSet = true;
+    update();
 }
 
 DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
@@ -304,6 +312,7 @@ void DeclarativeBars::setShadowQuality(DeclarativeBars::ShadowQuality quality)
 {
     m_cachedState->m_shadowQuality = QtDataVis3D::ShadowQuality(quality);
     m_cachedState->m_isShadowQualitySet = true;
+    update();
 }
 
 DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
@@ -373,7 +382,7 @@ void DeclarativeBarsRenderer::render()
     m_barsRenderer->m_mousePos.setY(100);
 
     // Call the shared rendering function
-    m_barsRenderer->render();
+    m_barsRenderer->render(m_fbo->handle());
 
     m_fbo->bindDefault();
 

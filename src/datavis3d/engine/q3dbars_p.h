@@ -67,7 +67,7 @@ class Q3DBars;
 class Q3DBarsPrivate : public QObject
 {
 public:
-    Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle);
+    Q3DBarsPrivate(Q3DBars *q, QRect rect);
     ~Q3DBarsPrivate();
 
     Q3DBars *q_ptr;

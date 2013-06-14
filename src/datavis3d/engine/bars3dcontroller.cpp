@@ -57,7 +57,7 @@
 #include <QPainter>
 #include <QScreen>
 #include <QMouseEvent>
-
+#include <QThread>
 #include <qmath.h>
 
 #include <QDebug>
@@ -70,7 +70,6 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-//#define DISPLAY_RENDER_SPEED
 
 #ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
@@ -84,7 +83,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
-Bars3dController::Bars3dController(QRect rect, GLuint fbohandle)
+Bars3dController::Bars3dController(QRect rect)
     : m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
@@ -133,7 +132,6 @@ Bars3dController::Bars3dController(QRect rect, GLuint fbohandle)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
-      m_fbohandle(fbohandle),
       m_zoomLevel(100),
       m_zoomAdjustment(1.0f),
       m_horizontalRotation(-45.0f),
@@ -149,6 +147,11 @@ Bars3dController::Bars3dController(QRect rect, GLuint fbohandle)
       m_scaleZ(0),
       m_scaleFactor(0),
       m_maxSceneSize(40.0)
+#ifdef DISPLAY_RENDER_SPEED
+     ,m_isFirstFrame(true),
+      m_numFrames(0)
+#endif
+
 {
     m_theme = new Theme();
     m_dataSet->d_ptr->setDrawer(m_drawer);
@@ -180,36 +183,6 @@ Bars3dController::~Bars3dController()
     delete m_drawer;
 }
 
-void Bars3dController::render()
-{
-    if (!m_isInitialized)
-        return;
-
-#ifdef DISPLAY_RENDER_SPEED
-    // For speed computation
-    static bool firstRender = true;
-    static QTime lastTime;
-    static GLint nbFrames = 0;
-    if (firstRender) {
-        lastTime.start();
-        firstRender = false;
-    }
-
-    // Measure speed (as milliseconds per frame)
-    nbFrames++;
-    if (lastTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << qreal(lastTime.elapsed()) / qreal(nbFrames) << "ms/frame (=" << qreal(nbFrames) << "fps)";
-        nbFrames = 0;
-        lastTime.restart();
-    }
-#endif
-
-    // If zoom selection is on, draw zoom scene
-    drawZoomScene();
-    // Draw bars scene
-    drawScene();
-}
-
 void Bars3dController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
@@ -217,7 +190,6 @@ void Bars3dController::initializeOpenGL()
         return;
 
     m_renderer = new Bars3dRenderer(this);
-
     initializeOpenGLFunctions();
 
     m_textureHelper = new TextureHelper();
@@ -236,7 +208,7 @@ void Bars3dController::initializeOpenGL()
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
         // Init the depth buffer (for shadows)
-        initDepthBuffer();
+        updateDepthBuffer();
     } else {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertex"),
@@ -317,6 +289,33 @@ void Bars3dController::initializeOpenGL()
 
     // Load background mesh
     loadBackgroundMesh();
+}
+
+void Bars3dController::render(const GLuint defaultFboHandle)
+{
+    if (!m_isInitialized)
+        return;
+
+#ifdef DISPLAY_RENDER_SPEED
+    // For speed computation
+    if (m_isFirstFrame) {
+        m_lastFrameTime.start();
+        m_isFirstFrame = false;
+    }
+
+    // Measure speed (as milliseconds per frame)
+    m_numFrames++;
+    if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
+        qDebug() << qreal(m_lastFrameTime.elapsed()) / qreal(m_numFrames) << "ms/frame (=" << qreal(m_numFrames) << "fps)";
+        m_numFrames = 0;
+        m_lastFrameTime.restart();
+    }
+#endif
+
+    // If zoom selection is on, draw zoom scene
+    drawZoomScene();
+    // Draw bars scene
+    drawScene(defaultFboHandle);
 }
 
 void Bars3dController::drawZoomScene()
@@ -536,7 +535,7 @@ void Bars3dController::drawZoomScene()
     m_labelShader->release();
 }
 
-void Bars3dController::drawScene()
+void Bars3dController::drawScene(const GLuint defaultFboHandle)
 {
     GLint startBar = 0;
     GLint stopBar = 0;
@@ -624,6 +623,10 @@ void Bars3dController::drawScene()
 #if !defined(QT_OPENGL_ES_2)
     if (m_shadowQuality > ShadowNone/*!m_zoomActivated*/) {
         // Render scene into a depth texture for using with shadow mapping
+        // Enable drawing to depth framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
         // Bind depth shader
         m_depthShader->bind();
 
@@ -631,10 +634,6 @@ void Bars3dController::drawScene()
         glViewport(m_sceneViewPort.x(), m_sceneViewPort.y(),
                    m_sceneViewPort.width() * m_shadowQuality,
                    m_sceneViewPort.height() * m_shadowQuality);
-
-        // Enable drawing to framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
-        glClear(GL_DEPTH_BUFFER_BIT);
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
@@ -710,8 +709,8 @@ void Bars3dController::drawScene()
             }
         }
 
-        // Disable drawing to framebuffer (= enable drawing to screen)
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbohandle);
+        // Disable drawing to depth framebuffer (= enable drawing to screen)
+        glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Release depth shader
         m_depthShader->release();
@@ -850,7 +849,7 @@ void Bars3dController::drawScene()
             selection = Utils::getSelection(m_mousePos, height());
 
 #ifndef USE_HAX0R_SELECTION
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbohandle);
+        glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 #endif
 
         // Release selection shader
@@ -1726,8 +1725,8 @@ void Bars3dController::resizeNotify()
 
 #if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
-    if (m_isInitialized && m_shadowQuality > ShadowNone)
-        initDepthBuffer();
+    if (m_isInitialized)
+        updateDepthBuffer();
 #endif
 }
 
@@ -1965,6 +1964,7 @@ bool Bars3dController::backgroundEnabled()
 
 void Bars3dController::setShadowQuality(ShadowQuality quality)
 {
+    qDebug() << "Bars3dController::setShadowQuality";
     m_shadowQuality = quality;
     switch (quality) {
     case ShadowLow:
@@ -1982,9 +1982,10 @@ void Bars3dController::setShadowQuality(ShadowQuality quality)
     }
     if (m_isInitialized) {
 #if !defined(QT_OPENGL_ES_2)
+        // Re-init depth buffer
+        updateDepthBuffer();
+
         if (m_shadowQuality > ShadowNone) {
-            // Re-init depth buffer
-            initDepthBuffer();
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -2164,7 +2165,7 @@ void Bars3dController::addDataSet(QDataSet* dataSet)
 
 const QSize Bars3dController::size()
 {
-    return m_boundingRect.size();;
+    return m_boundingRect.size();
 }
 
 const QRect Bars3dController::boundingRect()
@@ -2175,11 +2176,13 @@ const QRect Bars3dController::boundingRect()
 void Bars3dController::setBoundingRect(const QRect boundingRect)
 {
     m_boundingRect = boundingRect;
+    resizeNotify();
 }
 
 void Bars3dController::setWidth(const int width)
 {
     m_boundingRect.setWidth(width);
+    resizeNotify();
 }
 
 int Bars3dController::width()
@@ -2190,6 +2193,7 @@ int Bars3dController::width()
 void Bars3dController::setHeight(const int height)
 {
     m_boundingRect.setHeight(height);
+    resizeNotify();
 }
 
 int Bars3dController::height()
@@ -2300,14 +2304,22 @@ void Bars3dController::initDepthShader()
     m_depthShader->initialize();
 }
 
-void Bars3dController::initDepthBuffer()
+void Bars3dController::updateDepthBuffer()
 {
+    qDebug() << "updateDepthBuffer("<<this->size().width()<<" x "<< this->size().height()<<") ENTER m_depthFrameBuffer = " << m_depthFrameBuffer;
+    qDebug() << "Bars3dController::updateDepthBuffer() called on thread " << QThread::currentThread();
+
     if (m_depthTexture) {
         glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->deleteTexture(&m_depthTexture);
+        m_depthFrameBuffer = 0;
+        m_depthTexture = 0;
     }
-    m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
-                                                         m_shadowQuality);
+
+    if (m_shadowQuality > ShadowNone)
+        m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer, m_shadowQuality);
+
+    qDebug() << "updateDepthBuffer() EXIT  m_depthFrameBuffer = " << m_depthFrameBuffer;
 }
 #endif
 

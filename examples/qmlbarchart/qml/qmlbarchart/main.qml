@@ -100,7 +100,13 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            Qt.quit();
+            if (testchart.shadowQuality == Bars3D.ShadowNone) {
+                testchart.shadowQuality = Bars3D.ShadowLow;
+            }
+            else {
+                testchart.shadowQuality = Bars3D.ShadowNone;
+            }
+            //Qt.quit();
         }
     }
 

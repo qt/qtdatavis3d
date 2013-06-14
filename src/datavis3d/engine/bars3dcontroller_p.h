@@ -59,8 +59,10 @@
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
-
+#include <QTime>
 #include <QWindow>
+
+#define DISPLAY_RENDER_SPEED
 
 class QOpenGLPaintDevice;
 class QPoint;
@@ -165,7 +167,6 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
-    GLuint m_fbohandle;
     GLint m_zoomLevel;
     GLfloat m_zoomAdjustment;
     GLfloat m_horizontalRotation;
@@ -182,12 +183,18 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
 
+#ifdef DISPLAY_RENDER_SPEED
+    bool m_isFirstFrame;
+    QTime m_lastFrameTime;
+    GLint m_numFrames;
+#endif
+
 public:
-    explicit Bars3dController(QRect rect, GLuint fbohandle=0);
+    explicit Bars3dController(QRect rect);
     ~Bars3dController();
 
     void initializeOpenGL();
-    void render();
+    void render(const GLuint defaultFboHandle = 0);
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -318,7 +325,7 @@ public:
     void initSelectionBuffer();
 #if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
-    void initDepthBuffer();
+    void updateDepthBuffer();
 #endif
     void updateTextures();
     void calculateSceneScalingFactors();
@@ -329,7 +336,7 @@ public:
 
 private:
     void drawZoomScene();
-    void drawScene();
+    void drawScene(const GLuint defaultFboHandle);
     Q_DISABLE_COPY(Bars3dController)
 
     friend class DeclarativeBars;

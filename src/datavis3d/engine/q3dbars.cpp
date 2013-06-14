@@ -228,7 +228,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs a new 3D bar window.
  */
 Q3DBars::Q3DBars()
-    : d_ptr(new Q3DBarsPrivate(this, geometry(), 0))
+    : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
 }
 
@@ -702,9 +702,9 @@ void Q3DBars::addDataSet(QDataSet *dataSet)
     d_ptr->m_shared->addDataSet(dataSet);
 }
 
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle)
+Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),
-      m_shared(new Bars3dController(rect, fbohandle))
+      m_shared(new Bars3dController(rect))
 {
 }
 
