@@ -67,6 +67,9 @@ class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_ENUMS(SelectionMode)
+    Q_ENUMS(ShadowQuality)
+    Q_ENUMS(LabelTransparency)
 
 public:
     explicit Q3DBars();

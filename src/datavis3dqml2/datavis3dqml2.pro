@@ -22,8 +22,8 @@ SOURCES += \
 HEADERS += \
     datavis3dqml2_plugin.h \
     declarativebars.h \
-    declarativemaps.h \  #\
-    declarativebars_p.h
+    declarativebars_p.h \
+    declarativemaps.h #\
     #declarativedataitem.h \
     #declarativedatarow.h \
     #declarativedataset.h

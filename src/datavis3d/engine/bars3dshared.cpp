@@ -84,7 +84,7 @@ const GLfloat gridLineWidth = 0.005f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Bars3dModel::Bars3dModel(QRect boundingRect)
-    :m_mousePressed(MouseNone),
+    : m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
       m_boundingRect(boundingRect),
@@ -135,7 +135,6 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, GLuint fbohandle)
       m_tickCount(0),
       m_tickStep(0),
       m_negativeValues(false),
-
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),

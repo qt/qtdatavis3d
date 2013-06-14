@@ -58,7 +58,10 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 {
     setFlags(QQuickItem::ItemHasContents);
 
+    // TODO: Note; this does not flip the render result correctly. It is in mirror image.
     setRotation(180.0);
+
+    // TODO: These seem to have no effect; find a way to activate anti-aliasing
     setAntialiasing(true);
     setSmooth(true);
 }
@@ -90,7 +93,9 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     m_shared->setBoundingRect(boundingRect().toRect());
 
     if (m_cachedState->m_isSampleSpaceSet) {
-        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn, m_cachedState->m_labelRow, m_cachedState->m_labelColumn, m_cachedState->m_labelHeight);
+        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn,
+                                   m_cachedState->m_labelRow, m_cachedState->m_labelColumn,
+                                   m_cachedState->m_labelHeight);
         m_cachedState->m_isSampleSpaceSet = false;
     }
 
@@ -144,7 +149,6 @@ void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn, const 
     m_cachedState->m_isSampleSpaceSet = true;
 }
 
-
 void DeclarativeBars::setCameraPreset(CameraPreset preset)
 {
     m_shared->setCameraPreset(preset);
@@ -160,7 +164,8 @@ void DeclarativeBars::setTheme(ColorTheme theme)
     m_shared->setTheme(theme);
 }
 
-void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                  bool uniform)
 {
     m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
 }
@@ -243,7 +248,8 @@ void DeclarativeBars::addDataRow(QDataRow *dataRow)
     m_cachedState->m_dataRow = dataRow;
 }
 
-void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
+void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
+                                 const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
     m_shared->addDataSet(data, labelsRow,labelsColumn);
@@ -312,7 +318,9 @@ DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
 void DeclarativeBarsRenderer::render()
 {
     static bool firstRender = true;
-    if (firstRender) qDebug() << "DeclarativeBarsRenderer::render() running on thread "<< QThread::currentThread();
+    // TODO: Remove if once done testing
+    if (firstRender)
+        qDebug() << "DeclarativeBarsRenderer::render() running on thread " << QThread::currentThread();
     firstRender = false;
 
     QSize size = rect().size().toSize();
@@ -322,21 +330,6 @@ void DeclarativeBarsRenderer::render()
         format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
         m_fbo = new QOpenGLFramebufferObject(size, format);
         m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
-
-        // TODO: If we create the vis3d this way, how do we connect it with QML?
-        // Should we create it at QML and give it to DataVisView using a property (setVisualizer or similar)?
-        // DataVisView can then give it here as an argument in constructor?
-
-        // TODO: For testing. Add some data to scene.
-        QVector< QVector<float> > data;
-        QVector<float> row;
-        for (float j = 0.0f; j < 5.0f; j++) {
-            for (float i = 0.0f; i < 5.0f; i++)
-                row.append(j / 10.0f + i / 10.0f);
-            data.append(row);
-            row.clear();
-        }
-
         setTexture(m_texture);
     }
 
@@ -378,6 +371,5 @@ DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
 DeclarativeBarsCachedStatePrivate::~DeclarativeBarsCachedStatePrivate()
 {
 }
-
 
 QT_DATAVIS3D_END_NAMESPACE
