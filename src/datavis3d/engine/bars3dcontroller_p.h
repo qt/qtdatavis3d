@@ -78,60 +78,10 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class LabelItem;
+class Bars3dController;
 class Bars3dRenderer;
 
-class Bars3dModel : public QObject
-{
-    Q_OBJECT
-public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
-    // Interaction related parameters
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    SelectionMode m_selectionMode;
-
-    // Visual parameters
-    QRect m_boundingRect;
-    QString m_objFile;
-    Theme *m_theme;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    bool m_gridEnabled;
-    bool m_bgrEnabled;
-    ShadowQuality m_shadowQuality;
-
-    // Data parameters
-    QPair<int, int> m_sampleCount;
-    QDataItem *m_selectedBar;
-    QDataSet *m_dataSet;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
-    QDataRow *m_zoomSelection;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    bool m_negativeValues;
-
-    explicit Bars3dModel(QRect boundingRect);
-    ~Bars3dModel();
-};
-
-class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Bars3dController : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -183,6 +133,8 @@ public:
     GLfloat m_tickStep;
     bool m_negativeValues;
 
+    Bars3dRenderer *m_renderer;
+
 private:
 
     // Internal attributes purely related to how the scene is drawn with GL.
@@ -231,8 +183,8 @@ private:
     GLfloat m_maxSceneSize;
 
 public:
-    explicit Bars3dRenderer(QRect rect, GLuint fbohandle=0);
-    ~Bars3dRenderer();
+    explicit Bars3dController(QRect rect, GLuint fbohandle=0);
+    ~Bars3dController();
 
     void initializeOpenGL();
     void render();
@@ -378,11 +330,12 @@ public:
 private:
     void drawZoomScene();
     void drawScene();
-    Q_DISABLE_COPY(Bars3dRenderer)
+    Q_DISABLE_COPY(Bars3dController)
 
     friend class DeclarativeBars;
     friend class DeclarativeBarsRenderer;
 };
+
 
 QT_DATAVIS3D_END_NAMESPACE
 

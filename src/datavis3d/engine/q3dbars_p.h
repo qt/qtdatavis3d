@@ -52,7 +52,7 @@
 #ifndef Q3DBARS_p_H
 #define Q3DBARS_p_H
 
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
 #include "qdatavis3namespace.h"
 
 class QOpenGLPaintDevice;
@@ -71,7 +71,7 @@ public:
     ~Q3DBarsPrivate();
 
     Q3DBars *q_ptr;
-    Bars3dRenderer *m_shared;
+    Bars3dController *m_shared;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

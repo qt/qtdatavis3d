@@ -87,7 +87,7 @@ Item {
         //data: testdata1
 
         gridVisible: true
-        shadowQuality: Bars3D.ShadowLow
+        shadowQuality: Bars3D.ShadowNone
         selectionMode: Bars3D.ModeNone
         labelTransparency: Bars3D.TransparencyNone
 

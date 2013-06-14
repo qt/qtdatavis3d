@@ -40,7 +40,7 @@
 ****************************************************************************/
 
 #include "declarativebars.h"
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
 #include "qdataset.h"
 
 #include <QtQuick/QQuickWindow>
@@ -80,7 +80,7 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         delete oldNode;
 
     if (!m_shared)
-        m_shared = new Bars3dRenderer(boundingRect().toRect());
+        m_shared = new Bars3dController(boundingRect().toRect());
 
     // Lazy initialization of shared object on the SGRenderThread
     m_shared->initializeOpenGL();
@@ -319,7 +319,7 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
 
 
 
-DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dRenderer *renderer)
+DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *renderer)
     : m_fbo(0),
       m_texture(0),
       m_window(window),

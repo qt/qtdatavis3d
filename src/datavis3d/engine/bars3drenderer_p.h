@@ -39,40 +39,42 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef BARS3DRENDERER_P_H
+#define BARS3DRENDERER_P_H
 
 #include "QtDataVis3D/qdatavis3dglobal.h"
-#include <QScopedPointer>
-#include <QString>
+#include "QtDataVis3D/qdatavis3namespace.h"
+#include <QtCore/QSize>
+#include <QtCore/QObject>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QFont>
+#include <QWindow>
 #include <QObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+class Bars3dController;
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, public QOpenGLFunctions
 {
     Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
 
 public:
-    explicit QDataRow(const QString &label = QString());
-    ~QDataRow();
-
-    void setLabel(const QString &label); // label for value, unit for example
-    QString label();
-    Q_INVOKABLE void addItem(QDataItem *item);
-
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dController;
-    friend class Q3DMaps;
-    friend class Q3DMapsPrivate;
-    friend class QDataSetPrivate;
+    explicit Bars3dRenderer(Bars3dController *controller);
+    ~Bars3dRenderer();
 };
+
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // BARS3DRENDERER_P_H

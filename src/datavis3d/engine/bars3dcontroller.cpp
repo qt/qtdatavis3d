@@ -39,7 +39,8 @@
 **
 ****************************************************************************/
 
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
+#include "bars3drenderer_p.h"
 #include "camerahelper_p.h"
 #include "qdataitem_p.h"
 #include "qdatarow_p.h"
@@ -83,37 +84,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
-Bars3dModel::Bars3dModel(QRect boundingRect)
-    : m_mousePressed(MouseNone),
-      m_mousePos(QPoint(0, 0)),
-      m_selectionMode(ModeBar),
-      m_boundingRect(boundingRect),
-      m_objFile(QStringLiteral(":/defaultMeshes/bar")),
-      m_theme(new Theme()),
-      m_labelTransparency(TransparencyFromTheme),
-      m_font(QFont(QStringLiteral("Arial"))),
-      m_gridEnabled(true),
-      m_bgrEnabled(true),
-      m_shadowQuality(ShadowLow),
-      m_sampleCount(0, 0),
-      m_selectedBar(0),
-      m_dataSet(new QDataSet()),
-      m_axisLabelX(QStringLiteral("X")),
-      m_axisLabelZ(QStringLiteral("Z")),
-      m_axisLabelY(QStringLiteral("Y")),
-      m_zoomSelection(0),
-      m_tickCount(0),
-      m_tickStep(0),
-      m_negativeValues(false)
-{
-}
-
-Bars3dModel::~Bars3dModel()
-{
-    delete m_dataSet;
-}
-
-Bars3dRenderer::Bars3dRenderer(QRect rect, GLuint fbohandle)
+Bars3dController::Bars3dController(QRect rect, GLuint fbohandle)
     : m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
@@ -135,6 +106,7 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, GLuint fbohandle)
       m_tickCount(0),
       m_tickStep(0),
       m_negativeValues(false),
+      m_renderer(0),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
@@ -180,10 +152,10 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, GLuint fbohandle)
 {
     m_theme = new Theme();
     m_dataSet->d_ptr->setDrawer(m_drawer);
-    QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Bars3dRenderer::updateTextures);
+    QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Bars3dController::updateTextures);
 }
 
-Bars3dRenderer::~Bars3dRenderer()
+Bars3dController::~Bars3dController()
 {
 #ifndef USE_HAX0R_SELECTION
     glDeleteFramebuffers(1, &m_selectionFrameBuffer);
@@ -208,7 +180,7 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_drawer;
 }
 
-void Bars3dRenderer::render()
+void Bars3dController::render()
 {
     if (!m_isInitialized)
         return;
@@ -238,11 +210,13 @@ void Bars3dRenderer::render()
     drawScene();
 }
 
-void Bars3dRenderer::initializeOpenGL()
+void Bars3dController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
     if (m_isInitialized)
         return;
+
+    m_renderer = new Bars3dRenderer(this);
 
     initializeOpenGLFunctions();
 
@@ -345,7 +319,7 @@ void Bars3dRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3dRenderer::drawZoomScene()
+void Bars3dController::drawZoomScene()
 {
     // Set clear color
     QVector3D clearColor = Utils::vectorFromColor(m_theme->m_windowColor);
@@ -562,7 +536,7 @@ void Bars3dRenderer::drawZoomScene()
     m_labelShader->release();
 }
 
-void Bars3dRenderer::drawScene()
+void Bars3dController::drawScene()
 {
     GLint startBar = 0;
     GLint stopBar = 0;
@@ -872,7 +846,7 @@ void Bars3dRenderer::drawScene()
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (Bars3dRenderer::MouseOnScene == m_mousePressed)
+        if (Bars3dController::MouseOnScene == m_mousePressed)
             selection = Utils::getSelection(m_mousePos, height());
 
 #ifndef USE_HAX0R_SELECTION
@@ -964,10 +938,10 @@ void Bars3dRenderer::drawScene()
 
             GLfloat lightStrength = m_theme->m_lightStrength;
             if (m_selectionMode > ModeNone) {
-                Bars3dRenderer::SelectionType selectionType = isSelected(row, bar,
-                                                                         selection);
+                Bars3dController::SelectionType selectionType = isSelected(row, bar,
+                                                                           selection);
                 switch (selectionType) {
-                case Bars3dRenderer::SelectionBar: {
+                case Bars3dController::SelectionBar: {
                     barColor = Utils::vectorFromColor(m_theme->m_highlightBarColor);
                     lightStrength = m_theme->m_highlightLightStrength;
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
@@ -990,7 +964,7 @@ void Bars3dRenderer::drawScene()
                     }
                     break;
                 }
-                case Bars3dRenderer::SelectionRow: {
+                case Bars3dController::SelectionRow: {
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(m_theme->m_highlightRowColor);
                     lightStrength = m_theme->m_highlightLightStrength;
@@ -1006,7 +980,7 @@ void Bars3dRenderer::drawScene()
                     }
                     break;
                 }
-                case Bars3dRenderer::SelectionColumn: {
+                case Bars3dController::SelectionColumn: {
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(m_theme->m_highlightColumnColor);
                     lightStrength = m_theme->m_highlightLightStrength;
@@ -1022,7 +996,7 @@ void Bars3dRenderer::drawScene()
                     }
                     break;
                 }
-                case Bars3dRenderer::SelectionNone: {
+                case Bars3dController::SelectionNone: {
                     // Current bar is not selected, nor on a row or column
                     // do nothing
                     break;
@@ -1422,12 +1396,12 @@ void Bars3dRenderer::drawScene()
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         m_selectedBar = NULL;
-        if (m_zoomActivated && Bars3dRenderer::MouseOnOverview == m_mousePressed) {
+        if (m_zoomActivated && Bars3dController::MouseOnOverview == m_mousePressed) {
             m_sceneViewPort = QRect(0, 0, width(), height());
             m_zoomActivated = false;
         }
     } else if (m_selectionMode >= ModeZoomRow
-               && Bars3dRenderer::MouseOnScene == m_mousePressed) {
+               && Bars3dController::MouseOnScene == m_mousePressed) {
         // Activate zoom mode
         m_zoomActivated = true;
         m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
@@ -1620,16 +1594,16 @@ void Bars3dRenderer::drawScene()
 }
 
 #if defined(Q_OS_ANDROID)
-void Bars3dRenderer::mouseDoubleClickEvent(QMouseEvent *event)
+void Bars3dController::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_zoomActivated) {
-        m_mousePressed = Bars3dRenderer::MouseOnScene;
+        m_mousePressed = Bars3dController::MouseOnScene;
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
     }
 }
 
-void Bars3dRenderer::touchEvent(QTouchEvent *event)
+void Bars3dController::touchEvent(QTouchEvent *event)
 {
     static int prevDistance = 0;
 
@@ -1637,7 +1611,7 @@ void Bars3dRenderer::touchEvent(QTouchEvent *event)
     points = event->touchPoints();
 
     if (points.count() == 2) {
-        m_mousePressed = Bars3dRenderer::MouseOnPinch;
+        m_mousePressed = Bars3dController::MouseOnPinch;
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();
@@ -1658,23 +1632,23 @@ void Bars3dRenderer::touchEvent(QTouchEvent *event)
 }
 #endif
 
-void Bars3dRenderer::mousePressEvent(QMouseEvent *event)
+void Bars3dController::mousePressEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
         if (m_zoomActivated) {
             if (event->pos().x() <= m_sceneViewPort.width()
                     && event->pos().y() <= m_sceneViewPort.height()) {
-                m_mousePressed = Bars3dRenderer::MouseOnOverview;
+                m_mousePressed = Bars3dController::MouseOnOverview;
                 //qDebug() << "Mouse pressed on overview";
             } else {
-                m_mousePressed = Bars3dRenderer::MouseOnZoom;
+                m_mousePressed = Bars3dController::MouseOnZoom;
                 //qDebug() << "Mouse pressed on zoom";
             }
         } else {
 #if !defined(Q_OS_ANDROID)
-            m_mousePressed = Bars3dRenderer::MouseOnScene;
+            m_mousePressed = Bars3dController::MouseOnScene;
 #else
-            m_mousePressed = Bars3dRenderer::MouseRotating;
+            m_mousePressed = Bars3dController::MouseRotating;
 #endif
             // update mouse positions to prevent jumping when releasing or repressing a button
             m_mousePos = event->pos();
@@ -1685,9 +1659,9 @@ void Bars3dRenderer::mousePressEvent(QMouseEvent *event)
         m_mousePos = QPoint(0, 0);
     } else if (Qt::RightButton == event->button()) {
 #if !defined(Q_OS_ANDROID)
-        m_mousePressed = Bars3dRenderer::MouseRotating;
+        m_mousePressed = Bars3dController::MouseRotating;
 #else
-        m_mousePressed = Bars3dRenderer::MouseOnScene;
+        m_mousePressed = Bars3dController::MouseOnScene;
 #endif
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
@@ -1695,23 +1669,23 @@ void Bars3dRenderer::mousePressEvent(QMouseEvent *event)
     CameraHelper::updateMousePos(m_mousePos);
 }
 
-void Bars3dRenderer::mouseReleaseEvent(QMouseEvent *event)
+void Bars3dController::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (Bars3dRenderer::MouseRotating == m_mousePressed) {
+    if (Bars3dController::MouseRotating == m_mousePressed) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
         CameraHelper::updateMousePos(event->pos());
     }
-    m_mousePressed = Bars3dRenderer::MouseNone;
+    m_mousePressed = Bars3dController::MouseNone;
 }
 
-void Bars3dRenderer::mouseMoveEvent(QMouseEvent *event)
+void Bars3dController::mouseMoveEvent(QMouseEvent *event)
 {
-    if (Bars3dRenderer::MouseRotating == m_mousePressed)
+    if (Bars3dController::MouseRotating == m_mousePressed)
         m_mousePos = event->pos();
 }
 
-void Bars3dRenderer::wheelEvent(QWheelEvent *event)
+void Bars3dController::wheelEvent(QWheelEvent *event)
 {
     if (m_zoomLevel > 100)
         m_zoomLevel += event->angleDelta().y() / 12;
@@ -1725,12 +1699,12 @@ void Bars3dRenderer::wheelEvent(QWheelEvent *event)
         m_zoomLevel = 10;
 }
 
-void Bars3dRenderer::resizeNotify()
+void Bars3dController::resizeNotify()
 {
     if (!m_isInitialized)
         return;
 
-    qDebug() << "Bars3dRenderer::resizeEvent " << width() << "x" <<height();
+    qDebug() << "Bars3dController::resizeEvent " << width() << "x" <<height();
 
     // Set view port
     if (m_zoomActivated)
@@ -1757,7 +1731,7 @@ void Bars3dRenderer::resizeNotify()
 #endif
 }
 
-void Bars3dRenderer::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
+void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
     m_barThickness = thickness;
     if (relative) {
@@ -1770,7 +1744,7 @@ void Bars3dRenderer::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative
     calculateSceneScalingFactors();
 }
 
-void Bars3dRenderer::setBarType(BarStyle style, bool smooth)
+void Bars3dController::setBarType(BarStyle style, bool smooth)
 {
     if (style == Bars) {
         if (smooth)
@@ -1803,13 +1777,13 @@ void Bars3dRenderer::setBarType(BarStyle style, bool smooth)
         loadBarMesh();
 }
 
-void Bars3dRenderer::setMeshFileName(const QString &objFileName)
+void Bars3dController::setMeshFileName(const QString &objFileName)
 {
     m_objFile = objFileName;
 }
 
-void Bars3dRenderer::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                                      const QString &labelColumn, const QString &labelHeight)
+void Bars3dController::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
+                                        const QString &labelColumn, const QString &labelHeight)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     closeZoomMode();
@@ -1829,12 +1803,12 @@ void Bars3dRenderer::setupSampleSpace(int samplesRow, int samplesColumn, const Q
     m_axisLabelY = labelHeight;
 }
 
-void Bars3dRenderer::setCameraPreset(CameraPreset preset)
+void Bars3dController::setCameraPreset(CameraPreset preset)
 {
     CameraHelper::setCameraPreset(preset);
 }
 
-void Bars3dRenderer::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
+void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
@@ -1844,7 +1818,7 @@ void Bars3dRenderer::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLi
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
-void Bars3dRenderer::setTheme(ColorTheme theme)
+void Bars3dController::setTheme(ColorTheme theme)
 {
     m_theme->useTheme(theme);
     m_drawer->setTheme(*m_theme);
@@ -1878,8 +1852,8 @@ void Bars3dRenderer::setTheme(ColorTheme theme)
 #endif
 }
 
-void Bars3dRenderer::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                 bool uniform)
+void Bars3dController::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                   bool uniform)
 {
     m_theme->m_baseColor = baseColor;
     m_theme->m_heightColor = heightColor;
@@ -1917,7 +1891,7 @@ void Bars3dRenderer::setBarColor(QColor baseColor, QColor heightColor, QColor de
     m_theme->m_uniformColor = uniform;
 }
 
-void Bars3dRenderer::setSelectionMode(SelectionMode mode)
+void Bars3dController::setSelectionMode(SelectionMode mode)
 {
     m_selectionMode = mode;
     // Disable zoom if selection mode changes
@@ -1927,55 +1901,55 @@ void Bars3dRenderer::setSelectionMode(SelectionMode mode)
         m_zoomSelection = new QDataRow();
 }
 
-SelectionMode Bars3dRenderer::selectionMode()
+SelectionMode Bars3dController::selectionMode()
 {
     return m_selectionMode;
 }
 
-void Bars3dRenderer::setFontSize(float fontsize)
+void Bars3dController::setFontSize(float fontsize)
 {
     m_font.setPointSizeF(fontsize);
     m_drawer->setFont(m_font);
 }
 
-float Bars3dRenderer::fontSize()
+float Bars3dController::fontSize()
 {
     return m_font.pointSizeF();
 }
 
-void Bars3dRenderer::setFont(const QFont &font)
+void Bars3dController::setFont(const QFont &font)
 {
     m_font = font;
     m_drawer->setFont(font);
 }
 
-QFont Bars3dRenderer::font()
+QFont Bars3dController::font()
 {
     return m_font;
 }
 
-void Bars3dRenderer::setLabelTransparency(LabelTransparency transparency)
+void Bars3dController::setLabelTransparency(LabelTransparency transparency)
 {
     m_labelTransparency = transparency;
     m_drawer->setTransparency(transparency);
 }
 
-LabelTransparency Bars3dRenderer::labelTransparency()
+LabelTransparency Bars3dController::labelTransparency()
 {
     return m_labelTransparency;
 }
 
-void Bars3dRenderer::setGridEnabled(bool enable)
+void Bars3dController::setGridEnabled(bool enable)
 {
     m_gridEnabled = enable;
 }
 
-bool Bars3dRenderer::gridEnabled()
+bool Bars3dController::gridEnabled()
 {
     return m_gridEnabled;
 }
 
-void Bars3dRenderer::setBackgroundEnabled(bool enable)
+void Bars3dController::setBackgroundEnabled(bool enable)
 {
     if (m_bgrEnabled != enable) {
         m_bgrEnabled = enable;
@@ -1984,12 +1958,12 @@ void Bars3dRenderer::setBackgroundEnabled(bool enable)
     }
 }
 
-bool Bars3dRenderer::backgroundEnabled()
+bool Bars3dController::backgroundEnabled()
 {
     return m_bgrEnabled;
 }
 
-void Bars3dRenderer::setShadowQuality(ShadowQuality quality)
+void Bars3dController::setShadowQuality(ShadowQuality quality)
 {
     m_shadowQuality = quality;
     switch (quality) {
@@ -2047,12 +2021,12 @@ void Bars3dRenderer::setShadowQuality(ShadowQuality quality)
     }
 }
 
-ShadowQuality Bars3dRenderer::shadowQuality()
+ShadowQuality Bars3dController::shadowQuality()
 {
     return m_shadowQuality;
 }
 
-void Bars3dRenderer::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Bars3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
     m_tickCount = tickCount;
     m_tickStep = step;
@@ -2062,8 +2036,8 @@ void Bars3dRenderer::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum
     }
 }
 
-void Bars3dRenderer::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                                const QVector<QString> &labelsColumn)
+void Bars3dController::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
+                                  const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2077,8 +2051,8 @@ void Bars3dRenderer::addDataRow(const QVector<float> &dataRow, const QString &la
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
-void Bars3dRenderer::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                                const QVector<QString> &labelsColumn)
+void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
+                                  const QVector<QString> &labelsColumn)
 {
     // Convert to QDataRow and add to QDataSet
     QDataRow *row = new QDataRow(labelRow);
@@ -2092,7 +2066,7 @@ void Bars3dRenderer::addDataRow(const QVector<QDataItem*> &dataRow, const QStrin
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
-void Bars3dRenderer::addDataRow(QDataRow *dataRow)
+void Bars3dController::addDataRow(QDataRow *dataRow)
 {
     QDataRow *row = dataRow;
     // Check that the input data fits into sample space, and resize if it doesn't
@@ -2105,9 +2079,9 @@ void Bars3dRenderer::addDataRow(QDataRow *dataRow)
     handleLimitChange();
 }
 
-void Bars3dRenderer::addDataSet(const QVector< QVector<float> > &data,
-                                const QVector<QString> &labelsRow,
-                                const QVector<QString> &labelsColumn)
+void Bars3dController::addDataSet(const QVector< QVector<float> > &data,
+                                  const QVector<QString> &labelsRow,
+                                  const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2139,9 +2113,9 @@ void Bars3dRenderer::addDataSet(const QVector< QVector<float> > &data,
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
-void Bars3dRenderer::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                const QVector<QString> &labelsRow,
-                                const QVector<QString> &labelsColumn)
+void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
+                                  const QVector<QString> &labelsRow,
+                                  const QVector<QString> &labelsColumn)
 {
     // Copy axis labels
     QString xAxis;
@@ -2173,7 +2147,7 @@ void Bars3dRenderer::addDataSet(const QVector< QVector<QDataItem*> > &data,
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
-void Bars3dRenderer::addDataSet(QDataSet* dataSet)
+void Bars3dController::addDataSet(QDataSet* dataSet)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     closeZoomMode();
@@ -2188,62 +2162,62 @@ void Bars3dRenderer::addDataSet(QDataSet* dataSet)
     m_dataSet->d_ptr->setDrawer(m_drawer);
 }
 
-const QSize Bars3dRenderer::size()
+const QSize Bars3dController::size()
 {
     return m_boundingRect.size();;
 }
 
-const QRect Bars3dRenderer::boundingRect()
+const QRect Bars3dController::boundingRect()
 {
     return m_boundingRect;
 }
 
-void Bars3dRenderer::setBoundingRect(const QRect boundingRect)
+void Bars3dController::setBoundingRect(const QRect boundingRect)
 {
     m_boundingRect = boundingRect;
 }
 
-void Bars3dRenderer::setWidth(const int width)
+void Bars3dController::setWidth(const int width)
 {
     m_boundingRect.setWidth(width);
 }
 
-int Bars3dRenderer::width()
+int Bars3dController::width()
 {
     return m_boundingRect.width();
 }
 
-void Bars3dRenderer::setHeight(const int height)
+void Bars3dController::setHeight(const int height)
 {
     m_boundingRect.setHeight(height);
 }
 
-int Bars3dRenderer::height()
+int Bars3dController::height()
 {
     return m_boundingRect.height();
 }
 
-void Bars3dRenderer::setX(const int x)
+void Bars3dController::setX(const int x)
 {
     m_boundingRect.setX(x);
 }
 
-int Bars3dRenderer::x()
+int Bars3dController::x()
 {
     return m_boundingRect.x();
 }
 
-void Bars3dRenderer::setY(const int y)
+void Bars3dController::setY(const int y)
 {
     m_boundingRect.setY(y);
 }
 
-int Bars3dRenderer::y()
+int Bars3dController::y()
 {
     return m_boundingRect.y();
 }
 
-void Bars3dRenderer::loadBarMesh()
+void Bars3dController::loadBarMesh()
 {
     QString objectFileName = m_objFile;
     if (m_barObj)
@@ -2255,7 +2229,7 @@ void Bars3dRenderer::loadBarMesh()
     m_barObj->load();
 }
 
-void Bars3dRenderer::loadBackgroundMesh()
+void Bars3dController::loadBackgroundMesh()
 {
     if (!m_isInitialized)
         return;
@@ -2269,7 +2243,7 @@ void Bars3dRenderer::loadBackgroundMesh()
     m_backgroundObj->load();
 }
 
-void Bars3dRenderer::loadGridLineMesh()
+void Bars3dController::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
@@ -2277,7 +2251,7 @@ void Bars3dRenderer::loadGridLineMesh()
     m_gridLineObj->load();
 }
 
-void Bars3dRenderer::loadLabelMesh()
+void Bars3dController::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
@@ -2285,7 +2259,7 @@ void Bars3dRenderer::loadLabelMesh()
     m_labelObj->load();
 }
 
-void Bars3dRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
+void Bars3dController::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_barShader)
         delete m_barShader;
@@ -2293,7 +2267,7 @@ void Bars3dRenderer::initShaders(const QString &vertexShader, const QString &fra
     m_barShader->initialize();
 }
 
-void Bars3dRenderer::initSelectionShader()
+void Bars3dController::initSelectionShader()
 {
     if (m_selectionShader)
         delete m_selectionShader;
@@ -2302,7 +2276,7 @@ void Bars3dRenderer::initSelectionShader()
     m_selectionShader->initialize();
 }
 
-void Bars3dRenderer::initSelectionBuffer()
+void Bars3dController::initSelectionBuffer()
 {
 #ifndef USE_HAX0R_SELECTION
     if (m_selectionTexture) {
@@ -2317,7 +2291,7 @@ void Bars3dRenderer::initSelectionBuffer()
 }
 
 #if !defined(QT_OPENGL_ES_2)
-void Bars3dRenderer::initDepthShader()
+void Bars3dController::initDepthShader()
 {
     if (m_depthShader)
         delete m_depthShader;
@@ -2326,7 +2300,7 @@ void Bars3dRenderer::initDepthShader()
     m_depthShader->initialize();
 }
 
-void Bars3dRenderer::initDepthBuffer()
+void Bars3dController::initDepthBuffer()
 {
     if (m_depthTexture) {
         glDeleteFramebuffers(1, &m_depthFrameBuffer);
@@ -2337,8 +2311,8 @@ void Bars3dRenderer::initDepthBuffer()
 }
 #endif
 
-void Bars3dRenderer::initBackgroundShaders(const QString &vertexShader,
-                                           const QString &fragmentShader)
+void Bars3dController::initBackgroundShaders(const QString &vertexShader,
+                                             const QString &fragmentShader)
 {
     if (m_backgroundShader)
         delete m_backgroundShader;
@@ -2346,7 +2320,7 @@ void Bars3dRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
-void Bars3dRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
+void Bars3dController::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_labelShader)
         delete m_labelShader;
@@ -2354,13 +2328,13 @@ void Bars3dRenderer::initLabelShaders(const QString &vertexShader, const QString
     m_labelShader->initialize();
 }
 
-void Bars3dRenderer::updateTextures()
+void Bars3dController::updateTextures()
 {
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }
 
-void Bars3dRenderer::calculateSceneScalingFactors()
+void Bars3dController::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
     m_rowWidth = ((m_sampleCount.first + 1) * m_barSpacing.width()) / 2.0f;
@@ -2375,15 +2349,15 @@ void Bars3dRenderer::calculateSceneScalingFactors()
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
 }
 
-void Bars3dRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
+void Bars3dController::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
 {
     // 2.0f = max difference between minimum and maximum value after scaling with m_heightNormalizer
     m_yAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
     //qDebug() << m_yAdjustment;
 }
 
-Bars3dRenderer::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar,
-                                                         const QVector3D &selection)
+Bars3dController::SelectionType Bars3dController::isSelected(GLint row, GLint bar,
+                                                             const QVector3D &selection)
 {
     //static QVector3D prevSel = selection; // TODO: For debugging
     SelectionType isSelectedType = SelectionNone;
@@ -2419,7 +2393,7 @@ Bars3dRenderer::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar,
     return isSelectedType;
 }
 
-void Bars3dRenderer::handleLimitChange()
+void Bars3dController::handleLimitChange()
 {
     // Get the limits
     QPair<GLfloat, GLfloat> limits = m_dataSet->d_ptr->limitValues();
@@ -2444,7 +2418,7 @@ void Bars3dRenderer::handleLimitChange()
     }
 }
 
-void Bars3dRenderer::closeZoomMode()
+void Bars3dController::closeZoomMode()
 {
     m_zoomActivated = false;
     m_sceneViewPort = QRect(0, 0, this->width(), this->height());

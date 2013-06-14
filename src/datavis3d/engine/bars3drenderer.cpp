@@ -39,40 +39,57 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+#include "bars3drenderer_p.h"
+#include "bars3dcontroller_p.h"
+#include "camerahelper_p.h"
+#include "qdataitem_p.h"
+#include "qdatarow_p.h"
+#include "qdataset_p.h"
+#include "shaderhelper_p.h"
+#include "objecthelper_p.h"
+#include "texturehelper_p.h"
+#include "theme_p.h"
+#include "utils_p.h"
+#include "drawer_p.h"
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include <QScopedPointer>
-#include <QString>
-#include <QObject>
+#include <QMatrix4x4>
+#include <QOpenGLPaintDevice>
+#include <QPainter>
+#include <QScreen>
+#include <QMouseEvent>
+
+#include <qmath.h>
+
+#include <QDebug>
+
+// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
+// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
+#define USE_WIDER_SHADOWS
+
+// You can verify that depth buffer drawing works correctly by uncommenting this.
+// You should see the scene from  where the light is
+//#define SHOW_DEPTH_TEXTURE_SCENE
+
+//#define DISPLAY_RENDER_SPEED
+
+#ifdef DISPLAY_RENDER_SPEED
+#include <QTime>
+#endif
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+//#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
+#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+#include "bars3drenderer_p.h"
+#include "bars3dcontroller_p.h"
+
+Bars3dRenderer::Bars3dRenderer(Bars3dController *controller) : QObject(controller)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
+}
 
-public:
-    explicit QDataRow(const QString &label = QString());
-    ~QDataRow();
-
-    void setLabel(const QString &label); // label for value, unit for example
-    QString label();
-    Q_INVOKABLE void addItem(QDataItem *item);
-
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dController;
-    friend class Q3DMaps;
-    friend class Q3DMapsPrivate;
-    friend class QDataSetPrivate;
-};
+Bars3dRenderer::~Bars3dRenderer()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

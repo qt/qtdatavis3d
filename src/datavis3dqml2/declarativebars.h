@@ -42,7 +42,7 @@
 #ifndef DECLARATIVEBARS_H
 #define DECLARATIVEBARS_H
 
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
 #include "qdatavis3dglobal.h"
 #include "qdatavis3namespace.h"
 #include "declarativebars_p.h"
@@ -77,7 +77,7 @@ class DeclarativeBars : public QQuickItem
     Q_ENUMS(LabelTransparency)
 
 protected:
-    Bars3dRenderer *m_shared;
+    Bars3dController *m_shared;
     DeclarativeBarsCachedStatePrivate *m_cachedState;
 
 public:
@@ -226,7 +226,7 @@ class DeclarativeBarsRenderer : public QObject, public QSGSimpleTextureNode
     Q_OBJECT
 
 public:
-    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dRenderer *shared);
+    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *shared);
     ~DeclarativeBarsRenderer();
 
 public slots:
@@ -236,7 +236,7 @@ private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    Bars3dRenderer *m_barsRenderer;
+    Bars3dController *m_barsRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

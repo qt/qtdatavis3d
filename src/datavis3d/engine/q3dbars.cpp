@@ -41,7 +41,7 @@
 
 #include "q3dbars.h"
 #include "q3dbars_p.h"
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
 
 #include <QOpenGLPaintDevice>
 #include <QPainter>
@@ -704,7 +704,7 @@ void Q3DBars::addDataSet(QDataSet *dataSet)
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle)
     : q_ptr(q),
-      m_shared(new Bars3dRenderer(rect, fbohandle))
+      m_shared(new Bars3dController(rect, fbohandle))
 {
 }
 
