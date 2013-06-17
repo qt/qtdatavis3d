@@ -72,6 +72,16 @@ DeclarativeBars::~DeclarativeBars()
     delete m_shared;
 }
 
+void DeclarativeBars::classBegin()
+{
+    qDebug() << "classBegin";
+}
+
+void DeclarativeBars::componentComplete()
+{
+    qDebug() << "componentComplete";
+}
+
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     qDebug() << "Enter DeclarativeBars::updatePaintNode";
@@ -103,6 +113,11 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     if (m_cachedState->m_dataRow) {
         m_shared->addDataRow(m_cachedState->m_dataRow);
         m_cachedState->m_dataRow = 0;
+    }
+
+    if (m_cachedState->m_dataSet) {
+        m_shared->addDataSet(m_cachedState->m_dataSet);
+        m_cachedState->m_dataSet = 0;
     }
 
     if (m_cachedState->m_isSelectionModeSet) {
@@ -237,17 +252,18 @@ void DeclarativeBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimu
 
 void DeclarativeBars::setData(QAbstractItemModel *data)
 {
+    qDebug() << "setData";
     QDataSet *dataset = new QDataSet();
 
+    qDebug() << data << data->rowCount() << data->columnCount();
+
     // Get sample space size from data, and set it
-    m_shared->setupSampleSpace(data->rowCount(), data->columnCount());
+    setupSampleSpace(data->rowCount(), data->columnCount());
 
     // TODO: Maps data in QAbstractItemModel to qdatarows and qdataset
 
-    qDebug() << data;
-
     // Add data to scene
-    m_shared->addDataSet(dataset);
+    addDataSet(dataset);
 }
 
 QAbstractItemModel *DeclarativeBars::data()
@@ -293,7 +309,7 @@ void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
 
 void DeclarativeBars::addDataSet(QDataSet* dataSet)
 {
-    m_shared->addDataSet(dataSet);
+    m_cachedState->m_dataSet = dataSet;
 }
 
 void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
@@ -395,7 +411,8 @@ DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
     m_labelRow(QStringLiteral("")),
     m_labelColumn(QStringLiteral("")),
     m_labelHeight(QStringLiteral("")),
-    m_dataRow(0)
+    m_dataRow(0),
+    m_dataSet(0)
 {
 }
 

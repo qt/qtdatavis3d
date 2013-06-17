@@ -69,6 +69,9 @@ Q_DECLARE_METATYPE(QDataItem *)
 Q_DECLARE_METATYPE(QDataRow *)
 Q_DECLARE_METATYPE(QDataSet *)
 
+Q_DECLARE_METATYPE(QAbstractItemModel *)
+
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Datavis3dqml2Plugin : public QQmlExtensionPlugin

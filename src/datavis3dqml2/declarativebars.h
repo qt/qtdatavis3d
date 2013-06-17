@@ -109,6 +109,9 @@ public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
+    void classBegin();
+    void componentComplete();
+
     // TODO: We need to provide another way to pass row and column labels when using addData(QAbstractItemModel *data)
 
     // TODO: Map qml listitemmodel to qabstractitemmodel

@@ -59,6 +59,7 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataRow;
+class QDataSet;
 
 class DeclarativeBarsCachedStatePrivate
 {
@@ -75,6 +76,7 @@ public:
     QString m_labelHeight;
 
     QDataRow *m_dataRow;
+    QDataSet *m_dataSet;
 
     bool m_isSelectionModeSet;
     SelectionMode m_selectionMode;

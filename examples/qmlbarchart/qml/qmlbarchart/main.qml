@@ -18,8 +18,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
+import QtQuick 2.1
 import QtQuick.Window 2.1
+import QtQuick.Controls 1.0
 import com.digia.QtDataVis3D 1.0
 
 Item {
@@ -44,7 +45,6 @@ Item {
         label: "Test3"
         value: 5
     }
-
     DataItem {
         id: testitem4
         label: "Test4"
@@ -72,19 +72,23 @@ Item {
             testrow1.addItem(testitem6);
         }
     }
-/*
+
     ListModel {
         id: testdata1
-        ListElement{ column1: testitem1 ; column2: testitem2 ; column3: testitem3 }
-        ListElement{ column1: testitem4 ; column2: testitem6 ; column3: testitem6 }
+        ListElement{ column1: "test" ; column2: "test" ; column3: "test" }
+        ListElement{ column1: "test" ; column2: "test" ; column3: "test" }
+//        ListElement{ column1: testitem1 ; column2: testitem2 ; column3: testitem3 }
+//        ListElement{ column1: testitem4 ; column2: testitem6 ; column3: testitem6 }
     }
-*/
+
     Bars3D {
         id: testchart
         width: mainview.width
         height: mainview.height
 
-        //data: testdata1
+        Component.onCompleted: {
+            data = testdata1
+        }
 
         gridVisible: true
         shadowQuality: Bars3D.ShadowNone
@@ -92,8 +96,8 @@ Item {
         labelTransparency: Bars3D.TransparencyNone
 
         function setUpBars3D() {
-            testchart.setupSampleSpace(6, 1);
-            testchart.addDataRow(testrow1);
+            //testchart.setupSampleSpace(6, 1);
+            //testchart.addDataRow(testrow1);
         }
     }
 
@@ -114,7 +118,7 @@ Item {
         // This allows us to flip the texture to be displayed correctly in scene graph
         // TODO: Find a way to do it in code..
         //rotation.angle = 180
-        testrow1.addData();
-        testchart.setUpBars3D();
+        //testrow1.addData();
+        //testchart.setUpBars3D();
     }
 }
