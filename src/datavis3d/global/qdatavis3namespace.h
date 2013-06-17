@@ -49,7 +49,6 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 // Constants used in several files
-const GLfloat m_pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f;
 // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
 const GLfloat zComp = 10.0f;
 // Default light position. To have shadows working correctly, light should be as far as camera, or a bit further

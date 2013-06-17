@@ -42,7 +42,7 @@
 #ifndef QDATAROW_H
 #define QDATAROW_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
+#include "qdatavis3dglobal.h"
 #include <QScopedPointer>
 #include <QString>
 #include <QObject>

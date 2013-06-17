@@ -116,8 +116,8 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
     // Apply rotations
     // Handle x and z rotation when y -angle is other than 0
-    viewMatrix.rotate(m_xRotation, 0, cos(m_yRotation * m_pi / 180.0f),
-                      sin(m_yRotation * m_pi / 180.0f));
+    viewMatrix.rotate(m_xRotation, 0, cos(qDegreesToRadians(m_yRotation)),
+                      sin(qDegreesToRadians(m_yRotation)));
     // y rotation is always "clean"
     viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
     // handle zoom by scaling
@@ -126,10 +126,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
     //qDebug() << m_xRotation << m_yRotation;
 
-    //qDebug() << "sin(m_yRotation)" << sin(m_yRotation*m_pi/180);
-    //qDebug() << "asin(m_yRotation)" << asin(m_yRotation*m_pi/180);
-    //qDebug() << "cos(m_yRotation)" << cos(m_yRotation*m_pi/180);
-    //qDebug() << "tan(m_yRotation)" << tan(m_yRotation*m_pi/180);
+    //qDebug() << "sin(m_yRotation)" << sin(qDegreesToRadians(m_yRotation));
+    //qDebug() << "asin(m_yRotation)" << asin(qDegreesToRadians(m_yRotation));
+    //qDebug() << "cos(m_yRotation)" << cos(qDegreesToRadians(m_yRotation));
+    //qDebug() << "tan(m_yRotation)" << tan(qDegreesToRadians(m_yRotation));
 
     m_previousMousePos = mousePos;
     return viewMatrix;
@@ -144,10 +144,10 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition,
     GLfloat xAngle;
     GLfloat yAngle;
     if (!fixedRotation) {
-        xAngle = m_xRotation * m_pi / 180.0f;
-        yAngle = m_yRotation * m_pi / 180.0f;
+        xAngle = qDegreesToRadians(m_xRotation);
+        yAngle = qDegreesToRadians(m_yRotation);
     } else {
-        xAngle = fixedRotation * m_pi / 180.0f;
+        xAngle = qDegreesToRadians(fixedRotation);
         yAngle = 0;
     }
     GLfloat radius = (radiusFactor + lightPosition.y()); // set radius to match the highest height of the light

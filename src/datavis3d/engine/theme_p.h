@@ -52,8 +52,8 @@
 #ifndef THEME_P_H
 #define THEME_P_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "q3dbars.h"
 
 class QColor;

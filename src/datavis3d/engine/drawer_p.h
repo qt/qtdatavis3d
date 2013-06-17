@@ -52,8 +52,8 @@
 #ifndef DRAWER_P_H
 #define DRAWER_P_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "q3dbars.h"
 #include "theme_p.h"
 #include "labelitem_p.h"

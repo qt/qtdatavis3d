@@ -42,8 +42,8 @@
 #ifndef DATAVIS3DQML2_PLUGIN_H
 #define DATAVIS3DQML2_PLUGIN_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "qdataitem.h"
 #include "qdatarow.h"
 #include "qdataset.h"

@@ -42,8 +42,8 @@
 #ifndef Q3DMAPS_H
 #define Q3DMAPS_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "q3dwindow.h"
 
 #include <QFont>

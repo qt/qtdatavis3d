@@ -42,8 +42,8 @@
 #ifndef DECLARATIVEMAPS_H
 #define DECLARATIVEMAPS_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include "q3dmaps.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

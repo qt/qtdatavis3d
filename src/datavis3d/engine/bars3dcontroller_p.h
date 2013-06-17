@@ -52,8 +52,8 @@
 #ifndef Q3DBARSSHARED_p_H
 #define Q3DBARSSHARED_p_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 
 #include <QtCore/QSize>
 #include <QtCore/QObject>

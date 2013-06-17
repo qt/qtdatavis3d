@@ -232,16 +232,16 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     switch (alignment) {
     case Qt::AlignLeft: {
         xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+                * qFabs(cos(qDegreesToRadians(rotation.y())));
         zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+                * qFabs(sin(qDegreesToRadians(rotation.y())));
         break;
     }
     case Qt::AlignRight: {
         xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+                * qFabs(cos(qDegreesToRadians(rotation.y())));
         zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+                * qFabs(sin(qDegreesToRadians(rotation.y())));
         break;
     }
     default: {

@@ -52,8 +52,8 @@
 #ifndef DECLARATIVEBARS_P_H
 #define DECLARATIVEBARS_P_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include <QString>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

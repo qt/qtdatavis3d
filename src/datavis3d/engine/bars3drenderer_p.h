@@ -52,8 +52,8 @@
 #ifndef BARS3DRENDERER_P_H
 #define BARS3DRENDERER_P_H
 
-#include "QtDataVis3D/qdatavis3dglobal.h"
-#include "QtDataVis3D/qdatavis3namespace.h"
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
 #include <QtCore/QSize>
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
