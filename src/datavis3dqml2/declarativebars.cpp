@@ -55,7 +55,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_cachedState(new DeclarativeBarsCachedStatePrivate())
+      m_cachedState(new DeclarativeBarsCachedStatePrivate()),
+      m_initialisedSize(0,0)
 {
     setFlags(QQuickItem::ItemHasContents);
 
@@ -84,25 +85,12 @@ void DeclarativeBars::componentComplete()
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    qDebug() << "Enter DeclarativeBars::updatePaintNode";
-    // Delete old node and recreate it. This function gets called when window geometry changes.
-    if (oldNode)
-        delete oldNode;
-
-    if (!m_shared)
+    if (!m_shared) {
         m_shared = new Bars3dController(boundingRect().toRect());
+        m_shared->initializeOpenGL();
+    }
 
-    // Lazy initialization of shared object on the SGRenderThread
-    m_shared->initializeOpenGL();
-
-    // We need to create a node class that does the rendering (ie. a node that "captures" the rendering we do)
-    qDebug() << "DeclarativeBars::updatePaintNode Creating new node";
-
-    // Create the new render node
-    DeclarativeBarsRenderer *node = new DeclarativeBarsRenderer(window(), m_shared);
-    node->setRect(boundingRect());
-    m_shared->setBoundingRect(boundingRect().toRect());
-
+    // Check if properites have changed that need to be applied while on the SGRenderThread
     if (m_cachedState->m_isSampleSpaceSet) {
         m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn,
                                    m_cachedState->m_labelRow, m_cachedState->m_labelColumn,
@@ -140,7 +128,24 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         m_cachedState->m_isGridSet = false;
     }
 
-    qDebug() << "Exit DeclarativeBars::updatePaintNode";
+    // If old node exists and has right size, reuse it.
+    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
+        // Update bounding rectangle (that has same size as before).
+        static_cast<DeclarativeBarsRenderer *>( oldNode )->setRect(boundingRect());
+        return oldNode;
+    }
+
+    // Create a new render node when size changes or if there is no node yet
+    m_initialisedSize = boundingRect().size().toSize();
+
+    // Delete old node
+    if (oldNode)
+        delete oldNode;
+
+    // Create a new one and set it's bounding rectangle
+    DeclarativeBarsRenderer *node = new DeclarativeBarsRenderer(window(), m_shared);
+    node->setRect(boundingRect());
+    m_shared->setBoundingRect(boundingRect().toRect());
     return node;
 }
 

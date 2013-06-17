@@ -79,6 +79,7 @@ class DeclarativeBars : public QQuickItem
 protected:
     Bars3dController *m_shared;
     DeclarativeBarsCachedStatePrivate *m_cachedState;
+    QSize m_initialisedSize;
 
 public:
     // Duplicated here to be able to use the same enums
