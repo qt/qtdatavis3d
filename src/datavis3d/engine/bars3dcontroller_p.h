@@ -62,7 +62,7 @@
 #include <QTime>
 #include <QWindow>
 
-#define DISPLAY_RENDER_SPEED
+//#define DISPLAY_RENDER_SPEED
 
 class QOpenGLPaintDevice;
 class QPoint;

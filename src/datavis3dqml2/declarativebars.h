@@ -81,6 +81,11 @@ protected:
     DeclarativeBarsCachedStatePrivate *m_cachedState;
     QSize m_initialisedSize;
 
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+
 public:
     // Duplicated here to be able to use the same enums
     enum SelectionMode {

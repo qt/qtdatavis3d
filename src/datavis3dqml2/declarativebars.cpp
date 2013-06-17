@@ -59,6 +59,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
       m_initialisedSize(0,0)
 {
     setFlags(QQuickItem::ItemHasContents);
+    setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: Note; this does not flip the render result correctly. It is in mirror image.
     setRotation(180.0);
@@ -346,8 +347,25 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
     m_shared->setMeshFileName(objFileName);
 }
 
+void DeclarativeBars::mousePressEvent(QMouseEvent *event)
+{
+    m_shared->mousePressEvent(event);
+}
 
+void DeclarativeBars::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_shared->mouseReleaseEvent(event);
+}
 
+void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
+{
+    m_shared->mouseMoveEvent(event);
+}
+
+void DeclarativeBars::wheelEvent(QWheelEvent *event)
+{
+    m_shared->wheelEvent(event);
+}
 
 DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *renderer)
     : m_fbo(0),
@@ -355,10 +373,7 @@ DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dCon
       m_window(window),
       m_barsRenderer(renderer)
 {
-    qDebug() << "DeclarativeBarsRenderer::DeclarativeBarsRenderer()";
     connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
-    qDebug() << "QQuickWindow::openglContext()->thread()" << m_window->openglContext()->thread();
-    qDebug() << "QGuiApplication::instance()->thread()" << QGuiApplication::instance()->thread();
 }
 
 DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
@@ -369,12 +384,6 @@ DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
 
 void DeclarativeBarsRenderer::render()
 {
-    static bool firstRender = true;
-    // TODO: Remove if once done testing
-    if (firstRender)
-        qDebug() << "DeclarativeBarsRenderer::render() running on thread " << QThread::currentThread();
-    firstRender = false;
-
     QSize size = rect().size().toSize();
 
     if (!m_fbo) {
@@ -393,14 +402,6 @@ void DeclarativeBarsRenderer::render()
     glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
-    // Emulate mouse movement
-    // TODO: Remove this and implement properly
-    static int rot = 0;
-    rot += 5;
-    if (rot > 2870) rot = 0;
-    m_barsRenderer->m_mousePos.setX(rot);
-    m_barsRenderer->m_mousePos.setY(100);
 
     // Call the shared rendering function
     m_barsRenderer->render(m_fbo->handle());
