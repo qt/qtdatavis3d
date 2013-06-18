@@ -1630,7 +1630,7 @@ void Bars3dController::touchEvent(QTouchEvent *event)
 }
 #endif
 
-void Bars3dController::mousePressEvent(QMouseEvent *event)
+void Bars3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (Qt::LeftButton == event->button()) {
         if (m_zoomActivated) {
@@ -1662,25 +1662,27 @@ void Bars3dController::mousePressEvent(QMouseEvent *event)
         m_mousePressed = Bars3dController::MouseOnScene;
 #endif
         // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = event->pos();
+        m_mousePos = mousePos; //event->pos();
     }
     CameraHelper::updateMousePos(m_mousePos);
 }
 
-void Bars3dController::mouseReleaseEvent(QMouseEvent *event)
+void Bars3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
+    Q_UNUSED(event);
     if (Bars3dController::MouseRotating == m_mousePressed) {
         // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = event->pos();
-        CameraHelper::updateMousePos(event->pos());
+        m_mousePos = mousePos; //event->pos();
+        CameraHelper::updateMousePos(mousePos); //event->pos());
     }
     m_mousePressed = Bars3dController::MouseNone;
 }
 
-void Bars3dController::mouseMoveEvent(QMouseEvent *event)
+void Bars3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
+    Q_UNUSED(event);
     if (Bars3dController::MouseRotating == m_mousePressed)
-        m_mousePos = event->pos();
+        m_mousePos = mousePos; //event->pos();
 }
 
 void Bars3dController::wheelEvent(QWheelEvent *event)
@@ -2309,7 +2311,7 @@ void Bars3dController::updateDepthBuffer()
 
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
-        //m_depthTexture = 0;
+        m_depthTexture = 0;
     }
 
     if (m_shadowQuality > ShadowNone) {

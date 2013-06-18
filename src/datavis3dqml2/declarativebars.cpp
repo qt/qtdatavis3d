@@ -62,7 +62,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: Note; this does not flip the render result correctly. It is in mirror image.
-    setRotation(180.0);
+    //setRotation(180.0);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing
     setAntialiasing(true);
@@ -349,17 +349,23 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
 
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)
 {
-    m_shared->mousePressEvent(event);
+    QPoint mousePos = event->pos();
+    mousePos.setY(height() - mousePos.y());
+    m_shared->mousePressEvent(event, mousePos);
 }
 
 void DeclarativeBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_shared->mouseReleaseEvent(event);
+    QPoint mousePos = event->pos();
+    mousePos.setY(height() - mousePos.y());
+    m_shared->mouseReleaseEvent(event, mousePos);
 }
 
 void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
 {
-    m_shared->mouseMoveEvent(event);
+    QPoint mousePos = event->pos();
+    mousePos.setY(height() - mousePos.y());
+    m_shared->mouseMoveEvent(event, mousePos);
 }
 
 void DeclarativeBars::wheelEvent(QWheelEvent *event)
@@ -395,13 +401,6 @@ void DeclarativeBarsRenderer::render()
     }
 
     m_fbo->bind();
-
-    // SGRendering State resets between calls...
-//    glDepthMask(true);
-//    glEnable(GL_DEPTH_TEST);
-//    glDepthFunc(GL_LESS);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
 
     // Call the shared rendering function
     m_barsRenderer->render(m_fbo->handle());

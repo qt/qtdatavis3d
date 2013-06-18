@@ -280,7 +280,7 @@ void Q3DBars::touchEvent(QTouchEvent *event)
  */
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event);
+    d_ptr->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -288,7 +288,7 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event);
+    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -296,7 +296,7 @@ void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event);
+    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
