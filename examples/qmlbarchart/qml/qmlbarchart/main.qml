@@ -85,20 +85,7 @@ Item {
 
             Component.onCompleted: {
                 //data = testdata1
-                // This allows us to flip the texture to be displayed correctly in scene graph
-                // TODO: Find a way to do it in code..
-                rotation.angle = 180
             }
-
-            // This allows us to flip the texture to be displayed correctly in scene graph
-            // TODO: Find a way to do it in code..
-            transform: [
-                Rotation {
-                    id: rotation;
-                    axis.x: 1; axis.z: 0; axis.y: 0; angle: 0;
-                    origin.x: width / 2; origin.y: height / 2;
-                }
-            ]
 
             gridVisible: true
             shadowQuality: Bars3D.ShadowNone

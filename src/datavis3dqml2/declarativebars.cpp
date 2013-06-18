@@ -350,21 +350,21 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    mousePos.setY(height() - mousePos.y());
+    //mousePos.setY(height() - mousePos.y());
     m_shared->mousePressEvent(event, mousePos);
 }
 
 void DeclarativeBars::mouseReleaseEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    mousePos.setY(height() - mousePos.y());
+    //mousePos.setY(height() - mousePos.y());
     m_shared->mouseReleaseEvent(event, mousePos);
 }
 
 void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    mousePos.setY(height() - mousePos.y());
+    //mousePos.setY(height() - mousePos.y());
     m_shared->mouseMoveEvent(event, mousePos);
 }
 
@@ -397,7 +397,20 @@ void DeclarativeBarsRenderer::render()
         format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
         m_fbo = new QOpenGLFramebufferObject(size, format);
         m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+
         setTexture(m_texture);
+
+        // Flip texture
+        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
+        QSize ts = m_texture->textureSize();
+        QRectF sourceRect(0, 0, ts.width(), ts.height());
+        float tmp = sourceRect.top();
+        sourceRect.setTop(sourceRect.bottom());
+        sourceRect.setBottom(tmp);
+        QSGGeometry *geometry = this->geometry();
+        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
+                                                m_texture->convertToNormalizedSourceRect(sourceRect));
+        markDirty(DirtyMaterial);
     }
 
     m_fbo->bind();
