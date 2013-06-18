@@ -392,6 +392,7 @@ void DeclarativeBarsRenderer::render()
 {
     QSize size = rect().size().toSize();
 
+    // Create FBO
     if (!m_fbo) {
         QOpenGLFramebufferObjectFormat format;
         format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
@@ -413,13 +414,12 @@ void DeclarativeBarsRenderer::render()
         markDirty(DirtyMaterial);
     }
 
-    m_fbo->bind();
-
     // Call the shared rendering function
+    m_fbo->bind();
     m_barsRenderer->render(m_fbo->handle());
-
     m_fbo->bindDefault();
 
+    // New view is in the FBO, request repaint of scene graph
     m_window->update();
 }
 

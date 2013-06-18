@@ -2006,6 +2006,8 @@ void Bars3dController::setShadowQuality(ShadowQuality quality)
             }
             initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                                   QStringLiteral(":/shaders/fragment"));
+            // Re-init depth buffer
+            updateDepthBuffer();
         }
 #else
         if (!m_theme->m_uniformColor) {
@@ -2320,7 +2322,7 @@ void Bars3dController::updateDepthBuffer()
                                                              m_shadowQuality);
     }
 
-    qDebug() << "updateDepthBuffer() EXIT  m_depthFrameBuffer = " << m_depthFrameBuffer;
+    qDebug() << "updateDepthBuffer() EXIT  m_depthFrameBuffer = " << m_depthFrameBuffer << ", m_depthTexture = " << m_depthTexture;
 }
 #endif
 
