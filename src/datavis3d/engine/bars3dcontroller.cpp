@@ -70,7 +70,6 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-
 #ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
 #endif
@@ -161,11 +160,11 @@ Bars3dController::Bars3dController(QRect rect)
 Bars3dController::~Bars3dController()
 {
 #ifndef USE_HAX0R_SELECTION
-    glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-    glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
 #endif
-    glDeleteFramebuffers(1, &m_depthFrameBuffer);
+    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_dataSet;
     if (m_zoomSelection) {
@@ -243,16 +242,8 @@ void Bars3dController::initializeOpenGL()
     // Init selection shader
     initSelectionShader();
 
-#ifndef USE_HAX0R_SELECTION
-    // Init the selection buffer
-    initSelectionBuffer();
-#endif
-
     // Load default mesh
     loadBarMesh();
-
-    // Load background mesh
-    loadBackgroundMesh();
 
     // Load grid line mesh
     loadGridLineMesh();
@@ -279,15 +270,17 @@ void Bars3dController::initializeOpenGL()
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set view port
-    glViewport(0, 0, width(), height());
+    glViewport(m_zoomViewPort.x(), m_zoomViewPort.y(),
+               m_zoomViewPort.width(), m_zoomViewPort.height());
 
     // Set initialized -flag
     m_isInitialized = true;
 
     // Resize in case we've missed resize events
+    // Resize calls initSelectionBuffer and initDepthBuffer, so they don't need to be called here
     resizeNotify();
 
-    // Load background mesh
+    // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
 }
 
@@ -312,6 +305,18 @@ void Bars3dController::render(const GLuint defaultFboHandle)
     }
 #endif
 
+    if (defaultFboHandle) {
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
+    QVector3D clearColor = Utils::vectorFromColor(m_theme->m_windowColor);
+    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // If zoom selection is on, draw zoom scene
     drawZoomScene();
     // Draw bars scene
@@ -320,12 +325,6 @@ void Bars3dController::render(const GLuint defaultFboHandle)
 
 void Bars3dController::drawZoomScene()
 {
-    // Set clear color
-    QVector3D clearColor = Utils::vectorFromColor(m_theme->m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // If no zoom, return
     if (!m_zoomActivated)
         return;
@@ -1725,8 +1724,7 @@ void Bars3dController::resizeNotify()
 
 #if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
-    if (m_isInitialized)
-        updateDepthBuffer();
+    updateDepthBuffer();
 #endif
 }
 
@@ -1982,9 +1980,6 @@ void Bars3dController::setShadowQuality(ShadowQuality quality)
     }
     if (m_isInitialized) {
 #if !defined(QT_OPENGL_ES_2)
-        // Re-init depth buffer
-        updateDepthBuffer();
-
         if (m_shadowQuality > ShadowNone) {
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
@@ -1996,6 +1991,8 @@ void Bars3dController::setShadowQuality(ShadowQuality quality)
             }
             initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                                   QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            // Re-init depth buffer
+            updateDepthBuffer();
         } else {
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
@@ -2283,12 +2280,13 @@ void Bars3dController::initSelectionShader()
 void Bars3dController::initSelectionBuffer()
 {
 #ifndef USE_HAX0R_SELECTION
-    if (m_selectionTexture) {
-        glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-        glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    if (!m_isInitialized)
+        return;
+
+    if (m_selectionTexture)
         m_textureHelper->deleteTexture(&m_selectionTexture);
-    }
-    m_selectionTexture = m_textureHelper->createSelectionTexture(this->size(),
+
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_sceneViewPort.size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 #endif
@@ -2306,18 +2304,19 @@ void Bars3dController::initDepthShader()
 
 void Bars3dController::updateDepthBuffer()
 {
-    qDebug() << "updateDepthBuffer("<<this->size().width()<<" x "<< this->size().height()<<") ENTER m_depthFrameBuffer = " << m_depthFrameBuffer;
-    qDebug() << "Bars3dController::updateDepthBuffer() called on thread " << QThread::currentThread();
+    if (!m_isInitialized)
+        return;
 
     if (m_depthTexture) {
-        glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->deleteTexture(&m_depthTexture);
-        m_depthFrameBuffer = 0;
-        m_depthTexture = 0;
+        //m_depthTexture = 0;
     }
 
-    if (m_shadowQuality > ShadowNone)
-        m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer, m_shadowQuality);
+    if (m_shadowQuality > ShadowNone) {
+        m_depthTexture = m_textureHelper->createDepthTexture(m_sceneViewPort.size(),
+                                                             m_depthFrameBuffer,
+                                                             m_shadowQuality);
+    }
 
     qDebug() << "updateDepthBuffer() EXIT  m_depthFrameBuffer = " << m_depthFrameBuffer;
 }

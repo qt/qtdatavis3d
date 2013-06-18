@@ -191,7 +191,8 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer
-    glGenRenderbuffers(1, &depthBuffer);
+    if (!depthBuffer)
+        glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
 #if !defined(QT_OPENGL_ES_2)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.width(), size.height());
@@ -201,7 +202,8 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create frame buffer
-    glGenFramebuffers(1, &frameBuffer);
+    if (!frameBuffer)
+        glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     // Attach texture to color attachment
@@ -241,7 +243,8 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create frame buffer
-    glGenFramebuffers(1, &frameBuffer);
+    if (!frameBuffer)
+        glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     // Attach texture to depth attachment

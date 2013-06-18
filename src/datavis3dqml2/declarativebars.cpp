@@ -397,11 +397,11 @@ void DeclarativeBarsRenderer::render()
     m_fbo->bind();
 
     // SGRendering State resets between calls...
-    glDepthMask(true);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+//    glDepthMask(true);
+//    glEnable(GL_DEPTH_TEST);
+//    glDepthFunc(GL_LESS);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
 
     // Call the shared rendering function
     m_barsRenderer->render(m_fbo->handle());
