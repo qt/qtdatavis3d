@@ -42,18 +42,31 @@
 #ifndef DECLARATIVEMAPS_H
 #define DECLARATIVEMAPS_H
 
+#include "maps3dcontroller_p.h"
 #include "qdatavis3dglobal.h"
 #include "qdatavis3namespace.h"
-#include "q3dmaps.h"
+#include "declarativemaps_p.h"
+
+#include <qsgsimpletexturenode.h>
+#include <QQuickItem>
+#include <QObject>
+
+class QOpenGLFramebufferObject;
+class QSGTexture;
+class QQuickWindow;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class DeclarativeMaps : public Q3DMaps
+class DeclarativeMaps : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(SelectionMode selectionMode READ selMode WRITE setSelMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ transparency WRITE setTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadow WRITE setShadow)
+    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
+    Q_PROPERTY(int width READ width WRITE setWidth)
+    Q_PROPERTY(int height READ height WRITE setHeight)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelTransparency)
@@ -84,20 +97,113 @@ public:
     };
 
 public:
-    explicit DeclarativeMaps();
+    explicit DeclarativeMaps(QQuickItem *parent = 0);
     ~DeclarativeMaps();
 
+    void classBegin();
+    void componentComplete();
+
+    // Add data item. New data item is appended to old data.
+    // ownership of data is transferred
+    Q_INVOKABLE bool addDataItem(QDataItem *dataItem);
+
+    // Add data set. New data is appended to old data.
+    // ownership of data is transferred
+    Q_INVOKABLE bool addData(const QVector<QDataItem *> &data);
+    // ownership of data is transferred
+    Q_INVOKABLE bool addData(const QDataRow &data);
+
+    // Add data set. Old data is deleted.
+    // ownership of data is transferred
+    Q_INVOKABLE bool setData(const QVector<QDataItem *> &data);
+    // ownership of data is transferred
+    Q_INVOKABLE bool setData(QDataRow *data);
+
+    // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
+    // TODO: Start using thickness also in adjustment direction; use it as a relative value.
+    // For example, in AdjustAll mode setting thickness to (0.1f, 1.0f, 0.5f) would apply value to
+    // x at 10%, y at 100% and z at 50%. If a dimension is not included, given thickness states its absolute value.
+    Q_INVOKABLE void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
+                     Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
+
+    // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
+    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
+
+    // override bar type with own mesh
+    Q_INVOKABLE void setMeshFileName(const QString &objFileName);
+
+    // Select preset camera placement
+    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
+
+    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
+    // vertical (0...90) angles and distance in percentage (10...500))
+    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+
+    // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
+    Q_INVOKABLE void setTheme(ColorTheme theme);
+
+    // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
+    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
+
+    // Set area specs
+    Q_INVOKABLE void setAreaSpecs(const QRect &areaRect, const QImage &image);
+
+    // Set area image
+    Q_INVOKABLE void setImage(const QImage &image);
+
+    // TODO: light placement API
+
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelMode(DeclarativeMaps::SelectionMode mode);
-    DeclarativeMaps::SelectionMode selMode();
+    void setSelectionMode(SelectionMode mode);
+    SelectionMode selectionMode();
+
+    // Font size adjustment
+    void setFontSize(float fontsize);
+    float fontSize();
+
+    // Set font
+    void setFont(const QFont &font);
+    QFont font();
 
     // Label transparency adjustment
-    void setTransparency(DeclarativeMaps::LabelTransparency transparency);
-    DeclarativeMaps::LabelTransparency transparency();
+    void setLabelTransparency(LabelTransparency transparency);
+    LabelTransparency labelTransparency();
 
     // Adjust shadow quality
-    void setShadow(DeclarativeMaps::ShadowQuality quality);
-    DeclarativeMaps::ShadowQuality shadow();
+    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality shadowQuality();
+
+protected:
+    Maps3DController *m_shared;
+    DeclarativeMapsCachedStatePrivate *m_cachedState;
+    QSize m_initializedSize;
+
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+};
+
+// TODO: If we use texture node, our rendering is done into a texture that is then drawn to the
+// qquickwindow -> selection will not work
+class DeclarativeMapsRenderer : public QObject, public QSGSimpleTextureNode
+{
+    Q_OBJECT
+
+public:
+    DeclarativeMapsRenderer(QQuickWindow *window, Maps3DController *shared);
+    ~DeclarativeMapsRenderer();
+
+public slots:
+    void render();
+
+private:
+    QOpenGLFramebufferObject *m_fbo;
+    QSGTexture *m_texture;
+    QQuickWindow *m_window;
+    Maps3DController *m_mapsRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

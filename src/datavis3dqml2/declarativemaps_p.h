@@ -39,29 +39,37 @@
 **
 ****************************************************************************/
 
-#include "datavis3dqml2_plugin.h"
+#ifndef DECLARATIVEMAPS_P_H
+#define DECLARATIVEMAPS_P_H
 
-#include <qqml.h>
-#include <QDebug>
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
+#include <QString>
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-void Datavis3dqml2Plugin::registerTypes(const char *uri)
+class QDataRow;
+
+class DeclarativeMapsCachedStatePrivate
 {
-    qDebug() << "Datavis3dqml2Plugin::registerTypes()";
+public:
+    explicit DeclarativeMapsCachedStatePrivate();
+    ~DeclarativeMapsCachedStatePrivate();
 
-    // @uri com.digia.QtDataVis3D
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
-                                                   QLatin1String("Trying to create uncreatable: AbstractItemModel."));
+    int m_cachedState;
 
-    qmlRegisterType<QDataItem>(uri, 1, 0, "DataItem");
-    qmlRegisterType<QDataRow>(uri, 1, 0, "DataRow");
-    qmlRegisterType<QDataSet>(uri, 1, 0, "DataSet");
+    QDataRow *m_data;
 
-    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");
-}
+    bool m_isSelectionModeSet;
+    SelectionMode m_selectionMode;
 
-//#include "moc_datavis3dqml2_plugin.cpp"
+    bool m_isLabelTransparencySet;
+    LabelTransparency m_labelTransparency;
+
+    bool m_isShadowQualitySet;
+    ShadowQuality m_shadowQuality;
+};
 
 QT_DATAVIS3D_END_NAMESPACE
 
+#endif

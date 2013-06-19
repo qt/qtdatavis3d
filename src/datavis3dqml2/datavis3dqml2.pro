@@ -23,7 +23,8 @@ HEADERS += \
     datavis3dqml2_plugin.h \
     declarativebars.h \
     declarativebars_p.h \
-    declarativemaps.h #\
+    declarativemaps.h \
+    declarativemaps_p.h #\
     #declarativedataitem.h \
     #declarativedatarow.h \
     #declarativedataset.h
