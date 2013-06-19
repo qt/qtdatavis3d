@@ -43,12 +43,7 @@
 #include "q3dbars_p.h"
 #include "bars3dcontroller_p.h"
 
-#include <QOpenGLPaintDevice>
-#include <QPainter>
-#include <QScreen>
 #include <QMouseEvent>
-
-#include <qmath.h>
 
 #include <QDebug>
 

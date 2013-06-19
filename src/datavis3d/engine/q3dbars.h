@@ -193,8 +193,6 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    void drawZoomScene();
-    void drawScene();
     QScopedPointer<Q3DBarsPrivate> d_ptr;
     Q_DISABLE_COPY(Q3DBars)
 };

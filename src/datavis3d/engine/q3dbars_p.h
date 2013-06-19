@@ -55,11 +55,6 @@
 #include "bars3dcontroller_p.h"
 #include "qdatavis3namespace.h"
 
-class QOpenGLPaintDevice;
-
-class QPoint;
-class QSizeF;
-
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBars;

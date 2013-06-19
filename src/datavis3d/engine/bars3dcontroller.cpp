@@ -53,9 +53,6 @@
 #include "drawer_p.h"
 
 #include <QMatrix4x4>
-#include <QOpenGLPaintDevice>
-#include <QPainter>
-#include <QScreen>
 #include <QMouseEvent>
 #include <QThread>
 #include <qmath.h>
@@ -148,7 +145,7 @@ Bars3dController::Bars3dController(QRect rect)
       m_scaleFactor(0),
       m_maxSceneSize(40.0)
 #ifdef DISPLAY_RENDER_SPEED
-     ,m_isFirstFrame(true),
+      ,m_isFirstFrame(true),
       m_numFrames(0)
 #endif
 
@@ -266,8 +263,8 @@ void Bars3dController::initializeOpenGL()
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     m_camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                              QVector3D(0.0f, 0.0f, zComp),
-                                              QVector3D(0.0f, 1.0f, 0.0f));
+                                          QVector3D(0.0f, 0.0f, zComp),
+                                          QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set view port
     glViewport(m_zoomViewPort.x(), m_zoomViewPort.y(),
@@ -347,10 +344,10 @@ void Bars3dController::drawZoomScene()
 #ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
-                                                              m_zoomLevel
-                                                              * m_zoomAdjustment,
-                                                              m_zoomViewPort.width(),
-                                                              m_zoomViewPort.height());
+                                                          m_zoomLevel
+                                                          * m_zoomAdjustment,
+                                                          m_zoomViewPort.width(),
+                                                          m_zoomViewPort.height());
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
     lightPos = m_camera->calculateLightPosition(defaultLightPos);
@@ -562,11 +559,11 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
-                                                              m_zoomLevel
-                                                              * m_zoomAdjustment,
-                                                              m_sceneViewPort.width(),
-                                                              m_sceneViewPort.height(),
-                                                              m_negativeValues);
+                                                          m_zoomLevel
+                                                          * m_zoomAdjustment,
+                                                          m_sceneViewPort.width(),
+                                                          m_sceneViewPort.height(),
+                                                          m_negativeValues);
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -1813,7 +1810,7 @@ void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_zoomLevel = qBound(10, distance, 500);
     m_camera->setCameraRotation(QPointF(m_horizontalRotation,
-                                            m_verticalRotation));
+                                        m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
