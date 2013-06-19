@@ -105,6 +105,12 @@ void Drawer::setTransparency(LabelTransparency transparency)
 void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId,
                         GLuint depthTextureId)
 {
+    // Store the GL state before changing
+    GLint oldActiveTex[1];
+    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
+    GLint oldTexId[1];
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
+
     if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
@@ -112,13 +118,7 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
         shader->setUniformValue(shader->texture(), 0);
     }
 
-    if (depthTextureId && !textureId) {
-        // TODO: This is a HACK for QML2 integration. Find a way to make it work without this.
-        // Activate depth texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, depthTextureId);
-        shader->setUniformValue(shader->shadow(), 0);
-    } else if (depthTextureId) {
+    if (depthTextureId) {
         // Activate depth texture
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthTextureId);
@@ -152,12 +152,15 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    if (textureId || depthTextureId) {
-        glBindTexture(GL_TEXTURE_2D, 0);
+    if (textureId || depthTextureId)
         glDisableVertexAttribArray(shader->uvAtt());
-    }
+
     glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
+
+    // Restore the GL state
+    glActiveTexture(*oldActiveTex);
+    glBindTexture(GL_TEXTURE_2D, *oldTexId);
 }
 
 void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
