@@ -32,8 +32,8 @@ Item {
 
     Item {
         id: dataView
-        width: 480
-        height: 480
+        width: parent.width - shadowToggle.width
+        height: parent.height
         anchors.right: parent.right;
         DataItem {
             id: testitem1
@@ -65,9 +65,26 @@ Item {
             label: "Test6"
             value: 1
         }
+        DataItem {
+            id: testitem7
+            label: "Test7"
+            value: 3
+        }
+        DataItem {
+            id: testitem8
+            label: "Test8"
+            value: -2
+        }
 
         DataRow {
             id: testrow1
+        }
+        DataRow {
+            id: testrow2
+        }
+
+        DataSet {
+            id: testset1
         }
 
     //    ListModel {
@@ -100,11 +117,15 @@ Item {
         testrow1.addItem(testitem2);
         testrow1.addItem(testitem3);
         testrow1.addItem(testitem4);
-        testrow1.addItem(testitem5);
-        testrow1.addItem(testitem6);
+        testrow2.addItem(testitem5);
+        testrow2.addItem(testitem6);
+        testrow2.addItem(testitem7);
+        testrow2.addItem(testitem8);
+        testset1.addRow(testrow1);
+        testset1.addRow(testrow2)
 
-        testchart.setupSampleSpace(6, 1);
-        testchart.addDataRow(testrow1);
+        testchart.setupSampleSpace(4, 2);
+        testchart.addDataSet(testset1);
     }
 
     Rectangle {

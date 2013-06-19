@@ -395,7 +395,7 @@ void DeclarativeBarsRenderer::render()
     // Create FBO
     if (!m_fbo) {
         QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        format.setAttachment(QOpenGLFramebufferObject::Depth);
         m_fbo = new QOpenGLFramebufferObject(size, format);
         m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
 
@@ -412,12 +412,15 @@ void DeclarativeBarsRenderer::render()
         QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
                                                 m_texture->convertToNormalizedSourceRect(sourceRect));
         markDirty(DirtyMaterial);
+        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
     }
 
     // Call the shared rendering function
     m_fbo->bind();
+
     m_barsRenderer->render(m_fbo->handle());
-    m_fbo->bindDefault();
+
+    m_fbo->release();
 
     // New view is in the FBO, request repaint of scene graph
     m_window->update();

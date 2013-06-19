@@ -112,7 +112,13 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
         shader->setUniformValue(shader->texture(), 0);
     }
 
-    if (depthTextureId) {
+    if (depthTextureId && !textureId) {
+        // TODO: This is a HACK for QML2 integration. Find a way to make it work without this.
+        // Activate depth texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthTextureId);
+        shader->setUniformValue(shader->shadow(), 0);
+    } else if (depthTextureId) {
         // Activate depth texture
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthTextureId);
