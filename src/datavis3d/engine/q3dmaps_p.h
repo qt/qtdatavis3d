@@ -73,6 +73,7 @@ class ObjectHelper;
 class TextureHelper;
 class Theme;
 class Drawer;
+class CameraHelper;
 
 class Q3DMapsPrivate : public QObject
 {
@@ -167,6 +168,7 @@ public:
     ShadowQuality m_shadowQuality;
     GLfloat m_shadowQualityToShader;
     bool m_bgrHasAlpha;
+    CameraHelper *m_camera;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

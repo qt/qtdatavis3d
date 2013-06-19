@@ -38,42 +38,42 @@ Item {
         DataItem {
             id: testitem1
             label: "Test"
-            value: 10
+            value: -8
         }
         DataItem {
             id: testitem2
             label: "Test2"
-            value: -10
+            value: -2
         }
         DataItem {
             id: testitem3
             label: "Test3"
-            value: 5
+            value: 0
         }
         DataItem {
             id: testitem4
             label: "Test4"
-            value: -7
+            value: 1
         }
         DataItem {
             id: testitem5
             label: "Test5"
-            value: 8
+            value: 3
         }
         DataItem {
             id: testitem6
             label: "Test6"
-            value: 1
+            value: 5
         }
         DataItem {
             id: testitem7
             label: "Test7"
-            value: 3
+            value: 7
         }
         DataItem {
             id: testitem8
             label: "Test8"
-            value: -2
+            value: 10
         }
 
         DataRow {
@@ -122,7 +122,7 @@ Item {
         testrow2.addItem(testitem7);
         testrow2.addItem(testitem8);
         testset1.addRow(testrow1);
-        testset1.addRow(testrow2)
+        testset1.addRow(testrow2);
 
         testchart.setupSampleSpace(4, 2);
         testchart.addDataSet(testset1);

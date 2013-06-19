@@ -47,19 +47,24 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-// Initial camera position
-QVector3D m_position = QVector3D(0, 0.25, 3);
-QVector3D m_target = QVector3D(0, 0, 0);
-QVector3D m_up = QVector3D(0, 1, 0);
+CameraHelper::CameraHelper(QObject *parent) :
+    QObject(parent),
+    m_position(0, 0.25, 3),
+    m_target(0, 0, 0),
+    m_up(0, 1, 0),
+    m_previousMousePos(0,0),
+    m_xRotation(0),
+    m_yRotation(0),
+    m_defaultXRotation(0),
+    m_defaultYRotation(0),
+    m_rotationSpeed(100)
+{
+}
 
-QPoint m_previousMousePos(0, 0);
+CameraHelper::~CameraHelper()
+{
+}
 
-GLfloat m_xRotation = 0;
-GLfloat m_yRotation = 0;
-GLfloat m_defaultXRotation = 0;
-GLfloat m_defaultYRotation = 0;
-
-GLfloat m_rotationSpeed = 100;
 
 // FUNCTIONS
 void CameraHelper::setRotationSpeed(int speed)

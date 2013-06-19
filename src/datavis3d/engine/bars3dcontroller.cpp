@@ -105,6 +105,7 @@ Bars3dController::Bars3dController(QRect rect)
       m_tickStep(0),
       m_negativeValues(false),
       m_renderer(0),
+      m_camera(new CameraHelper()),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
@@ -180,6 +181,7 @@ Bars3dController::~Bars3dController()
     delete m_gridLineObj;
     delete m_textureHelper;
     delete m_drawer;
+    delete m_camera;
 }
 
 void Bars3dController::initializeOpenGL()
@@ -263,7 +265,7 @@ void Bars3dController::initializeOpenGL()
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+    m_camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
                                               QVector3D(0.0f, 0.0f, zComp),
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
@@ -344,14 +346,14 @@ void Bars3dController::drawZoomScene()
 
 #ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(m_mousePos,
+    QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                               m_zoomLevel
                                                               * m_zoomAdjustment,
                                                               m_zoomViewPort.width(),
                                                               m_zoomViewPort.height());
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+    lightPos = m_camera->calculateLightPosition(defaultLightPos);
 
     if (viewMatrix.row(0).z() <= 0) {
         startBar = m_zoomSelection->d_ptr->row().size() - 1;
@@ -373,9 +375,9 @@ void Bars3dController::drawZoomScene()
     QVector3D zoomLightPos = defaultLightPos;
     zoomLightPos.setY(-10.0f);
     if (ModeZoomColumn == m_selectionMode)
-        lightPos = CameraHelper::calculateLightPosition(zoomLightPos, -85.0f);
+        lightPos = m_camera->calculateLightPosition(zoomLightPos, -85.0f);
     else
-        lightPos = CameraHelper::calculateLightPosition(zoomLightPos, 5.0f);
+        lightPos = m_camera->calculateLightPosition(zoomLightPos, 5.0f);
 #endif
 
     // Bind bar shader
@@ -460,29 +462,29 @@ void Bars3dController::drawZoomScene()
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, false, false, LabelTop);
+                            m_labelObj, m_camera, false, false, LabelTop);
         m_drawer->drawLabel(*dummyItem, z, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, false, false, LabelBottom);
+                            m_labelObj, m_camera, false, false, LabelBottom);
     } else {
         m_drawer->drawLabel(*dummyItem, x, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, false, false, LabelBottom);
+                            m_labelObj, m_camera, false, false, LabelBottom);
         m_drawer->drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, false, false, LabelTop);
+                            m_labelObj, m_camera, false, false, LabelTop);
     }
     m_drawer->drawLabel(*dummyItem, y, viewMatrix, projectionMatrix,
                         QVector3D(0.0f, m_yAdjustment, zComp),
                         QVector3D(0.0f, 0.0f, 90.0f), m_heightNormalizer,
                         m_selectionMode, m_labelShader,
-                        m_labelObj, false, false, LabelLeft);
+                        m_labelObj, m_camera, false, false, LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < m_zoomSelection->d_ptr->row().size(); col++) {
@@ -492,7 +494,7 @@ void Bars3dController::drawZoomScene()
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj);
+                            m_labelObj, m_camera);
         // Draw labels
         LabelItem labelItem;
         if (ModeZoomRow == m_selectionMode) {
@@ -520,7 +522,7 @@ void Bars3dController::drawZoomScene()
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, -45.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, false, false, LabelBelow);
+                            m_labelObj, m_camera, false, false, LabelBelow);
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -559,7 +561,7 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
                                  / (GLfloat)m_sceneViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(m_mousePos,
+    QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                               m_zoomLevel
                                                               * m_zoomAdjustment,
                                                               m_sceneViewPort.width(),
@@ -608,7 +610,7 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
         backgroundRotation = 0.0f;
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos);
+    QVector3D lightPos = m_camera->calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
     // Skip depth rendering if we're in zoom mode
@@ -1459,7 +1461,7 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, true, false);
+                            m_labelObj, m_camera, true, false);
 #endif
         glDisable(GL_TEXTURE_2D);
         if (m_labelTransparency > TransparencyNone)
@@ -1527,7 +1529,7 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                             m_heightNormalizer, m_selectionMode,
-                            m_labelShader, m_labelObj, true, true, LabelMid,
+                            m_labelShader, m_labelObj, m_camera, true, true, LabelMid,
                             alignment);
 
         delete label;
@@ -1576,7 +1578,7 @@ void Bars3dController::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                             m_heightNormalizer, m_selectionMode,
-                            m_labelShader, m_labelObj, true, true, LabelMid,
+                            m_labelShader, m_labelObj, m_camera, true, true, LabelMid,
                             alignment);
 
         delete label;
@@ -1662,7 +1664,7 @@ void Bars3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePo
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = mousePos; //event->pos();
     }
-    CameraHelper::updateMousePos(m_mousePos);
+    m_camera->updateMousePos(m_mousePos);
 }
 
 void Bars3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
@@ -1671,7 +1673,7 @@ void Bars3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouse
     if (Bars3dController::MouseRotating == m_mousePressed) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = mousePos; //event->pos();
-        CameraHelper::updateMousePos(mousePos); //event->pos());
+        m_camera->updateMousePos(mousePos); //event->pos());
     }
     m_mousePressed = Bars3dController::MouseNone;
 }
@@ -1802,7 +1804,7 @@ void Bars3dController::setupSampleSpace(int samplesRow, int samplesColumn, const
 
 void Bars3dController::setCameraPreset(CameraPreset preset)
 {
-    CameraHelper::setCameraPreset(preset);
+    m_camera->setCameraPreset(preset);
 }
 
 void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
@@ -1810,7 +1812,7 @@ void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_zoomLevel = qBound(10, distance, 500);
-    CameraHelper::setCameraRotation(QPointF(m_horizontalRotation,
+    m_camera->setCameraRotation(QPointF(m_horizontalRotation,
                                             m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }

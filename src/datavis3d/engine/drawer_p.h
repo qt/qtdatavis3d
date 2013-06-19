@@ -65,6 +65,7 @@ class QDataItem;
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
+class CameraHelper;
 
 class Drawer : public QObject, public QOpenGLFunctions
 {
@@ -86,6 +87,7 @@ public:
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat maxHeight,
                    SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
+                   CameraHelper *camera,
                    bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
                    Qt::AlignmentFlag alignment = Qt::AlignCenter);

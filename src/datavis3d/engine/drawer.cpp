@@ -167,7 +167,9 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
                        GLfloat maxHeight, SelectionMode mode,
-                       ShaderHelper *shader, ObjectHelper *object, bool useDepth, bool rotateAlong,
+                       ShaderHelper *shader, ObjectHelper *object,
+                       CameraHelper *camera,
+                       bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment)
 {
     // Draw label
@@ -276,7 +278,7 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
 
     if (useDepth && !rotateAlong) {
         // Apply negative camera rotations to keep labels facing camera
-        QPointF camRotations = CameraHelper::getCameraRotations();
+        QPointF camRotations = camera->getCameraRotations();
         modelMatrix.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
     }

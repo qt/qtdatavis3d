@@ -58,7 +58,6 @@
 #include <QPainter>
 #include <QScreen>
 #include <QMouseEvent>
-
 #include <qmath.h>
 
 #include <QDebug>
@@ -196,7 +195,7 @@ void Q3DMaps::initialize()
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    CameraHelper::setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 1.0f + 2.9f * zComp),
+    d_ptr->m_camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 1.0f + 2.9f * zComp),
                                               QVector3D(0.0f, 0.0f, zComp),
                                               QVector3D(0.0f, 1.0f, 0.0f));
 
@@ -271,14 +270,14 @@ void Q3DMaps::drawScene()
                                  / (GLfloat)d_ptr->m_sceneViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = CameraHelper::calculateViewMatrix(d_ptr->m_mousePos,
+    QMatrix4x4 viewMatrix = d_ptr->m_camera->calculateViewMatrix(d_ptr->m_mousePos,
                                                               d_ptr->m_zoomLevel
                                                               * d_ptr->m_zoomAdjustment,
                                                               d_ptr->m_sceneViewPort.width(),
                                                               d_ptr->m_sceneViewPort.height());
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    QVector3D lightPos = CameraHelper::calculateLightPosition(defaultLightPos, 0.0f, distanceMod);
+    QVector3D lightPos = d_ptr->m_camera->calculateLightPosition(defaultLightPos, 0.0f, distanceMod);
 
     // Map adjustment direction to model matrix scaling
     GLfloat heightMultiplier = 0.0f;
@@ -809,7 +808,7 @@ void Q3DMaps::drawScene()
                                    QVector3D(0.0f, d_ptr->m_yAdjustment, zComp),
                                    QVector3D(0.0f, 0.0f, 0.0f), d_ptr->m_heightNormalizer,
                                    d_ptr->m_selectionMode, d_ptr->m_labelShader,
-                                   d_ptr->m_labelObj, true);
+                                   d_ptr->m_labelObj, d_ptr->m_camera, true);
 #else
         static bool firstSelection = true;
         // Draw the value string followed by row label and column label
@@ -1037,7 +1036,7 @@ void Q3DMaps::mousePressEvent(QMouseEvent *event)
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
     }
-    CameraHelper::updateMousePos(d_ptr->m_mousePos);
+    d_ptr->m_camera->updateMousePos(d_ptr->m_mousePos);
 }
 
 /*!
@@ -1049,7 +1048,7 @@ void Q3DMaps::mouseReleaseEvent(QMouseEvent *event)
     if (Q3DMapsPrivate::MouseRotating == d_ptr->m_mousePressed) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         d_ptr->m_mousePos = event->pos();
-        CameraHelper::updateMousePos(event->pos());
+        d_ptr->m_camera->updateMousePos(event->pos());
     }
     d_ptr->m_mousePressed = Q3DMapsPrivate::MouseNone;
 }
@@ -1180,7 +1179,7 @@ void Q3DMaps::setMeshFileName(const QString &objFileName)
 
 void Q3DMaps::setCameraPreset(CameraPreset preset)
 {
-    CameraHelper::setCameraPreset(preset);
+    d_ptr->m_camera->setCameraPreset(preset);
 }
 
 void Q3DMaps::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
@@ -1188,7 +1187,7 @@ void Q3DMaps::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint dist
     d_ptr->m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     d_ptr->m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     d_ptr->m_zoomLevel = qBound(10, distance, 500);
-    CameraHelper::setCameraRotation(QPointF(d_ptr->m_horizontalRotation,
+    d_ptr->m_camera->setCameraRotation(QPointF(d_ptr->m_horizontalRotation,
                                             d_ptr->m_verticalRotation));
     //qDebug() << "camera rotation set to" << d_ptr->m_horizontalRotation << d_ptr->m_verticalRotation;
 }
@@ -1558,7 +1557,8 @@ Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q)
       m_updateLabels(true),
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
-      m_bgrHasAlpha(false)
+      m_bgrHasAlpha(false),
+      m_camera(new CameraHelper())
 {
     //m_data->d_ptr->setDrawer(m_drawer);
     //QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Q3DMapsPrivate::updateTextures);
@@ -1580,6 +1580,7 @@ Q3DMapsPrivate::~Q3DMapsPrivate()
     delete m_gridLineObj;
     delete m_textureHelper;
     delete m_drawer;
+    delete m_camera;
 }
 
 void Q3DMapsPrivate::loadBarMesh()

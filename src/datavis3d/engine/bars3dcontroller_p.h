@@ -82,6 +82,7 @@ class Drawer;
 class LabelItem;
 class Bars3dController;
 class Bars3dRenderer;
+class CameraHelper;
 
 class QT_DATAVIS3D_EXPORT Bars3dController : public QObject, public QOpenGLFunctions
 {
@@ -136,6 +137,7 @@ public:
     bool m_negativeValues;
 
     Bars3dRenderer *m_renderer;
+    CameraHelper *m_camera;
 
 private:
 
