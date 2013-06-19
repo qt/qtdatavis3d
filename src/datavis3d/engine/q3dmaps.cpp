@@ -1633,12 +1633,9 @@ void Q3DMapsPrivate::initSelectionShader()
 
 void Q3DMapsPrivate::initSelectionBuffer()
 {
-    if (m_selectionTexture) {
-
-        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    if (m_selectionTexture)
         m_textureHelper->deleteTexture(&m_selectionTexture);
-    }
+
     m_selectionTexture = m_textureHelper->createSelectionTexture(q_ptr->size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
@@ -1656,10 +1653,9 @@ void Q3DMapsPrivate::initDepthShader()
 
 void Q3DMapsPrivate::initDepthBuffer()
 {
-    if (m_depthTexture) {
-        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+    if (m_depthTexture)
         m_textureHelper->deleteTexture(&m_depthTexture);
-    }
+
     m_depthTexture = m_textureHelper->createDepthTexture(q_ptr->size(), m_depthFrameBuffer,
                                                          m_shadowQuality);
 }
