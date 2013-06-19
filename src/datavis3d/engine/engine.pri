@@ -8,7 +8,9 @@ SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/drawer.cpp \
            $$PWD/labelitem.cpp \
            $$PWD/bars3dcontroller.cpp \
-           $$PWD/bars3drenderer.cpp
+           $$PWD/bars3drenderer.cpp \
+           $$PWD/maps3dcontroller.cpp \
+           $$PWD/maps3drenderer.cpp
 
 HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/q3dwindow.h \
@@ -26,6 +28,8 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/drawer_p.h \
            $$PWD/labelitem_p.h \
            $$PWD/bars3dcontroller_p.h \
-           $$PWD/bars3drenderer_p.h
+           $$PWD/bars3drenderer_p.h \
+           $$PWD/maps3dcontroller_p.h \
+           $$PWD/maps3drenderer_p.h
 
 RESOURCES += engine/engine.qrc

@@ -39,51 +39,33 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAITEM_H
-#define QDATAITEM_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef MAPS3DRENDERER_P_H
+#define MAPS3DRENDERER_P_H
 
 #include "qdatavis3dglobal.h"
-#include <QScopedPointer>
-#include <QString>
-#include <QObject>
-#include <QPointF>
-
-class QPoint;
+#include "qdatavis3namespace.h"
+#include <QOpenGLFunctions>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate;
+class Maps3DController;
 
-class QT_DATAVIS3D_EXPORT QDataItem : public QObject
+class QT_DATAVIS3D_EXPORT Maps3DRenderer : public QObject, public QOpenGLFunctions
 {
-    Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
-    Q_PROPERTY(float value READ value WRITE setValue)
-    Q_PROPERTY(int value READ value WRITE setValue)
-    Q_PROPERTY(QPointF position READ position WRITE setPosition)
 
 public:
-    QDataItem(float value = 0.0f, const QString &label = QString());
-    QDataItem(QDataItem &item);
-    ~QDataItem();
-
-    // TODO: Provide a Q_INVOKABLE version of this, or move prepend to it's own property.
-    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
-    QString label();
-    void setValue(float value);
-    void setValue(int value);
-    float value();
-    // Has no effect in Q3DBars
-    void setPosition(const QPointF &position);
-    void setPosition(const QPoint &position);
-    QPointF position();
-
-private:
-    QScopedPointer<QDataItemPrivate> d_ptr;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class QDataRowPrivate;
-    friend class Drawer;
+    explicit Maps3DRenderer(Maps3DController *controller);
+    ~Maps3DRenderer();
 };
 
 QT_DATAVIS3D_END_NAMESPACE

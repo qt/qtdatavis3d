@@ -70,8 +70,7 @@ public:
 
 private:
     friend class Bars3dController;
-    friend class Q3DMaps;
-    friend class Q3DMapsPrivate;
+    friend class Maps3DController;
     friend class Drawer;
 
     QColor m_baseColor;

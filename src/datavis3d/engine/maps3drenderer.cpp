@@ -39,53 +39,54 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAITEM_H
-#define QDATAITEM_H
+#include "maps3dcontroller_p.h"
+#include "maps3drenderer_p.h"
+#include "camerahelper_p.h"
+#include "qdataitem_p.h"
+#include "qdatarow_p.h"
+#include "qdataset_p.h"
+#include "shaderhelper_p.h"
+#include "objecthelper_p.h"
+#include "texturehelper_p.h"
+#include "theme_p.h"
+#include "utils_p.h"
+#include "drawer_p.h"
 
-#include "qdatavis3dglobal.h"
-#include <QScopedPointer>
-#include <QString>
-#include <QObject>
-#include <QPointF>
+#include <QOpenGLFunctions>
+#include <QMatrix4x4>
+#include <QOpenGLPaintDevice>
+#include <QPainter>
+#include <QScreen>
+#include <QMouseEvent>
 
-class QPoint;
+#include <qmath.h>
+
+#include <QDebug>
+
+//#define DISPLAY_RENDER_SPEED
+
+// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
+// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
+#define USE_WIDER_SHADOWS
+
+// You can verify that depth buffer drawing works correctly by uncommenting this.
+// You should see the scene from  where the light is
+//#define SHOW_DEPTH_TEXTURE_SCENE
+
+#ifdef DISPLAY_RENDER_SPEED
+#include <QTime>
+#endif
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate;
+//#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
-class QT_DATAVIS3D_EXPORT QDataItem : public QObject
+Maps3DRenderer::Maps3DRenderer(Maps3DController *controller) : QObject(controller)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
-    Q_PROPERTY(float value READ value WRITE setValue)
-    Q_PROPERTY(int value READ value WRITE setValue)
-    Q_PROPERTY(QPointF position READ position WRITE setPosition)
+}
 
-public:
-    QDataItem(float value = 0.0f, const QString &label = QString());
-    QDataItem(QDataItem &item);
-    ~QDataItem();
-
-    // TODO: Provide a Q_INVOKABLE version of this, or move prepend to it's own property.
-    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
-    QString label();
-    void setValue(float value);
-    void setValue(int value);
-    float value();
-    // Has no effect in Q3DBars
-    void setPosition(const QPointF &position);
-    void setPosition(const QPoint &position);
-    QPointF position();
-
-private:
-    QScopedPointer<QDataItemPrivate> d_ptr;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class QDataRowPrivate;
-    friend class Drawer;
-};
+Maps3DRenderer::~Maps3DRenderer()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

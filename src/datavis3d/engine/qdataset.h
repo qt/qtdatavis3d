@@ -72,8 +72,7 @@ public:
 private:
     QScopedPointer<QDataSetPrivate> d_ptr;
     friend class Bars3dController;
-    friend class Q3DMaps;
-    friend class Q3DMapsPrivate;
+    friend class Maps3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

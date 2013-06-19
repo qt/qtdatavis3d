@@ -52,123 +52,21 @@
 #ifndef Q3DMAPS_P_H
 #define Q3DMAPS_P_H
 
-#include "qdatavis3dglobal.h"
+#include "maps3dcontroller_p.h"
 #include "qdatavis3namespace.h"
-#include <QOpenGLFunctions>
-#include <QFont>
-
-class QOpenGLPaintDevice;
-
-class QPoint;
-class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DMaps;
-class QDataItem;
-class QDataRow;
-class QDataSet;
-class ShaderHelper;
-class ObjectHelper;
-class TextureHelper;
-class Theme;
-class Drawer;
-class CameraHelper;
 
 class Q3DMapsPrivate : public QObject
 {
 public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
-public:
-    Q3DMapsPrivate(Q3DMaps *q);
+    Q3DMapsPrivate(Q3DMaps *q, const QRect &rect);
     ~Q3DMapsPrivate();
 
-    void loadBarMesh();
-    void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadLabelMesh();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionShader();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
-    void initDepthShader();
-    void initDepthBuffer();
-#endif
-    void updateTextures();
-    void calculateSceneScalingFactors(const QRect &areaRect);
-    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
-    void calculateTranslation(QDataItem *item);
-    SelectionType isSelected(GLint bar, const QVector3D &selection);
-    bool isValid(const QDataItem &item);
-
     Q3DMaps *q_ptr;
-
-    QOpenGLPaintDevice *m_paintDevice;
-    ShaderHelper *m_barShader;
-    ShaderHelper *m_depthShader;
-    ShaderHelper *m_selectionShader;
-    ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
-    ObjectHelper *m_backgroundObj;
-    ObjectHelper *m_gridLineObj;
-    ObjectHelper *m_labelObj;
-    QString m_objFile;
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    GLint m_zoomLevel;
-    GLfloat m_zoomAdjustment;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
-    QVector3D m_barThickness;
-    GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
-    GLfloat m_scaleFactor;
-    Theme *m_theme;
-    bool m_isInitialized;
-    SelectionMode m_selectionMode;
-    QDataItem *m_selectedBar;
-    QDataRow *m_data;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
-    QRect m_sceneViewPort;
-    QRect m_zoomViewPort;
-    bool m_zoomActivated;
-    TextureHelper *m_textureHelper;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    Drawer *m_drawer;
-    QSizeF m_areaSize;
-    GLuint m_bgrTexture;
-    GLuint m_depthTexture;
-    GLuint m_selectionTexture;
-    GLuint m_depthFrameBuffer;
-    GLuint m_selectionFrameBuffer;
-    GLuint m_selectionDepthBuffer;
-    bool m_updateLabels;
-    Q3DMaps::AdjustmentDirection m_adjustDirection;
-    ShadowQuality m_shadowQuality;
-    GLfloat m_shadowQualityToShader;
-    bool m_bgrHasAlpha;
-    CameraHelper *m_camera;
+    Maps3DController *m_shared;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

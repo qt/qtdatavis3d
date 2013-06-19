@@ -80,7 +80,6 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class LabelItem;
-class Bars3dController;
 class Bars3dRenderer;
 class CameraHelper;
 

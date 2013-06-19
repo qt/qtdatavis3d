@@ -39,45 +39,69 @@
 **
 ****************************************************************************/
 
-#ifndef Q3DMAPS_H
-#define Q3DMAPS_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef MAPS3DCONTROLLER_P_H
+#define MAPS3DCONTROLLER_P_H
 
 #include "qdatavis3dglobal.h"
 #include "qdatavis3namespace.h"
-#include "q3dwindow.h"
+#include "q3dmaps.h"
 
+#include <QOpenGLFunctions>
 #include <QFont>
 
-class QImage;
-class QRect;
+//#define DISPLAY_RENDER_SPEED
+
+class QOpenGLPaintDevice;
+class QPoint;
+class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Maps3DController;
-class Q3DMapsPrivate;
 class QDataItem;
 class QDataRow;
+class ShaderHelper;
+class ObjectHelper;
+class TextureHelper;
+class Theme;
+class Drawer;
+class Maps3DRenderer;
+class CameraHelper;
 
-class QT_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
+class QT_DATAVIS3D_EXPORT Maps3DController : public QObject, public QOpenGLFunctions
 {
-    Q_OBJECT
-    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
-
 public:
+    enum SelectionType {
+        SelectionNone = 0,
+        SelectionBar,
+        SelectionRow,
+        SelectionColumn
+    };
 
-    enum AdjustmentDirection {
-        AdjustHeight = 0,   // map value to y
-        AdjustWidth,        // map value to x
-        AdjustDepth,        // map value to z
-        AdjustRadius,       // map value to x and z
-        AdjustAll           // map value to all (x, y, z)
+    enum MousePressType {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating,
+        MouseOnPinch
     };
 
 public:
-    explicit Q3DMaps();
-    ~Q3DMaps();
+    Maps3DController(const QRect &rect);
+    ~Maps3DController();
+
+    void initializeOpenGL();
+    void render(const GLuint defaultFboHandle = 0);
 
     // Add data item. New data item is appended to old data.
     // ownership of data is transferred
@@ -95,15 +119,12 @@ public:
     // ownership of data is transferred
     bool setData(QDataRow *data);
 
-    void setWidth(const int width);
-    void setHeight(const int height);
-
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.
     // For example, in AdjustAll mode setting thickness to (0.1f, 1.0f, 0.5f) would apply value to
     // x at 10%, y at 100% and z at 50%. If a dimension is not included, given thickness states its absolute value.
     void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
-                     AdjustmentDirection direction = AdjustHeight);
+                     Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
     void setBarType(BarStyle style, bool smooth = false);
@@ -136,10 +157,6 @@ public:
     void setSelectionMode(SelectionMode mode);
     SelectionMode selectionMode();
 
-    // Set window title
-    void setWindowTitle(const QString &title);
-    QString windowTitle();
-
     // Font size adjustment
     void setFontSize(float fontsize);
     float fontSize();
@@ -156,23 +173,104 @@ public:
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
-protected:
-    void initialize();
-    void render();
+    // Size
+    const QSize size();
+    const QRect boundingRect();
+    void setBoundingRect(const QRect boundingRect);
+    void setWidth(const int width);
+    int width();
+    void setHeight(const int height);
+    int height();
+    void setX(const int x);
+    int x();
+    void setY(const int y);
+    int y();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);
 #endif
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void resizeNotify();
+
+    void loadBarMesh();
+    void loadBackgroundMesh();
+    void loadGridLineMesh();
+    void loadLabelMesh();
+    void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initSelectionShader();
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initSelectionBuffer();
+#if !defined(QT_OPENGL_ES_2)
+    void initDepthShader();
+    void initDepthBuffer();
+#endif
+    void updateTextures();
+    void calculateSceneScalingFactors(const QRect &areaRect);
+    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
+    void calculateTranslation(QDataItem *item);
+    SelectionType isSelected(GLint bar, const QVector3D &selection);
+    bool isValid(const QDataItem &item);
 
 private:
-    QScopedPointer<Q3DMapsPrivate> d_ptr;
-    Q_DISABLE_COPY(Q3DMaps);
+    void drawScene(const GLuint defaultFboHandle);
+
+    Maps3DRenderer *m_renderer;
+    CameraHelper *m_camera;
+
+    QOpenGLPaintDevice *m_paintDevice;
+    ShaderHelper *m_barShader;
+    ShaderHelper *m_depthShader;
+    ShaderHelper *m_selectionShader;
+    ShaderHelper *m_backgroundShader;
+    ShaderHelper *m_labelShader;
+    ObjectHelper *m_barObj;
+    ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_gridLineObj;
+    ObjectHelper *m_labelObj;
+    QString m_objFile;
+    MousePressType m_mousePressed;
+    QPoint m_mousePos;
+    GLint m_zoomLevel;
+    GLfloat m_zoomAdjustment;
+    GLfloat m_horizontalRotation;
+    GLfloat m_verticalRotation;
+    QVector3D m_barThickness;
+    GLfloat m_heightNormalizer;
+    GLfloat m_yAdjustment;
+    GLfloat m_scaleFactor;
+    Theme *m_theme;
+    bool m_isInitialized;
+    SelectionMode m_selectionMode;
+    QDataItem *m_selectedBar;
+    QDataRow *m_data;
+    QString m_axisLabelX;
+    QString m_axisLabelZ;
+    QString m_axisLabelY;
+    QRect m_sceneViewPort;
+    QRect m_zoomViewPort;
+    bool m_zoomActivated;
+    TextureHelper *m_textureHelper;
+    LabelTransparency m_labelTransparency;
+    QFont m_font;
+    Drawer *m_drawer;
+    QSizeF m_areaSize;
+    GLuint m_bgrTexture;
+    GLuint m_depthTexture;
+    GLuint m_selectionTexture;
+    GLuint m_depthFrameBuffer;
+    GLuint m_selectionFrameBuffer;
+    GLuint m_selectionDepthBuffer;
+    bool m_updateLabels;
+    Q3DMaps::AdjustmentDirection m_adjustDirection;
+    ShadowQuality m_shadowQuality;
+    GLfloat m_shadowQualityToShader;
+    bool m_bgrHasAlpha;
+    QRect m_boundingRect;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
