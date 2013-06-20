@@ -54,9 +54,6 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QObject>
-#include <QtGui/QFont>
-#include <QTime>
-#include <QWindow>
 
 #include "qdatavis3dglobal.h"
 #include "qdatavis3namespace.h"
@@ -64,21 +61,16 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-class QOpenGLPaintDevice;
+class QFont;
 class QPoint;
 class QSizeF;
-class QOpenGLShaderProgram;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItem;
 class QDataRow;
 class QDataSet;
-class ShaderHelper;
-class ObjectHelper;
-class TextureHelper;
 class Theme;
-class Drawer;
 class LabelItem;
 class CameraHelper;
 
@@ -214,25 +206,8 @@ public:
     void wheelEvent(QWheelEvent *event);
     void resizeNotify();
 
-    void loadBarMesh();
-    void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadLabelMesh();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionShader();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
-    void initDepthShader();
-    void updateDepthBuffer();
-#endif
     void updateTextures();
-    void calculateSceneScalingFactors();
-    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     Bars3dRenderer::SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
-    void handleLimitChange();
-    void closeZoomMode();
 
 private:
 

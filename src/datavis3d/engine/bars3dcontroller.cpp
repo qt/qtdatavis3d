@@ -45,39 +45,16 @@
 #include "qdataitem_p.h"
 #include "qdatarow_p.h"
 #include "qdataset_p.h"
-#include "shaderhelper_p.h"
-#include "objecthelper_p.h"
-#include "texturehelper_p.h"
 #include "theme_p.h"
 #include "utils_p.h"
-#include "drawer_p.h"
 
-#include <QMatrix4x4>
 #include <QMouseEvent>
 #include <QThread>
 #include <qmath.h>
 
 #include <QDebug>
 
-// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
-// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
-#define USE_WIDER_SHADOWS
-
-// You can verify that depth buffer drawing works correctly by uncommenting this.
-// You should see the scene from  where the light is
-//#define SHOW_DEPTH_TEXTURE_SCENE
-
-#ifdef DISPLAY_RENDER_SPEED
-#include <QTime>
-#endif
-
 QT_DATAVIS3D_BEGIN_NAMESPACE
-
-//#define USE_HAX0R_SELECTION // keep this defined until the "real" method works
-#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
-
-const GLfloat gridLineWidth = 0.005f;
-static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Bars3dController::Bars3dController(QRect rect)
     : m_renderer(new Bars3dRenderer(rect, this)),
@@ -358,29 +335,16 @@ int Bars3dController::y()
     return m_renderer->y();
 }
 
-
 void Bars3dController::updateTextures()
 {
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_renderer->updateTextures();
 }
 
-
 Bars3dRenderer::SelectionType Bars3dController::isSelected(GLint row, GLint bar,
                                                              const QVector3D &selection)
 {
     return m_renderer->isSelected(row, bar, selection);
-}
-
-void Bars3dController::handleLimitChange()
-{
-    // TODO: Needs work
-    m_renderer->closeZoomMode();
-}
-
-void Bars3dController::closeZoomMode()
-{
-    m_renderer->closeZoomMode();
 }
 
 QT_DATAVIS3D_END_NAMESPACE

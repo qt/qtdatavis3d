@@ -90,8 +90,8 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_theme(new Theme()),
       m_labelTransparency(TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
-      m_gridEnabled(true),
-      m_bgrEnabled(true),
+      m_isGridEnabled(true),
+      m_isBackgroundEnabled(true),
       m_shadowQuality(ShadowLow),
       m_sampleCount(0, 0),
       m_selectedBar(0),
@@ -99,17 +99,17 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_axisLabelX(QStringLiteral("X")),
       m_axisLabelZ(QStringLiteral("Z")),
       m_axisLabelY(QStringLiteral("Y")),
-      m_zoomSelection(0),
+      m_sliceSelection(0),
       m_tickCount(0),
       m_tickStep(0),
-      m_negativeValues(false),
+      m_hasNegativeValues(false),
       m_camera(new CameraHelper()),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
-      m_sceneViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
-      m_zoomViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
-      m_zoomActivated(false),
+      m_mainViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
+      m_sliceViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
+      m_isSlicingActivated(false),
       m_paintDevice(0),
       m_updateLabels(false),
       m_isInitialized(false),
@@ -131,7 +131,7 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
       m_zoomLevel(100),
-      m_zoomAdjustment(1.0f),
+      m_sliceZoomAdjustment(1.0f),
       m_horizontalRotation(-45.0f),
       m_verticalRotation(15.0f),
       m_barThickness(QSizeF(0.75f, 0.75f)),
@@ -166,9 +166,9 @@ Bars3dRenderer::~Bars3dRenderer()
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_dataSet;
-    if (m_zoomSelection) {
-        m_zoomSelection->d_ptr->clear();
-        delete m_zoomSelection;
+    if (m_sliceSelection) {
+        m_sliceSelection->d_ptr->clear();
+        delete m_sliceSelection;
     }
     delete m_barShader;
     delete m_depthShader;
@@ -267,8 +267,8 @@ void Bars3dRenderer::initializeOpenGL()
                                           QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set view port
-    glViewport(m_zoomViewPort.x(), m_zoomViewPort.y(),
-               m_zoomViewPort.width(), m_zoomViewPort.height());
+    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
+               m_sliceViewPort.width(), m_sliceViewPort.height());
 
     // Set initialized -flag
     m_isInitialized = true;
@@ -314,46 +314,46 @@ void Bars3dRenderer::render(const GLuint defaultFboHandle)
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // If zoom selection is on, draw zoom scene
-    drawZoomScene();
+    // If slice selection is on, draw the sliced scene
+    drawSlicedScene();
     // Draw bars scene
     drawScene(defaultFboHandle);
 }
 
-void Bars3dRenderer::drawZoomScene()
+void Bars3dRenderer::drawSlicedScene()
 {
-    // If no zoom, return
-    if (!m_zoomActivated)
+    // If not slicing, return
+    if (!m_isSlicingActivated)
         return;
 
     GLfloat barPosX = 0;
     GLint startBar = 0;
-    GLint stopBar = m_zoomSelection->d_ptr->row().size();
+    GLint stopBar = m_sliceSelection->d_ptr->row().size();
     GLint stepBar = 1;
     QVector3D lightPos;
 
     // Specify viewport
-    glViewport(m_zoomViewPort.x(), m_zoomViewPort.y(),
-               m_zoomViewPort.width(), m_zoomViewPort.height());
+    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
+               m_sliceViewPort.width(), m_sliceViewPort.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_zoomViewPort.width()
-                                 / (GLfloat)m_zoomViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (GLfloat)m_sliceViewPort.width()
+                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
 
 #ifdef ROTATE_ZOOM_SELECTION
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                           m_zoomLevel
-                                                          * m_zoomAdjustment,
-                                                          m_zoomViewPort.width(),
-                                                          m_zoomViewPort.height());
+                                                          * m_sliceZoomAdjustment,
+                                                          m_sliceViewPort.width(),
+                                                          m_sliceViewPort.height());
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
     lightPos = m_camera->calculateLightPosition(defaultLightPos);
 
     if (viewMatrix.row(0).z() <= 0) {
-        startBar = m_zoomSelection->d_ptr->row().size() - 1;
+        startBar = m_sliceSelection->d_ptr->row().size() - 1;
         stopBar = -1;
         stepBar = -1;
     }
@@ -362,19 +362,19 @@ void Bars3dRenderer::drawZoomScene()
     QMatrix4x4 viewMatrix;
 
     // Adjust scaling (zoom rate based on aspect ratio)
-    GLfloat camPosZoomed = 5.0f / m_zoomAdjustment + zComp;
+    GLfloat camPosZoomed = 5.0f / m_sliceZoomAdjustment + zComp;
 
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camPosZoomed),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
-    QVector3D zoomLightPos = defaultLightPos;
-    zoomLightPos.setY(-10.0f);
+    QVector3D sliceLightPos = defaultLightPos;
+    sliceLightPos.setY(-10.0f);
     if (ModeZoomColumn == m_selectionMode)
-        lightPos = m_camera->calculateLightPosition(zoomLightPos, -85.0f);
+        lightPos = m_camera->calculateLightPosition(sliceLightPos, -85.0f);
     else
-        lightPos = m_camera->calculateLightPosition(zoomLightPos, 5.0f);
+        lightPos = m_camera->calculateLightPosition(sliceLightPos, 5.0f);
 #endif
 
     // Bind bar shader
@@ -383,7 +383,7 @@ void Bars3dRenderer::drawZoomScene()
     // Draw bars
     // Draw the selected row / column
     for (int bar = startBar; bar != stopBar; bar += stepBar) {
-        QDataItem *item = m_zoomSelection->d_ptr->getItem(bar);
+        QDataItem *item = m_sliceSelection->d_ptr->getItem(bar);
         if (!item)
             continue;
 
@@ -453,9 +453,9 @@ void Bars3dRenderer::drawZoomScene()
     LabelItem z;
     LabelItem y;
     m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
-    LabelItem zoomSelectionLabel = m_zoomSelection->d_ptr->labelItem();
+    LabelItem sliceSelectionLabel = m_sliceSelection->d_ptr->labelItem();
     if (ModeZoomRow == m_selectionMode) {
-        m_drawer->drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
@@ -471,7 +471,7 @@ void Bars3dRenderer::drawZoomScene()
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, false, false, LabelBottom);
-        m_drawer->drawLabel(*dummyItem, zoomSelectionLabel, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
@@ -484,8 +484,8 @@ void Bars3dRenderer::drawZoomScene()
                         m_labelObj, m_camera, false, false, LabelLeft);
 
     // Draw labels for bars
-    for (int col = 0; col < m_zoomSelection->d_ptr->row().size(); col++) {
-        QDataItem *item = m_zoomSelection->d_ptr->getItem(col);
+    for (int col = 0; col < m_sliceSelection->d_ptr->row().size(); col++) {
+        QDataItem *item = m_sliceSelection->d_ptr->getItem(col);
         // Draw values
         m_drawer->drawLabel(*item, item->d_ptr->label(), viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
@@ -549,21 +549,21 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     static QVector3D selection = skipColor;
 
     // Specify viewport
-    glViewport(m_sceneViewPort.x(), m_sceneViewPort.y(),
-               m_sceneViewPort.width(), m_sceneViewPort.height());
+    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+               m_mainViewPort.width(), m_mainViewPort.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_sceneViewPort.width()
-                                 / (GLfloat)m_sceneViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
+                                 / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                           m_zoomLevel
-                                                          * m_zoomAdjustment,
-                                                          m_sceneViewPort.width(),
-                                                          m_sceneViewPort.height(),
-                                                          m_negativeValues);
+                                                          * m_sliceZoomAdjustment,
+                                                          m_mainViewPort.width(),
+                                                          m_mainViewPort.height(),
+                                                          m_hasNegativeValues);
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -610,14 +610,14 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     QVector3D lightPos = m_camera->calculateLightPosition(defaultLightPos);
     //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
-    // Skip depth rendering if we're in zoom mode
-    // TODO: Fix this, causes problems if depth rendering is off in zoom mode
+    // Skip depth rendering if we're in slice mode
+    // TODO: Fix this, causes problems if depth rendering is off in slice mode
     // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_shadowQuality > ShadowNone/*!m_zoomActivated*/) {
+    if (m_shadowQuality > ShadowNone/*!m_isSlicingActivated*/) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -627,9 +627,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         m_depthShader->bind();
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-        glViewport(m_sceneViewPort.x(), m_sceneViewPort.y(),
-                   m_sceneViewPort.width() * m_shadowQuality,
-                   m_sceneViewPort.height() * m_shadowQuality);
+        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+                   m_mainViewPort.width() * m_shadowQuality,
+                   m_mainViewPort.height() * m_shadowQuality);
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
@@ -640,8 +640,8 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         // Set the depth projection matrix
 #ifdef USE_WIDER_SHADOWS
         // Use this for a bit exaggerated shadows
-        depthProjectionMatrix.perspective(20.0f, (GLfloat)m_sceneViewPort.width()
-                                          / (GLfloat)m_sceneViewPort.height(), 3.0f, 100.0f);
+        depthProjectionMatrix.perspective(20.0f, (GLfloat)m_mainViewPort.width()
+                                          / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
 #else
         // Use these for normal shadows, with the light further away
         depthProjectionMatrix = projectionMatrix;
@@ -733,13 +733,13 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         glCullFace(GL_BACK);
 
         // Revert to original viewport
-        glViewport(m_sceneViewPort.x(), m_sceneViewPort.y(),
-                   m_sceneViewPort.width(), m_sceneViewPort.height());
+        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+                   m_mainViewPort.width(), m_mainViewPort.height());
     }
 #endif
 
-    // Skip selection mode drawing if we're zoomed or have no selection mode
-    if (!m_zoomActivated && m_selectionMode > ModeNone) {
+    // Skip selection mode drawing if we're slicing or have no selection mode
+    if (!m_isSlicingActivated && m_selectionMode > ModeNone) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -886,8 +886,8 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     m_barShader->bind();
 
     // Draw bars
-    if (!m_zoomActivated && m_zoomSelection)
-        m_zoomSelection->d_ptr->clear();
+    if (!m_isSlicingActivated && m_sliceSelection)
+        m_sliceSelection->d_ptr->clear();
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
@@ -940,7 +940,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     barColor = Utils::vectorFromColor(m_theme->m_highlightBarColor);
                     lightStrength = m_theme->m_highlightLightStrength;
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
-                    if (!m_zoomActivated) {
+                    if (!m_isSlicingActivated) {
                         m_selectedBar = item;
                         if (m_dataSet->d_ptr->rowLabelItems().size() > row
                                 && m_dataSet->d_ptr->columnLabelItems().size() > bar) {
@@ -954,7 +954,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                         barSelectionFound = true;
                         if (m_selectionMode >= ModeZoomRow) {
                             item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                            m_zoomSelection->addItem(item);
+                            m_sliceSelection->addItem(item);
                         }
                     }
                     break;
@@ -963,11 +963,11 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(m_theme->m_highlightRowColor);
                     lightStrength = m_theme->m_highlightLightStrength;
-                    if (!m_zoomActivated && ModeZoomRow == m_selectionMode) {
+                    if (!m_isSlicingActivated && ModeZoomRow == m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                        m_zoomSelection->addItem(item);
+                        m_sliceSelection->addItem(item);
                         if (m_dataSet->d_ptr->rowLabelItems().size() > row) {
-                            m_zoomSelection->d_ptr->setLabelItem(
+                            m_sliceSelection->d_ptr->setLabelItem(
                                         m_dataSet->d_ptr->rowLabelItems().at(
                                             m_dataSet->d_ptr->rowLabelItems().size()
                                             - row - 1));
@@ -979,11 +979,11 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(m_theme->m_highlightColumnColor);
                     lightStrength = m_theme->m_highlightLightStrength;
-                    if (!m_zoomActivated && ModeZoomColumn == m_selectionMode) {
+                    if (!m_isSlicingActivated && ModeZoomColumn == m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                        m_zoomSelection->addItem(item);
+                        m_sliceSelection->addItem(item);
                         if (m_dataSet->d_ptr->columnLabelItems().size() > bar) {
-                            m_zoomSelection->d_ptr->setLabelItem(
+                            m_sliceSelection->d_ptr->setLabelItem(
                                         m_dataSet->d_ptr->columnLabelItems().at(
                                             m_dataSet->d_ptr->columnLabelItems().size()
                                             - bar - 1));
@@ -1044,13 +1044,13 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     // Bind background shader
     m_backgroundShader->bind();
 
-    if (m_negativeValues)
+    if (m_hasNegativeValues)
         glDisable(GL_CULL_FACE);
     else
         glCullFace(GL_BACK);
 
     // Draw background
-    if (m_bgrEnabled && m_backgroundObj) {
+    if (m_isBackgroundEnabled && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 depthMVPMatrix;
@@ -1122,13 +1122,13 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
 
     // Reset culling
-    if (m_negativeValues) {
+    if (m_hasNegativeValues) {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
     }
 
     // Draw grid lines
-    if (m_gridEnabled && m_heightNormalizer) {
+    if (m_isGridEnabled && m_heightNormalizer) {
         // Bind bar shader
         m_barShader->bind();
 
@@ -1252,7 +1252,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         if (m_tickCount > 0)
             heightStep = m_tickStep;
 
-        if (m_negativeValues)
+        if (m_hasNegativeValues)
             startLine = -m_heightNormalizer;
         else
             startLine = heightStep;
@@ -1378,32 +1378,32 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
 
     // TODO: Draw y labels
 
-    // Generate label textures for zoom selection if m_updateLabels is set
-    if (m_zoomActivated && m_updateLabels) {
+    // Generate label textures for slice selection if m_updateLabels is set
+    if (m_isSlicingActivated && m_updateLabels) {
         // Create label textures
-        for (int col = 0; col < m_zoomSelection->d_ptr->row().size(); col++) {
-            QDataItem *item = m_zoomSelection->d_ptr->getItem(col);
+        for (int col = 0; col < m_sliceSelection->d_ptr->row().size(); col++) {
+            QDataItem *item = m_sliceSelection->d_ptr->getItem(col);
             m_drawer->generateLabelTexture(item);
         }
     }
 
-    // Handle zoom activation and label drawing
+    // Handle slice activation and label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         m_selectedBar = NULL;
-        if (m_zoomActivated && Bars3dRenderer::MouseOnOverview == m_mousePressed) {
-            m_sceneViewPort = QRect(0, 0, width(), height());
-            m_zoomActivated = false;
+        if (m_isSlicingActivated && Bars3dRenderer::MouseOnOverview == m_mousePressed) {
+            m_mainViewPort = QRect(0, 0, width(), height());
+            m_isSlicingActivated = false;
         }
     } else if (m_selectionMode >= ModeZoomRow
                && Bars3dRenderer::MouseOnScene == m_mousePressed) {
-        // Activate zoom mode
-        m_zoomActivated = true;
-        m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
+        // Activate slice mode
+        m_isSlicingActivated = true;
+        m_mainViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
 
         // Create label textures
-        for (int col = 0; col < m_zoomSelection->d_ptr->row().size(); col++) {
-            QDataItem *item = m_zoomSelection->d_ptr->getItem(col);
+        for (int col = 0; col < m_sliceSelection->d_ptr->row().size(); col++) {
+            QDataItem *item = m_sliceSelection->d_ptr->getItem(col);
             m_drawer->generateLabelTexture(item);
         }
     } else {
@@ -1591,7 +1591,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
 #if defined(Q_OS_ANDROID)
 void Bars3dRenderer::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!m_zoomActivated) {
+    if (!m_isSlicingActivated) {
         m_mousePressed = Bars3dRenderer::MouseOnScene;
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
@@ -1630,9 +1630,9 @@ void Bars3dRenderer::touchEvent(QTouchEvent *event)
 void Bars3dRenderer::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (Qt::LeftButton == event->button()) {
-        if (m_zoomActivated) {
-            if (event->pos().x() <= m_sceneViewPort.width()
-                    && event->pos().y() <= m_sceneViewPort.height()) {
+        if (m_isSlicingActivated) {
+            if (event->pos().x() <= m_mainViewPort.width()
+                    && event->pos().y() <= m_mainViewPort.height()) {
                 m_mousePressed = Bars3dRenderer::MouseOnOverview;
                 //qDebug() << "Mouse pressed on overview";
             } else {
@@ -1704,11 +1704,11 @@ void Bars3dRenderer::resizeNotify()
     qDebug() << "Bars3dRenderer::resizeEvent " << width() << "x" <<height();
 
     // Set view port
-    if (m_zoomActivated)
-        m_sceneViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
+    if (m_isSlicingActivated)
+        m_mainViewPort = QRect(0, height() - height() / 5, width() / 5, height() / 5);
     else
-        m_sceneViewPort = QRect(0, 0, width(), height());
-    m_zoomViewPort = QRect(0, 0, width(), height());
+        m_mainViewPort = QRect(0, 0, width(), height());
+    m_sliceViewPort = QRect(0, 0, width(), height());
 
     // Calculate zoom level based on aspect ratio
     GLfloat div;
@@ -1716,7 +1716,7 @@ void Bars3dRenderer::resizeNotify()
     div = qMin(width(), height());
     zoomAdjustment = defaultRatio * ((width() / div) / (height() / div));
     //qDebug() << "zoom adjustment" << zoomAdjustment;
-    m_zoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
+    m_sliceZoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 
     // Re-init selection buffer
     initSelectionBuffer();
@@ -1893,8 +1893,8 @@ void Bars3dRenderer::setSelectionMode(SelectionMode mode)
     // Disable zoom if selection mode changes
     closeZoomMode();
     // Create zoom selection if there isn't one
-    if (mode >= ModeZoomRow && !m_zoomSelection)
-        m_zoomSelection = new QDataRow();
+    if (mode >= ModeZoomRow && !m_sliceSelection)
+        m_sliceSelection = new QDataRow();
 }
 
 SelectionMode Bars3dRenderer::selectionMode()
@@ -1937,18 +1937,18 @@ LabelTransparency Bars3dRenderer::labelTransparency()
 
 void Bars3dRenderer::setGridEnabled(bool enable)
 {
-    m_gridEnabled = enable;
+    m_isGridEnabled = enable;
 }
 
 bool Bars3dRenderer::gridEnabled()
 {
-    return m_gridEnabled;
+    return m_isGridEnabled;
 }
 
 void Bars3dRenderer::setBackgroundEnabled(bool enable)
 {
-    if (m_bgrEnabled != enable) {
-        m_bgrEnabled = enable;
+    if (m_isBackgroundEnabled != enable) {
+        m_isBackgroundEnabled = enable;
         // Load changed bar type
         loadBarMesh();
     }
@@ -1956,7 +1956,7 @@ void Bars3dRenderer::setBackgroundEnabled(bool enable)
 
 bool Bars3dRenderer::backgroundEnabled()
 {
-    return m_bgrEnabled;
+    return m_isBackgroundEnabled;
 }
 
 void Bars3dRenderer::setShadowQuality(ShadowQuality quality)
@@ -2223,7 +2223,7 @@ void Bars3dRenderer::loadBarMesh()
     if (m_barObj)
         delete m_barObj;
     // If background is disabled, load full version of bar mesh
-    if (!m_bgrEnabled)
+    if (!m_isBackgroundEnabled)
         objectFileName.append(QStringLiteral("Full"));
     m_barObj = new ObjectHelper(objectFileName);
     m_barObj->load();
@@ -2236,7 +2236,7 @@ void Bars3dRenderer::loadBackgroundMesh()
 
     if (m_backgroundObj)
         delete m_backgroundObj;
-    if (m_negativeValues)
+    if (m_hasNegativeValues)
         m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
     else
         m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
@@ -2285,7 +2285,7 @@ void Bars3dRenderer::initSelectionBuffer()
     if (m_selectionTexture)
         m_textureHelper->deleteTexture(&m_selectionTexture);
 
-    m_selectionTexture = m_textureHelper->createSelectionTexture(m_sceneViewPort.size(),
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 #endif
@@ -2312,7 +2312,7 @@ void Bars3dRenderer::updateDepthBuffer()
     }
 
     if (m_shadowQuality > ShadowNone) {
-        m_depthTexture = m_textureHelper->createDepthTexture(m_sceneViewPort.size(),
+        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_shadowQuality);
     }
@@ -2409,12 +2409,12 @@ void Bars3dRenderer::handleLimitChange()
     // TODO: What if we have only negative values?
 
     // Check if we have negative values
-    if (limits.first < 0 && !m_negativeValues) {
-        m_negativeValues = true;
+    if (limits.first < 0 && !m_hasNegativeValues) {
+        m_hasNegativeValues = true;
         // Reload background
         loadBackgroundMesh();
-    } else if (limits.first >= 0 && m_negativeValues) {
-        m_negativeValues = false;
+    } else if (limits.first >= 0 && m_hasNegativeValues) {
+        m_hasNegativeValues = false;
         // Reload background
         loadBackgroundMesh();
     }
@@ -2428,8 +2428,8 @@ void Bars3dRenderer::handleLimitChange()
 
 void Bars3dRenderer::closeZoomMode()
 {
-    m_zoomActivated = false;
-    m_sceneViewPort = QRect(0, 0, this->width(), this->height());
+    m_isSlicingActivated = false;
+    m_mainViewPort = QRect(0, 0, this->width(), this->height());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

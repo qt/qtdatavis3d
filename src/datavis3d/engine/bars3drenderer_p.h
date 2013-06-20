@@ -121,8 +121,8 @@ public:
     Theme *m_theme;
     LabelTransparency m_labelTransparency;
     QFont m_font;
-    bool m_gridEnabled;
-    bool m_bgrEnabled;
+    bool m_isGridEnabled;
+    bool m_isBackgroundEnabled;
     ShadowQuality m_shadowQuality;
 
     // Data parameters
@@ -132,10 +132,10 @@ public:
     QString m_axisLabelX;
     QString m_axisLabelZ;
     QString m_axisLabelY;
-    QDataRow *m_zoomSelection;
+    QDataRow *m_sliceSelection;
     GLint m_tickCount;
     GLfloat m_tickStep;
-    bool m_negativeValues;
+    bool m_hasNegativeValues;
 
     CameraHelper *m_camera;
 
@@ -145,9 +145,9 @@ private:
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
-    QRect m_sceneViewPort;
-    QRect m_zoomViewPort;
-    bool m_zoomActivated;
+    QRect m_mainViewPort;
+    QRect m_sliceViewPort;
+    bool m_isSlicingActivated;
     QOpenGLPaintDevice *m_paintDevice;
     bool m_updateLabels;
     bool m_isInitialized;
@@ -170,7 +170,7 @@ private:
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
     GLint m_zoomLevel;
-    GLfloat m_zoomAdjustment;
+    GLfloat m_sliceZoomAdjustment;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     QSizeF m_barThickness;
@@ -337,7 +337,7 @@ public:
     void closeZoomMode();
 
 private:
-    void drawZoomScene();
+    void drawSlicedScene();
     void drawScene(const GLuint defaultFboHandle);
     Q_DISABLE_COPY(Bars3dRenderer)
 };
