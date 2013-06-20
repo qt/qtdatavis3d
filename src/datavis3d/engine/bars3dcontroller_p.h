@@ -56,7 +56,7 @@
 #include <QtCore/QObject>
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "bars3drenderer_p.h"
 
 //#define DISPLAY_RENDER_SPEED

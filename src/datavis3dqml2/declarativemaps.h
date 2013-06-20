@@ -44,7 +44,7 @@
 
 #include "maps3dcontroller_p.h"
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "declarativemaps_p.h"
 
 #include <qsgsimpletexturenode.h>

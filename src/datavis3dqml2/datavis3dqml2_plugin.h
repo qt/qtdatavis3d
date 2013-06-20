@@ -43,7 +43,7 @@
 #define DATAVIS3DQML2_PLUGIN_H
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "qdataitem.h"
 #include "qdatarow.h"
 #include "qdataset.h"

@@ -116,7 +116,7 @@ void Q3DWindow::initialize()
     qDebug() << "GLSL version:" << (const char *)version;
 #if !defined(QT_OPENGL_ES_2)
     // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr = QString((const char *)version).split(" ");
+    QStringList splitversionstr = QString::fromLatin1((const char *)version).split(QChar::fromLatin1(' '));
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif

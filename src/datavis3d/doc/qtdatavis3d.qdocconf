@@ -15,7 +15,7 @@ sourcedirs += ..
 depends += qtcore \
            qtgui
 
-qhp.projects                    = QtDataVis3D
+qhp.projects                    = qtdatavis3d
 
 qhp.qtdatavis3d.file            = qtdatavis3d.qhp
 qhp.qtdatavis3d.namespace       = org.qt-project.qtdatavis3d.1.0.0

@@ -39,7 +39,7 @@
 **
 ****************************************************************************/
 
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"

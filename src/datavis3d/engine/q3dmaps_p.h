@@ -53,7 +53,7 @@
 #define Q3DMAPS_P_H
 
 #include "maps3dcontroller_p.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

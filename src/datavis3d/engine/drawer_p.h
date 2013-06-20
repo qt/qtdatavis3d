@@ -53,7 +53,7 @@
 #define DRAWER_P_H
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "q3dbars.h"
 #include "theme_p.h"
 #include "labelitem_p.h"

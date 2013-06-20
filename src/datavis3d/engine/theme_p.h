@@ -53,7 +53,7 @@
 #define THEME_P_H
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "q3dbars.h"
 
 class QColor;

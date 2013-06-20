@@ -53,7 +53,7 @@
 #define MAPS3DCONTROLLER_P_H
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#include "qdatavis3dnamespace.h"
 #include "q3dmaps.h"
 
 #include <QOpenGLFunctions>

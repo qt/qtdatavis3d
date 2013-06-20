@@ -46,7 +46,7 @@
 #include <QOpenGLFunctions>
 #include <QVector3D>
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+namespace QtDataVis3D {
 
 // Constants used in several files
 // Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
@@ -141,6 +141,6 @@ enum LabelTransparency {
     TransparencyNoBackground    // Draw just text on transparent background
 };
 
-QT_DATAVIS3D_END_NAMESPACE
+}
 
 #endif
