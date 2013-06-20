@@ -49,18 +49,18 @@
 //
 // We mean it.
 
-#ifndef Q3DBARSSHARED_p_H
-#define Q3DBARSSHARED_p_H
-
-#include "qdatavis3dglobal.h"
-#include "qdatavis3namespace.h"
+#ifndef Q3DBARSCONTROLLER_p_H
+#define Q3DBARSCONTROLLER_p_H
 
 #include <QtCore/QSize>
 #include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
 #include <QTime>
 #include <QWindow>
+
+#include "qdatavis3dglobal.h"
+#include "qdatavis3namespace.h"
+#include "bars3drenderer_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -80,115 +80,14 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class LabelItem;
-class Bars3dRenderer;
 class CameraHelper;
 
-class QT_DATAVIS3D_EXPORT Bars3dController : public QObject, public QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Bars3dController : public QObject
 {
     Q_OBJECT
 
-public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
-    // TODO: Filter to the set of attributes to be moved to the model object.
-    // * All GL rendering only related attribs should be moved out of this public set.
-    // * All attribs that are modifiable from QML need to e in this set.
-
-    // Interaction related parameters
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    SelectionMode m_selectionMode;
-
-    // Visual parameters
-    QRect m_boundingRect;
-    QString m_objFile;
-    Theme *m_theme;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    bool m_gridEnabled;
-    bool m_bgrEnabled;
-    ShadowQuality m_shadowQuality;
-
-    // Data parameters
-    QPair<int, int> m_sampleCount;
-    QDataItem *m_selectedBar;
-    QDataSet *m_dataSet;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
-    QDataRow *m_zoomSelection;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    bool m_negativeValues;
-
     Bars3dRenderer *m_renderer;
-    CameraHelper *m_camera;
-
-private:
-
-    // Internal attributes purely related to how the scene is drawn with GL.
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
-    QRect m_sceneViewPort;
-    QRect m_zoomViewPort;
-    bool m_zoomActivated;
-    QOpenGLPaintDevice *m_paintDevice;
-    bool m_updateLabels;
     bool m_isInitialized;
-    ShaderHelper *m_barShader;
-    ShaderHelper *m_depthShader;
-    ShaderHelper *m_selectionShader;
-    ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
-    ObjectHelper *m_backgroundObj;
-    ObjectHelper *m_gridLineObj;
-    ObjectHelper *m_labelObj;
-    TextureHelper *m_textureHelper;
-    Drawer *m_drawer;
-    GLuint m_bgrTexture;
-    GLuint m_depthTexture;
-    GLuint m_selectionTexture;
-    GLuint m_depthFrameBuffer;
-    GLuint m_selectionFrameBuffer;
-    GLuint m_selectionDepthBuffer;
-    GLfloat m_shadowQualityToShader;
-    GLint m_zoomLevel;
-    GLfloat m_zoomAdjustment;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
-    QSizeF m_barThickness;
-    QSizeF m_barSpacing;
-    GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
-    GLfloat m_rowWidth;
-    GLfloat m_columnDepth;
-    GLfloat m_maxDimension;
-    GLfloat m_scaleX;
-    GLfloat m_scaleZ;
-    GLfloat m_scaleFactor;
-    GLfloat m_maxSceneSize;
-
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
 
 public:
     explicit Bars3dController(QRect rect);
@@ -331,13 +230,12 @@ public:
     void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
-    SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
+    Bars3dRenderer::SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
     void handleLimitChange();
     void closeZoomMode();
 
 private:
-    void drawZoomScene();
-    void drawScene(const GLuint defaultFboHandle);
+
     Q_DISABLE_COPY(Bars3dController)
 
     friend class DeclarativeBars;

@@ -80,6 +80,7 @@ public:
 
 private:
     QScopedPointer<QDataItemPrivate> d_ptr;
+    friend class Bars3dRenderer;
     friend class Bars3dController;
     friend class Maps3DController;
     friend class QDataRowPrivate;

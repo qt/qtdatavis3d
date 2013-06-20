@@ -73,6 +73,7 @@ private:
     QScopedPointer<QDataSetPrivate> d_ptr;
     friend class Bars3dController;
     friend class Maps3DController;
+    friend class Bars3dRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
