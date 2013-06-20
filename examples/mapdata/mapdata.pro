@@ -5,7 +5,7 @@
 SOURCES += main.cpp mapdata.cpp
 HEADERS += mapdata.h
 
-QT += datavis3d widgets
+QT += widgets
 
 INSTALLS += target
 

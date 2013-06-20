@@ -11,6 +11,10 @@ win32 {
     DESTDIR = $$OUT_PWD
 }
 
+LIBS += -L$PWD/../lib
+
+QT += datavis3d
+
 contains(TARGET, qml.*) {
     uri = com.digia.QtDataVis3D
     lib_name = datavis3dqml2

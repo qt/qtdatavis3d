@@ -3,6 +3,5 @@
 }
 
 SOURCES += main.cpp
-QT += datavis3d
 
 INSTALLS += target
