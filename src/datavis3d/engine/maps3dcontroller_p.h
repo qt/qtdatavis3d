@@ -61,7 +61,6 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-class QOpenGLPaintDevice;
 class QPoint;
 class QSizeF;
 
@@ -109,13 +108,13 @@ public:
 
     // Add data set. New data is appended to old data.
     // ownership of data is transferred
-    bool addData(const QVector<QDataItem*> &data);
+    bool addData(const QVector<QDataItem *> &data);
     // ownership of data is transferred
     bool addData(const QDataRow &data);
 
     // Add data set. Old data is deleted.
     // ownership of data is transferred
-    bool setData(const QVector<QDataItem*> &data);
+    bool setData(const QVector<QDataItem *> &data);
     // ownership of data is transferred
     bool setData(QDataRow *data);
 
@@ -222,7 +221,6 @@ private:
     Maps3DRenderer *m_renderer;
     CameraHelper *m_camera;
 
-    QOpenGLPaintDevice *m_paintDevice;
     ShaderHelper *m_barShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;

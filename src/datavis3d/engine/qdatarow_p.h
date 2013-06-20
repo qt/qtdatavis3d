@@ -62,7 +62,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItem;
 
-class QDataRowPrivate
+class QT_DATAVIS3D_EXPORT QDataRowPrivate
 {
 public:
     explicit QDataRowPrivate(QDataRow *q, const QString &label = QString());

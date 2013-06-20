@@ -105,19 +105,19 @@ public:
 
     // Add data item. New data item is appended to old data.
     // ownership of data is transferred
-    Q_INVOKABLE bool addDataItem(QDataItem *dataItem);
+    Q_INVOKABLE void addDataItem(QDataItem *dataItem);
 
     // Add data set. New data is appended to old data.
     // ownership of data is transferred
-    Q_INVOKABLE bool addData(const QVector<QDataItem *> &data);
+    Q_INVOKABLE void addData(const QVector<QDataItem *> &data);
     // ownership of data is transferred
-    Q_INVOKABLE bool addData(const QDataRow &data);
+    Q_INVOKABLE void addData(const QDataRow &data);
 
     // Add data set. Old data is deleted.
     // ownership of data is transferred
-    Q_INVOKABLE bool setData(const QVector<QDataItem *> &data);
+    Q_INVOKABLE void setData(const QVector<QDataItem *> &data);
     // ownership of data is transferred
-    Q_INVOKABLE bool setData(QDataRow *data);
+    Q_INVOKABLE void setData(QDataRow *data);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.
@@ -150,6 +150,7 @@ public:
 
     // Set area image
     Q_INVOKABLE void setImage(const QImage &image);
+    Q_INVOKABLE void setImage(const QString &imageUrl);
 
     // TODO: light placement API
 

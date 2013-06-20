@@ -172,7 +172,7 @@ protected:
 
 private:
     QScopedPointer<Q3DMapsPrivate> d_ptr;
-    Q_DISABLE_COPY(Q3DMaps);
+    Q_DISABLE_COPY(Q3DMaps)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

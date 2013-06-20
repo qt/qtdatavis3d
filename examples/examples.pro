@@ -3,6 +3,7 @@ SUBDIRS += barchart \
            rainfall \
            widget \
            mapdata \
-           qmlbarchart
+           qmlbarchart \
+           qmlmaps
 
 qtHaveModule(multimedia): SUBDIRS += spectrum

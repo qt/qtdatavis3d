@@ -82,8 +82,7 @@ GLfloat distanceMod = 0.0f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Maps3DController::Maps3DController(const QRect &rect)
-    : m_paintDevice(0),
-      m_barShader(0),
+    : m_barShader(0),
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
@@ -1448,7 +1447,7 @@ ShadowQuality Maps3DController::shadowQuality()
     return m_shadowQuality;
 }
 
-bool Maps3DController::addDataItem(QDataItem* dataItem)
+bool Maps3DController::addDataItem(QDataItem *dataItem)
 {
     // Check validity
     if (!isValid(*dataItem))
@@ -1464,7 +1463,7 @@ bool Maps3DController::addDataItem(QDataItem* dataItem)
     return true;
 }
 
-bool Maps3DController::addData(const QVector<QDataItem*> &data)
+bool Maps3DController::addData(const QVector<QDataItem *> &data)
 {
     // Convert to QDataRow
     for (int i = 0; i < data.size(); i++) {
@@ -1507,7 +1506,7 @@ bool Maps3DController::addData(const QDataRow &dataRow)
     return true;
 }
 
-bool Maps3DController::setData(const QVector<QDataItem*> &dataRow)
+bool Maps3DController::setData(const QVector<QDataItem *> &dataRow)
 {
     // Delete previous data
     delete m_data;

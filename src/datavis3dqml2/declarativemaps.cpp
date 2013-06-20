@@ -41,7 +41,9 @@
 
 #include "declarativemaps.h"
 #include "maps3dcontroller_p.h"
+#include "qdataitem.h"
 #include "qdatarow.h"
+#include "qdatarow_p.h"
 
 #include <QQuickWindow>
 #include <QOpenGLFramebufferObject>
@@ -89,10 +91,15 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     }
 
     // Check if properites have changed that need to be applied while on the SGRenderThread
-//    if (m_cachedState->m_data) {
-//        m_shared->addData(m_cachedState->m_data);
-//        m_cachedState->m_data = 0;
-//    }
+    if (m_cachedState->m_isAreaRectSet) {
+        m_shared->setAreaSpecs(m_cachedState->m_arearect, m_cachedState->m_image);
+        m_cachedState->m_isAreaRectSet = false;
+    }
+
+    if (m_cachedState->m_isImageSet) {
+        m_shared->setImage(m_cachedState->m_image);
+        m_cachedState->m_isImageSet = false;
+    }
 
     if (m_cachedState->m_isSelectionModeSet) {
         m_shared->setSelectionMode(m_cachedState->m_selectionMode);
@@ -107,6 +114,14 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     if (m_cachedState->m_isShadowQualitySet) {
         m_shared->setShadowQuality(m_cachedState->m_shadowQuality);
         m_cachedState->m_isShadowQualitySet = false;
+    }
+
+    if (m_cachedState->m_data) {
+        if (m_cachedState->m_replaceData)
+            m_shared->setData(m_cachedState->m_data);
+        else
+            m_shared->addData(*m_cachedState->m_data);
+        m_cachedState->m_data = 0;
     }
 
     // If old node exists and has right size, reuse it.
@@ -168,12 +183,24 @@ void DeclarativeMaps::setBarColor(QColor baseColor, QColor heightColor, bool uni
 
 void DeclarativeMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
 {
-    m_shared->setAreaSpecs(areaRect, image);
+    m_cachedState->m_arearect = areaRect;
+    m_cachedState->m_isAreaRectSet = true;
+    m_cachedState->m_image = image;
+    update();
 }
 
 void DeclarativeMaps::setImage(const QImage &image)
 {
-    m_shared->setImage(image);
+    m_cachedState->m_image = image;
+    m_cachedState->m_isImageSet = true;
+    update();
+}
+
+void DeclarativeMaps::setImage(const QString &imageUrl)
+{
+    m_cachedState->m_image = QImage(imageUrl);
+    m_cachedState->m_isImageSet = true;
+    update();
 }
 
 void DeclarativeMaps::setSelectionMode(DeclarativeMaps::SelectionMode mode)
@@ -232,34 +259,62 @@ DeclarativeMaps::ShadowQuality DeclarativeMaps::shadowQuality()
     return DeclarativeMaps::ShadowQuality(m_shared->shadowQuality());
 }
 
-bool DeclarativeMaps::addDataItem(QDataItem *dataItem)
+void DeclarativeMaps::addDataItem(QDataItem *dataItem)
 {
     qDebug() << "Enter DeclarativeMaps::addDataItem(QDataItem *dataItem)";
-    return m_shared->addDataItem(dataItem);
+    QDataItem *newItem = new QDataItem(*dataItem);
+    m_cachedState->appendData(newItem);
+    update();
 }
 
-bool DeclarativeMaps::addData(const QVector<QDataItem *> &data)
+void DeclarativeMaps::addData(const QVector<QDataItem *> &data)
 {
     qDebug() << "Enter DeclarativeMaps::addData(const QVector<QDataItem *> &data)";
-    return m_shared->addData(data);
+    QDataItem *newItem;
+    for (int i = 0; i < data.count(); i++) {
+        newItem = new QDataItem(*data.at(i));
+        m_cachedState->appendData(newItem);
+    }
+    update();
 }
 
-bool DeclarativeMaps::addData(const QDataRow &dataRow)
+void DeclarativeMaps::addData(const QDataRow &dataRow)
 {
     qDebug() << "Enter DeclarativeMaps::addData(const QDataRow &dataRow)";
-    return m_shared->addData(dataRow);
+    QDataItem *newItem;
+    for (int i = 0; i < dataRow.d_ptr->row().count(); i++) {
+        newItem = new QDataItem(*dataRow.d_ptr->getItem(i));
+        m_cachedState->appendData(newItem);
+    }
+    update();
 }
 
-bool DeclarativeMaps::setData(const QVector<QDataItem *> &data)
+void DeclarativeMaps::setData(const QVector<QDataItem *> &data)
 {
     qDebug() << "Enter DeclarativeMaps::setData(const QVector<QDataItem *> &data)";
-    return m_shared->setData(data);
+    QDataItem *newItem;
+    delete m_cachedState->m_data;
+    m_cachedState->m_data = new QDataRow();
+    for (int i = 0; i < data.count(); i++) {
+        newItem = new QDataItem(*data.at(i));
+        m_cachedState->appendData(newItem);
+    }
+    m_cachedState->m_replaceData = true;
+    update();
 }
 
-bool DeclarativeMaps::setData(QDataRow *data)
+void DeclarativeMaps::setData(QDataRow *data)
 {
     qDebug() << "Enter DeclarativeMaps::setData(const QVector<QDataItem*> &data)";
-    return m_shared->setData(data);
+    QDataItem *newItem;
+    delete m_cachedState->m_data;
+    m_cachedState->m_data = new QDataRow();
+    for (int i = 0; i < data->d_ptr->row().count(); i++) {
+        newItem = new QDataItem(*data->d_ptr->getItem(i));
+        m_cachedState->appendData(newItem);
+    }
+    m_cachedState->m_replaceData = true;
+    update();
 }
 
 void DeclarativeMaps::mousePressEvent(QMouseEvent *event)
@@ -349,6 +404,15 @@ DeclarativeMapsCachedStatePrivate::DeclarativeMapsCachedStatePrivate()
 
 DeclarativeMapsCachedStatePrivate::~DeclarativeMapsCachedStatePrivate()
 {
+}
+
+void DeclarativeMapsCachedStatePrivate::appendData(QDataItem *item)
+{
+    if (!m_data)
+        m_data = new QDataRow();
+
+    m_data->addItem(item);
+    m_replaceData = false;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

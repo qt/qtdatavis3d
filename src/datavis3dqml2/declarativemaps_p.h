@@ -49,6 +49,7 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataRow;
+class QDataItem;
 
 class DeclarativeMapsCachedStatePrivate
 {
@@ -56,9 +57,18 @@ public:
     explicit DeclarativeMapsCachedStatePrivate();
     ~DeclarativeMapsCachedStatePrivate();
 
+    void appendData(QDataItem *item);
+
     int m_cachedState;
 
+    bool m_replaceData;
     QDataRow *m_data;
+
+    bool m_isImageSet;
+    QImage m_image;
+
+    bool m_isAreaRectSet;
+    QRect m_arearect;
 
     bool m_isSelectionModeSet;
     SelectionMode m_selectionMode;
