@@ -93,16 +93,11 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
       m_shadowQuality(ShadowLow),
-      m_sampleCount(0, 0),
+      m_hasNegativeValues(false),
       m_selectedBar(0),
-      m_dataSet(new QDataSet()),
-      m_axisLabelX(QStringLiteral("X")),
-      m_axisLabelZ(QStringLiteral("Z")),
-      m_axisLabelY(QStringLiteral("Y")),
       m_sliceSelection(0),
       m_tickCount(0),
       m_tickStep(0),
-      m_hasNegativeValues(false),
       m_camera(new CameraHelper()),
       m_xFlipped(false),
       m_zFlipped(false),
@@ -110,7 +105,6 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_mainViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
       m_sliceViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
       m_isSlicingActivated(false),
-      m_paintDevice(0),
       m_updateLabels(false),
       m_isInitialized(false),
       m_barShader(0),
@@ -152,7 +146,6 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
 
 {
     m_theme = new Theme();
-    m_dataSet->d_ptr->setDrawer(m_drawer);
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Bars3dRenderer::updateTextures);
 }
 
@@ -165,7 +158,6 @@ Bars3dRenderer::~Bars3dRenderer()
 #endif
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
-    delete m_dataSet;
     if (m_sliceSelection) {
         m_sliceSelection->d_ptr->clear();
         delete m_sliceSelection;
@@ -281,7 +273,11 @@ void Bars3dRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3dRenderer::render(const GLuint defaultFboHandle)
+void Bars3dRenderer::render(QDataSetPrivate *dataSet,
+                            const LabelItem &xLabel,
+                            const LabelItem &yLabel,
+                            const LabelItem &zLabel,
+                            const GLuint defaultFboHandle)
 {
     if (!m_isInitialized)
         return;
@@ -315,12 +311,15 @@ void Bars3dRenderer::render(const GLuint defaultFboHandle)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // If slice selection is on, draw the sliced scene
-    drawSlicedScene();
+    drawSlicedScene(dataSet, xLabel, yLabel, zLabel);
     // Draw bars scene
-    drawScene(defaultFboHandle);
+    drawScene(dataSet, defaultFboHandle);
 }
 
-void Bars3dRenderer::drawSlicedScene()
+void Bars3dRenderer::drawSlicedScene(QDataSetPrivate *dataSet,
+                                     const LabelItem &xLabel,
+                                     const LabelItem &yLabel,
+                                     const LabelItem &zLabel)
 {
     // If not slicing, return
     if (!m_isSlicingActivated)
@@ -449,10 +448,6 @@ void Bars3dRenderer::drawSlicedScene()
 
     // Draw labels for axes
     QDataItem *dummyItem = NULL;
-    LabelItem x;
-    LabelItem z;
-    LabelItem y;
-    m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
     LabelItem sliceSelectionLabel = m_sliceSelection->d_ptr->labelItem();
     if (ModeZoomRow == m_selectionMode) {
         m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
@@ -460,13 +455,13 @@ void Bars3dRenderer::drawSlicedScene()
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, false, false, LabelTop);
-        m_drawer->drawLabel(*dummyItem, z, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, zLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, false, false, LabelBottom);
     } else {
-        m_drawer->drawLabel(*dummyItem, x, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, xLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
@@ -477,7 +472,7 @@ void Bars3dRenderer::drawSlicedScene()
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, false, false, LabelTop);
     }
-    m_drawer->drawLabel(*dummyItem, y, viewMatrix, projectionMatrix,
+    m_drawer->drawLabel(*dummyItem, yLabel, viewMatrix, projectionMatrix,
                         QVector3D(0.0f, m_yAdjustment, zComp),
                         QVector3D(0.0f, 0.0f, 90.0f), m_heightNormalizer,
                         m_selectionMode, m_labelShader,
@@ -492,26 +487,27 @@ void Bars3dRenderer::drawSlicedScene()
                             QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera);
+
         // Draw labels
         LabelItem labelItem;
         if (ModeZoomRow == m_selectionMode) {
-            if (m_dataSet->d_ptr->columnLabelItems().size() > col) {
+            if (dataSet->columnLabelItems().size() > col) {
                 // If draw order of bars is flipped, label draw order should be too
                 if (m_xFlipped) {
-                    labelItem = m_dataSet->d_ptr->columnLabelItems().at(
-                                m_dataSet->d_ptr->columnLabelItems().size() - col - 1);
+                    labelItem = dataSet->columnLabelItems().at(
+                                dataSet->columnLabelItems().size() - col - 1);
                 } else {
-                    labelItem = m_dataSet->d_ptr->columnLabelItems().at(col);
+                    labelItem = dataSet->columnLabelItems().at(col);
                 }
             }
         } else {
-            if (m_dataSet->d_ptr->rowLabelItems().size() > col) {
+            if (dataSet->rowLabelItems().size() > col) {
                 // If draw order of bars is flipped, label draw order should be too
                 if (m_zFlipped) {
-                    labelItem = m_dataSet->d_ptr->rowLabelItems().at(
-                                m_dataSet->d_ptr->rowLabelItems().size() - col - 1);
+                    labelItem = dataSet->rowLabelItems().at(
+                                dataSet->rowLabelItems().size() - col - 1);
                 } else {
-                    labelItem = m_dataSet->d_ptr->rowLabelItems().at(col);
+                    labelItem = dataSet->rowLabelItems().at(col);
                 }
             }
         }
@@ -531,7 +527,8 @@ void Bars3dRenderer::drawSlicedScene()
     m_labelShader->release();
 }
 
-void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
+void Bars3dRenderer::drawScene(QDataSetPrivate *dataSet,
+                               const GLuint defaultFboHandle)
 {
     GLint startBar = 0;
     GLint stopBar = 0;
@@ -569,22 +566,22 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
     if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
-        stopRow = m_sampleCount.second;
+        stopRow = m_controller->getRowCount();
         stepRow = 1;
         m_zFlipped = false;
     } else {
-        startRow = m_sampleCount.second - 1;
+        startRow = m_controller->getRowCount() - 1;
         stopRow = -1;
         stepRow = -1;
         m_zFlipped = true;
     }
     if (viewMatrix.row(0).z() <= 0) {
         startBar = 0;
-        stopBar = m_sampleCount.first;
+        stopBar = m_controller->getColumnCount();
         stepBar = 1;
         m_xFlipped = false;
     } else {
-        startBar = m_sampleCount.first - 1;
+        startBar = m_controller->getColumnCount() - 1;
         stopBar = -1;
         stepBar = -1;
         m_xFlipped = true;
@@ -649,9 +646,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         // Draw bars to depth buffer
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                if (!m_dataSet->d_ptr->getRow(row))
+                if (!dataSet->getRow(row))
                     continue;
-                QDataItem *item = m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
+                QDataItem *item = dataSet->getRow(row)->d_ptr->getItem(bar);
                 if (!item)
                     continue;
 
@@ -753,9 +750,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                if (!m_dataSet->d_ptr->getRow(row))
+                if (!dataSet->getRow(row))
                     continue;
-                QDataItem *item = m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
+                QDataItem *item = dataSet->getRow(row)->d_ptr->getItem(bar);
                 if (!item)
                     continue;
 
@@ -891,9 +888,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            if (!m_dataSet->d_ptr->getRow(row))
+            if (!dataSet->getRow(row))
                 continue;
-            QDataItem *item = m_dataSet->d_ptr->getRow(row)->d_ptr->getItem(bar);
+            QDataItem *item = dataSet->getRow(row)->d_ptr->getItem(bar);
             if (!item)
                 continue;
 
@@ -927,7 +924,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
             QVector3D heightColor = Utils::vectorFromColor(m_theme->m_heightColor)
                     * barHeight;
             QVector3D depthColor = Utils::vectorFromColor(m_theme->m_depthColor)
-                    * (float(row) / GLfloat(m_sampleCount.second));
+                    * (float(row) / GLfloat(m_controller->getRowCount()));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
@@ -942,12 +939,12 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!m_isSlicingActivated) {
                         m_selectedBar = item;
-                        if (m_dataSet->d_ptr->rowLabelItems().size() > row
-                                && m_dataSet->d_ptr->columnLabelItems().size() > bar) {
+                        if (dataSet->rowLabelItems().size() > row
+                                && dataSet->columnLabelItems().size() > bar) {
                             m_selectedBar->setPosition(
-                                        QPoint(m_dataSet->d_ptr->rowLabelItems().size()
+                                        QPoint(dataSet->rowLabelItems().size()
                                                - row - 1,
-                                               m_dataSet->d_ptr->columnLabelItems().size()
+                                               dataSet->columnLabelItems().size()
                                                - bar - 1));
                         }
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
@@ -966,10 +963,10 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     if (!m_isSlicingActivated && ModeZoomRow == m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->addItem(item);
-                        if (m_dataSet->d_ptr->rowLabelItems().size() > row) {
+                        if (dataSet->rowLabelItems().size() > row) {
                             m_sliceSelection->d_ptr->setLabelItem(
-                                        m_dataSet->d_ptr->rowLabelItems().at(
-                                            m_dataSet->d_ptr->rowLabelItems().size()
+                                        dataSet->rowLabelItems().at(
+                                            dataSet->rowLabelItems().size()
                                             - row - 1));
                         }
                     }
@@ -982,10 +979,10 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                     if (!m_isSlicingActivated && ModeZoomColumn == m_selectionMode) {
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->addItem(item);
-                        if (m_dataSet->d_ptr->columnLabelItems().size() > bar) {
+                        if (dataSet->columnLabelItems().size() > bar) {
                             m_sliceSelection->d_ptr->setLabelItem(
-                                        m_dataSet->d_ptr->columnLabelItems().at(
-                                            m_dataSet->d_ptr->columnLabelItems().size()
+                                        dataSet->columnLabelItems().at(
+                                            dataSet->columnLabelItems().size()
                                             - bar - 1));
                         }
                     }
@@ -1141,7 +1138,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
                                      m_theme->m_ambientStrength);
 
         // Floor lines: rows
-        for (GLfloat row = 0.0f; row <= m_sampleCount.second; row++) {
+        for (GLfloat row = 0.0f; row <= m_controller->getRowCount(); row++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -1193,7 +1190,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         }
 
         // Floor lines: columns
-        for (GLfloat bar = 0.0f; bar <= m_sampleCount.first; bar++) {
+        for (GLfloat bar = 0.0f; bar <= m_controller->getColumnCount(); bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -1435,15 +1432,15 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         LabelItem labelItem = m_selectedBar->d_ptr->selectionLabel();
         if (firstSelection || prevItem != m_selectedBar || m_updateLabels) {
             QString labelText = m_selectedBar->d_ptr->valueStr();
-            if ((m_dataSet->d_ptr->columnLabels().size()
+            if ((dataSet->columnLabels().size()
                  > m_selectedBar->position().y())
-                    && (m_dataSet->d_ptr->rowLabels().size()
+                    && (dataSet->rowLabels().size()
                         > m_selectedBar->position().x())) {
                 labelText.append(QStringLiteral(" ("));
-                labelText.append(m_dataSet->d_ptr->rowLabels().at(
+                labelText.append(dataSet->rowLabels().at(
                                      m_selectedBar->position().x()));
                 labelText.append(QStringLiteral(", "));
-                labelText.append(m_dataSet->d_ptr->columnLabels().at(
+                labelText.append(dataSet->columnLabels().at(
                                      m_selectedBar->position().y()));
                 labelText.append(QStringLiteral(")"));
                 //qDebug() << labelText;
@@ -1483,9 +1480,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     }
 
     // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
-    for (int row = 0; row != m_sampleCount.second; row += 1) {
+    for (int row = 0; row != m_controller->getRowCount(); row += 1) {
         // Go through all rows and get position of max+1 or min-1 column, depending on x flip
-        // We need only positions for them, labels have already been generated at QDataSet. Just add LabelItems
+        // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
         rowPos = (row + 1) * (m_barSpacing.height());
         barPos = 0;
         GLfloat rotLabelX = -90.0f;
@@ -1495,7 +1492,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         if (m_zFlipped)
             rotLabelY = 180.0f;
         if (m_xFlipped) {
-            barPos = (m_sampleCount.first + 1) * (m_barSpacing.width());
+            barPos = (m_controller->getColumnCount() + 1) * (m_barSpacing.width());
             alignment = Qt::AlignLeft;
         }
         if (m_yFlipped) {
@@ -1515,12 +1512,12 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         // Create a data item
         QDataItem *label = new QDataItem();
         label->d_ptr->setTranslation(labelPos);
-        if (m_dataSet->d_ptr->rowLabelItems().size() > row) {
-            label->d_ptr->setLabel(m_dataSet->d_ptr->rowLabelItems().at(
-                                       m_dataSet->d_ptr->rowLabelItems().size() - row - 1));
+        if (dataSet->rowLabelItems().size() > row) {
+            label->d_ptr->setLabel(dataSet->rowLabelItems().at(
+                                       dataSet->rowLabelItems().size() - row - 1));
         }
 
-        //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_dataSet->d_ptr->rowLabels().at(row);
+        //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
 
         m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1531,9 +1528,9 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
 
         delete label;
     }
-    for (int bar = 0; bar != m_sampleCount.first; bar += 1) {
+    for (int bar = 0; bar != m_controller->getColumnCount(); bar += 1) {
         // Go through all columns and get position of max+1 or min-1 row, depending on z flip
-        // We need only positions for them, labels have already been generated at QDataSet. Just add LabelItems
+        // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
         barPos = (bar + 1) * (m_barSpacing.width());
         rowPos = 0;
         GLfloat rotLabelX = -90.0f;
@@ -1543,7 +1540,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         if (m_xFlipped)
             rotLabelY = -90.0f;
         if (m_zFlipped) {
-            rowPos = (m_sampleCount.second + 1) * (m_barSpacing.height());
+            rowPos = (m_controller->getRowCount() + 1) * (m_barSpacing.height());
             alignment = Qt::AlignRight;
         }
         if (m_yFlipped) {
@@ -1563,13 +1560,13 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
         // Create a data item
         QDataItem *label = new QDataItem();
         label->d_ptr->setTranslation(labelPos);
-        if (m_dataSet->d_ptr->columnLabelItems().size() > bar) {
-            label->d_ptr->setLabel(m_dataSet->d_ptr->columnLabelItems().at(
-                                       m_dataSet->d_ptr->columnLabelItems().size()
+        if (dataSet->columnLabelItems().size() > bar) {
+            label->d_ptr->setLabel(dataSet->columnLabelItems().at(
+                                       dataSet->columnLabelItems().size()
                                        - bar - 1));
         }
 
-        //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << m_dataSet->d_ptr->columnLabels().at(bar);
+        //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
 
         m_drawer->drawLabel(*label, label->d_ptr->label(), viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1778,26 +1775,21 @@ void Bars3dRenderer::setMeshFileName(const QString &objFileName)
     m_objFile = objFileName;
 }
 
-void Bars3dRenderer::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                                        const QString &labelColumn, const QString &labelHeight)
+void Bars3dRenderer::sampleSpaceChangedNotify(int samplesRow, int samplesColumn)
 {
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    closeZoomMode();
-    // Delete previous data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    m_sampleCount = qMakePair(samplesRow, samplesColumn);
-    m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
     m_maxSceneSize = 2 * qSqrt(samplesRow * samplesColumn);
     //qDebug() << "maxSceneSize" << m_maxSceneSize;
     // Calculate here and at setting bar specs
     calculateSceneScalingFactors();
-    m_axisLabelX = labelRow;
-    m_axisLabelZ = labelColumn;
-    m_axisLabelY = labelHeight;
 }
+
+void Bars3dRenderer::dataSetChangedNotify(QDataSetPrivate *dataSet)
+{
+    dataSet->setDrawer(m_drawer);
+}
+
 
 void Bars3dRenderer::setCameraPreset(CameraPreset preset)
 {
@@ -2033,132 +2025,6 @@ void Bars3dRenderer::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum
     }
 }
 
-void Bars3dRenderer::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                                  const QVector<QString> &labelsColumn)
-{
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow(labelRow);
-    for (int i = 0; i < dataRow.size(); i++)
-        row->addItem(new QDataItem(dataRow.at(i)));
-    row->d_ptr->verifySize(m_sampleCount.first);
-    m_dataSet->addRow(row);
-    handleLimitChange();
-    m_dataSet->setLabels(m_axisLabelX, m_axisLabelZ, m_axisLabelY,
-                         QVector<QString>(), labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
-}
-
-void Bars3dRenderer::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                                  const QVector<QString> &labelsColumn)
-{
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow(labelRow);
-    for (int i = 0; i < dataRow.size(); i++)
-        row->addItem(dataRow.at(i));
-    row->d_ptr->verifySize(m_sampleCount.first);
-    m_dataSet->addRow(row);
-    handleLimitChange();
-    m_dataSet->setLabels(m_axisLabelX, m_axisLabelZ, m_axisLabelY,
-                         QVector<QString>(), labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
-}
-
-void Bars3dRenderer::addDataRow(QDataRow *dataRow)
-{
-    QDataRow *row = dataRow;
-    // Check that the input data fits into sample space, and resize if it doesn't
-    row->d_ptr->verifySize(m_sampleCount.first);
-    // With each new row, the previous data row must be moved back
-    // ie. we need as many vectors as we have rows in the sample space
-    m_dataSet->addRow(row);
-    // if the added data pushed us over sample space, remove the oldest data set
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
-    handleLimitChange();
-}
-
-void Bars3dRenderer::addDataSet(const QVector< QVector<float> > &data,
-                                  const QVector<QString> &labelsRow,
-                                  const QVector<QString> &labelsColumn)
-{
-    // Copy axis labels
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    closeZoomMode();
-    // Delete old data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    // Give drawer to data set
-    m_dataSet->d_ptr->setDrawer(m_drawer);
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row;
-    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1))
-            row = new QDataRow(labelsRow.at(rowNr));
-        else
-            row = new QDataRow();
-        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
-            row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
-        row->d_ptr->verifySize(m_sampleCount.first);
-        m_dataSet->addRow(row);
-        row++;
-    }
-    handleLimitChange();
-    m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
-}
-
-void Bars3dRenderer::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                  const QVector<QString> &labelsRow,
-                                  const QVector<QString> &labelsColumn)
-{
-    // Copy axis labels
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    closeZoomMode();
-    // Delete old data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    // Give drawer to data set
-    m_dataSet->d_ptr->setDrawer(m_drawer);
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row;
-    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1))
-            row = new QDataRow(labelsRow.at(rowNr));
-        else
-            row = new QDataRow();
-        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
-            row->addItem(data.at(rowNr).at(colNr));
-        row->d_ptr->verifySize(m_sampleCount.first);
-        m_dataSet->addRow(row);
-        row++;
-    }
-    handleLimitChange();
-    m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
-}
-
-void Bars3dRenderer::addDataSet(QDataSet *dataSet)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    closeZoomMode();
-    // Delete old data set
-    delete m_dataSet;
-    // Check sizes
-    dataSet->d_ptr->verifySize(m_sampleCount.second, m_sampleCount.first);
-    // Take ownership of given set
-    m_dataSet = dataSet;
-    handleLimitChange();
-    // Give drawer to data set
-    m_dataSet->d_ptr->setDrawer(m_drawer);
-}
-
 const QSize Bars3dRenderer::size()
 {
     return m_boundingRect.size();
@@ -2345,11 +2211,11 @@ void Bars3dRenderer::updateTextures()
 void Bars3dRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
-    m_rowWidth = ((m_sampleCount.first + 1) * m_barSpacing.width()) / 2.0f;
-    m_columnDepth = ((m_sampleCount.second + 1) * m_barSpacing.height()) / 2.0f;
+    m_rowWidth = ((m_controller->getColumnCount() + 1) * m_barSpacing.width()) / 2.0f;
+    m_columnDepth = ((m_controller->getRowCount() + 1) * m_barSpacing.height()) / 2.0f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
-    m_scaleFactor = qMin((m_sampleCount.first * (m_maxDimension / m_maxSceneSize)),
-                         (m_sampleCount.second * (m_maxDimension / m_maxSceneSize)));
+    m_scaleFactor = qMin((m_controller->getColumnCount() * (m_maxDimension / m_maxSceneSize)),
+                         (m_controller->getRowCount() * (m_maxDimension / m_maxSceneSize)));
     m_scaleX = m_barThickness.width() / m_scaleFactor;
     m_scaleZ = m_barThickness.height() / m_scaleFactor;
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
@@ -2401,11 +2267,8 @@ Bars3dRenderer::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar,
     return isSelectedType;
 }
 
-void Bars3dRenderer::handleLimitChange()
+void Bars3dRenderer::limitsChangedNotify(QPair<GLfloat, GLfloat> limits)
 {
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_dataSet->d_ptr->limitValues();
-
     // TODO: What if we have only negative values?
 
     // Check if we have negative values

@@ -71,7 +71,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QDataItem;
 class QDataRow;
-class QDataSet;
+class QDataSetPrivate;
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
@@ -122,18 +122,13 @@ public:
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
     ShadowQuality m_shadowQuality;
+    bool m_hasNegativeValues;
 
     // Data parameters
-    QPair<int, int> m_sampleCount;
     QDataItem *m_selectedBar;
-    QDataSet *m_dataSet;
-    QString m_axisLabelX;
-    QString m_axisLabelZ;
-    QString m_axisLabelY;
     QDataRow *m_sliceSelection;
     GLint m_tickCount;
     GLfloat m_tickStep;
-    bool m_hasNegativeValues;
 
     CameraHelper *m_camera;
 
@@ -146,7 +141,6 @@ private:
     QRect m_mainViewPort;
     QRect m_sliceViewPort;
     bool m_isSlicingActivated;
-    QOpenGLPaintDevice *m_paintDevice;
     bool m_updateLabels;
     bool m_isInitialized;
     ShaderHelper *m_barShader;
@@ -194,31 +188,20 @@ public:
     ~Bars3dRenderer();
 
     void initializeOpenGL();
-    void render(const GLuint defaultFboHandle = 0);
+    void render(QDataSetPrivate *dataSet, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel, const GLuint defaultFboHandle = 0);
 
-    // Add a row of data. Each new row is added to the front of the sample space, moving previous
-    // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<GLfloat> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataRow is transferred
-    void addDataRow(QDataRow *dataRow);
+    // change in the "has data signed values" detected
+    void dataSetChangedNotify(QDataSetPrivate *dataSet);
 
-    // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<GLfloat> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    // change in the min/max values in the data
+    void limitsChangedNotify(QPair<GLfloat, GLfloat> limits);
 
-    // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataSet is transferred
-    void addDataSet(QDataSet* dataSet);
+    // how many samples per row and column, and names for axes
+    void sampleSpaceChangedNotify(int samplesRow, int samplesColumn);
+
+    void resizeNotify();
+
+
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -233,11 +216,6 @@ public:
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
 
-    // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn,
-                          const QString &labelRow = QString(),
-                          const QString &labelColumn = QString(),
-                          const QString &labelHeight = QString());
 
     // Select preset camera placement
     void setCameraPreset(CameraPreset preset);
@@ -312,7 +290,6 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void resizeNotify();
 
     void loadBarMesh();
     void loadBackgroundMesh();
@@ -331,12 +308,11 @@ public:
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
-    void handleLimitChange();
     void closeZoomMode();
 
 private:
-    void drawSlicedScene();
-    void drawScene(const GLuint defaultFboHandle);
+    void drawSlicedScene(QDataSetPrivate *dataSet, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawScene(QDataSetPrivate *dataSet, const GLuint defaultFboHandle);
     Q_DISABLE_COPY(Bars3dRenderer)
 };
 

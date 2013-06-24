@@ -79,6 +79,8 @@ class QT_DATAVIS3D_EXPORT Bars3dController : public QObject
 
     Bars3dRenderer *m_renderer;
     bool m_isInitialized;
+    QDataSet *m_dataSet;
+    QPair<int, int> m_sampleCount;
 
 public:
     explicit Bars3dController(QRect rect);
@@ -86,6 +88,9 @@ public:
 
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
+
+    int getColumnCount();
+    int getRowCount();
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -209,6 +214,7 @@ public:
     Bars3dRenderer::SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
 
 private:
+    void handleLimitChange();
 
     Q_DISABLE_COPY(Bars3dController)
 
