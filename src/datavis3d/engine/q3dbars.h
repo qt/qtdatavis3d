@@ -42,7 +42,6 @@
 #ifndef Q3DBARS_H
 #define Q3DBARS_H
 
-#include "qdatavis3dglobal.h"
 #include "qdatavis3dnamespace.h"
 #include "q3dwindow.h"
 

@@ -42,7 +42,7 @@
 #ifndef QDATASET_H
 #define QDATASET_H
 
-#include "qdatavis3dglobal.h"
+#include "qdatavis3dnamespace.h"
 #include "qdataitem.h"
 #include "qdatarow.h"
 

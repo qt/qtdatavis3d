@@ -23,11 +23,6 @@
 
 #include <qglobal.h>
 
-//#define ROTATE_ZOOM_SELECTION
-
-// Uncomment this if you want to try hardcoded QML2 -integration h4x0r version of the engine
-//#define USE_QML2_VERSION
-
 #define QT_DATAVIS3D_VERSION_STR   "0.0.1"
 /*
    QT_DATAVIS3D_VERSION is (major << 16) + (minor << 8) + patch.
@@ -69,25 +64,6 @@
 #  define QT_DATAVIS3D_BEGIN_NAMESPACE
 #  define QT_DATAVIS3D_END_NAMESPACE
 #  define QT_DATAVIS3D_USE_NAMESPACE
-#endif
-
-#if defined(DEVELOPMENT_BUILD) && !defined(QT_NO_DEBUG)
-#include <stdarg.h>
-#include <QDebug>
-
-#define CHART_DEBUG chartDebug(3,__LINE__,__FILE__,__FUNCTION__)
-
-static inline QDebug chartDebug(int numargs,...)
-{
-    va_list valist;
-    va_start(valist, numargs);
-    //for( int i = 0 ; i < numargs; i++ )
-    int line = va_arg(valist, int);
-    char *file = va_arg(valist, char *);
-    char *function = va_arg(valist, char *);
-    va_end(valist);
-    return qDebug() << QString().append(function).append("(").append(file).append(":%1)").arg(line);
-}
 #endif
 
 #endif // QVIS3DGLOBAL_H

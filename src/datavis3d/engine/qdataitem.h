@@ -42,7 +42,7 @@
 #ifndef QDATAITEM_H
 #define QDATAITEM_H
 
-#include "qdatavis3dglobal.h"
+#include "qdatavis3dnamespace.h"
 #include <QScopedPointer>
 #include <QString>
 #include <QObject>

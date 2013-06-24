@@ -43,7 +43,7 @@
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the Qt API.  It exists purely as an
+// This file is not part of the QtDataVis3D API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -52,8 +52,7 @@
 #ifndef CAMERAPOSITIONER_P_H
 #define CAMERAPOSITIONER_P_H
 
-#include "qdatavis3dglobal.h"
-#include "qdatavis3dnamespace.h"
+#include "datavis3dglobal_p.h"
 #include "q3dbars.h"
 #include <QObject>
 

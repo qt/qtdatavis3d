@@ -42,9 +42,8 @@
 #ifndef DECLARATIVEBARS_H
 #define DECLARATIVEBARS_H
 
+#include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
-#include "qdatavis3dglobal.h"
-#include "qdatavis3dnamespace.h"
 #include "declarativebars_p.h"
 
 #include <qsgsimpletexturenode.h>

@@ -43,18 +43,8 @@
 #define QVIS3DNAMESPACE_H
 
 #include "qdatavis3dglobal.h"
-#include <QOpenGLFunctions>
-#include <QVector3D>
 
 namespace QtDataVis3D {
-
-// Constants used in several files
-// Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
-const GLfloat zComp = 10.0f;
-// Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
-// y position is added to the minimum height (or can be thought to be that much above or below the camera)
-const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, zComp);
-const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 
 // Enums used in several files
 enum BarStyle {

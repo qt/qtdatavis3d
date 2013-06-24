@@ -42,11 +42,11 @@
 #ifndef Q3DMAPS_H
 #define Q3DMAPS_H
 
-#include "qdatavis3dglobal.h"
 #include "qdatavis3dnamespace.h"
 #include "q3dwindow.h"
 
 #include <QFont>
+#include <QVector3D>
 
 class QImage;
 class QRect;

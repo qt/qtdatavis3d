@@ -9,7 +9,7 @@ uri = com.digia.QtDataVis3D
 staticlib:DEFINES+=QT_DATAVIS3D_STATICLIB
 
 # Input
-INCLUDEPATH += ../datavis3d/engine
+INCLUDEPATH += ../datavis3d/engine ../datavis3d/global
 
 SOURCES += \
     datavis3dqml2_plugin.cpp \

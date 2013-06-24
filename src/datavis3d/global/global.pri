@@ -1,5 +1,4 @@
-INCLUDEPATH += $$PWD
-VPATH += $$PWD
 HEADERS += \
-    global/qdatavis3dglobal.h \
-    global/qdatavis3dnamespace.h
+    $$PWD/qdatavis3dglobal.h \
+    $$PWD/qdatavis3dnamespace.h \
+    $$PWD/datavis3dglobal_p.h

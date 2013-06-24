@@ -3,7 +3,7 @@
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
 ** Contact: http://www.qt-project.org/legal
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of QtDataVis3D module.
 **
 ** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
@@ -49,59 +49,29 @@
 //
 // We mean it.
 
-#ifndef QDATASET_P_H
-#define QDATASET_P_H
+#ifndef DATAVIS3DGLOBAL_P_H
+#define DATAVIS3DGLOBAL_P_H
 
-#include "datavis3dglobal_p.h"
-#include "qdataset.h"
-#include "drawer_p.h"
-#include "labelitem_p.h"
-#include <QVector>
-#include <QString>
+#include "qdatavis3dglobal.h"
+#include "qdatavis3dnamespace.h"
+#include <QOpenGLFunctions>
+#include <QVector3D>
+
+//#define ROTATE_ZOOM_SELECTION
+
+// Uncomment this if you want to try hardcoded QML2 -integration h4x0r version of the engine
+//#define USE_QML2_VERSION
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QDataSetPrivate : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit QDataSetPrivate(QDataSet *q);
-    ~QDataSetPrivate();
-
-    void setDrawer(Drawer *drawer);
-    QVector<QDataRow*> set();
-    QDataRow *getRow(int rowIndex);
-    QVector<QString> rowLabels();
-    QVector<QString> columnLabels();
-    QVector<LabelItem> rowLabelItems();
-    QVector<LabelItem> columnLabelItems();
-    void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
-    void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
-    void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
-    // first = min, second = max
-    QPair<GLfloat, GLfloat> limitValues();
-
-public Q_SLOTS:
-    void updateTextures();
-
-private:
-    QDataSet *q_ptr;
-    QVector<QDataRow*> m_set;
-    QString m_xAxis;
-    QString m_zAxis;
-    QString m_yAxis;
-    QVector<QString> m_labelsRow;
-    QVector<QString> m_labelsColumn;
-    LabelItem m_xAxisItem;
-    LabelItem m_zAxisItem;
-    LabelItem m_yAxisItem;
-    QVector<LabelItem> m_labelItemsRow;
-    QVector<LabelItem> m_labelItemsColumn;
-    Drawer *m_drawer;
-    friend class QDataSet;
-};
+// Constants used in several files
+// Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
+const GLfloat zComp = 10.0f;
+// Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
+// y position is added to the minimum height (or can be thought to be that much above or below the camera)
+const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, zComp);
+const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // DATAVIS3DGLOBAL_P_H
