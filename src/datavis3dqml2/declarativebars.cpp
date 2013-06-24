@@ -42,6 +42,8 @@
 #include "declarativebars.h"
 #include "bars3dcontroller_p.h"
 #include "qdataset.h"
+#include "qdataset_p.h"
+#include "qdatarow_p.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
@@ -60,9 +62,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
-
-    // TODO: Note; this does not flip the render result correctly. It is in mirror image.
-    //setRotation(180.0);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing
     setAntialiasing(true);
@@ -99,16 +98,6 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         m_cachedState->m_isSampleSpaceSet = false;
     }
 
-    if (m_cachedState->m_dataRow) {
-        m_shared->addDataRow(m_cachedState->m_dataRow);
-        m_cachedState->m_dataRow = 0;
-    }
-
-    if (m_cachedState->m_dataSet) {
-        m_shared->addDataSet(m_cachedState->m_dataSet);
-        m_cachedState->m_dataSet = 0;
-    }
-
     if (m_cachedState->m_isSelectionModeSet) {
         m_shared->setSelectionMode(m_cachedState->m_selectionMode);
         m_cachedState->m_isSelectionModeSet = false;
@@ -127,6 +116,16 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     if (m_cachedState->m_isGridSet) {
         m_shared->setGridEnabled(m_cachedState->m_isGridEnabled);
         m_cachedState->m_isGridSet = false;
+    }
+
+    if (m_cachedState->m_dataRow) {
+        m_shared->addDataRow(m_cachedState->m_dataRow);
+        m_cachedState->m_dataRow = 0;
+    }
+
+    if (m_cachedState->m_dataSet) {
+        m_shared->addDataSet(m_cachedState->m_dataSet);
+        m_cachedState->m_dataSet = 0;
     }
 
     // If old node exists and has right size, reuse it.
@@ -282,20 +281,42 @@ void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &l
                                  const QVector<QString> &labelsColumn)
 {
     qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<float> &dataRow...)";
-    m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    // TODO: Save labels to cachedstate
+    QDataItem *newItem;
+    delete m_cachedState->m_dataRow;
+    m_cachedState->m_dataRow = new QDataRow();
+    for (int i = 0; i < dataRow.count(); i++) {
+        newItem = new QDataItem(dataRow.at(i));
+        m_cachedState->m_dataRow->addItem(newItem);
+    }
+    update();
 }
 
-void DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
+void DeclarativeBars::addDataRow(const QVector<QDataItem *> &dataRow, const QString &labelRow,
                                  const QVector<QString> &labelsColumn)
 {
     qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow...)";
-    m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    // TODO: Save labels to cachedstate
+    QDataItem *newItem;
+    delete m_cachedState->m_dataRow;
+    m_cachedState->m_dataRow = new QDataRow();
+    for (int i = 0; i < dataRow.count(); i++) {
+        newItem = new QDataItem(*dataRow.at(i));
+        m_cachedState->m_dataRow->addItem(newItem);
+    }
+    update();
 }
 
 void DeclarativeBars::addDataRow(QDataRow *dataRow)
 {
     qDebug() << "Enter DeclarativeBars::addDataRow(QDataRow *dataRow)";
-    m_cachedState->m_dataRow = dataRow;
+    QDataItem *newItem;
+    delete m_cachedState->m_dataRow;
+    m_cachedState->m_dataRow = new QDataRow();
+    for (int i = 0; i < dataRow->d_ptr->row().count(); i++) {
+        newItem = new QDataItem(*dataRow->d_ptr->getItem(i));
+        m_cachedState->m_dataRow->addItem(newItem);
+    }
     update();
 }
 
@@ -303,19 +324,62 @@ void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
                                  const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
-    m_shared->addDataSet(data, labelsRow, labelsColumn);
+    qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<float> >...";
+    // TODO: Save labels to cachedstate
+    QDataItem *newItem;
+    QDataRow *newRow;
+    delete m_cachedState->m_dataSet;
+    m_cachedState->m_dataSet = new QDataSet();
+    for (int row = 0; row < data.count(); row++) {
+        newRow = new QDataRow();
+        for (int i = 0; i < data.at(row).count(); i++) {
+            newItem = new QDataItem(data.at(row).at(i));
+            newRow->addItem(newItem);
+        }
+        m_cachedState->m_dataSet->addRow(newRow);
+    }
+    update();
 }
 
-void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
+void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> > &data,
                                  const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
-    m_shared->addDataSet(data, labelsRow, labelsColumn);
+    qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> >...";
+    // TODO: Save labels to cachedstate
+    QDataItem *newItem;
+    QDataRow *newRow;
+    delete m_cachedState->m_dataSet;
+    m_cachedState->m_dataSet = new QDataSet();
+    for (int row = 0; row < data.count(); row++) {
+        newRow = new QDataRow();
+        for (int i = 0; i < data.at(row).count(); i++) {
+            newItem = new QDataItem(*data.at(row).at(i));
+            newRow->addItem(newItem);
+        }
+        m_cachedState->m_dataSet->addRow(newRow);
+    }
+    update();
 }
 
-void DeclarativeBars::addDataSet(QDataSet* dataSet)
+void DeclarativeBars::addDataSet(QDataSet *dataSet)
 {
-    m_cachedState->m_dataSet = dataSet;
+    qDebug() << "void DeclarativeBars::addDataSet(QDataSet *dataSet)";
+    // TODO: Handle labels?
+    QDataItem *newItem;
+    QDataRow *newRow;
+    delete m_cachedState->m_dataSet;
+    m_cachedState->m_dataSet = new QDataSet();
+    for (int row = 0; row < dataSet->d_ptr->set().count(); row++) {
+        newRow = new QDataRow();
+        for (int i = 0; i < dataSet->d_ptr->getRow(row)->d_ptr->row().count(); i++) {
+            newItem = new QDataItem(1.0f);//*dataSet->d_ptr->getRow(row)->d_ptr->getItem(i));
+            qDebug() << "adding" << row << ":" << i << newRow << newItem;
+            newRow->addItem(newItem);
+        }
+        m_cachedState->m_dataSet->addRow(newRow);
+    }
+    update();
 }
 
 void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)

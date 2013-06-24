@@ -2144,7 +2144,7 @@ void Bars3dRenderer::addDataSet(const QVector< QVector<QDataItem*> > &data,
     m_dataSet->d_ptr->verifySize(m_sampleCount.second);
 }
 
-void Bars3dRenderer::addDataSet(QDataSet* dataSet)
+void Bars3dRenderer::addDataSet(QDataSet *dataSet)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     closeZoomMode();

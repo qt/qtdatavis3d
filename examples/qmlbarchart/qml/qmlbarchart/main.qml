@@ -35,6 +35,18 @@ Item {
         width: parent.width - shadowToggle.width
         height: parent.height
         anchors.right: parent.right;
+
+        DataSet {
+            id: testset1
+        }
+
+        DataRow {
+            id: testrow1
+        }
+        DataRow {
+            id: testrow2
+        }
+
         DataItem {
             id: testitem1
             label: "Test"
@@ -76,17 +88,6 @@ Item {
             value: 10
         }
 
-        DataRow {
-            id: testrow1
-        }
-        DataRow {
-            id: testrow2
-        }
-
-        DataSet {
-            id: testset1
-        }
-
     //    ListModel {
     //        id: testdata1
     //        ListElement{ column1: "test" ; column2: "test" ; column3: "test" }
@@ -106,7 +107,7 @@ Item {
 
             gridVisible: true
             shadowQuality: Bars3D.ShadowNone
-            selectionMode: Bars3D.ModeNone
+            selectionMode: Bars3D.ModeBar
             labelTransparency: Bars3D.TransparencyNone
         }
     }
