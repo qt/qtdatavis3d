@@ -169,7 +169,7 @@ private:
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
     GLint m_zoomLevel;
-    GLfloat m_sliceZoomAdjustment;
+    GLfloat m_autoScaleAdjustment;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     QSizeF m_barThickness;

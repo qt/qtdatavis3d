@@ -131,7 +131,7 @@ Bars3dRenderer::Bars3dRenderer(QRect rect, Bars3dController *controller)
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
       m_zoomLevel(100),
-      m_sliceZoomAdjustment(1.0f),
+      m_autoScaleAdjustment(1.0f),
       m_horizontalRotation(-45.0f),
       m_verticalRotation(15.0f),
       m_barThickness(QSizeF(0.75f, 0.75f)),
@@ -345,7 +345,7 @@ void Bars3dRenderer::drawSlicedScene()
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                           m_zoomLevel
-                                                          * m_sliceZoomAdjustment,
+                                                          * m_autoScaleAdjustment,
                                                           m_sliceViewPort.width(),
                                                           m_sliceViewPort.height());
 
@@ -362,7 +362,7 @@ void Bars3dRenderer::drawSlicedScene()
     QMatrix4x4 viewMatrix;
 
     // Adjust scaling (zoom rate based on aspect ratio)
-    GLfloat camPosZoomed = 5.0f / m_sliceZoomAdjustment + zComp;
+    GLfloat camPosZoomed = 5.0f / m_autoScaleAdjustment + zComp;
 
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camPosZoomed),
                       QVector3D(0.0f, 0.0f, zComp),
@@ -560,7 +560,7 @@ void Bars3dRenderer::drawScene(const GLuint defaultFboHandle)
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
                                                           m_zoomLevel
-                                                          * m_sliceZoomAdjustment,
+                                                          * m_autoScaleAdjustment,
                                                           m_mainViewPort.width(),
                                                           m_mainViewPort.height(),
                                                           m_hasNegativeValues);
@@ -1716,7 +1716,7 @@ void Bars3dRenderer::resizeNotify()
     div = qMin(width(), height());
     zoomAdjustment = defaultRatio * ((width() / div) / (height() / div));
     //qDebug() << "zoom adjustment" << zoomAdjustment;
-    m_sliceZoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
+    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 
     // Re-init selection buffer
     initSelectionBuffer();
