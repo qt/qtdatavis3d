@@ -39,49 +39,46 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+#ifndef QABSTRACTAXIS_H
+#define QABSTRACTAXIS_H
+
+#include "qdatavis3dnamespace.h"
+#include <QObject>
+#include <QScopedPointer>
+#include <QVector>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
-{
-}
+class QAbstractAxisPrivate;
 
-LabelItem::~LabelItem()
+class QT_DATAVIS3D_EXPORT QAbstractAxis : public QObject
 {
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
-}
+    Q_OBJECT
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
 
-void LabelItem::setSize(const QSize &size)
-{
-    m_size = size;
-}
+protected:
+    explicit QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent = 0);
+public:
+    virtual ~QAbstractAxis();
 
-QSize LabelItem::size()
-{
-    return m_size;
-}
+    QString title() const;
+    QVector<QString> labels() const;
 
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
+public slots:
+    void setTitle(QString title);
 
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
+signals:
+    void titleChanged(QString newTitle);
 
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
-    m_size = QSize(0, 0);
-}
+protected:
+    QScopedPointer<QAbstractAxisPrivate> d_ptr;
+
+private:
+    Q_DISABLE_COPY(QAbstractAxis)
+
+    friend class QDataSetPrivate;
+};
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif // QABSTRACTAXIS_H

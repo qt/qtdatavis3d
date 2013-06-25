@@ -62,6 +62,7 @@ public:
     explicit QDataSet();
     ~QDataSet();
 
+    // TODO: Dataset specialized for bar chart. Generalize it to better serve other chart types.
     Q_INVOKABLE void setLabels(const QString &xAxis = QString(),
                                const QString &zAxis = QString(),
                                const QString &yAxis = QString(),

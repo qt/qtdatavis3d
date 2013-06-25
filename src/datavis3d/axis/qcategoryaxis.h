@@ -39,49 +39,26 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+#ifndef QCATEGORYAXIS_H
+#define QCATEGORYAXIS_H
+
+#include "qabstractaxis.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
 {
-}
+    Q_OBJECT
+public:
+    explicit QCategoryAxis(QObject *parent = 0);
+    ~QCategoryAxis();
 
-LabelItem::~LabelItem()
-{
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
-}
+    void setLabels(const QVector<QString> &labels);
 
-void LabelItem::setSize(const QSize &size)
-{
-    m_size = size;
-}
-
-QSize LabelItem::size()
-{
-    return m_size;
-}
-
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
-
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
-
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
-    m_size = QSize(0, 0);
-}
+private:
+    Q_DISABLE_COPY(QCategoryAxis)
+};
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif // QCATEGORYAXIS_H

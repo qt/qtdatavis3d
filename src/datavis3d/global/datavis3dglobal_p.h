@@ -56,6 +56,7 @@
 #include "qdatavis3dnamespace.h"
 #include <QOpenGLFunctions>
 #include <QVector3D>
+#include <QDebug>
 
 //#define ROTATE_ZOOM_SELECTION
 

@@ -39,49 +39,36 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#include "qvalueaxis.h"
+#include "qabstractaxis_p.h"
+
+#ifndef QVALUEAXIS_P_H
+#define QVALUEAXIS_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+class QT_DATAVIS3D_EXPORT QValueAxisPrivate : public QAbstractAxisPrivate
 {
-}
+    Q_OBJECT
 
-LabelItem::~LabelItem()
-{
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
-}
+public:
+    QValueAxisPrivate(QValueAxis *q);
+    ~QValueAxisPrivate();
 
-void LabelItem::setSize(const QSize &size)
-{
-    m_size = size;
-}
-
-QSize LabelItem::size()
-{
-    return m_size;
-}
-
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
-
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
-
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
-    m_size = QSize(0, 0);
-}
+protected:
+    void updateLabels();
+};
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif // QVALUEAXIS_P_H

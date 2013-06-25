@@ -39,49 +39,53 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+#include "qcategoryaxis.h"
+#include "qcategoryaxis_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+QCategoryAxis::QCategoryAxis(QObject *parent) :
+    QAbstractAxis(new QCategoryAxisPrivate(this), parent)
 {
 }
 
-LabelItem::~LabelItem()
+QCategoryAxis::~QCategoryAxis()
 {
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
 }
 
-void LabelItem::setSize(const QSize &size)
+void QCategoryAxis::setLabels(const QVector<QString> &labels)
 {
-    m_size = size;
-}
+    int newSize(labels.size());
+    int oldSize(d_ptr->m_labels.size());
 
-QSize LabelItem::size()
-{
-    return m_size;
-}
+    for (int i = oldSize - 1; i >= newSize; i--)
+        d_ptr->m_labelItems[i].clear();
 
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
+    d_ptr->m_labelItems.resize(newSize);
 
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
-
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
+    if (d_ptr->m_drawer) {
+        for (int i = 0; i < newSize; i++) {
+            if (i >= oldSize || labels.at(i) != d_ptr->m_labels.at(i))
+                d_ptr->m_drawer->generateLabelItem(&d_ptr->m_labelItems[i], labels.at(i));
+        }
     }
-    m_size = QSize(0, 0);
+
+    d_ptr->m_labels = labels;
+}
+
+QCategoryAxisPrivate::QCategoryAxisPrivate(QCategoryAxis *q)
+    : QAbstractAxisPrivate(q)
+{
+}
+
+QCategoryAxisPrivate::~QCategoryAxisPrivate()
+{
+}
+
+void QCategoryAxisPrivate::updateLabels()
+{
+    for (int i = 0; i < m_labels.size(); i++)
+        m_drawer->generateLabelItem(&m_labelItems[i], m_labels.at(i));
 }
 
 QT_DATAVIS3D_END_NAMESPACE

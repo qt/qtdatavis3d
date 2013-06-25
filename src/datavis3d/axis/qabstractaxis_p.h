@@ -39,49 +39,56 @@
 **
 ****************************************************************************/
 
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#include "qabstractaxis.h"
+#include "drawer_p.h"
 #include "labelitem_p.h"
+
+#ifndef QABSTRACTAXIS_P_H
+#define QABSTRACTAXIS_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+class QT_DATAVIS3D_EXPORT QAbstractAxisPrivate : public QObject
 {
-}
+    Q_OBJECT
+public:
+    QAbstractAxisPrivate(QAbstractAxis *q);
+    virtual ~QAbstractAxisPrivate();
 
-LabelItem::~LabelItem()
-{
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
-}
+    void setDrawer(Drawer *drawer);
+    QVector<LabelItem> labelItems() { return m_labelItems; }
+    LabelItem titleItem() { return m_titleItem; }
 
-void LabelItem::setSize(const QSize &size)
-{
-    m_size = size;
-}
+public slots:
+    void updateTextures();
 
-QSize LabelItem::size()
-{
-    return m_size;
-}
+protected:
+    virtual void updateLabels();
 
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
+    QAbstractAxis *q_ptr;
 
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
+    QString m_title;
+    LabelItem m_titleItem;
+    Drawer *m_drawer; // not owned
+    QVector<QString> m_labels;
+    QVector<LabelItem> m_labelItems;
 
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
-    m_size = QSize(0, 0);
-}
+    friend class QAbstractAxis;
+    friend class QValueAxis;
+    friend class QCategoryAxis;
+    friend class QDataSetPrivate;
+};
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif // QABSTRACTAXIS_P_H

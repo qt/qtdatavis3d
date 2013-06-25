@@ -54,6 +54,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "qdataset.h"
+#include "qabstractaxis.h"
 #include "drawer_p.h"
 #include "labelitem_p.h"
 #include <QVector>
@@ -70,35 +71,29 @@ public:
     ~QDataSetPrivate();
 
     void setDrawer(Drawer *drawer);
-    QVector<QDataRow*> set();
+    QVector<QDataRow *> set();
     QDataRow *getRow(int rowIndex);
+
+    // TODO: These functions need to go, these need to be asked from axes directly.
+    // Also, these are called a lot an each call constructs a new vector...
     QVector<QString> rowLabels();
     QVector<QString> columnLabels();
     QVector<LabelItem> rowLabelItems();
     QVector<LabelItem> columnLabelItems();
     void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
     void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
+
     void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
     // first = min, second = max
     QPair<GLfloat, GLfloat> limitValues();
 
-public Q_SLOTS:
-    void updateTextures();
-
 private:
     QDataSet *q_ptr;
-    QVector<QDataRow*> m_set;
-    QString m_xAxis;
-    QString m_zAxis;
-    QString m_yAxis;
-    QVector<QString> m_labelsRow;
-    QVector<QString> m_labelsColumn;
-    LabelItem m_xAxisItem;
-    LabelItem m_zAxisItem;
-    LabelItem m_yAxisItem;
-    QVector<LabelItem> m_labelItemsRow;
-    QVector<LabelItem> m_labelItemsColumn;
-    Drawer *m_drawer;
+    QVector<QDataRow *> m_set;
+    QAbstractAxis *m_axisX;
+    QAbstractAxis *m_axisY;
+    QAbstractAxis *m_axisZ;
+
     friend class QDataSet;
 };
 

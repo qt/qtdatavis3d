@@ -11,6 +11,7 @@ include($$PWD/common.pri)
 include($$PWD/engine/engine.pri)
 include($$PWD/global/global.pri)
 include($$PWD/utils/utils.pri)
+include($$PWD/axis/axis.pri)
 
 wince* {
     # The Microsoft MIPS compiler crashes if /Og is specified.

@@ -39,49 +39,77 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+#include "qabstractaxis.h"
+#include "qabstractaxis_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent) :
+    QObject(parent),
+    d_ptr(d)
 {
 }
 
-LabelItem::~LabelItem()
+QAbstractAxis::~QAbstractAxis()
 {
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
 }
 
-void LabelItem::setSize(const QSize &size)
+QString QAbstractAxis::title() const
 {
-    m_size = size;
+    return d_ptr->m_title;
 }
 
-QSize LabelItem::size()
+QVector<QString> QAbstractAxis::labels() const
 {
-    return m_size;
+    return d_ptr->m_labels;
 }
 
-void LabelItem::setTextureId(GLuint textureId)
+void QAbstractAxis::setTitle(QString title)
 {
-    m_textureId = textureId;
-}
-
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
-
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
+    if (d_ptr->m_title != title) {
+        d_ptr->m_title = title;
+        // Generate axis label texture
+        if (d_ptr->m_drawer)
+            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_titleItem, title);
+        emit titleChanged(title);
     }
-    m_size = QSize(0, 0);
+}
+
+// QAbstractAxisPrivate
+
+QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q)
+    : q_ptr(q),
+      m_drawer(0)
+{
+}
+
+QAbstractAxisPrivate::~QAbstractAxisPrivate()
+{
+    m_titleItem.clear();
+    for (int i = 0; i < m_labelItems.size(); i++)
+        m_labelItems[i].clear();
+}
+
+void QAbstractAxisPrivate::setDrawer(Drawer *drawer)
+{
+    m_drawer = drawer;
+    connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
+    updateTextures();
+}
+
+void QAbstractAxisPrivate::updateTextures()
+{
+    if (m_title.isEmpty())
+        m_titleItem.clear();
+    else
+        m_drawer->generateLabelItem(&m_titleItem, m_title);
+
+    updateLabels();
+}
+
+void QAbstractAxisPrivate::updateLabels()
+{
+    // Default implementation does nothing.
 }
 
 QT_DATAVIS3D_END_NAMESPACE

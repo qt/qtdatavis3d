@@ -68,6 +68,7 @@ public:
     QSize size();
     void setTextureId(GLuint textureId);
     GLuint textureId();
+    void clear();
 
 private:
     QSize m_size;

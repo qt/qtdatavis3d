@@ -308,10 +308,7 @@ void Drawer::generateLabelItem(LabelItem *item, const QString &text)
 {
     initializeOpenGL();
 
-    // Delete previous texture, if there is one
-    GLuint labelTexture = item->textureId();
-    if (labelTexture)
-        glDeleteTextures(1, &labelTexture);
+    item->clear();
 
     // Create labels
     // Print label into a QImage using QPainter

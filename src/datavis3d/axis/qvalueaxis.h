@@ -39,49 +39,24 @@
 **
 ****************************************************************************/
 
-#include "labelitem_p.h"
+#ifndef QVALUEAXIS_H
+#define QVALUEAXIS_H
+
+#include "qabstractaxis.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-LabelItem::LabelItem()
-    : m_size(QSize(0, 0)),
-      m_textureId(0)
+class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
 {
-}
+    Q_OBJECT
+public:
+    explicit QValueAxis(QObject *parent = 0);
+    ~QValueAxis();
 
-LabelItem::~LabelItem()
-{
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
-}
-
-void LabelItem::setSize(const QSize &size)
-{
-    m_size = size;
-}
-
-QSize LabelItem::size()
-{
-    return m_size;
-}
-
-void LabelItem::setTextureId(GLuint textureId)
-{
-    m_textureId = textureId;
-}
-
-GLuint LabelItem::textureId()
-{
-    return m_textureId;
-}
-
-void LabelItem::clear()
-{
-    if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
-    m_size = QSize(0, 0);
-}
+private:
+    Q_DISABLE_COPY(QValueAxis)
+};
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif // QVALUEAXIS_H
