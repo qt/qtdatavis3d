@@ -54,9 +54,10 @@
 
 #include <QtCore/QSize>
 #include <QtCore/QObject>
+#include <QWindow>
 
 #include "datavis3dglobal_p.h"
-#include "bars3drenderer_p.h"
+#include "qdataset_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -66,6 +67,7 @@ class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+class Bars3dRenderer;
 class QDataItem;
 class QDataRow;
 class QDataSet;
@@ -77,10 +79,52 @@ class QT_DATAVIS3D_EXPORT Bars3dController : public QObject
 {
     Q_OBJECT
 
-    Bars3dRenderer *m_renderer;
+public:
+    enum SelectionType {
+        SelectionNone = 0,
+        SelectionBar,
+        SelectionRow,
+        SelectionColumn
+    };
+
+    enum MouseState {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating,
+        MouseOnPinch
+    };
+
+private:
     bool m_isInitialized;
+
+    // Data
     QDataSet *m_dataSet;
     QPair<int, int> m_sampleCount;
+
+    // Interaction
+    MouseState m_mouseState;
+    QPoint m_mousePos;
+    SelectionMode m_selectionMode;
+    int m_zoomLevel;
+    bool m_isSlicingActivated;
+
+    // Camera
+    CameraHelper *m_cameraHelper;
+    GLfloat m_horizontalRotation;
+    GLfloat m_verticalRotation;
+
+    bool m_isBarSpecRelative;
+    QSizeF m_barThickness;
+    QSizeF m_barSpacing;
+    QRect m_boundingRect;
+
+    // Look'n'Feel
+    QString m_objFile;
+    ColorTheme m_colorTheme;
+
+    Bars3dRenderer *m_renderer;
 
 public:
     explicit Bars3dController(QRect rect);
@@ -89,8 +133,19 @@ public:
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
 
-    int getColumnCount();
-    int getRowCount();
+    int columnCount();
+    int rowCount();
+
+    int zoomLevel();
+    void setZoomLevel(int zoomLevel);
+
+    MouseState mouseState();
+    QPoint mousePosition();
+
+    bool isSlicingActive();
+    void setSlicingActive(bool isSlicing);
+
+    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
@@ -116,15 +171,21 @@ public:
     // ownership of dataSet is transferred
     void addDataSet(QDataSet* dataSet);
 
+    QPair<GLfloat, GLfloat> limits();
+
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
     void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
                      QSizeF spacing = QSizeF(1.0f, 1.0f),
                      bool relative = true);
+    QSizeF barThickness();
+    QSizeF barSpacing();
+    bool isBarSpecRelative();
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(BarStyle style, bool smooth = false);
+    QString objFile();
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
@@ -156,10 +217,12 @@ public:
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
     void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    ColorTheme colorTheme();
 
     // TODO: light placement API
 
     // Size
+    void setSize(const int width, const int height);
     const QSize size();
     const QRect boundingRect();
     void setBoundingRect(const QRect boundingRect);
@@ -208,10 +271,19 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void resizeNotify();
-
     void updateTextures();
-    Bars3dRenderer::SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
+
+signals:
+    void selectionModeChanged(SelectionMode mode);
+    void slicingActiveChanged(bool isSlicing);
+    void dataSetChanged(QDataSetPrivate *dataSet);
+    void limitsChanged(QPair<GLfloat, GLfloat> limits);
+    void sampleSpaceChanged(int samplesRow, int samplesColumn);
+    void zoomLevelChanged(int zoomLevel);
+    void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
+    void objFileChanged(QString fileName);
+    void boundingRectChanged(QRect boundingRect);
+    void colorThemeChanged(ColorTheme theme);
 
 private:
     void handleLimitChange();

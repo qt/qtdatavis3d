@@ -187,9 +187,7 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
 void Q3DBars::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->resizeNotify();
+    d_ptr->m_shared->setSize(width(), height());
 }
 
 // TODO: Document

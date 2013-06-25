@@ -52,17 +52,19 @@
 #ifndef Q3DBARSRENDERER_p_H
 #define Q3DBARSRENDERER_p_H
 
-#include "datavis3dglobal_p.h"
 #include <QtCore/QSize>
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
 #include <QTime>
 #include <QWindow>
+#include <QMutex>
+
+#include "datavis3dglobal_p.h"
+#include "bars3dcontroller_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
-class QOpenGLPaintDevice;
 class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
@@ -78,41 +80,20 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class LabelItem;
-class Bars3dController;
 class CameraHelper;
 
 class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
+private:
     // TODO: Filter to the set of attributes to be moved to the model object.
     // * All GL rendering only related attribs should be moved out of this public set.
     // * All attribs that are modifiable from QML need to e in this set.
 
     Bars3dController *m_controller;
-
-    // Interaction related parameters
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    SelectionMode m_selectionMode;
-
+    // Mutex for sharing resources between render and main threads.
+    QMutex m_mutex;
     // Visual parameters
     QRect m_boundingRect;
     QString m_objFile;
@@ -127,12 +108,9 @@ public:
     // Data parameters
     QDataItem *m_selectedBar;
     QDataRow *m_sliceSelection;
+
     GLint m_tickCount;
     GLfloat m_tickStep;
-
-    CameraHelper *m_camera;
-
-private:
 
     // Internal attributes purely related to how the scene is drawn with GL.
     bool m_xFlipped;
@@ -140,9 +118,7 @@ private:
     bool m_yFlipped;
     QRect m_mainViewPort;
     QRect m_sliceViewPort;
-    bool m_isSlicingActivated;
     bool m_updateLabels;
-    bool m_isInitialized;
     ShaderHelper *m_barShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
@@ -161,12 +137,11 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
-    GLint m_zoomLevel;
+
     GLfloat m_autoScaleAdjustment;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
     QSizeF m_barThickness;
     QSizeF m_barSpacing;
+
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_rowWidth;
@@ -176,6 +151,18 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
+    QVector3D m_selection;
+
+    QPoint m_selectionPointRequest;
+    bool m_isSelectionPointRequestActive;
+
+    // Cached state based on emitted signals from the controller
+    SelectionMode m_selectionMode;
+    int m_zoomLevel;
+    bool m_isSlicingActivated;
+    QPair<GLfloat,GLfloat> m_limits;
+    int m_rowCount;
+    int m_columnCount;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -184,24 +171,10 @@ private:
 #endif
 
 public:
-    explicit Bars3dRenderer(QRect rect, Bars3dController *controller);
+    explicit Bars3dRenderer(Bars3dController *controller);
     ~Bars3dRenderer();
 
-    void initializeOpenGL();
-    void render(QDataSetPrivate *dataSet, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel, const GLuint defaultFboHandle = 0);
-
-    // change in the "has data signed values" detected
-    void dataSetChangedNotify(QDataSetPrivate *dataSet);
-
-    // change in the min/max values in the data
-    void limitsChangedNotify(QPair<GLfloat, GLfloat> limits);
-
-    // how many samples per row and column, and names for axes
-    void sampleSpaceChangedNotify(int samplesRow, int samplesColumn);
-
-    void resizeNotify();
-
-
+    void render(QDataSetPrivate *dataSet, CameraHelper *camera, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel, const GLuint defaultFboHandle = 0);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -227,7 +200,7 @@ public:
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    void setTheme(ColorTheme theme);
+    void setColorTheme(ColorTheme colorTheme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
@@ -242,6 +215,7 @@ public:
     // TODO: light placement API
 
     // Size
+    void setSize(const int width, const int height);
     const QSize size();
     const QRect boundingRect();
     void setBoundingRect(const QRect boundingRect);
@@ -254,9 +228,7 @@ public:
     void setY(const int y);
     int y();
 
-    // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    QRect mainViewPort();
 
     // Font size adjustment
     void setFontSize(float fontsize);
@@ -282,15 +254,6 @@ public:
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
-#if defined(Q_OS_ANDROID)
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-#endif
-    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
-    void wheelEvent(QWheelEvent *event);
-
     void loadBarMesh();
     void loadBackgroundMesh();
     void loadGridLineMesh();
@@ -307,12 +270,30 @@ public:
     void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
-    SelectionType isSelected(GLint row, GLint bar, const QVector3D &selection);
-    void closeZoomMode();
+    Bars3dController::SelectionType isSelected(GLint row, GLint bar);
+
+public slots:
+    void updateSelectionMode(SelectionMode newMode);
+    void updateSlicingActive(bool isSlicing);
+    void updateDataSet(QDataSetPrivate *newDataSet);
+    void updateLimits(QPair<GLfloat, GLfloat> newLimits);
+    void updateSampleSpace(int columnCount, int rowCount);
+    void updateZoomLevel(int newZoomLevel);
+
+    // Requests that upon next render pass the column and row under the given point is inspected for selection.
+    // Only one request can be queued per render pass at this point. New request will override any pending requests.
+    // After inspection the selectionUpdated signal is emitted.
+    void inspectSelectionAtPoint(const QPoint &point);
+
+signals:
+    void selectionUpdated(QVector3D selection);
 
 private:
-    void drawSlicedScene(QDataSetPrivate *dataSet, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
-    void drawScene(QDataSetPrivate *dataSet, const GLuint defaultFboHandle);
+    void initializeOpenGL();
+    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
+    void handleResize();
+
     Q_DISABLE_COPY(Bars3dRenderer)
 };
 
