@@ -53,6 +53,7 @@
 #define DECLARATIVEMAPS_P_H
 
 #include "datavis3dglobal_p.h"
+#include "maps3dcontroller_p.h"
 #include <QString>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -76,6 +77,10 @@ public:
     bool m_isImageSet;
     QImage m_image;
 
+    bool m_isBarSpecsSet;
+    QVector3D m_thickness;
+    Q3DMaps::AdjustmentDirection m_direction;
+
     bool m_isAreaRectSet;
     QRect m_arearect;
 
@@ -87,6 +92,33 @@ public:
 
     bool m_isShadowQualitySet;
     ShadowQuality m_shadowQuality;
+
+    float m_fontsize;
+
+    bool m_isBarStyleSet;
+    BarStyle m_barstyle;
+    bool m_barsmooth;
+
+    bool m_isMeshSet;
+    QString m_meshfilename;
+
+    bool m_isCameraPresetSet;
+    CameraPreset m_camerapreset;
+
+    float m_camhorizontal;
+    float m_camvertical;
+    float m_camdistance;
+
+    bool m_isThemeSet;
+    ColorTheme m_theme;
+
+    bool m_isColorSet;
+    QColor m_basecolor;
+    QColor m_heightcolor;
+    bool m_coloruniform;
+
+    bool m_isFontSet;
+    QFont m_font;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

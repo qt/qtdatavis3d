@@ -27,59 +27,63 @@ Item {
     width: 800
     height: 500
     visible: true
+    //title: "Noise levels from construction site"
 
     Item {
         id: dataView
-        width: parent.width - shadowToggle.width
-        height: parent.height
-        anchors.right: parent.right;
+        width: parent.width
+        height: parent.height - shadowToggle.height
+        anchors.bottom: parent.bottom
 
         Image {
             id: testimage
-            source: "qrc:/images/image.jpg"
+            source: "qrc:/images/floorplan.jpg"
+            visible: false
         }
 
         DataItem {
             id: testitem1
-            label: "Test"
-            value: 200
-            position: "100.0, 200.0"
+            label: "dB"
+            value: 76
+            position: "95.0, 490.0"
         }
         DataItem {
             id: testitem2
-            label: "Test2"
-            value: 300
-            position: "200.0, 200.0"
+            label: "dB"
+            value: 88
+            position: "185.0, 105.0"
         }
         DataItem {
             id: testitem3
-            label: "Test3"
-            value: 400
-            position: "100.0, 100.0"
+            label: "dB"
+            value: 85
+            position: "700.0, 465.0"
         }
         DataItem {
             id: testitem4
-            label: "Test4"
-            value: 600
-            position: "200.0, 100.0"
+            label: "dB"
+            value: 92
+            position: "505.0, 225.0"
         }
 
         Maps3D {
             id: testmap
             width: dataView.width
             height: dataView.height
+            fontSize: 300.0
 
             Component.onCompleted: {
                 console.log("testmap complete");
                 console.log(testimage);
                 console.log(testimage.sourceSize);
+                setBarSpecs(Qt.vector3d(10.0, 10.0, 10.0));
                 setAreaSpecs(Qt.rect(0, 0, testimage.sourceSize.width, testimage.sourceSize.height),
                              testimage);
                 //setImage(testimage);
-                setImage(":/images/image.jpg");
+                setImage(":/images/floorplan.jpg");
                 shadowQuality = Maps3D.ShadowNone
                 selectionMode = Maps3D.ModeBar
-                labelTransparency = Maps3D.TransparencyFromTheme
+                labelTransparency = Maps3D.TransparencyNoBackground//.TransparencyFromTheme
                 addDataItem(testitem1);
                 addDataItem(testitem2);
                 addDataItem(testitem3);
@@ -97,8 +101,8 @@ Item {
         color: "#FFFFFF"
         x: 0
         y: 0
-        width: 160
-        height: 80
+        width: parent.width
+        height: 60
 
         TextArea {
             id: buttonText

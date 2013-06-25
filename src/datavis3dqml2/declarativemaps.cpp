@@ -101,6 +101,11 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         m_cachedState->m_isImageSet = false;
     }
 
+    if (m_cachedState->m_isBarSpecsSet) {
+        m_shared->setBarSpecs(m_cachedState->m_thickness, m_cachedState->m_direction);
+        m_cachedState->m_isBarSpecsSet = false;
+    }
+
     if (m_cachedState->m_isSelectionModeSet) {
         m_shared->setSelectionMode(m_cachedState->m_selectionMode);
         m_cachedState->m_isSelectionModeSet = false;
@@ -114,6 +119,55 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     if (m_cachedState->m_isShadowQualitySet) {
         m_shared->setShadowQuality(m_cachedState->m_shadowQuality);
         m_cachedState->m_isShadowQualitySet = false;
+    }
+
+    if (m_cachedState->m_fontsize) {
+        m_shared->setFontSize(m_cachedState->m_fontsize);
+        m_cachedState->m_fontsize = 0.0;
+    }
+
+    if (m_cachedState->m_isBarStyleSet) {
+        m_shared->setBarType(m_cachedState->m_barstyle, m_cachedState->m_barsmooth);
+        m_cachedState->m_isBarStyleSet = false;
+    }
+
+    if (m_cachedState->m_isMeshSet) {
+        m_shared->setMeshFileName(m_cachedState->m_meshfilename);
+        m_cachedState->m_isMeshSet = false;
+    }
+
+    if (m_cachedState->m_isCameraPresetSet) {
+        m_shared->setCameraPreset(m_cachedState->m_camerapreset);
+        m_cachedState->m_isCameraPresetSet = false;
+    }
+
+    if (m_cachedState->m_camdistance) {
+        m_shared->setCameraPosition(m_cachedState->m_camhorizontal,
+                                    m_cachedState->m_camvertical,
+                                    m_cachedState->m_camdistance);
+        m_cachedState->m_camdistance = 0.0f;
+    }
+
+    if (m_cachedState->m_isThemeSet) {
+        m_shared->setTheme(m_cachedState->m_theme);
+        m_cachedState->m_isThemeSet = false;
+    }
+
+    if (m_cachedState->m_isColorSet) {
+        m_shared->setBarColor(m_cachedState->m_basecolor,
+                              m_cachedState->m_heightcolor,
+                              m_cachedState->m_coloruniform);
+        m_cachedState->m_isColorSet = false;
+    }
+
+    if (m_cachedState->m_isFontSet) {
+        m_shared->setFont(m_cachedState->m_font);
+        m_cachedState->m_isFontSet = false;
+    }
+
+    if (m_cachedState->m_isLabelTransparencySet) {
+        m_shared->setLabelTransparency(m_cachedState->m_labelTransparency);
+        m_cachedState->m_isLabelTransparencySet = false;
     }
 
     if (m_cachedState->m_data) {
@@ -148,37 +202,56 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 void DeclarativeMaps::setBarSpecs(const QVector3D &thickness,
                                   Q3DMaps::AdjustmentDirection direction)
 {
-    m_shared->setBarSpecs(thickness, direction);
+    m_cachedState->m_thickness = thickness;
+    m_cachedState->m_direction = direction;
+    m_cachedState->m_isBarSpecsSet = true;
+    update();
 }
 
 void DeclarativeMaps::setBarType(BarStyle style, bool smooth)
 {
-    m_shared->setBarType(style, smooth);
+    m_cachedState->m_barstyle = style;
+    m_cachedState->m_barsmooth = smooth;
+    m_cachedState->m_isBarStyleSet = true;
+    update();
 }
 
 void DeclarativeMaps::setMeshFileName(const QString &objFileName)
 {
-    m_shared->setMeshFileName(objFileName);
+    m_cachedState->m_meshfilename = objFileName;
+    m_cachedState->m_isMeshSet = true;
+    update();
 }
 
 void DeclarativeMaps::setCameraPreset(CameraPreset preset)
 {
-    m_shared->setCameraPreset(preset);
+    m_cachedState->m_camerapreset = preset;
+    m_cachedState->m_isCameraPresetSet = true;
+    update();
 }
 
 void DeclarativeMaps::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
-    m_shared->setCameraPosition(horizontal, vertical, distance);
+    m_cachedState->m_camhorizontal = horizontal;
+    m_cachedState->m_camvertical = vertical;
+    m_cachedState->m_camdistance = distance;
+    update();
 }
 
 void DeclarativeMaps::setTheme(ColorTheme theme)
 {
-    m_shared->setTheme(theme);
+    m_cachedState->m_theme = theme;
+    m_cachedState->m_isThemeSet = true;
+    update();
 }
 
 void DeclarativeMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
 {
-    m_shared->setBarColor(baseColor, heightColor, uniform);
+    m_cachedState->m_basecolor = baseColor;
+    m_cachedState->m_heightcolor = heightColor;
+    m_cachedState->m_coloruniform = uniform;
+    m_cachedState->m_isColorSet = true;
+    update();
 }
 
 void DeclarativeMaps::setAreaSpecs(const QRect &areaRect, const QImage &image)
@@ -212,27 +285,38 @@ void DeclarativeMaps::setSelectionMode(DeclarativeMaps::SelectionMode mode)
 
 DeclarativeMaps::SelectionMode DeclarativeMaps::selectionMode()
 {
-    return DeclarativeMaps::SelectionMode(m_shared->selectionMode());
+    if (m_shared)
+        return DeclarativeMaps::SelectionMode(m_shared->selectionMode());
+    else
+        return DeclarativeMaps::ModeBar;
 }
 
 void DeclarativeMaps::setFontSize(float fontsize)
 {
-    m_shared->setFontSize(fontsize);
+    m_cachedState->m_fontsize = fontsize;
 }
 
 float DeclarativeMaps::fontSize()
 {
-    return m_shared->fontSize();
+    if (m_shared)
+        return m_shared->fontSize();
+    else
+        return QFont(QStringLiteral("Arial")).pointSizeF();
 }
 
 void DeclarativeMaps::setFont(const QFont &font)
 {
-    m_shared->setFont(font);
+    m_cachedState->m_font = font;
+    m_cachedState->m_isFontSet = true;
+    update();
 }
 
 QFont DeclarativeMaps::font()
 {
-    return m_shared->font();
+    if (m_shared)
+        return m_shared->font();
+    else
+        return QFont(QStringLiteral("Arial"));
 }
 
 void DeclarativeMaps::setLabelTransparency(DeclarativeMaps::LabelTransparency transparency)
@@ -244,7 +328,10 @@ void DeclarativeMaps::setLabelTransparency(DeclarativeMaps::LabelTransparency tr
 
 DeclarativeMaps::LabelTransparency DeclarativeMaps::labelTransparency()
 {
-    return DeclarativeMaps::LabelTransparency(m_shared->labelTransparency());
+    if (m_shared)
+        return DeclarativeMaps::LabelTransparency(m_shared->labelTransparency());
+    else
+        return DeclarativeMaps::TransparencyFromTheme;
 }
 
 void DeclarativeMaps::setShadowQuality(DeclarativeMaps::ShadowQuality quality)
@@ -256,7 +343,10 @@ void DeclarativeMaps::setShadowQuality(DeclarativeMaps::ShadowQuality quality)
 
 DeclarativeMaps::ShadowQuality DeclarativeMaps::shadowQuality()
 {
-    return DeclarativeMaps::ShadowQuality(m_shared->shadowQuality());
+    if (m_shared)
+        return DeclarativeMaps::ShadowQuality(m_shared->shadowQuality());
+    else
+        return DeclarativeMaps::ShadowLow;
 }
 
 void DeclarativeMaps::addDataItem(QDataItem *dataItem)
@@ -398,7 +488,22 @@ void DeclarativeMapsRenderer::render()
 
 
 DeclarativeMapsCachedStatePrivate::DeclarativeMapsCachedStatePrivate()
-    : m_data(0)
+    : m_data(0),
+      m_replaceData(false),
+      m_isImageSet(false),
+      m_isBarSpecsSet(false),
+      m_isAreaRectSet(false),
+      m_isSelectionModeSet(false),
+      m_isLabelTransparencySet(false),
+      m_isShadowQualitySet(false),
+      m_fontsize(0.0f),
+      m_isBarStyleSet(false),
+      m_isMeshSet(false),
+      m_isCameraPresetSet(false),
+      m_camdistance(0.0f),
+      m_isThemeSet(false),
+      m_isColorSet(false),
+      m_isFontSet(false)
 {
 }
 

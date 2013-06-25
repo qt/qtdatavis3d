@@ -95,10 +95,10 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_zoomLevel(100),
-      m_zoomAdjustment(1.0f),
+      m_autoScaleAdjustment(1.0f),
       m_horizontalRotation(0.0f),
       m_verticalRotation(45.0f),
-      m_barThickness(QVector3D(1.0f, 0.0f, 1.0f)),
+      m_barThickness(QVector3D(1.0f, 1.0f, 1.0f)),
       m_heightNormalizer(0.0f),
       m_yAdjustment(0.0f),
       m_scaleFactor(1.0f),
@@ -125,6 +125,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_updateLabels(true),
+      m_adjustDirection(Q3DMaps::AdjustHeight),
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_bgrHasAlpha(false),
@@ -178,8 +179,6 @@ void Maps3DController::initializeOpenGL()
         }
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadow"));
-        // Init the depth buffer (for shadows)
-        initDepthBuffer();
     } else {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertex"),
@@ -212,9 +211,6 @@ void Maps3DController::initializeOpenGL()
 
     // Init selection shader
     initSelectionShader();
-
-    // Init the selection buffer
-    initSelectionBuffer();
 
     // Load default mesh
     loadBarMesh();
@@ -292,6 +288,14 @@ void Maps3DController::render(const GLuint defaultFboHandle)
     }
 #endif
 
+    if (defaultFboHandle) {
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
     // Draw scene
     drawScene(defaultFboHandle);
 }
@@ -320,8 +324,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
-                                                          m_zoomLevel
-                                                          * m_zoomAdjustment,
+                                                          m_zoomLevel * m_autoScaleAdjustment,
                                                           m_sceneViewPort.width(),
                                                           m_sceneViewPort.height());
 
@@ -462,8 +465,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             QMatrix4x4 MVPMatrix;
 
             modelMatrix.translate(item->d_ptr->translation().x(),
-                                  heightMultiplier * barHeight + heightScaler
-                                  - m_yAdjustment,
+                                  heightMultiplier * barHeight + heightScaler - m_yAdjustment,
                                   item->d_ptr->translation().z());
             modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
                                         heightMultiplier * barHeight + heightScaler,
@@ -550,8 +552,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             QMatrix4x4 MVPMatrix;
 
             modelMatrix.translate(item->d_ptr->translation().x(),
-                                  heightMultiplier * barHeight + heightScaler
-                                  - m_yAdjustment,
+                                  heightMultiplier * barHeight + heightScaler - m_yAdjustment,
                                   item->d_ptr->translation().z());
             modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
                                         heightMultiplier * barHeight + heightScaler,
@@ -574,23 +575,19 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                                            (GLfloat)barIdxGreen / 255.0f,
                                            (GLfloat)barIdxBlue / 255.0f);
 
-            m_selectionShader->setUniformValue(m_selectionShader->MVP(),
-                                               MVPMatrix);
-            m_selectionShader->setUniformValue(m_selectionShader->color(),
-                                               barColor);
+            m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
+            m_selectionShader->setUniformValue(m_selectionShader->color(), barColor);
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(m_selectionShader->posAtt());
             glBindBuffer(GL_ARRAY_BUFFER, m_barObj->vertexBuf());
-            glVertexAttribPointer(m_selectionShader->posAtt(),
-                                  3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+            glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
             // Index buffer
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_barObj->elementBuf());
 
             // Draw the triangles
-            glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT,
-                           (void *)0);
+            glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
 
             // Free buffers
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -669,8 +666,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
         QVector3D baseColor = Utils::vectorFromColor(m_theme->m_baseColor);
-        QVector3D heightColor = Utils::vectorFromColor(m_theme->m_heightColor)
-                * barHeight;
+        QVector3D heightColor = Utils::vectorFromColor(m_theme->m_heightColor) * barHeight;
 
         QVector3D barColor = baseColor + heightColor;
 
@@ -710,22 +706,17 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                                          itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
             m_barShader->setUniformValue(m_barShader->color(), barColor);
-            m_barShader->setUniformValue(m_barShader->ambientS(),
-                                         m_theme->m_ambientStrength);
+            m_barShader->setUniformValue(m_barShader->ambientS(), m_theme->m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_shadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(),
-                                             m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(),
-                                             depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
-                                             lightStrength / 10.0f);
+                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
+                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
+                m_barShader->setUniformValue(m_barShader->lightS(), lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_barObj,
-                                     0, m_depthTexture);
+                m_drawer->drawObject(m_barShader, m_barObj, 0, m_depthTexture);
             } else
 #endif
             {
@@ -792,8 +783,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                                                 m_theme->m_lightStrength / 25.0f);
 
             // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_backgroundObj,
-                                 m_bgrTexture, m_depthTexture);
+            m_drawer->drawObject(m_backgroundShader, m_backgroundObj, m_bgrTexture, m_depthTexture);
         } else
 #endif
         {
@@ -802,8 +792,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                                                 m_theme->m_lightStrength);
 
             // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_backgroundObj,
-                                 m_bgrTexture);
+            m_drawer->drawObject(m_backgroundShader, m_backgroundObj, m_bgrTexture);
         }
     }
 
@@ -928,8 +917,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
         QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
                                        -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                       (m_columnDepth - rowPos) / m_scaleFactor
-                                       + zComp);
+                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
 
         // TODO: Try it; draw the label here
 
@@ -937,8 +925,8 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         QDataItem *label = new QDataItem();
         label->setTranslation(labelPos);
         if (m_data->d_ptr->rowLabelItems().size() > row) {
-            label->setLabel(m_data->d_ptr->rowLabelItems().at(
-                                m_data->d_ptr->rowLabelItems().size() - row - 1));
+            label->setLabel(m_data->d_ptr->rowLabelItems().at(m_data->d_ptr->rowLabelItems().size()
+                                                              - row - 1));
         }
 
         //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_dataSet->rowLabels().at(row);
@@ -967,8 +955,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
         QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
                                        -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                       (m_columnDepth - rowPos) / m_scaleFactor
-                                       + zComp);
+                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
 
         // TODO: Try it; draw the label here
 
@@ -977,8 +964,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         label->setTranslation(labelPos);
         if (m_data->d_ptr->columnLabelItems().size() > bar) {
             label->setLabel(m_data->d_ptr->columnLabelItems().at(
-                                m_data->d_ptr->columnLabelItems().size()
-                                - bar - 1));
+                                m_data->d_ptr->columnLabelItems().size() - bar - 1));
         }
 
         //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << m_dataSet->columnLabels().at(bar);
@@ -1123,8 +1109,8 @@ void Maps3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos
     GLfloat focalPoint = tan(45.0f / 2.0f);
 
     // TODO: Testi - laske viewmatriisin kerroin
-    QVector3D worldRay = QVector3D(0.0f, 0.0f, 0.0f)
-            - QVector3D(mouse3D.x(), mouse3D.y(), -focalPoint);
+    QVector3D worldRay = QVector3D(0.0f, 0.0f, 0.0f) - QVector3D(mouse3D.x(), mouse3D.y(),
+                                                                 -focalPoint);
     //qDebug() << "worldRay" << worldRay;
     // multiply viewmatrix with this to get something?
 #endif
@@ -1168,7 +1154,7 @@ void Maps3DController::resizeNotify()
     div = qMin(width(), height());
     zoomAdjustment = defaultRatio * ((width() / div) / (height() / div));
     //qDebug() << "zoom adjustment" << zoomAdjustment;
-    m_zoomAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
+    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 
     // Re-init selection buffer
     initSelectionBuffer();
@@ -1239,8 +1225,7 @@ void Maps3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_zoomLevel = qBound(10, distance, 500);
-    m_camera->setCameraRotation(QPointF(m_horizontalRotation,
-                                        m_verticalRotation));
+    m_camera->setCameraRotation(QPointF(m_horizontalRotation, m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
@@ -1404,8 +1389,6 @@ void Maps3DController::setShadowQuality(ShadowQuality quality)
     if (m_isInitialized) {
 #if !defined(QT_OPENGL_ES_2)
         if (m_shadowQuality > ShadowNone) {
-            // Re-init depth buffer
-            initDepthBuffer();
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -1428,6 +1411,8 @@ void Maps3DController::setShadowQuality(ShadowQuality quality)
             initBackgroundShaders(QStringLiteral(":/shaders/vertexTexture"),
                                   QStringLiteral(":/shaders/fragmentTexture"));
         }
+        // Re-init depth buffer
+        initDepthBuffer();
 #else
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexES2"),
@@ -1683,8 +1668,10 @@ void Maps3DController::initDepthBuffer()
     if (m_depthTexture)
         m_textureHelper->deleteTexture(&m_depthTexture);
 
-    m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
-                                                         m_shadowQuality);
+    if (m_shadowQuality > ShadowNone) {
+        m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
+                                                             m_shadowQuality);
+    }
 }
 #endif
 
@@ -1702,8 +1689,6 @@ void Maps3DController::initLabelShaders(const QString &vertexShader, const QStri
     if (m_labelShader)
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    //    m_labelShader = new ShaderHelper(q_ptr, QStringLiteral(":/shaders/testDepthVert"),
-    //                                     QStringLiteral(":/shaders/testDepthFrag"));
     m_labelShader->initialize();
 }
 

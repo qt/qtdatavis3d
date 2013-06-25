@@ -233,7 +233,7 @@ private:
     MousePressType m_mousePressed;
     QPoint m_mousePos;
     GLint m_zoomLevel;
-    GLfloat m_zoomAdjustment;
+    GLfloat m_autoScaleAdjustment;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     QVector3D m_barThickness;

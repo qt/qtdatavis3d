@@ -80,6 +80,13 @@ QDataItem::QDataItem(float value, const QString &label)
 QDataItem::QDataItem(QDataItem &item)
     : d_ptr(new QDataItemPrivate(&item))
 {
+    d_ptr->m_label = item.d_ptr->m_label;
+    d_ptr->m_labelString = item.d_ptr->m_labelString;
+    d_ptr->m_position = item.d_ptr->m_position;
+    d_ptr->m_prependLabel = item.d_ptr->m_prependLabel;
+    d_ptr->m_selectionLabel = item.d_ptr->m_selectionLabel;
+    d_ptr->m_translation = item.d_ptr->m_translation;
+    d_ptr->m_value = item.d_ptr->m_value;
 }
 
 /*!
