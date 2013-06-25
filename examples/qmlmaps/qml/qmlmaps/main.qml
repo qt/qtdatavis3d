@@ -116,12 +116,10 @@ Item {
             onClicked: {
                 if (testmap.shadowQuality === Maps3D.ShadowNone) {
                     testmap.shadowQuality = Maps3D.ShadowLow;
-                    buttonText.textColor = "#FFFFFF";
-                    shadowToggle.color = "#000000";
+                    buttonText.textColor = "#999999";
                 } else {
                     testmap.shadowQuality = Maps3D.ShadowNone;
                     buttonText.textColor = "#000000";
-                    shadowToggle.color = "#FFFFFF";
                 }
             }
         }

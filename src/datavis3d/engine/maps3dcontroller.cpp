@@ -1665,8 +1665,13 @@ void Maps3DController::initDepthShader()
 
 void Maps3DController::initDepthBuffer()
 {
-    if (m_depthTexture)
+    if (!m_isInitialized)
+        return;
+
+    if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
+        m_depthTexture = 0;
+    }
 
     if (m_shadowQuality > ShadowNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
