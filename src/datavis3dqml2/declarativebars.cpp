@@ -280,6 +280,8 @@ QAbstractItemModel *DeclarativeBars::data()
 void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
                                  const QVector<QString> &labelsColumn)
 {
+    Q_UNUSED(labelRow)
+    Q_UNUSED(labelsColumn)
     qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<float> &dataRow...)";
     // TODO: Save labels to cachedstate
     QDataItem *newItem;
@@ -295,6 +297,8 @@ void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &l
 void DeclarativeBars::addDataRow(const QVector<QDataItem *> &dataRow, const QString &labelRow,
                                  const QVector<QString> &labelsColumn)
 {
+    Q_UNUSED(labelRow)
+    Q_UNUSED(labelsColumn)
     qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow...)";
     // TODO: Save labels to cachedstate
     QDataItem *newItem;
@@ -324,6 +328,8 @@ void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
                                  const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
+    Q_UNUSED(labelsRow)
+    Q_UNUSED(labelsColumn)
     qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<float> >...";
     // TODO: Save labels to cachedstate
     QDataItem *newItem;
@@ -345,6 +351,8 @@ void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> > &data,
                                  const QVector<QString> &labelsRow,
                                  const QVector<QString> &labelsColumn)
 {
+    Q_UNUSED(labelsRow)
+    Q_UNUSED(labelsColumn)
     qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> >...";
     // TODO: Save labels to cachedstate
     QDataItem *newItem;

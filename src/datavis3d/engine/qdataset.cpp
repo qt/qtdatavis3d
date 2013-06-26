@@ -125,8 +125,8 @@ QDataSetPrivate::QDataSetPrivate(QDataSet *q)
     : q_ptr(q),
       m_set(QVector<QDataRow*>()),
       m_axisX(new QCategoryAxis()),
-      m_axisZ(new QCategoryAxis()),
-      m_axisY(new QValueAxis())
+      m_axisY(new QValueAxis()),
+      m_axisZ(new QCategoryAxis())
 {
 }
 

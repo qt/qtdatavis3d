@@ -488,8 +488,8 @@ void DeclarativeMapsRenderer::render()
 
 
 DeclarativeMapsCachedStatePrivate::DeclarativeMapsCachedStatePrivate()
-    : m_data(0),
-      m_replaceData(false),
+    : m_replaceData(false),
+      m_data(0),
       m_isImageSet(false),
       m_isBarSpecsSet(false),
       m_isAreaRectSet(false),

@@ -66,7 +66,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QDataItem.
  */
 QDataItem::QDataItem(float value, const QString &label)
-    : d_ptr(new QDataItemPrivate(this, value, label))
+    : QObject(0),
+      d_ptr(new QDataItemPrivate(this, value, label))
 {
 }
 
@@ -78,7 +79,8 @@ QDataItem::QDataItem(float value, const QString &label)
  * Constructs QDataItem.
  */
 QDataItem::QDataItem(QDataItem &item)
-    : d_ptr(new QDataItemPrivate(&item))
+    : QObject(0),
+      d_ptr(new QDataItemPrivate(&item))
 {
     d_ptr->m_label = item.d_ptr->m_label;
     d_ptr->m_labelString = item.d_ptr->m_labelString;

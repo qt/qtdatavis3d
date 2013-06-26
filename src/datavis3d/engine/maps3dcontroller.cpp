@@ -82,7 +82,8 @@ GLfloat distanceMod = 0.0f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Maps3DController::Maps3DController(const QRect &rect)
-    : m_barShader(0),
+    : m_camera(new CameraHelper()),
+      m_barShader(0),
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
@@ -129,7 +130,6 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_bgrHasAlpha(false),
-      m_camera(new CameraHelper()),
       m_boundingRect(rect.x(), rect.y(), rect.width(), rect.height())
 {
     //m_data->setDrawer(m_drawer);
@@ -1690,6 +1690,9 @@ void Maps3DController::initDepthBuffer()
             case ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
                 (void)setShadowQuality(ShadowNone);
+                break;
+            default:
+                // Cannot get here
                 break;
             }
         }
