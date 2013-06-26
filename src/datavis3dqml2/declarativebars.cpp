@@ -381,8 +381,7 @@ void DeclarativeBars::addDataSet(QDataSet *dataSet)
     for (int row = 0; row < dataSet->d_ptr->set().count(); row++) {
         newRow = new QDataRow();
         for (int i = 0; i < dataSet->d_ptr->getRow(row)->d_ptr->row().count(); i++) {
-            newItem = new QDataItem(1.0f);//*dataSet->d_ptr->getRow(row)->d_ptr->getItem(i));
-            qDebug() << "adding" << row << ":" << i << newRow << newItem;
+            newItem = new QDataItem(*dataSet->d_ptr->getRow(row)->d_ptr->getItem(i));
             newRow->addItem(newItem);
         }
         m_cachedState->m_dataSet->addRow(newRow);
