@@ -199,6 +199,8 @@ int main(int argc, char **argv)
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
+    QObject::connect(modifier, &MapsModifier::shadowQuality, shadowQuality,
+                     &QComboBox::setCurrentIndex);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &MapsModifier::changeFont);

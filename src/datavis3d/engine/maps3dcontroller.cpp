@@ -1366,7 +1366,7 @@ LabelTransparency Maps3DController::labelTransparency()
     return m_labelTransparency;
 }
 
-void Maps3DController::setShadowQuality(ShadowQuality quality)
+ShadowQuality Maps3DController::setShadowQuality(ShadowQuality quality)
 {
     m_shadowQuality = quality;
     switch (quality) {
@@ -1425,6 +1425,7 @@ void Maps3DController::setShadowQuality(ShadowQuality quality)
                               QStringLiteral(":/shaders/fragmentTextureES2"));
 #endif
     }
+    return m_shadowQuality;
 }
 
 ShadowQuality Maps3DController::shadowQuality()
@@ -1676,6 +1677,22 @@ void Maps3DController::initDepthBuffer()
     if (m_shadowQuality > ShadowNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
                                                              m_shadowQuality);
+        if (!m_depthTexture) {
+            switch (m_shadowQuality) {
+            case ShadowHigh:
+                qWarning("Creating high quality shadows failed. Changing to medium quality.");
+                (void)setShadowQuality(ShadowMedium);
+                break;
+            case ShadowMedium:
+                qWarning("Creating medium quality shadows failed. Changing to low quality.");
+                (void)setShadowQuality(ShadowLow);
+                break;
+            case ShadowLow:
+                qWarning("Creating low quality shadows failed. Switching shadows off.");
+                (void)setShadowQuality(ShadowNone);
+                break;
+            }
+        }
     }
 }
 #endif

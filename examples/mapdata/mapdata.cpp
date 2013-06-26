@@ -315,7 +315,22 @@ void MapsModifier::changeShadowQuality(int quality)
         sq = ShadowHigh;
         break;
     }
-    m_chart->setShadowQuality(sq);
+    ShadowQuality realquality = m_chart->setShadowQuality(sq);
+    // Check if it setting quality was successful
+    if (realquality != sq) {
+        switch (realquality) {
+        case ShadowLow:
+            quality = 1;
+            break;
+        case ShadowMedium:
+            quality = 2;
+            break;
+        case ShadowHigh:
+            quality = 3;
+            break;
+        }
+        emit shadowQuality(quality);
+    }
 }
 
 //void MapsModifier::setGridEnabled(int enabled)

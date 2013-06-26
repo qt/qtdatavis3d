@@ -75,6 +75,9 @@ public slots:
     void changeValueDimension(int dimension);
     void changeShadowQuality(int quality);
 
+signals:
+    void shadowQuality(int quality);
+
 private:
     Q3DMaps *m_chart;
     QRect m_imageRect;

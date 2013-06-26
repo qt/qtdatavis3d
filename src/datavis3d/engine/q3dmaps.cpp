@@ -267,9 +267,9 @@ LabelTransparency Q3DMaps::labelTransparency()
     return d_ptr->m_shared->labelTransparency();
 }
 
-void Q3DMaps::setShadowQuality(ShadowQuality quality)
+ShadowQuality Q3DMaps::setShadowQuality(ShadowQuality quality)
 {
-    d_ptr->m_shared->setShadowQuality(quality);
+    return d_ptr->m_shared->setShadowQuality(quality);
 }
 
 ShadowQuality Q3DMaps::shadowQuality()

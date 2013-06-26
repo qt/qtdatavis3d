@@ -153,7 +153,7 @@ public:
     LabelTransparency labelTransparency();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
 protected:
