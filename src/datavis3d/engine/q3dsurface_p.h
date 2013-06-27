@@ -49,49 +49,37 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef Q3DSURFACE_P_H
+#define Q3DSURFACE_P_H
 
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
+#include "surface3dcontroller_p.h"
+#include "qdatavis3dnamespace.h"
 
-class QColor;
+#include <QList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class Q3DSurface;
+
+class Q3DSurfacePrivate : public QObject
 {
 public:
-    explicit Theme();
-    ~Theme();
+    Q3DSurfacePrivate(Q3DSurface *q, QRect rect);
+    ~Q3DSurfacePrivate();
 
-    void useTheme(ColorTheme theme);
+    // TODO
+    void appendSeries(QList<qreal> series);
+    QList<qreal> seriesAt(int i);
+    int numOfSeries();
+    // TODO
+
+    Surface3dController *m_shared;
 
 private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Drawer;
-
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    Q3DSurface *q_ptr;
+    QList<QList<qreal> > m_seriesList; // Temp to be replaced by dataset
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // Q3DSURFACE_P_H

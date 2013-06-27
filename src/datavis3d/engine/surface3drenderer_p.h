@@ -49,49 +49,102 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef SURFACE3DRENDERER_P_H
+#define SURFACE3DRENDERER_P_H
 
 #include "datavis3dglobal_p.h"
-#include "q3dbars.h"
+#include <QtCore/QSize>
+#include <QtCore/QObject>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QFont>
+#include <QWindow>
 
-class QColor;
+class QOpenGLShaderProgram;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
-{
-public:
-    explicit Theme();
-    ~Theme();
+class ShaderHelper;
+class ObjectHelper;
+class Theme;
+class Drawer;
+class Surface3dController;
+class CameraHelper;
 
-    void useTheme(ColorTheme theme);
+class QT_DATAVIS3D_EXPORT Surface3dRenderer : public QObject, protected QOpenGLFunctions
+{
+    Q_OBJECT
+
+public:
+    enum MousePressType {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating,
+        MouseOnPinch
+    };
+
+    Surface3dController *m_controller;
+
+    // Interaction related parameters
+    MousePressType m_mousePressed;
+    QPoint m_mousePos;
+    SelectionMode m_selectionMode;
+
+    // Visual parameters
+    QRect m_boundingRect;
+    Theme *m_theme;
+    LabelTransparency m_labelTransparency;
+    QFont m_font;
+    bool m_hasNegativeValues;
+
+    CameraHelper *m_camera;
 
 private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Drawer;
+    QRect m_mainViewPort;
+    QRect m_sliceViewPort;
+    bool m_isInitialized;
+    ObjectHelper *m_backgroundObj;
 
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    Drawer *m_drawer;
+
+public:
+    explicit Surface3dRenderer(QRect rect, Surface3dController *controller);
+    ~Surface3dRenderer();
+
+    void initializeOpenGL();
+    void render(const GLuint defaultFboHandle = 0);
+
+    // Size
+    const QSize size();
+    const QRect boundingRect();
+    void setBoundingRect(const QRect boundingRect);
+    void setWidth(const int width);
+    int width();
+    void setHeight(const int height);
+    int height();
+    void setX(const int x);
+    int x();
+    void setY(const int y);
+    int y();
+
+#if defined(Q_OS_ANDROID)
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void touchEvent(QTouchEvent *event);
+#endif
+    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
+    void wheelEvent(QWheelEvent *event);
+    void resizeNotify();
+
+    void loadBackgroundMesh();
+
+private:
+    void drawScene(const GLuint defaultFboHandle);
+    Q_DISABLE_COPY(Surface3dRenderer)
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // SURFACE3DRENDERER_P_H

@@ -39,59 +39,88 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#include "surface3dcontroller_p.h"
+#include "surface3drenderer_p.h"
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#include <QMouseEvent>
 
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-
-class QColor;
+#include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+Surface3dController::Surface3dController(QRect rect)
+    : m_renderer(new Surface3dRenderer(rect, this)),
+      m_isInitialized(false)
 {
-public:
-    explicit Theme();
-    ~Theme();
+}
 
-    void useTheme(ColorTheme theme);
+Surface3dController::~Surface3dController()
+{
+}
 
-private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Drawer;
+void Surface3dController::initializeOpenGL()
+{
+    // Initialization is called multiple times when Qt Quick components are used
+    if (m_isInitialized)
+        return;
 
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-};
+    m_renderer->initializeOpenGL();
+    m_isInitialized = true;
+}
+
+void Surface3dController::render(const GLuint defaultFboHandle)
+{
+    if (!m_isInitialized)
+        return;
+
+    m_renderer->render(defaultFboHandle);
+}
+
+void Surface3dController::setWidth(const int width)
+{
+    m_renderer->setWidth(width);
+}
+
+void Surface3dController::setHeight(const int height)
+{
+    m_renderer->setHeight(height);
+}
+
+#if defined(Q_OS_ANDROID)
+void Surface3dController::mouseDoubleClickEvent(QMouseEvent *event)
+{
+}
+void touchEvent(QTouchEvent *event)
+{
+}
+#endif
+
+void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    Q_UNUSED(event)
+    Q_UNUSED(mousePos)
+}
+
+void Surface3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    Q_UNUSED(event)
+    Q_UNUSED(mousePos)
+}
+
+void Surface3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    Q_UNUSED(event)
+    Q_UNUSED(mousePos)
+}
+
+void Surface3dController::wheelEvent(QWheelEvent *event)
+{
+    Q_UNUSED(event)
+}
+
+void Surface3dController::resizeNotify()
+{
+
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

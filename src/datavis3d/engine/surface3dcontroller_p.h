@@ -49,49 +49,42 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef SURFACE3DCONTROLLER_P_H
+#define SURFACE3DCONTROLLER_P_H
 
 #include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-
-class QColor;
+#include "surface3drenderer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class QT_DATAVIS3D_EXPORT Surface3dController : public QObject
 {
+    Q_OBJECT
+
+    Surface3dRenderer *m_renderer;
+    bool m_isInitialized;
+
 public:
-    explicit Theme();
-    ~Theme();
+    explicit Surface3dController(QRect rect);
+    ~Surface3dController();
 
-    void useTheme(ColorTheme theme);
+    void initializeOpenGL();
+    void render(const GLuint defaultFboHandle = 0);
 
-private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Drawer;
+    void setWidth(const int width);
+    void setHeight(const int height);
 
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+#if defined(Q_OS_ANDROID)
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void touchEvent(QTouchEvent *event);
+#endif
+    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
+    void wheelEvent(QWheelEvent *event);
+    void resizeNotify();
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // SURFACE3DCONTROLLER_P_H

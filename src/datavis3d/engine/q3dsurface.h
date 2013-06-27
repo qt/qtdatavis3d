@@ -39,59 +39,48 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef Q3DSURFACE_H
+#define Q3DSURFACE_H
 
-#ifndef THEME_P_H
-#define THEME_P_H
-
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-
-class QColor;
+#include "qdatavis3dnamespace.h"
+#include "q3dwindow.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
-{
-public:
-    explicit Theme();
-    ~Theme();
+class Q3DSurfacePrivate;
 
-    void useTheme(ColorTheme theme);
+class QT_DATAVIS3D_EXPORT Q3DSurface : public Q3DWindow
+{
+    Q_OBJECT
+
+public:
+    explicit Q3DSurface();
+    ~Q3DSurface();
+
+//TODO part
+    void appendSeries(QList<qreal> series);
+    void showData();
+//END TODO
+
+protected:
+    void initialize();
+    void render();
+
+#if defined(Q_OS_ANDROID)
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void touchEvent(QTouchEvent *event);
+#endif
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Drawer;
-
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    QScopedPointer<Q3DSurfacePrivate> d_ptr;
+    Q_DISABLE_COPY(Q3DSurface)
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // Q3DSURFACE_H
