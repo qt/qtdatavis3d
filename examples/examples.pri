@@ -50,7 +50,7 @@ contains(TARGET, qml.*) {
                 src_lib = lib$${lib_name}.dylib
             }
         } else {
-            src_lib = $${lib_name}.so
+            src_lib = lib$${lib_name}.so
         }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib

@@ -6,7 +6,10 @@ CONFIG += qt plugin
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = com.digia.QtDataVis3D
 
-staticlib:DEFINES+=QT_DATAVIS3D_STATICLIB
+static {
+    DEFINES += QT_DATAVIS3D_STATICLIB
+    CONFIG -= static staticlib
+}
 
 # Input
 INCLUDEPATH += ../datavis3d/engine ../datavis3d/global
