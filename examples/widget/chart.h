@@ -81,6 +81,9 @@ public:
 public slots:
     void changeShadowQuality(int quality);
 
+signals:
+    void shadowQuality(int quality);
+
 private:
     Q3DBars *m_chart;
     int m_columnCount;

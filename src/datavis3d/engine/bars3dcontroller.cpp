@@ -73,7 +73,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_isBarSpecRelative(true),
       m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
-      m_colorTheme(ColorTheme::ThemeSystem)
+      m_colorTheme(ThemeSystem)
 {
     emit dataSetChanged(m_dataSet->d_ptr.data());
 }
@@ -453,9 +453,9 @@ bool Bars3dController::backgroundEnabled()
     return m_renderer->backgroundEnabled();
 }
 
-void Bars3dController::setShadowQuality(ShadowQuality quality)
+ShadowQuality Bars3dController::setShadowQuality(ShadowQuality quality)
 {
-    m_renderer->setShadowQuality(quality);
+    return m_renderer->setShadowQuality(quality);
 }
 
 ShadowQuality Bars3dController::shadowQuality()

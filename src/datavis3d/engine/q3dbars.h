@@ -174,7 +174,7 @@ public:
     bool isBackgroundVisible();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
 protected:

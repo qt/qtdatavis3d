@@ -453,11 +453,14 @@ bool Q3DBars::isBackgroundVisible()
  *
  * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
  *
- * Sets shadow quality.
+ * \return ShadowQuality that was successfully set.
+ *
+ * Sets shadow quality. If setting ShadowQuality of a certain level fails, a level is lowered
+ * until it is successful. The value that was successfully set is returned.
  */
-void Q3DBars::setShadowQuality(ShadowQuality quality)
+ShadowQuality Q3DBars::setShadowQuality(ShadowQuality quality)
 {
-    d_ptr->m_shared->setShadowQuality(quality);
+    return d_ptr->m_shared->setShadowQuality(quality);
 }
 
 ShadowQuality Q3DBars::shadowQuality()

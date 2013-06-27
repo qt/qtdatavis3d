@@ -260,7 +260,7 @@ public:
     bool backgroundEnabled();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
 #if defined(Q_OS_ANDROID)

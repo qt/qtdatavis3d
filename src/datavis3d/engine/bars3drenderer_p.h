@@ -251,7 +251,7 @@ public:
     bool backgroundEnabled();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
     void loadBarMesh();
