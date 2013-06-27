@@ -992,7 +992,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
 /*!
  * \internal
  */
-void Q3DMaps::mouseDoubleClickEvent(QMouseEvent *event)
+void Maps3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_zoomActivated) {
         m_mousePressed = Maps3DController::MouseOnScene;
@@ -1004,7 +1004,7 @@ void Q3DMaps::mouseDoubleClickEvent(QMouseEvent *event)
 /*!
  * \internal
  */
-void Q3DMaps::touchEvent(QTouchEvent *event)
+void Maps3DController::touchEvent(QTouchEvent *event)
 {
     static int prevDistance = 0;
 
