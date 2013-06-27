@@ -20,6 +20,10 @@
 
 #include <QtGui/QGuiApplication>
 #include "qtquick2applicationviewer.h"
+#ifdef Q_OS_ANDROID
+#include <QDir>
+#include <QQmlEngine>
+#endif
 #include <QDebug>
 
 int main(int argc, char *argv[])
