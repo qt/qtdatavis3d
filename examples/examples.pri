@@ -11,7 +11,7 @@ win32 {
     DESTDIR = $$OUT_PWD
 }
 
-LIBS += -L$$OUT_PWD/../lib
+LIBS += -L$$OUT_PWD/../../lib
 
 QT += datavis3d
 
