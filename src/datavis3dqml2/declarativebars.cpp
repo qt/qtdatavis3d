@@ -66,6 +66,9 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // TODO: These seem to have no effect; find a way to activate anti-aliasing
     setAntialiasing(true);
     setSmooth(true);
+
+    // Create the shared component on the main GUI thread.
+    m_shared = new Bars3dController(boundingRect().toRect());
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -85,10 +88,8 @@ void DeclarativeBars::componentComplete()
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    if (!m_shared) {
-        m_shared = new Bars3dController(boundingRect().toRect());
-        m_shared->initializeOpenGL();
-    }
+    // Call initialize on each update paint node and let the shared code worry about it.
+    m_shared->initializeOpenGL();
 
     // Check if properites have changed that need to be applied while on the SGRenderThread
     if (m_cachedState->m_isSampleSpaceSet) {
