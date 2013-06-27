@@ -156,6 +156,8 @@ private:
     QPoint m_selectionPointRequest;
     bool m_isSelectionPointRequestActive;
 
+    bool m_hasHeightAdjustmentChanged;
+
     // Cached state based on emitted signals from the controller
     SelectionMode m_selectionMode;
     int m_zoomLevel;
@@ -174,7 +176,9 @@ public:
     explicit Bars3dRenderer(Bars3dController *controller);
     ~Bars3dRenderer();
 
-    void render(QDataSetPrivate *dataSet, CameraHelper *camera, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel, const GLuint defaultFboHandle = 0);
+    void render(QDataSetPrivate *dataSet, CameraHelper *camera,
+                const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
+                const GLuint defaultFboHandle = 0);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -290,7 +294,8 @@ signals:
 
 private:
     void initializeOpenGL();
-    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera, const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera,
+                         const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
     void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 

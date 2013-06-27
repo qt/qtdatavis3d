@@ -124,10 +124,11 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
+      m_hasHeightAdjustmentChanged(true),
       m_rowCount(0),
       m_columnCount(0)
     #ifdef DISPLAY_RENDER_SPEED
-    ,m_isFirstFrame(true),
+      ,m_isFirstFrame(true),
       m_numFrames(0)
     #endif
 {
@@ -310,6 +311,13 @@ void Bars3dRenderer::render(QDataSetPrivate *dataSet,
     QVector3D clearColor = Utils::vectorFromColor(m_theme->m_windowColor);
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (m_hasHeightAdjustmentChanged) {
+        // Set initial camera position. Also update if height adjustment has changed.
+        camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                            QVector3D(0.0f, -m_yAdjustment, zComp),
+                                            QVector3D(0.0f, 1.0f, 0.0f));
+    }
 
     // If slice selection is on, draw the sliced scene
     if (m_isSlicingActivated)
@@ -1932,7 +1940,11 @@ void Bars3dRenderer::calculateSceneScalingFactors()
 void Bars3dRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
 {
     // 2.0f = max difference between minimum and maximum value after scaling with m_heightNormalizer
-    m_yAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
+    GLfloat newAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
+    if (newAdjustment != m_yAdjustment) {
+        m_hasHeightAdjustmentChanged = true;
+        m_yAdjustment = newAdjustment;
+    }
     //qDebug() << m_yAdjustment;
 }
 

@@ -90,12 +90,6 @@ void Bars3dController::initializeOpenGL()
     if (m_isInitialized)
         return;
 
-    // Set initial camera position
-    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    m_cameraHelper->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                                QVector3D(0.0f, 0.0f, zComp),
-                                                QVector3D(0.0f, 1.0f, 0.0f));
-
     m_renderer = new Bars3dRenderer(this);
     m_isInitialized = true;
 }
