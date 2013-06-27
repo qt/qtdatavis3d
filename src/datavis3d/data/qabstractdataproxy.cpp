@@ -39,30 +39,38 @@
 **
 ****************************************************************************/
 
-#ifndef QCATEGORYAXIS_H
-#define QCATEGORYAXIS_H
-
-#include "qabstractaxis.h"
+#include "qabstractdataproxy.h"
+#include "qabstractdataproxy_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate;
-
-class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
+QAbstractDataProxy::QAbstractDataProxy(QAbstractDataProxyPrivate *d) :
+    QObject(0),
+    d_ptr(d)
 {
-    Q_OBJECT
-public:
-    explicit QCategoryAxis();
-    ~QCategoryAxis();
+}
 
-    void setLabels(const QVector<QString> &labels);
+QAbstractDataProxy::~QAbstractDataProxy()
+{
+}
 
-private:
-    QCategoryAxisPrivate *dptr();
+QAbstractDataProxy::DataType QAbstractDataProxy::type() const
+{
+    return d_ptr->m_type;
+}
 
-    Q_DISABLE_COPY(QCategoryAxis)
-};
+
+// QAbstractDataProxyPrivate
+
+QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
+    : QObject(q),
+      q_ptr(q),
+      m_type(type)
+{
+}
+
+QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif // QCATEGORYAXIS_H

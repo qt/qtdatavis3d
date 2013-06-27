@@ -44,8 +44,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QValueAxis::QValueAxis(QObject *parent) :
-    QAbstractAxis(new QValueAxisPrivate(this), parent)
+QValueAxis::QValueAxis() :
+    QAbstractAxis(new QValueAxisPrivate(this))
 {
 }
 

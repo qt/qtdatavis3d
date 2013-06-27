@@ -12,7 +12,9 @@ static {
 }
 
 # Input
-INCLUDEPATH += ../datavis3d/engine ../datavis3d/global
+INCLUDEPATH += ../datavis3d/engine \
+               ../datavis3d/global \
+               ../datavis3d/data
 
 SOURCES += \
     datavis3dqml2_plugin.cpp \

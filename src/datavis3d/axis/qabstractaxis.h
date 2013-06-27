@@ -76,7 +76,7 @@ public:
     };
 
 protected:
-    explicit QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent = 0);
+    explicit QAbstractAxis(QAbstractAxisPrivate *d);
 public:
     virtual ~QAbstractAxis();
 

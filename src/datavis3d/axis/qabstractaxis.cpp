@@ -44,8 +44,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent) :
-    QObject(parent),
+QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d) :
+    QObject(0),
     d_ptr(d)
 {
 }
@@ -88,7 +88,8 @@ void QAbstractAxis::setTitle(QString title)
 // QAbstractAxisPrivate
 
 QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type)
-    : q_ptr(q),
+    : QObject(0),
+      q_ptr(q),
       m_drawer(0),
       m_orientation(QAbstractAxis::AxisOrientationNone),
       m_type(type)

@@ -39,30 +39,40 @@
 **
 ****************************************************************************/
 
-#ifndef QCATEGORYAXIS_H
-#define QCATEGORYAXIS_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qabstractaxis.h"
+#include "qabstractdataproxy.h"
+
+#ifndef QABSTRACTDATAPROXY_P_H
+#define QABSTRACTDATAPROXY_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate;
-
-class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
+class QT_DATAVIS3D_EXPORT QAbstractDataProxyPrivate : public QObject
 {
     Q_OBJECT
 public:
-    explicit QCategoryAxis();
-    ~QCategoryAxis();
+    QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type);
+    virtual ~QAbstractDataProxyPrivate();
 
-    void setLabels(const QVector<QString> &labels);
+public slots:
+
+protected:
+    QAbstractDataProxy *q_ptr;
+    QAbstractDataProxy::DataType m_type;
 
 private:
-    QCategoryAxisPrivate *dptr();
-
-    Q_DISABLE_COPY(QCategoryAxis)
+    friend class QAbstractDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QCATEGORYAXIS_H
+#endif // QABSTRACTDATAPROXY_P_H

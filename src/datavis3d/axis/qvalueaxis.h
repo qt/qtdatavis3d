@@ -52,7 +52,7 @@ class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
 {
     Q_OBJECT
 public:
-    explicit QValueAxis(QObject *parent = 0);
+    explicit QValueAxis();
     ~QValueAxis();
 
 private:

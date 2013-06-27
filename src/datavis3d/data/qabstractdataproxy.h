@@ -39,30 +39,50 @@
 **
 ****************************************************************************/
 
-#ifndef QCATEGORYAXIS_H
-#define QCATEGORYAXIS_H
+#ifndef QABSTRACTDATAPROXY_H
+#define QABSTRACTDATAPROXY_H
 
-#include "qabstractaxis.h"
+#include "qdatavis3dnamespace.h"
+#include <QObject>
+#include <QScopedPointer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate;
+class QAbstractDataProxyPrivate;
 
-class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
+class QT_DATAVIS3D_EXPORT QAbstractDataProxy : public QObject
 {
     Q_OBJECT
-public:
-    explicit QCategoryAxis();
-    ~QCategoryAxis();
+    Q_ENUMS(DataType)
+    Q_PROPERTY(DataType type READ type)
 
-    void setLabels(const QVector<QString> &labels);
+public:
+    enum DataType {
+        DataTypeNone = 0,
+        DataTypeBar = 1,
+        DataTypeMap = 2,
+        DataTypeScatter = 4,
+        DataTypeSurface = 8
+    };
+
+protected:
+    explicit QAbstractDataProxy(QAbstractDataProxyPrivate *d);
+public:
+    virtual ~QAbstractDataProxy();
+
+    DataType type() const;
+
+public slots:
+
+signals:
+
+protected:
+    QScopedPointer<QAbstractDataProxyPrivate> d_ptr;
 
 private:
-    QCategoryAxisPrivate *dptr();
-
-    Q_DISABLE_COPY(QCategoryAxis)
+    Q_DISABLE_COPY(QAbstractDataProxy)
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QCATEGORYAXIS_H
+#endif // QABSTRACTDATAPROXY_H

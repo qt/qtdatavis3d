@@ -44,8 +44,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QCategoryAxis::QCategoryAxis(QObject *parent) :
-    QAbstractAxis(new QCategoryAxisPrivate(this), parent)
+QCategoryAxis::QCategoryAxis() :
+    QAbstractAxis(new QCategoryAxisPrivate(this))
 {
 }
 
