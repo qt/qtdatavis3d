@@ -1515,18 +1515,6 @@ void Bars3dRenderer::drawScene(QDataSetPrivate *dataSet,
     m_labelShader->release();
 }
 
-#if defined(Q_OS_ANDROID)
-void Bars3dRenderer::mouseDoubleClickEvent(QMouseEvent *event)
-{
-
-}
-
-void Bars3dRenderer::touchEvent(QTouchEvent *event)
-{
-
-}
-#endif
-
 void Bars3dRenderer::inspectSelectionAtPoint(const QPoint &point)
 {
     QMutexLocker locker(&m_mutex);

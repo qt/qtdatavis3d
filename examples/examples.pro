@@ -6,4 +6,4 @@ SUBDIRS += barchart \
            qmlbarchart \
            qmlmaps
 
-qtHaveModule(multimedia): SUBDIRS += spectrum
+qtHaveModule(multimedia):!android: SUBDIRS += spectrum
