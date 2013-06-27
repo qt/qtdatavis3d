@@ -1525,6 +1525,8 @@ void Bars3dRenderer::inspectSelectionAtPoint(const QPoint &point)
 
 void Bars3dRenderer::handleResize()
 {
+    if (width() == 0 || height() == 0)
+        return;
     qDebug() << "Bars3dRenderer::resizeEvent " << width() << "x" <<height();
 
     // Set view port

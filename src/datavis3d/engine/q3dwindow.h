@@ -67,7 +67,6 @@ private slots:
 
 protected:
     virtual void render();
-    virtual void initialize();
 
     void setAnimating(bool animating);
     bool event(QEvent *event);

@@ -95,21 +95,6 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     qDebug() << "initializeOpenGLFunctions()";
     initializeOpenGLFunctions();
 
-    initialize();
-}
-
-/*!
- * Destroys Q3DWindow.
- */
-Q3DWindow::~Q3DWindow()
-{
-}
-
-/*!
- * \internal
- */
-void Q3DWindow::initialize()
-{
     const GLubyte *version = glGetString(GL_VERSION);
     qDebug() << "OpenGL version:" << (const char *)version;
     version = glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -121,6 +106,13 @@ void Q3DWindow::initialize()
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
     setAnimating(true);
+}
+
+/*!
+ * Destroys Q3DWindow.
+ */
+Q3DWindow::~Q3DWindow()
+{
 }
 
 /*!
@@ -174,16 +166,9 @@ void Q3DWindow::renderNow()
     if (!isExposed())
         return;
 
-    static bool needsInit = true;
-
     d_ptr->m_updatePending = false;
 
     d_ptr->m_context->makeCurrent(this);
-
-    if (needsInit) {
-        initialize();
-        needsInit = false;
-    }
 
     render();
 

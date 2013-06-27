@@ -104,6 +104,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
+    d_ptr->m_shared->initializeOpenGL();
 }
 
 /*!
@@ -111,16 +112,6 @@ Q3DBars::Q3DBars()
  */
 Q3DBars::~Q3DBars()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DBars::initialize()
-{
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->initializeOpenGL();
 }
 
 /*!
