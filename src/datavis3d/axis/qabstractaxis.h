@@ -54,7 +54,26 @@ class QAbstractAxisPrivate;
 class QT_DATAVIS3D_EXPORT QAbstractAxis : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(AxisOrientation)
+    Q_ENUMS(AxisType)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(AxisOrientation orientation READ orientation)
+    Q_PROPERTY(AxisType type READ type)
+
+public:
+    enum AxisOrientation {
+        AxisOrientationNone = 0,
+        AxisOrientationX = 1,
+        AxisOrientationY = 2,
+        AxisOrientationZ = 4
+    };
+
+    enum AxisType {
+        AxisTypeNone = 0,
+        AxisTypeCategory = 1,
+        AxisTypeValue = 2
+        //AxisTypeLogValue = 4 // TODO
+    };
 
 protected:
     explicit QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent = 0);
@@ -63,6 +82,9 @@ public:
 
     QString title() const;
     QVector<QString> labels() const;
+
+    AxisOrientation orientation() const;
+    AxisType type() const;
 
 public slots:
     void setTitle(QString title);
@@ -76,6 +98,7 @@ protected:
 private:
     Q_DISABLE_COPY(QAbstractAxis)
 
+    friend class QAbstractDataSetPrivate;
     friend class QDataSetPrivate;
 };
 

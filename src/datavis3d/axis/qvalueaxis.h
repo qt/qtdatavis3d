@@ -46,6 +46,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+class QValueAxisPrivate;
+
 class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
 {
     Q_OBJECT
@@ -54,6 +56,8 @@ public:
     ~QValueAxis();
 
 private:
+    QValueAxisPrivate *dptr();
+
     Q_DISABLE_COPY(QValueAxis)
 };
 

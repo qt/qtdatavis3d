@@ -64,6 +64,16 @@ QVector<QString> QAbstractAxis::labels() const
     return d_ptr->m_labels;
 }
 
+QAbstractAxis::AxisOrientation QAbstractAxis::orientation() const
+{
+    return d_ptr->m_orientation;
+}
+
+QAbstractAxis::AxisType QAbstractAxis::type() const
+{
+    return d_ptr->m_type;
+}
+
 void QAbstractAxis::setTitle(QString title)
 {
     if (d_ptr->m_title != title) {
@@ -77,9 +87,11 @@ void QAbstractAxis::setTitle(QString title)
 
 // QAbstractAxisPrivate
 
-QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q)
+QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type)
     : q_ptr(q),
-      m_drawer(0)
+      m_drawer(0),
+      m_orientation(QAbstractAxis::AxisOrientationNone),
+      m_type(type)
 {
 }
 
@@ -95,6 +107,14 @@ void QAbstractAxisPrivate::setDrawer(Drawer *drawer)
     m_drawer = drawer;
     connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
     updateTextures();
+}
+
+void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orientation)
+{
+    if (m_orientation == QAbstractAxis::AxisOrientationNone)
+        m_orientation = orientation;
+    else
+        Q_ASSERT("Attempted to reset axis orientation.");
 }
 
 void QAbstractAxisPrivate::updateTextures()

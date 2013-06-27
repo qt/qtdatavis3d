@@ -46,6 +46,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+class QCategoryAxisPrivate;
+
 class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
 {
     Q_OBJECT
@@ -56,6 +58,8 @@ public:
     void setLabels(const QVector<QString> &labels);
 
 private:
+    QCategoryAxisPrivate *dptr();
+
     Q_DISABLE_COPY(QCategoryAxis)
 };
 

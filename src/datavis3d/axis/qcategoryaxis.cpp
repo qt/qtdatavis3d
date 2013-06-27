@@ -73,8 +73,13 @@ void QCategoryAxis::setLabels(const QVector<QString> &labels)
     d_ptr->m_labels = labels;
 }
 
+QCategoryAxisPrivate *QCategoryAxis::dptr()
+{
+    return static_cast<QCategoryAxisPrivate *>(d_ptr.data());
+}
+
 QCategoryAxisPrivate::QCategoryAxisPrivate(QCategoryAxis *q)
-    : QAbstractAxisPrivate(q)
+    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeCategory)
 {
 }
 

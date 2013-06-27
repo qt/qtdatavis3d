@@ -53,8 +53,13 @@ QValueAxis::~QValueAxis()
 {
 }
 
+QValueAxisPrivate *QValueAxis::dptr()
+{
+    return static_cast<QValueAxisPrivate *>(d_ptr.data());
+}
+
 QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
-    : QAbstractAxisPrivate(q)
+    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue)
 {
 }
 
