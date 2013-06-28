@@ -70,8 +70,8 @@ public:
     void setFromTheme(Theme &theme);
 
 private:
+    friend class Abstract3DController;
     friend class Bars3dRenderer;
-    friend class Bars3dController;
     friend class Maps3DController;
     friend class Surface3dRenderer;
     friend class Surface3dController;

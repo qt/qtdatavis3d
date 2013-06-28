@@ -56,6 +56,7 @@
 #include <QtCore/QObject>
 #include <QWindow>
 
+#include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
 #include "qdataset_p.h"
 
@@ -71,11 +72,9 @@ class Bars3dRenderer;
 class QDataItem;
 class QDataRow;
 class QDataSet;
-class Theme;
 class LabelItem;
-class CameraHelper;
 
-class QT_DATAVIS3D_EXPORT Bars3dController : public QObject
+class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
 {
     Q_OBJECT
 
@@ -108,27 +107,17 @@ private:
     MouseState m_mouseState;
     QPoint m_mousePos;
     SelectionMode m_selectionMode;
-    int m_zoomLevel;
     bool m_isSlicingActivated;
-
-    // Camera
-    CameraHelper *m_cameraHelper;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
 
     bool m_isBarSpecRelative;
     QSizeF m_barThickness;
     QSizeF m_barSpacing;
-    QRect m_boundingRect;
 
     // Look'n'Feel
     QString m_objFile;
-    Theme m_theme;
     QFont m_font;
-    LabelTransparency m_labelTransparency;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
-    ShadowQuality m_shadowQuality;
     GLint m_tickCount;
     GLfloat m_tickStep;
     GLfloat m_tickMinimum;
@@ -144,9 +133,6 @@ public:
 
     int columnCount();
     int rowCount();
-
-    int zoomLevel();
-    void setZoomLevel(int zoomLevel);
 
     MouseState mouseState();
     QPoint mousePosition();
@@ -205,44 +191,12 @@ public:
                           const QString &labelColumn = QString(),
                           const QString &labelHeight = QString());
 
-    // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
-
-    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
-    // percentage (10...500))
-    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
-
-    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
-    // color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                     bool uniform = true);
-
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
-    void setColorTheme(ColorTheme colorTheme);
-    Theme theme();
-
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
     void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
     // TODO: light placement API
-
-    // Size
-    void setSize(const int width, const int height);
-    const QSize size();
-    const QRect boundingRect();
-    void setBoundingRect(const QRect boundingRect);
-    void setWidth(const int width);
-    int width();
-    void setHeight(const int height);
-    int height();
-    void setX(const int x);
-    int x();
-    void setY(const int y);
-    int y();
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
@@ -256,10 +210,6 @@ public:
     void setFont(const QFont &font);
     QFont font();
 
-    // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
-
     // Enable or disable background grid
     void setGridEnabled(bool enable);
     bool gridEnabled();
@@ -268,9 +218,6 @@ public:
     void setBackgroundEnabled(bool enable);
     bool backgroundEnabled();
 
-    // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -287,21 +234,12 @@ signals:
     void dataSetChanged(QDataSetPrivate *dataSet);
     void limitsChanged(QPair<GLfloat, GLfloat> limits);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
-    void zoomLevelChanged(int zoomLevel);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
-    void boundingRectChanged(QRect boundingRect);
-    void sizeChanged(QRect boundingRect);
-    void positionChanged(QRect boundingRect);
-    void themeChanged(Theme theme);
     void fontChanged(QFont font);
-    void labelTransparencyUpdated(LabelTransparency transparency);
     void gridEnabledChanged(bool enable);
     void backgroundEnabledChanged(bool enable);
-    void shadowQualityChanged(ShadowQuality quality);
     void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
-    void barColorsChanged(QColor baseColor, QColor heightColor, QColor depthColor,
-                         bool uniform);
 
 private:
     void handleLimitChange();

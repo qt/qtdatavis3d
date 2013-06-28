@@ -45,7 +45,6 @@
 #include "qdataitem_p.h"
 #include "qdatarow_p.h"
 #include "qdataset_p.h"
-#include "theme_p.h"
 #include "utils_p.h"
 
 #include <QMatrix4x4>
@@ -57,40 +56,31 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Bars3dController::Bars3dController(QRect boundRect)
-    : m_isInitialized(false),
+    : Abstract3DController(boundRect),
+      m_isInitialized(false),
       m_dataSet(new QDataSet()),
       m_rowCount(0),
       m_columnCount(0),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
-      m_zoomLevel(100),
       m_isSlicingActivated(false),
-      m_cameraHelper(new CameraHelper()),
-      m_horizontalRotation(-45.0f),
-      m_verticalRotation(15.0f),
       m_isBarSpecRelative(true),
       m_barThickness(QSizeF(0.75f, 0.75f)),
       m_barSpacing(m_barThickness * 3.0f),
-      m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
-      m_theme(),
       m_font(QFont(QStringLiteral("Arial"))),
-      m_labelTransparency(TransparencyFromTheme),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
-      m_shadowQuality(ShadowLow),
       m_tickCount(0),
       m_tickStep(0),
       m_tickMinimum(0.0f)
 {
-    m_theme.useColorTheme(ThemeSystem);
 }
 
 Bars3dController::~Bars3dController()
 {
     delete m_dataSet;
-    delete m_cameraHelper;
 }
 
 void Bars3dController::initializeOpenGL()
@@ -251,15 +241,6 @@ void Bars3dController::wheelEvent(QWheelEvent *event)
         m_zoomLevel = 10;
 }
 
-int Bars3dController::zoomLevel()
-{
-    return m_zoomLevel;
-}
-
-void Bars3dController::setZoomLevel(int zoomLevel)
-{
-    m_zoomLevel = zoomLevel;
-}
 
 void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
@@ -354,43 +335,6 @@ void Bars3dController::setupSampleSpace(int columnCount, int rowCount, const QSt
     emit sampleSpaceChanged(columnCount, rowCount);
 }
 
-void Bars3dController::setCameraPreset(CameraPreset preset)
-{
-    m_cameraHelper->setCameraPreset(preset);
-}
-
-void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
-{
-    m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
-    m_verticalRotation = qBound(0.0f, vertical, 90.0f);
-    m_zoomLevel = qBound(10, distance, 500);
-    m_cameraHelper->setCameraRotation(QPointF(m_horizontalRotation,
-                                              m_verticalRotation));
-    //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
-}
-
-void Bars3dController::setColorTheme(ColorTheme colorTheme)
-{
-    m_theme.useColorTheme(colorTheme);
-    emit themeChanged(m_theme);
-}
-
-Theme Bars3dController::theme()
-{
-    return m_theme;
-}
-
-
-void Bars3dController::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                   bool uniform)
-{
-    m_theme.m_baseColor = baseColor;
-    m_theme.m_heightColor = heightColor;
-    m_theme.m_depthColor = depthColor;
-    m_theme.m_uniformColor = uniform;
-
-    emit barColorsChanged(baseColor, heightColor, depthColor, uniform);
-}
 
 void Bars3dController::setSelectionMode(SelectionMode mode)
 {
@@ -432,17 +376,6 @@ QFont Bars3dController::font()
     return m_font;
 }
 
-void Bars3dController::setLabelTransparency(LabelTransparency transparency)
-{
-    m_labelTransparency = transparency;
-    emit labelTransparencyUpdated(m_labelTransparency);
-}
-
-LabelTransparency Bars3dController::labelTransparency()
-{
-    return m_labelTransparency;
-}
-
 void Bars3dController::setGridEnabled(bool enable)
 {
     m_isGridEnabled = enable;
@@ -463,17 +396,6 @@ void Bars3dController::setBackgroundEnabled(bool enable)
 bool Bars3dController::backgroundEnabled()
 {
     return m_isBackgroundEnabled;
-}
-
-void Bars3dController::setShadowQuality(ShadowQuality quality)
-{
-    m_shadowQuality = quality;
-    emit shadowQualityChanged(m_shadowQuality);
-}
-
-ShadowQuality Bars3dController::shadowQuality()
-{
-    return m_shadowQuality;
 }
 
 void Bars3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
@@ -648,74 +570,4 @@ void Bars3dController::addDataSet(QDataSet* dataSet)
     emit dataSetChanged(m_dataSet->d_ptr.data());
 }
 
-void Bars3dController::setSize(const int width, const int height)
-{
-    m_boundingRect.setWidth(width);
-    m_boundingRect.setHeight(height);
-
-    //qDebug() << "Bars3dController::setSize " << m_boundingRect.width() << "x" <<m_boundingRect.height();
-    emit boundingRectChanged(m_boundingRect);
-}
-
-const QSize Bars3dController::size()
-{
-    return m_boundingRect.size();
-}
-
-const QRect Bars3dController::boundingRect()
-{
-    return m_boundingRect;
-}
-
-void Bars3dController::setBoundingRect(const QRect boundingRect)
-{
-    m_boundingRect = boundingRect;
-
-    //qDebug() << "Bars3dController::setBoundingRect " << m_boundingRect.width() << "x" <<m_boundingRect.height();
-    emit boundingRectChanged(m_boundingRect);
-}
-
-void Bars3dController::setWidth(const int width)
-{
-    m_boundingRect.setWidth(width);
-    emit sizeChanged(m_boundingRect);
-}
-
-int Bars3dController::width()
-{
-    return m_boundingRect.width();
-}
-
-void Bars3dController::setHeight(const int height)
-{
-    m_boundingRect.setHeight(height);
-    emit sizeChanged(m_boundingRect);
-}
-
-int Bars3dController::height()
-{
-    return m_boundingRect.height();
-}
-
-void Bars3dController::setX(const int x)
-{
-    m_boundingRect.setX(x);
-    emit positionChanged(m_boundingRect);
-}
-
-int Bars3dController::x()
-{
-    return m_boundingRect.x();
-}
-
-void Bars3dController::setY(const int y)
-{
-    m_boundingRect.setY(y);
-    emit positionChanged(m_boundingRect);
-}
-
-int Bars3dController::y()
-{
-    return m_boundingRect.y();
-}
 QT_DATAVIS3D_END_NAMESPACE
