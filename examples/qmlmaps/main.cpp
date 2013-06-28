@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     viewer.addImportPath(QString::fromLatin1("%1/%2").arg(QCoreApplication::applicationDirPath(),
                                                           QString::fromLatin1("qml")));
 #endif
-    viewer.setMainQmlFile(QStringLiteral("qml/qmlmaps/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

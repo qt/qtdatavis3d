@@ -29,7 +29,6 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    qDebug() << "Hello world.";
 
     QtQuick2ApplicationViewer viewer;
 #ifdef Q_OS_ANDROID
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
     viewer.addImportPath(QString::fromLatin1("%1/%2").arg(QCoreApplication::applicationDirPath(),
                                                           QString::fromLatin1("qml")));
 #endif
-    viewer.setMainQmlFile(QStringLiteral("qml/qmlbarchart/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 
