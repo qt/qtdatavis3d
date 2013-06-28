@@ -105,6 +105,8 @@ Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Bars3dController::shadowQualityChanged, this,
+                     &Q3DBars::handleShadowQualityUpdate);
 }
 
 /*!
@@ -120,6 +122,11 @@ Q3DBars::~Q3DBars()
 void Q3DBars::render()
 {
     d_ptr->m_shared->render();
+}
+
+void Q3DBars::handleShadowQualityUpdate(ShadowQuality quality)
+{
+    emit shadowQualityChanged(quality);
 }
 
 #if defined(Q_OS_ANDROID)
@@ -285,7 +292,7 @@ void Q3DBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint dist
  */
 void Q3DBars::setTheme(ColorTheme theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    d_ptr->m_shared->setColorTheme(theme);
 }
 
 /*!
@@ -444,12 +451,10 @@ bool Q3DBars::isBackgroundVisible()
  *
  * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
  *
- * \return ShadowQuality that was successfully set.
- *
  * Sets shadow quality. If setting ShadowQuality of a certain level fails, a level is lowered
- * until it is successful. The value that was successfully set is returned.
+ * until it is successful and shadowQualityChanged signal is emitted for each time the change is done.
  */
-ShadowQuality Q3DBars::setShadowQuality(ShadowQuality quality)
+void Q3DBars::setShadowQuality(ShadowQuality quality)
 {
     return d_ptr->m_shared->setShadowQuality(quality);
 }

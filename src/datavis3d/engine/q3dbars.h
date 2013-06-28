@@ -174,8 +174,16 @@ public:
     bool isBackgroundVisible();
 
     // Adjust shadow quality
-    ShadowQuality setShadowQuality(ShadowQuality quality);
+    void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
+
+public slots:
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(ShadowQuality quality);
+
+signals:
+    // Signals shadow quality changes.
+    void shadowQualityChanged(ShadowQuality quality);
 
 protected:
     void render();

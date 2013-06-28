@@ -71,9 +71,15 @@ Theme::~Theme()
 {
 }
 
-void Theme::useTheme(ColorTheme theme)
+ColorTheme Theme::colorTheme()
 {
-    switch (theme) {
+    return m_colorTheme;
+}
+
+void Theme::useColorTheme(ColorTheme colorTheme)
+{
+    m_colorTheme = colorTheme;
+    switch (colorTheme) {
     case ThemeSystem: {
 #ifdef Q_OS_WIN
         DWORD colorHighlight;
@@ -293,6 +299,26 @@ void Theme::useTheme(ColorTheme theme)
     default:
         break;
     }
+}
+
+void Theme::setFromTheme(Theme &theme)
+{
+    m_colorTheme = theme.m_colorTheme;
+    m_baseColor = theme.m_baseColor;
+    m_heightColor = theme.m_heightColor;
+    m_depthColor = theme.m_depthColor;
+    m_backgroundColor = theme.m_backgroundColor;
+    m_windowColor = theme.m_windowColor;
+    m_textColor = theme.m_textColor;
+    m_textBackgroundColor = theme.m_textBackgroundColor;
+    m_gridLine = theme.m_gridLine;
+    m_highlightBarColor = theme.m_highlightBarColor;
+    m_highlightRowColor = theme.m_highlightRowColor;
+    m_highlightColumnColor = theme.m_highlightColumnColor;
+    m_lightStrength = theme.m_lightStrength;
+    m_ambientStrength = theme.m_ambientStrength;
+    m_highlightLightStrength = theme.m_highlightLightStrength;
+    m_uniformColor = theme.m_uniformColor;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

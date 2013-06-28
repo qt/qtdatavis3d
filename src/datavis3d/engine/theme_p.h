@@ -65,7 +65,9 @@ public:
     explicit Theme();
     ~Theme();
 
-    void useTheme(ColorTheme theme);
+    void useColorTheme(ColorTheme theme);
+    ColorTheme colorTheme();
+    void setFromTheme(Theme &theme);
 
 private:
     friend class Bars3dRenderer;
@@ -75,6 +77,7 @@ private:
     friend class Surface3dController;
     friend class Drawer;
 
+    ColorTheme m_colorTheme;
     QColor m_baseColor;
     QColor m_heightColor;
     QColor m_depthColor;

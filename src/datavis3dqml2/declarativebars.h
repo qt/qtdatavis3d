@@ -222,6 +222,14 @@ public:
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
+public slots:
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quality);
+
+signals:
+    // Signals shadow quality changes.
+    void shadowQualityChanged(DeclarativeBars::ShadowQuality quality);
+
 protected:
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 

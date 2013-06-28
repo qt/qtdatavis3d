@@ -59,7 +59,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Bars3dController::Bars3dController(QRect boundRect)
     : m_isInitialized(false),
       m_dataSet(new QDataSet()),
-      m_sampleCount(0, 0),
+      m_rowCount(0),
+      m_columnCount(0),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
@@ -68,14 +69,22 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_cameraHelper(new CameraHelper()),
       m_horizontalRotation(-45.0f),
       m_verticalRotation(15.0f),
+      m_isBarSpecRelative(true),
       m_barThickness(QSizeF(0.75f, 0.75f)),
       m_barSpacing(m_barThickness * 3.0f),
-      m_isBarSpecRelative(true),
       m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
-      m_colorTheme(ThemeSystem)
+      m_theme(),
+      m_font(QFont(QStringLiteral("Arial"))),
+      m_labelTransparency(TransparencyFromTheme),
+      m_isGridEnabled(true),
+      m_isBackgroundEnabled(true),
+      m_shadowQuality(ShadowLow),
+      m_tickCount(0),
+      m_tickStep(0),
+      m_tickMinimum(0.0f)
 {
-    emit dataSetChanged(m_dataSet->d_ptr.data());
+    m_theme.useColorTheme(ThemeSystem);
 }
 
 Bars3dController::~Bars3dController()
@@ -93,8 +102,6 @@ void Bars3dController::initializeOpenGL()
     m_renderer = new Bars3dRenderer(this);
     m_isInitialized = true;
 }
-
-
 
 void Bars3dController::render(const GLuint defaultFboHandle)
 {
@@ -290,7 +297,6 @@ QPair<GLfloat, GLfloat> Bars3dController::limits()
     return qMakePair(0.f, 0.f);
 }
 
-
 void Bars3dController::setBarType(BarStyle style, bool smooth)
 {
     if (style == Bars) {
@@ -330,7 +336,7 @@ void Bars3dController::setMeshFileName(const QString &objFileName)
     emit objFileChanged(m_objFile);
 }
 
-void Bars3dController::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
+void Bars3dController::setupSampleSpace(int columnCount, int rowCount, const QString &labelRow,
                                         const QString &labelColumn, const QString &labelHeight)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
@@ -341,10 +347,11 @@ void Bars3dController::setupSampleSpace(int samplesRow, int samplesColumn, const
     m_dataSet = new QDataSet();
     emit dataSetChanged(m_dataSet->d_ptr.data());
 
-    m_sampleCount = qMakePair(samplesRow, samplesColumn);
+    m_rowCount = rowCount;
+    m_columnCount = columnCount;
     m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
 
-    emit sampleSpaceChanged(samplesRow, samplesColumn);
+    emit sampleSpaceChanged(columnCount, rowCount);
 }
 
 void Bars3dController::setCameraPreset(CameraPreset preset)
@@ -362,21 +369,27 @@ void Bars3dController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
-void Bars3dController::setTheme(ColorTheme theme)
+void Bars3dController::setColorTheme(ColorTheme colorTheme)
 {
-    m_colorTheme = theme;
-    emit colorThemeChanged(theme);
+    m_theme.useColorTheme(colorTheme);
+    emit themeChanged(m_theme);
 }
 
-ColorTheme Bars3dController::colorTheme()
+Theme Bars3dController::theme()
 {
-    return m_colorTheme;
+    return m_theme;
 }
+
 
 void Bars3dController::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                                    bool uniform)
 {
-    m_renderer->setBarColor(baseColor, heightColor, depthColor, uniform);
+    m_theme.m_baseColor = baseColor;
+    m_theme.m_heightColor = heightColor;
+    m_theme.m_depthColor = depthColor;
+    m_theme.m_uniformColor = uniform;
+
+    emit barColorsChanged(baseColor, heightColor, depthColor, uniform);
 }
 
 void Bars3dController::setSelectionMode(SelectionMode mode)
@@ -399,77 +412,86 @@ SelectionMode Bars3dController::selectionMode()
 
 void Bars3dController::setFontSize(float fontsize)
 {
-    m_renderer->setFontSize(fontsize);
+    m_font.setPointSizeF(fontsize);
+    emit fontChanged(m_font);
 }
 
 float Bars3dController::fontSize()
 {
-    return m_renderer->fontSize();
+    return m_font.pointSizeF();
 }
 
 void Bars3dController::setFont(const QFont &font)
 {
-    m_renderer->setFont(font);
+    m_font = font;
+    emit fontChanged(m_font);
 }
 
 QFont Bars3dController::font()
 {
-    return m_renderer->font();
+    return m_font;
 }
 
 void Bars3dController::setLabelTransparency(LabelTransparency transparency)
 {
-    m_renderer->setLabelTransparency(transparency);
+    m_labelTransparency = transparency;
+    emit labelTransparencyUpdated(m_labelTransparency);
 }
 
 LabelTransparency Bars3dController::labelTransparency()
 {
-    return m_renderer->labelTransparency();
+    return m_labelTransparency;
 }
 
 void Bars3dController::setGridEnabled(bool enable)
 {
-    m_renderer->setGridEnabled(enable);
+    m_isGridEnabled = enable;
+    emit gridEnabledChanged(m_isGridEnabled);
 }
 
 bool Bars3dController::gridEnabled()
 {
-    return m_renderer->gridEnabled();
+    return m_isGridEnabled;
 }
 
 void Bars3dController::setBackgroundEnabled(bool enable)
 {
-    m_renderer->setBackgroundEnabled(enable);
+    m_isBackgroundEnabled = enable;
+    emit backgroundEnabledChanged(m_isBackgroundEnabled);
 }
 
 bool Bars3dController::backgroundEnabled()
 {
-    return m_renderer->backgroundEnabled();
+    return m_isBackgroundEnabled;
 }
 
-ShadowQuality Bars3dController::setShadowQuality(ShadowQuality quality)
+void Bars3dController::setShadowQuality(ShadowQuality quality)
 {
-    return m_renderer->setShadowQuality(quality);
+    m_shadowQuality = quality;
+    emit shadowQualityChanged(m_shadowQuality);
 }
 
 ShadowQuality Bars3dController::shadowQuality()
 {
-    return m_renderer->shadowQuality();
+    return m_shadowQuality;
 }
 
 void Bars3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
-    m_renderer->setTickCount(tickCount, step, minimum);
+    m_tickCount   = tickCount;
+    m_tickStep    = step;
+    m_tickMinimum = minimum;
+    emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
 }
 
 int Bars3dController::columnCount()
 {
-    return m_sampleCount.first;
+    return m_columnCount;
 }
 
 int Bars3dController::rowCount()
 {
-    return m_sampleCount.second;
+    return m_rowCount;
 }
 
 void Bars3dController::handleLimitChange()
@@ -493,14 +515,14 @@ void Bars3dController::addDataRow(const QVector<float> &dataRow, const QString &
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(new QDataItem(dataRow.at(i)));
-    row->d_ptr->verifySize(m_sampleCount.first);
+    row->d_ptr->verifySize(m_columnCount);
     m_dataSet->addRow(row);
     handleLimitChange();
 
     // TODO: Separate axis labels from data
     m_dataSet->setLabels(xAxis, zAxis, yAxis,
                          QVector<QString>(), labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
+    m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
 void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
@@ -516,25 +538,25 @@ void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow, const QStr
     QDataRow *row = new QDataRow(labelRow);
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(dataRow.at(i));
-    row->d_ptr->verifySize(m_sampleCount.first);
+    row->d_ptr->verifySize(m_columnCount);
     m_dataSet->addRow(row);
     handleLimitChange();
 
     // TODO: Separate axis labels from data
     m_dataSet->setLabels(xAxis, zAxis, yAxis,
                          QVector<QString>(), labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
+    m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
 void Bars3dController::addDataRow(QDataRow *dataRow)
 {
     // Check that the input data fits into sample space, and resize if it doesn't
-    dataRow->d_ptr->verifySize(m_sampleCount.first);
+    dataRow->d_ptr->verifySize(m_columnCount);
     // With each new row, the previous data row must be moved back
     // ie. we need as many vectors as we have rows in the sample space
     m_dataSet->addRow(dataRow);
     // if the added data pushed us over sample space, remove the oldest data set
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
+    m_dataSet->d_ptr->verifySize(m_rowCount);
     handleLimitChange();
 }
 
@@ -564,13 +586,13 @@ void Bars3dController::addDataSet(const QVector< QVector<float> > &data,
             row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
-        row->d_ptr->verifySize(m_sampleCount.first);
+        row->d_ptr->verifySize(m_columnCount);
         m_dataSet->addRow(row);
         row++;
     }
     handleLimitChange();
     m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
+    m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
 void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
@@ -600,13 +622,13 @@ void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
             row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(data.at(rowNr).at(colNr));
-        row->d_ptr->verifySize(m_sampleCount.first);
+        row->d_ptr->verifySize(m_columnCount);
         m_dataSet->addRow(row);
         row++;
     }
     handleLimitChange();
     m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
-    m_dataSet->d_ptr->verifySize(m_sampleCount.second);
+    m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
 void Bars3dController::addDataSet(QDataSet* dataSet)
@@ -615,7 +637,7 @@ void Bars3dController::addDataSet(QDataSet* dataSet)
     setSlicingActive(false);
 
     // Check sizes
-    dataSet->d_ptr->verifySize(m_sampleCount.second, m_sampleCount.first);
+    dataSet->d_ptr->verifySize(m_rowCount, m_columnCount);
 
     // Delete old data set
     delete m_dataSet;
@@ -628,12 +650,16 @@ void Bars3dController::addDataSet(QDataSet* dataSet)
 
 void Bars3dController::setSize(const int width, const int height)
 {
-    m_renderer->setSize(width, height);
+    m_boundingRect.setWidth(width);
+    m_boundingRect.setHeight(height);
+
+    //qDebug() << "Bars3dController::setSize " << m_boundingRect.width() << "x" <<m_boundingRect.height();
+    emit boundingRectChanged(m_boundingRect);
 }
 
 const QSize Bars3dController::size()
 {
-    return m_renderer->size();
+    return m_boundingRect.size();
 }
 
 const QRect Bars3dController::boundingRect()
@@ -644,53 +670,52 @@ const QRect Bars3dController::boundingRect()
 void Bars3dController::setBoundingRect(const QRect boundingRect)
 {
     m_boundingRect = boundingRect;
+
+    //qDebug() << "Bars3dController::setBoundingRect " << m_boundingRect.width() << "x" <<m_boundingRect.height();
     emit boundingRectChanged(m_boundingRect);
 }
 
 void Bars3dController::setWidth(const int width)
 {
-    m_renderer->setWidth(width);
+    m_boundingRect.setWidth(width);
+    emit sizeChanged(m_boundingRect);
 }
 
 int Bars3dController::width()
 {
-    return m_renderer->width();
+    return m_boundingRect.width();
 }
 
 void Bars3dController::setHeight(const int height)
 {
-    m_renderer->setHeight(height);
+    m_boundingRect.setHeight(height);
+    emit sizeChanged(m_boundingRect);
 }
 
 int Bars3dController::height()
 {
-    return m_renderer->height();
+    return m_boundingRect.height();
 }
 
 void Bars3dController::setX(const int x)
 {
-    m_renderer->setX(x);
+    m_boundingRect.setX(x);
+    emit positionChanged(m_boundingRect);
 }
 
 int Bars3dController::x()
 {
-    return m_renderer->x();
+    return m_boundingRect.x();
 }
 
 void Bars3dController::setY(const int y)
 {
-    m_renderer->setY(y);
+    m_boundingRect.setY(y);
+    emit positionChanged(m_boundingRect);
 }
 
 int Bars3dController::y()
 {
-    return m_renderer->y();
+    return m_boundingRect.y();
 }
-
-void Bars3dController::updateTextures()
-{
-    // Drawer has changed; this flag needs to be checked when checking if we need to update labels
-    m_renderer->updateTextures();
-}
-
 QT_DATAVIS3D_END_NAMESPACE

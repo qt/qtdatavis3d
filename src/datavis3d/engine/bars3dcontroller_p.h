@@ -101,7 +101,8 @@ private:
 
     // Data
     QDataSet *m_dataSet;
-    QPair<int, int> m_sampleCount;
+    int m_rowCount;
+    int m_columnCount;
 
     // Interaction
     MouseState m_mouseState;
@@ -122,7 +123,15 @@ private:
 
     // Look'n'Feel
     QString m_objFile;
-    ColorTheme m_colorTheme;
+    Theme m_theme;
+    QFont m_font;
+    LabelTransparency m_labelTransparency;
+    bool m_isGridEnabled;
+    bool m_isBackgroundEnabled;
+    ShadowQuality m_shadowQuality;
+    GLint m_tickCount;
+    GLfloat m_tickStep;
+    GLfloat m_tickMinimum;
 
     Bars3dRenderer *m_renderer;
 
@@ -204,20 +213,20 @@ public:
     // percentage (10...500))
     void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
-    void setTheme(ColorTheme theme);
-
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                      bool uniform = true);
 
+    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
+    // colors are affected)
+    void setColorTheme(ColorTheme colorTheme);
+    Theme theme();
+
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
     void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
-    ColorTheme colorTheme();
 
     // TODO: light placement API
 
@@ -260,7 +269,7 @@ public:
     bool backgroundEnabled();
 
     // Adjust shadow quality
-    ShadowQuality setShadowQuality(ShadowQuality quality);
+    void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
 #if defined(Q_OS_ANDROID)
@@ -271,7 +280,6 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void updateTextures();
 
 signals:
     void selectionModeChanged(SelectionMode mode);
@@ -283,7 +291,17 @@ signals:
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
     void boundingRectChanged(QRect boundingRect);
-    void colorThemeChanged(ColorTheme theme);
+    void sizeChanged(QRect boundingRect);
+    void positionChanged(QRect boundingRect);
+    void themeChanged(Theme theme);
+    void fontChanged(QFont font);
+    void labelTransparencyUpdated(LabelTransparency transparency);
+    void gridEnabledChanged(bool enable);
+    void backgroundEnabledChanged(bool enable);
+    void shadowQualityChanged(ShadowQuality quality);
+    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
+    void barColorsChanged(QColor baseColor, QColor heightColor, QColor depthColor,
+                         bool uniform);
 
 private:
     void handleLimitChange();

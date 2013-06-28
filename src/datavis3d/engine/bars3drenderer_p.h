@@ -92,27 +92,33 @@ private:
     // * All attribs that are modifiable from QML need to e in this set.
 
     Bars3dController *m_controller;
+
     // Mutex for sharing resources between render and main threads.
     QMutex m_mutex;
-    // Visual parameters
-    QRect m_boundingRect;
-    QString m_objFile;
-    Theme *m_theme;
-    LabelTransparency m_labelTransparency;
-    QFont m_font;
-    bool m_isGridEnabled;
-    bool m_isBackgroundEnabled;
-    ShadowQuality m_shadowQuality;
-    bool m_hasNegativeValues;
 
-    // Data parameters
+    // Cached state based on emitted signals from the controller
+    QSizeF m_cachedBarThickness;
+    QSizeF m_cachedBarSpacing;
+    QString m_cachedObjFile;
+    bool m_cachedIsSlicingActivated;
+    SelectionMode m_cachedSelectionMode;
+    int m_cachedZoomLevel;
+    int m_cachedRowCount;
+    int m_cachedColumnCount;
+    QRect m_cachedBoundingRect;
+    Theme m_cachedTheme;
+    LabelTransparency m_cachedLabelTransparency;
+    QFont m_cachedFont;
+    bool m_cachedIsGridEnabled;
+    bool m_cachedIsBackgroundEnabled;
+    ShadowQuality m_cachedShadowQuality;
+
+    // Internal state
+    bool m_hasNegativeValues;
     QDataItem *m_selectedBar;
     QDataRow *m_sliceSelection;
-
     GLint m_tickCount;
     GLfloat m_tickStep;
-
-    // Internal attributes purely related to how the scene is drawn with GL.
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
@@ -137,11 +143,7 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
-
     GLfloat m_autoScaleAdjustment;
-    QSizeF m_barThickness;
-    QSizeF m_barSpacing;
-
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_rowWidth;
@@ -157,14 +159,7 @@ private:
     bool m_isSelectionPointRequestActive;
 
     bool m_hasHeightAdjustmentChanged;
-
-    // Cached state based on emitted signals from the controller
-    SelectionMode m_selectionMode;
-    int m_zoomLevel;
-    bool m_isSlicingActivated;
     QPair<GLfloat,GLfloat> m_limits;
-    int m_rowCount;
-    int m_columnCount;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -180,83 +175,43 @@ public:
                 const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
                 const GLuint defaultFboHandle = 0);
 
-    // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
-    // y -component sets the thickness/spacing of z -direction
-    // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                     QSizeF spacing = QSizeF(1.0f, 1.0f),
-                     bool relative = true);
-
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
-
-    // override bar type with own mesh
-    void setMeshFileName(const QString &objFileName);
-
-
-    // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
-
-    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
-    // percentage (10...500))
-    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
-
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
-    void setColorTheme(ColorTheme colorTheme);
-
-    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
-    // color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                     bool uniform = true);
-
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
-
-    // TODO: light placement API
-
-    // Size
-    void setSize(const int width, const int height);
-    const QSize size();
-    const QRect boundingRect();
-    void setBoundingRect(const QRect boundingRect);
-    void setWidth(const int width);
-    int width();
-    void setHeight(const int height);
-    int height();
-    void setX(const int x);
-    int x();
-    void setY(const int y);
-    int y();
-
     QRect mainViewPort();
 
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
+public slots:
+    void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+                        QSizeF spacing = QSizeF(1.0f, 1.0f),
+                        bool relative = true);
+    void updateTheme(Theme theme);
+    void updateSelectionMode(SelectionMode newMode);
+    void updateSlicingActive(bool isSlicing);
+    void updateDataSet(QDataSetPrivate *newDataSet);
+    void updateLimits(QPair<GLfloat, GLfloat> newLimits);
+    void updateSampleSpace(int columnCount, int rowCount);
+    void updateZoomLevel(int newZoomLevel);
+    void updateFont(const QFont &font);
+    void updateLabelTransparency(LabelTransparency transparency);
+    void updateGridEnabled(bool enable);
+    void updateBackgroundEnabled(bool enable);
+    void updateShadowQuality(ShadowQuality quality);
+    void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void updateMeshFileName(const QString &objFileName);
+    void updateBoundingRect(const QRect boundingRect);
+    void updatePosition(const QRect boundingRect);
 
-    // Set font
-    void setFont(const QFont &font);
-    QFont font();
+    // Requests that upon next render pass the column and row under the given point is inspected for selection.
+    // Only one request can be queued per render pass at this point. New request will override any pending requests.
+    // After inspection the selectionUpdated signal is emitted.
+    void requestSelectionAtPoint(const QPoint &point);
 
-    // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+signals:
+    void selectionUpdated(QVector3D selection);
 
-    // Enable or disable background grid
-    void setGridEnabled(bool enable);
-    bool gridEnabled();
-
-    // Enable or disable background mesh
-    void setBackgroundEnabled(bool enable);
-    bool backgroundEnabled();
-
-    // Adjust shadow quality
-    ShadowQuality setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+private:
+    void initializeOpenGL();
+    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera,
+                         const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
+    void handleResize();
 
     void loadBarMesh();
     void loadBackgroundMesh();
@@ -275,29 +230,6 @@ public:
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     Bars3dController::SelectionType isSelected(GLint row, GLint bar);
-
-public slots:
-    void updateSelectionMode(SelectionMode newMode);
-    void updateSlicingActive(bool isSlicing);
-    void updateDataSet(QDataSetPrivate *newDataSet);
-    void updateLimits(QPair<GLfloat, GLfloat> newLimits);
-    void updateSampleSpace(int columnCount, int rowCount);
-    void updateZoomLevel(int newZoomLevel);
-
-    // Requests that upon next render pass the column and row under the given point is inspected for selection.
-    // Only one request can be queued per render pass at this point. New request will override any pending requests.
-    // After inspection the selectionUpdated signal is emitted.
-    void inspectSelectionAtPoint(const QPoint &point);
-
-signals:
-    void selectionUpdated(QVector3D selection);
-
-private:
-    void initializeOpenGL();
-    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera,
-                         const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
-    void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
-    void handleResize();
 
     Q_DISABLE_COPY(Bars3dRenderer)
 };

@@ -253,6 +253,25 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
+void ChartModifier::shadowQualityUpdatedByVisual(ShadowQuality sq)
+{
+    int quality = 0;
+    switch (sq) {
+    case ShadowLow:
+        quality = 1;
+        break;
+    case ShadowMedium:
+        quality = 2;
+        break;
+    case ShadowHigh:
+        quality = 3;
+        break;
+    }
+
+    // Updates the UI component to show correct shadow quality
+    emit shadowQualityChanged(quality);
+}
+
 void ChartModifier::changeShadowQuality(int quality)
 {
     ShadowQuality sq = ShadowNone;
@@ -267,22 +286,8 @@ void ChartModifier::changeShadowQuality(int quality)
         sq = ShadowHigh;
         break;
     }
-    ShadowQuality realquality = m_chart->setShadowQuality(sq);
-    // Check if it setting quality was successful
-    if (realquality != sq) {
-        switch (realquality) {
-        case ShadowLow:
-            quality = 1;
-            break;
-        case ShadowMedium:
-            quality = 2;
-            break;
-        case ShadowHigh:
-            quality = 3;
-            break;
-        }
-        emit shadowQuality(quality);
-    }
+    m_chart->setShadowQuality(sq);
+    emit shadowQualityChanged(quality);
 }
 
 void ChartModifier::setBackgroundEnabled(int enabled)

@@ -1229,9 +1229,9 @@ void Maps3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
-void Maps3DController::setTheme(ColorTheme theme)
+void Maps3DController::setTheme(ColorTheme colorTheme)
 {
-    m_theme->useTheme(theme);
+    m_theme->useColorTheme(colorTheme);
     m_drawer->setTheme(*m_theme);
 #if !defined(QT_OPENGL_ES_2)
     if (m_shadowQuality > ShadowNone) {

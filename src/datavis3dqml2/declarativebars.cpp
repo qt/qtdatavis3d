@@ -69,12 +69,20 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3dController(boundingRect().toRect());
+    QObject::connect(m_shared, &Bars3dController::shadowQualityChanged, this,
+                     &DeclarativeBars::handleShadowQualityUpdate);
 }
 
 DeclarativeBars::~DeclarativeBars()
 {
     delete m_shared;
 }
+
+void DeclarativeBars::handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quality)
+{
+    emit shadowQualityChanged(DeclarativeBars::ShadowQuality(quality));
+}
+
 
 void DeclarativeBars::classBegin()
 {
@@ -185,7 +193,7 @@ void DeclarativeBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GL
 
 void DeclarativeBars::setTheme(ColorTheme theme)
 {
-    m_shared->setTheme(theme);
+    m_shared->setColorTheme(theme);
 }
 
 void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
@@ -497,7 +505,6 @@ void DeclarativeBarsRenderer::render()
     // New view is in the FBO, request repaint of scene graph
     m_window->update();
 }
-
 
 DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
     m_isSampleSpaceSet(false),
