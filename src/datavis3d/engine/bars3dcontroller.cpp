@@ -46,6 +46,9 @@
 #include "qdatarow_p.h"
 #include "qdataset_p.h"
 #include "utils_p.h"
+#include "qabstractaxis_p.h"
+#include "qvalueaxis.h"
+#include "qcategoryaxis.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -74,8 +77,13 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_isBackgroundEnabled(true),
       m_tickCount(0),
       m_tickStep(0),
-      m_tickMinimum(0.0f)
+      m_tickMinimum(0.0f),
+      m_renderer(0)
 {
+    // Default axes. Only Y axis can actually be changed by user.
+    setAxisX(new QCategoryAxis());
+    setAxisY(new QValueAxis());
+    setAxisZ(new QCategoryAxis());
 }
 
 Bars3dController::~Bars3dController()
@@ -90,6 +98,12 @@ void Bars3dController::initializeOpenGL()
         return;
 
     m_renderer = new Bars3dRenderer(this);
+    if (m_axisX)
+        m_axisX->d_ptr->setDrawer(m_renderer->drawer());
+    if (m_axisY)
+        m_axisY->d_ptr->setDrawer(m_renderer->drawer());
+    if (m_axisZ)
+        m_axisZ->d_ptr->setDrawer(m_renderer->drawer());
     m_isInitialized = true;
 }
 
@@ -98,12 +112,7 @@ void Bars3dController::render(const GLuint defaultFboHandle)
     if (!m_isInitialized)
         return;
 
-    LabelItem x;
-    LabelItem z;
-    LabelItem y;
-    m_dataSet->d_ptr->axisLabelItems(&x, &z, &y);
-
-    m_renderer->render(m_dataSet->d_ptr.data(), m_cameraHelper, x, y, z, defaultFboHandle);
+    m_renderer->render(m_dataSet->d_ptr.data(), m_cameraHelper, m_axisX->d_ptr->titleItem(), m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
 }
 
 QMatrix4x4 Bars3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
@@ -241,6 +250,15 @@ void Bars3dController::wheelEvent(QWheelEvent *event)
         m_zoomLevel = 10;
 }
 
+// TODO: abstract renderer should have accessor for Drawer instead
+Drawer *Bars3dController::drawer()
+{
+    if (m_renderer)
+        return m_renderer->drawer();
+    else
+        return 0;
+}
+
 
 void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
@@ -317,8 +335,7 @@ void Bars3dController::setMeshFileName(const QString &objFileName)
     emit objFileChanged(m_objFile);
 }
 
-void Bars3dController::setupSampleSpace(int columnCount, int rowCount, const QString &labelRow,
-                                        const QString &labelColumn, const QString &labelHeight)
+void Bars3dController::setupSampleSpace(int columnCount, int rowCount)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);
@@ -330,7 +347,6 @@ void Bars3dController::setupSampleSpace(int columnCount, int rowCount, const QSt
 
     m_rowCount = rowCount;
     m_columnCount = columnCount;
-    m_dataSet->setLabels(labelRow, labelColumn, labelHeight);
 
     emit sampleSpaceChanged(columnCount, rowCount);
 }
@@ -424,49 +440,29 @@ void Bars3dController::handleLimitChange()
     emit limitsChanged(limits);
 }
 
-void Bars3dController::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                                  const QVector<QString> &labelsColumn)
+void Bars3dController::addDataRow(const QVector<float> &dataRow)
 {
-    // Copy axis labels. TODO: Separate axis labels from data
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
-
     // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow(labelRow);
+    QDataRow *row = new QDataRow();
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(new QDataItem(dataRow.at(i)));
     row->d_ptr->verifySize(m_columnCount);
     m_dataSet->addRow(row);
     handleLimitChange();
 
-    // TODO: Separate axis labels from data
-    m_dataSet->setLabels(xAxis, zAxis, yAxis,
-                         QVector<QString>(), labelsColumn);
     m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
-void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                                  const QVector<QString> &labelsColumn)
+void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow)
 {
-    // Copy axis labels
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
-
     // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow(labelRow);
+    QDataRow *row = new QDataRow();
     for (int i = 0; i < dataRow.size(); i++)
         row->addItem(dataRow.at(i));
     row->d_ptr->verifySize(m_columnCount);
     m_dataSet->addRow(row);
     handleLimitChange();
 
-    // TODO: Separate axis labels from data
-    m_dataSet->setLabels(xAxis, zAxis, yAxis,
-                         QVector<QString>(), labelsColumn);
     m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
@@ -482,16 +478,8 @@ void Bars3dController::addDataRow(QDataRow *dataRow)
     handleLimitChange();
 }
 
-void Bars3dController::addDataSet(const QVector< QVector<float> > &data,
-                                  const QVector<QString> &labelsRow,
-                                  const QVector<QString> &labelsColumn)
+void Bars3dController::addDataSet(const QVector< QVector<float> > &data)
 {
-    // Copy axis labels
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
-
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);
     // Delete old data set
@@ -502,10 +490,7 @@ void Bars3dController::addDataSet(const QVector< QVector<float> > &data,
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1))
-            row = new QDataRow(labelsRow.at(rowNr));
-        else
-            row = new QDataRow();
+        row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
         row->d_ptr->verifySize(m_columnCount);
@@ -513,22 +498,13 @@ void Bars3dController::addDataSet(const QVector< QVector<float> > &data,
         row++;
     }
     handleLimitChange();
-    m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 
-void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                  const QVector<QString> &labelsRow,
-                                  const QVector<QString> &labelsColumn)
+void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);
-
-    // Copy axis labels
-    QString xAxis;
-    QString zAxis;
-    QString yAxis;
-    m_dataSet->d_ptr->axisLabels(&xAxis, &zAxis, &yAxis);
 
     // Delete old data set
     delete m_dataSet;
@@ -538,10 +514,7 @@ void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
     // Convert to QDataRow and add to QDataSet
     QDataRow *row;
     for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        if (labelsRow.size() >= (rowNr + 1))
-            row = new QDataRow(labelsRow.at(rowNr));
-        else
-            row = new QDataRow();
+        row = new QDataRow();
         for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
             row->addItem(data.at(rowNr).at(colNr));
         row->d_ptr->verifySize(m_columnCount);
@@ -549,7 +522,6 @@ void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data,
         row++;
     }
     handleLimitChange();
-    m_dataSet->setLabels(xAxis, zAxis, yAxis, labelsRow, labelsColumn);
     m_dataSet->d_ptr->verifySize(m_rowCount);
 }
 

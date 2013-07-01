@@ -239,22 +239,14 @@ void Q3DBars::setBarType(BarStyle style, bool smooth)
  *
  * \a samplesColumn How many items there are per row.
  *
- * \a labelRow QString label for the rows, ie. x -axis label.
- *
- * \a labelColumn QString label for the columns, ie. z -axis label.
- *
- * \a labelHeight QString label for height, ie. y -axis label.
- *
  * Set up sample space. This must be called to initialize the sample space before adding data to the
  * Q3DBars.
  *
  * \sa addDataRow(), addDataSet()
  */
-void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                               const QString &labelColumn, const QString &labelHeight)
+void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn)
 {
-    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn, labelRow, labelColumn,
-                                      labelHeight);
+    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
 }
 
 /*!
@@ -464,6 +456,28 @@ ShadowQuality Q3DBars::shadowQuality()
     return d_ptr->m_shared->shadowQuality();
 }
 
+QCategoryAxis *Q3DBars::rowAxis()
+{
+    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
+}
+
+QCategoryAxis *Q3DBars::columnAxis()
+{
+    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
+}
+
+void Q3DBars::setValueAxis(QAbstractAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisY(axis);
+}
+
+QAbstractAxis *Q3DBars::valueAxis()
+{
+    return d_ptr->m_shared->axisY();
+}
+
 /*!
  * \a tickCount How many ticks will be drawn. \c 5 by default.
  *
@@ -484,34 +498,24 @@ void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
  * \a dataRow A vector of floats representing a single row of data. Sample space must be large
  * enough to hold the row.
  *
- * \a labelRow A QString label for the row.
- *
- * \a labelsColumn A vector of strings, one for each item in the row.
- *
  * Add a row of data. Each new row is added to the front of the sample space, moving previous
  * rows back (if sample space is more than one row deep).
  */
-void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::addDataRow(const QVector<float> &dataRow)
 {
-    d_ptr->m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    d_ptr->m_shared->addDataRow(dataRow);
 }
 
 /*!
  * \a dataRow A vector of QDataItems representing a single row of data. Sample space must be
  * large enough to hold the row. Ownership of QDataItems is transferred to Q3DBars.
  *
- * \a labelRow A QString label for the row.
- *
- * \a labelsColumn A vector of strings, one for each item in the row.
- *
  * Add a row of data. Each new row is added to the front of the sample space, moving previous
  * rows back (if sample space is more than one row deep).
  */
-void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow)
 {
-    d_ptr->m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    d_ptr->m_shared->addDataRow(dataRow);
 }
 
 /*!
@@ -530,35 +534,24 @@ void Q3DBars::addDataRow(QDataRow *dataRow)
  * \a data A vector of vector of floats representing the whole data set. Sample space must be
  * large enough to hold the set.
  *
- * \a labelsRow A vector of strings, one for each column in the row.
- *
- * \a labelsColumn A vector of strings, one for each row in the column.
- *
  * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
  * new one.
  */
-void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
 {
-    d_ptr->m_shared->addDataSet(data, labelsRow, labelsColumn);
+    d_ptr->m_shared->addDataSet(data);
 }
 
 /*!
  * \a data A vector of vector of QDataItems representing the whole data set. Sample space must
  * be large enough to hold the set. Ownership of QDataItems is transferred to Q3DBars.
  *
- * \a labelsRow A vector of strings, one for each column in the row.
- *
- * \a labelsColumn A vector of strings, one for each row in the column.
- *
  * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
  * new one.
  */
-void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                         const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data)
 {
-    d_ptr->m_shared->addDataSet(data, labelsRow, labelsColumn);
+    d_ptr->m_shared->addDataSet(data);
 }
 
 /*!

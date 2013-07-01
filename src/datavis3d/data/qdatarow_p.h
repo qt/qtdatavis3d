@@ -54,9 +54,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "qdatarow.h"
-#include "labelitem_p.h"
 #include <QVector>
-#include <QString>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -65,7 +63,7 @@ class QDataItem;
 class QT_DATAVIS3D_EXPORT QDataRowPrivate
 {
 public:
-    explicit QDataRowPrivate(QDataRow *q, const QString &label = QString());
+    explicit QDataRowPrivate(QDataRow *q);
     ~QDataRowPrivate();
 
     QVector<QDataItem*> row();
@@ -74,15 +72,10 @@ public:
     QDataItem *getItem(int itemIndex);
     void verifySize(int size);
     QPair<GLfloat, GLfloat> limitValues();
-    QString label();
-    void setLabelItem(const LabelItem &item);
-    LabelItem labelItem();
 
 private:
     QDataRow *q_ptr;
     QVector<QDataItem*> m_row;
-    QString m_label;
-    LabelItem m_labelItem;
     friend class QDataRow;
 };
 

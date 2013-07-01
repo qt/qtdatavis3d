@@ -59,7 +59,7 @@ QString QAbstractAxis::title() const
     return d_ptr->m_title;
 }
 
-QVector<QString> QAbstractAxis::labels() const
+QVector<QString> &QAbstractAxis::labels() const
 {
     return d_ptr->m_labels;
 }
@@ -106,8 +106,10 @@ QAbstractAxisPrivate::~QAbstractAxisPrivate()
 void QAbstractAxisPrivate::setDrawer(Drawer *drawer)
 {
     m_drawer = drawer;
-    connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
-    updateTextures();
+    if (m_drawer) {
+        connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
+        updateTextures();
+    }
 }
 
 void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orientation)

@@ -101,9 +101,7 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 
     // Check if properites have changed that need to be applied while on the SGRenderThread
     if (m_cachedState->m_isSampleSpaceSet) {
-        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn,
-                                   m_cachedState->m_labelRow, m_cachedState->m_labelColumn,
-                                   m_cachedState->m_labelHeight);
+        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
         m_cachedState->m_isSampleSpaceSet = false;
     }
 

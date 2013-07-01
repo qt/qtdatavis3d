@@ -44,7 +44,6 @@
 
 #include "qdatavis3dnamespace.h"
 #include <QScopedPointer>
-#include <QString>
 #include <QObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -55,14 +54,11 @@ class QDataItem;
 class QT_DATAVIS3D_EXPORT QDataRow : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
 
 public:
-    explicit QDataRow(const QString &label = QString());
+    explicit QDataRow();
     ~QDataRow();
 
-    void setLabel(const QString &label); // label for value, unit for example
-    QString label();
     Q_INVOKABLE void addItem(QDataItem *item);
 
 private:

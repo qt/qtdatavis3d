@@ -54,7 +54,6 @@
 
 #include "datavis3dglobal_p.h"
 #include "qdataset.h"
-#include "qabstractaxis.h"
 #include "drawer_p.h"
 #include "labelitem_p.h"
 #include <QVector>
@@ -70,18 +69,8 @@ public:
     explicit QDataSetPrivate(QDataSet *q);
     ~QDataSetPrivate();
 
-    void setDrawer(Drawer *drawer);
     QVector<QDataRow *> set();
     QDataRow *getRow(int rowIndex);
-
-    // TODO: These functions need to go, these need to be asked from axes directly.
-    // Also, these are called a lot an each call constructs a new vector...
-    QVector<QString> rowLabels();
-    QVector<QString> columnLabels();
-    QVector<LabelItem> rowLabelItems();
-    QVector<LabelItem> columnLabelItems();
-    void axisLabels(QString *xAxis, QString *zAxis, QString *yAxis);
-    void axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem, LabelItem *yAxisItem);
 
     void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
     // first = min, second = max
@@ -90,9 +79,6 @@ public:
 private:
     QDataSet *q_ptr;
     QVector<QDataRow *> m_set;
-    QAbstractAxis *m_axisX;
-    QAbstractAxis *m_axisY;
-    QAbstractAxis *m_axisZ;
 
     friend class QDataSet;
 };

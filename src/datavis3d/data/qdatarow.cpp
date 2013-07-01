@@ -67,8 +67,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  *
  * Constructs QDataRow.
  */
-QDataRow::QDataRow(const QString &label)
-    : d_ptr(new QDataRowPrivate(this, label))
+QDataRow::QDataRow()
+    : d_ptr(new QDataRowPrivate(this))
 {
 }
 
@@ -77,23 +77,6 @@ QDataRow::QDataRow(const QString &label)
  */
 QDataRow::~QDataRow()
 {
-}
-
-/*!
- * \property QDataRow::label
- *
- * \a label A QString label for the row.
- *
- * Sets a label for the row.
- */
-void QDataRow::setLabel(const QString &label)
-{
-    d_ptr->m_label = label;
-}
-
-QString QDataRow::label()
-{
-    return d_ptr->m_label;
 }
 
 /*!
@@ -106,10 +89,8 @@ void QDataRow::addItem(QDataItem *item)
     d_ptr->m_row.prepend(item);
 }
 
-QDataRowPrivate::QDataRowPrivate(QDataRow *q, const QString &label)
-    : q_ptr(q),
-      m_label(label),
-      m_labelItem(LabelItem())
+QDataRowPrivate::QDataRowPrivate(QDataRow *q)
+    : q_ptr(q)
 {
 }
 
@@ -167,21 +148,6 @@ QPair<GLfloat, GLfloat> QDataRowPrivate::limitValues()
             limits.first = itemValue;
     }
     return limits;
-}
-
-QString QDataRowPrivate::label()
-{
-    return m_label;
-}
-
-void QDataRowPrivate::setLabelItem(const LabelItem &item)
-{
-    m_labelItem = item;
-}
-
-LabelItem QDataRowPrivate::labelItem()
-{
-    return m_labelItem;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

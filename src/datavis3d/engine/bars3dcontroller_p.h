@@ -144,25 +144,17 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<GLfloat> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<GLfloat> &dataRow);
     // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<QDataItem*> &dataRow);
     // ownership of dataRow is transferred
     void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<GLfloat> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<GLfloat> > &data);
 
     // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<QDataItem*> > &data);
     // ownership of dataSet is transferred
     void addDataSet(QDataSet* dataSet);
 
@@ -186,10 +178,7 @@ public:
     void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn,
-                          const QString &labelRow = QString(),
-                          const QString &labelColumn = QString(),
-                          const QString &labelHeight = QString());
+    void setupSampleSpace(int samplesRow, int samplesColumn);
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
@@ -218,7 +207,6 @@ public:
     void setBackgroundEnabled(bool enable);
     bool backgroundEnabled();
 
-
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);
@@ -227,6 +215,9 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
+
+    // TODO: abstract renderer should have accessor for Drawer instead
+    virtual Drawer *drawer();
 
 signals:
     void selectionModeChanged(SelectionMode mode);

@@ -39,6 +39,8 @@
 ****************************************************************************/
 
 #include "chart.h"
+#include "qcategoryaxis.h"
+#include "qvalueaxis.h"
 
 using namespace QtDataVis3D;
 
@@ -121,13 +123,16 @@ void ChartModifier::addDataSet()
     QDataSet *dataSet = new QDataSet();
 
     // Add labels
-    dataSet->setLabels("Year", "Month", "Average temperature (" + celsiusString + ")",
-                       years, months);
+    m_chart->rowAxis()->setTitle("Year");
+    m_chart->columnAxis()->setTitle("Month");
+    m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
+    m_chart->rowAxis()->setLabels(years);
+    m_chart->columnAxis()->setLabels(months);
 
     // Create data rows
     QDataRow *dataRow;
     for (int year = 0; year < years.size(); year++) {
-        dataRow = new QDataRow(years.at(year));
+        dataRow = new QDataRow();
         // Create data items
         for (int month = 0; month < months.size(); month++) {
             // Add data to rows

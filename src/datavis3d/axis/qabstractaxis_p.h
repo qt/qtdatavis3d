@@ -66,8 +66,8 @@ public:
     virtual ~QAbstractAxisPrivate();
 
     void setDrawer(Drawer *drawer);
-    QVector<LabelItem> labelItems() { return m_labelItems; }
-    LabelItem titleItem() { return m_titleItem; }
+    QVector<LabelItem> &labelItems() { return m_labelItems; }
+    LabelItem &titleItem() { return m_titleItem; }
     void setOrientation(QAbstractAxis::AxisOrientation orientation);
 
 public slots:
@@ -79,6 +79,8 @@ protected:
     QAbstractAxis *q_ptr;
 
     QString m_title;
+    // TODO: Does m_titleItem/m_drawer/m_labelItems usage need to be protected with render mutex?
+    // TODO: Replace Drawer with AbstractRenderer?
     LabelItem m_titleItem;
     Drawer *m_drawer; // not owned
     QVector<QString> m_labels;
@@ -89,7 +91,6 @@ protected:
     friend class QAbstractAxis;
     friend class QValueAxis;
     friend class QCategoryAxis;
-    friend class QDataSetPrivate;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

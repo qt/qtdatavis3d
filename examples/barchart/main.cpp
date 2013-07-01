@@ -40,6 +40,7 @@
 
 #include "q3dbars.h"
 #include "qdataset.h"
+#include "qcategoryaxis.h"
 
 #include <QGuiApplication>
 #include <QScreen>
@@ -229,12 +230,16 @@ void ChartDataGenerator::addDataSet()
     QDataSet *dataSet = new QDataSet();
 
     // Add labels
-    dataSet->setLabels("Week of year", "Day of week", "Hours playing banjo", weeks, days);
+    m_chart->rowAxis()->setTitle("Week of year");
+    m_chart->columnAxis()->setTitle("Day of week");
+    m_chart->valueAxis()->setTitle("Hours playing banjo");
+    m_chart->rowAxis()->setLabels(weeks);
+    m_chart->columnAxis()->setLabels(days);
 
     // Create data rows
     QDataRow *dataRow;
     for (int week = 0; week < weeks.size(); week++) {
-        dataRow = new QDataRow(weeks.at(week));
+        dataRow = new QDataRow();
         // Create data items
         for (int day = 0; day < days.size(); day++) {
             // Add data to rows

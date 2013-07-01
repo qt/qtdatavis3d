@@ -40,20 +40,23 @@
 ****************************************************************************/
 #include "abstract3dcontroller_p.h"
 #include "camerahelper_p.h"
+#include "qabstractaxis_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     QObject(parent),
     m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
-    m_cameraHelper(new CameraHelper()),
     m_horizontalRotation(-45.0f),
     m_verticalRotation(15.0f),
-    m_zoomLevel(100),
     m_theme(),
     m_shadowQuality(ShadowLow),
-    m_labelTransparency(TransparencyFromTheme)
-
+    m_labelTransparency(TransparencyFromTheme),
+    m_cameraHelper(new CameraHelper()),
+    m_zoomLevel(100),
+    m_axisX(0),
+    m_axisY(0),
+    m_axisZ(0)
 {
     m_theme.useColorTheme(ThemeSystem);
 }
@@ -61,6 +64,9 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
 Abstract3DController::~Abstract3DController()
 {
     delete m_cameraHelper;
+    delete m_axisX;
+    delete m_axisY;
+    delete m_axisZ;
 }
 
 void Abstract3DController::setSize(const int width, const int height)
@@ -132,6 +138,57 @@ void Abstract3DController::setY(const int y)
 int Abstract3DController::y()
 {
     return m_boundingRect.y();
+}
+
+void Abstract3DController::setAxisX(QAbstractAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    delete m_axisX;
+    m_axisX = axis;
+    m_axisX->d_ptr->setOrientation(QAbstractAxis::AxisOrientationX);
+    m_axisX->d_ptr->setDrawer(drawer());
+
+    emit axisChanged(QAbstractAxis::AxisOrientationX, m_axisX);
+}
+
+QAbstractAxis *Abstract3DController::axisX()
+{
+    return m_axisX;
+}
+
+void Abstract3DController::setAxisY(QAbstractAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    delete m_axisY;
+    m_axisY = axis;
+    m_axisY->d_ptr->setOrientation(QAbstractAxis::AxisOrientationY);
+    m_axisY->d_ptr->setDrawer(drawer());
+
+    emit axisChanged(QAbstractAxis::AxisOrientationY, m_axisY);
+}
+
+QAbstractAxis *Abstract3DController::axisY()
+{
+    return m_axisY;
+}
+
+void Abstract3DController::setAxisZ(QAbstractAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    delete m_axisZ;
+    m_axisZ = axis;
+    m_axisZ->d_ptr->setOrientation(QAbstractAxis::AxisOrientationZ);
+    m_axisZ->d_ptr->setDrawer(drawer());
+
+    emit axisChanged(QAbstractAxis::AxisOrientationZ, m_axisZ);
+}
+
+QAbstractAxis *Abstract3DController::axisZ()
+{
+    return m_axisZ;
 }
 
 int Abstract3DController::zoomLevel()

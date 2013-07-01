@@ -44,7 +44,6 @@
 
 #include "qdatavis3dnamespace.h"
 #include "q3dwindow.h"
-
 #include <QFont>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -54,6 +53,8 @@ class QDataItem;
 class QDataRow;
 class QDataSet;
 class LabelItem;
+class QAbstractAxis;
+class QCategoryAxis;
 
 class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -76,25 +77,17 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<float> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<float> &dataRow);
     // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow,
-                    const QString &labelRow = QString(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataRow(const QVector<QDataItem*> &dataRow);
     // ownership of dataRow is transferred
     void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<float> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<float> > &data);
 
     // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                    const QVector<QString> &labelsRow = QVector<QString>(),
-                    const QVector<QString> &labelsColumn = QVector<QString>());
+    void addDataSet(const QVector< QVector<QDataItem*> > &data);
     // ownership of dataSet is transferred
     void addDataSet(QDataSet* dataSet);
 
@@ -109,10 +102,7 @@ public:
     void setBarType(BarStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn,
-                          const QString &labelRow = QString(),
-                          const QString &labelColumn = QString(),
-                          const QString &labelHeight = QString());
+    void setupSampleSpace(int samplesRow, int samplesColumn);
 
     // Select preset camera placement
     void setCameraPreset(CameraPreset preset);
@@ -176,6 +166,13 @@ public:
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
+
+    // Axes - row & column axes are fixed to category axes, value axis can be
+    // customized.
+    QCategoryAxis *rowAxis();
+    QCategoryAxis *columnAxis();
+    void setValueAxis(QAbstractAxis *axis);
+    QAbstractAxis *valueAxis();
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.

@@ -84,33 +84,6 @@ QDataSet::~QDataSet()
 }
 
 /*!
- * \a xAxis A QString label for x axis.
- *
- * \a zAxis A QString label for z axis.
- *
- * \a yAxis A QString label for y axis.
- *
- * \a labelsRow A QVector of QStrings, one for each row.
- *
- * \a labelsColumn A QVector of QStrings, one for each column.
- *
- * Sets labels for the QDataSet.
- */
-void QDataSet::setLabels(const QString &xAxis,
-                         const QString &zAxis,
-                         const QString &yAxis,
-                         const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
-{
-    d_ptr->m_axisX->setTitle(xAxis);
-    d_ptr->m_axisZ->setTitle(zAxis);
-    d_ptr->m_axisY->setTitle(yAxis);
-
-    static_cast<QCategoryAxis *>(d_ptr->m_axisX)->setLabels(labelsRow);
-    static_cast<QCategoryAxis *>(d_ptr->m_axisZ)->setLabels(labelsColumn);
-}
-
-/*!
  * \a row A QDataRow instance.
  *
  * Adds a QDataRow instance to QDataSet. Ownership of the QDataRow instance is transferred to
@@ -123,10 +96,7 @@ void QDataSet::addRow(QDataRow *row)
 
 QDataSetPrivate::QDataSetPrivate(QDataSet *q)
     : q_ptr(q),
-      m_set(QVector<QDataRow*>()),
-      m_axisX(new QCategoryAxis()),
-      m_axisY(new QValueAxis()),
-      m_axisZ(new QCategoryAxis())
+      m_set(QVector<QDataRow*>())
 {
 }
 
@@ -135,13 +105,6 @@ QDataSetPrivate::~QDataSetPrivate()
     for (int itemCount = 0; itemCount < m_set.size(); itemCount++)
         delete m_set.at(itemCount);
     m_set.clear();
-}
-
-void QDataSetPrivate::setDrawer(Drawer *drawer)
-{
-    m_axisX->d_ptr->setDrawer(drawer);
-    m_axisY->d_ptr->setDrawer(drawer);
-    m_axisZ->d_ptr->setDrawer(drawer);
 }
 
 QVector<QDataRow*> QDataSetPrivate::set()
@@ -155,47 +118,6 @@ QDataRow *QDataSetPrivate::getRow(int rowIndex)
     if (m_set.size() > rowIndex)
         row = m_set.at(rowIndex);
     return row;
-}
-
-QVector<QString> QDataSetPrivate::rowLabels()
-{
-    // TODO get rid of this function
-    return m_axisX->labels();
-}
-
-QVector<QString> QDataSetPrivate::columnLabels()
-{
-    // TODO get rid of this function
-    return m_axisZ->labels();
-}
-
-QVector<LabelItem> QDataSetPrivate::rowLabelItems()
-{
-    // TODO get rid of this function
-    return m_axisX->d_ptr->labelItems();
-}
-
-QVector<LabelItem> QDataSetPrivate::columnLabelItems()
-{
-    // TODO get rid of this function
-    return m_axisZ->d_ptr->labelItems();
-}
-
-void QDataSetPrivate::axisLabels(QString *xAxis, QString *zAxis, QString *yAxis)
-{
-    // TODO get rid of this function
-    *xAxis = m_axisX->title();
-    *zAxis = m_axisZ->title();
-    *yAxis = m_axisY->title();
-}
-
-void QDataSetPrivate::axisLabelItems(LabelItem *xAxisItem, LabelItem *zAxisItem,
-                                     LabelItem *yAxisItem)
-{
-    // TODO get rid of this function
-    *xAxisItem = m_axisX->d_ptr->titleItem();
-    *zAxisItem = m_axisZ->d_ptr->titleItem();
-    *yAxisItem = m_axisY->d_ptr->titleItem();
 }
 
 void QDataSetPrivate::verifySize(int colSize, int rowSize)

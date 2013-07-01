@@ -81,6 +81,7 @@ class Theme;
 class Drawer;
 class LabelItem;
 class CameraHelper;
+class QAbstractAxisPrivate;
 
 class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -117,6 +118,8 @@ private:
     bool m_hasNegativeValues;
     QDataItem *m_selectedBar;
     QDataRow *m_sliceSelection;
+    QAbstractAxisPrivate *m_sliceAxisP;
+    int m_sliceIndex;
     GLint m_tickCount;
     GLfloat m_tickStep;
     bool m_xFlipped;
@@ -176,6 +179,8 @@ public:
                 const GLuint defaultFboHandle = 0);
 
     QRect mainViewPort();
+    // TODO: Not thread-safe, needs rethinking how axes create labels
+    Drawer *drawer() { return m_drawer; }
 
 public slots:
     void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
@@ -208,7 +213,7 @@ signals:
 
 private:
     void initializeOpenGL();
-    void drawSlicedScene(QDataSetPrivate *dataSet, CameraHelper *camera,
+    void drawSlicedScene(CameraHelper *camera,
                          const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
     void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();

@@ -40,6 +40,7 @@
 
 #include "q3dbars.h"
 #include "qdataitem.h"
+#include "qcategoryaxis.h"
 
 #include <QGuiApplication>
 #include <QFont>
@@ -72,9 +73,19 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
 
     // Set up sample space; make it match actual data size
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount,
-                              QStringLiteral("year"), QStringLiteral("month"),
-                              QStringLiteral("rainfall (in mm)"));
+    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+
+    // Set axis labels and titles
+    QVector<QString> months;
+    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
+    QVector<QString> years;
+    years << "2000" << "2001" << "2002" << "2003" << "2004" << "2005" << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
+
+    m_chart->rowAxis()->setTitle("Year");
+    m_chart->columnAxis()->setTitle("Month");
+    m_chart->valueAxis()->setTitle("rainfall (in mm)");
+    m_chart->rowAxis()->setLabels(years);
+    m_chart->columnAxis()->setLabels(months);
 
     // Set bar type to cylinder
     m_chart->setBarType(Cylinders, false);
@@ -313,13 +324,8 @@ void RainfallChart::addDataSet()
     row.append(new QDataItem(49, "mm")); //December 2012
     data.append(row);
     row.clear();
-    // Set up row and column names
-    QVector<QString> months;
-    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QVector<QString> years;
-    years << "2000" << "2001" << "2002" << "2003" << "2004" << "2005" << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
-    m_chart->addDataSet(data, years, months);
+    m_chart->addDataSet(data);
 }
 
 int main(int argc, char **argv)

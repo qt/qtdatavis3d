@@ -81,7 +81,7 @@ public:
     virtual ~QAbstractAxis();
 
     QString title() const;
-    QVector<QString> labels() const;
+    QVector<QString> &labels() const;
 
     AxisOrientation orientation() const;
     AxisType type() const;
@@ -98,8 +98,9 @@ protected:
 private:
     Q_DISABLE_COPY(QAbstractAxis)
 
-    friend class QAbstractDataSetPrivate;
-    friend class QDataSetPrivate;
+    friend class Abstract3DController;
+    friend class Bars3dController;
+    friend class Bars3dRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

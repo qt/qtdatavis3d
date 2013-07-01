@@ -56,10 +56,11 @@
 
 #include "datavis3dglobal_p.h"
 #include "theme_p.h"
+#include "qabstractaxis.h"
+#include "drawer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 class CameraHelper;
-
 
 class QT_DATAVIS3D_EXPORT Abstract3DController : public QObject
 {
@@ -76,6 +77,9 @@ private:
 protected:
     CameraHelper *m_cameraHelper;
     int m_zoomLevel;
+    QAbstractAxis *m_axisX;
+    QAbstractAxis *m_axisY;
+    QAbstractAxis *m_axisZ;
 
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
     ~Abstract3DController();
@@ -97,6 +101,12 @@ public:
     virtual int x();
     virtual void setY(const int y);
     virtual int y();
+    virtual void setAxisX(QAbstractAxis *axis);
+    virtual QAbstractAxis *axisX();
+    virtual void setAxisY(QAbstractAxis *axis);
+    virtual QAbstractAxis *axisY();
+    virtual void setAxisZ(QAbstractAxis *axis);
+    virtual QAbstractAxis *axisZ();
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
@@ -127,6 +137,9 @@ public:
     virtual void setLabelTransparency(LabelTransparency transparency);
     virtual LabelTransparency labelTransparency();
 
+    // TODO: abstract renderer should have accessor for Drawer instead
+    virtual Drawer *drawer() = 0;
+
 signals:
     void boundingRectChanged(QRect boundingRect);
     void sizeChanged(QRect boundingRect);
@@ -135,6 +148,7 @@ signals:
     void themeChanged(Theme theme);
     void shadowQualityChanged(ShadowQuality quality);
     void labelTransparencyUpdated(LabelTransparency transparency);
+    void axisChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *newAxis);
 };
 
 QT_DATAVIS3D_END_NAMESPACE
