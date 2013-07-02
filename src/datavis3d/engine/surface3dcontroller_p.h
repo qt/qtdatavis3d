@@ -52,12 +52,14 @@
 #ifndef SURFACE3DCONTROLLER_P_H
 #define SURFACE3DCONTROLLER_P_H
 
+#include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
-#include "surface3drenderer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT Surface3dController : public QObject
+class Surface3dRenderer;
+
+class QT_DATAVIS3D_EXPORT Surface3dController : public Abstract3DController
 {
     Q_OBJECT
 
@@ -74,6 +76,9 @@ public:
     void setWidth(const int width);
     void setHeight(const int height);
 
+    //TODO: Temp solution
+    void setData(QList<qreal> series, int width, int depth);
+
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);
@@ -82,7 +87,14 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void resizeNotify();
+
+    // TODO: abstract renderer should have accessor for Drawer instead
+    virtual Drawer *drawer();
+
+private:
+    QList<qreal> m_series; // TODO: TEMP
+    int m_dataWidth;
+    int m_dataDepth;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

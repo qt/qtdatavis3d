@@ -51,17 +51,11 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Q3DSurface::Q3DSurface()
     : d_ptr(new Q3DSurfacePrivate(this, geometry()))
 {
+    d_ptr->m_shared->initializeOpenGL();
 }
 
 Q3DSurface::~Q3DSurface()
 {
-}
-
-void Q3DSurface::initialize()
-{
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->initializeOpenGL();
 }
 
 void Q3DSurface::render()
@@ -103,7 +97,18 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
     d_ptr->m_shared->setWidth(width());
     d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->resizeNotify();
+}
+
+void Q3DSurface::setWidth(const int width)
+{
+    d_ptr->m_shared->setWidth(width);
+    QWindow::setWidth(width);
+}
+
+void Q3DSurface::setHeight(const int height)
+{
+    d_ptr->m_shared->setHeight(height);
+    QWindow::setHeight(height);
 }
 
 
@@ -111,6 +116,7 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
 void Q3DSurface::appendSeries(QList<qreal> series)
 {
     d_ptr->appendSeries(series);
+    d_ptr->m_shared->setData(series, 9, 5);
 }
 
 void Q3DSurface::showData()
@@ -136,6 +142,7 @@ Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
+    qDebug() << "Q3DSurfacePrivate::~Q3DSurfacePrivate";
 }
 
 void Q3DSurfacePrivate::appendSeries(QList<qreal> series)

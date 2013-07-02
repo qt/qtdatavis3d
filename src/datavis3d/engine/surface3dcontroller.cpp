@@ -49,7 +49,8 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Surface3dController::Surface3dController(QRect rect)
-    : m_renderer(new Surface3dRenderer(rect, this)),
+    : Abstract3DController(rect),
+      m_renderer(0),
       m_isInitialized(false)
 {
 }
@@ -64,7 +65,7 @@ void Surface3dController::initializeOpenGL()
     if (m_isInitialized)
         return;
 
-    m_renderer->initializeOpenGL();
+    m_renderer = new Surface3dRenderer(this);
     m_isInitialized = true;
 }
 
@@ -118,9 +119,25 @@ void Surface3dController::wheelEvent(QWheelEvent *event)
     Q_UNUSED(event)
 }
 
-void Surface3dController::resizeNotify()
+// TODO: abstract renderer should have accessor for Drawer instead
+Drawer *Surface3dController::drawer()
 {
+    if (m_renderer)
+        return m_renderer->drawer();
+    else
+        return 0;
+}
 
+
+// TODO: Temp
+void Surface3dController::setData(QList<qreal> series, int width, int depth)
+{
+    m_series = series;
+    m_dataWidth = width;
+    m_dataDepth = depth;
+
+    m_renderer->setYRangeStuff(5, 50.0f, 0.0f);
+    m_renderer->setXZStuff(width, depth);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

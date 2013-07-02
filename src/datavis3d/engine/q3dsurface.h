@@ -62,8 +62,12 @@ public:
     void showData();
 //END TODO
 
+    // TODO: Do these need to be public? Where are they called from?
+    // Size
+    void setWidth(const int width);
+    void setHeight(const int height);
+
 protected:
-    void initialize();
     void render();
 
 #if defined(Q_OS_ANDROID)

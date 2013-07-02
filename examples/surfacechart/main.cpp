@@ -41,6 +41,7 @@
 #include <Q3DSurface>
 
 #include <QGuiApplication>
+#include <QScreen>
 
 using namespace QtDataVis3D;
 
@@ -67,7 +68,9 @@ int main(int argc, char *argv[])
 //    topList << 2.1 << 2.2;
 //    surfaceChart.appendSeries(topList);
 
-    surfaceChart.showData();
+    QSize screenSize = surfaceChart.screen()->size();
+    surfaceChart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
+    surfaceChart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
     surfaceChart.show();
 
     return a.exec();

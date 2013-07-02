@@ -52,12 +52,14 @@
 #ifndef SURFACE3DRENDERER_P_H
 #define SURFACE3DRENDERER_P_H
 
-#include "datavis3dglobal_p.h"
 #include <QtCore/QSize>
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
 #include <QWindow>
+
+#include "datavis3dglobal_p.h"
+#include "surface3dcontroller_p.h"
 
 class QOpenGLShaderProgram;
 
@@ -65,9 +67,9 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class ObjectHelper;
+class TextureHelper;
 class Theme;
 class Drawer;
-class Surface3dController;
 class CameraHelper;
 
 class QT_DATAVIS3D_EXPORT Surface3dRenderer : public QObject, protected QOpenGLFunctions
@@ -86,7 +88,7 @@ public:
 
     Surface3dController *m_controller;
 
-    // Interaction related parameters
+    // Interaction related parameters // TODO: Moved to controller
     MousePressType m_mousePressed;
     QPoint m_mousePos;
     SelectionMode m_selectionMode;
@@ -96,24 +98,52 @@ public:
     Theme *m_theme;
     LabelTransparency m_labelTransparency;
     QFont m_font;
+    bool m_isGridEnabled;
+    bool m_isBackgroundEnabled;
+    ShadowQuality m_shadowQuality;
     bool m_hasNegativeValues;
 
     CameraHelper *m_camera;
 
 private:
+    // Data parameters
+    GLint m_tickYCount;
+    GLfloat m_tickYStep;
+    GLint m_tickXCount;
+    GLint m_tickZCount;
+
+    // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
     QRect m_sliceViewPort;
+    ShaderHelper *m_backgroundShader;
+    TextureHelper *m_textureHelper;
     bool m_isInitialized;
+    GLfloat m_yRange; // m_heightNormalizer
+    GLfloat m_yAdjustment;
+    GLfloat m_xLength;
+    GLfloat m_zLength;
+    GLfloat m_maxDimension;
+    GLfloat m_scaleFactor;
+    GLfloat m_scaleX;
+    GLfloat m_scaleZ;
+    GLfloat m_maxSceneSize;
     ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_gridLineObj;
+    GLuint m_depthTexture;
+    GLuint m_depthFrameBuffer;
+    GLfloat m_shadowQualityToShader;
 
     Drawer *m_drawer;
 
 public:
-    explicit Surface3dRenderer(QRect rect, Surface3dController *controller);
+    explicit Surface3dRenderer(Surface3dController *controller);
     ~Surface3dRenderer();
 
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
+
+    // TODO: Not thread-safe, needs rethinking how axes create labels
+    Drawer *drawer() { return m_drawer; }
 
     // Size
     const QSize size();
@@ -136,12 +166,24 @@ public:
     void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
-    void resizeNotify();
+    void handleResize();
 
+
+#if !defined(QT_OPENGL_ES_2)
+    void updateDepthBuffer();
+#endif
     void loadBackgroundMesh();
+    void loadGridLineMesh();
+
+    // TODO: temp
+    void setYRangeStuff(GLint tickCount, GLfloat step, GLfloat minimum);
+    void setXZStuff(GLint tickXCount, GLint tickZCount);
 
 private:
     void drawScene(const GLuint defaultFboHandle);
+    void calculateSceneScalingFactors();
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+
     Q_DISABLE_COPY(Surface3dRenderer)
 };
 

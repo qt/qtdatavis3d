@@ -86,6 +86,8 @@ class TextureHelper : protected QOpenGLFunctions
     friend class Bars3dRenderer;
     friend class Bars3dController;
     friend class Maps3DController;
+    friend class Surface3dRenderer;
+    friend class Surface3dController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
