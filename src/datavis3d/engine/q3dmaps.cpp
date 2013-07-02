@@ -70,6 +70,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Q3DMaps::Q3DMaps()
     : d_ptr(new Q3DMapsPrivate(this, geometry()))
 {
+    d_ptr->m_shared->initializeOpenGL();
 }
 
 /*!
@@ -77,16 +78,6 @@ Q3DMaps::Q3DMaps()
  */
 Q3DMaps::~Q3DMaps()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DMaps::initialize()
-{
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->initializeOpenGL();
 }
 
 /*!

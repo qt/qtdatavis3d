@@ -157,7 +157,6 @@ public:
     ShadowQuality shadowQuality();
 
 protected:
-    void initialize();
     void render();
 
 #if defined(Q_OS_ANDROID)
