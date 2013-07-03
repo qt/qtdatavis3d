@@ -72,9 +72,18 @@ public:
 
     DataType type() const;
 
-public slots:
+    // TODO: Maybe proxy should be just
+
+    // Items use this string to format single item labels, unless custom proxy initializes
+    // item labels with something else.
+    void setItemLabelFormat(const QString &format);
+    const QString &itemLabelFormat();
+
+    QMutex *mutex();
 
 signals:
+//    void dataHintChanged();
+    void itemLabelFormatChanged();
 
 protected:
     QScopedPointer<QAbstractDataProxyPrivate> d_ptr;

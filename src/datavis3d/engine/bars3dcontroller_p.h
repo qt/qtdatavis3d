@@ -58,7 +58,6 @@
 
 #include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
-#include "qdataset_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -69,10 +68,8 @@ class QSizeF;
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Bars3dRenderer;
-class QDataItem;
-class QDataRow;
-class QDataSet;
 class LabelItem;
+class QBarDataProxy;
 
 class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
 {
@@ -90,7 +87,6 @@ private:
     bool m_isInitialized;
 
     // Data
-    QDataSet *m_dataSet;
     int m_rowCount;
     int m_columnCount;
 
@@ -114,6 +110,7 @@ private:
     GLfloat m_tickMinimum;
 
     Bars3dRenderer *m_renderer;
+    QBarDataProxy *m_data;
 
 public:
     explicit Bars3dController(QRect rect);
@@ -132,22 +129,6 @@ public:
     void setSlicingActive(bool isSlicing);
 
     QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
-
-    // Add a row of data. Each new row is added to the front of the sample space, moving previous
-    // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<GLfloat> &dataRow);
-    // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow);
-    // ownership of dataRow is transferred
-    void addDataRow(QDataRow *dataRow);
-
-    // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<GLfloat> > &data);
-
-    // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data);
-    // ownership of dataSet is transferred
-    void addDataSet(QDataSet* dataSet);
 
     QPair<GLfloat, GLfloat> limits();
 
@@ -210,10 +191,20 @@ public:
     // TODO: abstract renderer should have accessor for Drawer instead
     virtual Drawer *drawer();
 
+    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
+    void setDataProxy(QBarDataProxy *proxy);
+    QBarDataProxy *dataProxy();
+
+public slots:
+    void handleArrayReset();
+    void handleRowsAdded(int startIndex, int count);
+    void handleRowsChanged(int startIndex, int count);
+    void handleRowsRemoved(int startIndex, int count);
+    void handleRowsInserted(int startIndex, int count);
+
 signals:
     void selectionModeChanged(SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
-    void dataSetChanged(QDataSetPrivate *dataSet);
     void limitsChanged(QPair<GLfloat, GLfloat> limits);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);

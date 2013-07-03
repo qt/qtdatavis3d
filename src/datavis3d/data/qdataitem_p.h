@@ -77,12 +77,7 @@ public:
     float value();
     // Value and label appended into a string. If label has prepend -flag set, append label and value
     QString valueStr();
-    // Label item (containing valueStr as texture)
-    void setLabel(const LabelItem &label);
-    LabelItem label();
-    // Selection label item (containing specialar selection texture, if mode is activated)
-    void setSelectionLabel(const LabelItem &label);
-    LabelItem selectionLabel();
+
     QPointF position();
 
 private:
@@ -91,8 +86,6 @@ private:
     QString m_labelString;
     bool m_prependLabel;
     QVector3D m_translation;
-    LabelItem m_label;
-    LabelItem m_selectionLabel;
     QPointF m_position;
     friend class QDataItem;
 };

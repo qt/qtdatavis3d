@@ -42,13 +42,11 @@
 #include "bars3dcontroller_p.h"
 #include "bars3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "qdataitem_p.h"
-#include "qdatarow_p.h"
-#include "qdataset_p.h"
 #include "utils_p.h"
 #include "qabstractaxis_p.h"
 #include "qvalueaxis.h"
 #include "qcategoryaxis.h"
+#include "qbardataproxy_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -61,7 +59,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Bars3dController::Bars3dController(QRect boundRect)
     : Abstract3DController(boundRect),
       m_isInitialized(false),
-      m_dataSet(new QDataSet()),
       m_rowCount(0),
       m_columnCount(0),
       m_mouseState(MouseNone),
@@ -78,7 +75,8 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_tickCount(0),
       m_tickStep(0),
       m_tickMinimum(0.0f),
-      m_renderer(0)
+      m_renderer(0),
+      m_data(new QBarDataProxy)
 {
     // Default axes. Only Y axis can actually be changed by user.
     setAxisX(new QCategoryAxis());
@@ -88,7 +86,7 @@ Bars3dController::Bars3dController(QRect boundRect)
 
 Bars3dController::~Bars3dController()
 {
-    delete m_dataSet;
+    delete m_data;
 }
 
 void Bars3dController::initializeOpenGL()
@@ -112,7 +110,10 @@ void Bars3dController::render(const GLuint defaultFboHandle)
     if (!m_isInitialized)
         return;
 
-    m_renderer->render(m_dataSet->d_ptr.data(), m_cameraHelper, m_axisX->d_ptr->titleItem(), m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
+    // TODO do not give the entire data array, just the data window
+    QMutexLocker(m_data->mutex());
+    m_renderer->render(m_data->array(), m_cameraHelper, m_axisX->d_ptr->titleItem(),
+                       m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
 }
 
 QMatrix4x4 Bars3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
@@ -164,16 +165,18 @@ void Bars3dController::touchEvent(QTouchEvent *event)
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();
         int zoomRate = 1;
-        if (m_zoomLevel > 100)
+        int zoomLevel = m_zoomLevel;
+        if (zoomLevel > 100)
             zoomRate = 5;
         if (newDistance > prevDistance)
-            m_zoomLevel += zoomRate;
+            zoomLevel += zoomRate;
         else
-            m_zoomLevel -= zoomRate;
-        if (m_zoomLevel > 500)
-            m_zoomLevel = 500;
-        else if (m_zoomLevel < 10)
-            m_zoomLevel = 10;
+            zoomLevel -= zoomRate;
+        if (zoomLevel > 500)
+            zoomLevel = 500;
+        else if (zoomLevel < 10)
+            zoomLevel = 10;
+        setZoomLevel(zoomLevel);
         prevDistance = newDistance;
         //qDebug() << "distance" << distance.manhattanLength();
     }
@@ -238,16 +241,19 @@ void Bars3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos
 
 void Bars3dController::wheelEvent(QWheelEvent *event)
 {
-    if (m_zoomLevel > 100)
-        m_zoomLevel += event->angleDelta().y() / 12;
-    else if (m_zoomLevel > 50)
-        m_zoomLevel += event->angleDelta().y() / 60;
+    int zoomLevel = m_zoomLevel;
+    if (zoomLevel > 100)
+        zoomLevel += event->angleDelta().y() / 12;
+    else if (zoomLevel > 50)
+        zoomLevel += event->angleDelta().y() / 60;
     else
-        m_zoomLevel += event->angleDelta().y() / 120;
-    if (m_zoomLevel > 500)
-        m_zoomLevel = 500;
-    else if (m_zoomLevel < 10)
-        m_zoomLevel = 10;
+        zoomLevel += event->angleDelta().y() / 120;
+    if (zoomLevel > 500)
+        zoomLevel = 500;
+    else if (zoomLevel < 10)
+        zoomLevel = 10;
+
+    setZoomLevel(zoomLevel);
 }
 
 // TODO: abstract renderer should have accessor for Drawer instead
@@ -259,6 +265,70 @@ Drawer *Bars3dController::drawer()
         return 0;
 }
 
+void Bars3dController::setDataProxy(QBarDataProxy *proxy)
+{
+    delete m_data;
+    m_data = proxy;
+
+    QObject::connect(m_data, &QBarDataProxy::arrayReset, this, &Bars3dController::handleArrayReset);
+    QObject::connect(m_data, &QBarDataProxy::rowsAdded, this, &Bars3dController::handleRowsAdded);
+    QObject::connect(m_data, &QBarDataProxy::rowsChanged, this, &Bars3dController::handleRowsChanged);
+    QObject::connect(m_data, &QBarDataProxy::rowsRemoved, this, &Bars3dController::handleRowsRemoved);
+    QObject::connect(m_data, &QBarDataProxy::rowsInserted, this, &Bars3dController::handleRowsInserted);
+
+    // emit something?
+}
+
+QBarDataProxy *Bars3dController::dataProxy()
+{
+    return m_data;
+}
+
+void Bars3dController::handleArrayReset()
+{
+    setSlicingActive(false);
+    handleLimitChange();
+}
+
+void Bars3dController::handleRowsAdded(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO check if affects data window
+    // TODO should update slice instead of deactivating?
+    setSlicingActive(false);
+    handleLimitChange();
+}
+
+void Bars3dController::handleRowsChanged(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO check if affects data window
+    // TODO should update slice instead of deactivating?
+    setSlicingActive(false);
+    handleLimitChange();
+}
+
+void Bars3dController::handleRowsRemoved(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO check if affects data window
+    // TODO should update slice instead of deactivating?
+    setSlicingActive(false);
+    handleLimitChange();
+}
+
+void Bars3dController::handleRowsInserted(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO check if affects data window
+    // TODO should update slice instead of deactivating?
+    setSlicingActive(false);
+    handleLimitChange();
+}
 
 void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
@@ -290,8 +360,8 @@ QString Bars3dController::objFile()
 
 QPair<GLfloat, GLfloat> Bars3dController::limits()
 {
-    if (m_dataSet->d_ptr)
-        return m_dataSet->d_ptr->limitValues();
+    if (m_data)
+        return m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
 
     return qMakePair(0.f, 0.f);
 }
@@ -335,15 +405,11 @@ void Bars3dController::setMeshFileName(const QString &objFileName)
     emit objFileChanged(m_objFile);
 }
 
+// TODO: This sets data window. Needs more parameters, now assumes window always starts at 0,0.
 void Bars3dController::setupSampleSpace(int columnCount, int rowCount)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);
-
-    // Recreate data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    emit dataSetChanged(m_dataSet->d_ptr.data());
 
     m_rowCount = rowCount;
     m_columnCount = columnCount;
@@ -434,112 +500,10 @@ int Bars3dController::rowCount()
 
 void Bars3dController::handleLimitChange()
 {
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_dataSet->d_ptr->limitValues();
+    // Get the limits for data window
+    QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
 
     emit limitsChanged(limits);
-}
-
-void Bars3dController::addDataRow(const QVector<float> &dataRow)
-{
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow();
-    for (int i = 0; i < dataRow.size(); i++)
-        row->addItem(new QDataItem(dataRow.at(i)));
-    row->d_ptr->verifySize(m_columnCount);
-    m_dataSet->addRow(row);
-    handleLimitChange();
-
-    m_dataSet->d_ptr->verifySize(m_rowCount);
-}
-
-void Bars3dController::addDataRow(const QVector<QDataItem*> &dataRow)
-{
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row = new QDataRow();
-    for (int i = 0; i < dataRow.size(); i++)
-        row->addItem(dataRow.at(i));
-    row->d_ptr->verifySize(m_columnCount);
-    m_dataSet->addRow(row);
-    handleLimitChange();
-
-    m_dataSet->d_ptr->verifySize(m_rowCount);
-}
-
-void Bars3dController::addDataRow(QDataRow *dataRow)
-{
-    // Check that the input data fits into sample space, and resize if it doesn't
-    dataRow->d_ptr->verifySize(m_columnCount);
-    // With each new row, the previous data row must be moved back
-    // ie. we need as many vectors as we have rows in the sample space
-    m_dataSet->addRow(dataRow);
-    // if the added data pushed us over sample space, remove the oldest data set
-    m_dataSet->d_ptr->verifySize(m_rowCount);
-    handleLimitChange();
-}
-
-void Bars3dController::addDataSet(const QVector< QVector<float> > &data)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    setSlicingActive(false);
-    // Delete old data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    emit dataSetChanged(m_dataSet->d_ptr.data());
-
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row;
-    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        row = new QDataRow();
-        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
-            row->addItem(new QDataItem(data.at(rowNr).at(colNr)));
-        row->d_ptr->verifySize(m_columnCount);
-        m_dataSet->addRow(row);
-        row++;
-    }
-    handleLimitChange();
-    m_dataSet->d_ptr->verifySize(m_rowCount);
-}
-
-void Bars3dController::addDataSet(const QVector< QVector<QDataItem*> > &data)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    setSlicingActive(false);
-
-    // Delete old data set
-    delete m_dataSet;
-    m_dataSet = new QDataSet();
-    emit dataSetChanged(m_dataSet->d_ptr.data());
-
-    // Convert to QDataRow and add to QDataSet
-    QDataRow *row;
-    for (int rowNr = 0; rowNr < data.size(); rowNr++) {
-        row = new QDataRow();
-        for (int colNr = 0; colNr < data.at(rowNr).size(); colNr++)
-            row->addItem(data.at(rowNr).at(colNr));
-        row->d_ptr->verifySize(m_columnCount);
-        m_dataSet->addRow(row);
-        row++;
-    }
-    handleLimitChange();
-    m_dataSet->d_ptr->verifySize(m_rowCount);
-}
-
-void Bars3dController::addDataSet(QDataSet* dataSet)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    setSlicingActive(false);
-
-    // Check sizes
-    dataSet->d_ptr->verifySize(m_rowCount, m_columnCount);
-
-    // Delete old data set
-    delete m_dataSet;
-    // Take ownership of given set
-    m_dataSet = dataSet;
-    handleLimitChange();
-
-    emit dataSetChanged(m_dataSet->d_ptr.data());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

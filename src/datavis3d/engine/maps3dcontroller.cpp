@@ -51,6 +51,8 @@
 #include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
+#include "qbardataitem.h" // TODO change to mapdataitem?
+#include "qabstractdataitem_p.h"
 
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
@@ -836,15 +838,19 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
 #ifndef DISPLAY_FULL_DATA_ON_SELECTION
         // Draw just the value string of the selected bar
+        QBarDataItem dummyItem; // TODO temporary solution
+        dummyItem.setValue(m_selectedBar->d_ptr->value());
+        dummyItem.setLabel(m_selectedBar->d_ptr->valueStr());
         if (prevItem != m_selectedBar || m_updateLabels) {
-            m_drawer->generateLabelTexture(m_selectedBar);
+            m_drawer->generateLabelTexture(&dummyItem);
             prevItem = m_selectedBar;
         }
 
-        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->d_ptr->label(),
+        m_drawer->drawLabel(dummyItem, dummyItem.d_ptr->labelItem(),
                             viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            QVector3D(0.0f, 0.0f, 0.0f),
+                            (m_selectedBar->d_ptr->value() / m_heightNormalizer),
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, true);
 #else

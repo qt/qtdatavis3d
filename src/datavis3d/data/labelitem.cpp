@@ -51,8 +51,7 @@ LabelItem::LabelItem()
 
 LabelItem::~LabelItem()
 {
-    // Note: Cannot delete texture here, unless we also implement
-    // reference counting for created textures.
+    glDeleteTextures(1, &m_textureId);
 }
 
 void LabelItem::setSize(const QSize &size)
@@ -60,17 +59,18 @@ void LabelItem::setSize(const QSize &size)
     m_size = size;
 }
 
-QSize LabelItem::size()
+QSize LabelItem::size() const
 {
     return m_size;
 }
 
 void LabelItem::setTextureId(GLuint textureId)
 {
+    glDeleteTextures(1, &m_textureId);
     m_textureId = textureId;
 }
 
-GLuint LabelItem::textureId()
+GLuint LabelItem::textureId() const
 {
     return m_textureId;
 }

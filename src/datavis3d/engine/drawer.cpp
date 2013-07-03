@@ -44,10 +44,9 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "camerahelper_p.h"
-#include "qdataitem.h"
-#include "qdataitem_p.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
+#include "qabstractdataitem_p.h"
 #include <QMatrix4x4>
 #include <qmath.h>
 
@@ -163,17 +162,16 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
     glBindTexture(GL_TEXTURE_2D, *oldTexId);
 }
 
-void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
+void Drawer::drawLabel(const QAbstractDataItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat maxHeight, SelectionMode mode,
+                       GLfloat itemHeight, SelectionMode mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        CameraHelper *camera,
                        bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment)
 {
     // Draw label
-    LabelItem labelItem = label;
     if (!labelItem.textureId())
         return; // No texture, skip
 
@@ -200,15 +198,15 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     }
     case LabelHigh: {
         // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
-        yPosition = item.d_ptr->translation().y() + (item.d_ptr->value() / maxHeight) / 2.0f;
+        yPosition = item.d_ptr->translation().y() + itemHeight / 2.0f;
         break;
     }
     case LabelOver: {
         float mod = 0.1f;
-        if (item.d_ptr->value() < 0)
+        if (itemHeight < 0)
             mod = -0.1f;
         yPosition = item.d_ptr->translation().y() - (positionComp.y() / 2.0f - 0.2f)
-                + (item.d_ptr->value() / maxHeight) + mod;
+                + itemHeight + mod;
         break;
     }
     case LabelBottom: {
@@ -297,18 +295,15 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     drawObject(shader, object, labelItem.textureId());
 }
 
-void Drawer::generateLabelTexture(QDataItem *item)
+void Drawer::generateLabelTexture(QAbstractDataItem *item)
 {
-    LabelItem labelItem = item->d_ptr->label();
-    generateLabelItem(&labelItem, item->d_ptr->valueStr());
-    item->d_ptr->setLabel(labelItem);
+    LabelItem &labelItem = item->d_ptr->labelItem();
+    generateLabelItem(labelItem, item->label());
 }
 
-void Drawer::generateLabelItem(LabelItem *item, const QString &text)
+void Drawer::generateLabelItem(LabelItem &item, const QString &text)
 {
     initializeOpenGL();
-
-    item->clear();
 
     // Create labels
     // Print label into a QImage using QPainter
@@ -319,9 +314,9 @@ void Drawer::generateLabelItem(LabelItem *item, const QString &text)
                                            m_transparency);
 
     // Set label size
-    item->setSize(label.size());
-    // Insert text texture into label
-    item->setTextureId(m_textureHelper->create2DTexture(label, true, true));
+    item.setSize(label.size());
+    // Insert text texture into label (also deletes the old texture)
+    item.setTextureId(m_textureHelper->create2DTexture(label, true, true));
 }
 
 QT_DATAVIS3D_END_NAMESPACE

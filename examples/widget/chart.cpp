@@ -41,6 +41,7 @@
 #include "chart.h"
 #include "qcategoryaxis.h"
 #include "qvalueaxis.h"
+#include "qolddataproxy.h"
 
 using namespace QtDataVis3D;
 
@@ -152,8 +153,10 @@ void ChartModifier::addDataSet()
     // Set up sample space based on prepared data
     m_chart->setupSampleSpace(months.size(), years.size());
 
+    QOldDataProxy *proxy = new QOldDataProxy;
+    m_chart->setDataProxy(proxy);
     // Add data to chart
-    m_chart->addDataSet(dataSet);
+    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);
 }
 
 void ChartModifier::addBars()
@@ -161,7 +164,7 @@ void ChartModifier::addBars()
     QVector<float> data;
     for (float i = 0; i < m_columnCount; i++)
         data.append(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
-    m_chart->addDataRow(data);
+    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
 }
 
 void ChartModifier::changeStyle()

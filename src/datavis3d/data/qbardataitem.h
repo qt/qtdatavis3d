@@ -39,37 +39,33 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+#ifndef QBARDATAITEM_H
+#define QBARDATAITEM_H
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#include "qabstractdataitem.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+class QBarDataItemPrivate;
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+class QT_DATAVIS3D_EXPORT QBarDataItem : public QAbstractDataItem
 {
-    Q_OBJECT
-
 public:
-    explicit QDataRow();
-    ~QDataRow();
+    QBarDataItem();
+    ~QBarDataItem();
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+    void setValue(float value);
+    float value();
+
+protected:
+    QBarDataItemPrivate *dptr();
 
 private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
     friend class Bars3dRenderer;
     friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
+    friend class QBarDataProxyPrivate;
+
+    Q_DISABLE_COPY(QBarDataItem)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -478,6 +478,16 @@ QAbstractAxis *Q3DBars::valueAxis()
     return d_ptr->m_shared->axisY();
 }
 
+void Q3DBars::setDataProxy(QBarDataProxy *proxy)
+{
+    d_ptr->m_shared->setDataProxy(proxy);
+}
+
+QBarDataProxy *Q3DBars::dataProxy()
+{
+    return d_ptr->m_shared->dataProxy();
+}
+
 /*!
  * \a tickCount How many ticks will be drawn. \c 5 by default.
  *
@@ -492,78 +502,6 @@ QAbstractAxis *Q3DBars::valueAxis()
 void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
     d_ptr->m_shared->setTickCount(tickCount, step, minimum);
-}
-
-/*!
- * \a dataRow A vector of floats representing a single row of data. Sample space must be large
- * enough to hold the row.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(const QVector<float> &dataRow)
-{
-    d_ptr->m_shared->addDataRow(dataRow);
-}
-
-/*!
- * \a dataRow A vector of QDataItems representing a single row of data. Sample space must be
- * large enough to hold the row. Ownership of QDataItems is transferred to Q3DBars.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow)
-{
-    d_ptr->m_shared->addDataRow(dataRow);
-}
-
-/*!
- * \a dataRow A QDataRow instance representing a single row of data. Sample space must be
- * large enough to hold the row. Ownership of QDataRow is transferred to Q3DBars.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(QDataRow *dataRow)
-{
-    d_ptr->m_shared->addDataRow(dataRow);
-}
-
-/*!
- * \a data A vector of vector of floats representing the whole data set. Sample space must be
- * large enough to hold the set.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(const QVector< QVector<float> > &data)
-{
-    d_ptr->m_shared->addDataSet(data);
-}
-
-/*!
- * \a data A vector of vector of QDataItems representing the whole data set. Sample space must
- * be large enough to hold the set. Ownership of QDataItems is transferred to Q3DBars.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data)
-{
-    d_ptr->m_shared->addDataSet(data);
-}
-
-/*!
- * \a dataSet A QDataSet instance holding the whole data set. Sample space must
- * be large enough to hold the set. Ownership of QDataSet is transferred to Q3DBars.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(QDataSet *dataSet)
-{
-    d_ptr->m_shared->addDataSet(dataSet);
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

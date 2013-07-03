@@ -80,7 +80,7 @@ void QAbstractAxis::setTitle(QString title)
         d_ptr->m_title = title;
         // Generate axis label texture
         if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(&d_ptr->m_titleItem, title);
+            d_ptr->m_drawer->generateLabelItem(d_ptr->m_titleItem, title);
         emit titleChanged(title);
     }
 }
@@ -107,7 +107,7 @@ void QAbstractAxisPrivate::setDrawer(Drawer *drawer)
 {
     m_drawer = drawer;
     if (m_drawer) {
-        connect(m_drawer, SIGNAL(drawerChanged()), this, SLOT(updateTextures()));
+        QObject::connect(m_drawer, &Drawer::drawerChanged, this, &QAbstractAxisPrivate::updateTextures);
         updateTextures();
     }
 }
@@ -125,7 +125,7 @@ void QAbstractAxisPrivate::updateTextures()
     if (m_title.isEmpty())
         m_titleItem.clear();
     else
-        m_drawer->generateLabelItem(&m_titleItem, m_title);
+        m_drawer->generateLabelItem(m_titleItem, m_title);
 
     updateLabels();
 }

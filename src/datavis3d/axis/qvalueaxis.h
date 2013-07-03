@@ -55,9 +55,10 @@ public:
     explicit QValueAxis();
     ~QValueAxis();
 
-private:
+protected:
     QValueAxisPrivate *dptr();
 
+private:
     Q_DISABLE_COPY(QValueAxis)
 };
 

@@ -39,37 +39,65 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#ifndef QABSTRACTDATAITEM_P_H
+#define QABSTRACTDATAITEM_P_H
+
+#include "datavis3dglobal_p.h"
+#include "qabstractdataitem.h"
+#include "labelitem_p.h"
+
+#include <QOpenGLFunctions>
+#include <QString>
+#include <QVector3D>
+//#include <QVector4D>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+class QAbstractDataProxy;
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+class QAbstractDataItemPrivate
 {
-    Q_OBJECT
-
 public:
-    explicit QDataRow();
-    ~QDataRow();
+    QAbstractDataItemPrivate();
+    virtual ~QAbstractDataItemPrivate();
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+    // Position in 3D scene
+    void setTranslation(const QVector3D &translation) { m_translation = translation; }
+    const QVector3D &translation() const {return m_translation; }
 
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
+    // Label item for formatted label
+    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
+    const LabelItem &labelItem() const { return m_labelItem; }
+    LabelItem &labelItem() { return m_labelItem; }
+
+    // Selection label item (containing special selection texture, if mode is activated)
+    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
+    void setSelectionLabel(const LabelItem &labelItem);
+    const LabelItem &selectionLabel() const { return m_selectionLabel; }
+    LabelItem &selectionLabel() { return m_selectionLabel; }
+
+    void setDataProxy(QAbstractDataProxy *proxy) { m_dataProxy = proxy; }
+
+protected:
+    virtual void formatLabel() = 0;
+
+    QString m_label;
+    QVector3D m_translation;
+    LabelItem m_labelItem;
+    LabelItem m_selectionLabel;
+    QAbstractDataProxy *m_dataProxy;
+
+    friend class QAbstractDataItem;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

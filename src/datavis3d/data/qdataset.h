@@ -70,6 +70,7 @@ private:
     friend class Maps3DController;
     friend class Bars3dRenderer;
     friend class DeclarativeBars;
+    friend class QOldDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

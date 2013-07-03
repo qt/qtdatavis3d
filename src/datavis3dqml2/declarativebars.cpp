@@ -44,6 +44,7 @@
 #include "qdataset.h"
 #include "qdataset_p.h"
 #include "qdatarow_p.h"
+#include "qolddataproxy.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
@@ -71,6 +72,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     m_shared = new Bars3dController(boundingRect().toRect());
     QObject::connect(m_shared, &Bars3dController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
+
+    m_shared->setDataProxy(new QOldDataProxy);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -99,6 +102,8 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     // Call initialize on each update paint node and let the shared code worry about it.
     m_shared->initializeOpenGL();
 
+    // TODO: Setting stuff to controller in render thread. Isn't this incorrect?
+
     // Check if properites have changed that need to be applied while on the SGRenderThread
     if (m_cachedState->m_isSampleSpaceSet) {
         m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
@@ -126,12 +131,12 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     }
 
     if (m_cachedState->m_dataRow) {
-        m_shared->addDataRow(m_cachedState->m_dataRow);
+        static_cast<QOldDataProxy *>(m_shared->m_data)->addDataRow(m_cachedState->m_dataRow);
         m_cachedState->m_dataRow = 0;
     }
 
     if (m_cachedState->m_dataSet) {
-        m_shared->addDataSet(m_cachedState->m_dataSet);
+        static_cast<QOldDataProxy *>(m_shared->m_data)->addDataSet(m_cachedState->m_dataSet);
         m_cachedState->m_dataSet = 0;
     }
 

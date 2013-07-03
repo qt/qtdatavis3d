@@ -51,6 +51,7 @@
 
 #include "qcategoryaxis.h"
 #include "qabstractaxis_p.h"
+#include "qbardataitem.h"
 
 #ifndef QCATEGORYAXIS_P_H
 #define QCATEGORYAXIS_P_H

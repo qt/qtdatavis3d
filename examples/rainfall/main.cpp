@@ -41,6 +41,7 @@
 #include "q3dbars.h"
 #include "qdataitem.h"
 #include "qcategoryaxis.h"
+#include "qolddataproxy.h"
 
 #include <QGuiApplication>
 #include <QFont>
@@ -325,7 +326,9 @@ void RainfallChart::addDataSet()
     data.append(row);
     row.clear();
 
-    m_chart->addDataSet(data);
+    QOldDataProxy *proxy = new QOldDataProxy;
+    m_chart->setDataProxy(proxy);
+    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(data);
 }
 
 int main(int argc, char **argv)

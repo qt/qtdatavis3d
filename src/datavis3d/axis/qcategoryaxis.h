@@ -57,8 +57,10 @@ public:
 
     void setLabels(const QVector<QString> &labels);
 
-private:
+protected:
     QCategoryAxisPrivate *dptr();
+
+private:
 
     Q_DISABLE_COPY(QCategoryAxis)
 };

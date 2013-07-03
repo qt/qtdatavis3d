@@ -49,7 +49,10 @@
 //
 // We mean it.
 
+#include "datavis3dglobal_p.h"
 #include "qabstractdataproxy.h"
+#include <QString>
+#include <QMutex>
 
 #ifndef QABSTRACTDATAPROXY_P_H
 #define QABSTRACTDATAPROXY_P_H
@@ -68,6 +71,8 @@ public slots:
 protected:
     QAbstractDataProxy *q_ptr;
     QAbstractDataProxy::DataType m_type;
+    QMutex m_mutex;
+    QString m_itemLabelFormat;
 
 private:
     friend class QAbstractDataProxy;

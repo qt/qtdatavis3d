@@ -77,6 +77,7 @@ private:
     QDataRow *q_ptr;
     QVector<QDataItem*> m_row;
     friend class QDataRow;
+    friend class QOldDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

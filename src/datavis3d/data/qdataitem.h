@@ -85,6 +85,7 @@ private:
     friend class Maps3DController;
     friend class QDataRowPrivate;
     friend class Drawer;
+    friend class QOldDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

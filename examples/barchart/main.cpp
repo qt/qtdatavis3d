@@ -41,6 +41,7 @@
 #include "q3dbars.h"
 #include "qdataset.h"
 #include "qcategoryaxis.h"
+#include "qolddataproxy.h"
 
 #include <QGuiApplication>
 #include <QScreen>
@@ -255,7 +256,7 @@ void ChartDataGenerator::addDataSet()
     m_chart->setupSampleSpace(days.size(), weeks.size());
 
     // Add data to chart
-    m_chart->addDataSet(dataSet);
+    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);
 #endif
 }
 
@@ -264,7 +265,7 @@ void ChartDataGenerator::addBars()
     QVector<float> data;
     for (int i = 0; i < m_columnCount; i++)
         data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
-    m_chart->addDataRow(data);
+    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
 }
 
 void ChartDataGenerator::changeStyle()
@@ -326,6 +327,8 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     Q3DBars barchart;
+    QOldDataProxy *proxy = new QOldDataProxy;
+    barchart.setDataProxy(proxy);
     QSize screenSize = barchart.screen()->size();
     barchart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
     barchart.setPosition(screenSize.width() / 6, screenSize.height() / 6);

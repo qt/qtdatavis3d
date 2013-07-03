@@ -39,39 +39,59 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#include "qbardataproxy.h"
+#include "qabstractdataproxy_p.h"
+#include "qbardataitem.h"
+#include <QVector>
+
+#ifndef QBARDATAPROXY_P_H
+#define QBARDATAPROXY_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
-
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+class QT_DATAVIS3D_EXPORT QBarDataProxyPrivate : public QAbstractDataProxyPrivate
 {
     Q_OBJECT
-
 public:
-    explicit QDataRow();
-    ~QDataRow();
+    QBarDataProxyPrivate(QBarDataProxy *q);
+    virtual ~QBarDataProxyPrivate();
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+    void resetArray(int rowCount, int columnCount);
+    // TODO void resetRow(int rowIndex);
+    void setRow(int rowIndex, QBarDataRow *row);
+    int addRows(QBarDataArray *rows);
+    void insertRows(int rowIndex, QBarDataArray *rows);
+
+    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+
+    void setRowCount(int count);
+    void setColumnCount(int count);
+
+protected:
+    void clearRow(int rowIndex);
+    void addEmptyRow();
+    void fixRow(QBarDataRow &row);
+
+    QBarDataArray m_dataArray;
+
+    int m_rowCount;
+    int m_columnCount;
+    QString m_itemLabelFormat;
 
 private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
+    friend class QBarDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // QBARDATAPROXY_P_H

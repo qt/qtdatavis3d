@@ -49,12 +49,10 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
-class QDataItem;
-class QDataRow;
-class QDataSet;
 class LabelItem;
 class QAbstractAxis;
 class QCategoryAxis;
+class QBarDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
@@ -77,19 +75,22 @@ public:
 
     // Add a row of data. Each new row is added to the front of the sample space, moving previous
     // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<float> &dataRow);
+    //void addDataRow(const QVector<float> &dataRow);
+
     // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow);
+    //void addDataRow(const QVector<QDataItem*> &dataRow);
+
     // ownership of dataRow is transferred
-    void addDataRow(QDataRow *dataRow);
+    //void addDataRow(QDataRow *dataRow);
 
     // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<float> > &data);
+    //void addDataSet(const QVector< QVector<float> > &data);
 
     // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data);
+    //void addDataSet(const QVector< QVector<QDataItem*> > &data);
+
     // ownership of dataSet is transferred
-    void addDataSet(QDataSet* dataSet);
+    //void addDataSet(QDataSet* dataSet);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -102,6 +103,7 @@ public:
     void setBarType(BarStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
+    // TODO: This defines the data window, needs additional parameters startRow, startColumn
     void setupSampleSpace(int samplesRow, int samplesColumn);
 
     // Select preset camera placement
@@ -173,6 +175,10 @@ public:
     QCategoryAxis *columnAxis();
     void setValueAxis(QAbstractAxis *axis);
     QAbstractAxis *valueAxis();
+
+    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
+    void setDataProxy(QBarDataProxy *proxy);
+    QBarDataProxy *dataProxy();
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.

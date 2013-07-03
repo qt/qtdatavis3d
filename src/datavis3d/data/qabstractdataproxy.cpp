@@ -59,11 +59,27 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
     return d_ptr->m_type;
 }
 
+void QAbstractDataProxy::setItemLabelFormat(const QString &format)
+{
+    d_ptr->m_itemLabelFormat = format;
+    emit itemLabelFormatChanged();
+}
+
+const QString &QAbstractDataProxy::itemLabelFormat()
+{
+    return d_ptr->m_itemLabelFormat;
+}
+
+QMutex *QAbstractDataProxy::mutex()
+{
+    return &d_ptr->m_mutex;
+}
+
 
 // QAbstractDataProxyPrivate
 
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
-    : QObject(q),
+    : QObject(0),
       q_ptr(q),
       m_type(type)
 {

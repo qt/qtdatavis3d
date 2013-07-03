@@ -45,6 +45,9 @@
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
+#include "qdataitem.h"
+#include "qdatarow.h"
+#include "qdataset.h"
 
 #include <qsgsimpletexturenode.h>
 #include <QAbstractItemModel>

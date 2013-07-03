@@ -62,6 +62,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
+#include "qbardataproxy.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -71,9 +72,6 @@ class QOpenGLShaderProgram;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItem;
-class QDataRow;
-class QDataSetPrivate;
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
@@ -116,10 +114,11 @@ private:
 
     // Internal state
     bool m_hasNegativeValues;
-    QDataItem *m_selectedBar;
-    QDataRow *m_sliceSelection;
-    QAbstractAxisPrivate *m_sliceAxisP;
-    int m_sliceIndex;
+    QBarDataItem *m_selectedBar; // TODO: Does this need to be member variable?
+    QBarDataItem *m_previouslySelectedBar;
+    QBarDataRow *m_sliceSelection;
+    QAbstractAxisPrivate *m_sliceAxisP; // not owned
+    const LabelItem *m_sliceTitleItem; // not owned
     GLint m_tickCount;
     GLfloat m_tickStep;
     bool m_xFlipped;
@@ -163,6 +162,7 @@ private:
 
     bool m_hasHeightAdjustmentChanged;
     QPair<GLfloat,GLfloat> m_limits;
+    QBarDataItem *m_dummyBarDataItem;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -174,7 +174,7 @@ public:
     explicit Bars3dRenderer(Bars3dController *controller);
     ~Bars3dRenderer();
 
-    void render(QDataSetPrivate *dataSet, CameraHelper *camera,
+    void render(const QBarDataArray &dataArray, CameraHelper *camera,
                 const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
                 const GLuint defaultFboHandle = 0);
 
@@ -189,7 +189,6 @@ public slots:
     void updateTheme(Theme theme);
     void updateSelectionMode(SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
-    void updateDataSet(QDataSetPrivate *newDataSet);
     void updateLimits(QPair<GLfloat, GLfloat> newLimits);
     void updateSampleSpace(int columnCount, int rowCount);
     void updateZoomLevel(int newZoomLevel);
@@ -215,7 +214,7 @@ private:
     void initializeOpenGL();
     void drawSlicedScene(CameraHelper *camera,
                          const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
-    void drawScene(QDataSetPrivate *dataSet, CameraHelper *camera, const GLuint defaultFboHandle);
+    void drawScene(const QBarDataArray &dataArray, CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 
     void loadBarMesh();

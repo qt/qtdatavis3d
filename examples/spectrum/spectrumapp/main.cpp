@@ -41,6 +41,7 @@
 #include "q3dbars.h"
 #include "engine.h"
 #include "utils.h"
+#include "qolddataproxy.h"
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -118,6 +119,9 @@ MainApp::MainApp(Q3DBars *window)
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
+
+    QOldDataProxy *proxy = new QOldDataProxy;
+    m_chart->setDataProxy(proxy);
 }
 
 MainApp::~MainApp()
@@ -156,7 +160,7 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
         }
     }
     if (data.size() > 0)
-        m_chart->addDataRow(data);
+        static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)

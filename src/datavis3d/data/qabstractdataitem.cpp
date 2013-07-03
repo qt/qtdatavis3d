@@ -39,39 +39,61 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
-
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#include "qabstractdataitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+/*!
+ * \class QAbstractDataItem
+ * \inmodule QtDataVis3D
+ * \brief The QAbstractDataItem class provides a base container for resolved data to be added to graphs.
+ * \since 1.0.0
+ *
+ * A QAbstractDataItem holds data for a single rendered item in a graph.
+ * Data proxies parse data into QAbstractDataItem based instances for visualizing.
+ *
+ * \sa QAbstractDataProxy, {Qt Data Visualization 3D C++ Classes}
+ */
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+/*!
+ * Constructs QAbstractDataItem.
+ */
+QAbstractDataItem::QAbstractDataItem(QAbstractDataItemPrivate *d)
+    : d_ptr(d)
 {
-    Q_OBJECT
+}
 
-public:
-    explicit QDataRow();
-    ~QDataRow();
+/*!
+ * Destroys QAbstractDataItem.
+ */
+QAbstractDataItem::~QAbstractDataItem()
+{
+}
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+/*!
+ * \a label A formatted label for the data item.
+ *
+ * Sets the formatted label for the data item.
+ */
+void QAbstractDataItem::setLabel(const QString &label)
+{
+    d_ptr->m_label = label;
+}
 
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
-};
+QString &QAbstractDataItem::label() const
+{
+    if (d_ptr->m_label.isNull())
+        d_ptr->formatLabel();
+    return d_ptr->m_label;
+}
+
+QAbstractDataItemPrivate::QAbstractDataItemPrivate()
+    : m_dataProxy(0)
+{
+}
+
+QAbstractDataItemPrivate::~QAbstractDataItemPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

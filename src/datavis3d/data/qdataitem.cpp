@@ -82,11 +82,9 @@ QDataItem::QDataItem(QDataItem &item)
     : QObject(0),
       d_ptr(new QDataItemPrivate(&item))
 {
-    d_ptr->m_label = item.d_ptr->m_label;
     d_ptr->m_labelString = item.d_ptr->m_labelString;
     d_ptr->m_position = item.d_ptr->m_position;
     d_ptr->m_prependLabel = item.d_ptr->m_prependLabel;
-    d_ptr->m_selectionLabel = item.d_ptr->m_selectionLabel;
     d_ptr->m_translation = item.d_ptr->m_translation;
     d_ptr->m_value = item.d_ptr->m_value;
 }
@@ -182,9 +180,8 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q, float value, const QString &lab
       m_value(value),
       m_labelString(label),
       m_prependLabel(false),
-      m_translation(QVector3D(0, 0, 0)),
-      m_label(LabelItem()),
-      m_selectionLabel(LabelItem())
+      m_translation(QVector3D(0, 0, 0))
+
 {
 }
 
@@ -193,9 +190,8 @@ QDataItemPrivate::QDataItemPrivate(QDataItem *q)
       m_value(q->value()),
       m_labelString(q->label()),
       m_prependLabel(false),
-      m_translation(QVector3D(0, 0, 0)),
-      m_label(LabelItem()),
-      m_selectionLabel(LabelItem())
+      m_translation(QVector3D(0, 0, 0))
+
 {
 }
 
@@ -232,26 +228,6 @@ QString QDataItemPrivate::valueStr()
         strVal.append(m_labelString);
     }
     return strVal;
-}
-
-void QDataItemPrivate::setLabel(const LabelItem &label)
-{
-    m_label = label;
-}
-
-LabelItem QDataItemPrivate::label()
-{
-    return m_label;
-}
-
-void QDataItemPrivate::setSelectionLabel(const LabelItem &label)
-{
-    m_selectionLabel = label;
-}
-
-LabelItem QDataItemPrivate::selectionLabel()
-{
-    return m_selectionLabel;
 }
 
 QPointF QDataItemPrivate::position()

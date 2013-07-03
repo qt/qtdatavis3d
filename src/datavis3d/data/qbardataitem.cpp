@@ -39,39 +39,69 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
-
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#include "qbardataitem_p.h"
+#include "qabstractdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
+/*!
+ * \class QBarDataItem
+ * \inmodule QtDataVis3D
+ * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
+ * \since 1.0.0
+ *
+ * A QAbstractDataItem holds data for a single rendered bar in a graph.
+ * Bar data proxies parse data into QBarDataItem instances for visualizing.
+ *
+ * \sa QAbstractDataItem, QBarDataProxy, {Qt Data Visualization 3D C++ Classes}
+ */
 
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+/*!
+ * Constructs QBarDataItem.
+ */
+QBarDataItem::QBarDataItem()
+    : QAbstractDataItem(new QBarDataItemPrivate())
 {
-    Q_OBJECT
+}
 
-public:
-    explicit QDataRow();
-    ~QDataRow();
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+/*!
+ * Destroys QBarDataItem.
+ */
+QBarDataItem::~QBarDataItem()
+{
+}
 
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
-};
+void QBarDataItem::setValue(float value)
+{
+    dptr()->m_value = value;
+    setLabel(QString()); // Forces reformatting on next access
+}
+
+float QBarDataItem::value()
+{
+    return dptr()->m_value;
+}
+
+QBarDataItemPrivate *QBarDataItem::dptr()
+{
+    return static_cast<QBarDataItemPrivate *>(d_ptr.data());
+}
+
+
+QBarDataItemPrivate::~QBarDataItemPrivate()
+{
+}
+
+void QBarDataItemPrivate::formatLabel()
+{
+    // Format the string on first access
+    QString numStr;
+    numStr.setNum(m_value);
+    // TODO actually format instead of just appending the value
+    m_label.clear();
+    m_label.append(m_dataProxy->itemLabelFormat());
+    m_label.append(numStr);
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif
