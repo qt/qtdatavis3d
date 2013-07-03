@@ -69,7 +69,6 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_labelTransparency(TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_hasNegativeValues(false),
-      m_camera(new CameraHelper()),
       m_tickYCount(0),
       m_tickYStep(0.0f),
       m_tickXCount(0),
@@ -156,12 +155,6 @@ void Surface3dRenderer::initializeOpenGL()
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 #endif
 
-    // Set initial camera position
-    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    m_camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                          QVector3D(0.0f, 0.0f, zComp),
-                                          QVector3D(0.0f, 1.0f, 0.0f));
-
     // Set view port
     glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
                m_sliceViewPort.width(), m_sliceViewPort.height());
@@ -177,7 +170,7 @@ void Surface3dRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Surface3dRenderer::render(const GLuint defaultFboHandle)
+void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
     if (!m_isInitialized)
         return;
@@ -194,10 +187,17 @@ void Surface3dRenderer::render(const GLuint defaultFboHandle)
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawScene(defaultFboHandle);
+    // TODO: bars have m_hasHeightAdjustmentChanged, which is always true!
+    // Set initial camera position
+    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
+    camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                        QVector3D(0.0f, 0.0f, zComp),
+                                        QVector3D(0.0f, 1.0f, 0.0f));
+
+    drawScene(camera, defaultFboHandle);
 }
 
-void Surface3dRenderer::drawScene(const GLuint defaultFboHandle)
+void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
 {
     Q_UNUSED(defaultFboHandle)
 
@@ -215,11 +215,11 @@ void Surface3dRenderer::drawScene(const GLuint defaultFboHandle)
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_camera->calculateViewMatrix(m_mousePos,
-                                                          100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
-                                                          m_mainViewPort.width(),
-                                                          m_mainViewPort.height(),
-                                                          m_hasNegativeValues);
+    QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
+                100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
+                m_mainViewPort.width(),
+                m_mainViewPort.height(),
+                m_hasNegativeValues);
 
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
@@ -231,7 +231,7 @@ void Surface3dRenderer::drawScene(const GLuint defaultFboHandle)
     else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 0.0f;
 
-    QVector3D lightPos = m_camera->calculateLightPosition(defaultLightPos);
+    QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
 
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
@@ -512,7 +512,8 @@ void Surface3dRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_shadowQuality > ShadowNone) {
+    // TODO: bars uses some m_cachedShadowQuality
+    if (m_shadowQuality > ShadowNone && !m_mainViewPort.size().isEmpty()) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_shadowQuality);

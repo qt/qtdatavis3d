@@ -86,15 +86,6 @@ public:
         SelectionColumn
     };
 
-    enum MouseState {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
 private:
     bool m_isInitialized;
 

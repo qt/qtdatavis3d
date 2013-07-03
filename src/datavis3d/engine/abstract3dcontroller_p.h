@@ -66,6 +66,16 @@ class QT_DATAVIS3D_EXPORT Abstract3DController : public QObject
 {
     Q_OBJECT
 
+public:
+    enum MouseState {
+        MouseNone = 0,
+        MouseOnScene,
+        MouseOnOverview,
+        MouseOnZoom,
+        MouseRotating,
+        MouseOnPinch
+    };
+
 private:
     QRect m_boundingRect;
     GLfloat m_horizontalRotation;

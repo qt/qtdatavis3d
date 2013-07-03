@@ -41,7 +41,9 @@
 
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
+#include "camerahelper_p.h"
 
+#include <QMatrix4x4>
 #include <QMouseEvent>
 
 #include <QDebug>
@@ -50,6 +52,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Surface3dController::Surface3dController(QRect rect)
     : Abstract3DController(rect),
+      m_mouseState(MouseNone),
+      m_mousePos(QPoint(0, 0)),
       m_renderer(0),
       m_isInitialized(false)
 {
@@ -74,16 +78,27 @@ void Surface3dController::render(const GLuint defaultFboHandle)
     if (!m_isInitialized)
         return;
 
-    m_renderer->render(defaultFboHandle);
+    m_renderer->render(m_cameraHelper, defaultFboHandle);
+}
+
+QMatrix4x4 Surface3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
+{
+    return m_cameraHelper->calculateViewMatrix(m_mousePos,
+                                               zoom,
+                                               viewPortWidth,
+                                               viewPortHeight,
+                                               showUnder);
 }
 
 void Surface3dController::setWidth(const int width)
 {
+    qDebug() << "Surface3dController::setWidth";
     m_renderer->setWidth(width);
 }
 
 void Surface3dController::setHeight(const int height)
 {
+    qDebug() << "Surface3dController::setHeight";
     m_renderer->setHeight(height);
 }
 
@@ -98,20 +113,34 @@ void touchEvent(QTouchEvent *event)
 
 void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    Q_UNUSED(event)
-    Q_UNUSED(mousePos)
+    if (Qt::RightButton == event->button()) {
+    #if !defined(Q_OS_ANDROID)
+        m_mouseState = Abstract3DController::MouseRotating;
+    #else
+        m_mouseState = Abstract3DController::MouseOnScene;
+    #endif
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        m_mousePos = mousePos; //event->pos();
+    }
+    m_cameraHelper->updateMousePos(m_mousePos);
 }
 
 void Surface3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event)
-    Q_UNUSED(mousePos)
+    if (Abstract3DController::MouseRotating == m_mouseState) {
+        // update mouse positions to prevent jumping when releasing or repressing a button
+        m_mousePos = mousePos; //event->pos();
+        m_cameraHelper->updateMousePos(mousePos); //event->pos());
+    }
+    m_mouseState = Abstract3DController::MouseNone;
 }
 
 void Surface3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event)
-    Q_UNUSED(mousePos)
+    if (Abstract3DController::MouseRotating == m_mouseState)
+        m_mousePos = mousePos; //event->pos();
 }
 
 void Surface3dController::wheelEvent(QWheelEvent *event)

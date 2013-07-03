@@ -103,8 +103,6 @@ public:
     ShadowQuality m_shadowQuality;
     bool m_hasNegativeValues;
 
-    CameraHelper *m_camera;
-
 private:
     // Data parameters
     GLint m_tickYCount;
@@ -140,7 +138,7 @@ public:
     ~Surface3dRenderer();
 
     void initializeOpenGL();
-    void render(const GLuint defaultFboHandle = 0);
+    void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
 
     // TODO: Not thread-safe, needs rethinking how axes create labels
     Drawer *drawer() { return m_drawer; }
@@ -180,7 +178,7 @@ public:
     void setXZStuff(GLint tickXCount, GLint tickZCount);
 
 private:
-    void drawScene(const GLuint defaultFboHandle);
+    void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
 

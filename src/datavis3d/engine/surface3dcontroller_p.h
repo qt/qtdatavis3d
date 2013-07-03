@@ -66,12 +66,20 @@ class QT_DATAVIS3D_EXPORT Surface3dController : public Abstract3DController
     Surface3dRenderer *m_renderer;
     bool m_isInitialized;
 
+private:
+    // Interaction
+    MouseState m_mouseState;
+    QPoint m_mousePos;
+    SelectionMode m_selectionMode;
+
 public:
     explicit Surface3dController(QRect rect);
     ~Surface3dController();
 
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
+
+    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
 
     void setWidth(const int width);
     void setHeight(const int height);
