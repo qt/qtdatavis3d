@@ -76,12 +76,14 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_tickStep(0),
       m_tickMinimum(0.0f),
       m_renderer(0),
-      m_data(new QBarDataProxy)
+      m_data(0)
 {
     // Default axes. Only Y axis can actually be changed by user.
     setAxisX(new QCategoryAxis());
     setAxisY(new QValueAxis());
     setAxisZ(new QCategoryAxis());
+
+    setDataProxy(new QBarDataProxy);
 }
 
 Bars3dController::~Bars3dController()
@@ -406,7 +408,7 @@ void Bars3dController::setMeshFileName(const QString &objFileName)
 }
 
 // TODO: This sets data window. Needs more parameters, now assumes window always starts at 0,0.
-void Bars3dController::setupSampleSpace(int columnCount, int rowCount)
+void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);

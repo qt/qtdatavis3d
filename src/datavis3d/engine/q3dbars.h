@@ -73,25 +73,6 @@ public:
     explicit Q3DBars();
     ~Q3DBars();
 
-    // Add a row of data. Each new row is added to the front of the sample space, moving previous
-    // rows back (if sample space is more than one row deep)
-    //void addDataRow(const QVector<float> &dataRow);
-
-    // ownership of dataItems is transferred
-    //void addDataRow(const QVector<QDataItem*> &dataRow);
-
-    // ownership of dataRow is transferred
-    //void addDataRow(QDataRow *dataRow);
-
-    // Add complete data set at a time, as a vector of data rows
-    //void addDataSet(const QVector< QVector<float> > &data);
-
-    // ownership of dataItems is transferred
-    //void addDataSet(const QVector< QVector<QDataItem*> > &data);
-
-    // ownership of dataSet is transferred
-    //void addDataSet(QDataSet* dataSet);
-
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between

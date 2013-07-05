@@ -86,7 +86,7 @@ MainApp::MainApp(Q3DBars *window)
       m_lowFreq(SpectrumLowFreq),
       m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setupSampleSpace(SpectrumNumBands, SpectrumNumBands * 2);
+    m_chart->setupSampleSpace(SpectrumNumBands * 2, SpectrumNumBands);
     // Disable grid
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining tick count and step, even though we don't draw grid

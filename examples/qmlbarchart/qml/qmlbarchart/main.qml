@@ -125,7 +125,7 @@ Item {
         testset1.addRow(testrow1);
         testset1.addRow(testrow2);
 
-        testchart.setupSampleSpace(4, 2);
+        testchart.setupSampleSpace(2, 4);
         testchart.addDataSet(testset1);
     }
 

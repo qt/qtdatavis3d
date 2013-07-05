@@ -53,20 +53,22 @@ QCategoryAxis::~QCategoryAxis()
 {
 }
 
-void QCategoryAxis::setLabels(const QVector<QString> &labels)
+void QCategoryAxis::setLabels(const QStringList &labels)
 {
     int newSize(labels.size());
     int oldSize(d_ptr->m_labels.size());
 
-    for (int i = oldSize - 1; i >= newSize; i--)
-        d_ptr->m_labelItems[i].clear();
+    for (int i = newSize; i < oldSize; i++)
+        delete d_ptr->m_labelItems.takeLast();
 
-    d_ptr->m_labelItems.resize(newSize);
+    d_ptr->m_labelItems.reserve(newSize);
 
     if (d_ptr->m_drawer) {
         for (int i = 0; i < newSize; i++) {
+            if (i >= oldSize)
+                d_ptr->m_labelItems.append(new LabelItem);
             if (i >= oldSize || labels.at(i) != d_ptr->m_labels.at(i))
-                d_ptr->m_drawer->generateLabelItem(d_ptr->m_labelItems[i], labels.at(i));
+                d_ptr->m_drawer->generateLabelItem(*d_ptr->m_labelItems[i], labels.at(i));
         }
     }
 
@@ -90,7 +92,7 @@ QCategoryAxisPrivate::~QCategoryAxisPrivate()
 void QCategoryAxisPrivate::updateLabels()
 {
     for (int i = 0; i < m_labels.size(); i++)
-        m_drawer->generateLabelItem(m_labelItems[i], m_labels.at(i));
+        m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i));
 }
 
 QT_DATAVIS3D_END_NAMESPACE

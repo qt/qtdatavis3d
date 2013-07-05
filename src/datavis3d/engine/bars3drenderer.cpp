@@ -310,7 +310,6 @@ void Bars3dRenderer::render(const QBarDataArray &dataArray,
                             const LabelItem &zLabel,
                             const GLuint defaultFboHandle)
 {
-    // TODO: Protect access to data with mutex!
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
     if (m_isFirstFrame) {
@@ -481,11 +480,13 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     QBarDataItem *dummyItem = NULL;
     const LabelItem &sliceSelectionLabel = *m_sliceTitleItem;
     if (ModeZoomRow == m_cachedSelectionMode) {
-        m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), 0,
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, false, false, LabelTop);
+        if (m_sliceTitleItem) {
+            m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, 0.0f, 0.0f), 0,
+                                m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, camera, false, false, LabelTop);
+        }
         m_drawer->drawLabel(*dummyItem, zLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
@@ -497,11 +498,13 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera, false, false, LabelBottom);
-        m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), 0,
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, false, false, LabelTop);
+        if (m_sliceTitleItem) {
+            m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, 0.0f, 0.0f), 0,
+                                m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, camera, false, false, LabelTop);
+        }
     }
     m_drawer->drawLabel(*dummyItem, yLabel, viewMatrix, projectionMatrix,
                         QVector3D(0.0f, m_yAdjustment, zComp),
@@ -520,22 +523,22 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                             m_labelObj, camera);
 
         // Draw labels
-        const LabelItem *labelItem;
         // TODO: Protect with mutex or redesign axis label handling?
         if (m_sliceAxisP->labelItems().size() > col) {
+            const LabelItem *labelItem(0);
             // If draw order of bars is flipped, label draw order should be too
             if (m_xFlipped) {
-                labelItem = &m_sliceAxisP->labelItems().at(col);
+                labelItem = m_sliceAxisP->labelItems().at(col);
             } else {
-                labelItem = &m_sliceAxisP->labelItems().at(
+                labelItem = m_sliceAxisP->labelItems().at(
                             m_sliceAxisP->labelItems().size() - col - 1);
             }
+            m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, 0.0f, -45.0f), (item->value() / m_heightNormalizer),
+                                m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, camera, false, false, LabelBelow);
         }
-        m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, -45.0f), (item->value() / m_heightNormalizer),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, false, false, LabelBelow);
     }
 
     glDisable(GL_TEXTURE_2D);
@@ -668,6 +671,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             if (dataArray.size() <= row || !dataArray.at(row))
                 continue;
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
+                if (dataArray.at(row)->size() <= bar)
+                    continue;
                 QBarDataItem *item = dataArray.at(row)->at(bar);
                 if (!item)
                     continue;
@@ -770,6 +775,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             if (dataArray.size() <= row || !dataArray.at(row))
                 continue;
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
+                if (dataArray.at(row)->size() <= bar)
+                    continue;
                 QBarDataItem *item = dataArray.at(row)->at(bar);
                 if (!item)
                     continue;
@@ -877,12 +884,15 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
     if (!m_cachedIsSlicingActivated && m_sliceSelection) {
         m_sliceSelection->clear(); // Slice doesn't own its items
         m_sliceAxisP = 0;
+        m_sliceTitleItem = 0;
     }
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
         if (dataArray.size() <= row || !dataArray.at(row))
             continue;
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
+            if (dataArray.at(row)->size() <= bar)
+                continue;
             QBarDataItem *item = dataArray.at(row)->at(bar);
             if (!item)
                 continue;
@@ -959,8 +969,10 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisZ()->d_ptr.data();
-                            m_sliceTitleItem = &m_controller->axisX()->d_ptr->labelItems().at(
-                                        m_controller->axisX()->d_ptr->labelItems().size() - row - 1);
+                            if (m_controller->axisX()->d_ptr->labelItems().size() > row) {
+                                m_sliceTitleItem = m_controller->axisX()->d_ptr->labelItems().at(
+                                            m_controller->axisX()->d_ptr->labelItems().size() - row - 1);
+                            }
                         }
                     }
                     break;
@@ -975,8 +987,10 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisX()->d_ptr.data();
-                            m_sliceTitleItem = &m_controller->axisZ()->d_ptr->labelItems().at(
-                                        m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1);
+                            if (m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
+                                m_sliceTitleItem = m_controller->axisZ()->d_ptr->labelItems().at(
+                                            m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1);
+                            }
                         }
                     }
                     break;
@@ -1384,10 +1398,9 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
 #else
         // TODO: using static is bad, cannot use two barcharts at the same time!
         // TODO: Besides, doesn't m_previouslySelectedBar mechanic already cover this?
-        static bool firstSelection = true;
         // Draw the value string followed by row label and column label
         LabelItem &labelItem = m_selectedBar->d_ptr->selectionLabel();
-        if (firstSelection || m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
             QString labelText = m_selectedBar->label();
             if ((m_controller->axisZ()->labels().size() > m_selectedBar->dptr()->position().y())
                     && (m_controller->axisX()->labels().size() > m_selectedBar->dptr()->position().x())) {
@@ -1400,7 +1413,6 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             }
             m_drawer->generateLabelItem(labelItem, labelText);
             m_previouslySelectedBar = m_selectedBar;
-            firstSelection = false;
         }
 
         m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
@@ -1462,7 +1474,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             // TODO: Try it; draw the label here
 
             m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
-            const LabelItem &axisLabelItem = m_controller->axisX()->d_ptr->labelItems().at(
+            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(
                         m_controller->axisX()->d_ptr->labelItems().size() - row - 1);
             //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
 
@@ -1505,7 +1517,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             // TODO: Try it; draw the label here
 
             m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
-            const LabelItem &axisLabelItem = m_controller->axisZ()->d_ptr->labelItems().at(
+            const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(
                         m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1);
             //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
 

@@ -71,10 +71,8 @@ public:
     void clear();
 
 private:
-    // LabelItem owns a global texture id resource, and deletes it at destructor,
-    // so we disable assignment operator as a safety measure. We don't use Q_DISABLE_COPY
-    // macro, because that also disables the default constructor, which we need.
-    LabelItem &operator=(const LabelItem &);
+    Q_DISABLE_COPY(LabelItem);
+
     QSize m_size;
     GLuint m_textureId;
 };

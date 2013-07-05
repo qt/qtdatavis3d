@@ -52,6 +52,7 @@ class QT_DATAVIS3D_EXPORT QBarDataItem : public QAbstractDataItem
 {
 public:
     QBarDataItem();
+    QBarDataItem(float value);
     ~QBarDataItem();
 
     void setValue(float value);

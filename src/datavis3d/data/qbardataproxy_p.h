@@ -66,10 +66,11 @@ public:
     QBarDataProxyPrivate(QBarDataProxy *q);
     virtual ~QBarDataProxyPrivate();
 
-    void resetArray(int rowCount, int columnCount);
-    // TODO void resetRow(int rowIndex);
+    void resetArray(QBarDataArray *newArray, int rowCount, int columnCount);
     void setRow(int rowIndex, QBarDataRow *row);
+    int addRow(QBarDataRow *row);
     int addRows(QBarDataArray *rows);
+    void insertRow(int rowIndex, QBarDataRow *row);
     void insertRows(int rowIndex, QBarDataArray *rows);
 
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
@@ -79,8 +80,8 @@ public:
 
 protected:
     void clearRow(int rowIndex);
-    void addEmptyRow();
-    void fixRow(QBarDataRow &row);
+    void clearArray();
+    void fixRow(QBarDataRow *row);
 
     QBarDataArray m_dataArray;
 

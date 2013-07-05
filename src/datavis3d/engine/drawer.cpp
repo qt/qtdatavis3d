@@ -305,6 +305,8 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text)
 {
     initializeOpenGL();
 
+    item.clear();
+
     // Create labels
     // Print label into a QImage using QPainter
     QImage label = Utils::printTextToImage(m_font,

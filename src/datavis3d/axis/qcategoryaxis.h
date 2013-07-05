@@ -55,7 +55,7 @@ public:
     explicit QCategoryAxis();
     ~QCategoryAxis();
 
-    void setLabels(const QVector<QString> &labels);
+    void setLabels(const QStringList &labels);
 
 protected:
     QCategoryAxisPrivate *dptr();

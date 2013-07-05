@@ -42,10 +42,10 @@
 #define CHARTMODIFIER_H
 
 #include "q3dbars.h"
-#include "qdataset.h"
 
 #include <QFont>
 #include <QDebug>
+#include <QStringList>
 
 using namespace QtDataVis3D;
 
@@ -100,6 +100,8 @@ private:
     int m_ticks;
     float m_tickStep;
     float m_minval;
+    QStringList m_genericRowLabels;
+    QStringList m_genericColumnLabels;
 };
 
 #endif

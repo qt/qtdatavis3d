@@ -82,11 +82,15 @@ public:
 
     // Selection label item (containing special selection texture, if mode is activated)
     // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
-    void setSelectionLabel(const LabelItem &labelItem);
     const LabelItem &selectionLabel() const { return m_selectionLabel; }
     LabelItem &selectionLabel() { return m_selectionLabel; }
 
     void setDataProxy(QAbstractDataProxy *proxy) { m_dataProxy = proxy; }
+
+    // setLabel is not public because changing value automatically reformats it.
+    // If we want to enable custom labels for items, we should have item specific
+    // labelFormat instead.
+    void setLabel(const QString &label);
 
 protected:
     virtual void formatLabel() = 0;

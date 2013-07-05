@@ -94,7 +94,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
 #endif
 
     // Set bar type to smooth bar
@@ -201,7 +201,7 @@ void ChartDataGenerator::addDataSet()
         row.clear();
     }
     // Set up sample space based on inserted data
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
     // Add data to chart
     m_chart->addDataSet(data);
 #else
@@ -212,9 +212,9 @@ void ChartDataGenerator::addDataSet()
     m_chart->setWindowTitle(QStringLiteral("Hours playing banjo"));
 
     // Set up row and column names
-    QVector<QString> days;
+    QStringList days;
     days << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
-    QVector<QString> weeks;
+    QStringList weeks;
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
@@ -253,7 +253,7 @@ void ChartDataGenerator::addDataSet()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(days.size(), weeks.size());
+    m_chart->setupSampleSpace(weeks.size(), days.size());
 
     // Add data to chart
     static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);

@@ -46,6 +46,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QVector>
+#include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -81,7 +82,7 @@ public:
     virtual ~QAbstractAxis();
 
     QString title() const;
-    QVector<QString> &labels() const;
+    QStringList &labels() const;
 
     AxisOrientation orientation() const;
     AxisType type() const;

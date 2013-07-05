@@ -66,7 +66,7 @@ public:
     virtual ~QAbstractAxisPrivate();
 
     void setDrawer(Drawer *drawer);
-    QVector<LabelItem> &labelItems() { return m_labelItems; }
+    QList<LabelItem *> &labelItems() { return m_labelItems; }
     LabelItem &titleItem() { return m_titleItem; }
     void setOrientation(QAbstractAxis::AxisOrientation orientation);
 
@@ -83,8 +83,8 @@ protected:
     // TODO: Replace Drawer with AbstractRenderer?
     LabelItem m_titleItem;
     Drawer *m_drawer; // not owned
-    QVector<QString> m_labels;
-    QVector<LabelItem> m_labelItems;
+    QStringList m_labels;
+    QList<LabelItem *> m_labelItems;
     QAbstractAxis::AxisOrientation m_orientation;
     QAbstractAxis::AxisType m_type;
 

@@ -840,7 +840,6 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         // Draw just the value string of the selected bar
         QBarDataItem dummyItem; // TODO temporary solution
         dummyItem.setValue(m_selectedBar->d_ptr->value());
-        dummyItem.setLabel(m_selectedBar->d_ptr->valueStr());
         if (prevItem != m_selectedBar || m_updateLabels) {
             m_drawer->generateLabelTexture(&dummyItem);
             prevItem = m_selectedBar;

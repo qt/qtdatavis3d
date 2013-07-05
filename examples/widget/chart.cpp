@@ -41,9 +41,9 @@
 #include "chart.h"
 #include "qcategoryaxis.h"
 #include "qvalueaxis.h"
-#include "qolddataproxy.h"
+#include "qbardataproxy.h"
 
-using namespace QtDataVis3D;
+QT_DATAVIS3D_USE_NAMESPACE
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -64,6 +64,12 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_minval(-15.2f)
 {
     // Don't set any styles or specifications, start from defaults
+    // Generate generic labels
+    for (int i = 0; i < m_rowCount; i++)
+        m_genericRowLabels << QStringLiteral("Row %1").arg(i);
+    for (int i = 0; i < m_columnCount; i++)
+        m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
+
 }
 
 ChartModifier::~ChartModifier()
@@ -88,12 +94,20 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setFont(QFont("Times Roman", 20));
         m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
     } else {
+        m_chart->dataProxy()->resetArray(0, 0);
         // Set up sample space
-        m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+        m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
         m_chart->setSelectionMode(ModeBarRowAndColumn);
         // Reset tick count to default
         m_chart->setTickCount(0, 0);
+
+        m_chart->rowAxis()->setTitle("Generic Row");
+        m_chart->columnAxis()->setTitle("Generic Column");
+        m_chart->valueAxis()->setTitle("Generic Value");
+
+        m_chart->rowAxis()->setLabels(QStringList());
+        m_chart->columnAxis()->setLabels(m_genericColumnLabels);
     }
 }
 
@@ -106,9 +120,9 @@ void ChartModifier::addDataSet()
     m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     // Set up row and column names
-    QVector<QString> months;
+    QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QVector<QString> years;
+    QStringList years;
     years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
     // Set up data
@@ -120,8 +134,9 @@ void ChartModifier::addDataSet()
                          {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
                          {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};    // 2012
 
-    // Create data set
-    QDataSet *dataSet = new QDataSet();
+    // Use default data proxy to feed data directly in expected format
+    QBarDataProxy *proxy = m_chart->dataProxy();
+    proxy->setItemLabelFormat(celsiusString);
 
     // Add labels
     m_chart->rowAxis()->setTitle("Year");
@@ -131,18 +146,19 @@ void ChartModifier::addDataSet()
     m_chart->columnAxis()->setLabels(months);
 
     // Create data rows
-    QDataRow *dataRow;
+    QBarDataArray *dataSet = new QBarDataArray;
+    QBarDataRow *dataRow;
+
+    dataSet->reserve(years.size());
     for (int year = 0; year < years.size(); year++) {
-        dataRow = new QDataRow();
+        dataRow = new QBarDataRow;
         // Create data items
         for (int month = 0; month < months.size(); month++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(temp[year][month], celsiusString));
+            dataRow->append(new QBarDataItem(temp[year][month]));
         }
         // Add row to set
-        dataSet->addRow(dataRow);
-        // Get next pointer
-        dataRow++;
+        dataSet->append(dataRow);
     }
 
     // Set tick count (4 steps of 5 degrees, with absolute minimum of -16C, even though we don't have quite that low temperatures in the data)
@@ -151,20 +167,21 @@ void ChartModifier::addDataSet()
     m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(months.size(), years.size());
+    m_chart->setupSampleSpace(years.size(), months.size());
 
-    QOldDataProxy *proxy = new QOldDataProxy;
-    m_chart->setDataProxy(proxy);
-    // Add data to chart
-    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);
+    // Add data to chart (chart assumes ownership)
+    proxy->resetArray(dataSet);
 }
 
 void ChartModifier::addBars()
 {
-    QVector<float> data;
+    QBarDataRow *dataRow = new QBarDataRow;
     for (float i = 0; i < m_columnCount; i++)
-        data.append(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
-    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
+        dataRow->append(new QBarDataItem(i + m_chart->dataProxy()->rowCount()));
+        //dataRow->append(new QBarDataItem(((i + 1) / (float)m_columnCount) * (float)(rand() % 100)));
+    m_chart->dataProxy()->insertRow(0, dataRow);
+    if (m_chart->dataProxy()->rowCount() <= m_rowCount)
+        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_chart->dataProxy()->rowCount()));
 }
 
 void ChartModifier::changeStyle()
@@ -347,11 +364,11 @@ void ChartModifier::setSpacingSpecsZ(int spacing)
 void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
 }

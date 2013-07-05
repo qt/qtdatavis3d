@@ -50,7 +50,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
  * \since 1.0.0
  *
- * A QAbstractDataItem holds data for a single rendered bar in a graph.
+ * A QBarDataItem holds data for a single rendered bar in a graph.
  * Bar data proxies parse data into QBarDataItem instances for visualizing.
  *
  * \sa QAbstractDataItem, QBarDataProxy, {Qt Data Visualization 3D C++ Classes}
@@ -64,6 +64,12 @@ QBarDataItem::QBarDataItem()
 {
 }
 
+QBarDataItem::QBarDataItem(float value)
+    : QAbstractDataItem(new QBarDataItemPrivate())
+{
+    setValue(value);
+}
+
 
 /*!
  * Destroys QBarDataItem.
@@ -75,7 +81,7 @@ QBarDataItem::~QBarDataItem()
 void QBarDataItem::setValue(float value)
 {
     dptr()->m_value = value;
-    setLabel(QString()); // Forces reformatting on next access
+    d_ptr->setLabel(QString()); // Forces reformatting on next access
 }
 
 float QBarDataItem::value()
@@ -98,10 +104,10 @@ void QBarDataItemPrivate::formatLabel()
     // Format the string on first access
     QString numStr;
     numStr.setNum(m_value);
-    // TODO actually format instead of just appending the value
+    // TODO actually format instead of just prepending the value
     m_label.clear();
-    m_label.append(m_dataProxy->itemLabelFormat());
     m_label.append(numStr);
+    m_label.append(m_dataProxy->itemLabelFormat());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

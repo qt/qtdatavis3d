@@ -59,7 +59,7 @@ QString QAbstractAxis::title() const
     return d_ptr->m_title;
 }
 
-QVector<QString> &QAbstractAxis::labels() const
+QStringList &QAbstractAxis::labels() const
 {
     return d_ptr->m_labels;
 }
@@ -100,7 +100,7 @@ QAbstractAxisPrivate::~QAbstractAxisPrivate()
 {
     m_titleItem.clear();
     for (int i = 0; i < m_labelItems.size(); i++)
-        m_labelItems[i].clear();
+        delete m_labelItems[i];
 }
 
 void QAbstractAxisPrivate::setDrawer(Drawer *drawer)

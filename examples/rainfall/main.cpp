@@ -74,12 +74,12 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
 
     // Set up sample space; make it match actual data size
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
 
     // Set axis labels and titles
-    QVector<QString> months;
+    QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QVector<QString> years;
+    QStringList years;
     years << "2000" << "2001" << "2002" << "2003" << "2004" << "2005" << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
     m_chart->rowAxis()->setTitle("Year");

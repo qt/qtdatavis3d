@@ -57,8 +57,10 @@ protected:
 public:
     virtual ~QAbstractDataItem();
 
+    // Set custom label format for this item - otherwise uses label format specified by the proxy
+    //TODO void setLabelFormat(const QString &labelFormat);
+
     // formatted label for value
-    void setLabel(const QString &label);
     QString &label() const;
 
 protected:

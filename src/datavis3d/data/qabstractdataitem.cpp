@@ -70,16 +70,6 @@ QAbstractDataItem::~QAbstractDataItem()
 {
 }
 
-/*!
- * \a label A formatted label for the data item.
- *
- * Sets the formatted label for the data item.
- */
-void QAbstractDataItem::setLabel(const QString &label)
-{
-    d_ptr->m_label = label;
-}
-
 QString &QAbstractDataItem::label() const
 {
     if (d_ptr->m_label.isNull())
@@ -94,6 +84,12 @@ QAbstractDataItemPrivate::QAbstractDataItemPrivate()
 
 QAbstractDataItemPrivate::~QAbstractDataItemPrivate()
 {
+}
+
+void QAbstractDataItemPrivate::setLabel(const QString &label)
+{
+    m_labelItem.clear();
+    m_label = label;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

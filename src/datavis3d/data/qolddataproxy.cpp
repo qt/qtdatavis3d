@@ -176,7 +176,7 @@ void QOldDataProxy::addProxySet(QDataSet *dataSet)
         newProxyArray->append(newProxyRow);
     }
 
-    resetArray(rowCount(), columnCount());
+    resetArray(0, 0);
     addRows(newProxyArray);
 }
 
