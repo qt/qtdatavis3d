@@ -39,53 +39,74 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QVARIANTBARDATAPROXY_H
+#define QVARIANTBARDATAPROXY_H
 
 #include "qbardataproxy.h"
-#include "qabstractdataproxy_p.h"
-#include "qbardataitem.h"
-
-#ifndef QBARDATAPROXY_P_H
-#define QBARDATAPROXY_P_H
+#include "qvariantdataset.h"
+#include <QStringList>
+#include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QBarDataProxyPrivate : public QAbstractDataProxyPrivate
+class QVariantBarDataProxyPrivate;
+class QVariantDataSet;
+class QVariantBarDataProxy;
+
+class QVariantBarMappingItem {
+public:
+    enum Mapping {
+        MapRow = 0,
+        MapColumn,
+        MapValue
+    };
+
+    QVariantBarMappingItem()
+        : itemIndex(0) {}
+
+    QVariantBarMappingItem(int index)
+        : itemIndex(index) {}
+
+    QVariantBarMappingItem(int index, QStringList categories)
+        : itemIndex(index),
+          itemCategories(categories) {}
+
+    QVariantBarMappingItem(const QVariantBarMappingItem &item)
+        : itemIndex(item.itemIndex),
+          itemCategories(item.itemCategories) {}
+
+    ~QVariantBarMappingItem() {}
+
+    // Index of the mapped item in the QVariantDataItem
+    int itemIndex;
+
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    // Not used for value mapping.
+    QStringList itemCategories;
+};
+
+typedef QMap<QVariantBarMappingItem::Mapping, QVariantBarMappingItem> QVariantBarMapping;
+
+class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
+
 public:
-    QBarDataProxyPrivate(QBarDataProxy *q);
-    virtual ~QBarDataProxyPrivate();
+    explicit QVariantBarDataProxy();
+    virtual ~QVariantBarDataProxy();
 
-    bool resetArray(QBarDataArray *newArray);
-    void setRow(int rowIndex, QBarDataRow *row);
-    int addRow(QBarDataRow *row);
-    int addRows(QBarDataArray *rows);
-    void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, QBarDataArray *rows);
+    void setDataSet(QVariantDataSet *newSet); // Gains ownership
 
-    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+    // Map key (row, column, value) to value index in data item (QVariantItem).
+    void setMappings(const QVariantBarMapping &mappings);
 
-private:
-    void clearRow(int rowIndex);
-    void clearArray();
-
-    QBarDataArray m_dataArray;
-
-    QString m_itemLabelFormat;
+protected:
+    QVariantBarDataProxyPrivate *dptr();
 
 private:
-    friend class QBarDataProxy;
+    Q_DISABLE_COPY(QVariantBarDataProxy)
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QBARDATAPROXY_P_H
+#endif // QBARDATAPROXY_H

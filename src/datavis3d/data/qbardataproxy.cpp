@@ -50,14 +50,19 @@ QBarDataProxy::QBarDataProxy() :
 {
 }
 
+QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d) :
+    QAbstractDataProxy(d)
+{
+}
+
 QBarDataProxy::~QBarDataProxy()
 {
 }
 
 void QBarDataProxy::resetArray(QBarDataArray *newArray)
 {
-    dptr()->resetArray(newArray);
-    emit arrayReset();
+    if (dptr()->resetArray(newArray))
+        emit arrayReset();
 }
 
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
@@ -137,15 +142,21 @@ QBarDataProxyPrivate::~QBarDataProxyPrivate()
     clearArray();
 }
 
-void QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
+bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
 {
     QMutexLocker locker(&m_mutex);
+
+    if (!m_dataArray.size() && (!newArray || !newArray->size()))
+        return false;
+
     clearArray();
 
     if (newArray) {
         m_dataArray = *newArray;
         delete newArray;
     }
+
+    return true;
 }
 
 void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row)

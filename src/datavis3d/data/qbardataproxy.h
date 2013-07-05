@@ -44,7 +44,6 @@
 
 #include "qabstractdataproxy.h"
 #include "qbardataitem.h"
-#include <QVector>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -59,6 +58,7 @@ class QT_DATAVIS3D_EXPORT QBarDataProxy : public QAbstractDataProxy
 
 public:
     explicit QBarDataProxy();
+    explicit QBarDataProxy(QBarDataProxyPrivate *d);
     virtual ~QBarDataProxy();
 
     // BarDataProxy is optimized for adding, inserting, and removing rows of data.

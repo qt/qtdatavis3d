@@ -39,53 +39,77 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#include "qbardataproxy.h"
-#include "qabstractdataproxy_p.h"
-#include "qbardataitem.h"
-
-#ifndef QBARDATAPROXY_P_H
-#define QBARDATAPROXY_P_H
+#include "qvariantdataset_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QBarDataProxyPrivate : public QAbstractDataProxyPrivate
+QVariantDataSet::QVariantDataSet()
+    : d_ptr(new QVariantDataSetPrivate(this))
 {
-    Q_OBJECT
-public:
-    QBarDataProxyPrivate(QBarDataProxy *q);
-    virtual ~QBarDataProxyPrivate();
+}
 
-    bool resetArray(QBarDataArray *newArray);
-    void setRow(int rowIndex, QBarDataRow *row);
-    int addRow(QBarDataRow *row);
-    int addRows(QBarDataArray *rows);
-    void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, QBarDataArray *rows);
+QVariantDataSet::~QVariantDataSet()
+{
+}
 
-    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+void QVariantDataSet::clear()
+{
+    d_ptr->clear();
+    emit dataCleared();
+}
 
-private:
-    void clearRow(int rowIndex);
-    void clearArray();
+int QVariantDataSet::addItem(QVariantDataItem *item)
+{
+    int addIndex = d_ptr->addItem(item);
+    emit itemsAdded(addIndex, 1);
+    return addIndex;
+}
 
-    QBarDataArray m_dataArray;
+int QVariantDataSet::addItems(QVariantDataItemList *itemList)
+{
+    int newCount = itemList->size();
+    int addIndex = d_ptr->addItems(itemList); // deletes itemlist
+    emit itemsAdded(addIndex, newCount);
+    return addIndex;
+}
 
-    QString m_itemLabelFormat;
+const QVariantDataItemList &QVariantDataSet::itemList() const
+{
+    return d_ptr->m_variantData;
+}
 
-private:
-    friend class QBarDataProxy;
-};
+QVariantDataSetPrivate::QVariantDataSetPrivate(QVariantDataSet *q)
+    : q_ptr(q)
+{
+}
+
+QVariantDataSetPrivate::~QVariantDataSetPrivate()
+{
+    clear();
+}
+
+void QVariantDataSetPrivate::clear()
+{
+    foreach (QVariantDataItem *item, m_variantData) {
+        item->clear();
+        delete item;
+    }
+    m_variantData.clear();
+}
+
+int QVariantDataSetPrivate::addItem(QVariantDataItem *item)
+{
+    m_variantData.append(item);
+    return m_variantData.size();
+}
+
+int QVariantDataSetPrivate::addItems(QVariantDataItemList *itemList)
+{
+    int currentCount = m_variantData.size();
+    m_variantData.append(*itemList);
+    delete itemList;
+    return currentCount;
+}
+
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif // QBARDATAPROXY_P_H

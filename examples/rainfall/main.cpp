@@ -39,13 +39,14 @@
 ****************************************************************************/
 
 #include "q3dbars.h"
-#include "qdataitem.h"
 #include "qcategoryaxis.h"
-#include "qolddataproxy.h"
+#include "qvariantbardataproxy.h"
 
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>
+#include <QTextStream>
+#include <QFile>
 
 using namespace QtDataVis3D;
 
@@ -62,6 +63,7 @@ private:
     Q3DBars *m_chart;
     int m_columnCount;
     int m_rowCount;
+    QStringList m_years;
 };
 
 RainfallChart::RainfallChart(Q3DBars *rainfall)
@@ -79,13 +81,12 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     // Set axis labels and titles
     QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QStringList years;
-    years << "2000" << "2001" << "2002" << "2003" << "2004" << "2005" << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
+    m_years << "2000" << "2001" << "2002" << "2003" << "2004" << "2005" << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
     m_chart->valueAxis()->setTitle("rainfall (in mm)");
-    m_chart->rowAxis()->setLabels(years);
+    m_chart->rowAxis()->setLabels(m_years);
     m_chart->columnAxis()->setLabels(months);
 
     // Set bar type to cylinder
@@ -112,6 +113,9 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 
     // Set window title
     m_chart->setWindowTitle(QStringLiteral("Monthly rainfall in Northern Finland (2000-2012)"));
+
+    QVariantBarDataProxy *proxy = new QVariantBarDataProxy;
+    m_chart->setDataProxy(proxy);
 }
 
 RainfallChart::~RainfallChart()
@@ -126,211 +130,44 @@ void RainfallChart::start()
 
 void RainfallChart::addDataSet()
 {
-    // Fill in rainfall per month from 2000 to 2012 in Northern Finland (Sodankylä, Utsjoki, Kuusamo)
-    QVector< QVector<QDataItem*> > data;
-    QVector<QDataItem*> row;
-    // TODO: Change this example to load data from file
-    // 2000
-    row.append(new QDataItem(72, "mm")); //January 2000
-    row.append(new QDataItem(47, "mm")); //February 2000
-    row.append(new QDataItem(37, "mm")); //March 2000
-    row.append(new QDataItem(79, "mm")); //April 2000
-    row.append(new QDataItem(42, "mm")); //May 2000
-    row.append(new QDataItem(73, "mm")); //June 2000
-    row.append(new QDataItem(94, "mm")); //July 2000
-    row.append(new QDataItem(37, "mm")); //August 2000
-    row.append(new QDataItem(17, "mm")); //September 2000
-    row.append(new QDataItem(69, "mm")); //October 2000
-    row.append(new QDataItem(42, "mm")); //November 2000
-    row.append(new QDataItem(42, "mm")); //December 2000
-    data.append(row);
-    row.clear();
-    // 2001
-    row.append(new QDataItem(25, "mm")); //January 2001
-    row.append(new QDataItem(47, "mm")); //February 2001
-    row.append(new QDataItem(20, "mm")); //March 2001
-    row.append(new QDataItem(70, "mm")); //April 2001
-    row.append(new QDataItem(27, "mm")); //May 2001
-    row.append(new QDataItem(40, "mm")); //June 2001
-    row.append(new QDataItem(123, "mm")); //July 2001
-    row.append(new QDataItem(39, "mm")); //August 2001
-    row.append(new QDataItem(66, "mm")); //September 2001
-    row.append(new QDataItem(55, "mm")); //October 2001
-    row.append(new QDataItem(29, "mm")); //November 2001
-    row.append(new QDataItem(12, "mm")); //December 2001
-    data.append(row);
-    row.clear();
-    // 2002
-    row.append(new QDataItem(24, "mm")); //January 2002
-    row.append(new QDataItem(45, "mm")); //February 2002
-    row.append(new QDataItem(27, "mm")); //March 2002
-    row.append(new QDataItem(30, "mm")); //April 2002
-    row.append(new QDataItem(16, "mm")); //May 2002
-    row.append(new QDataItem(98, "mm")); //June 2002
-    row.append(new QDataItem(122, "mm")); //July 2002
-    row.append(new QDataItem(20, "mm")); //August 2002
-    row.append(new QDataItem(50, "mm")); //September 2002
-    row.append(new QDataItem(24, "mm")); //October 2002
-    row.append(new QDataItem(22, "mm")); //November 2002
-    row.append(new QDataItem(12, "mm")); //December 2002
-    data.append(row);
-    row.clear();
-    // 2003
-    row.append(new QDataItem(43, "mm")); //January 2003
-    row.append(new QDataItem(17, "mm")); //February 2003
-    row.append(new QDataItem(26, "mm")); //March 2003
-    row.append(new QDataItem(22, "mm")); //April 2003
-    row.append(new QDataItem(60, "mm")); //May 2003
-    row.append(new QDataItem(14, "mm")); //June 2003
-    row.append(new QDataItem(86, "mm")); //July 2003
-    row.append(new QDataItem(77, "mm")); //August 2003
-    row.append(new QDataItem(69, "mm")); //September 2003
-    row.append(new QDataItem(49, "mm")); //October 2003
-    row.append(new QDataItem(23, "mm")); //November 2003
-    row.append(new QDataItem(44, "mm")); //December 2003
-    data.append(row);
-    row.clear();
-    // 2004
-    row.append(new QDataItem(15, "mm")); //January 2004
-    row.append(new QDataItem(19, "mm")); //February 2004
-    row.append(new QDataItem(10, "mm")); //March 2004
-    row.append(new QDataItem(11, "mm")); //April 2004
-    row.append(new QDataItem(41, "mm")); //May 2004
-    row.append(new QDataItem(29, "mm")); //June 2004
-    row.append(new QDataItem(49, "mm")); //July 2004
-    row.append(new QDataItem(72, "mm")); //August 2004
-    row.append(new QDataItem(50, "mm")); //September 2004
-    row.append(new QDataItem(18, "mm")); //October 2004
-    row.append(new QDataItem(19, "mm")); //November 2004
-    row.append(new QDataItem(40, "mm")); //December 2004
-    data.append(row);
-    row.clear();
-    // 2005
-    row.append(new QDataItem(60, "mm")); //January 2005
-    row.append(new QDataItem(24, "mm")); //February 2005
-    row.append(new QDataItem(12, "mm")); //March 2005
-    row.append(new QDataItem(50, "mm")); //April 2005
-    row.append(new QDataItem(88, "mm")); //May 2005
-    row.append(new QDataItem(32, "mm")); //June 2005
-    row.append(new QDataItem(76, "mm")); //July 2005
-    row.append(new QDataItem(55, "mm")); //August 2005
-    row.append(new QDataItem(92, "mm")); //September 2005
-    row.append(new QDataItem(35, "mm")); //October 2005
-    row.append(new QDataItem(105, "mm")); //November 2005
-    row.append(new QDataItem(59, "mm")); //December 2005
-    data.append(row);
-    row.clear();
-    // 2006
-    row.append(new QDataItem(27, "mm")); //January 2006
-    row.append(new QDataItem(18, "mm")); //February 2006
-    row.append(new QDataItem(17, "mm")); //March 2006
-    row.append(new QDataItem(26, "mm")); //April 2006
-    row.append(new QDataItem(24, "mm")); //May 2006
-    row.append(new QDataItem(18, "mm")); //June 2006
-    row.append(new QDataItem(35, "mm")); //July 2006
-    row.append(new QDataItem(28, "mm")); //August 2006
-    row.append(new QDataItem(80, "mm")); //September 2006
-    row.append(new QDataItem(52, "mm")); //October 2006
-    row.append(new QDataItem(43, "mm")); //November 2006
-    row.append(new QDataItem(44, "mm")); //December 2006
-    data.append(row);
-    row.clear();
-    // 2007
-    row.append(new QDataItem(41, "mm")); //January 2007
-    row.append(new QDataItem(21, "mm")); //February 2007
-    row.append(new QDataItem(30, "mm")); //March 2007
-    row.append(new QDataItem(20, "mm")); //April 2007
-    row.append(new QDataItem(53, "mm")); //May 2007
-    row.append(new QDataItem(29, "mm")); //June 2007
-    row.append(new QDataItem(139, "mm")); //July 2007
-    row.append(new QDataItem(52, "mm")); //August 2007
-    row.append(new QDataItem(51, "mm")); //September 2007
-    row.append(new QDataItem(24, "mm")); //October 2007
-    row.append(new QDataItem(47, "mm")); //November 2007
-    row.append(new QDataItem(33, "mm")); //December 2007
-    data.append(row);
-    row.clear();
-    // 2008
-    row.append(new QDataItem(67, "mm")); //January 2008
-    row.append(new QDataItem(19, "mm")); //February 2008
-    row.append(new QDataItem(30, "mm")); //March 2008
-    row.append(new QDataItem(31, "mm")); //April 2008
-    row.append(new QDataItem(29, "mm")); //May 2008
-    row.append(new QDataItem(79, "mm")); //June 2008
-    row.append(new QDataItem(75, "mm")); //July 2008
-    row.append(new QDataItem(99, "mm")); //August 2008
-    row.append(new QDataItem(34, "mm")); //September 2008
-    row.append(new QDataItem(52, "mm")); //October 2008
-    row.append(new QDataItem(60, "mm")); //November 2008
-    row.append(new QDataItem(20, "mm")); //December 2008
-    data.append(row);
-    row.clear();
-    // 2009
-    row.append(new QDataItem(9, "mm")); //January 2009
-    row.append(new QDataItem(22, "mm")); //February 2009
-    row.append(new QDataItem(11, "mm")); //March 2009
-    row.append(new QDataItem(10, "mm")); //April 2009
-    row.append(new QDataItem(69, "mm")); //May 2009
-    row.append(new QDataItem(30, "mm")); //June 2009
-    row.append(new QDataItem(78, "mm")); //July 2009
-    row.append(new QDataItem(93, "mm")); //August 2009
-    row.append(new QDataItem(70, "mm")); //September 2009
-    row.append(new QDataItem(32, "mm")); //October 2009
-    row.append(new QDataItem(56, "mm")); //November 2009
-    row.append(new QDataItem(23, "mm")); //December 2009
-    data.append(row);
-    row.clear();
-    // 2010
-    row.append(new QDataItem(12, "mm")); //January 2010
-    row.append(new QDataItem(28, "mm")); //February 2010
-    row.append(new QDataItem(55, "mm")); //March 2010
-    row.append(new QDataItem(20, "mm")); //April 2010
-    row.append(new QDataItem(65, "mm")); //May 2010
-    row.append(new QDataItem(26, "mm")); //June 2010
-    row.append(new QDataItem(134, "mm")); //July 2010
-    row.append(new QDataItem(57, "mm")); //August 2010
-    row.append(new QDataItem(51, "mm")); //September 2010
-    row.append(new QDataItem(53, "mm")); //October 2010
-    row.append(new QDataItem(8, "mm")); //November 2010
-    row.append(new QDataItem(9, "mm")); //December 2010
-    data.append(row);
-    row.clear();
-    // 2011
-    row.append(new QDataItem(34, "mm")); //January 2011
-    row.append(new QDataItem(20, "mm")); //February 2011
-    row.append(new QDataItem(30, "mm")); //March 2011
-    row.append(new QDataItem(31, "mm")); //April 2011
-    row.append(new QDataItem(42, "mm")); //May 2011
-    row.append(new QDataItem(78, "mm")); //June 2011
-    row.append(new QDataItem(85, "mm")); //July 2011
-    row.append(new QDataItem(33, "mm")); //August 2011
-    row.append(new QDataItem(42, "mm")); //September 2011
-    row.append(new QDataItem(87, "mm")); //October 2011
-    row.append(new QDataItem(41, "mm")); //November 2011
-    row.append(new QDataItem(72, "mm")); //December 2011
-    data.append(row);
-    row.clear();
-    // 2012
-    row.append(new QDataItem(32, "mm")); //January 2012
-    row.append(new QDataItem(42, "mm")); //February 2012
-    row.append(new QDataItem(30, "mm")); //March 2012
-    row.append(new QDataItem(50, "mm")); //April 2012
-    row.append(new QDataItem(30, "mm")); //May 2012
-    row.append(new QDataItem(70, "mm")); //June 2012
-    row.append(new QDataItem(52, "mm")); //July 2012
-    row.append(new QDataItem(20, "mm")); //August 2012
-    row.append(new QDataItem(99, "mm")); //September 2012
-    row.append(new QDataItem(70, "mm")); //October 2012
-    row.append(new QDataItem(69, "mm")); //November 2012
-    row.append(new QDataItem(49, "mm")); //December 2012
-    data.append(row);
-    row.clear();
+    QVariantDataSet *dataSet =  new QVariantDataSet;
+    QVariantDataItemList *itemList = new QVariantDataItemList;
+    QTextStream stream;
+    QFile dataFile(":/data/raindata.txt");
+    if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        stream.setDevice(&dataFile);
+        while (!stream.atEnd()) {
+            QString line = stream.readLine();
+            if (line.startsWith("#"))
+                continue;
+            QStringList strList = line.split(",", QString::SkipEmptyParts);
+            if (strList.size() < 3) {
+                qWarning() << "Invalid row read from data:" << line;
+                continue;
+            }
+            QVariantDataItem *newItem = new QVariantDataItem;
+            for (int i = 0; i < 3; i++)
+                newItem->append(strList.at(i));
+            itemList->append(newItem);
+        }
+    } else {
+        qWarning() << "Unable to open data file:" << dataFile.fileName();
+    }
 
-    // TODO QDataSet reverses the data in rows and columns when you add it, so results are now mirrored.
-    qWarning() << "Example broken! QDataSet mirrors data, rows and columns will not be correct!";
-    QOldDataProxy *proxy = new QOldDataProxy;
-    m_chart->setDataProxy(proxy);
-    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(data);
+    dataSet->addItems(itemList);
+
+    static_cast<QVariantBarDataProxy *>(m_chart->dataProxy())->setDataSet(dataSet);
+
+    // In data file the months are in numeric format, so create custom list
+    QStringList numericMonths;
+    for (int i = 1; i <= 12; i++)
+        numericMonths << QString::number(i);
+
+    QVariantBarMapping mappings;
+    mappings[QVariantBarMappingItem::MapRow] = QVariantBarMappingItem(0, m_years);
+    mappings[QVariantBarMappingItem::MapColumn] = QVariantBarMappingItem(1, numericMonths);
+    mappings[QVariantBarMappingItem::MapValue] = QVariantBarMappingItem(2);
+    static_cast<QVariantBarDataProxy *>(m_chart->dataProxy())->setMappings(mappings);
 }
 
 int main(int argc, char **argv)

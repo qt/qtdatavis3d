@@ -39,53 +39,45 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QVARIANTDATASET_H
+#define QVARIANTDATASET_H
 
-#include "qbardataproxy.h"
-#include "qabstractdataproxy_p.h"
-#include "qbardataitem.h"
-
-#ifndef QBARDATAPROXY_P_H
-#define QBARDATAPROXY_P_H
+#include "qdatavis3dnamespace.h"
+#include <QScopedPointer>
+#include <QVariantList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QBarDataProxyPrivate : public QAbstractDataProxyPrivate
+class QVariantDataSetPrivate;
+
+typedef QVariantList QVariantDataItem;
+typedef QList<QVariantDataItem *> QVariantDataItemList;
+
+class QT_DATAVIS3D_EXPORT QVariantDataSet : public QObject
 {
     Q_OBJECT
+
 public:
-    QBarDataProxyPrivate(QBarDataProxy *q);
-    virtual ~QBarDataProxyPrivate();
+    explicit QVariantDataSet();
+    ~QVariantDataSet();
 
-    bool resetArray(QBarDataArray *newArray);
-    void setRow(int rowIndex, QBarDataRow *row);
-    int addRow(QBarDataRow *row);
-    int addRows(QBarDataArray *rows);
-    void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, QBarDataArray *rows);
+    void clear();
 
-    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+    int addItem(QVariantDataItem *item);
+    int addItems(QVariantDataItemList *itemList);
 
-private:
-    void clearRow(int rowIndex);
-    void clearArray();
+    const QVariantDataItemList &itemList() const;
 
-    QBarDataArray m_dataArray;
-
-    QString m_itemLabelFormat;
+signals:
+    void itemsAdded(int index, int count);
+    void dataCleared();
 
 private:
-    friend class QBarDataProxy;
+    Q_DISABLE_COPY(QVariantDataSet)
+
+    QScopedPointer<QVariantDataSetPrivate> d_ptr;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QBARDATAPROXY_P_H
+#endif

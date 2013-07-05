@@ -49,43 +49,36 @@
 //
 // We mean it.
 
-#include "qbardataproxy.h"
-#include "qabstractdataproxy_p.h"
-#include "qbardataitem.h"
+#ifndef QVARIANTDATASET_P_H
+#define QVARIANTDATASET_P_H
 
-#ifndef QBARDATAPROXY_P_H
-#define QBARDATAPROXY_P_H
+#include "datavis3dglobal_p.h"
+#include "qvariantdataset.h"
+#include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QBarDataProxyPrivate : public QAbstractDataProxyPrivate
+class QT_DATAVIS3D_EXPORT QVariantDataSetPrivate : public QObject
 {
     Q_OBJECT
+
 public:
-    QBarDataProxyPrivate(QBarDataProxy *q);
-    virtual ~QBarDataProxyPrivate();
+    explicit QVariantDataSetPrivate(QVariantDataSet *q);
+    ~QVariantDataSetPrivate();
 
-    bool resetArray(QBarDataArray *newArray);
-    void setRow(int rowIndex, QBarDataRow *row);
-    int addRow(QBarDataRow *row);
-    int addRows(QBarDataArray *rows);
-    void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, QBarDataArray *rows);
+    void clear();
 
-    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+    int addItem(QVariantDataItem *item);
+    int addItems(QVariantDataItemList *itemList);
 
 private:
-    void clearRow(int rowIndex);
-    void clearArray();
+    QVariantDataSet *q_ptr;
 
-    QBarDataArray m_dataArray;
+    QVariantDataItemList m_variantData;
 
-    QString m_itemLabelFormat;
-
-private:
-    friend class QBarDataProxy;
+    friend class QVariantDataSet;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QBARDATAPROXY_P_H
+#endif
