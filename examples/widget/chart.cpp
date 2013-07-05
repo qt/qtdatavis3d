@@ -65,9 +65,9 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
 {
     // Don't set any styles or specifications, start from defaults
     // Generate generic labels
-    for (int i = 0; i < m_rowCount; i++)
+    for (int i = 0; i < 200; i++)
         m_genericRowLabels << QStringLiteral("Row %1").arg(i);
-    for (int i = 0; i < m_columnCount; i++)
+    for (int i = 0; i < 200; i++)
         m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
 
 }
@@ -365,6 +365,7 @@ void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_chart->dataProxy()->setColumnCount(m_columnCount);
 }
 
 void ChartModifier::setSampleCountZ(int samples)

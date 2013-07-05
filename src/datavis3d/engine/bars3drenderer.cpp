@@ -528,10 +528,10 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
             const LabelItem *labelItem(0);
             // If draw order of bars is flipped, label draw order should be too
             if (m_xFlipped) {
-                labelItem = m_sliceAxisP->labelItems().at(col);
-            } else {
                 labelItem = m_sliceAxisP->labelItems().at(
                             m_sliceAxisP->labelItems().size() - col - 1);
+            } else {
+                labelItem = m_sliceAxisP->labelItems().at(col);
             }
             m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -943,13 +943,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!m_cachedIsSlicingActivated) {
                         m_selectedBar = item;
-                        // TODO why position relies on axis labels? Shouldn't it be just row/column?
-                        if (m_controller->axisX()->d_ptr->labelItems().size() > row
-                                && m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
-                            m_selectedBar->dptr()->setPosition(
-                                        QPoint(m_controller->axisX()->d_ptr->labelItems().size() - row - 1,
-                                               m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1));
-                        }
+                        m_selectedBar->dptr()->setPosition(QPoint(row, bar));
                         item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
                         barSelectionFound = true;
                         if (m_cachedSelectionMode >= ModeZoomRow) {
@@ -969,10 +963,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisZ()->d_ptr.data();
-                            if (m_controller->axisX()->d_ptr->labelItems().size() > row) {
-                                m_sliceTitleItem = m_controller->axisX()->d_ptr->labelItems().at(
-                                            m_controller->axisX()->d_ptr->labelItems().size() - row - 1);
-                            }
+                            if (m_controller->axisX()->d_ptr->labelItems().size() > row)
+                                m_sliceTitleItem = m_controller->axisX()->d_ptr->labelItems().at(row);
                         }
                     }
                     break;
@@ -987,10 +979,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisX()->d_ptr.data();
-                            if (m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
-                                m_sliceTitleItem = m_controller->axisZ()->d_ptr->labelItems().at(
-                                            m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1);
-                            }
+                            if (m_controller->axisZ()->d_ptr->labelItems().size() > bar)
+                                m_sliceTitleItem = m_controller->axisZ()->d_ptr->labelItems().at(bar);
                         }
                     }
                     break;
@@ -1474,8 +1464,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             // TODO: Try it; draw the label here
 
             m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(
-                        m_controller->axisX()->d_ptr->labelItems().size() - row - 1);
+            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(row);
             //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
 
             m_drawer->drawLabel(*m_dummyBarDataItem, axisLabelItem, viewMatrix, projectionMatrix,
@@ -1517,8 +1506,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
             // TODO: Try it; draw the label here
 
             m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(
-                        m_controller->axisZ()->d_ptr->labelItems().size() - bar - 1);
+            const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(bar);
             //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
 
             m_drawer->drawLabel(*m_dummyBarDataItem, axisLabelItem, viewMatrix, projectionMatrix,

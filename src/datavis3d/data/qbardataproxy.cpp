@@ -128,7 +128,6 @@ void QBarDataProxy::setRowCount(int count)
 
 void QBarDataProxy::setColumnCount(int count)
 {
-    QMutexLocker locker(mutex());
     dptr()->setColumnCount(count);
     // TODO emit columnsAdded/columnsRemoved
 }

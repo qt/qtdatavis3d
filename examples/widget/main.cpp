@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     QPushButton *dataButton = new QPushButton(widget);
-    dataButton->setText(QStringLiteral("Add a row of random data"));
+    dataButton->setText(QStringLiteral("Insert a row of data"));
     dataButton->setEnabled(false);
 
     QPushButton *themeButton = new QPushButton(widget);
@@ -147,13 +147,13 @@ int main(int argc, char **argv)
     sampleSliderX->setTickInterval(1);
     sampleSliderX->setMinimum(2);
     sampleSliderX->setValue(10);
-    sampleSliderX->setMaximum(100);
+    sampleSliderX->setMaximum(200);
     sampleSliderX->setEnabled(false);
     QSlider *sampleSliderZ = new QSlider(Qt::Horizontal, widget);
     sampleSliderZ->setTickInterval(1);
     sampleSliderZ->setMinimum(2);
     sampleSliderZ->setValue(10);
-    sampleSliderZ->setMaximum(100);
+    sampleSliderZ->setMaximum(200);
     sampleSliderZ->setEnabled(false);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);

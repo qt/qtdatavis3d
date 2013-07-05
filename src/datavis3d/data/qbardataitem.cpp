@@ -95,6 +95,11 @@ QBarDataItemPrivate *QBarDataItem::dptr()
 }
 
 
+QBarDataItemPrivate::QBarDataItemPrivate()
+    : m_value(0)
+{
+}
+
 QBarDataItemPrivate::~QBarDataItemPrivate()
 {
 }

@@ -60,7 +60,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class QBarDataItemPrivate : public QAbstractDataItemPrivate
 {
 public:
-    QBarDataItemPrivate() {};
+    QBarDataItemPrivate();
     virtual ~QBarDataItemPrivate();
 
     const QPoint &position() { return m_position; }
