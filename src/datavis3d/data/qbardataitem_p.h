@@ -52,26 +52,20 @@
 #ifndef QBARDATAITEM_P_H
 #define QBARDATAITEM_P_H
 
-#include "qabstractdataitem_p.h"
+#include "datavis3dglobal_p.h"
 #include "qbardataitem.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QBarDataItemPrivate : public QAbstractDataItemPrivate
+class QT_DATAVIS3D_EXPORT QBarDataItemPrivate
 {
 public:
     QBarDataItemPrivate();
     virtual ~QBarDataItemPrivate();
 
-    const QPoint &position() { return m_position; }
-    void setPosition(const QPoint &pos) { m_position = pos; }
+    // TODO stores other data for bars besides value
 
 protected:
-    virtual void formatLabel();
-
-    float m_value;
-    QPoint m_position; // x = row, y = column
-
     friend class QBarDataItem;
 };
 

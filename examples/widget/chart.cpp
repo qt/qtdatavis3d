@@ -42,6 +42,7 @@
 #include "qcategoryaxis.h"
 #include "qvalueaxis.h"
 #include "qbardataproxy.h"
+#include <QTime>
 
 QT_DATAVIS3D_USE_NAMESPACE
 
@@ -94,7 +95,7 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setFont(QFont("Times Roman", 20));
         m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
     } else {
-        m_chart->dataProxy()->resetArray(0, 0);
+        m_chart->dataProxy()->resetArray(0);
         // Set up sample space
         m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
@@ -151,11 +152,11 @@ void ChartModifier::addDataSet()
 
     dataSet->reserve(years.size());
     for (int year = 0; year < years.size(); year++) {
-        dataRow = new QBarDataRow;
+        dataRow = new QBarDataRow(months.size());
         // Create data items
         for (int month = 0; month < months.size(); month++) {
             // Add data to rows
-            dataRow->append(new QBarDataItem(temp[year][month]));
+            (*dataRow)[month].setValue(temp[year][month]);
         }
         // Add row to set
         dataSet->append(dataRow);
@@ -173,15 +174,34 @@ void ChartModifier::addDataSet()
     proxy->resetArray(dataSet);
 }
 
-void ChartModifier::addBars()
+void ChartModifier::addRow()
 {
-    QBarDataRow *dataRow = new QBarDataRow;
-    for (float i = 0; i < m_columnCount; i++)
-        dataRow->append(new QBarDataItem(i + m_chart->dataProxy()->rowCount()));
-        //dataRow->append(new QBarDataItem(((i + 1) / (float)m_columnCount) * (float)(rand() % 100)));
+    QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+    for (float i = 0; i < m_columnCount; i++) {
+        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+        //(*dataRow)[i].setValue(i + m_chart->dataProxy()->rowCount());
+    }
     m_chart->dataProxy()->insertRow(0, dataRow);
     if (m_chart->dataProxy()->rowCount() <= m_rowCount)
         m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_chart->dataProxy()->rowCount()));
+}
+
+void ChartModifier::addRows()
+{
+    QTime timer;
+    timer.start();
+    int oldCount = m_chart->dataProxy()->rowCount();
+    QBarDataArray *dataArray = new QBarDataArray();
+    for (int i = 0; i < m_rowCount; i++) {
+        QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+        for (int j = 0; j < m_columnCount; j++)
+            (*dataRow)[j].setValue(qreal(j + i + m_chart->dataProxy()->rowCount()));
+        dataArray->append(dataRow);
+    }
+    m_chart->dataProxy()->insertRows(0, dataArray);
+    if (oldCount < m_rowCount)
+        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
+    qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
 void ChartModifier::changeStyle()
@@ -365,7 +385,6 @@ void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
-    m_chart->dataProxy()->setColumnCount(m_columnCount);
 }
 
 void ChartModifier::setSampleCountZ(int samples)

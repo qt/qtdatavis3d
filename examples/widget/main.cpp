@@ -78,6 +78,10 @@ int main(int argc, char **argv)
     dataButton->setText(QStringLiteral("Insert a row of data"));
     dataButton->setEnabled(false);
 
+    QPushButton *multiDataButton = new QPushButton(widget);
+    multiDataButton->setText(QStringLiteral("Insert many rows of data"));
+    multiDataButton->setEnabled(false);
+
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
 
@@ -185,6 +189,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(sampleSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
     vLayout->addWidget(dataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(multiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -236,7 +241,8 @@ int main(int argc, char **argv)
     QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeTransparency);
-    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addBars);
+    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
+    QObject::connect(multiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
 
@@ -258,6 +264,8 @@ int main(int argc, char **argv)
                      &QSlider::setValue);
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, multiDataButton,
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
                      &QSlider::setEnabled);

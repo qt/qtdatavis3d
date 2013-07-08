@@ -48,9 +48,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-// TODO: Would QVector or mix of QList and QVector be a better choice?
-// TODO: How about not using item pointers but directly allocating items here?
-typedef QList<QBarDataItem *> QBarDataRow;
+typedef QVector<QBarDataItem> QBarDataRow;
 typedef QList<QBarDataRow *> QBarDataArray;
 
 class QBarDataProxyPrivate;
@@ -63,19 +61,20 @@ public:
     explicit QBarDataProxy();
     virtual ~QBarDataProxy();
 
-    // Anyone accessing the data needs to protect the access with QAbstractDataProxy::mutex().
-    // However, unprotected use from same thread that handles data setting to proxy is generally
-    // not very risky, as QtDataVis3D does very little automatic changing of data that can be changed via
-    // public interface. E.g. Item labels is one such example that could conflict.
+    // BarDataProxy is optimized for adding, inserting, and removing rows of data.
+    // Adding a column essentially means modifying every row, which is comparatively very inefficient.
+    // Proxy is also optimized to use cases where the only defining characteristic of an individual
+    // bar is its value. Modifying other data such as color or label format of individual bar
+    // requires allocating additional data object for the bar.
+
+    // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
     int rowCount();
-    int columnCount();
     const QBarDataArray &array() const;
     const QBarDataRow *rowAt(int rowIndex) const;
-    QBarDataItem *itemAt(int rowIndex, int columnIndex);
+    const QBarDataItem *itemAt(int rowIndex, int columnIndex) const; // Row and column in said row need to exist or this crashes
 
     // The data array is a list of list (rows) of QBarDataItem instances.
-    // Each row can contains exactly zero or the column count items, empty items are added if
-    // adding too short rows or removed if adding too long rows.
+    // Each row can contain different amount of items.
 
     // All array/item manipulation functions are internally protected by data mutex.
 
@@ -88,38 +87,23 @@ public:
 
     // QBarDataProxy takes ownership of all QBarDataArrays, QBarDataRows, and QBarDataItems passed to it.
 
-    void setRowCount(int count);
-    void setColumnCount(int count);
-
-    // Clears the array and reserves specified amount of new empty rows.
-    void resetArray(int rowCount, int columnCount);
-    // Clears the existing array and sets it data to new array. Fixes the array according to
-    // specified row and column counts.
-    void resetArray(QBarDataArray *newArray, int rowCount, int columnCount);
     // Clears the existing array and sets it data to new array.
-    // Row count is the row count of new array, and column count is the column count of
-    // the first row of the new array. Rest of the rows are fixed to this count.
     void resetArray(QBarDataArray *newArray);
 
     void setRow(int rowIndex, QBarDataRow *row);
-    // TODO void setColumn(int columnIndex, QBarDataRow *column);
+    // TODO? void setColumn(int columnIndex, QBarDataRow *column);
     // TODO void setItem(int rowIndex, int columnIndex, QBarDataItem *item);
 
     int addRow(QBarDataRow *row); // returns the index of added row
     int addRows(QBarDataArray *rows); // returns the index of first added row
-    // TODO int addColumns(QBarDataArray *columns); // returns the index of first added column
+    // TODO? int addColumns(QBarDataArray *columns); // returns the index of first added column
 
     void insertRow(int rowIndex, QBarDataRow *row);
     void insertRows(int rowIndex, QBarDataArray *rows);
-    // TODO void insertColumns(int columnIndex, QBarDataArray *columns);
+    // TODO? void insertColumns(int columnIndex, QBarDataArray *columns);
 
     // TODO void removeRows(int rowIndex, int removeCount);
-    // TODO void removeColumns(int columnIndex, int removeCount);
-
-
-    // TODO void setRowCount(); // Deletes excess if smaller, creates empties if larger
-    // TODO void setColumnCount();
-
+    // TODO? void removeColumns(int columnIndex, int removeCount);
 
 signals:
     void arrayReset();

@@ -256,6 +256,8 @@ void ChartDataGenerator::addDataSet()
     m_chart->setupSampleSpace(weeks.size(), days.size());
 
     // Add data to chart
+    // TODO QDataSet reverses the data in rows and columns when you add it, so results are now mirrored.
+    qWarning() << "Example broken! QDataSet mirrors data, rows and columns will not be correct!";
     static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);
 #endif
 }

@@ -46,7 +46,6 @@
 #include "camerahelper_p.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
-#include "qabstractdataitem_p.h"
 #include <QMatrix4x4>
 #include <qmath.h>
 
@@ -162,7 +161,7 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
     glBindTexture(GL_TEXTURE_2D, *oldTexId);
 }
 
-void Drawer::drawLabel(const QAbstractDataItem &item, const LabelItem &labelItem,
+void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
                        GLfloat itemHeight, SelectionMode mode,
@@ -193,19 +192,19 @@ void Drawer::drawLabel(const QAbstractDataItem &item, const LabelItem &labelItem
     }
     case LabelMid: {
         // Use this for positioning with absolute item y position value
-        yPosition = item.d_ptr->translation().y();
+        yPosition = item.translation().y();
         break;
     }
     case LabelHigh: {
         // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
-        yPosition = item.d_ptr->translation().y() + itemHeight / 2.0f;
+        yPosition = item.translation().y() + itemHeight / 2.0f;
         break;
     }
     case LabelOver: {
         float mod = 0.1f;
         if (itemHeight < 0)
             mod = -0.1f;
-        yPosition = item.d_ptr->translation().y() - (positionComp.y() / 2.0f - 0.2f)
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f - 0.2f)
                 + itemHeight + mod;
         break;
     }
@@ -259,11 +258,11 @@ void Drawer::drawLabel(const QAbstractDataItem &item, const LabelItem &labelItem
     }
 
     if (position < LabelBottom) {
-        xPosition = item.d_ptr->translation().x();
+        xPosition = item.translation().x();
         if (useDepth)
-            zPosition = item.d_ptr->translation().z();
+            zPosition = item.translation().z();
         else if (ModeZoomColumn == mode)
-            xPosition = -(item.d_ptr->translation().z()) + positionComp.z(); // flip first to left
+            xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 
     // Position label
@@ -295,9 +294,9 @@ void Drawer::drawLabel(const QAbstractDataItem &item, const LabelItem &labelItem
     drawObject(shader, object, labelItem.textureId());
 }
 
-void Drawer::generateLabelTexture(QAbstractDataItem *item)
+void Drawer::generateLabelTexture(AbstractRenderItem *item)
 {
-    LabelItem &labelItem = item->d_ptr->labelItem();
+    LabelItem &labelItem = item->labelItem();
     generateLabelItem(labelItem, item->label());
 }
 

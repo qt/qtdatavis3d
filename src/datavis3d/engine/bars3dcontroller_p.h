@@ -111,6 +111,7 @@ private:
 
     Bars3dRenderer *m_renderer;
     QBarDataProxy *m_data;
+    bool m_valuesDirty;
 
 public:
     explicit Bars3dController(QRect rect);

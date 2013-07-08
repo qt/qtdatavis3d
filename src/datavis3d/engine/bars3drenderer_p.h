@@ -63,6 +63,7 @@
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "qbardataproxy.h"
+#include "barrenderitem_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -114,9 +115,9 @@ private:
 
     // Internal state
     bool m_hasNegativeValues;
-    QBarDataItem *m_selectedBar; // TODO: Does this need to be member variable?
-    QBarDataItem *m_previouslySelectedBar;
-    QBarDataRow *m_sliceSelection;
+    BarRenderItem *m_selectedBar; // TODO: Does this need to be member variable?
+    BarRenderItem *m_previouslySelectedBar;
+    QList<BarRenderItem *> *m_sliceSelection;
     QAbstractAxisPrivate *m_sliceAxisP; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     GLint m_tickCount;
@@ -162,7 +163,11 @@ private:
 
     bool m_hasHeightAdjustmentChanged;
     QPair<GLfloat,GLfloat> m_limits;
-    QBarDataItem *m_dummyBarDataItem;
+    BarRenderItem m_dummyBarRenderItem;
+    QBarDataProxy *m_dataProxy; // Only valid during render
+
+    BarRenderItemArray m_renderItemArray;
+    bool m_dataWindowChanged;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -174,7 +179,7 @@ public:
     explicit Bars3dRenderer(Bars3dController *controller);
     ~Bars3dRenderer();
 
-    void render(const QBarDataArray &dataArray, CameraHelper *camera,
+    void render(QBarDataProxy *dataProxy, bool valuesDirty, CameraHelper *camera,
                 const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
                 const GLuint defaultFboHandle = 0);
 
@@ -190,7 +195,7 @@ public slots:
     void updateSelectionMode(SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateLimits(QPair<GLfloat, GLfloat> newLimits);
-    void updateSampleSpace(int columnCount, int rowCount);
+    void updateSampleSpace(int rowCount, int columnCount);
     void updateZoomLevel(int newZoomLevel);
     void updateFont(const QFont &font);
     void updateLabelTransparency(LabelTransparency transparency);
@@ -214,7 +219,7 @@ private:
     void initializeOpenGL();
     void drawSlicedScene(CameraHelper *camera,
                          const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
-    void drawScene(const QBarDataArray &dataArray, CameraHelper *camera, const GLuint defaultFboHandle);
+    void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 
     void loadBarMesh();
@@ -236,6 +241,8 @@ private:
     Bars3dController::SelectionType isSelected(GLint row, GLint bar);
 
     Q_DISABLE_COPY(Bars3dRenderer)
+
+    friend class BarRenderItem;
 };
 
 

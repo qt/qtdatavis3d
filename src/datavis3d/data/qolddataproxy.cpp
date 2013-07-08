@@ -146,38 +146,31 @@ void QOldDataProxy::addDataSet(QDataSet* dataSet)
 
 void QOldDataProxy::addProxyRow(QDataRow *dataRow)
 {
-    QBarDataRow *newProxyRow = new QBarDataRow;
+    QBarDataRow *newProxyRow = new QBarDataRow(dataRow->d_ptr->m_row.size());
     for (int i = 0; i < dataRow->d_ptr->m_row.size(); i++) {
         QDataItem *oldItem = dataRow->d_ptr->getItem(i);
-        QBarDataItem *newItem = new QBarDataItem;
-        newItem->setValue(oldItem->value());
-        newProxyRow->append(newItem);
+        (*newProxyRow)[i].setValue(qreal(oldItem->value()));
     }
 
-    QBarDataArray *newProxyArray = new QBarDataArray;
-    newProxyArray->append(newProxyRow);
-    insertRows(0, newProxyArray);
+    insertRow(0, newProxyRow);
 }
 
 void QOldDataProxy::addProxySet(QDataSet *dataSet)
 {
-    QBarDataArray *newProxyArray = new QBarDataArray;
-
     QVector<QDataRow *> oldSet = dataSet->d_ptr->set();
+    QBarDataArray *newProxyArray = new QBarDataArray();
+
     for (int i = 0; i < oldSet.size(); i++) {
-        QBarDataRow *newProxyRow = new QBarDataRow;
         QDataRow *oldRow = oldSet.at(i);
+        QBarDataRow *newProxyRow = new QBarDataRow(oldRow->d_ptr->m_row.size());
         for (int j = 0; j < oldRow->d_ptr->m_row.size(); j++) {
             QDataItem *oldItem = oldRow->d_ptr->getItem(j);
-            QBarDataItem *newItem = new QBarDataItem;
-            newItem->setValue(oldItem->value());
-            newProxyRow->append(newItem);
+            (*newProxyRow)[j].setValue(qreal(oldItem->value()));
         }
         newProxyArray->append(newProxyRow);
     }
 
-    resetArray(0, 0);
-    addRows(newProxyArray);
+    resetArray(newProxyArray);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

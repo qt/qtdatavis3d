@@ -65,7 +65,7 @@ void QAbstractDataProxy::setItemLabelFormat(const QString &format)
     emit itemLabelFormatChanged();
 }
 
-const QString &QAbstractDataProxy::itemLabelFormat()
+const QString &QAbstractDataProxy::itemLabelFormat() const
 {
     return d_ptr->m_itemLabelFormat;
 }

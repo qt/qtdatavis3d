@@ -326,6 +326,8 @@ void RainfallChart::addDataSet()
     data.append(row);
     row.clear();
 
+    // TODO QDataSet reverses the data in rows and columns when you add it, so results are now mirrored.
+    qWarning() << "Example broken! QDataSet mirrors data, rows and columns will not be correct!";
     QOldDataProxy *proxy = new QOldDataProxy;
     m_chart->setDataProxy(proxy);
     static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(data);

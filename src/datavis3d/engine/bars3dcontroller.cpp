@@ -76,7 +76,8 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_tickStep(0),
       m_tickMinimum(0.0f),
       m_renderer(0),
-      m_data(0)
+      m_data(0),
+      m_valuesDirty(false)
 {
     // Default axes. Only Y axis can actually be changed by user.
     setAxisX(new QCategoryAxis());
@@ -113,9 +114,10 @@ void Bars3dController::render(const GLuint defaultFboHandle)
         return;
 
     // TODO do not give the entire data array, just the data window
-    QMutexLocker(m_data->mutex());
-    m_renderer->render(m_data->array(), m_cameraHelper, m_axisX->d_ptr->titleItem(),
+    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, m_axisX->d_ptr->titleItem(),
                        m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
+
+    m_valuesDirty = false;
 }
 
 QMatrix4x4 Bars3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
@@ -278,7 +280,7 @@ void Bars3dController::setDataProxy(QBarDataProxy *proxy)
     QObject::connect(m_data, &QBarDataProxy::rowsRemoved, this, &Bars3dController::handleRowsRemoved);
     QObject::connect(m_data, &QBarDataProxy::rowsInserted, this, &Bars3dController::handleRowsInserted);
 
-    // emit something?
+    // emit something? Renderer might be interested?
 }
 
 QBarDataProxy *Bars3dController::dataProxy()
@@ -290,6 +292,7 @@ void Bars3dController::handleArrayReset()
 {
     setSlicingActive(false);
     handleLimitChange();
+    m_valuesDirty = true;
 }
 
 void Bars3dController::handleRowsAdded(int startIndex, int count)
@@ -300,6 +303,7 @@ void Bars3dController::handleRowsAdded(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     handleLimitChange();
+    m_valuesDirty = true;
 }
 
 void Bars3dController::handleRowsChanged(int startIndex, int count)
@@ -310,6 +314,7 @@ void Bars3dController::handleRowsChanged(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     handleLimitChange();
+    m_valuesDirty = true;
 }
 
 void Bars3dController::handleRowsRemoved(int startIndex, int count)
@@ -320,6 +325,7 @@ void Bars3dController::handleRowsRemoved(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     handleLimitChange();
+    m_valuesDirty = true;
 }
 
 void Bars3dController::handleRowsInserted(int startIndex, int count)
@@ -330,6 +336,7 @@ void Bars3dController::handleRowsInserted(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     handleLimitChange();
+    m_valuesDirty = true;
 }
 
 void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -416,7 +423,7 @@ void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
     m_rowCount = rowCount;
     m_columnCount = columnCount;
 
-    emit sampleSpaceChanged(columnCount, rowCount);
+    emit sampleSpaceChanged(rowCount, columnCount);
 }
 
 

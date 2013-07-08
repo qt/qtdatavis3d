@@ -10,8 +10,8 @@ HEADERS += \
            $$PWD/qabstractdataproxy_p.h \
            $$PWD/qbardataproxy.h \
            $$PWD/qbardataproxy_p.h \
-           $$PWD/qabstractdataitem.h \
-           $$PWD/qabstractdataitem_p.h \
+           $$PWD/abstractrenderitem_p.h \
+           $$PWD/barrenderitem_p.h \
            $$PWD/qbardataitem.h \
            $$PWD/qbardataitem_p.h \
            $$PWD/qolddataproxy.h
@@ -23,6 +23,7 @@ SOURCES += \
            $$PWD/labelitem.cpp \
            $$PWD/qabstractdataproxy.cpp \
            $$PWD/qbardataproxy.cpp \
-           $$PWD/qabstractdataitem.cpp \
+           $$PWD/abstractrenderitem.cpp \
+           $$PWD/barrenderitem.cpp \
            $$PWD/qbardataitem.cpp \
            $$PWD/qolddataproxy.cpp

@@ -49,7 +49,7 @@
 #include "utils_p.h"
 #include "drawer_p.h"
 #include "qabstractaxis_p.h"
-#include "qbardataitem_p.h"
+#include "qbardataitem.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -121,12 +121,15 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
       m_hasHeightAdjustmentChanged(true),
-      m_dummyBarDataItem(new QBarDataItem)
+      m_dataProxy(0),
+      m_dataWindowChanged(false)
     #ifdef DISPLAY_RENDER_SPEED
     ,m_isFirstFrame(true),
       m_numFrames(0)
     #endif
 {
+    m_dummyBarRenderItem.setRenderer(this);
+
     // Listen to changes in the drawer
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Bars3dRenderer::updateTextures);
 
@@ -167,7 +170,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
                      &Bars3dRenderer::updateZoomLevel);
 
     updateTheme(m_controller->theme());
-    updateSampleSpace(m_controller->columnCount(), m_controller->rowCount());
+    updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
     updateSelectionMode(m_controller->selectionMode());
     updateSlicingActive(m_controller->isSlicingActive());
     updateLimits(m_controller->limits());
@@ -214,7 +217,6 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_gridLineObj;
     delete m_textureHelper;
     delete m_drawer;
-    delete m_dummyBarDataItem;
 }
 
 void Bars3dRenderer::initializeOpenGL()
@@ -303,7 +305,8 @@ void Bars3dRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3dRenderer::render(const QBarDataArray &dataArray,
+void Bars3dRenderer::render(QBarDataProxy *dataProxy,
+                            bool valuesDirty,
                             CameraHelper *camera,
                             const LabelItem &xLabel,
                             const LabelItem &yLabel,
@@ -325,6 +328,32 @@ void Bars3dRenderer::render(const QBarDataArray &dataArray,
         m_lastFrameTime.restart();
     }
 #endif
+
+    // TODO Would it be enough to just mutex cache update?
+    // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
+    QMutexLocker(dataProxy->mutex());
+    m_dataProxy = dataProxy;
+
+    // Update cached data window
+    // TODO Should data changes be notified via signal instead of reading data in render?
+    // TODO this cache initialization assumes data window starts at 0,0 offset from array
+    if (valuesDirty || m_dataWindowChanged) {
+        m_dataWindowChanged = false;
+        int dataRowCount = dataProxy->rowCount();
+        for (int i = 0; i < m_renderItemArray.size(); i++) {
+            int j = 0;
+            if (i < dataRowCount) {
+                const QBarDataRow *dataRow = dataProxy->rowAt(i);
+                int updateSize = qMin(dataRow->size(), m_renderItemArray[i].size());
+                if (dataRow) {
+                    for (; j < updateSize ; j++)
+                        m_renderItemArray[i][j].setValue(dataRow->at(j).value());
+                }
+            }
+            for (; j < m_renderItemArray[i].size(); j++)
+                m_renderItemArray[i][j].setValue(0);
+        }
+    }
 
     if (defaultFboHandle) {
         glDepthMask(true);
@@ -350,7 +379,7 @@ void Bars3dRenderer::render(const QBarDataArray &dataArray,
         drawSlicedScene(camera, xLabel, yLabel, zLabel);
 
     // Draw bars scene
-    drawScene(dataArray, camera, defaultFboHandle);
+    drawScene(camera, defaultFboHandle);
 }
 
 void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
@@ -413,7 +442,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     // Draw bars
     // Draw the selected row / column
     for (int bar = startBar; bar != stopBar; bar += stepBar) {
-        QBarDataItem *item = m_sliceSelection->at(bar);
+        BarRenderItem *item = m_sliceSelection->at(bar);
         if (!item)
             continue;
 
@@ -428,11 +457,11 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        GLfloat barPosY = item->d_ptr->translation().y() - m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
+        GLfloat barPosY = item->translation().y() - m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
         if (ModeZoomRow == m_cachedSelectionMode)
-            barPosX = item->d_ptr->translation().x();
+            barPosX = item->translation().x();
         else
-            barPosX = -(item->d_ptr->translation().z() - zComp); // flip z; frontmost bar to the left
+            barPosX = -(item->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX, barPosY, zComp);
         modelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
         itModelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
@@ -477,7 +506,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     }
 
     // Draw labels for axes
-    QBarDataItem *dummyItem = NULL;
+    BarRenderItem *dummyItem(0);
     const LabelItem &sliceSelectionLabel = *m_sliceTitleItem;
     if (ModeZoomRow == m_cachedSelectionMode) {
         if (m_sliceTitleItem) {
@@ -514,9 +543,9 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
 
     // Draw labels for bars
     for (int col = 0; col < m_sliceSelection->size(); col++) {
-        QBarDataItem *item = m_sliceSelection->at(col);
+        BarRenderItem *item = m_sliceSelection->at(col);
         // Draw values
-        m_drawer->drawLabel(*item, item->dptr()->labelItem(), viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*item, item->labelItem(), viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), (item->value() / m_heightNormalizer),
                             m_cachedSelectionMode, m_labelShader,
@@ -550,8 +579,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     m_labelShader->release();
 }
 
-void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
-                               CameraHelper *camera,
+void Bars3dRenderer::drawScene(CameraHelper *camera,
                                const GLuint defaultFboHandle)
 {
     GLint startBar = 0;
@@ -668,16 +696,13 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
 #endif
         // Draw bars to depth buffer
         for (int row = startRow; row != stopRow; row += stepRow) {
-            if (dataArray.size() <= row || !dataArray.at(row))
-                continue;
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                if (dataArray.at(row)->size() <= bar)
-                    continue;
-                QBarDataItem *item = dataArray.at(row)->at(bar);
-                if (!item)
+                BarRenderItem &item = m_renderItemArray[row][bar];
+                if (!item.value())
                     continue;
 
-                GLfloat barHeight = item->value() / m_heightNormalizer;
+                // TODO Cache barHeights to render items
+                GLfloat barHeight = item.value() / m_heightNormalizer;
 
                 // skip shadows for 0 -height bars
                 if (barHeight == 0)
@@ -772,16 +797,12 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int row = startRow; row != stopRow; row += stepRow) {
-            if (dataArray.size() <= row || !dataArray.at(row))
-                continue;
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                if (dataArray.at(row)->size() <= bar)
+                BarRenderItem &item = m_renderItemArray[row][bar];
+                if (!item.value())
                     continue;
-                QBarDataItem *item = dataArray.at(row)->at(bar);
-                if (!item)
-                    continue;
-
-                GLfloat barHeight = item->value() / m_heightNormalizer;
+                // TODO resolved bar heights should be cached?
+                GLfloat barHeight = item.value() / m_heightNormalizer;
 
                 if (barHeight < 0)
                     glCullFace(GL_FRONT);
@@ -888,16 +909,13 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
     }
     bool barSelectionFound = false;
     for (int row = startRow; row != stopRow; row += stepRow) {
-        if (dataArray.size() <= row || !dataArray.at(row))
-            continue;
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            if (dataArray.at(row)->size() <= bar)
-                continue;
-            QBarDataItem *item = dataArray.at(row)->at(bar);
-            if (!item)
+            BarRenderItem &item = m_renderItemArray[row][bar];
+            if (!item.value())
                 continue;
 
-            GLfloat barHeight = item->value() / m_heightNormalizer;
+            // TODO resolved bar heights should be cached?
+            GLfloat barHeight = item.value() / m_heightNormalizer;
 
             if (barHeight < 0)
                 glCullFace(GL_FRONT);
@@ -942,13 +960,13 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
                     if (!m_cachedIsSlicingActivated) {
-                        m_selectedBar = item;
-                        m_selectedBar->dptr()->setPosition(QPoint(row, bar));
-                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
+                        m_selectedBar = &item;
+                        m_selectedBar->setPosition(QPoint(row, bar));
+                        item.setTranslation(modelMatrix.column(3).toVector3D());
                         barSelectionFound = true;
                         if (m_cachedSelectionMode >= ModeZoomRow) {
-                            item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                            m_sliceSelection->append(item);
+                            item.setTranslation(modelMatrix.column(3).toVector3D());
+                            m_sliceSelection->append(&item);
                         }
                     }
                     break;
@@ -958,8 +976,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     if (!m_cachedIsSlicingActivated && ModeZoomRow == m_cachedSelectionMode) {
-                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                        m_sliceSelection->append(item);
+                        item.setTranslation(modelMatrix.column(3).toVector3D());
+                        m_sliceSelection->append(&item);
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisZ()->d_ptr.data();
@@ -974,8 +992,8 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     if (!m_cachedIsSlicingActivated && ModeZoomColumn == m_cachedSelectionMode) {
-                        item->d_ptr->setTranslation(modelMatrix.column(3).toVector3D());
-                        m_sliceSelection->append(item);
+                        item.setTranslation(modelMatrix.column(3).toVector3D());
+                        m_sliceSelection->append(&item);
                         if (!m_sliceAxisP) {
                             // m_sliceAxisP is the axis for labels, while title comes from different axis.
                             m_sliceAxisP = m_controller->axisX()->d_ptr.data();
@@ -1342,7 +1360,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
     if (m_cachedIsSlicingActivated && m_updateLabels) {
         // Create label textures
         for (int col = 0; col < m_sliceSelection->size(); col++) {
-            QBarDataItem *item = m_sliceSelection->at(col);
+            BarRenderItem *item = m_sliceSelection->at(col);
             m_drawer->generateLabelTexture(item);
         }
     }
@@ -1360,7 +1378,7 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
 
         // Create label textures
         for (int col = 0; col < m_sliceSelection->size(); col++) {
-            QBarDataItem *item = m_sliceSelection->at(col);
+            BarRenderItem *item = m_sliceSelection->at(col);
             m_drawer->generateLabelTexture(item);
         }
     } else {
@@ -1386,18 +1404,16 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, true);
 #else
-        // TODO: using static is bad, cannot use two barcharts at the same time!
-        // TODO: Besides, doesn't m_previouslySelectedBar mechanic already cover this?
         // Draw the value string followed by row label and column label
-        LabelItem &labelItem = m_selectedBar->d_ptr->selectionLabel();
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
+        LabelItem &labelItem = m_selectedBar->selectionLabel();
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
             QString labelText = m_selectedBar->label();
-            if ((m_controller->axisZ()->labels().size() > m_selectedBar->dptr()->position().y())
-                    && (m_controller->axisX()->labels().size() > m_selectedBar->dptr()->position().x())) {
+            if ((m_controller->axisZ()->labels().size() > m_selectedBar->position().y())
+                    && (m_controller->axisX()->labels().size() > m_selectedBar->position().x())) {
                 labelText.append(QStringLiteral(" ("));
-                labelText.append(m_controller->axisX()->labels().at(m_selectedBar->dptr()->position().x()));
+                labelText.append(m_controller->axisX()->labels().at(m_selectedBar->position().x()));
                 labelText.append(QStringLiteral(", "));
-                labelText.append(m_controller->axisZ()->labels().at(m_selectedBar->dptr()->position().y()));
+                labelText.append(m_controller->axisZ()->labels().at(m_selectedBar->position().y()));
                 labelText.append(QStringLiteral(")"));
                 //qDebug() << labelText;
             }
@@ -1463,11 +1479,11 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
 
             // TODO: Try it; draw the label here
 
-            m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
+            m_dummyBarRenderItem.setTranslation(labelPos);
             const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(row);
             //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
 
-            m_drawer->drawLabel(*m_dummyBarDataItem, axisLabelItem, viewMatrix, projectionMatrix,
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
@@ -1505,11 +1521,11 @@ void Bars3dRenderer::drawScene(const QBarDataArray &dataArray,
 
             // TODO: Try it; draw the label here
 
-            m_dummyBarDataItem->d_ptr->setTranslation(labelPos);
+            m_dummyBarRenderItem.setTranslation(labelPos);
             const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(bar);
             //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
 
-            m_drawer->drawLabel(*m_dummyBarDataItem, axisLabelItem, viewMatrix, projectionMatrix,
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
@@ -1587,8 +1603,26 @@ void Bars3dRenderer::updateMeshFileName(const QString &objFileName)
     loadBarMesh();
 }
 
-void Bars3dRenderer::updateSampleSpace(int columnCount, int rowCount)
+void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
 {
+    // Destroy old render items and reallocate new array
+    // TODO is there a way to allocate the whole array with one allocation?
+    m_renderItemArray.clear();
+    m_renderItemArray.resize(rowCount);
+    for (int i = 0; i < rowCount; i++) {
+        m_renderItemArray[i].resize(columnCount);
+        for (int j = 0; j < columnCount; j++)
+            m_renderItemArray[i][j].setRenderer(this);
+    }
+
+    m_dataWindowChanged = true;
+
+    // Force update for selection related items
+    m_sliceAxisP = 0;
+    m_sliceTitleItem = 0;
+    if (m_sliceSelection)
+        m_sliceSelection->clear();
+
     m_cachedColumnCount = columnCount;
     m_cachedRowCount    = rowCount;
     // TODO: Invent "idiotproof" max scene size formula..
@@ -1639,8 +1673,13 @@ void Bars3dRenderer::updateSelectionMode(SelectionMode mode)
     m_cachedSelectionMode      = mode;
 
     // Create zoom selection if there isn't one
-    if (mode >= ModeZoomRow && !m_sliceSelection)
-        m_sliceSelection = new QBarDataRow;
+    if (mode >= ModeZoomRow && !m_sliceSelection) {
+        m_sliceSelection = new QList<BarRenderItem *>;
+        if (mode == ModeZoomRow)
+            m_sliceSelection->reserve(m_cachedRowCount);
+        else
+            m_sliceSelection->reserve(m_cachedColumnCount);
+    }
 }
 
 void Bars3dRenderer::updateFont(const QFont &font)

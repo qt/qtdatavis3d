@@ -39,57 +39,55 @@
 **
 ****************************************************************************/
 
-#include "qabstractdataitem_p.h"
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef BARRENDERITEM_P_H
+#define BARRENDERITEM_P_H
+
+#include "abstractrenderitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-/*!
- * \class QAbstractDataItem
- * \inmodule QtDataVis3D
- * \brief The QAbstractDataItem class provides a base container for resolved data to be added to graphs.
- * \since 1.0.0
- *
- * A QAbstractDataItem holds data for a single rendered item in a graph.
- * Data proxies parse data into QAbstractDataItem based instances for visualizing.
- *
- * \sa QAbstractDataProxy, {Qt Data Visualization 3D C++ Classes}
- */
+class Bars3dRenderer;
 
-/*!
- * Constructs QAbstractDataItem.
- */
-QAbstractDataItem::QAbstractDataItem(QAbstractDataItemPrivate *d)
-    : d_ptr(d)
+class BarRenderItem : public AbstractRenderItem
 {
-}
+public:
+    BarRenderItem();
+    virtual ~BarRenderItem();
 
-/*!
- * Destroys QAbstractDataItem.
- */
-QAbstractDataItem::~QAbstractDataItem()
-{
-}
+    // Position relative to data window (for bar label generation)
+    const QPoint &position() { return m_position; }
+    void setPosition(const QPoint &pos) { m_position = pos; }
 
-QString &QAbstractDataItem::label() const
-{
-    if (d_ptr->m_label.isNull())
-        d_ptr->formatLabel();
-    return d_ptr->m_label;
-}
+    // Actual cached data value of the bar (needed to trigger label reformats)
+    void setValue(qreal value);
+    qreal value() { return m_value; }
 
-QAbstractDataItemPrivate::QAbstractDataItemPrivate()
-    : m_dataProxy(0)
-{
-}
+    // TODO should be in abstract, but currently there is no abstract renderer
+    void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
 
-QAbstractDataItemPrivate::~QAbstractDataItemPrivate()
-{
-}
+protected:
+    virtual void formatLabel();
 
-void QAbstractDataItemPrivate::setLabel(const QString &label)
-{
-    m_labelItem.clear();
-    m_label = label;
-}
+    Bars3dRenderer *m_renderer;
+    qreal m_value;
+    QPoint m_position; // x = row, y = column
+
+    friend class QBarDataItem;
+};
+
+typedef QVector<BarRenderItem> BarRenderItemRow;
+typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
 QT_DATAVIS3D_END_NAMESPACE
+
+#endif

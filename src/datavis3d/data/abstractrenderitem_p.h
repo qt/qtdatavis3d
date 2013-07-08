@@ -49,59 +49,49 @@
 //
 // We mean it.
 
-#ifndef DRAWER_P_H
-#define DRAWER_P_H
+#ifndef ABSTRACTRENDERITEM_P_H
+#define ABSTRACTRENDERITEM_P_H
 
 #include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include "theme_p.h"
 #include "labelitem_p.h"
-#include "abstractrenderitem_p.h"
-#include <QFont>
+
+#include <QOpenGLFunctions>
+#include <QString>
+#include <QVector3D>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class ShaderHelper;
-class ObjectHelper;
-class TextureHelper;
-class CameraHelper;
-
-class Drawer : public QObject, public QOpenGLFunctions
+class AbstractRenderItem
 {
-    Q_OBJECT
-
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
-    ~Drawer();
+    AbstractRenderItem();
+    virtual ~AbstractRenderItem();
 
-    void initializeOpenGL();
+    // Position in 3D scene
+    void setTranslation(const QVector3D &translation) { m_translation = translation; }
+    const QVector3D &translation() const {return m_translation; }
 
-    void setTheme(const Theme &theme);
-    void setFont(const QFont &font);
-    void setTransparency(LabelTransparency transparency);
+    // Label item for formatted label
+    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
+    LabelItem &labelItem();
 
-    void drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId = 0,
-                    GLuint depthTextureId = 0);
-    void drawLabel(const AbstractRenderItem &item, const LabelItem &label,
-                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat maxHeight,
-                   SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
-                   CameraHelper *camera,
-                   bool useDepth = false, bool rotateAlong = false,
-                   LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
+    // Selection label item (containing special selection texture, if mode is activated)
+    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
+    LabelItem &selectionLabel();
 
-    void generateLabelTexture(AbstractRenderItem *item);
-    void generateLabelItem(LabelItem &item, const QString &text);
+    // Formatted label for item.
+    void setLabel(const QString &label);
+    QString &label(); // Formats label if not previously formatted
 
-Q_SIGNALS:
-    void drawerChanged();
+protected:
+    virtual void formatLabel() = 0;
 
-private:
-    Theme m_theme;
-    QFont m_font;
-    LabelTransparency m_transparency;
-    TextureHelper *m_textureHelper;
+    QString m_label;
+    QVector3D m_translation;
+    LabelItem *m_labelItem;
+    LabelItem *m_selectionLabel;
+
+    friend class QAbstractDataItem;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

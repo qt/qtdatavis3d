@@ -41,7 +41,6 @@
 
 #include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
-#include "qabstractdataitem_p.h"
 #include <QMutexLocker>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -55,26 +54,10 @@ QBarDataProxy::~QBarDataProxy()
 {
 }
 
-void QBarDataProxy::resetArray(int rowCount, int columnCount)
-{
-    resetArray(0, rowCount, columnCount);
-}
-
-void QBarDataProxy::resetArray(QBarDataArray *newArray, int rowCount, int columnCount)
-{
-    dptr()->resetArray(newArray, rowCount, columnCount);
-    emit arrayReset();
-}
-
 void QBarDataProxy::resetArray(QBarDataArray *newArray)
 {
-    int rowCount(newArray->size());
-    int columnCount(0);
-
-    if (rowCount)
-        columnCount = newArray->at(0)->size();
-
-    resetArray(newArray, rowCount, columnCount);
+    dptr()->resetArray(newArray);
+    emit arrayReset();
 }
 
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
@@ -111,36 +94,10 @@ void QBarDataProxy::insertRows(int rowIndex, QBarDataArray *rows)
     emit rowsInserted(rowIndex, insertCount);
 }
 
-void QBarDataProxy::setRowCount(int count)
-{
-    QMutexLocker locker(mutex());
-    int oldCount = dptr()->m_rowCount;
-
-    dptr()->setRowCount(count);
-
-    locker.unlock();
-
-    if (oldCount < count)
-        emit rowsAdded(oldCount, count - oldCount);
-    else if (oldCount > count)
-        emit rowsRemoved(count, oldCount - count);
-}
-
-void QBarDataProxy::setColumnCount(int count)
-{
-    dptr()->setColumnCount(count);
-    // TODO emit columnsAdded/columnsRemoved
-}
-
 // Mutexing data accessors should be done by user
 int QBarDataProxy::rowCount()
 {
-    return dptr()->m_rowCount;
-}
-
-int QBarDataProxy::columnCount()
-{
-    return dptr()->m_columnCount;
+    return dptrc()->m_dataArray.size();
 }
 
 const QBarDataArray &QBarDataProxy::array() const
@@ -153,9 +110,9 @@ const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
     return dptrc()->m_dataArray[rowIndex];
 }
 
-QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex)
+const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 {
-    return dptr()->m_dataArray[rowIndex]->at(columnIndex);
+    return &dptrc()->m_dataArray[rowIndex]->at(columnIndex);
 }
 
 QBarDataProxyPrivate *QBarDataProxy::dptr()
@@ -171,9 +128,7 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
 // QBarDataProxyPrivate
 
 QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
-    : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
-      m_rowCount(0),
-      m_columnCount(0)
+    : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar)
 {
 }
 
@@ -182,68 +137,38 @@ QBarDataProxyPrivate::~QBarDataProxyPrivate()
     clearArray();
 }
 
-void QBarDataProxyPrivate::resetArray(QBarDataArray *newArray, int rowCount, int columnCount)
+void QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
 {
     QMutexLocker locker(&m_mutex);
     clearArray();
 
-    m_rowCount = rowCount;
-    m_columnCount = columnCount;
     if (newArray) {
         m_dataArray = *newArray;
         delete newArray;
     }
-
-    int oldSize = m_dataArray.size();
-
-    if (oldSize < m_rowCount) {
-        m_dataArray.reserve(m_rowCount);
-        for (int i = oldSize; i < m_rowCount; i++)
-            m_dataArray.append(0);
-    } else if (oldSize > m_rowCount) {
-        for (int i = oldSize - 1; i >= m_rowCount; i--) {
-            clearRow(i);
-            m_dataArray.removeLast();
-        }
-    }
-
-    for (int i = 0; i < m_dataArray.size(); i++)
-        fixRow(m_dataArray.at(i));
 }
 
 void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row)
 {
     QMutexLocker locker(&m_mutex);
     clearRow(rowIndex);
-    fixRow(row);
     m_dataArray[rowIndex] = row;
 }
 
 int QBarDataProxyPrivate::addRow(QBarDataRow *row)
 {
     QMutexLocker locker(&m_mutex);
-    int currentSize = m_rowCount;
-    // Init column count to row size if not yet explicitly set
-    if (!m_columnCount)
-        m_columnCount = row->size();
-    fixRow(row);
+    int currentSize = m_dataArray.size();
     m_dataArray.append(row);
-    m_rowCount++;
     return currentSize;
 }
 
 int QBarDataProxyPrivate::addRows(QBarDataArray *rows)
 {
     QMutexLocker locker(&m_mutex);
-    int currentSize = m_rowCount;
-    // Init column count to first row size if not yet explicitly set
-    if (!m_columnCount && rows->size())
-        m_columnCount = rows->at(0)->size();
-    for (int i = 0; i < rows->size(); i++) {
-        fixRow(rows->at(i));
+    int currentSize = m_dataArray.size();
+    for (int i = 0; i < rows->size(); i++)
         m_dataArray.append(rows->at(i));
-    }
-    m_rowCount += rows->size();
     delete rows;
     return currentSize;
 }
@@ -251,53 +176,15 @@ int QBarDataProxyPrivate::addRows(QBarDataArray *rows)
 void QBarDataProxyPrivate::insertRow(int rowIndex, QBarDataRow *row)
 {
     QMutexLocker locker(&m_mutex);
-    // Init column count to row size if not yet explicitly set
-    if (!m_columnCount)
-        m_columnCount = row->size();
-    fixRow(row);
     m_dataArray.insert(rowIndex, row);
-    m_rowCount++;
 }
 
 void QBarDataProxyPrivate::insertRows(int rowIndex, QBarDataArray *rows)
 {
     QMutexLocker locker(&m_mutex);
-    // Init column count to first row size if not yet explicitly set
-    if (!m_columnCount && rows->size())
-        m_columnCount = rows->at(0)->size();
-    for (int i = 0; i < rows->size(); i++) {
-        fixRow(rows->at(i));
+    for (int i = 0; i < rows->size(); i++)
         m_dataArray.insert(rowIndex, rows->at(i));
-    }
-    m_rowCount += rows->size();
     delete rows;
-}
-
-void QBarDataProxyPrivate::setRowCount(int count)
-{
-    // Locked already in public implementatation to avoid multiple lockings per call
-    if (m_rowCount != count) {
-        if (count < m_columnCount) {
-            for (int i = m_columnCount - 1; i >= count; i--) {
-                clearRow(i);
-                m_dataArray.removeLast();
-            }
-        } else if (count > m_columnCount) {
-            for (int i = m_columnCount; i < count; i++)
-                m_dataArray.append(0);
-        }
-        m_rowCount = count;
-    }
-}
-
-void QBarDataProxyPrivate::setColumnCount(int count)
-{
-    QMutexLocker locker(&m_mutex);
-    if (m_columnCount != count) {
-        m_columnCount = count;
-        for (int i = 0; i < m_rowCount; i++)
-            fixRow(m_dataArray.at(i));
-    }
 }
 
 // Protected & private functions. Do not mutex as these are used from mutexed functions.
@@ -305,8 +192,6 @@ void QBarDataProxyPrivate::setColumnCount(int count)
 void QBarDataProxyPrivate::clearRow(int rowIndex)
 {
     if (m_dataArray[rowIndex]) {
-        for (int i = 0; i < m_columnCount; i++)
-            delete m_dataArray[rowIndex]->at(i);
         delete m_dataArray[rowIndex];
         m_dataArray[rowIndex] = 0;
     }
@@ -314,43 +199,23 @@ void QBarDataProxyPrivate::clearRow(int rowIndex)
 
 void QBarDataProxyPrivate::clearArray()
 {
-    for (int i = 0; i < m_rowCount; i++)
+    for (int i = 0; i < m_dataArray.size(); i++)
         clearRow(i);
     m_dataArray.clear();
-}
-
-void QBarDataProxyPrivate::fixRow(QBarDataRow *row)
-{
-    if (!row)
-        return;
-
-    int rowSize = row->size();
-    if (rowSize < m_columnCount) {
-        for (int i = rowSize; i < m_columnCount; i++)
-            row->append(new QBarDataItem);
-    } else if (rowSize > m_columnCount) {
-        for (int i = m_columnCount; i < rowSize; i++)
-            delete row->takeLast();
-    }
-    for (int i = 0; i < m_columnCount; i++) {
-        if (row->at(i))
-            row->at(i)->d_ptr->setDataProxy(q_ptr);
-    }
 }
 
 QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endRow, int startColumn, int endColumn)
 {
     QMutexLocker locker(&m_mutex);
     QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
-    endRow = qMin(endRow, m_rowCount - 1);
-    endColumn = qMin(endColumn, m_columnCount - 1);
+    endRow = qMin(endRow, m_dataArray.size() - 1);
     for (int i = startRow; i <= endRow; i++) {
-        if (!m_dataArray.at(i))
-            continue;
-        for (int j = startColumn; j <= endColumn; j++) {
-            QBarDataItem *item = m_dataArray.at(i)->at(j);
-            if (item) {
-                float itemValue = item->value();
+        QBarDataRow *row = m_dataArray.at(i);
+        if (row) {
+            endColumn = qMin(endColumn, row->size() - 1);
+            for (int j = startColumn; j <= endColumn; j++) {
+                const QBarDataItem &item = m_dataArray.at(i)->at(j);
+                qreal itemValue = item.value();
                 if (limits.second < itemValue)
                     limits.second = itemValue;
                 if (limits.first > itemValue)

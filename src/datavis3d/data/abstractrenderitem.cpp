@@ -39,71 +39,50 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef QABSTRACTDATAITEM_P_H
-#define QABSTRACTDATAITEM_P_H
-
-#include "datavis3dglobal_p.h"
-#include "qabstractdataitem.h"
-#include "labelitem_p.h"
-
-#include <QOpenGLFunctions>
-#include <QString>
-#include <QVector3D>
-//#include <QVector4D>
+#include "abstractrenderitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractDataProxy;
-
-class QAbstractDataItemPrivate
+AbstractRenderItem::AbstractRenderItem()
+    : m_labelItem(0),
+      m_selectionLabel(0)
 {
-public:
-    QAbstractDataItemPrivate();
-    virtual ~QAbstractDataItemPrivate();
+}
 
-    // Position in 3D scene
-    void setTranslation(const QVector3D &translation) { m_translation = translation; }
-    const QVector3D &translation() const {return m_translation; }
+AbstractRenderItem::~AbstractRenderItem()
+{
+    delete m_labelItem;
+    delete m_selectionLabel;
+}
 
-    // Label item for formatted label
-    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
-    const LabelItem &labelItem() const { return m_labelItem; }
-    LabelItem &labelItem() { return m_labelItem; }
+LabelItem &AbstractRenderItem::labelItem()
+{
+    if (!m_labelItem)
+        m_labelItem = new LabelItem;
+    return *m_labelItem;
+}
 
-    // Selection label item (containing special selection texture, if mode is activated)
-    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
-    const LabelItem &selectionLabel() const { return m_selectionLabel; }
-    LabelItem &selectionLabel() { return m_selectionLabel; }
+LabelItem &AbstractRenderItem::selectionLabel()
+{
+    if (!m_selectionLabel)
+        m_selectionLabel = new LabelItem;
+    return *m_selectionLabel;
+}
 
-    void setDataProxy(QAbstractDataProxy *proxy) { m_dataProxy = proxy; }
+QString &AbstractRenderItem::label()
+{
+    if (m_label.isNull())
+        formatLabel();
+    return m_label;
+}
 
-    // setLabel is not public because changing value automatically reformats it.
-    // If we want to enable custom labels for items, we should have item specific
-    // labelFormat instead.
-    void setLabel(const QString &label);
-
-protected:
-    virtual void formatLabel() = 0;
-
-    QString m_label;
-    QVector3D m_translation;
-    LabelItem m_labelItem;
-    LabelItem m_selectionLabel;
-    QAbstractDataProxy *m_dataProxy;
-
-    friend class QAbstractDataItem;
-};
+void AbstractRenderItem::setLabel(const QString &label)
+{
+    if (m_labelItem)
+        m_labelItem->clear();
+    if (m_selectionLabel)
+        m_selectionLabel->clear();
+    m_label = label;
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

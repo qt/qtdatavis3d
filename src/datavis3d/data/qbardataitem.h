@@ -42,31 +42,26 @@
 #ifndef QBARDATAITEM_H
 #define QBARDATAITEM_H
 
-#include "qabstractdataitem.h"
+#include "qdatavis3dnamespace.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QBarDataItemPrivate;
 
-class QT_DATAVIS3D_EXPORT QBarDataItem : public QAbstractDataItem
+class QT_DATAVIS3D_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();
-    QBarDataItem(float value);
     ~QBarDataItem();
 
-    void setValue(float value);
-    float value();
+    void setValue(qreal value);
+    qreal value() const;
 
-protected:
-    QBarDataItemPrivate *dptr();
+    // TODO Set color, label format, ...?
 
 private:
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class QBarDataProxyPrivate;
-
-    Q_DISABLE_COPY(QBarDataItem)
+    qreal m_value;
+    QBarDataItemPrivate *d_ptr;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

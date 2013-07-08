@@ -40,7 +40,6 @@
 ****************************************************************************/
 
 #include "qbardataitem_p.h"
-#include "qabstractdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -53,66 +52,42 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * A QBarDataItem holds data for a single rendered bar in a graph.
  * Bar data proxies parse data into QBarDataItem instances for visualizing.
  *
- * \sa QAbstractDataItem, QBarDataProxy, {Qt Data Visualization 3D C++ Classes}
+ * \sa QBarDataProxy, {Qt Data Visualization 3D C++ Classes}
  */
 
 /*!
  * Constructs QBarDataItem.
  */
 QBarDataItem::QBarDataItem()
-    : QAbstractDataItem(new QBarDataItemPrivate())
+    : d_ptr(0) // private data doesn't exist by default (optimization)
 {
 }
-
-QBarDataItem::QBarDataItem(float value)
-    : QAbstractDataItem(new QBarDataItemPrivate())
-{
-    setValue(value);
-}
-
 
 /*!
  * Destroys QBarDataItem.
  */
 QBarDataItem::~QBarDataItem()
 {
+    delete d_ptr;
 }
 
-void QBarDataItem::setValue(float value)
+void QBarDataItem::setValue(qreal value)
 {
-    dptr()->m_value = value;
-    d_ptr->setLabel(QString()); // Forces reformatting on next access
+    m_value = value;
 }
 
-float QBarDataItem::value()
+qreal QBarDataItem::value() const
 {
-    return dptr()->m_value;
-}
-
-QBarDataItemPrivate *QBarDataItem::dptr()
-{
-    return static_cast<QBarDataItemPrivate *>(d_ptr.data());
+    return m_value;
 }
 
 
 QBarDataItemPrivate::QBarDataItemPrivate()
-    : m_value(0)
 {
 }
 
 QBarDataItemPrivate::~QBarDataItemPrivate()
 {
-}
-
-void QBarDataItemPrivate::formatLabel()
-{
-    // Format the string on first access
-    QString numStr;
-    numStr.setNum(m_value);
-    // TODO actually format instead of just prepending the value
-    m_label.clear();
-    m_label.append(numStr);
-    m_label.append(m_dataProxy->itemLabelFormat());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -57,7 +57,8 @@ public:
     ~ChartModifier();
 
     void addDataSet();
-    void addBars();
+    void addRow();
+    void addRows();
     void changeStyle();
     void changePresetCamera();
     void changeTheme();

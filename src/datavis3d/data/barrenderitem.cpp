@@ -39,43 +39,39 @@
 **
 ****************************************************************************/
 
-#ifndef QABSTRACTDATAITEM_H
-#define QABSTRACTDATAITEM_H
-
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QString>
+#include "barrenderitem_p.h"
+#include "bars3drenderer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractDataItemPrivate;
-
-class QT_DATAVIS3D_EXPORT QAbstractDataItem
+BarRenderItem::BarRenderItem()
+    : AbstractRenderItem(),
+      m_renderer(0),
+      m_value(0)
 {
-protected:
-    explicit QAbstractDataItem(QAbstractDataItemPrivate *d);
-public:
-    virtual ~QAbstractDataItem();
+}
 
-    // Set custom label format for this item - otherwise uses label format specified by the proxy
-    //TODO void setLabelFormat(const QString &labelFormat);
+BarRenderItem::~BarRenderItem()
+{
+}
 
-    // formatted label for value
-    QString &label() const;
+void BarRenderItem::setValue(qreal value)
+{
+    if (m_value != value) {
+        m_value = value;
+        setLabel(QString()); // Forces reformatting on next access
+    }
+}
 
-protected:
-    QScopedPointer<QAbstractDataItemPrivate> d_ptr;
-
-private:
-    Q_DISABLE_COPY(QAbstractDataItem)
-
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class QDataRowPrivate;
-    friend class Drawer;
-};
+void BarRenderItem::formatLabel()
+{
+    // Format the string on first access
+    QString numStr;
+    numStr.setNum(m_value);
+    // TODO actually format instead of just prepending the value
+    m_label.clear();
+    m_label.append(numStr);
+    m_label.append(m_renderer->m_dataProxy->itemLabelFormat());
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif
