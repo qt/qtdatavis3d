@@ -167,7 +167,7 @@ private:
     QBarDataProxy *m_dataProxy; // Only valid during render
 
     BarRenderItemArray m_renderItemArray;
-    bool m_dataWindowChanged;
+    bool m_valueUpdateNeeded;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

@@ -55,14 +55,6 @@ BarRenderItem::~BarRenderItem()
 {
 }
 
-void BarRenderItem::setValue(qreal value)
-{
-    if (m_value != value) {
-        m_value = value;
-        setLabel(QString()); // Forces reformatting on next access
-    }
-}
-
 void BarRenderItem::formatLabel()
 {
     // Format the string on first access

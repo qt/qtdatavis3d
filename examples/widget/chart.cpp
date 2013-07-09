@@ -66,11 +66,18 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
 {
     // Don't set any styles or specifications, start from defaults
     // Generate generic labels
-    for (int i = 0; i < 200; i++)
-        m_genericRowLabels << QStringLiteral("Row %1").arg(i);
-    for (int i = 0; i < 200; i++)
-        m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
-
+    for (int i = 0; i < 200; i++) {
+        if (i % 5)
+            m_genericRowLabels << QString();
+        else
+            m_genericRowLabels << QStringLiteral("Row %1").arg(i);
+    }
+    for (int i = 0; i < 200; i++) {
+        if (i % 5)
+            m_genericColumnLabels << QString();
+        else
+            m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
+    }
 }
 
 ChartModifier::~ChartModifier()
@@ -199,9 +206,10 @@ void ChartModifier::addRows()
         dataArray->append(dataRow);
     }
     m_chart->dataProxy()->insertRows(0, dataArray);
+    qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
     if (oldCount < m_rowCount)
         m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
-    qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
+    qDebug() << "... Including Label creation, time:" << timer.elapsed();
 }
 
 void ChartModifier::changeStyle()

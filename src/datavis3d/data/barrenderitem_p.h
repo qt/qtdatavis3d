@@ -65,15 +65,19 @@ public:
     virtual ~BarRenderItem();
 
     // Position relative to data window (for bar label generation)
-    const QPoint &position() { return m_position; }
-    void setPosition(const QPoint &pos) { m_position = pos; }
+    inline const QPoint &position() { return m_position; }
+    inline void setPosition(const QPoint &pos) { m_position = pos; }
 
     // Actual cached data value of the bar (needed to trigger label reformats)
-    void setValue(qreal value);
-    qreal value() { return m_value; }
+    inline void setValue(qreal value);
+    inline qreal value() { return m_value; }
+
+    // Normalized bar height
+    inline void setHeight(GLfloat height) { m_height = height; }
+    inline GLfloat height() { return m_height; }
 
     // TODO should be in abstract, but currently there is no abstract renderer
-    void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
+    inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
 
 protected:
     virtual void formatLabel();
@@ -81,9 +85,19 @@ protected:
     Bars3dRenderer *m_renderer;
     qreal m_value;
     QPoint m_position; // x = row, y = column
+    GLfloat m_height;
 
     friend class QBarDataItem;
 };
+
+void BarRenderItem::setValue(qreal value)
+{
+    if (m_value != value) {
+        m_value = value;
+        if (!m_label.isNull())
+            setLabel(QString()); // Forces reformatting on next access
+    }
+}
 
 typedef QVector<BarRenderItem> BarRenderItemRow;
 typedef QVector<BarRenderItemRow> BarRenderItemArray;

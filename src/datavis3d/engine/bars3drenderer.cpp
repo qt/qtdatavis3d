@@ -110,7 +110,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
       m_autoScaleAdjustment(1.0f),
-      m_heightNormalizer(0.0f),
+      m_heightNormalizer(1.0f),
       m_yAdjustment(0.0f),
       m_rowWidth(0),
       m_columnDepth(0),
@@ -122,7 +122,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_selection(selectionSkipColor),
       m_hasHeightAdjustmentChanged(true),
       m_dataProxy(0),
-      m_dataWindowChanged(false)
+      m_valueUpdateNeeded(false)
     #ifdef DISPLAY_RENDER_SPEED
     ,m_isFirstFrame(true),
       m_numFrames(0)
@@ -337,8 +337,8 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
     // Update cached data window
     // TODO Should data changes be notified via signal instead of reading data in render?
     // TODO this cache initialization assumes data window starts at 0,0 offset from array
-    if (valuesDirty || m_dataWindowChanged) {
-        m_dataWindowChanged = false;
+    if (valuesDirty || m_valueUpdateNeeded) {
+        m_valueUpdateNeeded = false;
         int dataRowCount = dataProxy->rowCount();
         for (int i = 0; i < m_renderItemArray.size(); i++) {
             int j = 0;
@@ -346,8 +346,11 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
                 const QBarDataRow *dataRow = dataProxy->rowAt(i);
                 int updateSize = qMin(dataRow->size(), m_renderItemArray[i].size());
                 if (dataRow) {
-                    for (; j < updateSize ; j++)
-                        m_renderItemArray[i][j].setValue(dataRow->at(j).value());
+                    for (; j < updateSize ; j++) {
+                        qreal value = dataRow->at(j).value();
+                        m_renderItemArray[i][j].setValue(value);
+                        m_renderItemArray[i][j].setHeight(value / m_heightNormalizer);
+                    }
                 }
             }
             for (; j < m_renderItemArray[i].size(); j++)
@@ -446,9 +449,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
         if (!item)
             continue;
 
-        GLfloat barHeight = item->value() / m_heightNormalizer;
-
-        if (barHeight < 0)
+        if (item->height() < 0)
             glCullFace(GL_FRONT);
         else
             glCullFace(GL_BACK);
@@ -463,19 +464,19 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
         else
             barPosX = -(item->translation().z() - zComp); // flip z; frontmost bar to the left
         modelMatrix.translate(barPosX, barPosY, zComp);
-        modelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
-        itModelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
+        modelMatrix.scale(QVector3D(m_scaleX, item->height(), m_scaleZ));
+        itModelMatrix.scale(QVector3D(m_scaleX, item->height(), m_scaleZ));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
         QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
-        QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * barHeight;
+        QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item->height();
 
         QVector3D barColor = baseColor + heightColor;
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
 
-        if (barHeight != 0) {
+        if (item->height() != 0) {
             // Set shader bindings
             m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
             m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
@@ -547,7 +548,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
         // Draw values
         m_drawer->drawLabel(*item, item->labelItem(), viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), (item->value() / m_heightNormalizer),
+                            QVector3D(0.0f, 0.0f, 0.0f), item->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera);
 
@@ -564,7 +565,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
             }
             m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
-                                QVector3D(0.0f, 0.0f, -45.0f), (item->value() / m_heightNormalizer),
+                                QVector3D(0.0f, 0.0f, -45.0f), item->height(),
                                 m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, camera, false, false, LabelBelow);
         }
@@ -701,16 +702,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 if (!item.value())
                     continue;
 
-                // TODO Cache barHeights to render items
-                GLfloat barHeight = item.value() / m_heightNormalizer;
-
-                // skip shadows for 0 -height bars
-                if (barHeight == 0)
-                    continue;
-
                 // Set front face culling for positive valued bars and back face culling for
                 // negative valued bars to reduce self-shadowing issues
-                if (barHeight < 0)
+                if (item.height() < 0)
                     glCullFace(GL_BACK);
                 else
                     glCullFace(GL_FRONT);
@@ -722,9 +716,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 rowPos = (row + 1) * (m_cachedBarSpacing.height());
 
                 modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
-                                      barHeight - m_yAdjustment,
+                                      item.height() - m_yAdjustment,
                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
-                modelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
+                modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
 
                 MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
@@ -801,10 +795,8 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 BarRenderItem &item = m_renderItemArray[row][bar];
                 if (!item.value())
                     continue;
-                // TODO resolved bar heights should be cached?
-                GLfloat barHeight = item.value() / m_heightNormalizer;
 
-                if (barHeight < 0)
+                if (item.height() < 0)
                     glCullFace(GL_FRONT);
                 else
                     glCullFace(GL_BACK);
@@ -816,9 +808,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 rowPos = (row + 1) * (m_cachedBarSpacing.height());
 
                 modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
-                                      barHeight - m_yAdjustment,
+                                      item.height() - m_yAdjustment,
                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
-                modelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
+                modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -914,10 +906,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             if (!item.value())
                 continue;
 
-            // TODO resolved bar heights should be cached?
-            GLfloat barHeight = item.value() / m_heightNormalizer;
-
-            if (barHeight < 0)
+            if (item.height() < 0)
                 glCullFace(GL_FRONT);
             else
                 glCullFace(GL_BACK);
@@ -930,10 +919,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             barPos = (bar + 1) * (m_cachedBarSpacing.width());
             rowPos = (row + 1) * (m_cachedBarSpacing.height());
             modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
-                                  barHeight - m_yAdjustment,
+                                  item.height() - m_yAdjustment,
                                   (m_columnDepth - rowPos) / m_scaleFactor + zComp);
-            modelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
-            itModelMatrix.scale(QVector3D(m_scaleX, barHeight, m_scaleZ));
+            modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
+            itModelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 #else
@@ -942,7 +931,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
-            QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * barHeight;
+            QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
             QVector3D depthColor = Utils::vectorFromColor(m_cachedTheme.m_depthColor)
                     * (float(row) / GLfloat(m_cachedRowCount));
 
@@ -1011,7 +1000,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 }
             }
 
-            if (barHeight != 0) {
+            if (item.height() != 0) {
                 // Set shader bindings
                 m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
                 m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
@@ -1400,7 +1389,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         m_drawer->drawLabel(*m_selectedBar, m_selectedBar->label(),
                             viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            QVector3D(0.0f, 0.0f, 0.0f),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, true);
 #else
@@ -1423,7 +1412,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
         m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), (m_selectedBar->value() / m_heightNormalizer),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera, true, false);
 #endif
@@ -1615,7 +1604,7 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
             m_renderItemArray[i][j].setRenderer(this);
     }
 
-    m_dataWindowChanged = true;
+    m_valueUpdateNeeded = true;
 
     // Force update for selection related items
     m_sliceAxisP = 0;
@@ -1772,6 +1761,7 @@ void Bars3dRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat mini
     if (tickCount > 0 && step > 0) {
         m_heightNormalizer = tickCount * step;
         calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
+        m_valueUpdateNeeded = true;
     }
 }
 
@@ -1914,6 +1904,7 @@ void Bars3dRenderer::updateLimits(QPair<GLfloat, GLfloat> limits)
     if (m_tickCount == 0) {
         m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
         calculateHeightAdjustment(limits);
+        m_valueUpdateNeeded = true;
     }
 }
 

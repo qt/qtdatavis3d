@@ -84,7 +84,7 @@ public:
                     GLuint depthTextureId = 0);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &label,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat maxHeight,
+                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
                    SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
                    CameraHelper *camera,
                    bool useDepth = false, bool rotateAlong = false,

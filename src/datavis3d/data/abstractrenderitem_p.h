@@ -68,8 +68,8 @@ public:
     virtual ~AbstractRenderItem();
 
     // Position in 3D scene
-    void setTranslation(const QVector3D &translation) { m_translation = translation; }
-    const QVector3D &translation() const {return m_translation; }
+    inline void setTranslation(const QVector3D &translation) { m_translation = translation; }
+    inline const QVector3D &translation() const {return m_translation; }
 
     // Label item for formatted label
     // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate

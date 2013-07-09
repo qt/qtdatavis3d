@@ -45,7 +45,7 @@
 
 #include <QGuiApplication>
 #include <QFont>
-//#include <QDebug>
+#include <QDebug>
 
 using namespace QtDataVis3D;
 
