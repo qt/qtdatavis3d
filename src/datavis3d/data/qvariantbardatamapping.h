@@ -39,51 +39,51 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QVARIANTBARDATAMAPPING_H
+#define QVARIANTBARDATAMAPPING_H
 
-#include "qvariantbardataproxy.h"
-#include "qbardataproxy_p.h"
-
-#ifndef QVARIANTBARDATAPROXY_P_H
-#define QVARIANTBARDATAPROXY_P_H
+#include "qdatavis3dnamespace.h"
+#include <QStringList>
+#include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantDataSet;
+class QVariantBarDataMappingPrivate;
 
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxyPrivate : public QBarDataProxyPrivate
+class QT_DATAVIS3D_EXPORT QVariantBarDataMapping : public QObject
 {
     Q_OBJECT
 public:
-    QVariantBarDataProxyPrivate(QVariantBarDataProxy *q);
-    virtual ~QVariantBarDataProxyPrivate();
+    explicit QVariantBarDataMapping();
+    explicit QVariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
+                                    const QStringList &rowCategories,
+                                    const QStringList &columnCategories);
+    virtual ~QVariantBarDataMapping();
 
-    void setDataSet(QVariantDataSet *newSet);
-    void setMapping(QVariantBarDataMapping *mapping);
+    void setRowIndex(int index);
+    int rowIndex() const;
+    void setColumnIndex(int index);
+    int columnIndex() const;
+    void setValueIndex(int index);
+    int valueIndex() const;
 
-public slots:
-    void handleItemsAdded(int index, int count);
-    void handleDataCleared();
-    void handleMappingChanged();
+    void setRowCategories(const QStringList &categories);
+    const QStringList &rowCategories() const;
+    void setColumnCategories(const QStringList &categories);
+    const QStringList &columnCategories() const;
+
+    void remap(int rowIndex, int columnIndex, int valueIndex,
+               const QStringList &rowCategories,
+               const QStringList &columnCategories);
+signals:
+    void mappingChanged();
 
 private:
-    void connectDataSet();
-    void resolveDataSet();
-    QVariantBarDataProxy *qptr();
+    Q_DISABLE_COPY(QVariantBarDataMapping)
 
-    QVariantDataSet *m_dataSet;
-    QVariantBarDataMapping *m_mapping;
-
-    friend class QVariantBarDataProxy;
+    QScopedPointer<QVariantBarDataMappingPrivate> d_ptr;
 };
+
 
 QT_DATAVIS3D_END_NAMESPACE
 

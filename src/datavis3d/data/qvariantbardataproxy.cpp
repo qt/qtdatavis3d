@@ -48,6 +48,14 @@ QVariantBarDataProxy::QVariantBarDataProxy() :
 {
 }
 
+QVariantBarDataProxy::QVariantBarDataProxy(QVariantDataSet *newSet,
+                                           QVariantBarDataMapping *mapping) :
+    QBarDataProxy(new QVariantBarDataProxyPrivate(this))
+{
+    dptr()->setDataSet(newSet);
+    dptr()->setMapping(mapping);
+}
+
 QVariantBarDataProxy::~QVariantBarDataProxy()
 {
 }
@@ -57,11 +65,20 @@ void QVariantBarDataProxy::setDataSet(QVariantDataSet *newSet)
     dptr()->setDataSet(newSet);
 }
 
-void QVariantBarDataProxy::setMappings(const QVariantBarMapping &mappings)
+QVariantDataSet *QVariantBarDataProxy::dataSet()
 {
-    dptr()->setMappings(mappings);
+    return dptr()->m_dataSet;
 }
 
+void QVariantBarDataProxy::setMapping(QVariantBarDataMapping *mapping)
+{
+    dptr()->setMapping(mapping);
+}
+
+QVariantBarDataMapping *QVariantBarDataProxy::mapping()
+{
+    return dptr()->m_mapping;
+}
 
 QVariantBarDataProxyPrivate *QVariantBarDataProxy::dptr()
 {
@@ -72,7 +89,8 @@ QVariantBarDataProxyPrivate *QVariantBarDataProxy::dptr()
 
 QVariantBarDataProxyPrivate::QVariantBarDataProxyPrivate(QVariantBarDataProxy *q)
     : QBarDataProxyPrivate(q),
-      m_dataSet(new QVariantDataSet)
+      m_dataSet(new QVariantDataSet),
+      m_mapping(0)
 {
     connectDataSet();
 }
@@ -80,6 +98,7 @@ QVariantBarDataProxyPrivate::QVariantBarDataProxyPrivate(QVariantBarDataProxy *q
 QVariantBarDataProxyPrivate::~QVariantBarDataProxyPrivate()
 {
     delete m_dataSet;
+    delete m_mapping;
 }
 
 void QVariantBarDataProxyPrivate::setDataSet(QVariantDataSet *newSet)
@@ -90,15 +109,19 @@ void QVariantBarDataProxyPrivate::setDataSet(QVariantDataSet *newSet)
     resolveDataSet();
 }
 
-void QVariantBarDataProxyPrivate::setMappings(const QVariantBarMapping &mappings)
+void QVariantBarDataProxyPrivate::setMapping(QVariantBarDataMapping *mapping)
 {
-    m_mappings = mappings;
+    delete m_mapping;
+    m_mapping = mapping;
+
+    QObject::connect(m_mapping, &QVariantBarDataMapping::mappingChanged, this, &QVariantBarDataProxyPrivate::handleMappingChanged);
+
     resolveDataSet();
 }
 
 void QVariantBarDataProxyPrivate::handleItemsAdded(int index, int count)
 {
-    // Resolve new item
+    // Resolve new items
     // TODO
 }
 
@@ -106,6 +129,11 @@ void QVariantBarDataProxyPrivate::handleDataCleared()
 {
     // Data cleared, reset array
     qptr()->resetArray(0);
+}
+
+void QVariantBarDataProxyPrivate::handleMappingChanged()
+{
+    resolveDataSet();
 }
 
 void QVariantBarDataProxyPrivate::connectDataSet()
@@ -117,18 +145,18 @@ void QVariantBarDataProxyPrivate::connectDataSet()
 // Resolve entire dataset into QBarDataArray.
 void QVariantBarDataProxyPrivate::resolveDataSet()
 {
-    if (!m_mappings.size()) {
+    if (!m_mapping || !m_mapping->rowCategories().size() || !m_mapping->columnCategories().size()) {
         qptr()->resetArray(0);
         return;
     }
     const QVariantDataItemList &itemList = m_dataSet->itemList();
     int totalCount = itemList.size();
 
-    int rowIndex = m_mappings[QVariantBarMappingItem::MapRow].itemIndex;
-    int columnIndex = m_mappings[QVariantBarMappingItem::MapColumn].itemIndex;
-    int valueIndex = m_mappings[QVariantBarMappingItem::MapValue].itemIndex;
-    QStringList rowList = m_mappings[QVariantBarMappingItem::MapRow].itemCategories;
-    QStringList columnList = m_mappings[QVariantBarMappingItem::MapColumn].itemCategories;
+    int rowIndex = m_mapping->rowIndex();
+    int columnIndex = m_mapping->columnIndex();
+    int valueIndex = m_mapping->valueIndex();
+    const QStringList &rowList = m_mapping->rowCategories();
+    const QStringList &columnList = m_mapping->columnCategories();
 
     // Sort values into rows and columns
     typedef QHash<QString, qreal> ColumnValueMap;

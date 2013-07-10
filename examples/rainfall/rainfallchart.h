@@ -38,22 +38,39 @@
 **
 ****************************************************************************/
 
-#include "rainfallchart.h"
-#include <QGuiApplication>
+#ifndef RAINFALLCHART_H
+#define RAINFALLCHART_H
+
+#include "q3dbars.h"
+#include "qvariantbardataproxy.h"
+#include <QTimer>
 
 using namespace QtDataVis3D;
 
-int main(int argc, char **argv)
+class RainfallChart : public QObject
 {
-    QGuiApplication app(argc, argv);
+    Q_OBJECT
+public:
+    explicit RainfallChart(Q3DBars *rainfall);
+    ~RainfallChart();
 
-    Q3DBars rainfall;
-    rainfall.resize(1280, 800);
-    rainfall.setPosition(QPoint(10, 30));
-    rainfall.show();
+    void addDataSet();
+    void start();
 
-    RainfallChart *rainfallchart = new RainfallChart(&rainfall);
-    rainfallchart->start();
+public slots:
+    void timeout();
+private:
 
-    return app.exec();
-}
+    void updateYearsList(int start, int end);
+    Q3DBars *m_chart;
+    int m_columnCount;
+    int m_rowCount;
+    QStringList m_years;
+    QStringList m_numericMonths;
+    QTimer m_timer;
+    QVariantBarDataProxy *m_proxy;
+    int m_city;
+};
+
+
+#endif // RAINFALLCHART_H

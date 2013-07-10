@@ -49,40 +49,33 @@
 //
 // We mean it.
 
-#include "qvariantbardataproxy.h"
-#include "qbardataproxy_p.h"
+#include "qvariantbardatamapping.h"
 
-#ifndef QVARIANTBARDATAPROXY_P_H
-#define QVARIANTBARDATAPROXY_P_H
+#ifndef QVARIANTBARDATAMAPPING_P_H
+#define QVARIANTBARDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantDataSet;
-
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxyPrivate : public QBarDataProxyPrivate
+class QVariantBarDataMappingPrivate : public QObject
 {
     Q_OBJECT
 public:
-    QVariantBarDataProxyPrivate(QVariantBarDataProxy *q);
-    virtual ~QVariantBarDataProxyPrivate();
-
-    void setDataSet(QVariantDataSet *newSet);
-    void setMapping(QVariantBarDataMapping *mapping);
-
-public slots:
-    void handleItemsAdded(int index, int count);
-    void handleDataCleared();
-    void handleMappingChanged();
+    QVariantBarDataMappingPrivate(QVariantBarDataMapping *q);
+    virtual ~QVariantBarDataMappingPrivate();
 
 private:
-    void connectDataSet();
-    void resolveDataSet();
-    QVariantBarDataProxy *qptr();
+    // Indexes of the mapped items in the QVariantDataItem
+    int m_rowIndex;
+    int m_columnIndex;
+    int m_valueIndex;
 
-    QVariantDataSet *m_dataSet;
-    QVariantBarDataMapping *m_mapping;
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    QStringList m_rowCategories;
+    QStringList m_columnCategories;
 
-    friend class QVariantBarDataProxy;
+    QVariantBarDataMapping *q_ptr;
+
+    friend class QVariantBarDataMapping;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

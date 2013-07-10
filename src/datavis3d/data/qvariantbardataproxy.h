@@ -44,48 +44,13 @@
 
 #include "qbardataproxy.h"
 #include "qvariantdataset.h"
+#include "qvariantbardatamapping.h"
 #include <QStringList>
 #include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QVariantBarDataProxyPrivate;
-class QVariantDataSet;
-class QVariantBarDataProxy;
-
-class QVariantBarMappingItem {
-public:
-    enum Mapping {
-        MapRow = 0,
-        MapColumn,
-        MapValue
-    };
-
-    QVariantBarMappingItem()
-        : itemIndex(0) {}
-
-    QVariantBarMappingItem(int index)
-        : itemIndex(index) {}
-
-    QVariantBarMappingItem(int index, QStringList categories)
-        : itemIndex(index),
-          itemCategories(categories) {}
-
-    QVariantBarMappingItem(const QVariantBarMappingItem &item)
-        : itemIndex(item.itemIndex),
-          itemCategories(item.itemCategories) {}
-
-    ~QVariantBarMappingItem() {}
-
-    // Index of the mapped item in the QVariantDataItem
-    int itemIndex;
-
-    // For row/column items, sort items into these categories. Other categories are ignored.
-    // Not used for value mapping.
-    QStringList itemCategories;
-};
-
-typedef QMap<QVariantBarMappingItem::Mapping, QVariantBarMappingItem> QVariantBarMapping;
 
 class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
 {
@@ -93,12 +58,17 @@ class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
 
 public:
     explicit QVariantBarDataProxy();
+    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
     virtual ~QVariantBarDataProxy();
 
     void setDataSet(QVariantDataSet *newSet); // Gains ownership
+    QVariantDataSet *dataSet();
 
     // Map key (row, column, value) to value index in data item (QVariantItem).
-    void setMappings(const QVariantBarMapping &mappings);
+    // Ownership of the mapping item transfers to proxy.
+    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
+    void setMapping(QVariantBarDataMapping *mapping);
+    QVariantBarDataMapping *mapping();
 
 protected:
     QVariantBarDataProxyPrivate *dptr();
@@ -109,4 +79,4 @@ private:
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QBARDATAPROXY_H
+#endif
