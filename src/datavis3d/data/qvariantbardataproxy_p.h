@@ -60,7 +60,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QVariantDataSet;
 
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxyPrivate : public QBarDataProxyPrivate
+class QVariantBarDataProxyPrivate : public QBarDataProxyPrivate
 {
     Q_OBJECT
 public:

@@ -57,7 +57,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QBarDataItemPrivate
+class QBarDataItemPrivate
 {
 public:
     QBarDataItemPrivate();

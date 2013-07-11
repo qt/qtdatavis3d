@@ -58,7 +58,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QVariantDataSetPrivate : public QObject
+class QVariantDataSetPrivate : public QObject
 {
     Q_OBJECT
 

@@ -58,7 +58,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QCategoryAxisPrivate : public QAbstractAxisPrivate
+class QCategoryAxisPrivate : public QAbstractAxisPrivate
 {
     Q_OBJECT
 

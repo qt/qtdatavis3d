@@ -59,7 +59,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QItemModelBarDataProxyPrivate : public QBarDataProxyPrivate
+class QItemModelBarDataProxyPrivate : public QBarDataProxyPrivate
 {
     Q_OBJECT
 public:
