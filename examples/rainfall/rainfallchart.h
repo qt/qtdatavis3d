@@ -70,6 +70,8 @@ private:
     QTimer m_timer;
     QVariantBarDataProxy *m_proxy;
     int m_city;
+    QVariantBarDataMapping *m_mapping;
+    QVariantDataSet *m_dataSet;
 };
 
 

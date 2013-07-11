@@ -39,43 +39,42 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAPROXY_H
-#define QVARIANTBARDATAPROXY_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qbardataproxy.h"
-#include "qvariantdataset.h"
-#include "qvariantbardatamapping.h"
-#include <QStringList>
-#include <QMap>
+#include "qitemmodelbardatamapping.h"
+
+#ifndef QITEMMODELBARDATAMAPPING_P_H
+#define QITEMMODELBARDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantBarDataProxyPrivate;
-
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
+class QItemModelBarDataMappingPrivate : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit QVariantBarDataProxy();
-    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
-    virtual ~QVariantBarDataProxy();
-
-    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
-    void setDataSet(QVariantDataSet *newSet);
-    QVariantDataSet *dataSet();
-
-    // Map key (row, column, value) to value index in data item (QVariantItem).
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
-    void setMapping(QVariantBarDataMapping *mapping);
-    QVariantBarDataMapping *mapping();
-
-protected:
-    QVariantBarDataProxyPrivate *dptr();
+    QItemModelBarDataMappingPrivate(QItemModelBarDataMapping *q);
+    virtual ~QItemModelBarDataMappingPrivate();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataProxy)
+    QString m_rowRole;
+    QString m_columnRole;
+    QString m_valueRole;
+
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    QStringList m_rowCategories;
+    QStringList m_columnCategories;
+
+    QItemModelBarDataMapping *q_ptr;
+
+    friend class QItemModelBarDataMapping;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

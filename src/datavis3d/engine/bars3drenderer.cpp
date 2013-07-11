@@ -1699,7 +1699,7 @@ void Bars3dRenderer::updateBackgroundEnabled(bool enable)
 
 void Bars3dRenderer::updateShadowQuality(ShadowQuality quality)
 {
-    qDebug() << "Bars3dRenderer::setShadowQuality";
+    qDebug() << "Bars3dRenderer::setShadowQuality" << quality;
     m_cachedShadowQuality = quality;
     switch (quality) {
     case ShadowLow:

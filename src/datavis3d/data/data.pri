@@ -20,7 +20,11 @@ HEADERS += \
     $$PWD/qvariantbardataproxy_p.h \
     $$PWD/qvariantbardataproxy.h \
     $$PWD/qvariantbardatamapping.h \
-    $$PWD/qvariantbardatamapping_p.h
+    $$PWD/qvariantbardatamapping_p.h \
+    $$PWD/qitemmodelbardatamapping.h \
+    $$PWD/qitemmodelbardatamapping_p.h \
+    $$PWD/qitemmodelbardataproxy_p.h \
+    $$PWD/qitemmodelbardataproxy.h
 
 
 SOURCES += \
@@ -36,4 +40,6 @@ SOURCES += \
     $$PWD/qolddataproxy.cpp \
     $$PWD/qvariantdataset.cpp \
     $$PWD/qvariantbardataproxy.cpp \
-    $$PWD/qvariantbardatamapping.cpp
+    $$PWD/qvariantbardatamapping.cpp \
+    $$PWD/qitemmodelbardatamapping.cpp \
+    $$PWD/qitemmodelbardataproxy.cpp

@@ -43,31 +43,18 @@
 #define DATAVIS3DQML2_PLUGIN_H
 
 #include "datavis3dglobal_p.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-#include "qdataset.h"
-
 #include "declarativebars.h"
 #include "declarativemaps.h"
-//#include "declarativedataitem.h"
-//#include "declarativedatarow.h"
-//#include "declarativedataset.h"
+#include "qitemmodelbardatamapping.h"
 
 #include <QQmlExtensionPlugin>
 
 QT_DATAVIS3D_USE_NAMESPACE
 
-//Q_DECLARE_METATYPE(DeclarativeDataItem *)
-//Q_DECLARE_METATYPE(DeclarativeDataRow *)
-//Q_DECLARE_METATYPE(DeclarativeDataSet *)
-
 Q_DECLARE_METATYPE(DeclarativeBars *)
 Q_DECLARE_METATYPE(DeclarativeMaps *)
 
-Q_DECLARE_METATYPE(QDataItem *)
-Q_DECLARE_METATYPE(QDataRow *)
-Q_DECLARE_METATYPE(QDataSet *)
-
+Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
 Q_DECLARE_METATYPE(QAbstractItemModel *)
 
 

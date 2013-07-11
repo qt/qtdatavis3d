@@ -53,9 +53,7 @@ void Datavis3dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
                                                    QLatin1String("Trying to create uncreatable: AbstractItemModel."));
 
-    qmlRegisterType<QDataItem>(uri, 1, 0, "DataItem");
-    qmlRegisterType<QDataRow>(uri, 1, 0, "DataRow");
-    qmlRegisterType<QDataSet>(uri, 1, 0, "DataSet");
+    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");

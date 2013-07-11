@@ -39,43 +39,43 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAPROXY_H
-#define QVARIANTBARDATAPROXY_H
+#ifndef QITEMMODELBARDATAPROXY_H
+#define QITEMMODELBARDATAPROXY_H
 
 #include "qbardataproxy.h"
-#include "qvariantdataset.h"
-#include "qvariantbardatamapping.h"
+#include "qitemmodelbardatamapping.h"
+#include <QAbstractItemModel>
 #include <QStringList>
 #include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantBarDataProxyPrivate;
+class QItemModelBarDataProxyPrivate;
 
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
+class QT_DATAVIS3D_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
 
 public:
-    explicit QVariantBarDataProxy();
-    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
-    virtual ~QVariantBarDataProxy();
+    explicit QItemModelBarDataProxy();
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, QItemModelBarDataMapping *mapping);
+    virtual ~QItemModelBarDataProxy();
 
-    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
-    void setDataSet(QVariantDataSet *newSet);
-    QVariantDataSet *dataSet();
+    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
+    void setItemModel(QAbstractItemModel *itemModel);
+    QAbstractItemModel *itemModel();
 
     // Map key (row, column, value) to value index in data item (QVariantItem).
     // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
     // Modifying mapping that is set to proxy will trigger dataset re-resolving.
-    void setMapping(QVariantBarDataMapping *mapping);
-    QVariantBarDataMapping *mapping();
+    void setMapping(QItemModelBarDataMapping *mapping);
+    QItemModelBarDataMapping *mapping();
 
 protected:
-    QVariantBarDataProxyPrivate *dptr();
+    QItemModelBarDataProxyPrivate *dptr();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataProxy)
+    Q_DISABLE_COPY(QItemModelBarDataProxy)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

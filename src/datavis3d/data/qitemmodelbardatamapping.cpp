@@ -39,132 +39,134 @@
 **
 ****************************************************************************/
 
-#include "qvariantbardatamapping_p.h"
+#include "qitemmodelbardatamapping_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QVariantBarDataMapping::QVariantBarDataMapping()
+QItemModelBarDataMapping::QItemModelBarDataMapping()
     : QObject(0),
-      d_ptr(new QVariantBarDataMappingPrivate(this))
+      d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
 }
 
-QVariantBarDataMapping::QVariantBarDataMapping(const QVariantBarDataMapping &other)
+QItemModelBarDataMapping::QItemModelBarDataMapping(const QItemModelBarDataMapping &other)
     : QObject(0),
-      d_ptr(new QVariantBarDataMappingPrivate(this))
+      d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
     operator=(other);
 }
 
-QVariantBarDataMapping::QVariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                                               const QStringList &rowCategories,
-                                               const QStringList &columnCategories)
+QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
+                                                   const QString &columnRole,
+                                                   const QString &valueRole,
+                                                   const QStringList &rowCategories,
+                                                   const QStringList &columnCategories)
     : QObject(0),
-      d_ptr(new QVariantBarDataMappingPrivate(this))
+      d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
-    d_ptr->m_rowIndex = rowIndex;
-    d_ptr->m_columnIndex = columnIndex;
-    d_ptr->m_valueIndex = valueIndex;
+    d_ptr->m_rowRole = rowRole;
+    d_ptr->m_columnRole = columnRole;
+    d_ptr->m_valueRole = valueRole;
     d_ptr->m_rowCategories = rowCategories;
     d_ptr->m_columnCategories = columnCategories;
 }
 
-QVariantBarDataMapping::~QVariantBarDataMapping()
+QItemModelBarDataMapping::~QItemModelBarDataMapping()
 {
 }
 
-QVariantBarDataMapping &QVariantBarDataMapping::operator=(const QVariantBarDataMapping &other)
+QItemModelBarDataMapping &QItemModelBarDataMapping::operator=(const QItemModelBarDataMapping &other)
 {
-    d_ptr->m_rowIndex = other.d_ptr->m_rowIndex;
-    d_ptr->m_columnIndex = other.d_ptr->m_columnIndex;
-    d_ptr->m_valueIndex = other.d_ptr->m_valueIndex;
+    d_ptr->m_rowRole = other.d_ptr->m_rowRole;
+    d_ptr->m_columnRole = other.d_ptr->m_columnRole;
+    d_ptr->m_valueRole = other.d_ptr->m_valueRole;
     d_ptr->m_rowCategories = other.d_ptr->m_rowCategories;
     d_ptr->m_columnCategories = other.d_ptr->m_columnCategories;
 
     return *this;
 }
 
-void QVariantBarDataMapping::setRowIndex(int index)
+void QItemModelBarDataMapping::setRowRole(const QString &role)
 {
-    d_ptr->m_rowIndex = index;
+    d_ptr->m_rowRole = role;
     emit mappingChanged();
 }
 
-int QVariantBarDataMapping::rowIndex() const
+QString QItemModelBarDataMapping::rowRole() const
 {
-    return d_ptr->m_rowIndex;
+    return d_ptr->m_rowRole;
 }
 
-void QVariantBarDataMapping::setColumnIndex(int index)
+void QItemModelBarDataMapping::setColumnRole(const QString &role)
 {
-    d_ptr->m_columnIndex = index;
+    d_ptr->m_columnRole = role;
     emit mappingChanged();
 }
 
-int QVariantBarDataMapping::columnIndex() const
+QString QItemModelBarDataMapping::columnRole() const
 {
-    return d_ptr->m_columnIndex;
+    return d_ptr->m_columnRole;
 }
 
-void QVariantBarDataMapping::setValueIndex(int index)
+void QItemModelBarDataMapping::setValueRole(const QString &role)
 {
-    d_ptr->m_valueIndex = index;
+    d_ptr->m_valueRole = role;
     emit mappingChanged();
 }
 
-int QVariantBarDataMapping::valueIndex() const
+QString QItemModelBarDataMapping::valueRole() const
 {
-    return d_ptr->m_valueIndex;
+    return d_ptr->m_valueRole;
 }
 
-void QVariantBarDataMapping::setRowCategories(const QStringList &categories)
+void QItemModelBarDataMapping::setRowCategories(const QStringList &categories)
 {
     d_ptr->m_rowCategories = categories;
     emit mappingChanged();
 }
 
-const QStringList &QVariantBarDataMapping::rowCategories() const
+const QStringList &QItemModelBarDataMapping::rowCategories() const
 {
     return d_ptr->m_rowCategories;
 }
 
-void QVariantBarDataMapping::setColumnCategories(const QStringList &categories)
+void QItemModelBarDataMapping::setColumnCategories(const QStringList &categories)
 {
     d_ptr->m_columnCategories = categories;
     emit mappingChanged();
 }
 
-const QStringList &QVariantBarDataMapping::columnCategories() const
+const QStringList &QItemModelBarDataMapping::columnCategories() const
 {
     return d_ptr->m_columnCategories;
 }
 
-void QVariantBarDataMapping::remap(int rowIndex, int columnIndex, int valueIndex,
-                                   const QStringList &rowCategories,
-                                   const QStringList &columnCategories)
+void QItemModelBarDataMapping::remap(const QString &rowRole,
+                                     const QString &columnRole,
+                                     const QString &valueRole,
+                                     const QStringList &rowCategories,
+                                     const QStringList &columnCategories)
 {
-    d_ptr->m_rowIndex = rowIndex;
-    d_ptr->m_columnIndex = columnIndex;
-    d_ptr->m_valueIndex = valueIndex;
+    d_ptr->m_rowRole = rowRole;
+    d_ptr->m_columnRole = columnRole;
+    d_ptr->m_valueRole = valueRole;
     d_ptr->m_rowCategories = rowCategories;
     d_ptr->m_columnCategories = columnCategories;
+
     emit mappingChanged();
 }
 
-// QVariantBarDataMappingPrivate
+// QItemModelBarDataMappingPrivate
 
-QVariantBarDataMappingPrivate::QVariantBarDataMappingPrivate(QVariantBarDataMapping *q)
+QItemModelBarDataMappingPrivate::QItemModelBarDataMappingPrivate(QItemModelBarDataMapping *q)
     : QObject(0),
-      q_ptr(q),
-      m_rowIndex(0),
-      m_columnIndex(1),
-      m_valueIndex(2)
+      q_ptr(q)
 {
 }
 
-QVariantBarDataMappingPrivate::~QVariantBarDataMappingPrivate()
+QItemModelBarDataMappingPrivate::~QItemModelBarDataMappingPrivate()
 {
 }
-
 
 QT_DATAVIS3D_END_NAMESPACE
+

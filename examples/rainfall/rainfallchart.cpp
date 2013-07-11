@@ -107,6 +107,8 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 
 RainfallChart::~RainfallChart()
 {
+    delete m_mapping;
+    delete m_dataSet;
     delete m_chart;
 }
 
@@ -143,7 +145,7 @@ void RainfallChart::updateYearsList(int start, int end)
 
 void RainfallChart::addDataSet()
 {
-    QVariantDataSet *dataSet =  new QVariantDataSet;
+    m_dataSet =  new QVariantDataSet;
     QVariantDataItemList *itemList = new QVariantDataItemList;
     QTextStream stream;
     QFile dataFile(":/data/raindata.txt");
@@ -169,10 +171,10 @@ void RainfallChart::addDataSet()
         qWarning() << "Unable to open data file:" << dataFile.fileName();
     }
 
-    dataSet->addItems(itemList);
+    m_dataSet->addItems(itemList);
 
-    m_proxy->setDataSet(dataSet);
+    m_proxy->setDataSet(m_dataSet);
 
-    QVariantBarDataMapping *mapping =  new QVariantBarDataMapping(0, 1, m_city, m_years, m_numericMonths);
-    m_proxy->setMapping(mapping);
+    m_mapping =  new QVariantBarDataMapping(0, 1, m_city, m_years, m_numericMonths);
+    m_proxy->setMapping(m_mapping);
 }

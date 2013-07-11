@@ -44,7 +44,6 @@
 
 #include "qdatavis3dnamespace.h"
 #include <QStringList>
-#include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -53,12 +52,20 @@ class QVariantBarDataMappingPrivate;
 class QT_DATAVIS3D_EXPORT QVariantBarDataMapping : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex)
+    Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex)
+    Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
 public:
     explicit QVariantBarDataMapping();
-    explicit QVariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                                    const QStringList &rowCategories,
-                                    const QStringList &columnCategories);
+    QVariantBarDataMapping(const QVariantBarDataMapping &other);
+    QVariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
+                           const QStringList &rowCategories,
+                           const QStringList &columnCategories);
     virtual ~QVariantBarDataMapping();
+
+    QVariantBarDataMapping &operator=(const QVariantBarDataMapping &other);
 
     void setRowIndex(int index);
     int rowIndex() const;
@@ -79,8 +86,6 @@ signals:
     void mappingChanged();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataMapping)
-
     QScopedPointer<QVariantBarDataMappingPrivate> d_ptr;
 };
 

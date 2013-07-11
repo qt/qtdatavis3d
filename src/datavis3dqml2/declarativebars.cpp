@@ -41,10 +41,7 @@
 
 #include "declarativebars.h"
 #include "bars3dcontroller_p.h"
-#include "qdataset.h"
-#include "qdataset_p.h"
-#include "qdatarow_p.h"
-#include "qolddataproxy.h"
+#include "qitemmodelbardataproxy.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
@@ -73,7 +70,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     QObject::connect(m_shared, &Bars3dController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
 
-    m_shared->setDataProxy(new QOldDataProxy);
+    m_shared->setDataProxy(new QItemModelBarDataProxy);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -130,15 +127,13 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         m_cachedState->m_isGridSet = false;
     }
 
-    if (m_cachedState->m_dataRow) {
-        static_cast<QOldDataProxy *>(m_shared->m_data)->addDataRow(m_cachedState->m_dataRow);
-        m_cachedState->m_dataRow = 0;
+    if (m_cachedState->m_isTickCountSet) {
+        m_shared->setTickCount(GLint(m_cachedState->m_tickCount),
+                               GLfloat(m_cachedState->m_tickStep),
+                               GLfloat(m_cachedState->m_tickMin));
+        m_cachedState->m_isTickCountSet = false;
     }
 
-    if (m_cachedState->m_dataSet) {
-        static_cast<QOldDataProxy *>(m_shared->m_data)->addDataSet(m_cachedState->m_dataSet);
-        m_cachedState->m_dataSet = 0;
-    }
 
     // If old node exists and has right size, reuse it.
     if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
@@ -171,14 +166,10 @@ void DeclarativeBars::setBarType(BarStyle style, bool smooth)
     m_shared->setBarType(style, smooth);
 }
 
-void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                                       const QString &labelColumn, const QString &labelHeight)
+void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn)
 {
     m_cachedState->m_samplesRow = samplesRow;
     m_cachedState->m_samplesColumn = samplesColumn;
-    m_cachedState->m_labelRow = labelRow;
-    m_cachedState->m_labelColumn = labelColumn;
-    m_cachedState->m_labelHeight = labelHeight;
     m_cachedState->m_isSampleSpaceSet = true;
 
     update();
@@ -189,9 +180,9 @@ void DeclarativeBars::setCameraPreset(CameraPreset preset)
     m_shared->setCameraPreset(preset);
 }
 
-void DeclarativeBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
+void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 {
-    m_shared->setCameraPosition(horizontal, vertical, distance);
+    m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
 void DeclarativeBars::setTheme(ColorTheme theme)
@@ -262,143 +253,24 @@ bool DeclarativeBars::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void DeclarativeBars::setTickCount(int tickCount, qreal step, qreal minimum)
 {
-    m_shared->setTickCount(tickCount, step, minimum);
+    m_cachedState->m_isTickCountSet = true;
+    m_cachedState->m_tickCount = tickCount;
+    m_cachedState->m_tickStep = step;
+    m_cachedState->m_tickMin = minimum;
+
+    update();
 }
 
 void DeclarativeBars::setData(QAbstractItemModel *data)
 {
-    qDebug() << "setData";
-    QDataSet *dataset = new QDataSet();
-
-    qDebug() << data << data->rowCount() << data->columnCount();
-
-    // Get sample space size from data, and set it
-    setupSampleSpace(data->rowCount(), data->columnCount());
-
-    // TODO: Maps data in QAbstractItemModel to qdatarows and qdataset
-
-    // Add data to scene
-    addDataSet(dataset);
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
 }
 
 QAbstractItemModel *DeclarativeBars::data()
 {
-    // TODO: Map back from qdataset, or store as QAbstractItemModel as well?
-    return NULL;
-}
-
-void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                                 const QVector<QString> &labelsColumn)
-{
-    Q_UNUSED(labelRow)
-    Q_UNUSED(labelsColumn)
-    qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<float> &dataRow...)";
-    // TODO: Save labels to cachedstate
-    QDataItem *newItem;
-    delete m_cachedState->m_dataRow;
-    m_cachedState->m_dataRow = new QDataRow();
-    for (int i = 0; i < dataRow.count(); i++) {
-        newItem = new QDataItem(dataRow.at(i));
-        m_cachedState->m_dataRow->addItem(newItem);
-    }
-    update();
-}
-
-void DeclarativeBars::addDataRow(const QVector<QDataItem *> &dataRow, const QString &labelRow,
-                                 const QVector<QString> &labelsColumn)
-{
-    Q_UNUSED(labelRow)
-    Q_UNUSED(labelsColumn)
-    qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow...)";
-    // TODO: Save labels to cachedstate
-    QDataItem *newItem;
-    delete m_cachedState->m_dataRow;
-    m_cachedState->m_dataRow = new QDataRow();
-    for (int i = 0; i < dataRow.count(); i++) {
-        newItem = new QDataItem(*dataRow.at(i));
-        m_cachedState->m_dataRow->addItem(newItem);
-    }
-    update();
-}
-
-void DeclarativeBars::addDataRow(QDataRow *dataRow)
-{
-    qDebug() << "Enter DeclarativeBars::addDataRow(QDataRow *dataRow)";
-    QDataItem *newItem;
-    delete m_cachedState->m_dataRow;
-    m_cachedState->m_dataRow = new QDataRow();
-    for (int i = 0; i < dataRow->d_ptr->row().count(); i++) {
-        newItem = new QDataItem(*dataRow->d_ptr->getItem(i));
-        m_cachedState->m_dataRow->addItem(newItem);
-    }
-    update();
-}
-
-void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data,
-                                 const QVector<QString> &labelsRow,
-                                 const QVector<QString> &labelsColumn)
-{
-    Q_UNUSED(labelsRow)
-    Q_UNUSED(labelsColumn)
-    qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<float> >...";
-    // TODO: Save labels to cachedstate
-    QDataItem *newItem;
-    QDataRow *newRow;
-    delete m_cachedState->m_dataSet;
-    m_cachedState->m_dataSet = new QDataSet();
-    for (int row = 0; row < data.count(); row++) {
-        newRow = new QDataRow();
-        for (int i = 0; i < data.at(row).count(); i++) {
-            newItem = new QDataItem(data.at(row).at(i));
-            newRow->addItem(newItem);
-        }
-        m_cachedState->m_dataSet->addRow(newRow);
-    }
-    update();
-}
-
-void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> > &data,
-                                 const QVector<QString> &labelsRow,
-                                 const QVector<QString> &labelsColumn)
-{
-    Q_UNUSED(labelsRow)
-    Q_UNUSED(labelsColumn)
-    qDebug() << "void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem *> >...";
-    // TODO: Save labels to cachedstate
-    QDataItem *newItem;
-    QDataRow *newRow;
-    delete m_cachedState->m_dataSet;
-    m_cachedState->m_dataSet = new QDataSet();
-    for (int row = 0; row < data.count(); row++) {
-        newRow = new QDataRow();
-        for (int i = 0; i < data.at(row).count(); i++) {
-            newItem = new QDataItem(*data.at(row).at(i));
-            newRow->addItem(newItem);
-        }
-        m_cachedState->m_dataSet->addRow(newRow);
-    }
-    update();
-}
-
-void DeclarativeBars::addDataSet(QDataSet *dataSet)
-{
-    qDebug() << "void DeclarativeBars::addDataSet(QDataSet *dataSet)";
-    // TODO: Handle labels?
-    QDataItem *newItem;
-    QDataRow *newRow;
-    delete m_cachedState->m_dataSet;
-    m_cachedState->m_dataSet = new QDataSet();
-    for (int row = 0; row < dataSet->d_ptr->set().count(); row++) {
-        newRow = new QDataRow();
-        for (int i = 0; i < dataSet->d_ptr->getRow(row)->d_ptr->row().count(); i++) {
-            newItem = new QDataItem(*dataSet->d_ptr->getRow(row)->d_ptr->getItem(i));
-            newRow->addItem(newItem);
-        }
-        m_cachedState->m_dataSet->addRow(newRow);
-    }
-    update();
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->itemModel();
 }
 
 void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
@@ -423,6 +295,39 @@ void DeclarativeBars::setShadowQuality(DeclarativeBars::ShadowQuality quality)
 DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
 {
     return DeclarativeBars::ShadowQuality(m_shared->shadowQuality());
+}
+
+QItemModelBarDataMapping *DeclarativeBars::mapping() const
+{
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
+}
+
+void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
+{
+    qDebug() << "Setting the mapping!!";
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+int DeclarativeBars::rows() const
+{
+    return m_cachedState->m_samplesRow;
+}
+
+void DeclarativeBars::setRows(int rows)
+{
+    m_cachedState->m_samplesRow = rows;
+    setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
+}
+
+int DeclarativeBars::columns() const
+{
+    return m_cachedState->m_samplesColumn;
+}
+
+void DeclarativeBars::setColumns(int columns)
+{
+    m_cachedState->m_samplesColumn = columns;
+    setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
 }
 
 void DeclarativeBars::setMeshFileName(const QString &objFileName)
@@ -511,11 +416,25 @@ void DeclarativeBarsRenderer::render()
 
 DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
     m_isSampleSpaceSet(false),
+    m_samplesRow(0),
+    m_samplesColumn(0),
     m_labelRow(QStringLiteral("")),
     m_labelColumn(QStringLiteral("")),
     m_labelHeight(QStringLiteral("")),
-    m_dataRow(0),
-    m_dataSet(0)
+    m_isSelectionModeSet(false),
+    m_selectionMode(ModeNone),
+    m_isLabelTransparencySet(false),
+    m_labelTransparency(TransparencyNone),
+    m_isShadowQualitySet(false),
+    m_shadowQuality(ShadowNone),
+    m_isGridSet(false),
+    m_isGridEnabled(true),
+    m_isTickCountSet(false),
+    m_tickCount(5),
+    m_tickStep(1),
+    m_tickMin(0)
+
+
 {
 }
 

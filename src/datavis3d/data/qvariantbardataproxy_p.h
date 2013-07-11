@@ -49,11 +49,12 @@
 //
 // We mean it.
 
-#include "qvariantbardataproxy.h"
-#include "qbardataproxy_p.h"
-
 #ifndef QVARIANTBARDATAPROXY_P_H
 #define QVARIANTBARDATAPROXY_P_H
+
+#include "qvariantbardataproxy.h"
+#include "qbardataproxy_p.h"
+#include <QPointer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -75,12 +76,11 @@ public slots:
     void handleMappingChanged();
 
 private:
-    void connectDataSet();
     void resolveDataSet();
     QVariantBarDataProxy *qptr();
 
-    QVariantDataSet *m_dataSet;
-    QVariantBarDataMapping *m_mapping;
+    QPointer<QVariantDataSet> m_dataSet;
+    QPointer<QVariantBarDataMapping> m_mapping;
 
     friend class QVariantBarDataProxy;
 };

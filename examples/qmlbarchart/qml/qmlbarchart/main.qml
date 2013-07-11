@@ -26,119 +26,117 @@ import com.digia.QtDataVis3D 1.0
 Item {
     id: mainview
     //title: "My MainWindow"
-    width: 640
-    height: 480
+    width: 800
+    height: 600
     visible: true
 
     Item {
         id: dataView
-        width: parent.width - shadowToggle.width
+        width: parent.width - tableView.width
         height: parent.height
         anchors.right: parent.right;
 
-        DataSet {
-            id: testset1
+        BarDataMapping {
+            id: valueMapping
+            rowRole: "year"
+            columnRole: "month"
+            valueRole: "expenses"
+            rowCategories: ["2000", "2001", "2002", "2003", "2004"]
+            columnCategories: ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"]
         }
 
-        DataRow {
-            id: testrow1
-        }
-        DataRow {
-            id: testrow2
-        }
+        ListModel {
+            id: dataModel
+            ListElement{ year: "2000"; month: "January";   expenses: "3";  income: "8" }
+            ListElement{ year: "2000"; month: "February";  expenses: "8";  income: "14" }
+            ListElement{ year: "2000"; month: "March";     expenses: "10"; income: "20" }
+            ListElement{ year: "2000"; month: "April";     expenses: "12"; income: "24" }
+            ListElement{ year: "2000"; month: "May";       expenses: "10"; income: "19" }
+            ListElement{ year: "2000"; month: "June";      expenses: "5";  income: "8" }
+            ListElement{ year: "2000"; month: "July";      expenses: "1";  income: "4" }
+            ListElement{ year: "2000"; month: "August";    expenses: "7";  income: "12" }
+            ListElement{ year: "2000"; month: "September"; expenses: "4";  income: "16" }
+            ListElement{ year: "2000"; month: "October";   expenses: "22"; income: "33" }
+            ListElement{ year: "2000"; month: "November";  expenses: "16"; income: "25" }
+            ListElement{ year: "2000"; month: "December";  expenses: "2";  income: "7" }
 
-        DataItem {
-            id: testitem1
-            label: "Test"
-            value: -8
-        }
-        DataItem {
-            id: testitem2
-            label: "Test2"
-            value: -2
-        }
-        DataItem {
-            id: testitem3
-            label: "Test3"
-            value: 0
-        }
-        DataItem {
-            id: testitem4
-            label: "Test4"
-            value: 1
-        }
-        DataItem {
-            id: testitem5
-            label: "Test5"
-            value: 3
-        }
-        DataItem {
-            id: testitem6
-            label: "Test6"
-            value: 5
-        }
-        DataItem {
-            id: testitem7
-            label: "Test7"
-            value: 7
-        }
-        DataItem {
-            id: testitem8
-            label: "Test8"
-            value: 10
-        }
+            ListElement{ year: "2001"; month: "January";   expenses: "4";  income: "5"  }
+            ListElement{ year: "2001"; month: "February";  expenses: "4";  income: "7"  }
+            ListElement{ year: "2001"; month: "March";     expenses: "11"; income: "14"  }
+            ListElement{ year: "2001"; month: "April";     expenses: "16"; income: "22"  }
+            ListElement{ year: "2001"; month: "May";       expenses: "3";  income: "5"  }
+            ListElement{ year: "2001"; month: "June";      expenses: "4";  income: "8"  }
+            ListElement{ year: "2001"; month: "July";      expenses: "7";  income: "9"  }
+            ListElement{ year: "2001"; month: "August";    expenses: "9";  income: "13"  }
+            ListElement{ year: "2001"; month: "September"; expenses: "1";  income: "6"  }
+            ListElement{ year: "2001"; month: "October";   expenses: "14"; income: "25"  }
+            ListElement{ year: "2001"; month: "November";  expenses: "19"; income: "29"  }
+            ListElement{ year: "2001"; month: "December";  expenses: "5";  income: "7"  }
 
-    //    ListModel {
-    //        id: testdata1
-    //        ListElement{ column1: "test" ; column2: "test" ; column3: "test" }
-    //        ListElement{ column1: "test" ; column2: "test" ; column3: "test" }
-    //        ListElement{ column1: testitem1 ; column2: testitem2 ; column3: testitem3 }
-    //        ListElement{ column1: testitem4 ; column2: testitem6 ; column3: testitem6 }
-    //    }
+            ListElement{ year: "2002"; month: "January";   expenses: "14"; income: "22"  }
+            ListElement{ year: "2002"; month: "February";  expenses: "5";  income: "7"  }
+            ListElement{ year: "2002"; month: "March";     expenses: "1";  income: "9"  }
+            ListElement{ year: "2002"; month: "April";     expenses: "1";  income: "12"  }
+            ListElement{ year: "2002"; month: "May";       expenses: "5";  income: "9"  }
+            ListElement{ year: "2002"; month: "June";      expenses: "5";  income: "8"  }
+            ListElement{ year: "2002"; month: "July";      expenses: "3";  income: "7"  }
+            ListElement{ year: "2002"; month: "August";    expenses: "1";  income: "5"  }
+            ListElement{ year: "2002"; month: "September"; expenses: "2";  income: "4"  }
+            ListElement{ year: "2002"; month: "October";   expenses: "10"; income: "13"  }
+            ListElement{ year: "2002"; month: "November";  expenses: "12"; income: "17"  }
+            ListElement{ year: "2002"; month: "December";  expenses: "6";  income: "9"  }
+
+            ListElement{ year: "2003"; month: "January";   expenses: "2";  income: "6"  }
+            ListElement{ year: "2003"; month: "February";  expenses: "4";  income: "8"  }
+            ListElement{ year: "2003"; month: "March";     expenses: "7";  income: "12"  }
+            ListElement{ year: "2003"; month: "April";     expenses: "9";  income: "15"  }
+            // rest of 2003 missing on purpose, as well as whole of 2004
+        }
 
         Bars3D {
             id: testchart
             width: dataView.width
             height: dataView.height
-
-            Component.onCompleted: {
-                //data = testdata1
-            }
-
             gridVisible: true
             shadowQuality: Bars3D.ShadowNone
             selectionMode: Bars3D.ModeBar
             labelTransparency: Bars3D.TransparencyNone
+            rows: 5
+            columns: 12
+            mapping: valueMapping
         }
     }
 
-
     Component.onCompleted: {
-        testrow1.addItem(testitem1);
-        testrow1.addItem(testitem2);
-        testrow1.addItem(testitem3);
-        testrow1.addItem(testitem4);
-        testrow2.addItem(testitem5);
-        testrow2.addItem(testitem6);
-        testrow2.addItem(testitem7);
-        testrow2.addItem(testitem8);
-        testset1.addRow(testrow1);
-        testset1.addRow(testrow2);
+        console.log("setting data!")
+        testchart.setTickCount(10, 3, 0)
+        testchart.data = dataModel
+    }
 
-        testchart.setupSampleSpace(2, 4);
-        testchart.addDataSet(testset1);
+    TableView {
+        id: tableView
+        x: 0
+        y: 0
+        width: 270
+        height: 500
+        TableViewColumn{ role: "year"  ; title: "Year" ; width: 40 }
+        TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
+        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 70 }
+        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
+        model: dataModel
     }
 
     Rectangle {
         id: shadowToggle
         color: "#FFFFFF"
         x: 0
-        y: 0
-        width: 160
-        height: 80
+        y: tableView.height
+        width: tableView.width
+        height: 50
 
         TextArea {
-            id: buttonText
+            id: shadowButtonText
             text: "Toggle Shadows"
             anchors.fill: parent
             textColor: "#000000"
@@ -149,12 +147,40 @@ Item {
             onClicked: {
                 if (testchart.shadowQuality == Bars3D.ShadowNone) {
                     testchart.shadowQuality = Bars3D.ShadowLow;
-                    buttonText.textColor = "#FFFFFF";
+                    shadowButtonText.textColor = "#FFFFFF";
                     shadowToggle.color = "#000000";
                 } else {
                     testchart.shadowQuality = Bars3D.ShadowNone;
-                    buttonText.textColor = "#000000";
+                    shadowButtonText.textColor = "#000000";
                     shadowToggle.color = "#FFFFFF";
+                }
+            }
+        }
+    }
+    Rectangle {
+        id: mappingToggle
+        color: "#FFFFFF"
+        x: 0
+        y: shadowToggle.height + shadowToggle.y
+        width: shadowToggle.width
+        height: 50
+
+        TextArea {
+            id: mappingButtonText
+            text: "Show Income"
+            anchors.fill: parent
+            textColor: "#000000"
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (valueMapping.valueRole == "expenses") {
+                    valueMapping.valueRole = "income"
+                    mappingButtonText.text = "Show Expenses"
+                } else {
+                    valueMapping.valueRole = "expenses"
+                    mappingButtonText.text = "Show Income"
                 }
             }
         }

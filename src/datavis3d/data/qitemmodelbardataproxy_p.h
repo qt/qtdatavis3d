@@ -39,43 +39,49 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAPROXY_H
-#define QVARIANTBARDATAPROXY_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qbardataproxy.h"
-#include "qvariantdataset.h"
-#include "qvariantbardatamapping.h"
-#include <QStringList>
-#include <QMap>
+#ifndef QITEMMODELBARDATAPROXY_P_H
+#define QITEMMODELBARDATAPROXY_P_H
+
+#include "qitemmodelbardataproxy.h"
+#include "qbardataproxy_p.h"
+#include <QPointer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantBarDataProxyPrivate;
-
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
+class QT_DATAVIS3D_EXPORT QItemModelBarDataProxyPrivate : public QBarDataProxyPrivate
 {
     Q_OBJECT
-
 public:
-    explicit QVariantBarDataProxy();
-    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
-    virtual ~QVariantBarDataProxy();
+    QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q);
+    virtual ~QItemModelBarDataProxyPrivate();
 
-    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
-    void setDataSet(QVariantDataSet *newSet);
-    QVariantDataSet *dataSet();
+    void setItemModel(QAbstractItemModel *itemModel);
+    void setMapping(QItemModelBarDataMapping *mapping);
 
-    // Map key (row, column, value) to value index in data item (QVariantItem).
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
-    void setMapping(QVariantBarDataMapping *mapping);
-    QVariantBarDataMapping *mapping();
-
-protected:
-    QVariantBarDataProxyPrivate *dptr();
+public slots:
+    // TODO proper handlers
+    //void handleItemsAdded(int index, int count);
+    //void handleDataCleared();
+    void handleMappingChanged();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataProxy)
+    void resolveModel();
+    QItemModelBarDataProxy *qptr();
+
+    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
+    QPointer<QItemModelBarDataMapping> m_mapping; // Not owned
+
+    friend class QItemModelBarDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

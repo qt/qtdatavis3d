@@ -45,9 +45,7 @@
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-#include "qdataset.h"
+#include "qitemmodelbardatamapping.h"
 
 #include <qsgsimpletexturenode.h>
 #include <QAbstractItemModel>
@@ -72,11 +70,13 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(int width READ width WRITE setWidth)
-    Q_PROPERTY(int height READ height WRITE setHeight)
+    Q_PROPERTY(int rows READ rows WRITE setRows)
+    Q_PROPERTY(int columns READ columns WRITE setColumns)
+    Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelTransparency)
+
 
 protected:
     Bars3dController *m_shared;
@@ -127,33 +127,6 @@ public:
     void setData(QAbstractItemModel *data);
     QAbstractItemModel *data();
 
-    // TODO: Are we going to offer only addData(QAbstractItemModel *data) for QML2?
-    // If so, all these adds can be removed, as well as metatypes for dataset and datarow
-
-    // Add a row of data. Each new row is added to the front of the sample space, moving previous
-    // rows back (if sample space is more than one row deep)
-    Q_INVOKABLE void addDataRow(const QVector<GLfloat> &dataRow,
-                                const QString &labelRow = QString(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataItems is transferred
-    Q_INVOKABLE void addDataRow(const QVector<QDataItem*> &dataRow,
-                                const QString &labelRow = QString(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataRow is transferred
-    Q_INVOKABLE void addDataRow(QDataRow *dataRow);
-
-    // Add complete data set at a time, as a vector of data rows
-    Q_INVOKABLE void addDataSet(const QVector< QVector<GLfloat> > &data,
-                                const QVector<QString> &labelsRow = QVector<QString>(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
-
-    // ownership of dataItems is transferred
-    Q_INVOKABLE void addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                const QVector<QString> &labelsRow = QVector<QString>(),
-                                const QVector<QString> &labelsColumn = QVector<QString>());
-    // ownership of dataSet is transferred
-    Q_INVOKABLE void addDataSet(QDataSet* dataSet);
-
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
@@ -168,10 +141,7 @@ public:
     Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
-    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn,
-                                      const QString &labelRow = QString(),
-                                      const QString &labelColumn = QString(),
-                                      const QString &labelHeight = QString());
+    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn);
 
     // Select preset camera placement
     Q_INVOKABLE void setCameraPreset(CameraPreset preset);
@@ -179,7 +149,7 @@ public:
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
     // percentage (10...500))
-    Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+    Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
@@ -193,7 +163,7 @@ public:
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    Q_INVOKABLE void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    Q_INVOKABLE void setTickCount(int tickCount, qreal step, qreal minimum);
 
     // TODO: light placement API
 
@@ -224,6 +194,15 @@ public:
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
+
+    QItemModelBarDataMapping *mapping() const;
+    void setMapping(QItemModelBarDataMapping *mapping);
+
+    int rows() const;
+    void setRows(int rows);
+
+    int columns() const;
+    void setColumns(int columns);
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.

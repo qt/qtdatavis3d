@@ -93,7 +93,7 @@ public:
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
     // percentage (10...500))
-    void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
+    void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
@@ -107,7 +107,7 @@ public:
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void setTickCount(int tickCount, qreal step, qreal minimum = 0.0f);
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);

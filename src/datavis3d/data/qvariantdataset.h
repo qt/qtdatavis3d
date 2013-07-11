@@ -65,6 +65,7 @@ public:
 
     int addItem(QVariantDataItem *item);
     int addItems(QVariantDataItemList *itemList);
+    // TODO inserts/removes
 
     const QVariantDataItemList &itemList() const;
 

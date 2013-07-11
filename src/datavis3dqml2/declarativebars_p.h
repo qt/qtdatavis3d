@@ -57,9 +57,6 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRow;
-class QDataSet;
-
 class DeclarativeBarsCachedStatePrivate
 {
 public:
@@ -67,15 +64,11 @@ public:
     ~DeclarativeBarsCachedStatePrivate();
 
     bool m_isSampleSpaceSet;
-    int m_cachedState;
     int m_samplesRow;
     int m_samplesColumn;
     QString m_labelRow;
     QString m_labelColumn;
     QString m_labelHeight;
-
-    QDataRow *m_dataRow;
-    QDataSet *m_dataSet;
 
     bool m_isSelectionModeSet;
     SelectionMode m_selectionMode;
@@ -88,6 +81,11 @@ public:
 
     bool m_isGridSet;
     bool m_isGridEnabled;
+
+    bool m_isTickCountSet;
+    int m_tickCount;
+    qreal m_tickStep;
+    qreal m_tickMin;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

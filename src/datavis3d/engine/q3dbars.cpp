@@ -271,9 +271,9 @@ void Q3DBars::setCameraPreset(CameraPreset preset)
  * on data values. Negative vertical angles are allowed only if there are negative bar values.
  * Distance is adjustable between 10 and 500.
  */
-void Q3DBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
+void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 {
-    d_ptr->m_shared->setCameraPosition(horizontal, vertical, distance);
+    d_ptr->m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
 /*!
@@ -499,9 +499,9 @@ QBarDataProxy *Q3DBars::dataProxy()
  * Sets tick count and step. Note; tickCount * step should be the maximum possible value of data
  * set.
  */
-void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Q3DBars::setTickCount(int tickCount, qreal step, qreal minimum)
 {
-    d_ptr->m_shared->setTickCount(tickCount, step, minimum);
+    d_ptr->m_shared->setTickCount(GLint(tickCount), GLfloat(step), GLfloat(minimum));
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

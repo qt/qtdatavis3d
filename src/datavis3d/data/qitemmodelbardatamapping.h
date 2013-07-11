@@ -39,44 +39,60 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAPROXY_H
-#define QVARIANTBARDATAPROXY_H
+#ifndef QITEMMODELBARDATAMAPPING_H
+#define QITEMMODELBARDATAMAPPING_H
 
-#include "qbardataproxy.h"
-#include "qvariantdataset.h"
-#include "qvariantbardatamapping.h"
+#include "qdatavis3dnamespace.h"
 #include <QStringList>
-#include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QVariantBarDataProxyPrivate;
+class QItemModelBarDataMappingPrivate;
 
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
+class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole)
+    Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole)
+    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
 public:
-    explicit QVariantBarDataProxy();
-    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
-    virtual ~QVariantBarDataProxy();
+    explicit QItemModelBarDataMapping();
+    QItemModelBarDataMapping(const QItemModelBarDataMapping &other);
+    QItemModelBarDataMapping(const QString &rowRole, const QString &columnRole,
+                             const QString &valueRole, const QStringList &rowCategories,
+                             const QStringList &columnCategories);
+    virtual ~QItemModelBarDataMapping();
 
-    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
-    void setDataSet(QVariantDataSet *newSet);
-    QVariantDataSet *dataSet();
+    QItemModelBarDataMapping &operator=(const QItemModelBarDataMapping &other);
 
-    // Map key (row, column, value) to value index in data item (QVariantItem).
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
-    void setMapping(QVariantBarDataMapping *mapping);
-    QVariantBarDataMapping *mapping();
+    // If row categories or column categories is an empty list, use item models's rows and columns for rows and columns.
+    // If the categories are both defined, ignore item model's rows and columns and figure out the rows and columns from
+    // the values of the set roles for each item.
 
-protected:
-    QVariantBarDataProxyPrivate *dptr();
+    void setRowRole(const QString &role);
+    QString rowRole() const;
+    void setColumnRole(const QString &role);
+    QString columnRole() const;
+    void setValueRole(const QString &role);
+    QString valueRole() const;
+
+    void setRowCategories(const QStringList &categories);
+    const QStringList &rowCategories() const;
+    void setColumnCategories(const QStringList &categories);
+    const QStringList &columnCategories() const;
+
+    void remap(const QString &rowRole, const QString &columnRole,
+               const QString &valueRole, const QStringList &rowCategories,
+               const QStringList &columnCategories);
+signals:
+    void mappingChanged();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataProxy)
+    QScopedPointer<QItemModelBarDataMappingPrivate> d_ptr;
 };
+
 
 QT_DATAVIS3D_END_NAMESPACE
 
