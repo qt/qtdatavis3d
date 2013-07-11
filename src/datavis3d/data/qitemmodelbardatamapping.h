@@ -60,6 +60,7 @@ class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QObject
 public:
     explicit QItemModelBarDataMapping();
     QItemModelBarDataMapping(const QItemModelBarDataMapping &other);
+    QItemModelBarDataMapping(const QString &valueRole);
     QItemModelBarDataMapping(const QString &rowRole, const QString &columnRole,
                              const QString &valueRole, const QStringList &rowCategories,
                              const QStringList &columnCategories);

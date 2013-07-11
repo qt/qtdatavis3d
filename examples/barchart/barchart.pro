@@ -5,3 +5,5 @@
 SOURCES += main.cpp
 
 INSTALLS += target
+
+QT += widgets

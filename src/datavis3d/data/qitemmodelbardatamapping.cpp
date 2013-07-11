@@ -56,6 +56,13 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QItemModelBarDataMappin
     operator=(other);
 }
 
+QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole)
+    : QObject(0),
+      d_ptr(new QItemModelBarDataMappingPrivate(this))
+{
+    d_ptr->m_valueRole = valueRole;
+}
+
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
                                                    const QString &columnRole,
                                                    const QString &valueRole,

@@ -98,10 +98,9 @@ QVariantBarDataProxyPrivate::~QVariantBarDataProxyPrivate()
 
 void QVariantBarDataProxyPrivate::setDataSet(QVariantDataSet *newSet)
 {
-    if (!m_dataSet.isNull()) {
-        QObject::disconnect(m_dataSet.data(), &QVariantDataSet::itemsAdded, this, &QVariantBarDataProxyPrivate::handleItemsAdded);
-        QObject::disconnect(m_dataSet.data(), &QVariantDataSet::dataCleared, this, &QVariantBarDataProxyPrivate::handleDataCleared);
-    }
+    if (!m_dataSet.isNull())
+        QObject::disconnect(m_dataSet.data(), 0, this, 0);
+
     m_dataSet = newSet;
 
     if (!m_dataSet.isNull()) {
@@ -126,8 +125,13 @@ void QVariantBarDataProxyPrivate::setMapping(QVariantBarDataMapping *mapping)
 
 void QVariantBarDataProxyPrivate::handleItemsAdded(int index, int count)
 {
+    Q_UNUSED(index)
+    Q_UNUSED(count)
+
+    qDebug() << __FUNCTION__;
+
     // Resolve new items
-    // TODO
+    resolveDataSet(); // TODO Resolving entire dataset is inefficient
 }
 
 void QVariantBarDataProxyPrivate::handleDataCleared()
@@ -149,7 +153,6 @@ void QVariantBarDataProxyPrivate::resolveDataSet()
         return;
     }
     const QVariantDataItemList &itemList = m_dataSet->itemList();
-    int totalCount = itemList.size();
 
     int rowIndex = m_mapping->rowIndex();
     int columnIndex = m_mapping->columnIndex();
@@ -172,7 +175,7 @@ void QVariantBarDataProxyPrivate::resolveDataSet()
         newProxyArray->append(newProxyRow);
     }
 
-    qDebug() << __FUNCTION__ << "totalCount:" << totalCount << "RowCount:" << newProxyArray->size() << "Column count:" << newProxyArray->at(0)->size();
+    qDebug() << __FUNCTION__ << "RowCount:" << newProxyArray->size() << "Column count:" << (newProxyArray->size() ? newProxyArray->at(0)->size() : 0);
 
     qptr()->resetArray(newProxyArray);
 }

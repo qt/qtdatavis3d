@@ -41,9 +41,11 @@
 #include "q3dbars.h"
 #include "qdataset.h"
 #include "qcategoryaxis.h"
-#include "qolddataproxy.h"
+#include "qitemmodelbardataproxy.h"
 
-#include <QGuiApplication>
+#include <QApplication>
+#include <QVBoxLayout>
+#include <QTableWidget>
 #include <QScreen>
 #include <QTimer>
 #include <QFont>
@@ -59,11 +61,11 @@ using namespace QtDataVis3D;
 class ChartDataGenerator : public QObject
 {
 public:
-    explicit ChartDataGenerator(Q3DBars *barchart);
+    explicit ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWidget);
     ~ChartDataGenerator();
 
-    void addDataSet();
-    void addBars();
+    void setupModel();
+    void addRow();
     void changeStyle();
     void changePresetCamera();
     void changeTheme();
@@ -77,16 +79,18 @@ private:
     QTimer *m_themeTimer;
     int m_columnCount;
     int m_rowCount;
+    QTableWidget *m_tableWidget; // not owned
 };
 
-ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
+ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWidget)
     : m_chart(barchart),
       m_dataTimer(0),
       m_styleTimer(0),
       m_presetTimer(0),
       m_themeTimer(0),
-      m_columnCount(21),
-      m_rowCount(21)
+      m_columnCount(100),
+      m_rowCount(50),
+      m_tableWidget(tableWidget)
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
@@ -95,6 +99,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart)
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_tableWidget->setColumnCount(m_columnCount);
 #endif
 
     // Set bar type to smooth bar
@@ -148,11 +153,11 @@ void ChartDataGenerator::start()
 #ifndef USE_STATIC_DATA
     m_dataTimer = new QTimer();
     m_dataTimer->setTimerType(Qt::CoarseTimer);
-    m_dataTimer->setInterval(100);
-    QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addBars);
-    m_dataTimer->start(100);
+    m_dataTimer->setInterval(20);
+    QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addRow);
+    m_dataTimer->start(20);
 #else
-    addDataSet();
+    setupModel();
 #endif
 
 #ifdef CYCLE_THROUGH_STYLES
@@ -184,33 +189,8 @@ void ChartDataGenerator::start()
 #endif
 }
 
-void ChartDataGenerator::addDataSet()
+void ChartDataGenerator::setupModel()
 {
-#if 0
-    // Prepare data to be visualized
-    // Use float vector adder
-    QVector< QVector<float> > data;
-    QVector<float> row;
-    // TODO: Keep here for testing
-    for (int j = 0; j < m_rowCount; j++) {
-        for (int i = 0; i < m_columnCount; i++) {
-            row.prepend(((float)i / (float)m_columnCount) * 100 + (float)(rand() % 30));
-            //row.append(1.0f);
-        }
-        data.append(row);
-        row.clear();
-    }
-    // Set up sample space based on inserted data
-    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
-    // Add data to chart
-    m_chart->addDataSet(data);
-#else
-    // Prepare data to be visualized
-    // Use QDataSet adder
-
-    // Set window title
-    m_chart->setWindowTitle(QStringLiteral("Hours playing banjo"));
-
     // Set up row and column names
     QStringList days;
     days << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
@@ -221,14 +201,11 @@ void ChartDataGenerator::addDataSet()
     float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 7.0f},      // week 1
                          {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
                          {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
-                         {0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
+                         {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
                          {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
 
     // Set tick count and step, we want a line every hour -> 7 ticks, step 1 hour
     m_chart->setTickCount(7, 1.0f);
-
-    // Create data set
-    QDataSet *dataSet = new QDataSet();
 
     // Add labels
     m_chart->rowAxis()->setTitle("Week of year");
@@ -237,37 +214,30 @@ void ChartDataGenerator::addDataSet()
     m_chart->rowAxis()->setLabels(weeks);
     m_chart->columnAxis()->setLabels(days);
 
-    // Create data rows
-    QDataRow *dataRow;
+    m_tableWidget->setRowCount(5);
+    m_tableWidget->setColumnCount(7);
+    m_tableWidget->setHorizontalHeaderLabels(days);
+    m_tableWidget->setVerticalHeaderLabels(weeks);
+
     for (int week = 0; week < weeks.size(); week++) {
-        dataRow = new QDataRow();
-        // Create data items
         for (int day = 0; day < days.size(); day++) {
-            // Add data to rows
-            dataRow->addItem(new QDataItem(hours[week][day], "h"));//, " + days.at(day)));
+            QModelIndex index = m_tableWidget->model()->index(week, day);
+            m_tableWidget->model()->setData(index, hours[week][day]);
         }
-        // Add row to set
-        dataSet->addRow(dataRow);
-        // Get next pointer
-        dataRow++;
     }
 
     // Set up sample space based on prepared data
     m_chart->setupSampleSpace(weeks.size(), days.size());
-
-    // Add data to chart
-    // TODO QDataSet reverses the data in rows and columns when you add it, so results are now mirrored.
-    qWarning() << "Example broken! QDataSet mirrors data, rows and columns will not be correct!";
-    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataSet(dataSet);
-#endif
 }
 
-void ChartDataGenerator::addBars()
+void ChartDataGenerator::addRow()
 {
-    QVector<float> data;
-    for (int i = 0; i < m_columnCount; i++)
-        data.append(((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100);
-    static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
+    m_tableWidget->model()->insertRow(0);
+    for (int i = 0; i < m_columnCount; i++) {
+        QModelIndex index = m_tableWidget->model()->index(0, i);
+        m_tableWidget->model()->setData(index,
+            ((qreal)i / (qreal)m_columnCount) / 2.0 + (qreal)(rand() % 30) / 100.0);
+    }
 }
 
 void ChartDataGenerator::changeStyle()
@@ -326,18 +296,37 @@ void ChartDataGenerator::changeTheme()
 
 int main(int argc, char **argv)
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    Q3DBars barchart;
-    QOldDataProxy *proxy = new QOldDataProxy;
-    barchart.setDataProxy(proxy);
-    QSize screenSize = barchart.screen()->size();
-    barchart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
-    barchart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
-    barchart.show();
+    QWidget *widget = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(widget);
 
-    ChartDataGenerator *generator = new ChartDataGenerator(&barchart);
+    Q3DBars *chart = new Q3DBars();
+    QSize screenSize = chart->screen()->size();
+
+    QWidget *container = QWidget::createWindowContainer(chart);
+    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    container->setMaximumSize(screenSize);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    container->setFocusPolicy(Qt::StrongFocus);
+
+    widget->setWindowTitle(QStringLiteral("Hours playing banjo"));
+
+    QTableWidget *tableWidget = new QTableWidget(0, 0, widget);
+
+    layout->addWidget(tableWidget);
+    layout->addWidget(container, 1);
+
+    // We don't need to initialize the mapping object in any way, as it defaults
+    // to row/column support and uses the Qt::DisplayRole role for value role by default.
+    QItemModelBarDataMapping mapping;
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), &mapping);
+    chart->setDataProxy(proxy);
+
+    ChartDataGenerator *generator = new ChartDataGenerator(chart, tableWidget);
     generator->start();
+
+    widget->show();
 
     return app.exec();
 }
