@@ -63,12 +63,28 @@ QBarDataItem::QBarDataItem()
 {
 }
 
+QBarDataItem::QBarDataItem(const QBarDataItem &other)
+{
+    operator=(other);
+}
+
 /*!
  * Destroys QBarDataItem.
  */
 QBarDataItem::~QBarDataItem()
 {
     delete d_ptr;
+}
+
+QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
+{
+    m_value = other.m_value;
+    if (other.d_ptr)
+        createExtraData();
+    else
+        d_ptr = 0;
+    // TODO set extra data
+    return *this;
 }
 
 void QBarDataItem::setValue(qreal value)
@@ -79,6 +95,12 @@ void QBarDataItem::setValue(qreal value)
 qreal QBarDataItem::value() const
 {
     return m_value;
+}
+
+void QBarDataItem::createExtraData()
+{
+    if (!d_ptr)
+        d_ptr = new QBarDataItemPrivate;
 }
 
 

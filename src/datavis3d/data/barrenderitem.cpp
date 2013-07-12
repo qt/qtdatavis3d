@@ -61,7 +61,7 @@ void BarRenderItem::formatLabel()
     QString numStr;
     numStr.setNum(m_value);
     // TODO actually format instead of just prepending the value
-    m_label.clear();
+    m_label.clear(); // Just in case
     m_label.append(numStr);
     m_label.append(m_renderer->m_dataProxy->itemLabelFormat());
 }

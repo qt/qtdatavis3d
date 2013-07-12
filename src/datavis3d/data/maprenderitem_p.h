@@ -49,39 +49,43 @@
 //
 // We mean it.
 
-#ifndef QDATASET_P_H
-#define QDATASET_P_H
+#ifndef MAPRENDERITEM_P_H
+#define MAPRENDERITEM_P_H
 
-#include "datavis3dglobal_p.h"
-#include "qdataset.h"
-#include "drawer_p.h"
-#include "labelitem_p.h"
-#include <QVector>
-#include <QString>
+#include "barrenderitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QDataSetPrivate : public QObject
+class Maps3DRenderer;
+class Maps3DController; // TODO remove when maps refactored
+
+class MapRenderItem : public BarRenderItem
 {
-    Q_OBJECT
-
 public:
-    explicit QDataSetPrivate(QDataSet *q);
-    ~QDataSetPrivate();
+    MapRenderItem();
+    virtual ~MapRenderItem();
 
-    QVector<QDataRow *> set();
-    QDataRow *getRow(int rowIndex);
+    inline const QPointF &mapPosition() const { return m_mapPosition; }
+    inline void setMapPosition(const QPointF &pos) { m_mapPosition = pos; }
 
-    void verifySize(int colSize, int rowSize = 0); // If rowSize is 0, don't verify rows
-    // first = min, second = max
-    QPair<GLfloat, GLfloat> limitValues();
+    inline const QString &itemLabel() const { return m_itemLabel; }
+    inline void setItemLabel(const QString &label) { m_itemLabel = label; }
 
-private:
-    QDataSet *q_ptr;
-    QVector<QDataRow *> m_set;
+    // TODO should be in abstract, but currently there is no abstract renderer
+    // TODO change when maps refactored
+    inline void setRenderer(Maps3DController *renderer) { m_renderer = renderer; }
 
-    friend class QDataSet;
+protected:
+    virtual void formatLabel();
+
+    Maps3DController *m_renderer;
+    QPointF m_mapPosition;
+    QString m_itemLabel; // from QMapDataItem::label() - unformatted item label
+
+    friend class QMapDataItem;
 };
+
+typedef QVector<MapRenderItem> MapRenderItemArray;
 
 QT_DATAVIS3D_END_NAMESPACE
 

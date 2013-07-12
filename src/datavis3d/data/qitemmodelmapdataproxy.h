@@ -39,55 +39,42 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QITEMMODELMAPDATAPROXY_H
+#define QITEMMODELMAPDATAPROXY_H
 
-#ifndef QDATAITEM_P_H
-#define QDATAITEM_P_H
-
-#include "datavis3dglobal_p.h"
-#include "qdataitem.h"
-#include "labelitem_p.h"
-
-#include <QOpenGLFunctions>
-#include <QSize>
-#include <QString>
-#include <QVector3D>
+#include "qmapdataproxy.h"
+#include "qitemmodelmapdatamapping.h"
+#include <QAbstractItemModel>
+#include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate
+class QItemModelMapDataProxyPrivate;
+
+class QT_DATAVIS3D_EXPORT QItemModelMapDataProxy : public QMapDataProxy
 {
+    Q_OBJECT
+
 public:
-    QDataItemPrivate(QDataItem *q, float value, const QString &label);
-    QDataItemPrivate(QDataItem *q);
-    ~QDataItemPrivate();
+    explicit QItemModelMapDataProxy();
+    explicit QItemModelMapDataProxy(QAbstractItemModel *itemModel, QItemModelMapDataMapping *mapping);
+    virtual ~QItemModelMapDataProxy();
 
-    // Position in 3D scene
-    void setTranslation(const QVector3D &translation);
-    QVector3D translation();
-    // Value of bar
-    float value();
-    // Value and label appended into a string. If label has prepend -flag set, append label and value
-    QString valueStr();
+    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
+    void setItemModel(QAbstractItemModel *itemModel);
+    QAbstractItemModel *itemModel();
 
-    QPointF position();
+    // Map maps role (label, xPos, yPos, value) to role in model
+    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
+    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
+    void setMapping(QItemModelMapDataMapping *mapping);
+    QItemModelMapDataMapping *mapping();
+
+protected:
+    QItemModelMapDataProxyPrivate *dptr();
 
 private:
-    QDataItem *q_ptr;
-    float m_value;
-    QString m_labelString;
-    bool m_prependLabel;
-    QVector3D m_translation;
-    QPointF m_position;
-    friend class QDataItem;
+    Q_DISABLE_COPY(QItemModelMapDataProxy)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

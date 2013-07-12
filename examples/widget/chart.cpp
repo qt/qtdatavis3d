@@ -114,8 +114,11 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->columnAxis()->setTitle("Generic Column");
         m_chart->valueAxis()->setTitle("Generic Value");
 
-        m_chart->rowAxis()->setLabels(QStringList());
-        m_chart->columnAxis()->setLabels(m_genericColumnLabels);
+        if (m_chart->rowAxis()->labels().size() < m_rowCount)
+            m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
+
+        if (m_chart->columnAxis()->labels().size() < m_rowCount)
+            m_chart->columnAxis()->setLabels(m_genericRowLabels.mid(0, m_columnCount));
     }
 }
 
@@ -189,15 +192,12 @@ void ChartModifier::addRow()
         //(*dataRow)[i].setValue(i + m_chart->dataProxy()->rowCount());
     }
     m_chart->dataProxy()->insertRow(0, dataRow);
-    if (m_chart->dataProxy()->rowCount() <= m_rowCount)
-        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_chart->dataProxy()->rowCount()));
 }
 
 void ChartModifier::addRows()
 {
     QTime timer;
     timer.start();
-    int oldCount = m_chart->dataProxy()->rowCount();
     QBarDataArray *dataArray = new QBarDataArray();
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
@@ -207,9 +207,6 @@ void ChartModifier::addRows()
     }
     m_chart->dataProxy()->insertRows(0, dataArray);
     qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
-    if (oldCount < m_rowCount)
-        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
-    qDebug() << "... Including Label creation, time:" << timer.elapsed();
 }
 
 void ChartModifier::changeStyle()
@@ -393,10 +390,14 @@ void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    if (m_chart->columnAxis()->labels().size() < m_columnCount)
+        m_chart->columnAxis()->setLabels(m_genericRowLabels.mid(0, m_columnCount));
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    if (m_chart->rowAxis()->labels().size() < m_rowCount)
+        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
 }

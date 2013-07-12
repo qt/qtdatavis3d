@@ -52,16 +52,23 @@ class QT_DATAVIS3D_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();
+    QBarDataItem(const QBarDataItem &other);
     ~QBarDataItem();
+
+    QBarDataItem &operator=(const QBarDataItem &other);
 
     void setValue(qreal value);
     qreal value() const;
 
     // TODO Set color, label format, ...?
 
+protected:
+    virtual void createExtraData();
+
+    QBarDataItemPrivate *d_ptr;
+
 private:
     qreal m_value;
-    QBarDataItemPrivate *d_ptr;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

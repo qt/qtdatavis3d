@@ -49,58 +49,51 @@
 //
 // We mean it.
 
-#ifndef BARRENDERITEM_P_H
-#define BARRENDERITEM_P_H
+#ifndef QITEMMODELMAPDATAPROXY_P_H
+#define QITEMMODELMAPDATAPROXY_P_H
 
-#include "abstractrenderitem_p.h"
+#include "qitemmodelmapdataproxy.h"
+#include "qMapDataProxy_p.h"
+#include <QPointer>
+#include <QTimer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Bars3dRenderer;
-
-class BarRenderItem : public AbstractRenderItem
+class QItemModelMapDataProxyPrivate : public QMapDataProxyPrivate
 {
+    Q_OBJECT
 public:
-    BarRenderItem();
-    virtual ~BarRenderItem();
+    QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
+    virtual ~QItemModelMapDataProxyPrivate();
 
-    // Position relative to data window (for bar label generation)
-    inline void setPosition(const QPoint &pos) { m_position = pos; }
-    inline const QPoint &position() const { return m_position; }
+    void setItemModel(QAbstractItemModel *itemModel);
+    void setMapping(QItemModelMapDataMapping *mapping);
 
-    // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(qreal value);
-    inline qreal value() const { return m_value; }
+public slots:
+    void handleColumnsInserted(const QModelIndex & parent, int start, int end);
+    void handleColumnsMoved(const QModelIndex & sourceParent, int sourceStart, int sourceEnd, const QModelIndex & destinationParent, int destinationColumn);
+    void handleColumnsRemoved(const QModelIndex & parent, int start, int end);
+    void handleDataChanged(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ());
+    void handleLayoutChanged(const QList<QPersistentModelIndex> & parents = QList<QPersistentModelIndex> (), QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
+    void handleModelReset();
+    void handleRowsInserted(const QModelIndex & parent, int start, int end);
+    void handleRowsMoved(const QModelIndex & sourceParent, int sourceStart, int sourceEnd, const QModelIndex & destinationParent, int destinationRow);
+    void handleRowsRemoved(const QModelIndex & parent, int start, int end);
 
-    // Normalized bar height
-    inline void setHeight(GLfloat height) { m_height = height; }
-    inline GLfloat height() const { return m_height; }
+    void handleMappingChanged();
+    void handlePendingResolve();
 
-    // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
+private:
+    void resolveModel();
+    QItemModelMapDataProxy *qptr();
 
-protected:
-    virtual void formatLabel();
+    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
+    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
+    bool resolvePending;
+    QTimer m_resolveTimer;
 
-    Bars3dRenderer *m_renderer;
-    qreal m_value;
-    QPoint m_position; // x = row, y = column
-    GLfloat m_height;
-
-    friend class QBarDataItem;
+    friend class QItemModelMapDataProxy;
 };
-
-void BarRenderItem::setValue(qreal value)
-{
-    if (m_value != value) {
-        m_value = value;
-        if (!m_label.isNull())
-            setLabel(QString()); // Forces reformatting on next access
-    }
-}
-
-typedef QVector<BarRenderItem> BarRenderItemRow;
-typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
 QT_DATAVIS3D_END_NAMESPACE
 

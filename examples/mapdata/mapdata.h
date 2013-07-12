@@ -42,7 +42,6 @@
 #define CHARTMODIFIER_H
 
 #include "q3dmaps.h"
-#include "qdataset.h"
 
 #include <QFont>
 #include <QDebug>

@@ -41,7 +41,7 @@
 #include "q3dbars.h"
 #include "engine.h"
 #include "utils.h"
-#include "qolddataproxy.h"
+#include "qbardataproxy.h"
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -120,7 +120,7 @@ MainApp::MainApp(Q3DBars *window)
     m_restartTimer->setSingleShot(true);
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
-    QOldDataProxy *proxy = new QOldDataProxy;
+    QBarDataProxy *proxy = new QBarDataProxy;
     m_chart->setDataProxy(proxy);
 }
 
@@ -145,22 +145,20 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
     Q_UNUSED(position);
     Q_UNUSED(length);
     //qDebug() << "updating bar values" << position << length;
-    QVector<float> data;
+    QBarDataRow *data = new QBarDataRow(SpectrumNumBands);
     for (int bar = 0; bar < SpectrumNumBands; bar++) {
         // init data set
-        data.append(0.0f);
+        (*data)[bar].setValue(qreal(0.0));
     }
     FrequencySpectrum::const_iterator i = spectrum.begin();
     const FrequencySpectrum::const_iterator end = spectrum.end();
     for ( ; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
         if (e.frequency >= m_lowFreq && e.frequency < m_highFreq) {
-            data.replace(barIndex(e.frequency)
-                         , qMax(data.at(barIndex(e.frequency)), (float)e.amplitude));
+            (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), qreal(e.amplitude)));
         }
     }
-    if (data.size() > 0)
-        static_cast<QOldDataProxy *>(m_chart->dataProxy())->addDataRow(data);
+    static_cast<QBarDataProxy *>(m_chart->dataProxy())->insertRow(0, data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)

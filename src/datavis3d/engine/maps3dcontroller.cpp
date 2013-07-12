@@ -42,16 +42,14 @@
 #include "maps3dcontroller_p.h"
 #include "maps3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "qdataitem_p.h"
-#include "qdatarow_p.h"
-#include "qdataset_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
-#include "barrenderitem_p.h" // TODO change to maprenderitem?
+#include "maprenderitem_p.h"
+#include "qmapdataproxy_p.h"
 
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
@@ -108,7 +106,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_isInitialized(false),
       m_selectionMode(ModeBar),
       m_selectedBar(0),
-      m_data(new QDataRow()),
+      m_previouslySelectedBar(0),
       m_axisLabelX(QStringLiteral("X")),
       m_axisLabelZ(QStringLiteral("Z")),
       m_axisLabelY(QStringLiteral("Y")),
@@ -131,7 +129,9 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_shadowQuality(ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_bgrHasAlpha(false),
-      m_boundingRect(rect.x(), rect.y(), rect.width(), rect.height())
+      m_boundingRect(rect.x(), rect.y(), rect.width(), rect.height()),
+      m_data(0),
+      m_valuesDirty(false)
 {
     //m_data->setDrawer(m_drawer);
     //QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Maps3DController::updateTextures);
@@ -144,7 +144,6 @@ Maps3DController::~Maps3DController()
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->deleteTexture(&m_bgrTexture);
-    delete m_data;
     delete m_barShader;
     delete m_selectionShader;
     delete m_backgroundShader;
@@ -288,6 +287,24 @@ void Maps3DController::render(const GLuint defaultFboHandle)
         lastTime.restart();
     }
 #endif
+
+    QMutexLocker(m_data->mutex());
+    // Update cached values
+    if (m_valuesDirty) {
+        const QMapDataArray &dataArray = m_data->array();
+        int dataSize = dataArray.size();
+        m_renderItemArray.resize(dataSize);
+        for (int i = 0; i < dataSize ; i++) {
+            qreal value = dataArray.at(i).value();
+            m_renderItemArray[i].setValue(value);
+            m_renderItemArray[i].setMapPosition(dataArray.at(i).mapPosition());
+            m_renderItemArray[i].setHeight(value / m_heightNormalizer);
+            m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
+            calculateTranslation(m_renderItemArray[i]);
+            m_renderItemArray[i].setRenderer(this);
+        }
+        m_valuesDirty = false;
+    }
 
     if (defaultFboHandle) {
         glDepthMask(true);
@@ -455,22 +472,20 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
 #endif
         // Draw bars to depth buffer
-        for (int bar = 0; bar < m_data->d_ptr->row().size(); bar++) {
-            QDataItem *item = m_data->d_ptr->getItem(bar);
-            if (!item)
+        for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
+            const MapRenderItem &item = m_renderItemArray.at(bar);
+            if (!item.value())
                 continue;
-
-            GLfloat barHeight = item->value() / m_heightNormalizer;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
 
-            modelMatrix.translate(item->d_ptr->translation().x(),
-                                  heightMultiplier * barHeight + heightScaler - m_yAdjustment,
-                                  item->d_ptr->translation().z());
-            modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                        heightMultiplier * barHeight + heightScaler,
-                                        depthMultiplier * barHeight + depthScaler));
+            modelMatrix.translate(item.translation().x(),
+                                  heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                                  item.translation().z());
+            modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
+                                        heightMultiplier * item.height() + heightScaler,
+                                        depthMultiplier * item.height() + depthScaler));
 
             MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
@@ -542,22 +557,20 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         GLint barIdxRed = 0;
         GLint barIdxGreen = 0;
         GLint barIdxBlue = 0;
-        for (int bar = 0; bar < m_data->d_ptr->row().size(); bar++, barIdxRed++) {
-            QDataItem *item = m_data->d_ptr->getItem(bar);
-            if (!item)
+        for (int bar = 0; bar < m_renderItemArray.size(); bar++, barIdxRed++) {
+            const MapRenderItem &item = m_renderItemArray.at(bar);
+            if (!item.value())
                 continue;
-
-            GLfloat barHeight = item->value() / m_heightNormalizer;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
 
-            modelMatrix.translate(item->d_ptr->translation().x(),
-                                  heightMultiplier * barHeight + heightScaler - m_yAdjustment,
-                                  item->d_ptr->translation().z());
-            modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                        heightMultiplier * barHeight + heightScaler,
-                                        depthMultiplier * barHeight + depthScaler));
+            modelMatrix.translate(item.translation().x(),
+                                  heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                                  item.translation().z());
+            modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
+                                        heightMultiplier * item.height() + heightScaler,
+                                        depthMultiplier * item.height() + depthScaler));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -637,27 +650,25 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
     //if (!m_zoomActivated)
 
     bool barSelectionFound = false;
-    for (int bar = 0; bar < m_data->d_ptr->row().size(); bar++) {
-        QDataItem *item = m_data->d_ptr->getItem(bar);
-        if (!item)
+    for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
+        MapRenderItem &item = m_renderItemArray[bar];
+        if (!item.value())
             continue;
-
-        GLfloat barHeight = item->value() / m_heightNormalizer;
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(item->d_ptr->translation().x(),
-                              heightMultiplier * barHeight + heightScaler - m_yAdjustment,
-                              item->d_ptr->translation().z());
-        modelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                    heightMultiplier * barHeight + heightScaler,
-                                    depthMultiplier * barHeight + depthScaler));
-        itModelMatrix.scale(QVector3D(widthMultiplier * barHeight + widthScaler,
-                                      heightMultiplier * barHeight + heightScaler,
-                                      depthMultiplier * barHeight + depthScaler));
+        modelMatrix.translate(item.translation().x(),
+                              heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                              item.translation().z());
+        modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
+                                    heightMultiplier * item.height() + heightScaler,
+                                    depthMultiplier * item.height() + depthScaler));
+        itModelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
+                                      heightMultiplier * item.height() + heightScaler,
+                                      depthMultiplier * item.height() + depthScaler));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -667,7 +678,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
         QVector3D baseColor = Utils::vectorFromColor(m_theme->m_baseColor);
-        QVector3D heightColor = Utils::vectorFromColor(m_theme->m_heightColor) * barHeight;
+        QVector3D heightColor = Utils::vectorFromColor(m_theme->m_heightColor) * item.height();
 
         QVector3D barColor = baseColor + heightColor;
 
@@ -680,7 +691,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                 lightStrength = m_theme->m_highlightLightStrength;
                 // Insert data to QDataItem. We have no ownership, don't delete the previous one
                 if (!m_zoomActivated) {
-                    m_selectedBar = item;
+                    m_selectedBar = &item;
                     barSelectionFound = true;
                 }
                 break;
@@ -698,7 +709,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             }
         }
 
-        if (barHeight != 0) {
+        if (item.height() != 0) {
             // Set shader bindings
             m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
             m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
@@ -827,7 +838,6 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
     }*/ else {
         // Print value of selected bar
-        static QDataItem *prevItem = m_selectedBar;
         m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -837,48 +847,30 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         }
 #ifndef DISPLAY_FULL_DATA_ON_SELECTION
         // Draw just the value string of the selected bar
-        BarRenderItem dummyItem; // TODO temporary solution
-        dummyItem.setValue(m_selectedBar->d_ptr->value());
-        if (prevItem != m_selectedBar || m_updateLabels) {
-            m_drawer->generateLabelTexture(&dummyItem);
-            prevItem = m_selectedBar;
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
+            m_drawer->generateLabelTexture(m_selectedBar);
+            m_previouslySelectedBar = m_selectedBar;
         }
 
-        m_drawer->drawLabel(dummyItem, dummyItem.labelItem(),
+        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->labelItem(),
                             viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f),
-                            (m_selectedBar->d_ptr->value() / m_heightNormalizer),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, true);
 #else
-        static bool firstSelection = true;
         // Draw the value string followed by row label and column label
-        LabelItem labelItem = m_selectedBar->selectionLabel();
-        if (firstSelection || prevItem != m_selectedBar || m_updateLabels) {
-            QString labelText = m_selectedBar->valueStr();
-            //            if ((m_data->d_ptr->columnLabels().size()
-            //                 > m_selectedBar->position().y())
-            //                    && (m_data->d_ptr->rowLabels().size()
-            //                        > m_selectedBar->position().x())) {
-            //                labelText.append(QStringLiteral(" ("));
-            //                labelText.append(m_data->d_ptr->rowLabels().at(
-            //                                     m_selectedBar->position().x()));
-            //                labelText.append(QStringLiteral(", "));
-            //                labelText.append(m_data->d_ptr->columnLabels().at(
-            //                                     m_selectedBar->position().y()));
-            //                labelText.append(QStringLiteral(")"));
-            //                //qDebug() << labelText;
-            //            }
+        LabelItem &labelItem = m_selectedBar->selectionLabel();
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
+            QString labelText = m_selectedBar->label();
+            // TODO More elaborate label?
             m_drawer->generateLabelItem(&labelItem, labelText);
-            m_selectedBar->setSelectionLabel(labelItem);
-            prevItem = m_selectedBar;
-            firstSelection = false;
+            m_previouslySelectedBar = m_selectedBar;
         }
 
         m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_heightNormalizer,
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
                             m_selectionMode, m_labelShader,
                             m_labelObj, true, false);
 #endif
@@ -1437,109 +1429,7 @@ ShadowQuality Maps3DController::shadowQuality()
     return m_shadowQuality;
 }
 
-bool Maps3DController::addDataItem(QDataItem *dataItem)
-{
-    // Check validity
-    if (!isValid(*dataItem))
-        return false;
-    // Convert position to translation
-    calculateTranslation(dataItem);
-    // Add item
-    m_data->addItem(dataItem);
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_data->d_ptr->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    calculateHeightAdjustment(limits);
-    return true;
-}
 
-bool Maps3DController::addData(const QVector<QDataItem *> &data)
-{
-    // Convert to QDataRow
-    for (int i = 0; i < data.size(); i++) {
-        QDataItem *item = data.at(i);
-        // Check validity
-        if (!isValid(*item)) {
-            return false;
-        } else {
-            // Convert position to translation
-            calculateTranslation(item);
-            // Add item
-            m_data->addItem(item);
-        }
-    }
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_data->d_ptr->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    calculateHeightAdjustment(limits);
-    return true;
-}
-
-bool Maps3DController::addData(const QDataRow &dataRow)
-{
-    for (int itemIdx = 0; itemIdx < dataRow.d_ptr->row().size(); itemIdx++) {
-        QDataItem *item = dataRow.d_ptr->getItem(itemIdx);
-        // Check validity
-        if (!isValid(*item)) {
-            return false;
-        } else {
-            // Convert position to translation
-            calculateTranslation(item);
-            // Add item
-            m_data->addItem(item);
-        }
-    }
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_data->d_ptr->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    calculateHeightAdjustment(limits);
-    return true;
-}
-
-bool Maps3DController::setData(const QVector<QDataItem *> &dataRow)
-{
-    // Delete previous data
-    delete m_data;
-    // Convert to QDataRow
-    m_data = new QDataRow();
-    for (int i = 0; i < dataRow.size(); i++) {
-        QDataItem *item = dataRow.at(i);
-        // Check validity
-        if (!isValid(*item)) {
-            return false;
-        } else {
-            // Convert position to translation
-            calculateTranslation(item);
-            // Add item
-            m_data->addItem(item);
-        }
-    }
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_data->d_ptr->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    calculateHeightAdjustment(limits);
-    return true;
-}
-
-bool Maps3DController::setData(QDataRow *dataRow)
-{
-    // Check validity
-    for (int i = 0; i < dataRow->d_ptr->row().size(); i++) {
-        if (!isValid(*dataRow->d_ptr->row().at(i)))
-            return false;
-        else
-            calculateTranslation(dataRow->d_ptr->row()[i]);
-    }
-    // Delete previous data
-    delete m_data;
-    // Set give data as new data
-    m_data = dataRow;
-    // Get the limits
-    QPair<GLfloat, GLfloat> limits = m_data->d_ptr->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    calculateHeightAdjustment(limits);
-    return true;
-}
 
 const QSize Maps3DController::size()
 {
@@ -1745,17 +1635,17 @@ void Maps3DController::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &
     //qDebug() << m_yAdjustment;
 }
 
-void Maps3DController::calculateTranslation(QDataItem *item)
+void Maps3DController::calculateTranslation(MapRenderItem &item)
 {
     // We need to convert position (which is in coordinates), to translation (which has origin in the center and is scaled)
     // -> move pos(center, center) to trans(0, 0) and pos(0, 0) to trans(left, top)
-    GLfloat xTrans = 2.0f * (item->position().x() - (m_areaSize.width() / 2.0f))
+    GLfloat xTrans = 2.0f * (item.mapPosition().x() - (m_areaSize.width() / 2.0f))
             / m_scaleFactor;
-    GLfloat zTrans = 2.0f * (item->position().y() - (m_areaSize.height() / 2.0f))
+    GLfloat zTrans = 2.0f * (item.mapPosition().y() - (m_areaSize.height() / 2.0f))
             / m_scaleFactor;
-    //qDebug() << "x, y" << item->position().x() << item->position().y();
-    item->d_ptr->setTranslation(QVector3D(xTrans, 0.0f, zTrans + zComp));
-    //qDebug() << item->translation();
+    //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
+    item.setTranslation(QVector3D(xTrans, 0.0f, zTrans + zComp));
+    //qDebug() << item.translation();
 }
 
 Maps3DController::SelectionType Maps3DController::isSelected(GLint bar, const QVector3D &selection)
@@ -1794,20 +1684,90 @@ Maps3DController::SelectionType Maps3DController::isSelected(GLint bar, const QV
     return isSelectedType;
 }
 
-bool Maps3DController::isValid(const QDataItem &item)
+bool Maps3DController::isValid(const MapRenderItem &item)
 {
     bool retval = true;
-    if (item.d_ptr->value() < 0) {
+    if (item.value() < 0) {
         qCritical("Data item value out of range");
         retval = false;
-    } else if (item.d_ptr->position().x() < 0 || item.d_ptr->position().x() > m_areaSize.width()) {
+    } else if (item.mapPosition().x() < 0 || item.mapPosition().x() > m_areaSize.width()) {
         qCritical("Data item x position out of range");
         retval = false;
-    } else if (item.d_ptr->position().y() < 0 || item.d_ptr->position().y() > m_areaSize.height()) {
+    } else if (item.mapPosition().y() < 0 || item.mapPosition().y() > m_areaSize.height()) {
         qCritical("Data item y position out of range");
         retval = false;
     }
     return retval;
+}
+
+void Maps3DController::setDataProxy(QMapDataProxy *proxy)
+{
+    delete m_data;
+    m_data = proxy;
+
+    QObject::connect(m_data, &QMapDataProxy::arrayReset, this, &Maps3DController::handleArrayReset);
+    QObject::connect(m_data, &QMapDataProxy::itemsAdded, this, &Maps3DController::handleItemsAdded);
+    QObject::connect(m_data, &QMapDataProxy::itemsChanged, this, &Maps3DController::handleItemsChanged);
+    QObject::connect(m_data, &QMapDataProxy::itemsRemoved, this, &Maps3DController::handleItemsRemoved);
+    QObject::connect(m_data, &QMapDataProxy::itemsInserted, this, &Maps3DController::handleItemsInserted);
+
+    // emit something? Renderer might be interested?
+}
+
+QMapDataProxy *Maps3DController::dataProxy()
+{
+    return m_data;
+}
+
+void Maps3DController::handleLimitChange()
+{
+    QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues();
+    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+    calculateHeightAdjustment(limits);
+
+    //emit limitsChanged(limits);
+}
+
+void Maps3DController::handleArrayReset()
+{
+    handleLimitChange();
+    m_valuesDirty = true;
+}
+
+void Maps3DController::handleItemsAdded(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO should dirty only affected values?
+    handleLimitChange();
+    m_valuesDirty = true;
+}
+
+void Maps3DController::handleItemsChanged(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO should dirty only affected values?
+    handleLimitChange();
+    m_valuesDirty = true;
+}
+
+void Maps3DController::handleItemsRemoved(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO should dirty only affected values?
+    handleLimitChange();
+    m_valuesDirty = true;
+}
+
+void Maps3DController::handleItemsInserted(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    // TODO should dirty only affected values?
+    handleLimitChange();
+    m_valuesDirty = true;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

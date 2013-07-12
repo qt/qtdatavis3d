@@ -39,69 +39,37 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef BARRENDERITEM_P_H
-#define BARRENDERITEM_P_H
-
-#include "abstractrenderitem_p.h"
+#include "maprenderitem_p.h"
+#include "maps3drenderer_p.h" // TODO remove when maps refactored
+#include "maps3dcontroller_p.h" // TODO should be renderer
+#include "qmapdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Bars3dRenderer;
-
-class BarRenderItem : public AbstractRenderItem
+MapRenderItem::MapRenderItem()
+    : BarRenderItem()
 {
-public:
-    BarRenderItem();
-    virtual ~BarRenderItem();
-
-    // Position relative to data window (for bar label generation)
-    inline void setPosition(const QPoint &pos) { m_position = pos; }
-    inline const QPoint &position() const { return m_position; }
-
-    // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(qreal value);
-    inline qreal value() const { return m_value; }
-
-    // Normalized bar height
-    inline void setHeight(GLfloat height) { m_height = height; }
-    inline GLfloat height() const { return m_height; }
-
-    // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
-
-protected:
-    virtual void formatLabel();
-
-    Bars3dRenderer *m_renderer;
-    qreal m_value;
-    QPoint m_position; // x = row, y = column
-    GLfloat m_height;
-
-    friend class QBarDataItem;
-};
-
-void BarRenderItem::setValue(qreal value)
-{
-    if (m_value != value) {
-        m_value = value;
-        if (!m_label.isNull())
-            setLabel(QString()); // Forces reformatting on next access
-    }
 }
 
-typedef QVector<BarRenderItem> BarRenderItemRow;
-typedef QVector<BarRenderItemRow> BarRenderItemArray;
+MapRenderItem::~MapRenderItem()
+{
+}
+
+void MapRenderItem::formatLabel()
+{
+    // TODO The label format specified in proxy should probably have additional custom formatting
+    // TODO specifiers in addition to standard printf specifiers for placement of item labels
+    // TODO and selection data (like row/column in bar selection)
+
+    // Format the string on first access
+    QString numStr;
+    numStr.setNum(m_value);
+    // TODO actually format instead of just prepending the value
+    m_label.clear(); // Just in case
+    m_label.append(m_itemLabel);
+    m_label.append(QStringLiteral(" "));
+    m_label.append(numStr);
+    m_label.append(m_renderer->dataProxy()->itemLabelFormat());
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

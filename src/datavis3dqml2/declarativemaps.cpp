@@ -41,10 +41,7 @@
 
 #include "declarativemaps.h"
 #include "maps3dcontroller_p.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-#include "qdatarow_p.h"
-
+#include "qitemmodelmapdataproxy.h"
 #include <QQuickWindow>
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLContext>
@@ -83,11 +80,35 @@ void DeclarativeMaps::componentComplete()
     qDebug() << "componentComplete";
 }
 
+void DeclarativeMaps::setData(QAbstractItemModel *data)
+{
+    m_cachedState->m_model = data;
+}
+
+QAbstractItemModel *DeclarativeMaps::data()
+{
+    if (m_cachedState->m_model)
+        return m_cachedState->m_model;
+    else
+        return static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->itemModel();
+}
+
 QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     if (!m_shared) {
         m_shared = new Maps3DController(boundingRect().toRect());
+        m_shared->setDataProxy(new QItemModelMapDataProxy);
         m_shared->initializeOpenGL();
+    }
+
+    if (m_cachedState->m_model) {
+        static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setItemModel(m_cachedState->m_model);
+        m_cachedState->m_model = 0;
+    }
+
+    if (m_cachedState->m_mapping) {
+        static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setMapping(m_cachedState->m_mapping);
+        m_cachedState->m_mapping = 0;
     }
 
     // Check if properites have changed that need to be applied while on the SGRenderThread
@@ -168,14 +189,6 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     if (m_cachedState->m_isLabelTransparencySet) {
         m_shared->setLabelTransparency(m_cachedState->m_labelTransparency);
         m_cachedState->m_isLabelTransparencySet = false;
-    }
-
-    if (m_cachedState->m_data) {
-        if (m_cachedState->m_replaceData)
-            m_shared->setData(m_cachedState->m_data);
-        else
-            m_shared->addData(*m_cachedState->m_data);
-        m_cachedState->m_data = 0;
     }
 
     // If old node exists and has right size, reuse it.
@@ -349,62 +362,17 @@ DeclarativeMaps::ShadowQuality DeclarativeMaps::shadowQuality()
         return DeclarativeMaps::ShadowLow;
 }
 
-void DeclarativeMaps::addDataItem(QDataItem *dataItem)
+QItemModelMapDataMapping *DeclarativeMaps::mapping() const
 {
-    qDebug() << "Enter DeclarativeMaps::addDataItem(QDataItem *dataItem)";
-    QDataItem *newItem = new QDataItem(*dataItem);
-    m_cachedState->appendData(newItem);
-    update();
+    if (m_cachedState->m_mapping)
+        return m_cachedState->m_mapping;
+    else
+        return static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->mapping();
 }
 
-void DeclarativeMaps::addData(const QVector<QDataItem *> &data)
+void DeclarativeMaps::setMapping(QItemModelMapDataMapping *mapping)
 {
-    qDebug() << "Enter DeclarativeMaps::addData(const QVector<QDataItem *> &data)";
-    QDataItem *newItem;
-    for (int i = 0; i < data.count(); i++) {
-        newItem = new QDataItem(*data.at(i));
-        m_cachedState->appendData(newItem);
-    }
-    update();
-}
-
-void DeclarativeMaps::addData(const QDataRow &dataRow)
-{
-    qDebug() << "Enter DeclarativeMaps::addData(const QDataRow &dataRow)";
-    QDataItem *newItem;
-    for (int i = 0; i < dataRow.d_ptr->row().count(); i++) {
-        newItem = new QDataItem(*dataRow.d_ptr->getItem(i));
-        m_cachedState->appendData(newItem);
-    }
-    update();
-}
-
-void DeclarativeMaps::setData(const QVector<QDataItem *> &data)
-{
-    qDebug() << "Enter DeclarativeMaps::setData(const QVector<QDataItem *> &data)";
-    QDataItem *newItem;
-    delete m_cachedState->m_data;
-    m_cachedState->m_data = new QDataRow();
-    for (int i = 0; i < data.count(); i++) {
-        newItem = new QDataItem(*data.at(i));
-        m_cachedState->appendData(newItem);
-    }
-    m_cachedState->m_replaceData = true;
-    update();
-}
-
-void DeclarativeMaps::setData(QDataRow *data)
-{
-    qDebug() << "Enter DeclarativeMaps::setData(const QVector<QDataItem*> &data)";
-    QDataItem *newItem;
-    delete m_cachedState->m_data;
-    m_cachedState->m_data = new QDataRow();
-    for (int i = 0; i < data->d_ptr->row().count(); i++) {
-        newItem = new QDataItem(*data->d_ptr->getItem(i));
-        m_cachedState->appendData(newItem);
-    }
-    m_cachedState->m_replaceData = true;
-    update();
+    m_cachedState->m_mapping = mapping;
 }
 
 void DeclarativeMaps::mousePressEvent(QMouseEvent *event)
@@ -488,9 +456,7 @@ void DeclarativeMapsRenderer::render()
 
 
 DeclarativeMapsCachedStatePrivate::DeclarativeMapsCachedStatePrivate()
-    : m_replaceData(false),
-      m_data(0),
-      m_isImageSet(false),
+    : m_isImageSet(false),
       m_isBarSpecsSet(false),
       m_isAreaRectSet(false),
       m_isSelectionModeSet(false),
@@ -509,15 +475,6 @@ DeclarativeMapsCachedStatePrivate::DeclarativeMapsCachedStatePrivate()
 
 DeclarativeMapsCachedStatePrivate::~DeclarativeMapsCachedStatePrivate()
 {
-}
-
-void DeclarativeMapsCachedStatePrivate::appendData(QDataItem *item)
-{
-    if (!m_data)
-        m_data = new QDataRow();
-
-    m_data->addItem(item);
-    m_replaceData = false;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

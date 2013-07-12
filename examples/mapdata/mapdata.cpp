@@ -39,6 +39,7 @@
 ****************************************************************************/
 
 #include "mapdata.h"
+#include "qmapdataproxy.h"
 #include <QImage>
 #include <QFile>
 
@@ -64,6 +65,8 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustAll);
     m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
 #endif
+    QMapDataProxy *proxy = new QMapDataProxy;
+    m_chart->setDataProxy(proxy);
 }
 
 MapsModifier::~MapsModifier()
@@ -78,132 +81,156 @@ void MapsModifier::start()
 
 void MapsModifier::addData()
 {
-    QDataItem *item;
-    item = new QDataItem();
+    QMapDataArray *dataArray = new QMapDataArray;
+    QMapDataItem *item;
+    item = new QMapDataItem();
     item->setValue(191050);
-    item->setLabel("Oulu", true);
-    item->setPosition(QPoint(963, 1604));
-    m_chart->addDataItem(item);
+    item->setLabel("Oulu");
+    item->setMapPosition(QPointF(963, 1604));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(22274);
-    item->setLabel("Kemi", true);
-    item->setPosition(QPoint(857, 1383));
-    m_chart->addDataItem(item);
+    item->setLabel("Kemi");
+    item->setMapPosition(QPointF(857, 1383));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(60887);
-    item->setLabel("Rovaniemi", true);
-    item->setPosition(QPoint(1061, 1119));
-    m_chart->addDataItem(item);
+    item->setLabel("Rovaniemi");
+    item->setMapPosition(QPointF(1061, 1119));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(16176);
-    item->setLabel("Kuusamo", true);
-    item->setPosition(QPoint(1459, 1284));
-    m_chart->addDataItem(item);
+    item->setLabel("Kuusamo");
+    item->setMapPosition(QPointF(1459, 1284));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(3998);
-    item->setLabel("Ivalo", true);
-    item->setPosition(QPoint(1239, 474));
-    m_chart->addDataItem(item);
+    item->setLabel("Ivalo");
+    item->setMapPosition(QPointF(1239, 474));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(37978);
-    item->setLabel("Kajaani", true);
-    item->setPosition(QPoint(1285, 1859));
-    m_chart->addDataItem(item);
+    item->setLabel("Kajaani");
+    item->setMapPosition(QPointF(1285, 1859));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(46809);
-    item->setLabel("Kokkola", true);
-    item->setPosition(QPoint(580, 1973));
-    m_chart->addDataItem(item);
+    item->setLabel("Kokkola");
+    item->setMapPosition(QPointF(580, 1973));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(105236);
-    item->setLabel("Kuopio", true);
-    item->setPosition(QPoint(1292, 2283));
-    m_chart->addDataItem(item);
+    item->setLabel("Kuopio");
+    item->setMapPosition(QPointF(1292, 2283));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(133557);
-    item->setLabel("Jyväskylä", true);
-    item->setPosition(QPoint(991, 2496));
-    m_chart->addDataItem(item);
+    item->setLabel("Jyväskylä");
+    item->setMapPosition(QPointF(991, 2496));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(65771);
-    item->setLabel("Vaasa", true);
-    item->setPosition(QPoint(441, 2184));
-    m_chart->addDataItem(item);
+    item->setLabel("Vaasa");
+    item->setMapPosition(QPointF(441, 2184));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(217603);
-    item->setLabel("Tampere", true);
-    item->setPosition(QPoint(686, 2656));
-    m_chart->addDataItem(item);
+    item->setLabel("Tampere");
+    item->setMapPosition(QPointF(686, 2656));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(180350);
-    item->setLabel("Turku", true);
-    item->setPosition(QPoint(430, 3046));
-    m_chart->addDataItem(item);
+    item->setLabel("Turku");
+    item->setMapPosition(QPointF(430, 3046));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(72400);
-    item->setLabel("Lappeenranta", true);
-    item->setPosition(QPoint(1365, 2852));
-    m_chart->addDataItem(item);
+    item->setLabel("Lappeenranta");
+    item->setMapPosition(QPoint(1365, 2852));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(14754);
-    item->setLabel("Tammisaari", true);
-    item->setPosition(QPoint(605, 3215));
-    m_chart->addDataItem(item);
+    item->setLabel("Tammisaari");
+    item->setMapPosition(QPointF(605, 3215));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(1879);
-    item->setLabel("Enontekiö", true);
-    item->setPosition(QPoint(752, 556));
-    m_chart->addDataItem(item);
+    item->setLabel("Enontekiö");
+    item->setMapPosition(QPointF(752, 556));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(36624);
-    item->setLabel("Savonlinna", true);
-    item->setPosition(QPoint(1445, 2586));
-    m_chart->addDataItem(item);
+    item->setLabel("Savonlinna");
+    item->setMapPosition(QPointF(1445, 2586));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(605022);
-    item->setLabel("Helsinki", true);
-    item->setPosition(QPoint(822, 3130));
-    m_chart->addDataItem(item);
+    item->setLabel("Helsinki");
+    item->setMapPosition(QPointF(822, 3130));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(54887);
-    item->setLabel("Kotka", true);
-    item->setPosition(QPoint(1162, 3051));
-    m_chart->addDataItem(item);
+    item->setLabel("Kotka");
+    item->setMapPosition(QPointF(1162, 3051));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(11372);
-    item->setLabel("Maarianhamina", true);
-    item->setPosition(QPoint(56, 3101));
-    m_chart->addDataItem(item);
+    item->setLabel("Maarianhamina");
+    item->setMapPosition(QPointF(56, 3101));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(9266);
-    item->setLabel("Hanko", true);
-    item->setPosition(QPoint(527, 3228));
-    m_chart->addDataItem(item);
+    item->setLabel("Hanko");
+    item->setMapPosition(QPointF(527, 3228));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(1287);
-    item->setLabel("Utsjoki", true);
-    item->setPosition(QPoint(1180, 72));
-    m_chart->addDataItem(item);
+    item->setLabel("Utsjoki");
+    item->setMapPosition(QPointF(1180, 72));
+    dataArray->append(*item);
+    delete item;
+
+    static_cast<QMapDataProxy *>(m_chart->dataProxy())->resetArray(dataArray);
 }
 
 void MapsModifier::changeStyle()

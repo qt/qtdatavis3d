@@ -49,12 +49,12 @@
 //
 // We mean it.
 
+#ifndef QBARDATAPROXY_P_H
+#define QBARDATAPROXY_P_H
+
 #include "qbardataproxy.h"
 #include "qabstractdataproxy_p.h"
 #include "qbardataitem.h"
-
-#ifndef QBARDATAPROXY_P_H
-#define QBARDATAPROXY_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

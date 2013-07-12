@@ -45,8 +45,10 @@
 #include "datavis3dglobal_p.h"
 #include "maps3dcontroller_p.h"
 #include "declarativemaps_p.h"
+#include "qitemmodelmapdatamapping.h"
 
 #include <qsgsimpletexturenode.h>
+#include <QAbstractItemModel>
 #include <QQuickItem>
 #include <QObject>
 
@@ -59,13 +61,13 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeMaps : public QQuickItem
 {
     Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
-    Q_PROPERTY(int width READ width WRITE setWidth)
-    Q_PROPERTY(int height READ height WRITE setHeight)
+    Q_PROPERTY(QItemModelMapDataMapping *mapping READ mapping WRITE setMapping)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelTransparency)
@@ -102,21 +104,8 @@ public:
     void classBegin();
     void componentComplete();
 
-    // Add data item. New data item is appended to old data.
-    // ownership of data is transferred
-    Q_INVOKABLE void addDataItem(QDataItem *dataItem);
-
-    // Add data set. New data is appended to old data.
-    // ownership of data is transferred
-    Q_INVOKABLE void addData(const QVector<QDataItem *> &data);
-    // ownership of data is transferred
-    Q_INVOKABLE void addData(const QDataRow &data);
-
-    // Add data set. Old data is deleted.
-    // ownership of data is transferred
-    Q_INVOKABLE void setData(const QVector<QDataItem *> &data);
-    // ownership of data is transferred
-    Q_INVOKABLE void setData(QDataRow *data);
+    void setData(QAbstractItemModel *data);
+    QAbstractItemModel *data();
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.
@@ -172,6 +161,9 @@ public:
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
+
+    QItemModelMapDataMapping *mapping() const;
+    void setMapping(QItemModelMapDataMapping *mapping);
 
 protected:
     Maps3DController *m_shared;

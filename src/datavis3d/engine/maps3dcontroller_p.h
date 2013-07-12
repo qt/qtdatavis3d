@@ -54,7 +54,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "q3dmaps.h"
-
+#include "maprenderitem_p.h"
 #include <QOpenGLFunctions>
 #include <QFont>
 
@@ -65,8 +65,6 @@ class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItem;
-class QDataRow;
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
@@ -74,9 +72,11 @@ class Theme;
 class Drawer;
 class Maps3DRenderer;
 class CameraHelper;
+class QMapDataProxy;
 
 class QT_DATAVIS3D_EXPORT Maps3DController : public QObject, public QOpenGLFunctions
 {
+    Q_OBJECT
 public:
     enum SelectionType {
         SelectionNone = 0,
@@ -100,22 +100,6 @@ public:
 
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
-
-    // Add data item. New data item is appended to old data.
-    // ownership of data is transferred
-    bool addDataItem(QDataItem *dataItem);
-
-    // Add data set. New data is appended to old data.
-    // ownership of data is transferred
-    bool addData(const QVector<QDataItem *> &data);
-    // ownership of data is transferred
-    bool addData(const QDataRow &data);
-
-    // Add data set. Old data is deleted.
-    // ownership of data is transferred
-    bool setData(const QVector<QDataItem *> &data);
-    // ownership of data is transferred
-    bool setData(QDataRow *data);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.
@@ -210,9 +194,22 @@ public:
     void updateTextures();
     void calculateSceneScalingFactors(const QRect &areaRect);
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
-    void calculateTranslation(QDataItem *item);
+    void calculateTranslation(MapRenderItem &item);
     SelectionType isSelected(GLint bar, const QVector3D &selection);
-    bool isValid(const QDataItem &item);
+    bool isValid(const MapRenderItem &item);
+
+    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
+    void setDataProxy(QMapDataProxy *proxy);
+    QMapDataProxy *dataProxy();
+
+    void handleLimitChange();
+
+public slots:
+    void handleArrayReset();
+    void handleItemsAdded(int startIndex, int count);
+    void handleItemsChanged(int startIndex, int count);
+    void handleItemsRemoved(int startIndex, int count);
+    void handleItemsInserted(int startIndex, int count);
 
 private:
     void drawScene(const GLuint defaultFboHandle);
@@ -243,8 +240,8 @@ private:
     Theme *m_theme;
     bool m_isInitialized;
     SelectionMode m_selectionMode;
-    QDataItem *m_selectedBar;
-    QDataRow *m_data;
+    BarRenderItem *m_selectedBar; // points to renderitem array
+    BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QString m_axisLabelX;
     QString m_axisLabelZ;
     QString m_axisLabelY;
@@ -268,6 +265,9 @@ private:
     GLfloat m_shadowQualityToShader;
     bool m_bgrHasAlpha;
     QRect m_boundingRect;
+    QMapDataProxy *m_data;
+    bool m_valuesDirty;
+    MapRenderItemArray m_renderItemArray;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -41,29 +41,20 @@ Item {
             visible: false
         }
 
-        DataItem {
-            id: testitem1
-            label: "dB"
-            value: 76
-            position: "95.0, 490.0"
+        MapDataMapping {
+            id: mapMapping
+            labelRole: "label"
+            valueRole: "value"
+            xPosRole: "xPos"
+            yPosRole: "yPos"
         }
-        DataItem {
-            id: testitem2
-            label: "dB"
-            value: 88
-            position: "185.0, 105.0"
-        }
-        DataItem {
-            id: testitem3
-            label: "dB"
-            value: 85
-            position: "700.0, 465.0"
-        }
-        DataItem {
-            id: testitem4
-            label: "dB"
-            value: 92
-            position: "505.0, 225.0"
+
+        ListModel {
+            id: dataModel
+            ListElement{ label: "dB"; value: 76; xPos: 95.0; yPos: 490.0 }
+            ListElement{ label: "dB"; value: 88; xPos: 185.0; yPos: 105.0 }
+            ListElement{ label: "dB"; value: 85; xPos: 700.0; yPos: 465.0 }
+            ListElement{ label: "dB"; value: 92; xPos: 505.0; yPos: 225.0 }
         }
 
         Maps3D {
@@ -71,6 +62,7 @@ Item {
             width: dataView.width
             height: dataView.height
             fontSize: 300.0
+            mapping: mapMapping
 
             Component.onCompleted: {
                 console.log("testmap complete");
@@ -84,10 +76,7 @@ Item {
                 shadowQuality = Maps3D.ShadowNone
                 selectionMode = Maps3D.ModeBar
                 labelTransparency = Maps3D.TransparencyNoBackground//.TransparencyFromTheme
-                addDataItem(testitem1);
-                addDataItem(testitem2);
-                addDataItem(testitem3);
-                addDataItem(testitem4);
+                data = dataModel
             }
         }
     }

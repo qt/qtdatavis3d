@@ -39,55 +39,44 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAITEM_H
-#define QDATAITEM_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QString>
-#include <QObject>
-#include <QPointF>
+#ifndef QMAPDATAPROXY_P_H
+#define QMAPDATAPROXY_P_H
 
-class QPoint;
+#include "qmapdataproxy.h"
+#include "qabstractdataproxy_p.h"
+#include "qmapdataitem.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItemPrivate;
-
-class QT_DATAVIS3D_EXPORT QDataItem : public QObject
+class QMapDataProxyPrivate : public QAbstractDataProxyPrivate
 {
     Q_OBJECT
-    Q_PROPERTY(QString label READ label WRITE setLabel)
-    Q_PROPERTY(float value READ value WRITE setValue)
-    Q_PROPERTY(int value READ value WRITE setValue)
-    Q_PROPERTY(QPointF position READ position WRITE setPosition)
-
 public:
-    QDataItem(float value = 0.0f, const QString &label = QString());
-    QDataItem(QDataItem &item);
-    ~QDataItem();
+    QMapDataProxyPrivate(QMapDataProxy *q);
+    virtual ~QMapDataProxyPrivate();
 
-    // TODO: Provide a Q_INVOKABLE version of this, or move prepend to it's own property.
-    void setLabel(const QString &label, bool prepend = false); // label for value, unit for example
-    QString label();
-    void setValue(float value);
-    void setValue(int value);
-    float value();
-    // Has no effect in Q3DBars
-    void setPosition(const QPointF &position);
-    void setPosition(const QPoint &position);
-    QPointF position();
+    bool resetArray(QMapDataArray *newArray);
+
+    QPair<GLfloat, GLfloat> limitValues();
 
 private:
-    QScopedPointer<QDataItemPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class QDataRowPrivate;
-    friend class Drawer;
-    friend class QOldDataProxy;
+    QMapDataArray m_dataArray;
+    QString m_itemLabelFormat;
+
+private:
+    friend class QMapDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // QBARDATAPROXY_P_H

@@ -39,47 +39,85 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef QDATAROW_P_H
-#define QDATAROW_P_H
-
-#include "datavis3dglobal_p.h"
-#include "qdatarow.h"
-#include <QVector>
+#include "qmapdataitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataItem;
+/*!
+ * \class QMapDataItem
+ * \inmodule QtDataVis3D
+ * \brief The QMapDataItem class provides a container for resolved data to be added to maps graphs.
+ * \since 1.0.0
+ *
+ * A QMapDataItem holds data for a single rendered bar in a maps graph.
+ * Maps data proxies parse data into QMapDataItem instances for visualizing.
+ *
+ * \sa QMapDataProxy, {Qt Data Visualization 3D C++ Classes}
+ */
 
-class QT_DATAVIS3D_EXPORT QDataRowPrivate
+/*!
+ * Constructs QMapDataItem.
+ */
+QMapDataItem::QMapDataItem()
+    : QBarDataItem()
 {
-public:
-    explicit QDataRowPrivate(QDataRow *q);
-    ~QDataRowPrivate();
+}
 
-    QVector<QDataItem*> row();
-    // Clears vector, doesn't delete items
-    void clear();
-    QDataItem *getItem(int itemIndex);
-    void verifySize(int size);
-    QPair<GLfloat, GLfloat> limitValues();
+QMapDataItem::QMapDataItem(const QMapDataItem &other)
+    : QBarDataItem(other)
+{
+    operator=(other);
+}
 
-private:
-    QDataRow *q_ptr;
-    QVector<QDataItem*> m_row;
-    friend class QDataRow;
-    friend class QOldDataProxy;
-};
+/*!
+ * Destroys QMapDataItem.
+ */
+QMapDataItem::~QMapDataItem()
+{
+}
+
+QMapDataItem &QMapDataItem::operator=(const QMapDataItem &other)
+{
+    QBarDataItem::operator =(other);
+    m_mapPosition = other.m_mapPosition;
+    m_label = other.m_label;
+
+    return *this;
+}
+
+void QMapDataItem::setMapPosition(const QPointF &position)
+{
+    m_mapPosition = position;
+}
+
+const QPointF &QMapDataItem::mapPosition() const
+{
+    return m_mapPosition;
+}
+
+void QMapDataItem::setLabel(const QString &label)
+{
+    m_label = label;
+}
+
+const QString &QMapDataItem::label() const
+{
+    return m_label;
+}
+
+void QMapDataItem::createExtraData()
+{
+    if (!d_ptr)
+        d_ptr = new QMapDataItemPrivate;
+}
+
+QMapDataItemPrivate::QMapDataItemPrivate()
+    : QBarDataItemPrivate()
+{
+}
+
+QMapDataItemPrivate::~QMapDataItemPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

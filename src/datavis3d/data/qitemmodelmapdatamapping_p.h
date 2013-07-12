@@ -39,56 +39,41 @@
 **
 ****************************************************************************/
 
-#ifndef QOLDBARDATAPROXY_H
-#define QOLDBARDATAPROXY_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qbardataproxy.h"
-#include "qdataset.h"
-#include <QOpenGLFunctions>
+#include "qitemmodelmapdatamapping.h"
 
-// TODO: NOTE: THIS IS A TEMPORARY PROXY CLASS TO HANDLE OLD QDataSet
-// TODO: To be removed once QDataSet is booted off the island.
-// TODO: Until then, it serves as an example of how to customize proxy
-// TODO: Therefore it doesn't implement private class either.
+#ifndef QITEMMODELMAPDATAMAPPING_P_H
+#define QITEMMODELMAPDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QOldDataProxy : public QBarDataProxy
+class QItemModelMapDataMappingPrivate : public QObject
 {
     Q_OBJECT
-
 public:
-    explicit QOldDataProxy();
-    virtual ~QOldDataProxy();
-
-    // Add a row of data. Each new row is added to the front of the sample space, moving previous
-    // rows back (if sample space is more than one row deep)
-    void addDataRow(const QVector<GLfloat> &dataRow);
-
-    // ownership of dataItems is transferred
-    void addDataRow(const QVector<QDataItem*> &dataRow);
-
-    // ownership of dataRow is transferred
-    void addDataRow(QDataRow *dataRow);
-
-    // Add complete data set at a time, as a vector of data rows
-    void addDataSet(const QVector< QVector<GLfloat> > &data);
-
-    // ownership of dataItems is transferred
-    void addDataSet(const QVector< QVector<QDataItem*> > &data);
-
-    // ownership of dataSet is transferred
-    void addDataSet(QDataSet* dataSet);
+    QItemModelMapDataMappingPrivate(QItemModelMapDataMapping *q);
+    virtual ~QItemModelMapDataMappingPrivate();
 
 private:
-    void addProxyRow(QDataRow *dataRow);
-    void addProxySet(QDataSet* dataSet);
+    QString m_labelRole;
+    QString m_xPosRole;
+    QString m_yPosRole;
+    QString m_valueRole;
 
-    Q_DISABLE_COPY(QOldDataProxy)
+    QItemModelMapDataMapping *q_ptr;
 
-    QDataSet *m_dataSet;
+    friend class QItemModelMapDataMapping;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QOLDBARDATAPROXY_H
+#endif

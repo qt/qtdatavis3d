@@ -88,7 +88,7 @@ private:
     QItemModelBarDataProxy *qptr();
 
     QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelBarDataMapping> m_mapping; // Not owned'
+    QPointer<QItemModelBarDataMapping> m_mapping; // Not owned
     bool resolvePending;
     QTimer m_resolveTimer;
 

@@ -39,68 +39,41 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QMAPDATAITEM_H
+#define QMAPDATAITEM_H
 
-#ifndef BARRENDERITEM_P_H
-#define BARRENDERITEM_P_H
-
-#include "abstractrenderitem_p.h"
+#include "qdatavis3dnamespace.h"
+#include "qbardataitem.h"
+#include <QPointF>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Bars3dRenderer;
+class QMapDataItemPrivate;
 
-class BarRenderItem : public AbstractRenderItem
+class QT_DATAVIS3D_EXPORT QMapDataItem : public QBarDataItem
 {
 public:
-    BarRenderItem();
-    virtual ~BarRenderItem();
+    QMapDataItem();
+    QMapDataItem(const QMapDataItem &other);
+    ~QMapDataItem();
 
-    // Position relative to data window (for bar label generation)
-    inline void setPosition(const QPoint &pos) { m_position = pos; }
-    inline const QPoint &position() const { return m_position; }
+    QMapDataItem &operator=(const QMapDataItem &other);
 
-    // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(qreal value);
-    inline qreal value() const { return m_value; }
+    void setMapPosition(const QPointF &position);
+    const QPointF &mapPosition() const;
 
-    // Normalized bar height
-    inline void setHeight(GLfloat height) { m_height = height; }
-    inline GLfloat height() const { return m_height; }
-
-    // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
+    void setLabel(const QString &label);
+    const QString &label() const;
 
 protected:
-    virtual void formatLabel();
+    virtual void createExtraData();
 
-    Bars3dRenderer *m_renderer;
-    qreal m_value;
-    QPoint m_position; // x = row, y = column
-    GLfloat m_height;
+    QMapDataItemPrivate *d_ptr;
 
-    friend class QBarDataItem;
+private:
+    QPointF m_mapPosition;
+    QString m_label;
 };
-
-void BarRenderItem::setValue(qreal value)
-{
-    if (m_value != value) {
-        m_value = value;
-        if (!m_label.isNull())
-            setLabel(QString()); // Forces reformatting on next access
-    }
-}
-
-typedef QVector<BarRenderItem> BarRenderItemRow;
-typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
 QT_DATAVIS3D_END_NAMESPACE
 

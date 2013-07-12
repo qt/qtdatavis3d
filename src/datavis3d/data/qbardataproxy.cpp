@@ -99,7 +99,7 @@ void QBarDataProxy::insertRows(int rowIndex, QBarDataArray *rows)
     emit rowsInserted(rowIndex, insertCount);
 }
 
-// Mutexing data accessors should be done by user
+// Mutexing data accessors should be done by user, if needed
 int QBarDataProxy::rowCount()
 {
     return dptrc()->m_dataArray.size();

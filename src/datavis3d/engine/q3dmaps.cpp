@@ -268,29 +268,14 @@ ShadowQuality Q3DMaps::shadowQuality()
     return d_ptr->m_shared->shadowQuality();
 }
 
-bool Q3DMaps::addDataItem(QDataItem* dataItem)
+void Q3DMaps::setDataProxy(QMapDataProxy *proxy)
 {
-    return d_ptr->m_shared->addDataItem(dataItem);
+    d_ptr->m_shared->setDataProxy(proxy);
 }
 
-bool Q3DMaps::addData(const QVector<QDataItem*> &data)
+QMapDataProxy *Q3DMaps::dataProxy()
 {
-    return d_ptr->m_shared->addData(data);
-}
-
-bool Q3DMaps::addData(const QDataRow &dataRow)
-{
-    return d_ptr->m_shared->addData(dataRow);
-}
-
-bool Q3DMaps::setData(const QVector<QDataItem*> &dataRow)
-{
-    return d_ptr->m_shared->setData(dataRow);
-}
-
-bool Q3DMaps::setData(QDataRow *dataRow)
-{
-    return d_ptr->m_shared->setData(dataRow);
+    return d_ptr->m_shared->dataProxy();
 }
 
 Q3DMapsPrivate::Q3DMapsPrivate(Q3DMaps *q, const QRect &rect)

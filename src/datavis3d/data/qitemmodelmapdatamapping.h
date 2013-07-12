@@ -39,39 +39,50 @@
 **
 ****************************************************************************/
 
-#ifndef QDATASET_H
-#define QDATASET_H
+#ifndef QITEMMODELMAPDATAMAPPING_H
+#define QITEMMODELMAPDATAMAPPING_H
 
 #include "qdatavis3dnamespace.h"
-#include "qdataitem.h"
-#include "qdatarow.h"
-
-#include <QScopedPointer>
-#include <QVector>
-#include <QString>
+#include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataSetPrivate;
+class QItemModelMapDataMappingPrivate;
 
-class QT_DATAVIS3D_EXPORT QDataSet : public QObject
+class QT_DATAVIS3D_EXPORT QItemModelMapDataMapping : public QObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString labelRole READ labelRole WRITE setLabelRole)
+    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole)
+    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole)
+    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
 public:
-    explicit QDataSet();
-    ~QDataSet();
+    explicit QItemModelMapDataMapping();
+    QItemModelMapDataMapping(const QItemModelMapDataMapping &other);
+    QItemModelMapDataMapping(const QString &labelRole, const QString &xPosRole,
+                             const QString &yPosRole, const QString &valueRole);
+    virtual ~QItemModelMapDataMapping();
 
-    Q_INVOKABLE void addRow(QDataRow *row);
+    QItemModelMapDataMapping &operator=(const QItemModelMapDataMapping &other);
+
+    void setLabelRole(const QString &role);
+    QString labelRole() const;
+    void setXPosRole(const QString &role);
+    QString xPosRole() const;
+    void setYPosRole(const QString &role);
+    QString yPosRole() const;
+    void setValueRole(const QString &role);
+    QString valueRole() const;
+
+    void remap(const QString &labelRole, const QString &xPosRole,
+               const QString &yPosRole, const QString &valueRole);
+signals:
+    void mappingChanged();
 
 private:
-    QScopedPointer<QDataSetPrivate> d_ptr;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class Bars3dRenderer;
-    friend class DeclarativeBars;
-    friend class QOldDataProxy;
+    QScopedPointer<QItemModelMapDataMappingPrivate> d_ptr;
 };
+
 
 QT_DATAVIS3D_END_NAMESPACE
 

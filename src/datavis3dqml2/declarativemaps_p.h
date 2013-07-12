@@ -54,7 +54,9 @@
 
 #include "datavis3dglobal_p.h"
 #include "maps3dcontroller_p.h"
+#include "qitemmodelmapdatamapping.h"
 #include <QString>
+#include <QAbstractItemModel>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -69,10 +71,8 @@ public:
 
     void appendData(QDataItem *item);
 
-    int m_cachedState;
-
-    bool m_replaceData;
-    QDataRow *m_data;
+    QAbstractItemModel *m_model;
+    QItemModelMapDataMapping *m_mapping;
 
     bool m_isImageSet;
     QImage m_image;

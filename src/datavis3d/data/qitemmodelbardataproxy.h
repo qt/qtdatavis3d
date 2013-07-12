@@ -46,7 +46,6 @@
 #include "qitemmodelbardatamapping.h"
 #include <QAbstractItemModel>
 #include <QStringList>
-#include <QMap>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -65,7 +64,7 @@ public:
     void setItemModel(QAbstractItemModel *itemModel);
     QAbstractItemModel *itemModel();
 
-    // Map key (row, column, value) to value index in data item (QVariantItem).
+    // Map bars role (row, column, value) to role in model.
     // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
     // Modifying mapping that is set to proxy will trigger dataset re-resolving.
     void setMapping(QItemModelBarDataMapping *mapping);

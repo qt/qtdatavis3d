@@ -39,7 +39,6 @@
 ****************************************************************************/
 
 #include "q3dbars.h"
-#include "qdataset.h"
 #include "qcategoryaxis.h"
 #include "qitemmodelbardataproxy.h"
 

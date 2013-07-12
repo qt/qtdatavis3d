@@ -329,9 +329,6 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
     }
 #endif
 
-    // TODO Would it be enough to just mutex cache update?
-    // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
-    QMutexLocker(dataProxy->mutex());
     m_dataProxy = dataProxy;
 
     // Update cached data window
@@ -698,7 +695,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         // Draw bars to depth buffer
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                BarRenderItem &item = m_renderItemArray[row][bar];
+                const BarRenderItem &item = m_renderItemArray.at(row).at(bar);
                 if (!item.value())
                     continue;
 
@@ -792,7 +789,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                BarRenderItem &item = m_renderItemArray[row][bar];
+                const BarRenderItem &item = m_renderItemArray.at(row).at(bar);
                 if (!item.value())
                     continue;
 
@@ -1386,10 +1383,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             m_previouslySelectedBar = m_selectedBar;
         }
 
-        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->label(),
+        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->labelItem(),
                             viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, true);
 #else

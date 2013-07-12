@@ -115,8 +115,8 @@ private:
 
     // Internal state
     bool m_hasNegativeValues;
-    BarRenderItem *m_selectedBar; // TODO: Does this need to be member variable?
-    BarRenderItem *m_previouslySelectedBar;
+    BarRenderItem *m_selectedBar; // points to renderitem array
+    BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QList<BarRenderItem *> *m_sliceSelection;
     QAbstractAxisPrivate *m_sliceAxisP; // not owned
     const LabelItem *m_sliceTitleItem; // not owned

@@ -39,37 +39,35 @@
 **
 ****************************************************************************/
 
-#ifndef QDATAROW_H
-#define QDATAROW_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QObject>
+#ifndef QMAPDATAITEM_P_H
+#define QMAPDATAITEM_P_H
+
+#include "datavis3dglobal_p.h"
+#include "qmapdataitem.h"
+#include "qbardataitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QDataRowPrivate;
-class QDataItem;
-
-class QT_DATAVIS3D_EXPORT QDataRow : public QObject
+class QMapDataItemPrivate : public QBarDataItemPrivate
 {
-    Q_OBJECT
-
 public:
-    explicit QDataRow();
-    ~QDataRow();
+    QMapDataItemPrivate();
+    virtual ~QMapDataItemPrivate();
 
-    Q_INVOKABLE void addItem(QDataItem *item);
+    // TODO stores other data for map items besides position
 
-private:
-    QScopedPointer<QDataRowPrivate> d_ptr;
-    friend class Bars3dRenderer;
-    friend class Bars3dController;
-    friend class Maps3DController;
-    friend class DeclarativeBars;
-    friend class DeclarativeMaps;
-    friend class QDataSetPrivate;
-    friend class QOldDataProxy;
+protected:
+    friend class QMapDataItem;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

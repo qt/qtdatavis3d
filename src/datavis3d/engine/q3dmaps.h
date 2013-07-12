@@ -55,8 +55,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Maps3DController;
 class Q3DMapsPrivate;
-class QDataItem;
-class QDataRow;
+class QMapDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
@@ -78,22 +77,6 @@ public:
 public:
     explicit Q3DMaps();
     ~Q3DMaps();
-
-    // Add data item. New data item is appended to old data.
-    // ownership of data is transferred
-    bool addDataItem(QDataItem *dataItem);
-
-    // Add data set. New data is appended to old data.
-    // ownership of data is transferred
-    bool addData(const QVector<QDataItem*> &data);
-    // ownership of data is transferred
-    bool addData(const QDataRow &data);
-
-    // Add data set. Old data is deleted.
-    // ownership of data is transferred
-    bool setData(const QVector<QDataItem*> &data);
-    // ownership of data is transferred
-    bool setData(QDataRow *data);
 
     void setWidth(const int width);
     void setHeight(const int height);
@@ -155,6 +138,10 @@ public:
     // Adjust shadow quality
     ShadowQuality setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
+
+    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
+    void setDataProxy(QMapDataProxy *proxy);
+    QMapDataProxy *dataProxy();
 
 protected:
     void render();

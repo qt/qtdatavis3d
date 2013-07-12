@@ -46,6 +46,7 @@
 #include "declarativebars.h"
 #include "declarativemaps.h"
 #include "qitemmodelbardatamapping.h"
+#include "qitemmodelmapdatamapping.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -55,6 +56,7 @@ Q_DECLARE_METATYPE(DeclarativeBars *)
 Q_DECLARE_METATYPE(DeclarativeMaps *)
 
 Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
+Q_DECLARE_METATYPE(QItemModelMapDataMapping *)
 Q_DECLARE_METATYPE(QAbstractItemModel *)
 
 

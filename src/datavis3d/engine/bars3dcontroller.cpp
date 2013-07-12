@@ -114,10 +114,15 @@ void Bars3dController::render(const GLuint defaultFboHandle)
         return;
 
     // TODO do not give the entire data array, just the data window
+    // TODO Would it be enough to just mutex cache update in renderer?
+    // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
+    // TODO Also, m_valuesDirty flag setting needs to be under same mutex
+    QMutexLocker(m_data->mutex());
     m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, m_axisX->d_ptr->titleItem(),
                        m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
 
     m_valuesDirty = false;
+
 }
 
 QMatrix4x4 Bars3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
