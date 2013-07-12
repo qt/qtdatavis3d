@@ -118,7 +118,7 @@ void ChartModifier::restart(bool dynamicData)
             m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
 
         if (m_chart->columnAxis()->labels().size() < m_rowCount)
-            m_chart->columnAxis()->setLabels(m_genericRowLabels.mid(0, m_columnCount));
+            m_chart->columnAxis()->setLabels(m_genericColumnLabels.mid(0, m_columnCount));
     }
 }
 
@@ -391,7 +391,7 @@ void ChartModifier::setSampleCountX(int samples)
     m_columnCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
     if (m_chart->columnAxis()->labels().size() < m_columnCount)
-        m_chart->columnAxis()->setLabels(m_genericRowLabels.mid(0, m_columnCount));
+        m_chart->columnAxis()->setLabels(m_genericColumnLabels.mid(0, m_columnCount));
 }
 
 void ChartModifier::setSampleCountZ(int samples)
