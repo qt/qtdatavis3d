@@ -43,6 +43,8 @@
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "abstractobjecthelper_p.h"
+#include "surfaceobject_p.h"
 #include "camerahelper_p.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
@@ -100,7 +102,7 @@ void Drawer::setTransparency(LabelTransparency transparency)
     emit drawerChanged();
 }
 
-void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId,
+void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
                         GLuint depthTextureId)
 {
     // Store the GL state before changing
@@ -154,6 +156,36 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
         glDisableVertexAttribArray(shader->uvAtt());
 
     glDisableVertexAttribArray(shader->normalAtt());
+    glDisableVertexAttribArray(shader->posAtt());
+
+    // Restore the GL state
+    glActiveTexture(*oldActiveTex);
+    glBindTexture(GL_TEXTURE_2D, *oldTexId);
+}
+
+void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
+{
+    // Store the GL state before changing
+    GLint oldActiveTex[1];
+    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
+    GLint oldTexId[1];
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->gridElementBuf());
+
+    // Draw the lines
+    glDrawElements(GL_LINES, object->gridIndexCount(), GL_UNSIGNED_SHORT, (void*)0);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     glDisableVertexAttribArray(shader->posAtt());
 
     // Restore the GL state

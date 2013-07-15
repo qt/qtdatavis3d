@@ -44,6 +44,7 @@
 #include "camerahelper_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "surfaceobject_p.h"
 #include "texturehelper_p.h"
 #include "theme_p.h"
 #include "utils_p.h"
@@ -74,6 +75,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_tickXCount(0),
       m_tickZCount(0),
       m_backgroundShader(0),
+      m_surfaceShader(0),
+      m_surfaceGridShader(0),
       m_isInitialized(false),
       m_yRange(0.0f), // m_heightNormalizer
       m_yAdjustment(0.0f),
@@ -86,9 +89,12 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_maxSceneSize(40.0),
       m_backgroundObj(0),
       m_gridLineObj(0),
+      m_surfaceObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
+      m_surfaceGridTexture(0),
       m_shadowQualityToShader(33.3f),
+      m_smoothSurface(true),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency))
 {
     initializeOpenGL();
@@ -96,6 +102,7 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
 
 Surface3dRenderer::~Surface3dRenderer()
 {
+    qDebug() << "Surface3dRenderer::~Surface3dRenderer()";
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
 
     if (m_backgroundShader)
@@ -105,6 +112,7 @@ Surface3dRenderer::~Surface3dRenderer()
         m_textureHelper->deleteTexture(&m_depthTexture);
 
     delete m_backgroundObj;
+    delete m_surfaceObj;
     delete m_textureHelper;
     delete m_drawer;
 }
@@ -133,6 +141,8 @@ void Surface3dRenderer::initializeOpenGL()
     initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
                           QStringLiteral(":/shaders/fragmentES2"));
 #endif
+
+    initSurfaceShaders();
 
     // Init selection shader
     //initSelectionShader();
@@ -168,6 +178,8 @@ void Surface3dRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+
+    loadSurfaceObj();
 }
 
 void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
@@ -246,6 +258,78 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
+    m_surfaceShader->bind();
+
+    // For surface we can see climpses from underneath
+    glDisable(GL_CULL_FACE);
+
+    if (1) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        QMatrix4x4 depthMVPMatrix;
+        QMatrix4x4 itModelMatrix;
+
+        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
+        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+                                    1.0f,
+                                    m_zLength / m_scaleFactor));
+        itModelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+                                      1.0f,
+                                      m_zLength / m_scaleFactor));
+
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+        MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+#else
+        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+#endif
+        // TODO Check the usage?
+        depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+
+        QVector3D baseColor = Utils::vectorFromColor(QColor(Qt::red)/*m_theme->m_baseColor*/);
+
+        // Set shader bindings
+        m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
+        m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
+        m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
+        m_surfaceShader->setUniformValue(m_surfaceShader->nModel(), itModelMatrix.inverted().transposed());
+        m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
+        m_surfaceShader->setUniformValue(m_surfaceShader->color(), baseColor);
+        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(), m_theme->m_ambientStrength);
+
+        //IF QT_OPENGL_ES_2 TODO
+        // Shadow quality etc.
+        //m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(), m_shadowQualityToShader);
+        //m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
+        m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
+                                            m_theme->m_lightStrength * 2.0f);
+
+        m_drawer->drawObject(m_surfaceShader, m_surfaceObj, 0, m_depthTexture);
+        m_surfaceShader->release();
+
+        // Draw the grid over the surface
+        glPolygonOffset(1.0f, 1.0f);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+
+        m_surfaceGridShader->bind();
+
+        QVector3D gridColor = Utils::vectorFromColor(QColor(Qt::white));
+        // Set shader bindings
+        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->view(), viewMatrix);
+        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->model(), modelMatrix);
+        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->nModel(), itModelMatrix.inverted().transposed());
+        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(), gridColor);
+        //m_surfaceGridShader->setUniformValue(m_surfaceGridShader->ambientS(), m_theme->m_ambientStrength);
+        m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
+
+        m_surfaceGridShader->release();
+
+        glPolygonOffset(0.0f, 0.0f);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
+
+    //m_surfaceShader->release();
+
     // Bind background shader
     m_backgroundShader->bind();
 
@@ -262,13 +346,13 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D( 9.6f / 4.057f /*m_xLength / m_scaleFactor*/,
+        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
                                     1.0f,
-                                    7.2f / 4.057f /*m_zLength / m_scaleFactor*/));
+                                    m_zLength / m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
-        itModelMatrix.scale(QVector3D( 9.6f / 4.057f /*m_xLength / m_scaleFactor*/,
+        itModelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
                                       1.0f,
-                                      7.2f / 4.057f /*m_zLength / m_scaleFactor*/));
+                                      m_zLength / m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -350,6 +434,22 @@ void Surface3dRenderer::setXZStuff(GLint tickXCount, GLint tickZCount)
     calculateSceneScalingFactors();
 }
 
+void Surface3dRenderer::setSeries(QList<qreal> series)
+{
+//    QList<qreal> temp;
+//    temp.append(10);temp.append(150);temp.append(50);
+//    temp.append(10);temp.append(150);temp.append(50);
+//    temp.append(10);temp.append(150);temp.append(50);
+//    if (m_smoothSurface)
+//        m_surfaceObj->setUpSmoothData(temp, 3, 3, m_yRange);
+//    else
+//        m_surfaceObj->setUpData(temp, 3, 3, m_yRange);
+    if (m_smoothSurface)
+        m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange);
+    else
+        m_surfaceObj->setUpData(series, m_tickXCount, m_tickZCount, m_yRange);
+}
+
 void Surface3dRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
@@ -386,6 +486,17 @@ void Surface3dRenderer::loadBackgroundMesh()
     else
         m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
     m_backgroundObj->load();
+}
+
+void Surface3dRenderer::loadSurfaceObj()
+{
+    if (!m_isInitialized)
+        return;
+
+    if (m_surfaceObj)
+        delete m_surfaceObj;
+    m_surfaceObj = new SurfaceObject();
+    //m_surfaceObj->setUpData();
 }
 
 void Surface3dRenderer::loadGridLineMesh()
@@ -548,6 +659,26 @@ void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
         delete m_backgroundShader;
     m_backgroundShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_backgroundShader->initialize();
+}
+
+void Surface3dRenderer::initSurfaceShaders()
+{
+    if (m_surfaceShader)
+        delete m_surfaceShader;
+    if (m_smoothSurface) {
+        m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurface"),
+                                           QStringLiteral(":/shaders/fragmentSurface"));
+    } else {
+        m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                           QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+    }
+    m_surfaceShader->initialize();
+
+    if (m_surfaceGridShader)
+        delete m_surfaceGridShader;
+    m_surfaceGridShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceGrid"),
+                                           QStringLiteral(":/shaders/fragmentSurfaceGrid"));
+    m_surfaceGridShader->initialize();
 }
 
 QT_DATAVIS3D_END_NAMESPACE

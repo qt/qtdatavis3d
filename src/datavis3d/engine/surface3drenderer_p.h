@@ -67,6 +67,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class ObjectHelper;
+class SurfaceObject;
 class TextureHelper;
 class Theme;
 class Drawer;
@@ -114,6 +115,8 @@ private:
     QRect m_mainViewPort;
     QRect m_sliceViewPort;
     ShaderHelper *m_backgroundShader;
+    ShaderHelper *m_surfaceShader;
+    ShaderHelper *m_surfaceGridShader;
     TextureHelper *m_textureHelper;
     bool m_isInitialized;
     GLfloat m_yRange; // m_heightNormalizer
@@ -127,9 +130,12 @@ private:
     GLfloat m_maxSceneSize;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
+    SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
+    GLuint m_surfaceGridTexture;
     GLfloat m_shadowQualityToShader;
+    bool m_smoothSurface;
 
     Drawer *m_drawer;
 
@@ -166,21 +172,23 @@ public:
     void wheelEvent(QWheelEvent *event);
     void handleResize();
 
-
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif
     void loadBackgroundMesh();
     void loadGridLineMesh();
+    void loadSurfaceObj();
 
     // TODO: temp
     void setYRangeStuff(GLint tickCount, GLfloat step, GLfloat minimum);
     void setXZStuff(GLint tickXCount, GLint tickZCount);
+    void setSeries(QList<qreal> series);
 
 private:
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initSurfaceShaders();
 
     Q_DISABLE_COPY(Surface3dRenderer)
 };

@@ -49,64 +49,40 @@
 //
 // We mean it.
 
-#ifndef DRAWER_P_H
-#define DRAWER_P_H
+#ifndef SURFACEOBJECT_P_H
+#define SURFACEOBJECT_P_H
 
 #include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include "theme_p.h"
-#include "labelitem_p.h"
-#include "abstractrenderitem_p.h"
-#include <QFont>
+#include "abstractobjecthelper_p.h"
+#include <QOpenGLFunctions>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class ShaderHelper;
-class ObjectHelper;
-class AbstractObjectHelper;
-class SurfaceObject;
-class TextureHelper;
-class CameraHelper;
-
-class Drawer : public QObject, public QOpenGLFunctions
+class SurfaceObject : public AbstractObjectHelper
 {
-    Q_OBJECT
-
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
-    ~Drawer();
+    SurfaceObject();
+    ~SurfaceObject();
 
-    void initializeOpenGL();
-
-    void setTheme(const Theme &theme);
-    void setFont(const QFont &font);
-    void setTransparency(LabelTransparency transparency);
-
-    void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
-                    GLuint depthTextureId = 0);
-    void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
-    void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
-                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
-                   CameraHelper *camera,
-                   bool useDepth = false, bool rotateAlong = false,
-                   LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
-
-    void generateLabelTexture(AbstractRenderItem *item);
-    void generateLabelItem(LabelItem &item, const QString &text);
-
-Q_SIGNALS:
-    void drawerChanged();
+    void setUpData(QList<qreal> series, int columns, int rows, GLfloat yRange);
+    void setUpSmoothData(QList<qreal> series, int columns, int rows, GLfloat yRange);
+    GLuint gridElementBuf();
+    GLuint gridIndexCount();
 
 private:
-    Theme m_theme;
-    QFont m_font;
-    LabelTransparency m_transparency;
-    TextureHelper *m_textureHelper;
+    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
+    void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
+                       const QVector<QVector3D> &normals, const GLushort *indices,
+                       const GLushort *gridIndices);
+
+private:
+    QList<qreal> m_series;
+    int m_dataWidth;
+    int m_dataDepth;
+    GLfloat m_yRange;
+    GLuint m_gridElementbuffer;
+    GLuint m_gridIndexCount;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif
+#endif // SURFACEOBJECT_P_H

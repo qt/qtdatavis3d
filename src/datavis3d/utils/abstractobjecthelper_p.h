@@ -49,64 +49,37 @@
 //
 // We mean it.
 
-#ifndef DRAWER_P_H
-#define DRAWER_P_H
+#ifndef ABSTRACTOBJECTHELPER_H
+#define ABSTRACTOBJECTHELPER_H
 
 #include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include "theme_p.h"
-#include "labelitem_p.h"
-#include "abstractrenderitem_p.h"
-#include <QFont>
+#include <QOpenGLFunctions>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class ShaderHelper;
-class ObjectHelper;
-class AbstractObjectHelper;
-class SurfaceObject;
-class TextureHelper;
-class CameraHelper;
-
-class Drawer : public QObject, public QOpenGLFunctions
+class AbstractObjectHelper: protected QOpenGLFunctions
 {
-    Q_OBJECT
+protected:
+    AbstractObjectHelper();
+public:
+    ~AbstractObjectHelper();
+
+    GLuint vertexBuf();
+    GLuint normalBuf();
+    GLuint uvBuf();
+    GLuint elementBuf();
+    GLuint indexCount();
 
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
-    ~Drawer();
+    GLuint m_vertexbuffer;
+    GLuint m_normalbuffer;
+    GLuint m_uvbuffer;
+    GLuint m_elementbuffer;
 
-    void initializeOpenGL();
-
-    void setTheme(const Theme &theme);
-    void setFont(const QFont &font);
-    void setTransparency(LabelTransparency transparency);
-
-    void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
-                    GLuint depthTextureId = 0);
-    void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
-    void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
-                   const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
-                   CameraHelper *camera,
-                   bool useDepth = false, bool rotateAlong = false,
-                   LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
-
-    void generateLabelTexture(AbstractRenderItem *item);
-    void generateLabelItem(LabelItem &item, const QString &text);
-
-Q_SIGNALS:
-    void drawerChanged();
-
-private:
-    Theme m_theme;
-    QFont m_font;
-    LabelTransparency m_transparency;
-    TextureHelper *m_textureHelper;
+    GLuint m_indexCount;
+    GLboolean m_meshDataLoaded;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // ABSTRACTOBJECTHELPER_H

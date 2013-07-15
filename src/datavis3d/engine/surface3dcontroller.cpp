@@ -167,6 +167,7 @@ void Surface3dController::setData(QList<qreal> series, int width, int depth)
 
     m_renderer->setYRangeStuff(5, 50.0f, 0.0f);
     m_renderer->setXZStuff(width, depth);
+    m_renderer->setSeries(series);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

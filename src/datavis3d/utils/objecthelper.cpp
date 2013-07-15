@@ -42,28 +42,20 @@
 #include "meshloader_p.h"
 #include "vertexindexer_p.h"
 #include "objecthelper_p.h"
+#include "abstractobjecthelper_p.h"
 
 #include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 ObjectHelper::ObjectHelper(const QString &objectFile)
-    : m_objectFile(objectFile),
-      m_vertexbuffer(0),
-      m_normalbuffer(0),
-      m_uvbuffer(0),
-      m_elementbuffer(0),
-      m_indexCount(0),
-      m_meshDataLoaded(false)
+    : m_objectFile(objectFile)
 {
 }
 
 ObjectHelper::~ObjectHelper()
 {
-    glDeleteBuffers(1, &m_vertexbuffer);
-    glDeleteBuffers(1, &m_uvbuffer);
-    glDeleteBuffers(1, &m_normalbuffer);
-    glDeleteBuffers(1, &m_elementbuffer);
+    qDebug() << "ObjectHelper::~ObjectHelper()";
 }
 
 void ObjectHelper::setObjectFile(const QString &objectFile)
@@ -127,39 +119,6 @@ void ObjectHelper::load()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     m_meshDataLoaded = true;
-}
-
-GLuint ObjectHelper::vertexBuf()
-{
-    if (!m_meshDataLoaded)
-        qFatal("No loaded object");
-    return m_vertexbuffer;
-}
-
-GLuint ObjectHelper::normalBuf()
-{
-    if (!m_meshDataLoaded)
-        qFatal("No loaded object");
-    return m_normalbuffer;
-}
-
-GLuint ObjectHelper::uvBuf()
-{
-    if (!m_meshDataLoaded)
-        qFatal("No loaded object");
-    return m_uvbuffer;
-}
-
-GLuint ObjectHelper::elementBuf()
-{
-    if (!m_meshDataLoaded)
-        qFatal("No loaded object");
-    return m_elementbuffer;
-}
-
-GLuint ObjectHelper::indexCount()
-{
-    return m_indexCount;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

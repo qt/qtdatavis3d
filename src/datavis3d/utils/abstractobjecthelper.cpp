@@ -39,39 +39,63 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef OBJECTHELPER_P_H
-#define OBJECTHELPER_P_H
-
-#include "datavis3dglobal_p.h"
 #include "abstractobjecthelper_p.h"
-#include <QOpenGLFunctions>
+
+#include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class ObjectHelper : public AbstractObjectHelper
+AbstractObjectHelper::AbstractObjectHelper()
+    : m_vertexbuffer(0),
+      m_normalbuffer(0),
+      m_uvbuffer(0),
+      m_elementbuffer(0),
+      m_indexCount(0),
+      m_meshDataLoaded(false)
 {
-public:
-    ObjectHelper(const QString &objectFile = QString());
-    ~ObjectHelper();
+    qDebug() << "AbstractObjectHelper::AbstractObjectHelper";
+}
 
-    void setObjectFile(const QString &objectFile);
+AbstractObjectHelper::~AbstractObjectHelper()
+{
+    qDebug() << "AbstractObjectHelper::~AbstractObjectHelper";
+    glDeleteBuffers(1, &m_vertexbuffer);
+    glDeleteBuffers(1, &m_uvbuffer);
+    glDeleteBuffers(1, &m_normalbuffer);
+    glDeleteBuffers(1, &m_elementbuffer);
+}
 
-    void load();
+GLuint AbstractObjectHelper::vertexBuf()
+{
+    if (!m_meshDataLoaded)
+        qFatal("No loaded object");
+    return m_vertexbuffer;
+}
 
-private:
-    QString m_objectFile;
-};
+GLuint AbstractObjectHelper::normalBuf()
+{
+    if (!m_meshDataLoaded)
+        qFatal("No loaded object");
+    return m_normalbuffer;
+}
+
+GLuint AbstractObjectHelper::uvBuf()
+{
+    if (!m_meshDataLoaded)
+        qFatal("No loaded object");
+    return m_uvbuffer;
+}
+
+GLuint AbstractObjectHelper::elementBuf()
+{
+    if (!m_meshDataLoaded)
+        qFatal("No loaded object");
+    return m_elementbuffer;
+}
+
+GLuint AbstractObjectHelper::indexCount()
+{
+    return m_indexCount;
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif
