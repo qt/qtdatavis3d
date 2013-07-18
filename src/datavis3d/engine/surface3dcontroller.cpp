@@ -55,7 +55,9 @@ Surface3dController::Surface3dController(QRect rect)
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_renderer(0),
-      m_isInitialized(false)
+      m_isInitialized(false),
+      m_smoothSurface(false),
+      m_surfaceGrid(true)
 {
 }
 
@@ -101,6 +103,29 @@ void Surface3dController::setHeight(const int height)
     qDebug() << "Surface3dController::setHeight";
     m_renderer->setHeight(height);
 }
+
+void Surface3dController::setSmoothSurface(bool enable)
+{
+    m_smoothSurface = enable;
+    emit smoothStatusChanged(m_smoothSurface);
+}
+
+bool Surface3dController::smoothSurface()
+{
+    return m_smoothSurface;
+}
+
+void Surface3dController::setSurfaceGrid(bool enable)
+{
+    m_surfaceGrid = enable;
+    emit surfaceGridChanged(m_surfaceGrid);
+}
+
+bool Surface3dController::surfaceGrid()
+{
+    return m_surfaceGrid;
+}
+
 
 #if defined(Q_OS_ANDROID)
 void Surface3dController::mouseDoubleClickEvent(QMouseEvent *event)
@@ -156,7 +181,6 @@ Drawer *Surface3dController::drawer()
     else
         return 0;
 }
-
 
 // TODO: Temp
 void Surface3dController::setData(QList<qreal> series, int width, int depth)

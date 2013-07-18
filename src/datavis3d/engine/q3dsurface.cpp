@@ -99,6 +99,26 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
     d_ptr->m_shared->setHeight(height());
 }
 
+void Q3DSurface::setSmoothSurface(bool enable)
+{
+    d_ptr->m_shared->setSmoothSurface(enable);
+}
+
+bool Q3DSurface::smoothSurface()
+{
+    return d_ptr->m_shared->smoothSurface();
+}
+
+void Q3DSurface::setSurfaceGrid(bool enable)
+{
+    d_ptr->m_shared->setSurfaceGrid(enable);
+}
+
+bool Q3DSurface::surfaceGrid()
+{
+    return d_ptr->m_shared->surfaceGrid();
+}
+
 void Q3DSurface::setWidth(const int width)
 {
     d_ptr->m_shared->setWidth(width);

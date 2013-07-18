@@ -52,10 +52,20 @@ class Q3DSurfacePrivate;
 class QT_DATAVIS3D_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(bool smoothSurface READ smoothSurface WRITE setSmoothSurface)
+    Q_PROPERTY(bool surfaceGrid READ surfaceGrid WRITE setSurfaceGrid)
 
 public:
     explicit Q3DSurface();
     ~Q3DSurface();
+
+    // Enable or disable the smoothes of the surface
+    void setSmoothSurface(bool enable);
+    bool smoothSurface();
+
+    // Enable or disable the grid on the surface
+    void setSurfaceGrid(bool enable);
+    bool surfaceGrid();
 
 //TODO part
     void appendSeries(QList<qreal> series);

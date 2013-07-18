@@ -39,17 +39,69 @@
 ****************************************************************************/
 
 #include <Q3DSurface>
+#include "chartmodifier.h"
 
-#include <QGuiApplication>
+#include <QApplication>
+#include <QApplication>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QSlider>
+#include <QLabel>
 #include <QScreen>
 
 using namespace QtDataVis3D;
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication app(argc, argv);
 
-    Q3DSurface surfaceChart;
+    QWidget *widget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
+    vLayout->setAlignment(Qt::AlignTop);
+
+    Q3DSurface *surfaceChart = new Q3DSurface();
+    QSize screenSize = surfaceChart->screen()->size();
+
+    QWidget *container = QWidget::createWindowContainer(surfaceChart);
+    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    container->setMaximumSize(screenSize);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    container->setFocusPolicy(Qt::StrongFocus);
+
+    widget->setWindowTitle(QStringLiteral("Surface tester"));
+
+    hLayout->addWidget(container, 1);
+    hLayout->addLayout(vLayout);
+
+    QPushButton *someButton = new QPushButton(widget);
+    someButton->setText(QStringLiteral("Press me"));
+    someButton->setEnabled(true);
+
+    QCheckBox *smoothCB = new QCheckBox(widget);
+    smoothCB->setText(QStringLiteral("Smooth "));
+    smoothCB->setChecked(surfaceChart->smoothSurface());
+
+    QCheckBox *surfaceGridCB = new QCheckBox(widget);
+    surfaceGridCB->setText(QStringLiteral("Surface Grid"));
+    surfaceGridCB->setChecked(true);
+
+    // Add controls to the layout
+    vLayout->addWidget(smoothCB);
+    vLayout->addWidget(surfaceGridCB);
+    vLayout->addWidget(someButton);
+
+    widget->show();
+
+    ChartModifier *modifier = new ChartModifier(surfaceChart);
+
+    QObject::connect(smoothCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::toggleSmooth);
+    QObject::connect(surfaceGridCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::toggleSurfaceGrid);
 
     QList<qreal> lowList;
     lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 15.0;
@@ -68,16 +120,15 @@ int main(int argc, char *argv[])
 //    lowList << 35.0 << 105.0 << 170.0 << 105.0 << 35.0;
 //    lowList << 15.0 << 65.0  << 105.0 << 65.0  << 16.1;
 
-    surfaceChart.appendSeries(lowList);
+    surfaceChart->appendSeries(lowList);
 
 //    QList<qreal> topList;
 //    topList << 2.1 << 2.2;
 //    surfaceChart.appendSeries(topList);
 
-    QSize screenSize = surfaceChart.screen()->size();
-    surfaceChart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
-    surfaceChart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
-    surfaceChart.show();
+//    surfaceChart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
+//    surfaceChart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
+//    surfaceChart.show();
 
-    return a.exec();
+    return app.exec();
 }

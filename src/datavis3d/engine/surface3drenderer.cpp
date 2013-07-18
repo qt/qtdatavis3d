@@ -92,11 +92,18 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_surfaceObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
-      m_surfaceGridTexture(0),
       m_shadowQualityToShader(33.3f),
-      m_smoothSurface(true),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency))
 {
+    // Listen to changes in the controller
+    QObject::connect(m_controller, &Surface3dController::smoothStatusChanged, this,
+                     &Surface3dRenderer::updateSmoothStatus);
+    QObject::connect(m_controller, &Surface3dController::surfaceGridChanged, this,
+                     &Surface3dRenderer::updateSurfaceGridStatus);
+
+    m_cachedSmoothSurface =  m_controller->smoothSurface();
+    updateSurfaceGridStatus(m_controller->surfaceGrid());
+
     initializeOpenGL();
 }
 
@@ -306,29 +313,29 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         m_drawer->drawObject(m_surfaceShader, m_surfaceObj, 0, m_depthTexture);
         m_surfaceShader->release();
 
-        // Draw the grid over the surface
-        glPolygonOffset(1.0f, 1.0f);
-        glEnable(GL_POLYGON_OFFSET_FILL);
+        if (m_cachedSurfaceGridOn) {
+            // Draw the grid over the surface
+            glPolygonOffset(1.0f, 1.0f);
+            glEnable(GL_POLYGON_OFFSET_FILL);
 
-        m_surfaceGridShader->bind();
+            m_surfaceGridShader->bind();
 
-        QVector3D gridColor = Utils::vectorFromColor(QColor(Qt::white));
-        // Set shader bindings
-        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->view(), viewMatrix);
-        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->model(), modelMatrix);
-        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->nModel(), itModelMatrix.inverted().transposed());
-        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
-        m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(), gridColor);
-        //m_surfaceGridShader->setUniformValue(m_surfaceGridShader->ambientS(), m_theme->m_ambientStrength);
-        m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
+            QVector3D gridColor = Utils::vectorFromColor(QColor(Qt::white));
+            // Set shader bindings
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->view(), viewMatrix);
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->model(), modelMatrix);
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->nModel(), itModelMatrix.inverted().transposed());
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(), gridColor);
+            //m_surfaceGridShader->setUniformValue(m_surfaceGridShader->ambientS(), m_theme->m_ambientStrength);
+            m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
 
-        m_surfaceGridShader->release();
+            m_surfaceGridShader->release();
 
-        glPolygonOffset(0.0f, 0.0f);
-        glDisable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.0f, 0.0f);
+            glDisable(GL_POLYGON_OFFSET_FILL);
+        }
     }
-
-    //m_surfaceShader->release();
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -444,10 +451,12 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
 //        m_surfaceObj->setUpSmoothData(temp, 3, 3, m_yRange);
 //    else
 //        m_surfaceObj->setUpData(temp, 3, 3, m_yRange);
-    if (m_smoothSurface)
-        m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange);
+    m_series = series;
+
+    if (m_cachedSmoothSurface)
+        m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange, true);
     else
-        m_surfaceObj->setUpData(series, m_tickXCount, m_tickZCount, m_yRange);
+        m_surfaceObj->setUpData(series, m_tickXCount, m_tickZCount, m_yRange, true);
 }
 
 void Surface3dRenderer::calculateSceneScalingFactors()
@@ -472,6 +481,23 @@ void Surface3dRenderer::calculateSceneScalingFactors()
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
+}
+
+void Surface3dRenderer::updateSmoothStatus(bool enable)
+{
+    m_cachedSmoothSurface = enable;
+
+    if (m_cachedSmoothSurface)
+        m_surfaceObj->setUpSmoothData(m_series, m_tickXCount, m_tickZCount, m_yRange, true);
+    else
+        m_surfaceObj->setUpData(m_series, m_tickXCount, m_tickZCount, m_yRange, true);
+
+    initSurfaceShaders();
+}
+
+void Surface3dRenderer::updateSurfaceGridStatus(bool enable)
+{
+    m_cachedSurfaceGridOn = enable;
 }
 
 void Surface3dRenderer::loadBackgroundMesh()
@@ -665,7 +691,7 @@ void Surface3dRenderer::initSurfaceShaders()
 {
     if (m_surfaceShader)
         delete m_surfaceShader;
-    if (m_smoothSurface) {
+    if (m_cachedSmoothSurface) {
         m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurface"),
                                            QStringLiteral(":/shaders/fragmentSurface"));
     } else {

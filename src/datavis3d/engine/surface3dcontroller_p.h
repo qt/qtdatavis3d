@@ -63,10 +63,15 @@ class QT_DATAVIS3D_EXPORT Surface3dController : public Abstract3DController
 {
     Q_OBJECT
 
+private:
     Surface3dRenderer *m_renderer;
     bool m_isInitialized;
+    QList<qreal> m_series; // TODO: TEMP
+    int m_dataWidth;
+    int m_dataDepth;
+    bool m_smoothSurface;
+    bool m_surfaceGrid;
 
-private:
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
@@ -84,6 +89,14 @@ public:
     void setWidth(const int width);
     void setHeight(const int height);
 
+    // Enable or disable the smoothes of the surface
+    void setSmoothSurface(bool enable);
+    bool smoothSurface();
+
+    // Enable or disable the grid on the surface
+    void setSurfaceGrid(bool enable);
+    bool surfaceGrid();
+
     //TODO: Temp solution
     void setData(QList<qreal> series, int width, int depth);
 
@@ -99,10 +112,12 @@ public:
     // TODO: abstract renderer should have accessor for Drawer instead
     virtual Drawer *drawer();
 
+signals:
+    void smoothStatusChanged(bool enable);
+    void surfaceGridChanged(bool enable);
+
 private:
-    QList<qreal> m_series; // TODO: TEMP
-    int m_dataWidth;
-    int m_dataDepth;
+    Q_DISABLE_COPY(Surface3dController)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

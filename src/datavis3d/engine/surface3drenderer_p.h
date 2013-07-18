@@ -106,6 +106,7 @@ public:
 
 private:
     // Data parameters
+    QList<qreal> m_series; // TODO: TEMP
     GLint m_tickYCount;
     GLfloat m_tickYStep;
     GLint m_tickXCount;
@@ -133,9 +134,9 @@ private:
     SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
-    GLuint m_surfaceGridTexture;
     GLfloat m_shadowQualityToShader;
-    bool m_smoothSurface;
+    bool m_cachedSmoothSurface;
+    bool m_cachedSurfaceGridOn;
 
     Drawer *m_drawer;
 
@@ -149,6 +150,11 @@ public:
     // TODO: Not thread-safe, needs rethinking how axes create labels
     Drawer *drawer() { return m_drawer; }
 
+public slots:
+    void updateSmoothStatus(bool enable);
+    void updateSurfaceGridStatus(bool enable);
+
+public:
     // Size
     const QSize size();
     const QRect boundingRect();

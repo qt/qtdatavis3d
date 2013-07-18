@@ -57,7 +57,7 @@ SurfaceObject::~SurfaceObject()
 {
 }
 
-void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, GLfloat yRange)
+void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry)
 {
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
@@ -75,11 +75,9 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
         }
     }
 
-    qDebug() << "vertices.count() = " << vertices.count();
-
     // Create normals
     QVector<QVector3D> normals;
-    for (int i = 0, row = 0; i < rows - 1; i++, row += columns) {
+    for (int row = 0; row < (rows - 1) * columns; row += columns) {
         for (int j = 0; j < columns - 1; j++) {
             normals.append(normal(vertices.at(row + j),
                                   vertices.at(row + j + 1),
@@ -101,52 +99,56 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
                           vertices.at(p - columns - 1)));
 
     // Create indice table
-    m_indexCount = 6 * (columns - 1) * (rows - 1);
-    GLushort *indices = new GLushort[m_indexCount];
-    p = 0;
-    for (int i = 0, row = 0; i < rows - 1; i++, row += columns) {
-        for (int j = 0; j < columns - 1; j++) {
-            // Left triangle
-            indices[p++] = row + j + 1;
-            indices[p++] = row + columns + j;
-            indices[p++] = row + j;
+    GLushort *indices = 0;
+    if (changeGeometry) {
+        m_indexCount = 6 * (columns - 1) * (rows - 1);
+        indices = new GLushort[m_indexCount];
+        p = 0;
+        for (int row = 0; row < (rows - 1) * columns; row += columns) {
+            for (int j = 0; j < columns - 1; j++) {
+                // Left triangle
+                indices[p++] = row + j + 1;
+                indices[p++] = row + columns + j;
+                indices[p++] = row + j;
 
-            // Right triangle
-            indices[p++] = row + columns + j + 1;
-            indices[p++] = row + columns + j;
-            indices[p++] = row + j + 1;
+                // Right triangle
+                indices[p++] = row + columns + j + 1;
+                indices[p++] = row + columns + j;
+                indices[p++] = row + j + 1;
+            }
         }
     }
 
     // Create line element indices
-    m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
-    GLushort *gridIndices = new GLushort[m_gridIndexCount];
-    p = 0;
-    for (int i = 0, row = 0; i < rows; i++, row += columns) {
-        for (int j = 0; j < columns - 1; j++) {
-            gridIndices[p++] = row + j;
-            gridIndices[p++] = row + j + 1;
+    GLushort *gridIndices = 0;
+    if (changeGeometry) {
+        m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
+        gridIndices = new GLushort[m_gridIndexCount];
+        p = 0;
+        for (int i = 0, row = 0; i < rows; i++, row += columns) {
+            for (int j = 0; j < columns - 1; j++) {
+                gridIndices[p++] = row + j;
+                gridIndices[p++] = row + j + 1;
+            }
+        }
+        for (int i = 0, row = 0; i < rows - 1; i++, row += columns) {
+            for (int j = 0; j < columns; j++) {
+                gridIndices[p++] = row + j;
+                gridIndices[p++] = row + j + columns;
+            }
         }
     }
-    for (int i = 0, row = 0; i < rows - 1; i++, row += columns) {
-        for (int j = 0; j < columns; j++) {
-            gridIndices[p++] = row + j;
-            gridIndices[p++] = row + j + columns;
-        }
-    }
-//    for (int i = columns - 1; i < (rows - 1) * columns; i += columns) {
-//        gridIndices[p++] = i;
-//        gridIndices[p++] = i  + doubleColumns;
-//    }
 
-    createBuffers(vertices, uvs, normals, indices, gridIndices);
+    createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
 
-    delete indices;
-    delete gridIndices;
+    if (indices)
+        delete indices;
+    if (gridIndices)
+        delete gridIndices;
 }
 
 
-void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloat yRange)
+void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry)
 {
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
@@ -168,80 +170,89 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
         }
     }
 
-    // Create normals
+    // Create normals & indice table
     QVector<QVector3D> normals;
     int doubleColumns = columns * 2 - 2;
-    for (int i = 0, row = 0; i < rows - 1; i++, row += doubleColumns) {
-        for (int j = 0; j < columns * 2 - 2; j += 2) {
+
+    GLushort *indices = 0;
+    int p = 0;
+    if (changeGeometry) {
+        m_indexCount = 6 * (columns - 1) * (rows - 1);
+        indices = new GLushort[m_indexCount];
+    }
+
+    for (int row = 0, upperRow = doubleColumns;
+         row < (rows - 1) * doubleColumns;
+         row += doubleColumns, upperRow += doubleColumns) {
+        for (int j = 0; j < doubleColumns; j += 2) {
+            // Normal for the left triangle
             normals.append(normal(vertices.at(row + j),
                                   vertices.at(row + j + 1),
-                                  vertices.at(row + doubleColumns + j)));
+                                  vertices.at(upperRow + j)));
+
+            // Normal for the right triangle
             normals.append(normal(vertices.at(row + j + 1),
-                                  vertices.at(row + doubleColumns + j + 1),
-                                  vertices.at(row + doubleColumns + j)));
-        }
-    }
-    for (int j = (rows - 2) * doubleColumns ; j < (rows - 1) * doubleColumns; j++)
-        normals.append(normals.at(j));
+                                  vertices.at(upperRow + j + 1),
+                                  vertices.at(upperRow + j)));
 
-    // Create indice table
-    m_indexCount = 6 * (columns - 1) * (rows - 1);
-    GLushort *indices = new GLushort[6 * (columns - 1) * (rows - 1)];
-    int indWidth = columns - 1;
-    for (int i = 0, row = 0; i < rows - 1; i++, row += doubleColumns) {
-        for (int j = 0, jj = 0; j < columns - 1; j++, jj += 2) {
-            int p = (i * indWidth + j) * 2 * 3;
-            // Left triangle
-            indices[p + 0] = row + jj + 1;
-            indices[p + 1] = (i + 1) * doubleColumns + jj;
-            indices[p + 2] = row + jj;
+            if (changeGeometry) {
+                // Left triangle
+                indices[p++] = row + j + 1;
+                indices[p++] = upperRow + j;
+                indices[p++] = row + j;
 
-            // Right triangle
-            indices[p + 3] = (i + 1) * doubleColumns + (jj + 1);
-            indices[p + 4] = (i + 1) * doubleColumns + jj;
-            indices[p + 5] = row + jj + 1;
+                // Right triangle
+                indices[p++] = upperRow + j + 1;
+                indices[p++] = upperRow + j;
+                indices[p++] = row + j + 1;
+            }
         }
     }
 
-    // Create line element indices
+    // Create grid line element indices
     m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
     GLushort *gridIndices = new GLushort[m_gridIndexCount];
-    int p = 0;
-    for (int i = 0, row = 0; i < rows; i++, row += doubleColumns) {
-        for (int j = 0, jj = 0; j < columns - 1; j++, jj += 2) {
-            gridIndices[p++] = row + jj;
-            gridIndices[p++] = row + jj + 1;
+    p = 0;
+    int rowLimit = (rows - 1) * doubleColumns;
+    for (int row = 0; row < rows * doubleColumns; row += doubleColumns) {
+        for (int j = 0; j < doubleColumns; j += 2) {
+            gridIndices[p++] = row + j;
+            gridIndices[p++] = row + j + 1;
+
+            if (row < rowLimit) {
+                gridIndices[p++] = row + j;
+                gridIndices[p++] = row + j + doubleColumns;
+            }
         }
     }
-    for (int i = 0, row = 0; i < rows - 1; i++, row += doubleColumns) {
-        for (int j = 0, jj = 0; j < columns - 1; j++, jj += 2) {
-            gridIndices[p++] = row + jj;
-            gridIndices[p++] = row + jj + doubleColumns;
-        }
-    }
-    for (int i = doubleColumns - 1; i < (rows - 1) * doubleColumns; i += doubleColumns) {
+    for (int i = doubleColumns - 1; i < rowLimit; i += doubleColumns) {
         gridIndices[p++] = i;
         gridIndices[p++] = i  + doubleColumns;
     }
 
-    createBuffers(vertices, uvs, normals, indices, gridIndices);
+    createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
 
-    delete indices;
-    delete gridIndices;
+    if (indices)
+        delete indices;
+    if (gridIndices)
+        delete gridIndices;
 }
 
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                    const QVector<QVector3D> &normals, const GLushort *indices,
-                   const GLushort *gridIndices)
+                   const GLushort *gridIndices, bool changeGeometry)
 {
     initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);
-        glDeleteBuffers(1, &m_uvbuffer);
         glDeleteBuffers(1, &m_normalbuffer);
-        glDeleteBuffers(1, &m_elementbuffer);
+        if (changeGeometry) {
+            glDeleteBuffers(1, &m_uvbuffer);
+            glDeleteBuffers(1, &m_elementbuffer);
+            glDeleteBuffers(1, &m_gridElementbuffer);
+        }
     }
 
     // Move to buffers
@@ -255,20 +266,22 @@ void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVec
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(QVector3D),
                  &normals.at(0), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
-                 &uvs.at(0), GL_STATIC_DRAW);
+    if (changeGeometry) {
+        glGenBuffers(1, &m_uvbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                     &uvs.at(0), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_elementbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLushort),
-                 indices, GL_STATIC_DRAW);
+        glGenBuffers(1, &m_elementbuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLushort),
+                     indices, GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_gridElementbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLushort),
-                 gridIndices, GL_STATIC_DRAW);
+        glGenBuffers(1, &m_gridElementbuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLushort),
+                     gridIndices, GL_STATIC_DRAW);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
