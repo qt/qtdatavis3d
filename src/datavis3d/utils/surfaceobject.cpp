@@ -51,6 +51,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 SurfaceObject::SurfaceObject()
 {
+    m_indicesType = GL_UNSIGNED_INT;
 }
 
 SurfaceObject::~SurfaceObject()
@@ -99,10 +100,10 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
                           vertices.at(p - columns - 1)));
 
     // Create indice table
-    GLushort *indices = 0;
+    GLint *indices = 0;
     if (changeGeometry) {
         m_indexCount = 6 * (columns - 1) * (rows - 1);
-        indices = new GLushort[m_indexCount];
+        indices = new GLint[m_indexCount];
         p = 0;
         for (int row = 0; row < (rows - 1) * columns; row += columns) {
             for (int j = 0; j < columns - 1; j++) {
@@ -120,10 +121,10 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
     }
 
     // Create line element indices
-    GLushort *gridIndices = 0;
+    GLint *gridIndices = 0;
     if (changeGeometry) {
         m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
-        gridIndices = new GLushort[m_gridIndexCount];
+        gridIndices = new GLint[m_gridIndexCount];
         p = 0;
         for (int i = 0, row = 0; i < rows; i++, row += columns) {
             for (int j = 0; j < columns - 1; j++) {
@@ -174,11 +175,11 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
     QVector<QVector3D> normals;
     int doubleColumns = columns * 2 - 2;
 
-    GLushort *indices = 0;
+    GLint *indices = 0;
     int p = 0;
     if (changeGeometry) {
         m_indexCount = 6 * (columns - 1) * (rows - 1);
-        indices = new GLushort[m_indexCount];
+        indices = new GLint[m_indexCount];
     }
 
     for (int row = 0, upperRow = doubleColumns;
@@ -211,7 +212,7 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
 
     // Create grid line element indices
     m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
-    GLushort *gridIndices = new GLushort[m_gridIndexCount];
+    GLint *gridIndices = new GLint[m_gridIndexCount];
     p = 0;
     int rowLimit = (rows - 1) * doubleColumns;
     for (int row = 0; row < rows * doubleColumns; row += doubleColumns) {
@@ -240,8 +241,8 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
 
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                   const QVector<QVector3D> &normals, const GLushort *indices,
-                   const GLushort *gridIndices, bool changeGeometry)
+                   const QVector<QVector3D> &normals, const GLint *indices,
+                   const GLint *gridIndices, bool changeGeometry)
 {
     initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
@@ -274,12 +275,12 @@ void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVec
 
         glGenBuffers(1, &m_elementbuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLushort),
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
                      indices, GL_STATIC_DRAW);
 
         glGenBuffers(1, &m_gridElementbuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLushort),
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLint),
                      gridIndices, GL_STATIC_DRAW);
     }
 

@@ -77,10 +77,6 @@ int main(int argc, char *argv[])
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-    QPushButton *someButton = new QPushButton(widget);
-    someButton->setText(QStringLiteral("Press me"));
-    someButton->setEnabled(true);
-
     QCheckBox *smoothCB = new QCheckBox(widget);
     smoothCB->setText(QStringLiteral("Smooth "));
     smoothCB->setChecked(surfaceChart->smoothSurface());
@@ -89,26 +85,66 @@ int main(int argc, char *argv[])
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));
     surfaceGridCB->setChecked(true);
 
+    QCheckBox *sqrtSinCB = new QCheckBox(widget);
+    sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
+    sqrtSinCB->setChecked(false);
+
+    QCheckBox *gridSlidersLockCB = new QCheckBox(widget);
+    gridSlidersLockCB->setText(QStringLiteral("Lock"));
+    gridSlidersLockCB->setChecked(false);
+
+    QSlider *gridSliderX = new QSlider(Qt::Horizontal, widget);
+    gridSliderX->setTickInterval(1);
+    gridSliderX->setMinimum(2);
+    gridSliderX->setValue(10);
+    gridSliderX->setMaximum(200);
+    gridSliderX->setEnabled(true);
+    QSlider *gridSliderZ = new QSlider(Qt::Horizontal, widget);
+    gridSliderZ->setTickInterval(1);
+    gridSliderZ->setMinimum(2);
+    gridSliderZ->setValue(10);
+    gridSliderZ->setMaximum(200);
+    gridSliderZ->setEnabled(true);
+
+
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
-    vLayout->addWidget(someButton);
+    vLayout->addWidget(new QLabel(QStringLiteral("Select surface")));
+    vLayout->addWidget(sqrtSinCB);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
+    vLayout->addWidget(gridSlidersLockCB);
+    vLayout->addWidget(gridSliderX);
+    vLayout->addWidget(gridSliderZ);
 
     widget->show();
 
     ChartModifier *modifier = new ChartModifier(surfaceChart);
 
+    // Connect controls to slots on modifier
     QObject::connect(smoothCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleSmooth);
     QObject::connect(surfaceGridCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleSurfaceGrid);
+    QObject::connect(sqrtSinCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::toggleSqrtSin);
+    QObject::connect(gridSlidersLockCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::toggleGridSliderLock);
+    QObject::connect(gridSliderX, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustXCount);
+    QObject::connect(gridSliderZ, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustZCount);
 
-    QList<qreal> lowList;
-    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 15.0;
-    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
-    lowList << 105.0 << 170.0 << 215.0 << 240.0 << 245.0 << 240.0 << 215.0 << 170.0 << 105.0;
-    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
-    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 16.1;
+    modifier->setGridSliderZ(gridSliderZ);
+    modifier->setGridSliderX(gridSliderX);
+    modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
+
+//    QList<qreal> lowList;
+//    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 15.0;
+//    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
+//    lowList << 105.0 << 170.0 << 215.0 << 240.0 << 245.0 << 240.0 << 215.0 << 170.0 << 105.0;
+//    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
+//    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 16.1;
 
 //    lowList << 15.0 << 65.0  << 105.0 << 65.0  << 15.0;
 //    lowList << 35.0 << 105.0 << 170.0 << 105.0 << 35;
@@ -120,7 +156,7 @@ int main(int argc, char *argv[])
 //    lowList << 35.0 << 105.0 << 170.0 << 105.0 << 35.0;
 //    lowList << 15.0 << 65.0  << 105.0 << 65.0  << 16.1;
 
-    surfaceChart->appendSeries(lowList);
+//   surfaceChart->appendSeries(lowList, 9, 5);
 
 //    QList<qreal> topList;
 //    topList << 2.1 << 2.2;

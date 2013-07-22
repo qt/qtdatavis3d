@@ -153,6 +153,7 @@ public:
 public slots:
     void updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
+    void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
 public:
     // Size
@@ -186,7 +187,6 @@ public:
     void loadSurfaceObj();
 
     // TODO: temp
-    void setYRangeStuff(GLint tickCount, GLfloat step, GLfloat minimum);
     void setXZStuff(GLint tickXCount, GLint tickZCount);
     void setSeries(QList<qreal> series);
 

@@ -51,6 +51,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
 {
+    m_indicesType = GL_UNSIGNED_SHORT;
 }
 
 ObjectHelper::~ObjectHelper()

@@ -42,6 +42,7 @@
 #define CHARTMODIFIER_H
 
 #include <Q3DSurface>
+#include <QSlider>
 
 using namespace QtDataVis3D;
 
@@ -54,9 +55,20 @@ public:
 
     void toggleSmooth(bool enabled);
     void toggleSurfaceGrid(bool enable);
+    void toggleSqrtSin(bool enable);
+    void toggleGridSliderLock(bool enable);
+    void setGridSliderX(QSlider *slider) { m_gridSliderX = slider; }
+    void setGridSliderZ(QSlider *slider) { m_gridSliderZ = slider; }
+    void adjustXCount(int count);
+    void adjustZCount(int count);
 
 private:
     Q3DSurface *m_chart;
+    QSlider *m_gridSliderX;
+    QSlider *m_gridSliderZ;
+    bool m_gridSlidersLocked;
+    int m_xCount;
+    int m_zCount;
 };
 
 #endif // CHARTMODIFIER_H

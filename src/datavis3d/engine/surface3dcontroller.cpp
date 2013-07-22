@@ -182,6 +182,16 @@ Drawer *Surface3dController::drawer()
         return 0;
 }
 
+void Surface3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+{
+    m_tickCount   = tickCount;
+    m_tickStep    = step;
+    m_tickMinimum = minimum;
+
+    emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
+}
+
+
 // TODO: Temp
 void Surface3dController::setData(QList<qreal> series, int width, int depth)
 {
@@ -189,7 +199,6 @@ void Surface3dController::setData(QList<qreal> series, int width, int depth)
     m_dataWidth = width;
     m_dataDepth = depth;
 
-    m_renderer->setYRangeStuff(5, 50.0f, 0.0f);
     m_renderer->setXZStuff(width, depth);
     m_renderer->setSeries(series);
 }

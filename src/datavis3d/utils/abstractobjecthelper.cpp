@@ -98,4 +98,9 @@ GLuint AbstractObjectHelper::indexCount()
     return m_indexCount;
 }
 
+GLuint AbstractObjectHelper::indicesType()
+{
+    return m_indicesType;
+}
+
 QT_DATAVIS3D_END_NAMESPACE

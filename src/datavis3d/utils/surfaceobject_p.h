@@ -72,8 +72,8 @@ public:
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                       const QVector<QVector3D> &normals, const GLushort *indices,
-                       const GLushort *gridIndices, bool changeGeometry);
+                       const QVector<QVector3D> &normals, const GLint *indices,
+                       const GLint *gridIndices, bool changeGeometry);
 
 private:
     QList<qreal> m_series;

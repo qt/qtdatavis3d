@@ -100,6 +100,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
                      &Surface3dRenderer::updateSmoothStatus);
     QObject::connect(m_controller, &Surface3dController::surfaceGridChanged, this,
                      &Surface3dRenderer::updateSurfaceGridStatus);
+    QObject::connect(m_controller, &Surface3dController::tickCountChanged, this,
+                     &Surface3dRenderer::updateTickCount);
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
@@ -186,7 +188,7 @@ void Surface3dRenderer::initializeOpenGL()
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
 
-    loadSurfaceObj();
+    //loadSurfaceObj();
 }
 
 void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
@@ -258,19 +260,19 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -m_yAdjustment, zComp),
                            QVector3D(0.0f, 1.0f, 0.0f)); // TODO: Move
 
+    // Enable texturing
+    glEnable(GL_TEXTURE_2D);
+
     //
     //  Do the surface drawing
     //
 
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
+    if (m_surfaceObj) {
+        m_surfaceShader->bind();
 
-    m_surfaceShader->bind();
+        // For surface we can see climpses from underneath
+        glDisable(GL_CULL_FACE);
 
-    // For surface we can see climpses from underneath
-    glDisable(GL_CULL_FACE);
-
-    if (1) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 depthMVPMatrix;
@@ -417,7 +419,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     }
 }
 
-void Surface3dRenderer::setYRangeStuff(GLint tickCount, GLfloat step, GLfloat minimum)
+void Surface3dRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
     m_tickYCount = tickCount;
     m_tickYStep = step;
@@ -453,6 +455,10 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
 //        m_surfaceObj->setUpData(temp, 3, 3, m_yRange);
     m_series = series;
 
+    // TODO temp solution
+    if (!m_surfaceObj)
+        loadSurfaceObj();
+
     if (m_cachedSmoothSurface)
         m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange, true);
     else
@@ -486,6 +492,9 @@ void Surface3dRenderer::calculateSceneScalingFactors()
 void Surface3dRenderer::updateSmoothStatus(bool enable)
 {
     m_cachedSmoothSurface = enable;
+
+    if (!m_surfaceObj)
+        return;
 
     if (m_cachedSmoothSurface)
         m_surfaceObj->setUpSmoothData(m_series, m_tickXCount, m_tickZCount, m_yRange, true);

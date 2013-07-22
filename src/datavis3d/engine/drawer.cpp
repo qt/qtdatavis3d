@@ -146,7 +146,7 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
 
     // Draw the triangles
-    glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_SHORT, (void*)0);
+    glDrawElements(GL_TRIANGLES, object->indexCount(), object->indicesType(), (void*)0);
 
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -180,7 +180,7 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->gridElementBuf());
 
     // Draw the lines
-    glDrawElements(GL_LINES, object->gridIndexCount(), GL_UNSIGNED_SHORT, (void*)0);
+    glDrawElements(GL_LINES, object->gridIndexCount(), object->indicesType(), (void*)0);
 
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -67,8 +67,13 @@ public:
     void setSurfaceGrid(bool enable);
     bool surfaceGrid();
 
+    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
+    // important to set if values can be negative.
+    void setTickCount(int tickCount, qreal step, qreal minimum = 0.0f);
+
 //TODO part
-    void appendSeries(QList<qreal> series);
+    void appendSeries(QList<qreal> series, int width, int depth);
     void showData();
 //END TODO
 

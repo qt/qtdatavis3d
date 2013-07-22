@@ -72,6 +72,10 @@ private:
     bool m_smoothSurface;
     bool m_surfaceGrid;
 
+    GLint m_tickCount;
+    GLfloat m_tickStep;
+    GLfloat m_tickMinimum;
+
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
@@ -97,6 +101,11 @@ public:
     void setSurfaceGrid(bool enable);
     bool surfaceGrid();
 
+    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
+    // important to set if values can be negative.
+    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+
     //TODO: Temp solution
     void setData(QList<qreal> series, int width, int depth);
 
@@ -115,6 +124,7 @@ public:
 signals:
     void smoothStatusChanged(bool enable);
     void surfaceGridChanged(bool enable);
+    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
 
 private:
     Q_DISABLE_COPY(Surface3dController)

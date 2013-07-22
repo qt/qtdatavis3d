@@ -40,12 +40,16 @@
 
 #include "chartmodifier.h"
 
+#include <qmath.h>
+
 #include <QDebug>
 
 QT_DATAVIS3D_USE_NAMESPACE
 
 ChartModifier::ChartModifier(Q3DSurface *chart)
-    : m_chart(chart)
+    : m_chart(chart),
+      m_xCount(10),
+      m_zCount(10)
 {
 }
 
@@ -65,3 +69,62 @@ void ChartModifier::toggleSurfaceGrid(bool enable)
     qDebug() << "ChartModifier::toggleSurfaceGrid" << enable;
     m_chart->setSurfaceGrid(enable);
 }
+
+void ChartModifier::toggleSqrtSin(bool enable)
+{
+    qreal biggest = -9999.0;
+    qreal smallest = 9999.0;
+    QList<qreal> series;
+
+    if (enable) {
+        qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
+
+        qreal stepZ = 16.0 / qreal(m_zCount);
+        qreal stepX = 16.0 / qreal(m_xCount);
+
+        for (qreal i = -8.0 + stepZ / 2.0 ; i < 8.0 ; i += stepZ) {
+            for (qreal j = -8.0 + stepX / 2.0; j < 8.0; j += stepX) {
+                qreal R = qSqrt(i*i + j*j) + 0.01;
+                qreal y = sin(R)/R + 1.0;
+                series << y;
+                if (y > biggest) biggest = y;
+                if (y < smallest) smallest = y;
+            }
+        }
+
+        m_chart->setTickCount(4, 0.5f);
+        m_chart->appendSeries(series, m_xCount, m_zCount);
+
+        qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
+    } else {
+        qDebug() << "Remove surface";
+    }
+}
+
+void ChartModifier::toggleGridSliderLock(bool enable)
+{
+    m_gridSlidersLocked = enable;
+    if (m_gridSlidersLocked) {
+        m_gridSliderZ->setEnabled(false);
+        m_gridSliderZ->setValue(m_gridSliderX->value());
+    } else {
+        m_gridSliderZ->setEnabled(true);
+    }
+}
+
+void ChartModifier::adjustXCount(int count)
+{
+    m_xCount = count;
+    if (m_gridSlidersLocked)
+        m_gridSliderZ->setValue(count);
+
+    qDebug() << "X count = " << count;
+}
+
+void ChartModifier::adjustZCount(int count)
+{
+    m_zCount = count;
+
+    qDebug() << "Z count = " << count;
+}
+

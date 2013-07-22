@@ -131,12 +131,27 @@ void Q3DSurface::setHeight(const int height)
     QWindow::setHeight(height);
 }
 
+/*!
+ * \a tickCount How many ticks will be drawn. \c 5 by default.
+ *
+ * \a step How large a step each tick is.
+ *
+ * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
+ * important if values can be negative, or autoscaling won't work correctly.
+ *
+ * Sets tick count and step. Note; tickCount * step should be the maximum possible value of data
+ * set.
+ */
+void Q3DSurface::setTickCount(int tickCount, qreal step, qreal minimum)
+{
+    d_ptr->m_shared->setTickCount(GLint(tickCount), GLfloat(step), GLfloat(minimum));
+}
 
 // TODO /////////////////////////////////////////
-void Q3DSurface::appendSeries(QList<qreal> series)
+void Q3DSurface::appendSeries(QList<qreal> series, int width, int depth )
 {
     d_ptr->appendSeries(series);
-    d_ptr->m_shared->setData(series, 9, 5);
+    d_ptr->m_shared->setData(series, width, depth);
 }
 
 void Q3DSurface::showData()
@@ -163,6 +178,7 @@ Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
     qDebug() << "Q3DSurfacePrivate::~Q3DSurfacePrivate";
+    delete m_shared;
 }
 
 void Q3DSurfacePrivate::appendSeries(QList<qreal> series)
