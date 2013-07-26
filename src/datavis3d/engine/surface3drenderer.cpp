@@ -54,6 +54,9 @@
 #include <QMouseEvent>
 #include <qmath.h>
 
+#include <QLinearGradient>
+#include <QPainter>
+
 #include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -63,7 +66,6 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_controller(controller),
       m_mousePressed(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_theme(new Theme()),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
       m_shadowQuality(ShadowLow),
@@ -92,8 +94,9 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_surfaceObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
+      m_gradientTexture(0),
       m_shadowQualityToShader(33.3f),
-      m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency))
+      m_drawer(new Drawer(m_cachedTheme, m_font, m_labelTransparency))
 {
     // Listen to changes in the controller
     QObject::connect(m_controller, &Surface3dController::smoothStatusChanged, this,
@@ -102,9 +105,12 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
                      &Surface3dRenderer::updateSurfaceGridStatus);
     QObject::connect(m_controller, &Surface3dController::tickCountChanged, this,
                      &Surface3dRenderer::updateTickCount);
+    QObject::connect(m_controller, &Surface3dController::themeChanged, this,
+                     &Surface3dRenderer::updateTheme);
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
+    updateTheme(m_controller->theme());
 
     initializeOpenGL();
 }
@@ -117,8 +123,8 @@ Surface3dRenderer::~Surface3dRenderer()
     if (m_backgroundShader)
         delete m_backgroundShader;
 
-    if (m_depthTexture)
-        m_textureHelper->deleteTexture(&m_depthTexture);
+    m_textureHelper->deleteTexture(&m_depthTexture);
+    m_textureHelper->deleteTexture(&m_gradientTexture);
 
     delete m_backgroundObj;
     delete m_surfaceObj;
@@ -204,7 +210,7 @@ void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
         glCullFace(GL_BACK);
     }
 
-    QVector3D clearColor = Utils::vectorFromColor(m_theme->m_windowColor);
+    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -294,25 +300,22 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         // TODO Check the usage?
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-        QVector3D baseColor = Utils::vectorFromColor(QColor(Qt::red)/*m_theme->m_baseColor*/);
-
         // Set shader bindings
         m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
         m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->nModel(), itModelMatrix.inverted().transposed());
         m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->color(), baseColor);
-        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(), m_theme->m_ambientStrength);
+        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         //IF QT_OPENGL_ES_2 TODO
         // Shadow quality etc.
         //m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(), m_shadowQualityToShader);
         //m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
-                                            m_theme->m_lightStrength * 2.0f);
+                                            m_cachedTheme.m_lightStrength * 2.0f);
 
-        m_drawer->drawObject(m_surfaceShader, m_surfaceObj, 0, m_depthTexture);
+        m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
         m_surfaceShader->release();
 
         if (m_cachedSurfaceGridOn) {
@@ -370,7 +373,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
 #endif
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-        QVector3D backgroundColor = Utils::vectorFromColor(m_theme->m_backgroundColor);
+        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -381,7 +384,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_theme->m_ambientStrength * 2.0f);
+                                            m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_shadowQuality > ShadowNone) {
@@ -390,7 +393,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
                                                 m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_theme->m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
@@ -399,7 +402,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_theme->m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
@@ -443,16 +446,33 @@ void Surface3dRenderer::setXZStuff(GLint tickXCount, GLint tickZCount)
     calculateSceneScalingFactors();
 }
 
+void Surface3dRenderer::updateTheme(Theme theme)
+{
+    m_cachedTheme.setFromTheme(theme);
+
+    // Update things depending from the theme
+    updateSurfaceGradient();
+}
+
+void Surface3dRenderer::updateSurfaceGradient()
+{
+    QImage image(QSize(4, 100), QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(m_cachedTheme.m_surfaceGradient));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 4, 100);
+    image.save("C:\\Users\\misalmel\\Work\\image.png", "png");
+
+    if (m_gradientTexture) {
+        m_textureHelper->deleteTexture(&m_gradientTexture);
+        m_gradientTexture = 0;
+    }
+
+    m_gradientTexture = m_textureHelper->create2DTexture(image, false, true);
+}
+
 void Surface3dRenderer::setSeries(QList<qreal> series)
 {
-//    QList<qreal> temp;
-//    temp.append(10);temp.append(150);temp.append(50);
-//    temp.append(10);temp.append(150);temp.append(50);
-//    temp.append(10);temp.append(150);temp.append(50);
-//    if (m_smoothSurface)
-//        m_surfaceObj->setUpSmoothData(temp, 3, 3, m_yRange);
-//    else
-//        m_surfaceObj->setUpData(temp, 3, 3, m_yRange);
     m_series = series;
 
     // TODO temp solution
@@ -598,40 +618,6 @@ void Surface3dRenderer::setY(const int y)
 int Surface3dRenderer::y()
 {
     return m_boundingRect.y();
-}
-
-#if defined(Q_OS_ANDROID)
-void Surface3dRenderer::mouseDoubleClickEvent(QMouseEvent *event)
-{
-
-}
-
-void Surface3dRenderer::touchEvent(QTouchEvent *event)
-{
-
-}
-#endif
-void Surface3dRenderer::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event)
-    Q_UNUSED(mousePos)
-}
-
-void Surface3dRenderer::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event)
-    Q_UNUSED(mousePos)
-}
-
-void Surface3dRenderer::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event)
-    Q_UNUSED(mousePos)
-}
-
-void Surface3dRenderer::wheelEvent(QWheelEvent *event)
-{
-    Q_UNUSED(event)
 }
 
 void Surface3dRenderer::handleResize()

@@ -67,6 +67,8 @@ public:
     void setSurfaceGrid(bool enable);
     bool surfaceGrid();
 
+    void setGradientColorAt(qreal pos, const QColor &color);
+
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.

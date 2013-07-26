@@ -55,6 +55,8 @@
 #include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
 
+#include <QLinearGradient>
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Surface3dRenderer;
@@ -100,6 +102,8 @@ public:
     // Enable or disable the grid on the surface
     void setSurfaceGrid(bool enable);
     bool surfaceGrid();
+
+    void setGradientColorAt(qreal pos, const QColor &color);
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially

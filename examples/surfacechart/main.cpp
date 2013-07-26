@@ -51,6 +51,8 @@
 #include <QSlider>
 #include <QLabel>
 #include <QScreen>
+#include <QPainter>
+#include <QDebug>
 
 using namespace QtDataVis3D;
 
@@ -89,6 +91,10 @@ int main(int argc, char *argv[])
     sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
     sqrtSinCB->setChecked(false);
 
+    QCheckBox *planeCB = new QCheckBox(widget);
+    planeCB->setText(QStringLiteral("Plane"));
+    planeCB->setChecked(false);
+
     QCheckBox *gridSlidersLockCB = new QCheckBox(widget);
     gridSlidersLockCB->setText(QStringLiteral("Lock"));
     gridSlidersLockCB->setChecked(false);
@@ -106,16 +112,32 @@ int main(int argc, char *argv[])
     gridSliderZ->setMaximum(200);
     gridSliderZ->setEnabled(true);
 
+    QLinearGradient gr(0, 0, 100, 1);
+    gr.setColorAt(0.0, Qt::green);
+    gr.setColorAt(0.5, Qt::yellow);
+    gr.setColorAt(1.0, Qt::red);
+    QPixmap pm(100, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(gr));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 100, 24);
+    //pm.save("C:\\Users\\misalmel\\Work\\test.png", "png");
+    QPushButton *color = new QPushButton();
+    color->setIcon(QIcon(pm));
+    color->setIconSize(QSize(100, 24));
+    color->setFlat(true);
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
-    vLayout->addWidget(new QLabel(QStringLiteral("Select surface")));
+    vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
+    vLayout->addWidget(planeCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
+    vLayout->addWidget(color);
 
     widget->show();
 
@@ -128,6 +150,8 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::toggleSurfaceGrid);
     QObject::connect(sqrtSinCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleSqrtSin);
+    QObject::connect(planeCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::togglePlane);
     QObject::connect(gridSlidersLockCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleGridSliderLock);
     QObject::connect(gridSliderX, &QSlider::valueChanged,

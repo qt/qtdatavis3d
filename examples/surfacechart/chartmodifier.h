@@ -56,6 +56,7 @@ public:
     void toggleSmooth(bool enabled);
     void toggleSurfaceGrid(bool enable);
     void toggleSqrtSin(bool enable);
+    void togglePlane(bool enable);
     void toggleGridSliderLock(bool enable);
     void setGridSliderX(QSlider *slider) { m_gridSliderX = slider; }
     void setGridSliderZ(QSlider *slider) { m_gridSliderZ = slider; }

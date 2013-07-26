@@ -147,6 +147,11 @@ void Q3DSurface::setTickCount(int tickCount, qreal step, qreal minimum)
     d_ptr->m_shared->setTickCount(GLint(tickCount), GLfloat(step), GLfloat(minimum));
 }
 
+void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
+{
+    d_ptr->m_shared->setGradientColorAt(pos, color);
+}
+
 // TODO /////////////////////////////////////////
 void Q3DSurface::appendSeries(QList<qreal> series, int width, int depth )
 {

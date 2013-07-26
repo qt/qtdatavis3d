@@ -54,6 +54,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "q3dbars.h"
+#include <QLinearGradient>
 
 class QColor;
 
@@ -89,6 +90,7 @@ private:
     QColor m_highlightBarColor;
     QColor m_highlightRowColor;
     QColor m_highlightColumnColor;
+    QLinearGradient m_surfaceGradient;
     float m_lightStrength;
     float m_ambientStrength;
     float m_highlightLightStrength;

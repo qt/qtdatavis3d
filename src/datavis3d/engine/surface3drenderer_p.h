@@ -56,6 +56,7 @@
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
+#include <QLinearGradient>
 #include <QWindow>
 
 #include "datavis3dglobal_p.h"
@@ -96,7 +97,7 @@ public:
 
     // Visual parameters
     QRect m_boundingRect;
-    Theme *m_theme;
+    Theme m_cachedTheme;
     LabelTransparency m_labelTransparency;
     QFont m_font;
     bool m_isGridEnabled;
@@ -134,6 +135,7 @@ private:
     SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
+    GLuint m_gradientTexture;
     GLfloat m_shadowQualityToShader;
     bool m_cachedSmoothSurface;
     bool m_cachedSurfaceGridOn;
@@ -151,8 +153,10 @@ public:
     Drawer *drawer() { return m_drawer; }
 
 public slots:
+    void updateTheme(Theme theme);
     void updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
+    void updateSurfaceGradient();
     void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
 
 public:
@@ -169,14 +173,6 @@ public:
     void setY(const int y);
     int y();
 
-#if defined(Q_OS_ANDROID)
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-#endif
-    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
-    void wheelEvent(QWheelEvent *event);
     void handleResize();
 
 #if !defined(QT_OPENGL_ES_2)

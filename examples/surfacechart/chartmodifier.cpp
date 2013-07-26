@@ -85,7 +85,7 @@ void ChartModifier::toggleSqrtSin(bool enable)
         for (qreal i = -8.0 + stepZ / 2.0 ; i < 8.0 ; i += stepZ) {
             for (qreal j = -8.0 + stepX / 2.0; j < 8.0; j += stepX) {
                 qreal R = qSqrt(i*i + j*j) + 0.01;
-                qreal y = sin(R)/R + 1.0;
+                qreal y = (sin(R)/R + 0.24) * 1.61;
                 series << y;
                 if (y > biggest) biggest = y;
                 if (y < smallest) smallest = y;
@@ -98,6 +98,24 @@ void ChartModifier::toggleSqrtSin(bool enable)
         qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
     } else {
         qDebug() << "Remove surface";
+    }
+}
+
+void ChartModifier::togglePlane(bool enable)
+{
+    qDebug() << "ChartModifier::togglePlane " << enable;
+    if (enable) {
+        QList<qreal> series;
+
+        qreal y = 2.0 / qreal(m_xCount - 1);
+        for (int i = 0; i < m_zCount; i++) {
+            for (int j = 0; j < m_xCount; j++) {
+                series << j * y;
+            }
+        }
+
+        m_chart->setTickCount(4, 0.5f);
+        m_chart->appendSeries(series, m_xCount, m_zCount);
     }
 }
 

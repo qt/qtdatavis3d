@@ -191,6 +191,12 @@ void Surface3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat mi
     emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
 }
 
+void Surface3dController::setGradientColorAt(qreal pos, const QColor &color)
+{
+    Theme t = theme();
+    t.m_surfaceGradient.setColorAt(pos, color);
+    emit themeChanged(t);
+}
 
 // TODO: Temp
 void Surface3dController::setData(QList<qreal> series, int width, int depth)

@@ -60,11 +60,16 @@ Theme::Theme()
       m_highlightBarColor(QColor(Qt::red)),
       m_highlightRowColor(QColor(Qt::darkRed)),
       m_highlightColumnColor(QColor(Qt::darkMagenta)),
+      m_surfaceGradient(QLinearGradient(1, 100, 0, 0)),
       m_lightStrength(4.0f),
       m_ambientStrength(0.3f),
       m_highlightLightStrength(8.0f),
       m_uniformColor(true)
 {
+    // Default values for surface gradient
+    m_surfaceGradient.setColorAt(0.0, Qt::green);
+    m_surfaceGradient.setColorAt(0.5, Qt::yellow);
+    m_surfaceGradient.setColorAt(1.0, Qt::red);
 }
 
 Theme::~Theme()
@@ -315,6 +320,7 @@ void Theme::setFromTheme(Theme &theme)
     m_highlightBarColor = theme.m_highlightBarColor;
     m_highlightRowColor = theme.m_highlightRowColor;
     m_highlightColumnColor = theme.m_highlightColumnColor;
+    m_surfaceGradient = theme.m_surfaceGradient;
     m_lightStrength = theme.m_lightStrength;
     m_ambientStrength = theme.m_ambientStrength;
     m_highlightLightStrength = theme.m_highlightLightStrength;

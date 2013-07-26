@@ -7,13 +7,15 @@ flat in highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 
+uniform sampler2D textureSampler;
 uniform highp vec3 lightPosition_wrld;
-uniform highp vec3 color_mdl;
+//uniform highp vec3 color_mdl;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 
 void main() {
-    highp vec3 materialDiffuseColor = vec3(position_wrld.y, 1.0 - position_wrld.y, 0.0);
+    highp vec2 guv = vec2(0.5, (coords_mdl.y + 1.0) / 2.0);
+    highp vec3 materialDiffuseColor = texture2D(textureSampler, guv).xyz;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
 
@@ -27,7 +29,7 @@ void main() {
     highp vec3 R = reflect(-l, n);
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
-//    gl_FragColor.rgb = n;
+//    gl_FragColor.rgb = materialDiffuseColor;
     gl_FragColor.rgb =
         materialAmbientColor +
         materialDiffuseColor * lightStrength * pow(cosTheta, 2) / distance +
