@@ -372,6 +372,7 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
         camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
                                             QVector3D(0.0f, -m_yAdjustment, zComp),
                                             QVector3D(0.0f, 1.0f, 0.0f));
+        m_hasHeightAdjustmentChanged = false;
     }
 
     // If slice selection is on, draw the sliced scene
