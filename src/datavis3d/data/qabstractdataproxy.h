@@ -45,6 +45,7 @@
 #include "qdatavis3dnamespace.h"
 #include <QObject>
 #include <QScopedPointer>
+#include <QMutex>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
