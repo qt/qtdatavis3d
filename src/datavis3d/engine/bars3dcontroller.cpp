@@ -168,7 +168,7 @@ void Bars3dController::touchEvent(QTouchEvent *event)
     QList<QTouchEvent::TouchPoint> points;
     points = event->touchPoints();
 
-    if (points.count() == 2) {
+    if (!m_isSlicingActivated && points.count() == 2) {
         m_mouseState = Bars3dController::MouseOnPinch;
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
@@ -209,7 +209,8 @@ void Bars3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePo
 #if !defined(Q_OS_ANDROID)
             m_mouseState = Bars3dController::MouseOnScene;
 #else
-            m_mouseState = Bars3dController::MouseRotating;
+            if (!m_isSlicingActivated)
+                m_mouseState = Bars3dController::MouseRotating;
 #endif
             // update mouse positions to prevent jumping when releasing or repressing a button
             m_mousePos = event->pos();
@@ -218,7 +219,8 @@ void Bars3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePo
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
         m_mousePos = QPoint(0, 0);
-    } else if (Qt::RightButton == event->button()) {
+    } else if (!m_isSlicingActivated && Qt::RightButton == event->button()) {
+        // disable rotating when in slice view
 #if !defined(Q_OS_ANDROID)
         m_mouseState = Bars3dController::MouseRotating;
 #else
@@ -250,6 +252,10 @@ void Bars3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos
 
 void Bars3dController::wheelEvent(QWheelEvent *event)
 {
+    // disable zooming if in slice view
+    if (m_isSlicingActivated)
+        return;
+
     int zoomLevel = m_zoomLevel;
     if (zoomLevel > 100)
         zoomLevel += event->angleDelta().y() / 12;
