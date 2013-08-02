@@ -49,53 +49,24 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef Q3DSCATTER_p_H
+#define Q3DSCATTER_p_H
 
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "scatter3dcontroller_p.h"
+#include "qdatavis3dnamespace.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class Q3DScatter;
+
+class Q3DScatterPrivate : public QObject
 {
 public:
-    explicit Theme();
-    ~Theme();
+    Q3DScatterPrivate(Q3DScatter *q, QRect rect);
+    ~Q3DScatterPrivate();
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
-
-private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
-
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    Q3DScatter *q_ptr;
+    Scatter3DController *m_shared;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

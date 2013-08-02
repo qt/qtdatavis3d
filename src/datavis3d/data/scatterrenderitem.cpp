@@ -39,65 +39,36 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef THEME_P_H
-#define THEME_P_H
-
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "scatterrenderitem_p.h"
+#include "scatter3drenderer_p.h"
+#include "qscatterdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+ScatterRenderItem::ScatterRenderItem()
+    : BarRenderItem()
 {
-public:
-    explicit Theme();
-    ~Theme();
+}
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
+ScatterRenderItem::~ScatterRenderItem()
+{
+}
 
-private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
+void ScatterRenderItem::formatLabel()
+{
+    // TODO The label format specified in proxy should probably have additional custom formatting
+    // TODO specifiers in addition to standard printf specifiers for placement of item labels
+    // TODO and selection data (like row/column in bar selection)
 
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-};
+    // Format the string on first access
+    //    QString numStr;
+    //    numStr.setNum(m_value);
+    //    // TODO actually format instead of just prepending the value
+    //    m_label.clear(); // Just in case
+    //    m_label.append(m_itemLabel);
+    //    m_label.append(QStringLiteral(" "));
+    //    m_label.append(numStr);
+    //    m_label.append(m_renderer->dataProxy()->itemLabelFormat());
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

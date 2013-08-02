@@ -14,7 +14,11 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/q3dsurface_p.h \
            $$PWD/surface3dcontroller_p.h \
            $$PWD/surface3drenderer_p.h \
-           $$PWD/abstract3dcontroller_p.h
+           $$PWD/abstract3dcontroller_p.h \
+           $$PWD/q3dscatter.h \
+           $$PWD/q3dscatter_p.h \
+           $$PWD/scatter3dcontroller_p.h \
+           $$PWD/scatter3drenderer_p.h
 
 SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/q3dbars.cpp \
@@ -28,6 +32,9 @@ SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/q3dsurface.cpp \
            $$PWD/surface3drenderer.cpp \
            $$PWD/surface3dcontroller.cpp \
-           $$PWD/abstract3dcontroller.cpp
+           $$PWD/abstract3dcontroller.cpp \
+           $$PWD/q3dscatter.cpp \
+           $$PWD/scatter3dcontroller.cpp \
+           $$PWD/scatter3drenderer.cpp
 
 RESOURCES += engine/engine.qrc

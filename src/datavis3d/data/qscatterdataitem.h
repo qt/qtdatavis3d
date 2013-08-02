@@ -39,63 +39,40 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QSCATTERDATAITEM_H
+#define QSCATTERDATAITEM_H
 
-#ifndef THEME_P_H
-#define THEME_P_H
-
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "qdatavis3dnamespace.h"
+#include "qbardataitem.h"
+#include <QPointF>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class QScatterDataItemPrivate;
+
+class QT_DATAVIS3D_EXPORT QScatterDataItem : public QBarDataItem
 {
 public:
-    explicit Theme();
-    ~Theme();
+    QScatterDataItem();
+    QScatterDataItem(const QScatterDataItem &other);
+    ~QScatterDataItem();
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
+    QScatterDataItem &operator=(const QScatterDataItem &other);
+
+    void setScatterPosition(const QPointF &position);
+    const QPointF &scatterPosition() const;
+
+    //    void setSize(qreal size);
+    //    qreal size() const;
+
+protected:
+    virtual void createExtraData();
+
+    QScatterDataItemPrivate *d_ptr;
 
 private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
-
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    QPointF m_scatterPosition;
+    //    qreal m_size;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

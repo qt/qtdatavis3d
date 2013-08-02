@@ -49,55 +49,34 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef QSCATTERDATAPROXY_P_H
+#define QSCATTERDATAPROXY_P_H
 
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "qscatterdataproxy.h"
+#include "qabstractdataproxy_p.h"
+#include "qscatterdataitem.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class QScatterDataProxyPrivate : public QAbstractDataProxyPrivate
 {
+    Q_OBJECT
 public:
-    explicit Theme();
-    ~Theme();
+    QScatterDataProxyPrivate(QScatterDataProxy *q);
+    virtual ~QScatterDataProxyPrivate();
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
+    bool resetArray(QScatterDataArray *newArray);
+
+    QPair<GLfloat, GLfloat> limitValues();
 
 private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
+    QScatterDataArray m_dataArray;
+    QString m_itemLabelFormat;
 
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+private:
+    friend class QScatterDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // QBARDATAPROXY_P_H

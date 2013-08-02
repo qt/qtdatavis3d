@@ -39,65 +39,86 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef THEME_P_H
-#define THEME_P_H
-
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "qscatterdataitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+/*!
+ * \class QScatterDataItem
+ * \inmodule QtDataVis3D
+ * \brief The QScatterDataItem class provides a container for resolved data to be added to scatter
+ * graphs.
+ * \since 1.0.0
+ *
+ * A QScatterDataItem holds data for a single rendered item in a scatter graph.
+ * Scatter data proxies parse data into QScatterDataItem instances for visualizing.
+ *
+ * \sa QScatterDataProxy, {Qt Data Visualization 3D C++ Classes}
+ */
+
+/*!
+ * Constructs QScatterDataItem.
+ */
+QScatterDataItem::QScatterDataItem()
+    : QBarDataItem()
 {
-public:
-    explicit Theme();
-    ~Theme();
+}
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
+QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
+    : QBarDataItem(other)
+{
+    operator=(other);
+}
 
-private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
+/*!
+ * Destroys QScatterDataItem.
+ */
+QScatterDataItem::~QScatterDataItem()
+{
+}
 
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-};
+QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
+{
+    QBarDataItem::operator =(other);
+    m_scatterPosition = other.m_scatterPosition;
+    //    m_size = other.m_size;
+
+    return *this;
+}
+
+void QScatterDataItem::setScatterPosition(const QPointF &position)
+{
+    m_scatterPosition = position;
+}
+
+const QPointF &QScatterDataItem::scatterPosition() const
+{
+    return m_scatterPosition;
+}
+
+//void QScatterDataItem::setSize(qreal size)
+//{
+//    m_size = size;
+//}
+
+//const qreal &QScatterDataItem::size() const
+//{
+//    return m_size;
+//}
+
+void QScatterDataItem::createExtraData()
+{
+    if (!d_ptr)
+        d_ptr = new QScatterDataItemPrivate;
+}
+
+QScatterDataItemPrivate::QScatterDataItemPrivate()
+    : QBarDataItemPrivate()
+{
+}
+
+QScatterDataItemPrivate::~QScatterDataItemPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif

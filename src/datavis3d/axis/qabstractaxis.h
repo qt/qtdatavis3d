@@ -102,6 +102,8 @@ private:
     friend class Abstract3DController;
     friend class Bars3dController;
     friend class Bars3dRenderer;
+    friend class Scatter3DController;
+    friend class Scatter3DRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

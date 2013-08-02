@@ -49,54 +49,42 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef SCATTERRENDERITEM_P_H
+#define SCATTERRENDERITEM_P_H
 
-#include "datavis3dglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "barrenderitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Theme
+class Scatter3DRenderer;
+
+class ScatterRenderItem : public BarRenderItem
 {
 public:
-    explicit Theme();
-    ~Theme();
+    ScatterRenderItem();
+    virtual ~ScatterRenderItem();
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
-    void setFromTheme(Theme &theme);
+    inline const QPointF &scatterPosition() const { return m_scatterPosition; }
+    inline void setScatterPosition(const QPointF &pos) { m_scatterPosition = pos; }
 
-private:
-    friend class Abstract3DController;
-    friend class Bars3dRenderer;
-    friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
-    friend class Scatter3DRenderer;
-    friend class Drawer;
+    //    inline void setSize(qreal size);
+    //    inline qreal size() const { return m_size; }
 
-    ColorTheme m_colorTheme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
+    // TODO should be in abstract, but currently there is no abstract renderer
+    // TODO change when maps refactored
+    inline void setRenderer(Scatter3DRenderer *renderer) { m_renderer = renderer; }
+
+protected:
+    virtual void formatLabel();
+
+    Scatter3DRenderer *m_renderer;
+    QPointF m_scatterPosition;
+    //    qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
+
+    friend class QScatterDataItem;
 };
+
+typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 
 QT_DATAVIS3D_END_NAMESPACE
 
