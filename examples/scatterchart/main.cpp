@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
     fontSizeSlider->setMinimum(1);
-    fontSizeSlider->setValue(80);
+    fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
 //    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -169,7 +169,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
-//    // TODO: Add example for setMeshFileName
+    // TODO: Add example for setMeshFileName
 
     widget->show();
 

@@ -67,8 +67,6 @@ public:
 //    void rotateX(int rotation);
 //    void rotateY(int rotation);
     void setGridEnabled(int enabled);
-//    void setSpecsX(int barwidth);
-//    void setSpecsZ(int bardepth);
     void start();
 
 public slots:
@@ -82,7 +80,6 @@ private:
     Q3DScatter *m_chart;
     //QRect m_areaRect;
     int m_fontSize;
-    //QVector3D m_barSpecs;
 };
 
 #endif

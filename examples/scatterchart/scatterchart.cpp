@@ -40,19 +40,19 @@
 
 #include "scatterchart.h"
 #include "qscatterdataproxy.h"
-#include <QImage>
-#include <QFile>
+//#include <QDebug>
 
 using namespace QtDataVis3D;
 
+const int numberOfItems = 10000;
+
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
-      m_fontSize(80.0f)
+      m_fontSize(30.0f)
 {
     m_chart->setFontSize(m_fontSize);
 
     m_chart->setTheme(ThemeBlueIcy);
-    m_chart->setShadowQuality(ShadowMedium);
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     m_chart->setDataProxy(proxy);
@@ -71,87 +71,24 @@ void ScatterDataModifier::start()
 void ScatterDataModifier::addData()
 {
     QScatterDataArray *dataArray = new QScatterDataArray;
-    QScatterDataItem *item;
-#if 0
-    item = new QScatterDataItem();
-    item->setValue(-1.0);
-    //item->setLabel("Oulu");
-    item->setScatterPosition(QPointF(0.0f, 0.0f));
-    dataArray->append(*item);
-    delete item;
+    dataArray->resize(numberOfItems);
+    QScatterDataItem *ptrToDataArray = &dataArray->first();
 
-    item = new QScatterDataItem();
-    item->setValue(1.0);
-    //item->setLabel("Kemi");
-    item->setScatterPosition(QPointF(1.0f, 1.0f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(0.5);
-    //item->setLabel("Rovaniemi");
-    item->setScatterPosition(QPointF(-1.0f, -1.0f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(-0.5);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(0.5f, -0.5f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(-0.75);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(0.25f, 0.25f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(0.75);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(0.75f, -0.75f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(0.6);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(0.1f, -0.2f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(-0.4);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(0.2f, -0.05f));
-    dataArray->append(*item);
-    delete item;
-
-    item = new QScatterDataItem();
-    item->setValue(0.35);
-    //item->setLabel("Kuusamo");
-    item->setScatterPosition(QPointF(-0.25f, 0.35f));
-    dataArray->append(*item);
-    delete item;
-#else
-    for (int i = 0; i < 500; i++) {
-        item = new QScatterDataItem();
-        item->setValue((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0);
-        item->setScatterPosition(
+    for (int i = 0; i < numberOfItems; i++) {
+        //qDebug() << i << ptrToDataArray;
+        ptrToDataArray->setValue((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0);
+        ptrToDataArray->setScatterPosition(
                     QPointF((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
                             (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0));
-        dataArray->append(*item);
-        delete item;
+        ptrToDataArray++;
     }
-#endif
+
     static_cast<QScatterDataProxy *>(m_chart->dataProxy())->resetArray(dataArray);
 }
 
 void ScatterDataModifier::changeStyle()
 {
-    static int model = 0;
+    static int model = 1;
     switch (model) {
     case 0:
         m_chart->setBarType(Dots, false);
@@ -272,16 +209,4 @@ void ScatterDataModifier::setGridEnabled(int enabled)
 //{
 //    m_yRotation = rotation;
 //    m_chart->setCameraPosition(m_xRotation, m_yRotation);
-//}
-
-//void ScatterDataModifier::setSpecsX(int barwidth)
-//{
-//    m_barWidth = (float)barwidth / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}
-
-//void ScatterDataModifier::setSpecsZ(int bardepth)
-//{
-//    m_barDepth = (float)bardepth / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
 //}
