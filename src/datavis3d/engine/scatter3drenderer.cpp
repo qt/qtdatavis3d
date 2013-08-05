@@ -74,6 +74,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
+const GLfloat aspectRatio = 2.0f; // TODO: Calculate
+const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
@@ -83,8 +85,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_hasNegativeValues(false),
       m_selectedBar(0),
       m_previouslySelectedBar(0),
-      m_tickCount(0),
-      m_tickStep(0),
+      m_tickCount(5),
+      m_tickStep(0.2f),
       m_xFlipped(false),
       m_zFlipped(false),
       m_updateLabels(false),
@@ -116,7 +118,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
-      m_areaSize(QSizeF(1.0f, 1.0f)),
+      m_areaSize(QSizeF(2.0f, 2.0f)),
       m_hasHeightAdjustmentChanged(true),
       m_dataProxy(0),
       m_valueUpdateNeeded(false)
@@ -125,6 +127,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_numFrames(0)
     #endif
 {
+    //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);
 
     // Listen to changes in the drawer
@@ -190,6 +193,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 
 Scatter3DRenderer::~Scatter3DRenderer()
 {
+    //qDebug() << __FUNCTION__;
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
@@ -208,6 +212,7 @@ Scatter3DRenderer::~Scatter3DRenderer()
 
 void Scatter3DRenderer::initializeOpenGL()
 {
+    //qDebug() << __FUNCTION__;
     initializeOpenGLFunctions();
 
     m_textureHelper = new TextureHelper();
@@ -303,6 +308,7 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
     Q_UNUSED(xLabel);
     Q_UNUSED(yLabel);
     Q_UNUSED(zLabel);
+    //qDebug() << __FUNCTION__;
 
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
@@ -369,10 +375,8 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
 void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                   const GLuint defaultFboHandle)
 {
+    //qDebug() << __FUNCTION__;
     GLfloat backgroundRotation = 0;
-
-    GLfloat barPos = 0;
-    GLfloat rowPos = 0;
 
     // Specify viewport
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
@@ -416,9 +420,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     GLfloat heightMultiplier = 1.0f;
     GLfloat widthMultiplier = 1.0f;
     GLfloat depthMultiplier = 1.0f;
-    GLfloat heightScaler = 1.0f;
-    GLfloat widthScaler = 1.0f;
-    GLfloat depthScaler = 1.0f;
+    GLfloat heightScaler = 0.0f;
+    GLfloat widthScaler = 0.0f;
+    GLfloat depthScaler = 0.0f;
     //    switch (m_adjustDirection) {
     //    case Q3DMaps::AdjustHeight:
     //        widthMultiplier = 0.0f;
@@ -509,11 +513,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 MVPMatrix;
 
             modelMatrix.translate(item.translation().x(),
-                                  heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                                  item.translation().y(),
                                   item.translation().z());
-            modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
-                                        heightMultiplier * item.height() + heightScaler,
-                                        depthMultiplier * item.height() + depthScaler));
+            modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
+                                        heightMultiplier * 0.1f + heightScaler,
+                                        depthMultiplier * 0.1f + depthScaler));
+            //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
+            //                            heightMultiplier * item.size() + heightScaler,
+            //                            depthMultiplier * item.size() + depthScaler));
 
             MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
@@ -595,11 +602,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 MVPMatrix;
 
             modelMatrix.translate(item.translation().x(),
-                                  heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                                  item.translation().y(),
                                   item.translation().z());
-            modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
-                                        heightMultiplier * item.height() + heightScaler,
-                                        depthMultiplier * item.height() + depthScaler));
+            modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
+                                        heightMultiplier * 0.1f + heightScaler,
+                                        depthMultiplier * 0.1f + depthScaler));
+            //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
+            //                            heightMultiplier * item.size() + heightScaler,
+            //                            depthMultiplier * item.size() + depthScaler));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -641,7 +651,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        // Read color under cursor
         if (Scatter3DController::MouseOnScene == m_controller->mouseState())
             m_selection = Utils::getSelection(m_controller->mousePosition(),
                                               m_cachedBoundingRect.height());
@@ -678,6 +687,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_labelShader->release();
 #endif
     }
+#endif
+
 #if 1
     // Bind bar shader
     m_barShader->bind();
@@ -686,8 +697,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     glEnable(GL_TEXTURE_2D);
 
     // Draw bars
-    // TODO: Handle zoom by camera transformations
-
     bool barSelectionFound = false;
     for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
         ScatterRenderItem &item = m_renderItemArray[bar];
@@ -700,14 +709,20 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(item.translation().x(),
-                              heightMultiplier * item.height() + heightScaler - m_yAdjustment,
+                              item.translation().y(),
                               item.translation().z());
-        modelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
-                                    heightMultiplier * item.height() + heightScaler,
-                                    depthMultiplier * item.height() + depthScaler));
-        itModelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
-                                      heightMultiplier * item.height() + heightScaler,
-                                      depthMultiplier * item.height() + depthScaler));
+        modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
+                                    heightMultiplier * 0.1f + heightScaler,
+                                    depthMultiplier * 0.1f + depthScaler));
+        //            modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
+        //                                        heightMultiplier * item.size() + heightScaler,
+        //                                        depthMultiplier * item.size() + depthScaler));
+        itModelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
+                                      heightMultiplier * 0.1f + heightScaler,
+                                      depthMultiplier * 0.1f + depthScaler));
+        //        itModelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
+        //                                      heightMultiplier * item.height() + heightScaler,
+        //                                      depthMultiplier * item.height() + depthScaler));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -780,7 +795,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Release bar shader
     m_barShader->release();
+#endif
 
+#if 1
     // Bind background shader
     m_backgroundShader->bind();
 
@@ -793,14 +810,18 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor,
-                                    1.0f,
-                                    m_columnDepth / m_scaleFactor));
+        modelMatrix.translate(0.0f, -m_yAdjustment, zComp);
+        modelMatrix.scale(
+                    QVector3D(
+                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                        backgroundMargin / m_scaleFactor,
+                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
-        itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor,
-                                      1.0f,
-                                      m_columnDepth / m_scaleFactor));
+        itModelMatrix.scale(
+                    QVector3D(
+                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                        backgroundMargin / m_scaleFactor,
+                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -850,7 +871,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
+#endif
 
+#if 1
+    // TODO: Grid lines cannot be done as in bars; we need configurable lines. Let's use ticks for now.
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         // Bind bar shader
@@ -864,19 +888,28 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
-        for (GLfloat row = 0.0f; row <= m_cachedRowCount; row++) {
+        GLfloat heightStep = m_tickStep;
+        GLfloat startLine = -m_heightNormalizer;
+
+        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
+             lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
-            modelMatrix.translate(0.0f, -m_yAdjustment,
-                                  (m_columnDepth - rowPos) / m_scaleFactor + zComp);
-            modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                        gridLineWidth));
-            itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                          gridLineWidth));
+            modelMatrix.translate(
+                        0.0f,
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
+                        (aspectRatio * lineHeight) / (m_heightNormalizer * m_scaleFactor) + zComp);
+            modelMatrix.scale(
+                        QVector3D(
+                            (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                            gridLineWidth, gridLineWidth));
+            itModelMatrix.scale(
+                        QVector3D(
+                            (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                            gridLineWidth, gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -909,20 +942,25 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Floor lines: columns
-        for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
+        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
+             lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            barPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
-            modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
-                                  -m_yAdjustment, zComp);
-            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                        m_columnDepth / m_scaleFactor));
-            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                          m_columnDepth / m_scaleFactor));
-
+            modelMatrix.translate(
+                        (aspectRatio * lineHeight) / (m_heightNormalizer * m_scaleFactor),
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
+                        zComp);
+            modelMatrix.scale(
+                        QVector3D(
+                            gridLineWidth, gridLineWidth,
+                            (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
+            itModelMatrix.scale(
+                        QVector3D(
+                            gridLineWidth, gridLineWidth,
+                            (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -955,17 +993,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: back wall
-        GLfloat heightStep = m_heightNormalizer / 5.0f; // default to 5 lines
-        GLfloat startLine;
-
-        if (m_tickCount > 0)
-            heightStep = m_tickStep;
-
-        if (m_hasNegativeValues)
-            startLine = -m_heightNormalizer;
-        else
-            startLine = heightStep;
-
         for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
              lineHeight += heightStep) {
             QMatrix4x4 modelMatrix;
@@ -974,18 +1001,26 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 itModelMatrix;
 
             if (m_zFlipped) {
-                modelMatrix.translate(0.0f,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      m_columnDepth / m_scaleFactor + zComp);
+                modelMatrix.translate(
+                            0.0f,
+                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                            (aspectRatio * backgroundMargin * m_areaSize.height() / m_scaleFactor)
+                            + zComp);
             } else {
-                modelMatrix.translate(0.0f,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      -m_columnDepth / m_scaleFactor + zComp);
+                modelMatrix.translate(
+                            0.0f,
+                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                            -(aspectRatio * backgroundMargin * m_areaSize.height() / m_scaleFactor)
+                            + zComp);
             }
-            modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                        gridLineWidth));
-            itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                          gridLineWidth));
+            modelMatrix.scale(
+                        QVector3D(
+                            (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
+                            gridLineWidth, gridLineWidth));
+            itModelMatrix.scale(
+                        QVector3D(
+                            (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
+                            gridLineWidth, gridLineWidth));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1026,18 +1061,24 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 itModelMatrix;
 
             if (m_xFlipped) {
-                modelMatrix.translate(m_rowWidth / m_scaleFactor,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      zComp);
+                modelMatrix.translate(
+                            (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                            zComp);
             } else {
-                modelMatrix.translate(-m_rowWidth / m_scaleFactor,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      zComp);
+                modelMatrix.translate(
+                            -(aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                            zComp);
             }
-            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                        m_columnDepth / m_scaleFactor));
-            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                          m_columnDepth / m_scaleFactor));
+            modelMatrix.scale(
+                        QVector3D(
+                            gridLineWidth, gridLineWidth,
+                            (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
+            itModelMatrix.scale(
+                        QVector3D(
+                            gridLineWidth, gridLineWidth,
+                            (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1072,7 +1113,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // Release bar shader
         m_barShader->release();
     }
+#endif
 
+#if 0
     // Handle zoom activation and label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
@@ -1215,11 +1258,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     // Release label shader
     m_labelShader->release();
 #endif
-#endif
 }
 
 void Scatter3DRenderer::requestSelectionAtPoint(const QPoint &point)
 {
+    //qDebug() << __FUNCTION__;
     QMutexLocker locker(&m_mutex);
     m_selectionPointRequest.setX(point.x());
     m_selectionPointRequest.setY(point.y());
@@ -1228,6 +1271,7 @@ void Scatter3DRenderer::requestSelectionAtPoint(const QPoint &point)
 
 void Scatter3DRenderer::handleResize()
 {
+    //qDebug() << __FUNCTION__;
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
     qDebug() << "Scatter3DRenderer::resizeEvent " << m_cachedBoundingRect.width() << "x" <<m_cachedBoundingRect.height();
@@ -1254,6 +1298,7 @@ void Scatter3DRenderer::handleResize()
 
 void Scatter3DRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedBarThickness = thickness;
     if (relative) {
         m_cachedBarSpacing.setWidth((thickness.width() * 2) * (spacing.width() + 1.0f));
@@ -1268,12 +1313,14 @@ void Scatter3DRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool re
 
 void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedObjFile = objFileName;
     loadBarMesh();
 }
 
 void Scatter3DRenderer::updateTheme(Theme theme)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedTheme.setFromTheme(theme);
 
     m_drawer->setTheme(m_cachedTheme);
@@ -1309,28 +1356,33 @@ void Scatter3DRenderer::updateTheme(Theme theme)
 
 void Scatter3DRenderer::updateSelectionMode(SelectionMode mode)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedSelectionMode = mode;
 }
 
 void Scatter3DRenderer::updateFont(const QFont &font)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedFont = font;
     m_drawer->setFont(font);
 }
 
 void Scatter3DRenderer::updateLabelTransparency(LabelTransparency transparency)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedLabelTransparency = transparency;
     m_drawer->setTransparency(transparency);
 }
 
 void Scatter3DRenderer::updateGridEnabled(bool enable)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedIsGridEnabled = enable;
 }
 
 void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
 {
+    //qDebug() << __FUNCTION__;
     if (m_cachedIsBackgroundEnabled != enable) {
         m_cachedIsBackgroundEnabled = enable;
         // Load changed bar type
@@ -1397,6 +1449,7 @@ void Scatter3DRenderer::updateShadowQuality(ShadowQuality quality)
 
 void Scatter3DRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
+    //qDebug() << __FUNCTION__;
     m_tickCount = tickCount;
     m_tickStep = step;
     if (tickCount > 0 && step > 0) {
@@ -1408,29 +1461,33 @@ void Scatter3DRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat m
 
 void Scatter3DRenderer::updateBoundingRect(const QRect boundingRect)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedBoundingRect = boundingRect;
     handleResize();
 }
 
 void Scatter3DRenderer::updatePosition(const QRect boundingRect)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedBoundingRect = boundingRect;
 }
 
 void Scatter3DRenderer::loadBarMesh()
 {
+    //qDebug() << __FUNCTION__;
     QString objectFileName = m_cachedObjFile;
     if (m_barObj)
         delete m_barObj;
     // If background is disabled, load full version of bar mesh
-    if (!m_cachedIsBackgroundEnabled)
-        objectFileName.append(QStringLiteral("Full"));
+    //    if (!m_cachedIsBackgroundEnabled)
+    //        objectFileName.append(QStringLiteral("Full"));
     m_barObj = new ObjectHelper(objectFileName);
     m_barObj->load();
 }
 
 void Scatter3DRenderer::loadBackgroundMesh()
 {
+    //qDebug() << __FUNCTION__;
     if (m_backgroundObj)
         delete m_backgroundObj;
     m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
@@ -1439,6 +1496,7 @@ void Scatter3DRenderer::loadBackgroundMesh()
 
 void Scatter3DRenderer::loadGridLineMesh()
 {
+    //qDebug() << __FUNCTION__;
     if (m_gridLineObj)
         delete m_gridLineObj;
     m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
@@ -1447,6 +1505,7 @@ void Scatter3DRenderer::loadGridLineMesh()
 
 void Scatter3DRenderer::loadLabelMesh()
 {
+    //qDebug() << __FUNCTION__;
     if (m_labelObj)
         delete m_labelObj;
     m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
@@ -1455,53 +1514,55 @@ void Scatter3DRenderer::loadLabelMesh()
 
 void Scatter3DRenderer::updateTextures()
 {
+    //qDebug() << __FUNCTION__;
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }
 
 void Scatter3DRenderer::calculateSceneScalingFactors(const QRect &areaRect)
 {
+    //qDebug() << __FUNCTION__;
     m_areaSize = areaRect.size();
     // Calculate scaling factor so that we can be sure the whole area fits to positive z space
-    if (zComp > 1.0f)
-        m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height()) / zComp;
-    else
-        m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    //qDebug() << "scaleFactor" << m_scaleFactor;
+    m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
+    qDebug() << "scaleFactor" << m_scaleFactor;
 }
 
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
-    // TODO: We need to calculate y -translation here as well, based on value.
+    //qDebug() << __FUNCTION__;
+
     // Origin should be in the center of scene, ie. both positive and negative values are drawn
     // above background
 
-    // We need to convert position (which is in coordinates), to translation (which has origin in the center and is scaled)
-    // -> move pos(center, center) to trans(0, 0) and pos(0, 0) to trans(left, top)
-    GLfloat xTrans = 2.0f * (item.scatterPosition().x() - (m_areaSize.width() / 2.0f))
-            / m_scaleFactor;
-    GLfloat zTrans = 2.0f * (item.scatterPosition().y() - (m_areaSize.height() / 2.0f))
-            / m_scaleFactor;
+    // We need to normalize translation based on given area (if given)
+
+    GLfloat xTrans = aspectRatio * item.scatterPosition().x()
+            / (m_areaSize.width() * m_scaleFactor);
+    GLfloat zTrans = aspectRatio * item.scatterPosition().y()
+            / (m_areaSize.height() * m_scaleFactor);
+    GLfloat yTrans = item.value() / (m_tickCount * m_tickStep * m_scaleFactor);
     //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
-    item.setTranslation(QVector3D(xTrans, 0.0f, zTrans + zComp));
-    //qDebug() << item.translation();
+    item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
+    //qDebug() << item.translation() << m_heightNormalizer;
 }
 
 void Scatter3DRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
 {
-    // TODO: How does origin being in the center of the scene affect this?
+    //qDebug() << __FUNCTION__;
     // 2.0f = max difference between minimum and maximum value after scaling with m_heightNormalizer
     m_yAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
-    //qDebug() << m_yAdjustment;
+    //qDebug() << limits << m_yAdjustment;
 }
 
 Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
                                                                  const QVector3D &selection)
 {
+    //qDebug() << __FUNCTION__;
     GLubyte barIdxRed = 0;
     GLubyte barIdxGreen = 0;
     GLubyte barIdxBlue = 0;
-    //static QVector3D prevSel = selection; // TODO: For debugging
+    static QVector3D prevSel = selection; // TODO: For debugging
     Scatter3DController::SelectionType isSelectedType = Scatter3DController::SelectionNone;
 
     if (selection == selectionSkipColor)
@@ -1521,10 +1582,10 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     QVector3D current = QVector3D(barIdxRed, barIdxGreen, barIdxBlue);
 
     // TODO: For debugging
-    //if (selection != prevSel) {
-    //    qDebug() << selection.x() << selection .y() << selection.z();
-    //    prevSel = selection;
-    //}
+    if (selection != prevSel) {
+        qDebug() << selection.x() << selection .y() << selection.z();
+        prevSel = selection;
+    }
 
     if (current == selection)
         isSelectedType = Scatter3DController::SelectionBar;
@@ -1549,17 +1610,20 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
 
 void Scatter3DRenderer::updateZoomLevel(int newZoomLevel)
 {
+    //qDebug() << __FUNCTION__;
     m_cachedZoomLevel = newZoomLevel;
 }
 
 
 QRect Scatter3DRenderer::mainViewPort()
 {
+    //qDebug() << __FUNCTION__;
     return m_mainViewPort;
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
+    //qDebug() << __FUNCTION__;
     if (m_barShader)
         delete m_barShader;
     m_barShader = new ShaderHelper(this, vertexShader, fragmentShader);
@@ -1568,6 +1632,7 @@ void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &
 
 void Scatter3DRenderer::initSelectionShader()
 {
+    //qDebug() << __FUNCTION__;
     if (m_selectionShader)
         delete m_selectionShader;
     m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSelection"),
@@ -1577,6 +1642,7 @@ void Scatter3DRenderer::initSelectionShader()
 
 void Scatter3DRenderer::initSelectionBuffer()
 {
+    //qDebug() << __FUNCTION__;
     if (m_selectionTexture)
         m_textureHelper->deleteTexture(&m_selectionTexture);
 
@@ -1588,6 +1654,7 @@ void Scatter3DRenderer::initSelectionBuffer()
 #if !defined(QT_OPENGL_ES_2)
 void Scatter3DRenderer::initDepthShader()
 {
+    //qDebug() << __FUNCTION__;
     if (m_depthShader)
         delete m_depthShader;
     m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
@@ -1597,6 +1664,7 @@ void Scatter3DRenderer::initDepthShader()
 
 void Scatter3DRenderer::updateDepthBuffer()
 {
+    //qDebug() << __FUNCTION__;
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
@@ -1632,6 +1700,7 @@ void Scatter3DRenderer::updateDepthBuffer()
 void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                               const QString &fragmentShader)
 {
+    //qDebug() << __FUNCTION__;
     if (m_backgroundShader)
         delete m_backgroundShader;
     m_backgroundShader = new ShaderHelper(this, vertexShader, fragmentShader);
@@ -1640,6 +1709,7 @@ void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
 
 void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
 {
+    //qDebug() << __FUNCTION__;
     if (m_labelShader)
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);

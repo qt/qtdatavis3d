@@ -53,7 +53,8 @@ enum BarStyle {
     Cones,
     Cylinders,
     BevelBars,
-    Spheres
+    Spheres,
+    Dots
 };
 
 enum CameraPreset {

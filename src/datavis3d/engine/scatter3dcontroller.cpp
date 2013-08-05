@@ -68,7 +68,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_isBarSpecRelative(true),
       m_barThickness(QSizeF(0.75f, 0.75f)),
       m_barSpacing(m_barThickness * 3.0f),
-      m_objFile(QStringLiteral(":/defaultMeshes/bar")),
+      m_objFile(QStringLiteral(":/defaultMeshes/dot")),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
@@ -371,31 +371,16 @@ QString Scatter3DController::objFile()
 
 void Scatter3DController::setBarType(BarStyle style, bool smooth)
 {
-    if (style == Bars) {
+    if (style == Spheres) {
         if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/barSmooth");
+            m_objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else
-            m_objFile = QStringLiteral(":/defaultMeshes/bar");
-    } else if (style == Pyramids) {
+            m_objFile = QStringLiteral(":/defaultMeshes/sphere");
+    } else {
         if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/pyramidSmooth");
+            m_objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
         else
-            m_objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    } else if (style == Cones) {
-        if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/coneSmooth");
-        else
-            m_objFile = QStringLiteral(":/defaultMeshes/cone");
-    } else if (style == Cylinders) {
-        if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
-        else
-            m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    } else if (style == BevelBars) {
-        if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
-        else
-            m_objFile = QStringLiteral(":/defaultMeshes/bevelbar");
+            m_objFile = QStringLiteral(":/defaultMeshes/dot");
     }
 
     emit objFileChanged(m_objFile);
