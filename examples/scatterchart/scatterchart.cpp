@@ -40,7 +40,7 @@
 
 #include "scatterchart.h"
 #include "qscatterdataproxy.h"
-//#include <QDebug>
+#include "qcategoryaxis.h"
 
 using namespace QtDataVis3D;
 
@@ -70,16 +70,31 @@ void ScatterDataModifier::start()
 
 void ScatterDataModifier::addData()
 {
+    QStringList rowLabels;
+    rowLabels << "something 1" << "something 2" << "something 3" << "something 4" << "something 5";
+    QStringList columnLabels;
+    columnLabels << "other 1" << "other 2" << "other 3" << "other 4" << "other 5";
+
+    // Set tick count and step
+    //m_chart->setTickCount(10, 0.1f);
+
+    // Add labels
+    m_chart->rowAxis()->setTitle("Somethings");
+    m_chart->columnAxis()->setTitle("Others");
+    m_chart->valueAxis()->setTitle("Values");
+    m_chart->rowAxis()->setLabels(columnLabels);
+    m_chart->columnAxis()->setLabels(rowLabels);
+
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
 
     for (int i = 0; i < numberOfItems; i++) {
         //qDebug() << i << ptrToDataArray;
-        ptrToDataArray->setValue((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0);
-        ptrToDataArray->setScatterPosition(
-                    QPointF((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
-                            (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0));
+        ptrToDataArray->setPosition(
+                    QVector3D((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
+                              (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
+                              (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0));
         ptrToDataArray++;
     }
 

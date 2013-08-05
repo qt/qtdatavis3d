@@ -61,14 +61,14 @@ void ScatterRenderItem::formatLabel()
     // TODO and selection data (like row/column in bar selection)
 
     // Format the string on first access
-    //    QString numStr;
-    //    numStr.setNum(m_value);
-    //    // TODO actually format instead of just prepending the value
-    //    m_label.clear(); // Just in case
-    //    m_label.append(m_itemLabel);
-    //    m_label.append(QStringLiteral(" "));
-    //    m_label.append(numStr);
-    //    m_label.append(m_renderer->dataProxy()->itemLabelFormat());
+    QString numStr;
+    numStr.setNum(m_value);
+    // TODO actually format instead of just prepending the value
+    m_label.clear(); // Just in case
+    //m_label.append(m_itemLabel);
+    //m_label.append(QStringLiteral(" "));
+    m_label.append(numStr);
+    m_label.append(m_renderer->m_dataProxy->itemLabelFormat());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -114,8 +114,8 @@ private:
 
     // Internal state
     bool m_hasNegativeValues;
-    BarRenderItem *m_selectedBar; // points to renderitem array
-    BarRenderItem *m_previouslySelectedBar; // points to renderitem array
+    ScatterRenderItem *m_selectedItem; // points to renderitem array
+    ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
     GLint m_tickCount;
     GLfloat m_tickStep;
     bool m_xFlipped;
@@ -183,9 +183,6 @@ public:
     Drawer *drawer() { return m_drawer; }
 
 public slots:
-    void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                        QSizeF spacing = QSizeF(1.0f, 1.0f),
-                        bool relative = true);
     void updateTheme(Theme theme);
     void updateSelectionMode(SelectionMode newMode);
     //void updateLimits(QPair<GLfloat, GLfloat> newLimits);

@@ -83,8 +83,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : QObject(controller),
       m_controller(controller),
       m_hasNegativeValues(false),
-      m_selectedBar(0),
-      m_previouslySelectedBar(0),
+      m_selectedItem(0),
+      m_previouslySelectedItem(0),
       m_tickCount(5),
       m_tickStep(0.2f),
       m_xFlipped(false),
@@ -140,8 +140,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
                      &Scatter3DRenderer::updateSelectionMode);
     //QObject::connect(m_controller, &Scatter3DController::limitsChanged, this,
     //                 &Scatter3DRenderer::updateLimits);
-    QObject::connect(m_controller, &Scatter3DController::barSpecsChanged, this,
-                     &Scatter3DRenderer::updateBarSpecs);
     QObject::connect(m_controller, &Scatter3DController::objFileChanged, this,
                      &Scatter3DRenderer::updateMeshFileName);
     QObject::connect(m_controller, &Scatter3DController::boundingRectChanged, this,
@@ -169,8 +167,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     updateSelectionMode(m_controller->selectionMode());
     //updateLimits(m_controller->limits());
     updateZoomLevel(m_controller->zoomLevel());
-    updateBarSpecs(m_controller->barThickness(), m_controller->barSpacing(),
-                   m_controller->isBarSpecRelative());
     updateMeshFileName(m_controller->objFile());
     updateFont(m_controller->font());
     updateLabelTransparency(m_controller->labelTransparency());
@@ -181,6 +177,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 
     updateBoundingRect(m_controller->boundingRect());
     updateShadowQuality(m_controller->shadowQuality());
+
+    calculateSceneScalingFactors();
 
     // TODO: Protect with mutex or redesign how axes create label items?
     if (m_controller->axisX())
@@ -332,20 +330,19 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
     // TODO Should data changes be notified via signal instead of reading data in render?
     // TODO this cache initialization assumes data window starts at 0,0 offset from array
     // Update cached values
-    if (valuesDirty /*|| m_valueUpdateNeeded*/) {
+    if (valuesDirty) {
         const QScatterDataArray &dataArray = m_dataProxy->array();
         int dataSize = dataArray.size();
         m_renderItemArray.resize(dataSize);
         for (int i = 0; i < dataSize ; i++) {
-            qreal value = dataArray.at(i).value();
+            qreal value = dataArray.at(i).position().y();
             m_renderItemArray[i].setValue(value);
-            m_renderItemArray[i].setScatterPosition(dataArray.at(i).scatterPosition());
-            m_renderItemArray[i].setHeight(value / m_heightNormalizer);
+            m_renderItemArray[i].setPosition(dataArray.at(i).position());
+            //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
             //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
             calculateTranslation(m_renderItemArray[i]);
             m_renderItemArray[i].setRenderer(this);
         }
-        //        m_valueUpdateNeeded = false;
     }
 
     if (defaultFboHandle) {
@@ -515,6 +512,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(item.translation().x(),
                                   item.translation().y(),
                                   item.translation().z());
+            // TODO: We should adjust scaling of items based on item count?
             modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
                                         heightMultiplier * 0.1f + heightScaler,
                                         depthMultiplier * 0.1f + depthScaler));
@@ -577,7 +575,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
 #endif
 
-#if 1
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > ModeNone) {
         // Bind selection shader
@@ -604,6 +601,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(item.translation().x(),
                                   item.translation().y(),
                                   item.translation().z());
+            // TODO: We should adjust scaling of items based on item count?
             modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
                                         heightMultiplier * 0.1f + heightScaler,
                                         depthMultiplier * 0.1f + depthScaler));
@@ -687,9 +685,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_labelShader->release();
 #endif
     }
-#endif
 
-#if 1
     // Bind bar shader
     m_barShader->bind();
 
@@ -711,18 +707,19 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         modelMatrix.translate(item.translation().x(),
                               item.translation().y(),
                               item.translation().z());
+        // TODO: We should adjust scaling of items based on item count?
         modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
                                     heightMultiplier * 0.1f + heightScaler,
                                     depthMultiplier * 0.1f + depthScaler));
-        //            modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-        //                                        heightMultiplier * item.size() + heightScaler,
-        //                                        depthMultiplier * item.size() + depthScaler));
+        //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
+        //                            heightMultiplier * item.size() + heightScaler,
+        //                            depthMultiplier * item.size() + depthScaler));
         itModelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
                                       heightMultiplier * 0.1f + heightScaler,
                                       depthMultiplier * 0.1f + depthScaler));
-        //        itModelMatrix.scale(QVector3D(widthMultiplier * item.height() + widthScaler,
-        //                                      heightMultiplier * item.height() + heightScaler,
-        //                                      depthMultiplier * item.height() + depthScaler));
+        //itModelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
+        //                              heightMultiplier * item.size() + heightScaler,
+        //                              depthMultiplier * item.size() + depthScaler));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -732,7 +729,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
         QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
-        QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
+        QVector3D heightColor =
+                Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.translation().y();
 
         QVector3D barColor = baseColor + heightColor;
 
@@ -744,7 +742,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
                 // Insert data to QDataItem. We have no ownership, don't delete the previous one
-                m_selectedBar = &item;
+                m_selectedItem = &item;
                 barSelectionFound = true;
                 break;
             }
@@ -761,43 +759,39 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             }
         }
 
-        if (item.height() != 0) {
-            // Set shader bindings
-            m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-            m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-            m_barShader->setUniformValue(m_barShader->color(), barColor);
-            m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        // Set shader bindings
+        m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
+        m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
+        m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
+        m_barShader->setUniformValue(m_barShader->nModel(),
+                                     itModelMatrix.inverted().transposed());
+        m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+        m_barShader->setUniformValue(m_barShader->color(), barColor);
+        m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > ShadowNone) {
-                // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(), lightStrength / 10.0f);
+        if (m_cachedShadowQuality > ShadowNone) {
+            // Set shadow shader bindings
+            m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
+            m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
+            m_barShader->setUniformValue(m_barShader->lightS(), lightStrength / 10.0f);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_barObj, 0, m_depthTexture);
-            } else
+            // Draw the object
+            m_drawer->drawObject(m_barShader, m_barObj, 0, m_depthTexture);
+        } else
 #endif
-            {
-                // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
+        {
+            // Set shadowless shader bindings
+            m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_barObj);
-            }
+            // Draw the object
+            m_drawer->drawObject(m_barShader, m_barObj);
         }
     }
 
     // Release bar shader
     m_barShader->release();
-#endif
 
-#if 1
     // Bind background shader
     m_backgroundShader->bind();
 
@@ -871,9 +865,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
-#endif
 
-#if 1
     // TODO: Grid lines cannot be done as in bars; we need configurable lines. Let's use ticks for now.
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
@@ -1113,13 +1105,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // Release bar shader
         m_barShader->release();
     }
-#endif
 
-#if 0
     // Handle zoom activation and label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
-        m_selectedBar = NULL;
+        m_selectedItem = NULL;
     } else {
         // Print value of selected bar
         m_labelShader->bind();
@@ -1144,19 +1134,19 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             m_labelObj, m_camera, true);
 #else
         // Draw the value string followed by row label and column label
-        LabelItem &labelItem = m_selectedBar->selectionLabel();
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
-            QString labelText = m_selectedBar->label();
+        LabelItem &labelItem = m_selectedItem->selectionLabel();
+        if (m_previouslySelectedItem != m_selectedItem || m_updateLabels || !labelItem.textureId()) {
+            QString labelText = m_selectedItem->label();
             // TODO More elaborate label?
             m_drawer->generateLabelItem(labelItem, labelText);
-            m_previouslySelectedBar = m_selectedBar;
+            m_previouslySelectedItem = m_selectedItem;
         }
 
-        m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*m_selectedItem, labelItem, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, true, false);
+                            m_labelObj, camera, true, false, LabelMid);
 #endif
         glDisable(GL_TEXTURE_2D);
         if (m_cachedLabelTransparency > TransparencyNone)
@@ -1170,6 +1160,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_updateLabels = false;
     }
 
+#if 0
     // Draw axis labels
     // TODO: Calculations done temporarily here. When optimizing, move to after data set addition? Keep drawing of the labels here.
     // Bind label shader
@@ -1182,12 +1173,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
 
     // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
-    for (int row = 0; row != m_cachedRowCount; row++) {
+    for (int row = 0; row != m_controller->axisX()->d_ptr->labelItems().size(); row++) {
         if (m_controller->axisX()->d_ptr->labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            rowPos = (row + 1) * (m_cachedBarSpacing.height());
-            barPos = 0;
+            GLfloat rowPos = (row + 1) * (m_cachedBarSpacing.height());
+            GLfloat barPos = 0;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1217,12 +1208,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
     }
-    for (int bar = 0; bar != m_cachedColumnCount; bar += 1) {
+    for (int bar = 0; bar != m_controller->axisZ()->d_ptr->labelItems().size(); bar += 1) {
         if (m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            barPos = (bar + 1) * (m_cachedBarSpacing.width());
-            rowPos = 0;
+            GLfloat barPos = (bar + 1) * (m_cachedBarSpacing.width());
+            GLfloat rowPos = 0;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1294,21 +1285,6 @@ void Scatter3DRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
-}
-
-void Scatter3DRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedBarThickness = thickness;
-    if (relative) {
-        m_cachedBarSpacing.setWidth((thickness.width() * 2) * (spacing.width() + 1.0f));
-        m_cachedBarSpacing.setHeight((thickness.height() * 2) * (spacing.height() + 1.0f));
-    } else {
-        m_cachedBarSpacing = thickness * 2 + spacing * 2;
-    }
-
-    // Calculate here and at setting sample space
-    calculateSceneScalingFactors();
 }
 
 void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
@@ -1537,11 +1513,11 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
     // We need to normalize translation based on given area (if given)
 
-    GLfloat xTrans = aspectRatio * item.scatterPosition().x()
+    GLfloat xTrans = aspectRatio * item.position().x()
             / (m_areaSize.width() * m_scaleFactor);
-    GLfloat zTrans = aspectRatio * item.scatterPosition().y()
+    GLfloat zTrans = aspectRatio * item.position().z()
             / (m_areaSize.height() * m_scaleFactor);
-    GLfloat yTrans = item.value() / (m_tickCount * m_tickStep * m_scaleFactor);
+    GLfloat yTrans = item.position().y() / (m_tickCount * m_tickStep * m_scaleFactor);
     //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
     //qDebug() << item.translation() << m_heightNormalizer;
@@ -1562,7 +1538,7 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     GLubyte barIdxRed = 0;
     GLubyte barIdxGreen = 0;
     GLubyte barIdxBlue = 0;
-    static QVector3D prevSel = selection; // TODO: For debugging
+    //static QVector3D prevSel = selection; // TODO: For debugging
     Scatter3DController::SelectionType isSelectedType = Scatter3DController::SelectionNone;
 
     if (selection == selectionSkipColor)
@@ -1582,10 +1558,10 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     QVector3D current = QVector3D(barIdxRed, barIdxGreen, barIdxBlue);
 
     // TODO: For debugging
-    if (selection != prevSel) {
-        qDebug() << selection.x() << selection .y() << selection.z();
-        prevSel = selection;
-    }
+    //if (selection != prevSel) {
+    //    qDebug() << selection.x() << selection .y() << selection.z();
+    //    prevSel = selection;
+    //}
 
     if (current == selection)
         isSelectedType = Scatter3DController::SelectionBar;

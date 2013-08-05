@@ -59,15 +59,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
       m_isInitialized(false),
-      m_rowCount(0),
-      m_columnCount(0),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
       m_isSlicingActivated(false),
-      m_isBarSpecRelative(true),
-      m_barThickness(QSizeF(0.75f, 0.75f)),
-      m_barSpacing(m_barThickness * 3.0f),
       m_objFile(QStringLiteral(":/defaultMeshes/dot")),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
@@ -125,7 +120,8 @@ void Scatter3DController::render(const GLuint defaultFboHandle)
 
 }
 
-QMatrix4x4 Scatter3DController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
+QMatrix4x4 Scatter3DController::calculateViewMatrix(int zoom, int viewPortWidth,
+                                                    int viewPortHeight, bool showUnder)
 {
     return m_cameraHelper->calculateViewMatrix(m_mousePos,
                                                zoom,
@@ -341,29 +337,6 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     m_valuesDirty = true;
 }
 
-void Scatter3DController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
-{
-    m_barThickness      = thickness;
-    m_barSpacing        = spacing;
-    m_isBarSpecRelative = relative;
-    emit barSpecsChanged(thickness, spacing, relative);
-}
-
-QSizeF Scatter3DController::barThickness()
-{
-    return m_barThickness;
-}
-
-QSizeF Scatter3DController::barSpacing()
-{
-    return m_barSpacing;
-}
-
-bool Scatter3DController::isBarSpecRelative()
-{
-    return m_isBarSpecRelative;
-}
-
 QString Scatter3DController::objFile()
 {
     return m_objFile;
@@ -392,19 +365,6 @@ void Scatter3DController::setMeshFileName(const QString &objFileName)
 
     emit objFileChanged(m_objFile);
 }
-
-// TODO: This sets data window. Needs more parameters, now assumes window always starts at 0,0.
-void Scatter3DController::setupSampleSpace(int rowCount, int columnCount)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    setSlicingActive(false);
-
-    m_rowCount = rowCount;
-    m_columnCount = columnCount;
-
-    emit sampleSpaceChanged(rowCount, columnCount);
-}
-
 
 void Scatter3DController::setSelectionMode(SelectionMode mode)
 {
@@ -474,16 +434,6 @@ void Scatter3DController::setTickCount(GLint tickCount, GLfloat step, GLfloat mi
     m_tickStep    = step;
     m_tickMinimum = minimum;
     emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
-}
-
-int Scatter3DController::columnCount()
-{
-    return m_columnCount;
-}
-
-int Scatter3DController::rowCount()
-{
-    return m_rowCount;
 }
 
 void Scatter3DController::handleLimitChange()

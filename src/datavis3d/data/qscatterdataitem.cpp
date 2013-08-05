@@ -60,12 +60,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QScatterDataItem.
  */
 QScatterDataItem::QScatterDataItem()
-    : QBarDataItem()
 {
 }
 
 QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
-    : QBarDataItem(other)
 {
     operator=(other);
 }
@@ -79,21 +77,20 @@ QScatterDataItem::~QScatterDataItem()
 
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
-    QBarDataItem::operator =(other);
-    m_scatterPosition = other.m_scatterPosition;
-    //    m_size = other.m_size;
+    m_position = other.m_position;
+    //m_size = other.m_size;
 
     return *this;
 }
 
-void QScatterDataItem::setScatterPosition(const QPointF &position)
+void QScatterDataItem::setPosition(const QVector3D &position)
 {
-    m_scatterPosition = position;
+    m_position = position;
 }
 
-const QPointF &QScatterDataItem::scatterPosition() const
+const QVector3D &QScatterDataItem::position() const
 {
-    return m_scatterPosition;
+    return m_position;
 }
 
 //void QScatterDataItem::setSize(qreal size)
@@ -113,7 +110,6 @@ void QScatterDataItem::createExtraData()
 }
 
 QScatterDataItemPrivate::QScatterDataItemPrivate()
-    : QBarDataItemPrivate()
 {
 }
 

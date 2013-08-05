@@ -129,7 +129,7 @@ QPair<GLfloat, GLfloat> QScatterDataProxyPrivate::limitValues()
     QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
     for (int i = 0; i < m_dataArray.size(); i++) {
         const QScatterDataItem &item = m_dataArray.at(i);
-        qreal itemValue = item.value();
+        qreal itemValue = item.position().y();
         if (limits.second < itemValue)
             limits.second = itemValue;
         if (limits.first > itemValue)

@@ -64,11 +64,11 @@ public:
     ScatterRenderItem();
     virtual ~ScatterRenderItem();
 
-    inline const QPointF &scatterPosition() const { return m_scatterPosition; }
-    inline void setScatterPosition(const QPointF &pos) { m_scatterPosition = pos; }
+    inline const QVector3D &position() const { return m_position; }
+    inline void setPosition(const QVector3D &pos) { m_position = pos; }
 
-    //    inline void setSize(qreal size);
-    //    inline qreal size() const { return m_size; }
+    //inline void setSize(qreal size);
+    //inline qreal size() const { return m_size; }
 
     // TODO should be in abstract, but currently there is no abstract renderer
     // TODO change when maps refactored
@@ -78,8 +78,8 @@ protected:
     virtual void formatLabel();
 
     Scatter3DRenderer *m_renderer;
-    QPointF m_scatterPosition;
-    //    qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
+    QVector3D m_position;
+    //qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
     friend class QScatterDataItem;
 };

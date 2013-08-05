@@ -54,11 +54,10 @@
 
 #include "datavis3dglobal_p.h"
 #include "qscatterdataitem.h"
-#include "qbardataitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QScatterDataItemPrivate : public QBarDataItemPrivate
+class QScatterDataItemPrivate
 {
 public:
     QScatterDataItemPrivate();

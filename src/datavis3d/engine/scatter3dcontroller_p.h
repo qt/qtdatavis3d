@@ -86,19 +86,11 @@ public:
 private:
     bool m_isInitialized;
 
-    // Data
-    int m_rowCount;
-    int m_columnCount;
-
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
     SelectionMode m_selectionMode;
     bool m_isSlicingActivated;
-
-    bool m_isBarSpecRelative;
-    QSizeF m_barThickness;
-    QSizeF m_barSpacing;
 
     // Look'n'Feel
     QString m_objFile;
@@ -120,26 +112,14 @@ public:
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
 
-    int columnCount();
-    int rowCount();
-
     MouseState mouseState();
     QPoint mousePosition();
 
     bool isSlicingActive();
     void setSlicingActive(bool isSlicing);
 
-    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
-
-    // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
-    // y -component sets the thickness/spacing of z -direction
-    // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                     QSizeF spacing = QSizeF(1.0f, 1.0f),
-                     bool relative = true);
-    QSizeF barThickness();
-    QSizeF barSpacing();
-    bool isBarSpecRelative();
+    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight,
+                                   bool showUnder = false);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(BarStyle style, bool smooth = false);
@@ -147,9 +127,6 @@ public:
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
-
-    // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn);
 
     // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
@@ -205,8 +182,6 @@ signals:
     void selectionModeChanged(SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
     void limitsChanged(QPair<GLfloat, GLfloat> limits);
-    void sampleSpaceChanged(int samplesRow, int samplesColumn);
-    void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
     void fontChanged(QFont font);
     void gridEnabledChanged(bool enable);

@@ -203,24 +203,6 @@ void Q3DScatter::setHeight(const int height)
 }
 
 /*!
- * \a thickness Thickness of a bar in x and z axes.
- *
- * \a spacing Spacing between bars in x and z axes. If relative -flag is true, value of 0.0f
- * means the bars are side-to-side and for example 1.0f means there is one thickness in between the
- * bars.
- *
- * \a relative A flag to indicate if spacing is meant to be absolute or relative. \c true by
- * default.
- *
- * Sets bar specifications. Bar thickness is relative, as scene is automatically scaled to fit into
- * the view.
- */
-void Q3DScatter::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
-{
-    d_ptr->m_shared->setBarSpecs(thickness, spacing, relative);
-}
-
-/*!
  * \a style One of the values in \c BarStyle. \c Bars by default.
  *
  * \a smooth A flag to set shading to smooth. \c false by default.
@@ -232,21 +214,6 @@ void Q3DScatter::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 void Q3DScatter::setBarType(BarStyle style, bool smooth)
 {
     d_ptr->m_shared->setBarType(style, smooth);
-}
-
-/*!
- * \a samplesRow How many rows of data there will be.
- *
- * \a samplesColumn How many items there are per row.
- *
- * Set up sample space. This must be called to initialize the sample space before adding data to the
- * Q3DScatter.
- *
- * \sa addDataRow(), addDataSet()
- */
-void Q3DScatter::setupSampleSpace(int samplesRow, int samplesColumn)
-{
-    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
 }
 
 /*!

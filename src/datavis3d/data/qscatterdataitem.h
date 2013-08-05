@@ -43,14 +43,13 @@
 #define QSCATTERDATAITEM_H
 
 #include "qdatavis3dnamespace.h"
-#include "qbardataitem.h"
-#include <QPointF>
+#include <QVector3D>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QScatterDataItemPrivate;
 
-class QT_DATAVIS3D_EXPORT QScatterDataItem : public QBarDataItem
+class QT_DATAVIS3D_EXPORT QScatterDataItem
 {
 public:
     QScatterDataItem();
@@ -59,11 +58,11 @@ public:
 
     QScatterDataItem &operator=(const QScatterDataItem &other);
 
-    void setScatterPosition(const QPointF &position);
-    const QPointF &scatterPosition() const;
+    void setPosition(const QVector3D &position);
+    const QVector3D &position() const;
 
-    //    void setSize(qreal size);
-    //    qreal size() const;
+    //void setSize(qreal size);
+    //qreal size() const;
 
 protected:
     virtual void createExtraData();
@@ -71,8 +70,8 @@ protected:
     QScatterDataItemPrivate *d_ptr;
 
 private:
-    QPointF m_scatterPosition;
-    //    qreal m_size;
+    QVector3D m_position;
+    //qreal m_size;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
