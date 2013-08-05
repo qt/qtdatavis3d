@@ -78,9 +78,8 @@ const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
-    : QObject(controller),
+    : Abstract3DRenderer(controller),
       m_controller(controller),
-      m_hasNegativeValues(false),
       m_selectedBar(0),
       m_previouslySelectedBar(0),
       m_sliceSelection(0),

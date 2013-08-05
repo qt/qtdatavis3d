@@ -62,6 +62,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
+#include "abstract3drenderer_p.h"
 #include "qbardataproxy.h"
 #include "barrenderitem_p.h"
 
@@ -82,15 +83,12 @@ class LabelItem;
 class CameraHelper;
 class QAbstractAxisPrivate;
 
-class QT_DATAVIS3D_EXPORT Bars3dRenderer : public QObject, protected QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Bars3dRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
 private:
     // TODO: Filter to the set of attributes to be moved to the model object.
-    // * All GL rendering only related attribs should be moved out of this public set.
-    // * All attribs that are modifiable from QML need to e in this set.
-
     Bars3dController *m_controller;
 
     // Mutex for sharing resources between render and main threads.
@@ -114,7 +112,6 @@ private:
     ShadowQuality m_cachedShadowQuality;
 
     // Internal state
-    bool m_hasNegativeValues;
     BarRenderItem *m_selectedBar; // points to renderitem array
     BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QList<BarRenderItem *> *m_sliceSelection;
