@@ -209,8 +209,7 @@ void Bars3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePo
 #if !defined(Q_OS_ANDROID)
             m_mouseState = Bars3dController::MouseOnScene;
 #else
-            if (!m_isSlicingActivated)
-                m_mouseState = Bars3dController::MouseRotating;
+            m_mouseState = Bars3dController::MouseRotating;
 #endif
             // update mouse positions to prevent jumping when releasing or repressing a button
             m_mousePos = event->pos();
