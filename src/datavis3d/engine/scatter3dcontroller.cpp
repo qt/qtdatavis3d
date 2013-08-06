@@ -146,7 +146,6 @@ Scatter3DController::MouseState Scatter3DController::mouseState()
     return m_mouseState;
 }
 
-
 #if defined(Q_OS_ANDROID)
 void Scatter3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {

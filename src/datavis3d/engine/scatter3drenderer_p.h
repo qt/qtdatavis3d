@@ -97,13 +97,9 @@ private:
     QMutex m_mutex;
 
     // Cached state based on emitted signals from the controller
-    QSizeF m_cachedBarThickness;
-    QSizeF m_cachedBarSpacing;
     QString m_cachedObjFile;
     SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
-    int m_cachedRowCount;
-    int m_cachedColumnCount;
     QRect m_cachedBoundingRect;
     Theme m_cachedTheme;
     LabelTransparency m_cachedLabelTransparency;
@@ -113,7 +109,6 @@ private:
     ShadowQuality m_cachedShadowQuality;
 
     // Internal state
-    bool m_hasNegativeValues;
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
     GLint m_tickCount;
@@ -122,12 +117,12 @@ private:
     bool m_zFlipped;
     QRect m_mainViewPort;
     bool m_updateLabels;
-    ShaderHelper *m_barShader;
+    ShaderHelper *m_dotShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
+    ObjectHelper *m_dotObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -143,13 +138,7 @@ private:
     GLfloat m_autoScaleAdjustment;
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
-    GLfloat m_rowWidth;
-    GLfloat m_columnDepth;
-    GLfloat m_maxDimension;
-    GLfloat m_scaleX;
-    GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
-    GLfloat m_maxSceneSize;
     QVector3D m_selection;
     QSizeF m_areaSize;
 
@@ -228,7 +217,6 @@ private:
     void calculateTranslation(ScatterRenderItem &item);
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     Scatter3DController::SelectionType isSelected(GLint bar, const QVector3D &selection);
-
 
     Q_DISABLE_COPY(Scatter3DRenderer)
 

@@ -82,7 +82,6 @@ static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection tex
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : QObject(controller),
       m_controller(controller),
-      m_hasNegativeValues(false),
       m_selectedItem(0),
       m_previouslySelectedItem(0),
       m_tickCount(5),
@@ -90,12 +89,12 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_xFlipped(false),
       m_zFlipped(false),
       m_updateLabels(false),
-      m_barShader(0),
+      m_dotShader(0),
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
-      m_barObj(0),
+      m_dotObj(0),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -110,13 +109,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_autoScaleAdjustment(1.0f),
       m_heightNormalizer(1.0f),
       m_yAdjustment(0.0f),
-      m_rowWidth(0),
-      m_columnDepth(0),
-      m_maxDimension(0),
-      m_scaleX(0),
-      m_scaleZ(0),
       m_scaleFactor(0),
-      m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
       m_areaSize(QSizeF(2.0f, 2.0f)),
       m_hasHeightAdjustmentChanged(true),
@@ -197,11 +190,11 @@ Scatter3DRenderer::~Scatter3DRenderer()
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
-    delete m_barShader;
+    delete m_dotShader;
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_barObj;
+    delete m_dotObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
     delete m_textureHelper;
@@ -401,13 +394,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_xFlipped = true;
 
     // Calculate background rotation
-    if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
+    if (!m_zFlipped && !m_xFlipped)
         backgroundRotation = 270.0f;
-    else if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() > 0)
+    else if (!m_zFlipped && m_xFlipped)
         backgroundRotation = 180.0f;
-    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() > 0)
+    else if (m_zFlipped && m_xFlipped)
         backgroundRotation = 90.0f;
-    else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() <= 0)
+    else if (m_zFlipped && !m_xFlipped)
         backgroundRotation = 0.0f;
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
@@ -526,14 +519,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(m_depthShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, m_barObj->vertexBuf());
+            glBindBuffer(GL_ARRAY_BUFFER, m_dotObj->vertexBuf());
             glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
             // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_barObj->elementBuf());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_dotObj->elementBuf());
 
             // Draw the triangles
-            glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+            glDrawElements(GL_TRIANGLES, m_dotObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
 
             // Free buffers
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -631,14 +624,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, m_barObj->vertexBuf());
+            glBindBuffer(GL_ARRAY_BUFFER, m_dotObj->vertexBuf());
             glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
             // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_barObj->elementBuf());
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_dotObj->elementBuf());
 
             // Draw the triangles
-            glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+            glDrawElements(GL_TRIANGLES, m_dotObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
 
             // Free buffers
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -687,7 +680,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
 
     // Bind bar shader
-    m_barShader->bind();
+    m_dotShader->bind();
 
     // Enable texture
     glEnable(GL_TEXTURE_2D);
@@ -760,37 +753,37 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Set shader bindings
-        m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-        m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-        m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-        m_barShader->setUniformValue(m_barShader->nModel(),
+        m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
+        m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
+        m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
+        m_dotShader->setUniformValue(m_dotShader->nModel(),
                                      itModelMatrix.inverted().transposed());
-        m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-        m_barShader->setUniformValue(m_barShader->color(), barColor);
-        m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+        m_dotShader->setUniformValue(m_dotShader->color(), barColor);
+        m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > ShadowNone) {
             // Set shadow shader bindings
-            m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-            m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-            m_barShader->setUniformValue(m_barShader->lightS(), lightStrength / 10.0f);
+            m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
+            m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
+            m_dotShader->setUniformValue(m_dotShader->lightS(), lightStrength / 10.0f);
 
             // Draw the object
-            m_drawer->drawObject(m_barShader, m_barObj, 0, m_depthTexture);
+            m_drawer->drawObject(m_dotShader, m_dotObj, 0, m_depthTexture);
         } else
 #endif
         {
             // Set shadowless shader bindings
-            m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
+            m_dotShader->setUniformValue(m_dotShader->lightS(), lightStrength);
 
             // Draw the object
-            m_drawer->drawObject(m_barShader, m_barObj);
+            m_drawer->drawObject(m_dotShader, m_dotObj);
         }
     }
 
     // Release bar shader
-    m_barShader->release();
+    m_dotShader->release();
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -870,14 +863,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         // Bind bar shader
-        m_barShader->bind();
+        m_dotShader->bind();
 
         // Set unchanging shader bindings
         QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
-        m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-        m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-        m_barShader->setUniformValue(m_barShader->color(), barColor);
-        m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
+        m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
+        m_dotShader->setUniformValue(m_dotShader->color(), barColor);
+        m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
         GLfloat lineStep = m_tickStep * 2.0f; // TODO: For now, multiply by two to keep the tick count correct (as we start from negative)
@@ -906,29 +899,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
+            m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
+            m_dotShader->setUniformValue(m_dotShader->nModel(),
                                          itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
+                m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
+                m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
+                m_dotShader->setUniformValue(m_dotShader->lightS(),
                                              m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj);
             }
         }
 
@@ -956,29 +949,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
+            m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
+            m_dotShader->setUniformValue(m_dotShader->nModel(),
                                          itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
+                m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
+                m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
+                m_dotShader->setUniformValue(m_dotShader->lightS(),
                                              m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj);
             }
         }
 
@@ -1011,29 +1004,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
+            m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
+            m_dotShader->setUniformValue(m_dotShader->nModel(),
                                          itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
+                m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
+                m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
+                m_dotShader->setUniformValue(m_dotShader->lightS(),
                                              m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj);
             }
         }
 
@@ -1066,34 +1059,34 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
+            m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
+            m_dotShader->setUniformValue(m_dotShader->nModel(),
                                          itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
+                m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
+                m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
+                m_dotShader->setUniformValue(m_dotShader->lightS(),
                                              m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(m_dotShader, m_gridLineObj);
             }
         }
 
         // Release bar shader
-        m_barShader->release();
+        m_dotShader->release();
     }
 
     // Handle selection clearing and selection label drawing
@@ -1502,13 +1495,13 @@ void Scatter3DRenderer::loadBarMesh()
 {
     //qDebug() << __FUNCTION__;
     QString objectFileName = m_cachedObjFile;
-    if (m_barObj)
-        delete m_barObj;
+    if (m_dotObj)
+        delete m_dotObj;
     // If background is disabled, load full version of bar mesh
     //    if (!m_cachedIsBackgroundEnabled)
     //        objectFileName.append(QStringLiteral("Full"));
-    m_barObj = new ObjectHelper(objectFileName);
-    m_barObj->load();
+    m_dotObj = new ObjectHelper(objectFileName);
+    m_dotObj->load();
 }
 
 void Scatter3DRenderer::loadBackgroundMesh()
@@ -1650,10 +1643,10 @@ QRect Scatter3DRenderer::mainViewPort()
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     //qDebug() << __FUNCTION__;
-    if (m_barShader)
-        delete m_barShader;
-    m_barShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_barShader->initialize();
+    if (m_dotShader)
+        delete m_dotShader;
+    m_dotShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_dotShader->initialize();
 }
 
 void Scatter3DRenderer::initSelectionShader()
