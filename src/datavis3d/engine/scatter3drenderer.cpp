@@ -45,11 +45,7 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
-#include "theme_p.h"
 #include "utils_p.h"
-#include "drawer_p.h"
-#include "qabstractaxis_p.h"
-#include "qbardataitem.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -80,7 +76,7 @@ const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
-    : QObject(controller),
+    : Abstract3DRenderer(controller),
       m_controller(controller),
       m_selectedItem(0),
       m_previouslySelectedItem(0),
@@ -98,7 +94,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
-      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),
@@ -106,7 +101,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
-      m_autoScaleAdjustment(1.0f),
       m_heightNormalizer(1.0f),
       m_yAdjustment(0.0f),
       m_scaleFactor(0),
@@ -122,64 +116,9 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 {
     //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);
-
-    // Listen to changes in the drawer
-    QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Scatter3DRenderer::updateTextures);
-
-    // Listen to changes in the controller
-    QObject::connect(m_controller, &Scatter3DController::themeChanged, this,
-                     &Scatter3DRenderer::updateTheme);
-    QObject::connect(m_controller, &Scatter3DController::selectionModeChanged, this,
-                     &Scatter3DRenderer::updateSelectionMode);
-    //QObject::connect(m_controller, &Scatter3DController::limitsChanged, this,
-    //                 &Scatter3DRenderer::updateLimits);
-    QObject::connect(m_controller, &Scatter3DController::objFileChanged, this,
-                     &Scatter3DRenderer::updateMeshFileName);
-    QObject::connect(m_controller, &Scatter3DController::boundingRectChanged, this,
-                     &Scatter3DRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Scatter3DController::sizeChanged, this,
-                     &Scatter3DRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Scatter3DController::positionChanged, this,
-                     &Scatter3DRenderer::updatePosition);
-    QObject::connect(m_controller, &Scatter3DController::fontChanged, this,
-                     &Scatter3DRenderer::updateFont);
-    QObject::connect(m_controller, &Scatter3DController::labelTransparencyUpdated, this,
-                     &Scatter3DRenderer::updateLabelTransparency);
-    QObject::connect(m_controller, &Scatter3DController::gridEnabledChanged, this,
-                     &Scatter3DRenderer::updateGridEnabled);
-    QObject::connect(m_controller, &Scatter3DController::backgroundEnabledChanged, this,
-                     &Scatter3DRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Scatter3DController::shadowQualityChanged, this,
-                     &Scatter3DRenderer::updateShadowQuality);
-    QObject::connect(m_controller, &Scatter3DController::tickCountChanged, this,
-                     &Scatter3DRenderer::updateTickCount);
-    QObject::connect(m_controller, &Scatter3DController::zoomLevelChanged, this,
-                     &Scatter3DRenderer::updateZoomLevel);
-
-    updateTheme(m_controller->theme());
-    updateSelectionMode(m_controller->selectionMode());
-    //updateLimits(m_controller->limits());
-    updateZoomLevel(m_controller->zoomLevel());
-    updateMeshFileName(m_controller->objFile());
-    updateFont(m_controller->font());
-    updateLabelTransparency(m_controller->labelTransparency());
-    updateGridEnabled(m_controller->gridEnabled());
-    updateBackgroundEnabled(m_controller->backgroundEnabled());
-
+    initializePreOpenGL();
+    initializeOpenGLFunctions();
     initializeOpenGL();
-
-    updateBoundingRect(m_controller->boundingRect());
-    updateShadowQuality(m_controller->shadowQuality());
-
-    calculateSceneScalingFactors();
-
-    // TODO: Protect with mutex or redesign how axes create label items?
-    if (m_controller->axisX())
-        m_controller->axisX()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisY())
-        m_controller->axisY()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisZ())
-        m_controller->axisZ()->d_ptr->setDrawer(m_drawer);
 }
 
 Scatter3DRenderer::~Scatter3DRenderer()
@@ -198,51 +137,49 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_backgroundObj;
     delete m_gridLineObj;
     delete m_textureHelper;
-    delete m_drawer;
 }
+
+void Scatter3DRenderer::initializePreOpenGL()
+{
+    Abstract3DRenderer::initializePreOpenGL();
+
+    QObject::connect(m_controller, &Scatter3DController::selectionModeChanged, this,
+                     &Scatter3DRenderer::updateSelectionMode);
+    //QObject::connect(m_controller, &Scatter3DController::limitsChanged, this,
+    //                 &Scatter3DRenderer::updateLimits);
+    QObject::connect(m_controller, &Scatter3DController::objFileChanged, this,
+                     &Scatter3DRenderer::updateMeshFileName);
+    QObject::connect(m_controller, &Scatter3DController::positionChanged, this,
+                     &Scatter3DRenderer::updatePosition);
+    QObject::connect(m_controller, &Scatter3DController::gridEnabledChanged, this,
+                     &Scatter3DRenderer::updateGridEnabled);
+    QObject::connect(m_controller, &Scatter3DController::backgroundEnabledChanged, this,
+                     &Scatter3DRenderer::updateBackgroundEnabled);
+    QObject::connect(m_controller, &Scatter3DController::tickCountChanged, this,
+                     &Scatter3DRenderer::updateTickCount);
+    QObject::connect(m_controller, &Scatter3DController::zoomLevelChanged, this,
+                     &Scatter3DRenderer::updateZoomLevel);
+
+    // TODO Should all this initial setup be mutexed?
+    updateSelectionMode(m_controller->selectionMode());
+    //updateLimits(m_controller->limits());
+    updateZoomLevel(m_controller->zoomLevel());
+    updateMeshFileName(m_controller->objFile());
+    updateGridEnabled(m_controller->gridEnabled());
+    updateBackgroundEnabled(m_controller->backgroundEnabled());
+
+    calculateSceneScalingFactors();
+}
+
 
 void Scatter3DRenderer::initializeOpenGL()
 {
     //qDebug() << __FUNCTION__;
-    initializeOpenGLFunctions();
-
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
     // Initialize shaders
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                              QStringLiteral(":/shaders/fragmentShadowNoTex"));
-    } else {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                              QStringLiteral(":/shaders/fragment"));
-    }
-#else
-    if (!m_cachedTheme.m_uniformColor) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
-    initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
-                          QStringLiteral(":/shaders/fragmentES2"));
-#endif
+    handleShadowQualityChange();
 
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
@@ -286,19 +223,15 @@ void Scatter3DRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+
+    Abstract3DRenderer::initializeOpenGL();
 }
 
 void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
                                bool valuesDirty,
                                CameraHelper *camera,
-                               const LabelItem &xLabel,
-                               const LabelItem &yLabel,
-                               const LabelItem &zLabel,
                                const GLuint defaultFboHandle)
 {
-    Q_UNUSED(xLabel);
-    Q_UNUSED(yLabel);
-    Q_UNUSED(zLabel);
     //qDebug() << __FUNCTION__;
 
 #ifdef DISPLAY_RENDER_SPEED
@@ -1160,7 +1093,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     GLfloat startPos = -m_heightNormalizer;
     int labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
-        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+        if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
             GLfloat rotLabelX = -90.0f;
@@ -1181,7 +1114,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             // TODO: Try it; draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem =
-                    *m_controller->axisZ()->d_ptr->labelItems().at(labelNbr);
+                    *m_axisCacheZ.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1195,7 +1128,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     // X Labels
     labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
-        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+        if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
             GLfloat rotLabelX = -90.0f;
@@ -1216,7 +1149,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             // TODO: Try it; draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem =
-                    *m_controller->axisX()->d_ptr->labelItems().at(labelNbr);
+                    *m_axisCacheX.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1231,7 +1164,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
         // TODO: Test with x labels
-        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+        if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
@@ -1251,7 +1184,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             }
 
             // TODO: Test with x labels
-            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(labelNbr);
+            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
 
             // Back wall
             QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, labelZTrans + zComp);
@@ -1337,60 +1270,10 @@ void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
     loadBarMesh();
 }
 
-void Scatter3DRenderer::updateTheme(Theme theme)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedTheme.setFromTheme(theme);
-
-    m_drawer->setTheme(m_cachedTheme);
-    // Re-initialize shaders
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
-    } else {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
-    }
-#else
-    if (!m_cachedTheme.m_uniformColor) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
-#endif
-}
-
 void Scatter3DRenderer::updateSelectionMode(SelectionMode mode)
 {
     //qDebug() << __FUNCTION__;
     m_cachedSelectionMode = mode;
-}
-
-void Scatter3DRenderer::updateFont(const QFont &font)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedFont = font;
-    m_drawer->setFont(font);
-}
-
-void Scatter3DRenderer::updateLabelTransparency(LabelTransparency transparency)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedLabelTransparency = transparency;
-    m_drawer->setTransparency(transparency);
 }
 
 void Scatter3DRenderer::updateGridEnabled(bool enable)
@@ -1476,19 +1359,6 @@ void Scatter3DRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat m
         calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
         m_valueUpdateNeeded = true;
     }
-}
-
-void Scatter3DRenderer::updateBoundingRect(const QRect boundingRect)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedBoundingRect = boundingRect;
-    handleResize();
-}
-
-void Scatter3DRenderer::updatePosition(const QRect boundingRect)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedBoundingRect = boundingRect;
 }
 
 void Scatter3DRenderer::loadBarMesh()

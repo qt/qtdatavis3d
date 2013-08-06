@@ -164,9 +164,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
-    // TODO: abstract renderer should have accessor for Drawer instead
-    virtual Drawer *drawer();
-
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy();

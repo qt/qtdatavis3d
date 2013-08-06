@@ -48,7 +48,6 @@
 #include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
-#include "qabstractaxis_p.h"
 #include "qbardataitem.h"
 
 #include <QMatrix4x4>
@@ -83,7 +82,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_selectedBar(0),
       m_previouslySelectedBar(0),
       m_sliceSelection(0),
-      m_sliceAxisP(0),
+      m_sliceCache(0),
       m_sliceTitleItem(0),
       m_tickCount(0),
       m_tickStep(0),
@@ -181,6 +180,7 @@ void Bars3dRenderer::initializePreOpenGL()
     QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
                      &Bars3dRenderer::updateZoomLevel);
 
+    // TODO Should all this initial setup be mutexed?
     updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
     updateSelectionMode(m_controller->selectionMode());
     updateSlicingActive(m_controller->isSlicingActive());
@@ -195,14 +195,6 @@ void Bars3dRenderer::initializePreOpenGL()
 
 void Bars3dRenderer::initializeOpenGL()
 {
-    // TODO: Protect with mutex or redesign how axes create label items?
-    if (m_controller->axisX())
-        m_controller->axisX()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisY())
-        m_controller->axisY()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisZ())
-        m_controller->axisZ()->d_ptr->setDrawer(m_drawer);
-
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
@@ -257,9 +249,6 @@ void Bars3dRenderer::initializeOpenGL()
 void Bars3dRenderer::render(QBarDataProxy *dataProxy,
                             bool valuesDirty,
                             CameraHelper *camera,
-                            const LabelItem &xLabel,
-                            const LabelItem &yLabel,
-                            const LabelItem &zLabel,
                             const GLuint defaultFboHandle)
 {
 #ifdef DISPLAY_RENDER_SPEED
@@ -326,7 +315,7 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
 
     // If slice selection is on, draw the sliced scene
     if (m_cachedIsSlicingActivated)
-        drawSlicedScene(camera, xLabel, yLabel, zLabel);
+        drawSlicedScene(camera, m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
 
     // Draw bars scene
     drawScene(camera, defaultFboHandle);
@@ -500,15 +489,14 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                             m_labelObj, camera);
 
         // Draw labels
-        // TODO: Protect with mutex or redesign axis label handling?
-        if (m_sliceAxisP->labelItems().size() > col) {
+        if (m_sliceCache->labelItems().size() > col) {
             const LabelItem *labelItem(0);
             // If draw order of bars is flipped, label draw order should be too
             if (m_xFlipped) {
-                labelItem = m_sliceAxisP->labelItems().at(
-                            m_sliceAxisP->labelItems().size() - col - 1);
+                labelItem = m_sliceCache->labelItems().at(
+                            m_sliceCache->labelItems().size() - col - 1);
             } else {
-                labelItem = m_sliceAxisP->labelItems().at(col);
+                labelItem = m_sliceCache->labelItems().at(col);
             }
             m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -843,7 +831,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
     // Draw bars
     if (!m_cachedIsSlicingActivated && m_sliceSelection) {
         m_sliceSelection->clear(); // Slice doesn't own its items
-        m_sliceAxisP = 0;
+        m_sliceCache = 0;
         m_sliceTitleItem = 0;
     }
     bool barSelectionFound = false;
@@ -914,11 +902,11 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     if (!m_cachedIsSlicingActivated && ModeZoomRow == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->append(&item);
-                        if (!m_sliceAxisP) {
-                            // m_sliceAxisP is the axis for labels, while title comes from different axis.
-                            m_sliceAxisP = m_controller->axisZ()->d_ptr.data();
-                            if (m_controller->axisX()->d_ptr->labelItems().size() > row)
-                                m_sliceTitleItem = m_controller->axisX()->d_ptr->labelItems().at(row);
+                        if (!m_sliceCache) {
+                            // m_sliceCache is the axis for labels, while title comes from different axis.
+                            m_sliceCache = &m_axisCacheZ;
+                            if (m_axisCacheX.labelItems().size() > row)
+                                m_sliceTitleItem = m_axisCacheX.labelItems().at(row);
                         }
                     }
                     break;
@@ -930,11 +918,11 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     if (!m_cachedIsSlicingActivated && ModeZoomColumn == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->append(&item);
-                        if (!m_sliceAxisP) {
-                            // m_sliceAxisP is the axis for labels, while title comes from different axis.
-                            m_sliceAxisP = m_controller->axisX()->d_ptr.data();
-                            if (m_controller->axisZ()->d_ptr->labelItems().size() > bar)
-                                m_sliceTitleItem = m_controller->axisZ()->d_ptr->labelItems().at(bar);
+                        if (!m_sliceCache) {
+                            // m_sliceCache is the axis for labels, while title comes from different axis.
+                            m_sliceCache = &m_axisCacheX;
+                            if (m_axisCacheZ.labelItems().size() > bar)
+                                m_sliceTitleItem = m_axisCacheZ.labelItems().at(bar);
                         }
                     }
                     break;
@@ -1344,12 +1332,12 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         LabelItem &labelItem = m_selectedBar->selectionLabel();
         if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
             QString labelText = m_selectedBar->label();
-            if ((m_controller->axisZ()->labels().size() > m_selectedBar->position().y())
-                    && (m_controller->axisX()->labels().size() > m_selectedBar->position().x())) {
+            if ((m_axisCacheZ.labels().size() > m_selectedBar->position().y())
+                    && (m_axisCacheX.labels().size() > m_selectedBar->position().x())) {
                 labelText.append(QStringLiteral(" ("));
-                labelText.append(m_controller->axisX()->labels().at(m_selectedBar->position().x()));
+                labelText.append(m_axisCacheX.labels().at(m_selectedBar->position().x()));
                 labelText.append(QStringLiteral(", "));
-                labelText.append(m_controller->axisZ()->labels().at(m_selectedBar->position().y()));
+                labelText.append(m_axisCacheZ.labels().at(m_selectedBar->position().y()));
                 labelText.append(QStringLiteral(")"));
                 //qDebug() << labelText;
             }
@@ -1385,9 +1373,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
+    // Calculate the positions for row and column labels and store them
     for (int row = 0; row != m_cachedRowCount; row++) {
-        if (m_controller->axisX()->d_ptr->labelItems().size() > row) {
+        if (m_axisCacheX.labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             rowPos = (row + 1) * (m_cachedBarSpacing.height());
@@ -1416,7 +1404,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             // TODO: Try it; draw the label here
 
             m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(row);
+            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(row);
             //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
@@ -1429,7 +1417,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     }
     for (int bar = 0; bar != m_cachedColumnCount; bar += 1) {
-        if (m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
+        if (m_axisCacheZ.labelItems().size() > bar) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             barPos = (bar + 1) * (m_cachedBarSpacing.width());
@@ -1458,7 +1446,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             // TODO: Try it; draw the label here
 
             m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(bar);
+            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(bar);
             //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
@@ -1534,7 +1522,7 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
     m_valueUpdateNeeded = true;
 
     // Force update for selection related items
-    m_sliceAxisP = 0;
+    m_sliceCache = 0;
     m_sliceTitleItem = 0;
     if (m_sliceSelection)
         m_sliceSelection->clear();

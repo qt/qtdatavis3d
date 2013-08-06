@@ -63,10 +63,14 @@ class QValueAxisPrivate : public QAbstractAxisPrivate
 
 public:
     QValueAxisPrivate(QValueAxis *q);
-    ~QValueAxisPrivate();
+    virtual ~QValueAxisPrivate();
 
 protected:
-    void updateLabels();
+    qreal m_min;
+    qreal m_max;
+
+private:
+    friend class QValueAxis;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

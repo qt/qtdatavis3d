@@ -55,8 +55,18 @@ public:
     explicit QValueAxis();
     ~QValueAxis();
 
+    void setRange(qreal min, qreal max);
+    void setMin(qreal min);
+    void setMax (qreal max);
+    qreal min() const;
+    qreal max() const;
+
+signals:
+    void rangeChanged(qreal min, qreal max);
+
 protected:
     QValueAxisPrivate *dptr();
+    const QValueAxisPrivate *dptrc() const;
 
 private:
     Q_DISABLE_COPY(QValueAxis)

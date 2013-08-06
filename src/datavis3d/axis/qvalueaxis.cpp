@@ -53,23 +53,66 @@ QValueAxis::~QValueAxis()
 {
 }
 
+void QValueAxis::setRange(qreal min, qreal max)
+{
+    bool dirty = false;
+    if (dptr()->m_min != min) {
+        dptr()->m_min = min;
+        dirty = true;
+    }
+    if (dptr()->m_max != max) {
+        dptr()->m_max = max;
+        dirty = true;
+    }
+    if (dirty)
+        emit rangeChanged(min, max);
+}
+
+void QValueAxis::setMin(qreal min)
+{
+    if (dptr()->m_min != min) {
+        dptr()->m_min = min;
+        emit rangeChanged(min, dptr()->m_max);
+    }
+}
+
+void QValueAxis::setMax(qreal max)
+{
+    if (dptr()->m_max != max) {
+        dptr()->m_max = max;
+        emit rangeChanged(dptr()->m_min, max);
+    }
+}
+
+qreal QValueAxis::min() const
+{
+    return dptrc()->m_min;
+}
+
+qreal QValueAxis::max() const
+{
+    return dptrc()->m_max;
+}
+
 QValueAxisPrivate *QValueAxis::dptr()
 {
     return static_cast<QValueAxisPrivate *>(d_ptr.data());
 }
 
+const QValueAxisPrivate *QValueAxis::dptrc() const
+{
+    return static_cast<const QValueAxisPrivate *>(d_ptr.data());
+}
+
 QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
-    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue)
+    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue),
+      m_min(0.0),
+      m_max(0.0)
 {
 }
 
 QValueAxisPrivate::~QValueAxisPrivate()
 {
-}
-
-void QValueAxisPrivate::updateLabels()
-{
-    // TODO
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -57,7 +57,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "abstract3dcontroller_p.h"
-
+#include "axisrendercache_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -74,6 +74,10 @@ protected:
     LabelTransparency m_cachedLabelTransparency;
     Drawer *m_drawer;
     GLfloat m_autoScaleAdjustment;
+
+    AxisRenderCache m_axisCacheX;
+    AxisRenderCache m_axisCacheY;
+    AxisRenderCache m_axisCacheZ;
 
     Abstract3DRenderer(Abstract3DController *controller);
     virtual void initializePreOpenGL();
@@ -96,7 +100,13 @@ protected:
     virtual void updateShadowQuality(ShadowQuality quality)=0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader)=0;
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader)=0;
+    virtual void updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
+    virtual void updateAxisTitle(QAbstractAxis::AxisOrientation orientation, const QString &title);
+    virtual void updateAxisLabels(QAbstractAxis::AxisOrientation orientation, const QStringList &labels);
+    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
+    void initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis);
+    AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

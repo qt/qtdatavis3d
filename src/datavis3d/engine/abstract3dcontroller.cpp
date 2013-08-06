@@ -41,6 +41,7 @@
 #include "abstract3dcontroller_p.h"
 #include "camerahelper_p.h"
 #include "qabstractaxis_p.h"
+#include "qvalueaxis.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -143,14 +144,7 @@ int Abstract3DController::y()
 
 void Abstract3DController::setAxisX(QAbstractAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    delete m_axisX;
-    m_axisX = axis;
-    m_axisX->d_ptr->setOrientation(QAbstractAxis::AxisOrientationX);
-    m_axisX->d_ptr->setDrawer(drawer());
-
-    emit axisChanged(QAbstractAxis::AxisOrientationX, m_axisX);
+    setAxisHelper(QAbstractAxis::AxisOrientationX, axis, &m_axisX);
 }
 
 QAbstractAxis *Abstract3DController::axisX()
@@ -160,14 +154,7 @@ QAbstractAxis *Abstract3DController::axisX()
 
 void Abstract3DController::setAxisY(QAbstractAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    delete m_axisY;
-    m_axisY = axis;
-    m_axisY->d_ptr->setOrientation(QAbstractAxis::AxisOrientationY);
-    m_axisY->d_ptr->setDrawer(drawer());
-
-    emit axisChanged(QAbstractAxis::AxisOrientationY, m_axisY);
+    setAxisHelper(QAbstractAxis::AxisOrientationY, axis, &m_axisY);
 }
 
 QAbstractAxis *Abstract3DController::axisY()
@@ -177,14 +164,7 @@ QAbstractAxis *Abstract3DController::axisY()
 
 void Abstract3DController::setAxisZ(QAbstractAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    delete m_axisZ;
-    m_axisZ = axis;
-    m_axisZ->d_ptr->setOrientation(QAbstractAxis::AxisOrientationZ);
-    m_axisZ->d_ptr->setDrawer(drawer());
-
-    emit axisChanged(QAbstractAxis::AxisOrientationZ, m_axisZ);
+    setAxisHelper(QAbstractAxis::AxisOrientationZ, axis, &m_axisZ);
 }
 
 QAbstractAxis *Abstract3DController::axisZ()
@@ -284,6 +264,69 @@ void Abstract3DController::setLabelTransparency(LabelTransparency transparency)
 LabelTransparency Abstract3DController::labelTransparency()
 {
     return m_labelTransparency;
+}
+
+void Abstract3DController::handleAxisTitleChanged(const QString &title)
+{
+    if (sender() == m_axisX)
+        emit axisTitleChanged(QAbstractAxis::AxisOrientationX, title);
+    else if (sender() == m_axisY)
+        emit axisTitleChanged(QAbstractAxis::AxisOrientationY, title);
+    else if (sender() == m_axisZ)
+        emit axisTitleChanged(QAbstractAxis::AxisOrientationZ, title);
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+}
+
+void Abstract3DController::handleAxisLabelsChanged()
+{
+    if (sender() == m_axisX)
+        emit axisLabelsChanged(QAbstractAxis::AxisOrientationX, m_axisX->labels());
+    else if (sender() == m_axisY)
+        emit axisLabelsChanged(QAbstractAxis::AxisOrientationY, m_axisY->labels());
+    else if (sender() == m_axisZ)
+        emit axisLabelsChanged(QAbstractAxis::AxisOrientationZ, m_axisZ->labels());
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+}
+
+void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
+{
+    if (sender() == m_axisX)
+        emit axisRangeChanged(QAbstractAxis::AxisOrientationX, min, max);
+    else if (sender() == m_axisY)
+        emit axisRangeChanged(QAbstractAxis::AxisOrientationY, min, max);
+    else if (sender() == m_axisZ)
+        emit axisRangeChanged(QAbstractAxis::AxisOrientationZ, min, max);
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+}
+
+void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientation,
+                                         QAbstractAxis *axis, QAbstractAxis **axisPtr)
+{
+    Q_ASSERT(axis);
+
+    delete *axisPtr;
+    *axisPtr = axis;
+    axis->d_ptr->setOrientation(orientation);
+
+    QObject::connect(axis, &QAbstractAxis::titleChanged,
+                     this, &Abstract3DController::handleAxisTitleChanged);
+    QObject::connect(axis, &QAbstractAxis::labelsChanged,
+                     this, &Abstract3DController::handleAxisLabelsChanged);
+
+    emit axisTypeChanged(orientation, axis->type());
+    emit axisTitleChanged(orientation, axis->title());
+    emit axisLabelsChanged(orientation, axis->labels());
+
+    if (axis->type() & QAbstractAxis::AxisTypeValue) {
+        QValueAxis *valueAxis = static_cast<QValueAxis *>(axis);
+        QObject::connect(valueAxis, &QValueAxis::rangeChanged,
+                         this, &Abstract3DController::handleAxisRangeChanged);
+        emit axisRangeChanged(orientation, valueAxis->min(), valueAxis->max());
+    }
+
 }
 
 QT_DATAVIS3D_END_NAMESPACE

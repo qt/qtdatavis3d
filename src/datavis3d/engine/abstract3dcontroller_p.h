@@ -160,8 +160,10 @@ public:
     virtual void setLabelTransparency(LabelTransparency transparency);
     virtual LabelTransparency labelTransparency();
 
-    // TODO: abstract renderer should have accessor for Drawer instead
-    virtual Drawer *drawer() = 0;
+public slots:
+    void handleAxisTitleChanged(const QString &title);
+    void handleAxisLabelsChanged();
+    void handleAxisRangeChanged(qreal min, qreal max);
 
 signals:
     void boundingRectChanged(QRect boundingRect);
@@ -169,10 +171,16 @@ signals:
     void positionChanged(QRect boundingRect);
     void zoomLevelChanged(int zoomLevel);
     void themeChanged(Theme theme);
-    void fontChanged(QFont font);
+    void fontChanged(QFont font); // TODO should be handled via axis?? What about font for selection label?
     void shadowQualityChanged(ShadowQuality quality);
     void labelTransparencyUpdated(LabelTransparency transparency);
-    void axisChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *newAxis);
+    void axisTypeChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
+    void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
+    void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);
+    void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+
+private:
+    void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis, QAbstractAxis **axisPtr);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

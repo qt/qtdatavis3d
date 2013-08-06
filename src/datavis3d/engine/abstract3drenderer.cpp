@@ -39,6 +39,7 @@
 **
 ****************************************************************************/
 #include "abstract3drenderer_p.h"
+#include "qvalueaxis.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -67,6 +68,14 @@ void Abstract3DRenderer::initializePreOpenGL()
                      &Abstract3DRenderer::updateBoundingRect);
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
                      &Abstract3DRenderer::updateShadowQuality);
+    QObject::connect(m_controller, &Abstract3DController::axisTypeChanged, this,
+                     &Abstract3DRenderer::updateAxisType);
+    QObject::connect(m_controller, &Abstract3DController::axisTitleChanged, this,
+                     &Abstract3DRenderer::updateAxisTitle);
+    QObject::connect(m_controller, &Abstract3DController::axisLabelsChanged, this,
+                     &Abstract3DRenderer::updateAxisLabels);
+    QObject::connect(m_controller, &Abstract3DController::axisRangeChanged, this,
+                     &Abstract3DRenderer::updateAxisRange);
 
     updateTheme(m_controller->theme());
     updateFont(m_controller->font());
@@ -78,6 +87,10 @@ void Abstract3DRenderer::initializeOpenGL()
     // OpenGL is initialized, safe to call these.
     updateBoundingRect(m_controller->boundingRect());
     updateShadowQuality(m_controller->shadowQuality());
+
+    initializeAxisCache(QAbstractAxis::AxisOrientationX, m_controller->axisX());
+    initializeAxisCache(QAbstractAxis::AxisOrientationY, m_controller->axisY());
+    initializeAxisCache(QAbstractAxis::AxisOrientationZ, m_controller->axisZ());
 }
 
 void Abstract3DRenderer::updateBoundingRect(const QRect boundingRect)
@@ -170,5 +183,59 @@ void Abstract3DRenderer::handleResize()
     updateDepthBuffer();
 #endif
 }
+
+void Abstract3DRenderer::updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type)
+{
+    axisCacheForOrientation(orientation).setType(type);
+}
+
+void Abstract3DRenderer::updateAxisTitle(QAbstractAxis::AxisOrientation orientation, const QString &title)
+{
+    axisCacheForOrientation(orientation).setTitle(title);
+}
+
+void Abstract3DRenderer::updateAxisLabels(QAbstractAxis::AxisOrientation orientation, const QStringList &labels)
+{
+    axisCacheForOrientation(orientation).setLabels(labels);
+}
+
+void Abstract3DRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
+{
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    cache.setMin(min);
+    cache.setMax(max);
+}
+
+// This method needs to be called under the controller-renderer sync mutex
+void Abstract3DRenderer::initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis)
+{
+    axisCacheForOrientation(orientation).setDrawer(m_drawer);
+
+    if (axis) {
+        updateAxisType(orientation, axis->type());
+        updateAxisTitle(orientation, axis->title());
+        updateAxisLabels(orientation, axis->labels());
+        if (axis->type() & QAbstractAxis::AxisTypeValue) {
+            const QValueAxis *valueAxis = static_cast<const QValueAxis *>(axis);
+            updateAxisRange(orientation, valueAxis->min(), valueAxis->max());
+        }
+    }
+}
+
+AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation)
+{
+    switch (orientation) {
+    case QAbstractAxis::AxisOrientationX:
+        return m_axisCacheX;
+    case QAbstractAxis::AxisOrientationY:
+        return m_axisCacheY;
+    case QAbstractAxis::AxisOrientationZ:
+        return m_axisCacheZ;
+    default:
+        qFatal(__FUNCTION__);
+        return m_axisCacheX;
+    }
+}
+
 
 QT_DATAVIS3D_END_NAMESPACE

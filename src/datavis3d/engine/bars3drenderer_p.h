@@ -81,7 +81,6 @@ class Theme;
 class Drawer;
 class LabelItem;
 class CameraHelper;
-class QAbstractAxisPrivate;
 
 class QT_DATAVIS3D_EXPORT Bars3dRenderer : public Abstract3DRenderer
 {
@@ -92,6 +91,7 @@ private:
     Bars3dController *m_controller;
 
     // Mutex for sharing resources between render and main threads.
+    // Note: Data access mutex is separate and owned by data proxy.
     QMutex m_mutex;
 
     // Cached state based on emitted signals from the controller
@@ -105,13 +105,12 @@ private:
     int m_cachedColumnCount;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
-    ShadowQuality m_cachedShadowQuality;
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
     BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QList<BarRenderItem *> *m_sliceSelection;
-    QAbstractAxisPrivate *m_sliceAxisP; // not owned
+    AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     GLint m_tickCount;
     GLfloat m_tickStep;
@@ -171,12 +170,9 @@ public:
     ~Bars3dRenderer();
 
     void render(QBarDataProxy *dataProxy, bool valuesDirty, CameraHelper *camera,
-                const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
                 const GLuint defaultFboHandle = 0);
 
     QRect mainViewPort();
-    // TODO: Not thread-safe, needs rethinking how axes create labels
-    Drawer *drawer() { return m_drawer; }
 
 public slots:
     void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),

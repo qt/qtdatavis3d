@@ -73,7 +73,7 @@ public:
         AxisTypeNone = 0,
         AxisTypeCategory = 1,
         AxisTypeValue = 2
-        //AxisTypeLogValue = 4 // TODO
+        //AxisTypeLogValue = 6 // inherits valueaxis (4 + 2) // TODO
     };
 
 protected:
@@ -92,6 +92,7 @@ public slots:
 
 signals:
     void titleChanged(QString newTitle);
+    void labelsChanged();
 
 protected:
     QScopedPointer<QAbstractAxisPrivate> d_ptr;
@@ -100,10 +101,6 @@ private:
     Q_DISABLE_COPY(QAbstractAxis)
 
     friend class Abstract3DController;
-    friend class Bars3dController;
-    friend class Bars3dRenderer;
-    friend class Scatter3DController;
-    friend class Scatter3DRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

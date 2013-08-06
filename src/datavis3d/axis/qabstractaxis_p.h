@@ -50,8 +50,6 @@
 // We mean it.
 
 #include "qabstractaxis.h"
-#include "drawer_p.h"
-#include "labelitem_p.h"
 
 #ifndef QABSTRACTAXIS_P_H
 #define QABSTRACTAXIS_P_H
@@ -65,26 +63,13 @@ public:
     QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type);
     virtual ~QAbstractAxisPrivate();
 
-    void setDrawer(Drawer *drawer);
-    QList<LabelItem *> &labelItems() { return m_labelItems; }
-    LabelItem &titleItem() { return m_titleItem; }
     void setOrientation(QAbstractAxis::AxisOrientation orientation);
 
-public slots:
-    void updateTextures();
-
 protected:
-    virtual void updateLabels();
-
     QAbstractAxis *q_ptr;
 
     QString m_title;
-    // TODO: Does m_titleItem/m_drawer/m_labelItems usage need to be protected with render mutex?
-    // TODO: Replace Drawer with AbstractRenderer?
-    LabelItem m_titleItem;
-    Drawer *m_drawer; // not owned
     QStringList m_labels;
-    QList<LabelItem *> m_labelItems;
     QAbstractAxis::AxisOrientation m_orientation;
     QAbstractAxis::AxisType m_type;
 

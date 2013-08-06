@@ -49,24 +49,58 @@
 //
 // We mean it.
 
-#include "qcategoryaxis.h"
-#include "qabstractaxis_p.h"
-#include "qbardataitem.h"
+#ifndef AXISRENDERCACHE_P_H
+#define AXISRENDERCACHE_P_H
 
-#ifndef QCATEGORYAXIS_P_H
-#define QCATEGORYAXIS_P_H
+#include "datavis3dglobal_p.h"
+#include "labelitem_p.h"
+#include "qabstractaxis_p.h"
+#include "drawer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate : public QAbstractAxisPrivate
+class AxisRenderCache : public QObject
 {
     Q_OBJECT
-
 public:
-    QCategoryAxisPrivate(QCategoryAxis *q);
-    virtual ~QCategoryAxisPrivate();
+    AxisRenderCache();
+    virtual ~AxisRenderCache();
+
+    void setDrawer(Drawer *drawer);
+
+    void setType(QAbstractAxis::AxisType type);
+    inline QAbstractAxis::AxisType type() const { return m_type; }
+    void setTitle(const QString &title);
+    inline const QString &title() { return m_title; }
+    void setLabels(const QStringList &labels);
+    inline const QStringList &labels() { return m_labels; }
+    inline void setMin(qreal min) { m_min = min; }
+    inline qreal min() { return m_min; }
+    inline void setMax(qreal max) { m_max = max; }
+    inline qreal max() { return m_max; }
+
+    inline LabelItem &titleItem() { return m_titleItem; }
+    inline QList<LabelItem *> &labelItems() { return m_labelItems; }
+
+public slots:
+    void updateTextures();
+
+private:
+    // Cached axis values
+    QAbstractAxis::AxisType m_type;
+    QString m_title;
+    QStringList m_labels;
+    qreal m_min;
+    qreal m_max;
+
+    // Renderer items
+    Drawer *m_drawer; // Not owned
+    LabelItem m_titleItem;
+    QList<LabelItem *> m_labelItems;
+
+    Q_DISABLE_COPY(AxisRenderCache);
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QCATEGORYAXIS_P_H
+#endif

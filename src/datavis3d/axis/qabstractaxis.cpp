@@ -78,9 +78,6 @@ void QAbstractAxis::setTitle(QString title)
 {
     if (d_ptr->m_title != title) {
         d_ptr->m_title = title;
-        // Generate axis label texture
-        if (d_ptr->m_drawer)
-            d_ptr->m_drawer->generateLabelItem(d_ptr->m_titleItem, title);
         emit titleChanged(title);
     }
 }
@@ -90,7 +87,6 @@ void QAbstractAxis::setTitle(QString title)
 QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type)
     : QObject(0),
       q_ptr(q),
-      m_drawer(0),
       m_orientation(QAbstractAxis::AxisOrientationNone),
       m_type(type)
 {
@@ -98,18 +94,6 @@ QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::Axis
 
 QAbstractAxisPrivate::~QAbstractAxisPrivate()
 {
-    m_titleItem.clear();
-    for (int i = 0; i < m_labelItems.size(); i++)
-        delete m_labelItems[i];
-}
-
-void QAbstractAxisPrivate::setDrawer(Drawer *drawer)
-{
-    m_drawer = drawer;
-    if (m_drawer) {
-        QObject::connect(m_drawer, &Drawer::drawerChanged, this, &QAbstractAxisPrivate::updateTextures);
-        updateTextures();
-    }
 }
 
 void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orientation)
@@ -118,21 +102,6 @@ void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orienta
         m_orientation = orientation;
     else
         Q_ASSERT("Attempted to reset axis orientation.");
-}
-
-void QAbstractAxisPrivate::updateTextures()
-{
-    if (m_title.isEmpty())
-        m_titleItem.clear();
-    else
-        m_drawer->generateLabelItem(m_titleItem, m_title);
-
-    updateLabels();
-}
-
-void QAbstractAxisPrivate::updateLabels()
-{
-    // Default implementation does nothing.
 }
 
 QT_DATAVIS3D_END_NAMESPACE

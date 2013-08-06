@@ -94,12 +94,6 @@ void Scatter3DController::initializeOpenGL()
         return;
 
     m_renderer = new Scatter3DRenderer(this);
-    if (m_axisX)
-        m_axisX->d_ptr->setDrawer(m_renderer->drawer());
-    if (m_axisY)
-        m_axisY->d_ptr->setDrawer(m_renderer->drawer());
-    if (m_axisZ)
-        m_axisZ->d_ptr->setDrawer(m_renderer->drawer());
     m_isInitialized = true;
 }
 
@@ -113,8 +107,7 @@ void Scatter3DController::render(const GLuint defaultFboHandle)
     // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
     // TODO Also, m_valuesDirty flag setting needs to be under same mutex
     QMutexLocker(m_data->mutex());
-    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, m_axisX->d_ptr->titleItem(),
-                       m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
+    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, defaultFboHandle);
 
     m_valuesDirty = false;
 
@@ -258,15 +251,6 @@ void Scatter3DController::wheelEvent(QWheelEvent *event)
         zoomLevel = 10;
 
     setZoomLevel(zoomLevel);
-}
-
-// TODO: abstract renderer should have accessor for Drawer instead
-Drawer *Scatter3DController::drawer()
-{
-    if (m_renderer)
-        return m_renderer->drawer();
-    else
-        return 0;
 }
 
 void Scatter3DController::setDataProxy(QScatterDataProxy *proxy)

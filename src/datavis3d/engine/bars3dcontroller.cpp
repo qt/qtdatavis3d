@@ -98,12 +98,6 @@ void Bars3dController::initializeOpenGL()
         return;
 
     m_renderer = new Bars3dRenderer(this);
-    if (m_axisX)
-        m_axisX->d_ptr->setDrawer(m_renderer->drawer());
-    if (m_axisY)
-        m_axisY->d_ptr->setDrawer(m_renderer->drawer());
-    if (m_axisZ)
-        m_axisZ->d_ptr->setDrawer(m_renderer->drawer());
     m_isInitialized = true;
 }
 
@@ -117,8 +111,7 @@ void Bars3dController::render(const GLuint defaultFboHandle)
     // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
     // TODO Also, m_valuesDirty flag setting needs to be under same mutex
     QMutexLocker(m_data->mutex());
-    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, m_axisX->d_ptr->titleItem(),
-                       m_axisY->d_ptr->titleItem(), m_axisZ->d_ptr->titleItem(), defaultFboHandle);
+    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, defaultFboHandle);
 
     m_valuesDirty = false;
 
@@ -267,15 +260,6 @@ void Bars3dController::wheelEvent(QWheelEvent *event)
         zoomLevel = 10;
 
     setZoomLevel(zoomLevel);
-}
-
-// TODO: abstract renderer should have accessor for Drawer instead
-Drawer *Bars3dController::drawer()
-{
-    if (m_renderer)
-        return m_renderer->drawer();
-    else
-        return 0;
 }
 
 void Bars3dController::setDataProxy(QBarDataProxy *proxy)

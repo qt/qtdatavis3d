@@ -180,9 +180,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
-    // TODO: abstract renderer should have accessor for Drawer instead
-    virtual Drawer *drawer();
-
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *dataProxy();
@@ -197,13 +194,13 @@ public slots:
 signals:
     void selectionModeChanged(SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
-    void limitsChanged(QPair<GLfloat, GLfloat> limits);
+    void limitsChanged(QPair<GLfloat, GLfloat> limits); // TODO should be handled via axis range
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
-    void gridEnabledChanged(bool enable);
+    void gridEnabledChanged(bool enable); // TODO should be handled via axis
     void backgroundEnabledChanged(bool enable);
-    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
+    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);  // TODO should be handled via axis
 
 private:
     void handleLimitChange();

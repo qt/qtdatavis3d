@@ -49,8 +49,8 @@
 //
 // We mean it.
 
-#ifndef Q3DSCATTERRENDERER_p_H
-#define Q3DSCATTERRENDERER_p_H
+#ifndef Q3DSCATTERRENDERER_P_H
+#define Q3DSCATTERRENDERER_P_H
 
 #include <QtCore/QSize>
 #include <QtCore/QObject>
@@ -62,6 +62,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "scatter3dcontroller_p.h"
+#include "abstract3drenderer_p.h"
 #include "qscatterdataproxy.h"
 #include "scatterrenderitem_p.h"
 
@@ -76,13 +77,11 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class ShaderHelper;
 class ObjectHelper;
 class TextureHelper;
-class Theme;
-class Drawer;
 class LabelItem;
 class CameraHelper;
 class QAbstractAxisPrivate;
 
-class QT_DATAVIS3D_EXPORT Scatter3DRenderer : public QObject, protected QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
@@ -100,13 +99,8 @@ private:
     QString m_cachedObjFile;
     SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
-    QRect m_cachedBoundingRect;
-    Theme m_cachedTheme;
-    LabelTransparency m_cachedLabelTransparency;
-    QFont m_cachedFont;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
-    ShadowQuality m_cachedShadowQuality;
 
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
@@ -127,7 +121,6 @@ private:
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
     TextureHelper *m_textureHelper;
-    Drawer *m_drawer;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;
@@ -135,7 +128,6 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
-    GLfloat m_autoScaleAdjustment;
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_scaleFactor;
@@ -164,38 +156,34 @@ public:
     ~Scatter3DRenderer();
 
     void render(QScatterDataProxy *dataProxy, bool valuesDirty, CameraHelper *camera,
-                const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel,
                 const GLuint defaultFboHandle = 0);
 
     QRect mainViewPort();
-    // TODO: Not thread-safe, needs rethinking how axes create labels
-    Drawer *drawer() { return m_drawer; }
 
 public slots:
-    void updateTheme(Theme theme);
     void updateSelectionMode(SelectionMode newMode);
     //void updateLimits(QPair<GLfloat, GLfloat> newLimits);
     void updateZoomLevel(int newZoomLevel);
-    void updateFont(const QFont &font);
-    void updateLabelTransparency(LabelTransparency transparency);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
-    void updateShadowQuality(ShadowQuality quality);
     void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
     void updateMeshFileName(const QString &objFileName);
-    void updateBoundingRect(const QRect boundingRect);
-    void updatePosition(const QRect boundingRect);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.
     // Only one request can be queued per render pass at this point. New request will override any pending requests.
     // After inspection the selectionUpdated signal is emitted.
-    void requestSelectionAtPoint(const QPoint &point);
+    virtual void requestSelectionAtPoint(const QPoint &point);
 
 signals:
     void selectionUpdated(QVector3D selection);
 
 private:
-    void initializeOpenGL();
+    virtual void initializePreOpenGL();
+    virtual void initializeOpenGL();
+    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void updateShadowQuality(ShadowQuality quality);
+    virtual void updateTextures();
+
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 
@@ -203,7 +191,6 @@ private:
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -212,7 +199,6 @@ private:
     void initDepthShader();
     void updateDepthBuffer();
 #endif
-    void updateTextures();
     void calculateSceneScalingFactors(const QRect &areaRect = QRect(0, 0, 1, 1));
     void calculateTranslation(ScatterRenderItem &item);
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
