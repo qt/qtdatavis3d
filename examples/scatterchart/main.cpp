@@ -75,10 +75,6 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-//    QPushButton *dataButton = new QPushButton(widget);
-//    dataButton->setText(QStringLiteral("Add a row of random data"));
-//    dataButton->setEnabled(false);
-
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
 
@@ -91,47 +87,13 @@ int main(int argc, char **argv)
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
-//    QPushButton *selectionButton = new QPushButton(widget);
-//    selectionButton->setText(QStringLiteral("Change selection mode"));
+    QCheckBox *backgroundCheckBox = new QCheckBox(widget);
+    backgroundCheckBox->setText(QStringLiteral("Show background"));
+    backgroundCheckBox->setChecked(true);
 
     QCheckBox *gridCheckBox = new QCheckBox(widget);
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
-
-//    QCheckBox *rotationCheckBox = new QCheckBox(widget);
-//    rotationCheckBox->setText("Rotate with slider");
-
-//    QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
-//    rotationSliderX->setTickInterval(1);
-//    rotationSliderX->setMinimum(-180);
-//    rotationSliderX->setValue(0);
-//    rotationSliderX->setMaximum(180);
-//    rotationSliderX->setEnabled(false);
-//    QSlider *rotationSliderY = new QSlider(Qt::Horizontal, widget);
-//    rotationSliderY->setTickInterval(1);
-//    rotationSliderY->setMinimum(0);
-//    rotationSliderY->setValue(0);
-//    rotationSliderY->setMaximum(90);
-//    rotationSliderY->setEnabled(false);
-
-//    QSlider *sizeSliderX = new QSlider(Qt::Horizontal, widget);
-//    sizeSliderX->setTickInterval(1);
-//    sizeSliderX->setMinimum(1);
-//    sizeSliderX->setValue(100);
-//    sizeSliderX->setMaximum(100);
-//    QSlider *sizeSliderZ = new QSlider(Qt::Horizontal, widget);
-//    sizeSliderZ->setTickInterval(1);
-//    sizeSliderZ->setMinimum(1);
-//    sizeSliderZ->setValue(100);
-//    sizeSliderZ->setMaximum(100);
-
-//    QComboBox *valueDimension = new QComboBox(widget);
-//    valueDimension->addItem(QStringLiteral("Height"));
-//    valueDimension->addItem(QStringLiteral("Width"));
-//    valueDimension->addItem(QStringLiteral("Depth"));
-//    valueDimension->addItem(QStringLiteral("Radius"));
-//    valueDimension->addItem(QStringLiteral("All"));
-//    valueDimension->setCurrentIndex(4);
 
     QComboBox *shadowQuality = new QComboBox(widget);
     shadowQuality->addItem(QStringLiteral("None"));
@@ -148,20 +110,11 @@ int main(int argc, char **argv)
     fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
-//    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
-//    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
-//    vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
-//    vLayout->addWidget(sizeSliderX, 0, Qt::AlignTop);
-//    vLayout->addWidget(sizeSliderZ, 0, Qt::AlignTop);
-//    vLayout->addWidget(dataButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Apply value to:")));
-//    vLayout->addWidget(valueDimension, 0, Qt::AlignTop);
-//    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
+    vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout->addWidget(shadowQuality);
@@ -169,17 +122,10 @@ int main(int argc, char **argv)
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
-    // TODO: Add example for setMeshFileName
 
     widget->show();
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
-
-//    QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &MapsModifier::rotateX);
-//    QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &MapsModifier::rotateY);
-
-//    QObject::connect(sizeSliderX, &QSlider::valueChanged, modifier, &MapsModifier::setSpecsX);
-//    QObject::connect(sizeSliderZ, &QSlider::valueChanged, modifier, &MapsModifier::setSpecsZ);
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::changeFontSize);
@@ -192,12 +138,6 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTransparency);
-//    QObject::connect(dataButton, &QPushButton::clicked, modifier, &MapsModifier::addBars);
-//    QObject::connect(selectionButton, &QPushButton::clicked, modifier,
-//                     &MapsModifier::changeSelectionMode);
-
-//    QObject::connect(valueDimension, SIGNAL(currentIndexChanged(int)), modifier,
-//                     SLOT(changeValueDimension(int)));
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
@@ -209,17 +149,10 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
 
+    QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setGridEnabled);
-
-//    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
-//                     &QSlider::setEnabled);
-//    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
-//                     &QSlider::setValue);
-//    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
-//                     &QSlider::setEnabled);
-//    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
-//                     &QSlider::setValue);
 
     modifier->start();
 

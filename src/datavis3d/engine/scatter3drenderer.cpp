@@ -880,11 +880,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
-        GLfloat heightStep = m_tickStep;
+        GLfloat lineStep = m_tickStep * 2.0f; // TODO: For now, multiply by two to keep the tick count correct (as we start from negative)
         GLfloat startLine = -m_heightNormalizer;
 
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
+        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -893,7 +892,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(
                         0.0f,
                         -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
-                        (aspectRatio * lineHeight) / (m_heightNormalizer * m_scaleFactor) + zComp);
+                        (aspectRatio * linePos) / (m_heightNormalizer * m_scaleFactor) + zComp);
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
@@ -934,15 +933,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Floor lines: columns
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
+        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
             modelMatrix.translate(
-                        (aspectRatio * lineHeight) / (m_heightNormalizer * m_scaleFactor),
+                        (aspectRatio * linePos) / (m_heightNormalizer * m_scaleFactor),
                         -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
                         zComp);
             modelMatrix.scale(
@@ -985,26 +983,21 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: back wall
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
+        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+            GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            if (m_zFlipped) {
-                modelMatrix.translate(
-                            0.0f,
-                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                            (aspectRatio * backgroundMargin * m_areaSize.height() / m_scaleFactor)
-                            + zComp);
-            } else {
-                modelMatrix.translate(
-                            0.0f,
-                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                            -(aspectRatio * backgroundMargin * m_areaSize.height() / m_scaleFactor)
-                            + zComp);
-            }
+            if (!m_zFlipped)
+                lineZTrans = -lineZTrans;
+
+            modelMatrix.translate(
+                        0.0f,
+                        linePos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                        lineZTrans + zComp);
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
@@ -1045,24 +1038,21 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: side wall
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
+        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+            GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+                    / m_scaleFactor;
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            if (m_xFlipped) {
-                modelMatrix.translate(
-                            (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                            zComp);
-            } else {
-                modelMatrix.translate(
-                            -(aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                            lineHeight / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                            zComp);
-            }
+            if (!m_xFlipped)
+                lineXTrans = -lineXTrans;
+
+            modelMatrix.translate(
+                        lineXTrans,
+                        linePos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
+                        zComp);
             modelMatrix.scale(
                         QVector3D(
                             gridLineWidth, gridLineWidth,
@@ -1106,7 +1096,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_barShader->release();
     }
 
-    // Handle zoom activation and label drawing
+    // Handle selection clearing and selection label drawing
     if (!barSelectionFound) {
         // We have no ownership, don't delete. Just NULL the pointer.
         m_selectedItem = NULL;
@@ -1160,9 +1150,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_updateLabels = false;
     }
 
-#if 0
     // Draw axis labels
-    // TODO: Calculations done temporarily here. When optimizing, move to after data set addition? Keep drawing of the labels here.
+    // TODO: Calculations done temporarily here. Should be done when calculating lines to avoid
+    // extra for -loops?
     // Bind label shader
     m_labelShader->bind();
 
@@ -1172,13 +1162,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    // Calculate the positions for row and column labels and store them into QDataItems (and QDataRows?)
-    for (int row = 0; row != m_controller->axisX()->d_ptr->labelItems().size(); row++) {
-        if (m_controller->axisX()->d_ptr->labelItems().size() > row) {
-            // Go through all rows and get position of max+1 or min-1 column, depending on x flip
-            // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            GLfloat rowPos = (row + 1) * (m_cachedBarSpacing.height());
-            GLfloat barPos = 0;
+    // Z Labels
+    GLfloat posStep = m_tickStep * 2.0f; // TODO: For now, multiply by two to keep the tick count correct (as we start from negative)
+    GLfloat startPos = -m_heightNormalizer;
+    int labelNbr = 0;
+    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+            GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+                    / m_scaleFactor;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1186,18 +1177,18 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (m_zFlipped)
                 rotLabelY = 180.0f;
             if (m_xFlipped) {
-                barPos = (m_cachedColumnCount + 1) * (m_cachedBarSpacing.width());
+                labelXTrans = -labelXTrans;
                 alignment = Qt::AlignLeft;
             }
-            QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
-                                           -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                           (m_columnDepth - rowPos) / m_scaleFactor + zComp);
+            QVector3D labelTrans = QVector3D(
+                        labelXTrans,
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
+                        (aspectRatio * labelPos) / (m_heightNormalizer * m_scaleFactor) + zComp);
 
             // TODO: Try it; draw the label here
-
-            m_dummyRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(row);
-            //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem =
+                    *m_controller->axisZ()->d_ptr->labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1206,14 +1197,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                 m_labelShader, m_labelObj, camera, true, true, LabelMid,
                                 alignment);
         }
-
+        labelNbr++;
     }
-    for (int bar = 0; bar != m_controller->axisZ()->d_ptr->labelItems().size(); bar += 1) {
-        if (m_controller->axisZ()->d_ptr->labelItems().size() > bar) {
-            // Go through all columns and get position of max+1 or min-1 row, depending on z flip
-            // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            GLfloat barPos = (bar + 1) * (m_cachedBarSpacing.width());
-            GLfloat rowPos = 0;
+    // X Labels
+    labelNbr = 0;
+    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+            GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1221,18 +1212,18 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (m_xFlipped)
                 rotLabelY = -90.0f;
             if (m_zFlipped) {
-                rowPos = (m_cachedRowCount + 1) * (m_cachedBarSpacing.height());
+                labelZTrans = -labelZTrans;
                 alignment = Qt::AlignRight;
             }
-            QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
-                                           -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                           (m_columnDepth - rowPos) / m_scaleFactor + zComp);
+            QVector3D labelTrans = QVector3D(
+                        (aspectRatio * labelPos) / (m_heightNormalizer * m_scaleFactor),
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
+                        labelZTrans + zComp);
 
             // TODO: Try it; draw the label here
-
-            m_dummyRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_controller->axisZ()->d_ptr->labelItems().at(bar);
-            //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem =
+                    *m_controller->axisX()->d_ptr->labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1241,6 +1232,66 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                 m_labelShader, m_labelObj, camera, true, true, LabelMid,
                                 alignment);
         }
+        labelNbr++;
+    }
+    // Y Labels
+    labelNbr = 0;
+    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+        // TODO: Test with x labels
+        if (m_controller->axisX()->d_ptr->labelItems().size() > labelNbr) {
+            GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+                    / m_scaleFactor;
+            GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor;
+            GLfloat labelYTrans = labelPos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment;
+            GLfloat rotLabelX = 0.0f;
+            GLfloat rotLabelY = -90.0f;
+            GLfloat rotLabelZ = 0.0f;
+            Qt::AlignmentFlag alignment = Qt::AlignLeft;
+            if (!m_xFlipped) {
+                labelXTrans = -labelXTrans;
+                rotLabelY = 90.0f;
+            }
+            if (m_zFlipped) {
+                labelZTrans = -labelZTrans;
+                alignment = Qt::AlignRight;
+            }
+
+            // TODO: Test with x labels
+            const LabelItem &axisLabelItem = *m_controller->axisX()->d_ptr->labelItems().at(labelNbr);
+
+            // Back wall
+            QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, labelZTrans + zComp);
+
+            m_dummyRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                alignment);
+
+            // Side wall
+            if (m_xFlipped)
+                alignment = Qt::AlignLeft;
+            else
+                alignment = Qt::AlignRight;
+            if (m_zFlipped)
+                rotLabelY = 180.0f;
+            else
+                rotLabelY = 0.0f;
+
+            labelTrans = QVector3D(-labelXTrans, labelYTrans, -labelZTrans + zComp);
+
+            m_dummyRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                alignment);
+        }
+        labelNbr++;
     }
     glDisable(GL_TEXTURE_2D);
     if (m_cachedLabelTransparency > TransparencyNone)
@@ -1248,7 +1299,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Release label shader
     m_labelShader->release();
-#endif
 }
 
 void Scatter3DRenderer::requestSelectionAtPoint(const QPoint &point)

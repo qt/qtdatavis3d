@@ -456,7 +456,8 @@ QScatterDataProxy *Q3DScatter::dataProxy()
 }
 
 /*!
- * \a tickCount How many ticks will be drawn. \c 5 by default.
+ * \a tickCount How many ticks will be drawn in addition to the start line. \c 5 by default.
+ * \n There will be tickCount + 1 lines drawn, as there is always the start line.
  *
  * \a step How large a step each tick is.
  *

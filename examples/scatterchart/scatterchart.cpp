@@ -71,12 +71,15 @@ void ScatterDataModifier::start()
 void ScatterDataModifier::addData()
 {
     QStringList rowLabels;
-    rowLabels << "something 1" << "something 2" << "something 3" << "something 4" << "something 5";
+    rowLabels << "something 1" << "something 2" << "something 3" << "something 4" << "something 5"
+                 << "something 6" << "something 7" << "something 8" << "something 9"
+                 << "something 10" << "something 11";
     QStringList columnLabels;
-    columnLabels << "other 1" << "other 2" << "other 3" << "other 4" << "other 5";
+    columnLabels << "other 1" << "other 2" << "other 3" << "other 4" << "other 5" << "other 6"
+                 << "other 7" << "other 8" << "other 9" << "other 10" << "other 11";
 
     // Set tick count and step
-    //m_chart->setTickCount(10, 0.1f);
+    m_chart->setTickCount(10, 0.1f, -1.0f);
 
     // Add labels
     m_chart->rowAxis()->setTitle("Somethings");
@@ -153,16 +156,10 @@ void ScatterDataModifier::changeTransparency()
         transparency = TransparencyFromTheme;
 }
 
-//void ScatterDataModifier::changeValueDimension(int dimension)
-//{
-//    m_chart->setBarSpecs(m_barSpecs, (Q3DMaps::AdjustmentDirection)dimension);
-//}
-
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    //qDebug() << newFont << newFont.style();
     m_chart->setFont(newFont);
 }
 
@@ -209,19 +206,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
     emit shadowQualityChanged(quality);
 }
 
+void ScatterDataModifier::setBackgroundEnabled(int enabled)
+{
+    m_chart->setBackgroundVisible((bool)enabled);
+}
+
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
     m_chart->setGridVisible((bool)enabled);
 }
-
-//void ScatterDataModifier::rotateX(int rotation)
-//{
-//    m_xRotation = rotation;
-//    m_chart->setCameraPosition(m_xRotation, m_yRotation);
-//}
-
-//void ScatterDataModifier::rotateY(int rotation)
-//{
-//    m_yRotation = rotation;
-//    m_chart->setCameraPosition(m_xRotation, m_yRotation);
-//}

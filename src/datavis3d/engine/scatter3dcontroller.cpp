@@ -430,8 +430,12 @@ bool Scatter3DController::backgroundEnabled()
 
 void Scatter3DController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
 {
-    m_tickCount   = tickCount;
-    m_tickStep    = step;
+    if (tickCount <= 0) {
+        qCritical("Invalid tick count. It must be positive.");
+        return;
+    }
+    m_tickCount = tickCount;
+    m_tickStep = step;
     m_tickMinimum = minimum;
     emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
 }

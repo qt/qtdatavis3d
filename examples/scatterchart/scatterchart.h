@@ -45,7 +45,6 @@
 
 #include <QFont>
 #include <QDebug>
-//#include <QVector3D>
 
 using namespace QtDataVis3D;
 
@@ -60,12 +59,10 @@ public:
     void changeStyle();
     void changePresetCamera();
     void changeTheme();
-//    void changeSelectionMode();
     void changeTransparency();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
-//    void rotateX(int rotation);
-//    void rotateY(int rotation);
+    void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void start();
 
@@ -78,7 +75,6 @@ signals:
 
 private:
     Q3DScatter *m_chart;
-    //QRect m_areaRect;
     int m_fontSize;
 };
 
