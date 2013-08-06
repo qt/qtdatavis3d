@@ -61,7 +61,6 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-class QFont;
 class QPoint;
 class QSizeF;
 
@@ -102,7 +101,6 @@ private:
 
     // Look'n'Feel
     QString m_objFile;
-    QFont m_font;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
     GLint m_tickCount;
@@ -164,13 +162,6 @@ public:
     void setSelectionMode(SelectionMode mode);
     SelectionMode selectionMode();
 
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
-
-    // Set font
-    void setFont(const QFont &font);
-    QFont font();
 
     // Enable or disable background grid
     void setGridEnabled(bool enable);
@@ -210,7 +201,6 @@ signals:
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
-    void fontChanged(QFont font);
     void gridEnabledChanged(bool enable);
     void backgroundEnabledChanged(bool enable);
     void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);

@@ -69,7 +69,6 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_barThickness(QSizeF(0.75f, 0.75f)),
       m_barSpacing(m_barThickness * 3.0f),
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
-      m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
       m_tickCount(0),
@@ -453,28 +452,6 @@ QPoint Bars3dController::mousePosition()
 SelectionMode Bars3dController::selectionMode()
 {
     return m_selectionMode;
-}
-
-void Bars3dController::setFontSize(float fontsize)
-{
-    m_font.setPointSizeF(fontsize);
-    emit fontChanged(m_font);
-}
-
-float Bars3dController::fontSize()
-{
-    return m_font.pointSizeF();
-}
-
-void Bars3dController::setFont(const QFont &font)
-{
-    m_font = font;
-    emit fontChanged(m_font);
-}
-
-QFont Bars3dController::font()
-{
-    return m_font;
 }
 
 void Bars3dController::setGridEnabled(bool enable)

@@ -72,6 +72,7 @@ public:
 
 private:
     friend class Abstract3DController;
+    friend class Abstract3DRenderer;
     friend class Bars3dRenderer;
     friend class Maps3DController;
     friend class Surface3dRenderer;

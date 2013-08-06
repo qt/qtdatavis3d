@@ -53,8 +53,11 @@
 #define ABSTRACT3DRENDERER_P_H
 
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QFont>
+
 #include "datavis3dglobal_p.h"
 #include "abstract3dcontroller_p.h"
+
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -64,15 +67,35 @@ protected:
     Abstract3DController *m_controller;
 
     bool m_hasNegativeValues;
-
+    QRect m_cachedBoundingRect;
+    ShadowQuality m_cachedShadowQuality;
+    Theme m_cachedTheme;
+    QFont m_cachedFont;
+    LabelTransparency m_cachedLabelTransparency;
+    Drawer *m_drawer;
+    GLfloat m_autoScaleAdjustment;
 
     Abstract3DRenderer(Abstract3DController *controller);
-    virtual void initializeOpenGL()=0;
+    virtual void initializePreOpenGL();
+    virtual void initializeOpenGL();
+
+    virtual void updateBoundingRect(const QRect boundingRect);
+    virtual void updatePosition(const QRect boundingRect);
+    virtual void handleResize();
+
+    virtual void updateTheme(Theme theme);
+    virtual void updateFont(const QFont &font);
+    virtual void updateLabelTransparency(LabelTransparency transparency);
+
+    virtual void handleShadowQualityChange();
 
     virtual void requestSelectionAtPoint(const QPoint &point)=0;
-    virtual void handleResize()=0;
-    virtual void updateBoundingRect(const QRect boundingRect)=0;
-    virtual void updatePosition(const QRect boundingRect)=0;
+    virtual void updateTextures()=0;
+    virtual void initSelectionBuffer()=0;
+    virtual void updateDepthBuffer()=0;
+    virtual void updateShadowQuality(ShadowQuality quality)=0;
+    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader)=0;
+    virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader)=0;
 
 };
 

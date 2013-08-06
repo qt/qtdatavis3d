@@ -50,6 +50,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_horizontalRotation(-45.0f),
     m_verticalRotation(15.0f),
     m_theme(),
+    m_font(QFont(QStringLiteral("Arial"))),
     m_shadowQuality(ShadowLow),
     m_labelTransparency(TransparencyFromTheme),
     m_cameraHelper(new CameraHelper()),
@@ -238,6 +239,29 @@ Theme Abstract3DController::theme()
 {
     return m_theme;
 }
+
+void Abstract3DController::setFontSize(float fontsize)
+{
+    m_font.setPointSizeF(fontsize);
+    emit fontChanged(m_font);
+}
+
+float Abstract3DController::fontSize()
+{
+    return m_font.pointSizeF();
+}
+
+void Abstract3DController::setFont(const QFont &font)
+{
+    m_font = font;
+    emit fontChanged(m_font);
+}
+
+QFont Abstract3DController::font()
+{
+    return m_font;
+}
+
 
 void Abstract3DController::setShadowQuality(ShadowQuality quality)
 {

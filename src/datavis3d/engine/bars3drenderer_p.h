@@ -103,10 +103,6 @@ private:
     int m_cachedZoomLevel;
     int m_cachedRowCount;
     int m_cachedColumnCount;
-    QRect m_cachedBoundingRect;
-    Theme m_cachedTheme;
-    LabelTransparency m_cachedLabelTransparency;
-    QFont m_cachedFont;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
     ShadowQuality m_cachedShadowQuality;
@@ -135,7 +131,6 @@ private:
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
     TextureHelper *m_textureHelper;
-    Drawer *m_drawer;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;
@@ -143,7 +138,6 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
-    GLfloat m_autoScaleAdjustment;
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_rowWidth;
@@ -188,32 +182,31 @@ public slots:
     void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
                         QSizeF spacing = QSizeF(1.0f, 1.0f),
                         bool relative = true);
-    void updateTheme(Theme theme);
     void updateSelectionMode(SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateLimits(QPair<GLfloat, GLfloat> newLimits);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateZoomLevel(int newZoomLevel);
-    void updateFont(const QFont &font);
-    void updateLabelTransparency(LabelTransparency transparency);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
-    void updateShadowQuality(ShadowQuality quality);
     void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
     void updateMeshFileName(const QString &objFileName);
-    void updateBoundingRect(const QRect boundingRect);
-    void updatePosition(const QRect boundingRect);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.
     // Only one request can be queued per render pass at this point. New request will override any pending requests.
     // After inspection the selectionUpdated signal is emitted.
-    void requestSelectionAtPoint(const QPoint &point);
+    virtual void requestSelectionAtPoint(const QPoint &point);
 
 signals:
     void selectionUpdated(QVector3D selection);
 
 private:
-    void initializeOpenGL();
+    virtual void initializePreOpenGL();
+    virtual void initializeOpenGL();
+    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void updateShadowQuality(ShadowQuality quality);
+    virtual void updateTextures();
+
     void drawSlicedScene(CameraHelper *camera,
                          const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
@@ -223,7 +216,6 @@ private:
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -232,7 +224,6 @@ private:
     void initDepthShader();
     void updateDepthBuffer();
 #endif
-    void updateTextures();
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     Bars3dController::SelectionType isSelected(GLint row, GLint bar);

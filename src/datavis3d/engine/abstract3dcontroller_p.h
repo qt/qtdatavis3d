@@ -59,7 +59,10 @@
 #include "qabstractaxis.h"
 #include "drawer_p.h"
 
+class QFont;
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
+
 class CameraHelper;
 
 class QT_DATAVIS3D_EXPORT Abstract3DController : public QObject
@@ -81,6 +84,7 @@ private:
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     Theme m_theme;
+    QFont m_font;
     ShadowQuality m_shadowQuality;
     LabelTransparency m_labelTransparency;
 
@@ -139,6 +143,15 @@ public:
     virtual void setColorTheme(ColorTheme colorTheme);
     virtual Theme theme();
 
+    // Font size adjustment
+    virtual void setFontSize(float fontsize);
+    virtual float fontSize();
+
+    // Set font
+    virtual void setFont(const QFont &font);
+    virtual QFont font();
+
+
     // Adjust shadow quality
     virtual void setShadowQuality(ShadowQuality quality);
     virtual ShadowQuality shadowQuality();
@@ -156,6 +169,7 @@ signals:
     void positionChanged(QRect boundingRect);
     void zoomLevelChanged(int zoomLevel);
     void themeChanged(Theme theme);
+    void fontChanged(QFont font);
     void shadowQualityChanged(ShadowQuality quality);
     void labelTransparencyUpdated(LabelTransparency transparency);
     void axisChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *newAxis);

@@ -100,7 +100,6 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
-      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),
@@ -108,7 +107,6 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(33.3f),
-      m_autoScaleAdjustment(1.0f),
       m_heightNormalizer(1.0f),
       m_yAdjustment(0.0f),
       m_rowWidth(0),
@@ -128,72 +126,9 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
     #endif
 {
     m_dummyBarRenderItem.setRenderer(this);
-
-    // Listen to changes in the drawer
-    QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Bars3dRenderer::updateTextures);
-
-    // Listen to changes in the controller
-    QObject::connect(m_controller, &Bars3dController::themeChanged, this,
-                     &Bars3dRenderer::updateTheme);
-    QObject::connect(m_controller, &Bars3dController::selectionModeChanged, this,
-                     &Bars3dRenderer::updateSelectionMode);
-    QObject::connect(m_controller, &Bars3dController::slicingActiveChanged, this,
-                     &Bars3dRenderer::updateSlicingActive);
-    QObject::connect(m_controller, &Bars3dController::limitsChanged, this,
-                     &Bars3dRenderer::updateLimits);
-    QObject::connect(m_controller, &Bars3dController::sampleSpaceChanged, this,
-                     &Bars3dRenderer::updateSampleSpace);
-    QObject::connect(m_controller, &Bars3dController::barSpecsChanged, this,
-                     &Bars3dRenderer::updateBarSpecs);
-    QObject::connect(m_controller, &Bars3dController::objFileChanged, this,
-                     &Bars3dRenderer::updateMeshFileName);
-    QObject::connect(m_controller, &Bars3dController::boundingRectChanged, this,
-                     &Bars3dRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Bars3dController::sizeChanged, this,
-                     &Bars3dRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Bars3dController::positionChanged, this,
-                     &Bars3dRenderer::updatePosition);
-    QObject::connect(m_controller, &Bars3dController::fontChanged, this,
-                     &Bars3dRenderer::updateFont);
-    QObject::connect(m_controller, &Bars3dController::labelTransparencyUpdated, this,
-                     &Bars3dRenderer::updateLabelTransparency);
-    QObject::connect(m_controller, &Bars3dController::gridEnabledChanged, this,
-                     &Bars3dRenderer::updateGridEnabled);
-    QObject::connect(m_controller, &Bars3dController::backgroundEnabledChanged, this,
-                     &Bars3dRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Bars3dController::shadowQualityChanged, this,
-                     &Bars3dRenderer::updateShadowQuality);
-    QObject::connect(m_controller, &Bars3dController::tickCountChanged, this,
-                     &Bars3dRenderer::updateTickCount);
-    QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
-                     &Bars3dRenderer::updateZoomLevel);
-
-    updateTheme(m_controller->theme());
-    updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
-    updateSelectionMode(m_controller->selectionMode());
-    updateSlicingActive(m_controller->isSlicingActive());
-    updateLimits(m_controller->limits());
-    updateZoomLevel(m_controller->zoomLevel());
-    updateBarSpecs(m_controller->barThickness(), m_controller->barSpacing(),
-                   m_controller->isBarSpecRelative());
-    updateMeshFileName(m_controller->objFile());
-    updateFont(m_controller->font());
-    updateLabelTransparency(m_controller->labelTransparency());
-    updateGridEnabled(m_controller->gridEnabled());
-    updateBackgroundEnabled(m_controller->backgroundEnabled());
-
+    initializePreOpenGL();
+    initializeOpenGLFunctions();
     initializeOpenGL();
-
-    updateBoundingRect(m_controller->boundingRect());
-    updateShadowQuality(m_controller->shadowQuality());
-
-    // TODO: Protect with mutex or redesign how axes create label items?
-    if (m_controller->axisX())
-        m_controller->axisX()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisY())
-        m_controller->axisY()->d_ptr->setDrawer(m_drawer);
-    if (m_controller->axisZ())
-        m_controller->axisZ()->d_ptr->setDrawer(m_drawer);
 }
 
 Bars3dRenderer::~Bars3dRenderer()
@@ -218,48 +153,61 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_drawer;
 }
 
+void Bars3dRenderer::initializePreOpenGL()
+{
+    Abstract3DRenderer::initializePreOpenGL();
+
+    // Listen to changes in the controller
+    QObject::connect(m_controller, &Bars3dController::selectionModeChanged, this,
+                     &Bars3dRenderer::updateSelectionMode);
+    QObject::connect(m_controller, &Bars3dController::slicingActiveChanged, this,
+                     &Bars3dRenderer::updateSlicingActive);
+    QObject::connect(m_controller, &Bars3dController::limitsChanged, this,
+                     &Bars3dRenderer::updateLimits);
+    QObject::connect(m_controller, &Bars3dController::sampleSpaceChanged, this,
+                     &Bars3dRenderer::updateSampleSpace);
+    QObject::connect(m_controller, &Bars3dController::barSpecsChanged, this,
+                     &Bars3dRenderer::updateBarSpecs);
+    QObject::connect(m_controller, &Bars3dController::objFileChanged, this,
+                     &Bars3dRenderer::updateMeshFileName);
+    QObject::connect(m_controller, &Bars3dController::positionChanged, this,
+                     &Bars3dRenderer::updatePosition);
+    QObject::connect(m_controller, &Bars3dController::gridEnabledChanged, this,
+                     &Bars3dRenderer::updateGridEnabled);
+    QObject::connect(m_controller, &Bars3dController::backgroundEnabledChanged, this,
+                     &Bars3dRenderer::updateBackgroundEnabled);
+    QObject::connect(m_controller, &Bars3dController::tickCountChanged, this,
+                     &Bars3dRenderer::updateTickCount);
+    QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
+                     &Bars3dRenderer::updateZoomLevel);
+
+    updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
+    updateSelectionMode(m_controller->selectionMode());
+    updateSlicingActive(m_controller->isSlicingActive());
+    updateLimits(m_controller->limits());
+    updateZoomLevel(m_controller->zoomLevel());
+    updateBarSpecs(m_controller->barThickness(), m_controller->barSpacing(),
+                   m_controller->isBarSpecRelative());
+    updateMeshFileName(m_controller->objFile());
+    updateGridEnabled(m_controller->gridEnabled());
+    updateBackgroundEnabled(m_controller->backgroundEnabled());
+}
+
 void Bars3dRenderer::initializeOpenGL()
 {
-    initializeOpenGLFunctions();
+    // TODO: Protect with mutex or redesign how axes create label items?
+    if (m_controller->axisX())
+        m_controller->axisX()->d_ptr->setDrawer(m_drawer);
+    if (m_controller->axisY())
+        m_controller->axisY()->d_ptr->setDrawer(m_drawer);
+    if (m_controller->axisZ())
+        m_controller->axisZ()->d_ptr->setDrawer(m_drawer);
 
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
     // Initialize shaders
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                              QStringLiteral(":/shaders/fragmentShadowNoTex"));
-    } else {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                              QStringLiteral(":/shaders/fragment"));
-    }
-#else
-    if (!m_cachedTheme.m_uniformColor) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
-    initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
-                          QStringLiteral(":/shaders/fragmentES2"));
-#endif
-
+    handleShadowQualityChange();
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
 
@@ -302,6 +250,8 @@ void Bars3dRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+
+    Abstract3DRenderer::initializeOpenGL();
 }
 
 void Bars3dRenderer::render(QBarDataProxy *dataProxy,
@@ -1537,10 +1487,6 @@ void Bars3dRenderer::requestSelectionAtPoint(const QPoint &point)
 
 void Bars3dRenderer::handleResize()
 {
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
-        return;
-    qDebug() << "Bars3dRenderer::resizeEvent " << m_cachedBoundingRect.width() << "x" <<m_cachedBoundingRect.height();
-
     // Set view port
     if (m_cachedIsSlicingActivated) {
         m_mainViewPort = QRect(0,
@@ -1551,22 +1497,6 @@ void Bars3dRenderer::handleResize()
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
     }
     m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-
-    // Calculate zoom level based on aspect ratio
-    GLfloat div;
-    GLfloat zoomAdjustment;
-    div = qMin(m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    zoomAdjustment = defaultRatio * ((m_cachedBoundingRect.width() / div) / (m_cachedBoundingRect.height() / div));
-    //qDebug() << "zoom adjustment" << zoomAdjustment;
-    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
-
-    // Re-init selection buffer
-    initSelectionBuffer();
-
-#if !defined(QT_OPENGL_ES_2)
-    // Re-init depth buffer
-    updateDepthBuffer();
-#endif
 }
 
 void Bars3dRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -1619,40 +1549,6 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
     calculateSceneScalingFactors();
 }
 
-void Bars3dRenderer::updateTheme(Theme theme)
-{
-    m_cachedTheme.setFromTheme(theme);
-
-    m_drawer->setTheme(m_cachedTheme);
-    // Re-initialize shaders
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
-    } else {
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
-    }
-#else
-    if (!m_cachedTheme.m_uniformColor) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
-#endif
-}
 
 void Bars3dRenderer::updateSelectionMode(SelectionMode mode)
 {
@@ -1668,17 +1564,8 @@ void Bars3dRenderer::updateSelectionMode(SelectionMode mode)
     }
 }
 
-void Bars3dRenderer::updateFont(const QFont &font)
-{
-    m_cachedFont = font;
-    m_drawer->setFont(font);
-}
 
-void Bars3dRenderer::updateLabelTransparency(LabelTransparency transparency)
-{
-    m_cachedLabelTransparency = transparency;
-    m_drawer->setTransparency(transparency);
-}
+
 
 void Bars3dRenderer::updateGridEnabled(bool enable)
 {
@@ -1760,17 +1647,6 @@ void Bars3dRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat mini
         calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
         m_valueUpdateNeeded = true;
     }
-}
-
-void Bars3dRenderer::updateBoundingRect(const QRect boundingRect)
-{
-    m_cachedBoundingRect = boundingRect;
-    handleResize();
-}
-
-void Bars3dRenderer::updatePosition(const QRect boundingRect)
-{
-    m_cachedBoundingRect = boundingRect;
 }
 
 void Bars3dRenderer::loadBarMesh()
