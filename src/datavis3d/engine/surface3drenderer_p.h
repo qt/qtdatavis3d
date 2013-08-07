@@ -119,6 +119,7 @@ private:
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceShader;
     ShaderHelper *m_surfaceGridShader;
+    ShaderHelper *m_selectionShader;
     TextureHelper *m_textureHelper;
     bool m_isInitialized;
     GLfloat m_yRange; // m_heightNormalizer
@@ -135,8 +136,13 @@ private:
     SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
+    GLuint m_selectionFrameBuffer;
+    GLuint m_selectionDepthBuffer;
     GLuint m_gradientTexture;
+    GLuint m_selectionTexture;
+    GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
+    bool m_querySelection;
     bool m_cachedSmoothSurface;
     bool m_cachedSurfaceGridOn;
 
@@ -158,6 +164,8 @@ public slots:
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient();
     void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+
+    void getSelection();
 
 public:
     // Size
@@ -190,7 +198,11 @@ private:
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initSelectionShaders();
     void initSurfaceShaders();
+    void updateSelectionTexture();
+    void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
+    void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
 
     Q_DISABLE_COPY(Surface3dRenderer)
 };

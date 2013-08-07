@@ -59,6 +59,8 @@
 
 #include <QDebug>
 
+static const int ID_TO_RGBA_MASK = 0xff;
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
@@ -79,6 +81,7 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_backgroundShader(0),
       m_surfaceShader(0),
       m_surfaceGridShader(0),
+      m_selectionShader(0),
       m_isInitialized(false),
       m_yRange(0.0f), // m_heightNormalizer
       m_yAdjustment(0.0f),
@@ -94,8 +97,13 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_surfaceObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
+      m_selectionFrameBuffer(0),
+      m_selectionDepthBuffer(0),
       m_gradientTexture(0),
+      m_selectionTexture(0),
+      m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
+      m_querySelection(false),
       m_drawer(new Drawer(m_cachedTheme, m_font, m_labelTransparency))
 {
     // Listen to changes in the controller
@@ -107,6 +115,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
                      &Surface3dRenderer::updateTickCount);
     QObject::connect(m_controller, &Surface3dController::themeChanged, this,
                      &Surface3dRenderer::updateTheme);
+    QObject::connect(m_controller, &Surface3dController::leftMousePressed, this,
+                     &Surface3dRenderer::getSelection);
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
@@ -119,12 +129,18 @@ Surface3dRenderer::~Surface3dRenderer()
 {
     qDebug() << "Surface3dRenderer::~Surface3dRenderer()";
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-
-    if (m_backgroundShader)
-        delete m_backgroundShader;
+    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
 
     m_textureHelper->deleteTexture(&m_depthTexture);
     m_textureHelper->deleteTexture(&m_gradientTexture);
+    m_textureHelper->deleteTexture(&m_selectionTexture);
+    m_textureHelper->deleteTexture(&m_selectionResultTexture);
+
+    delete m_backgroundShader;
+    delete m_selectionShader;
+    delete m_surfaceShader;
+    delete m_surfaceGridShader;
 
     delete m_backgroundObj;
     delete m_surfaceObj;
@@ -160,7 +176,7 @@ void Surface3dRenderer::initializeOpenGL()
     initSurfaceShaders();
 
     // Init selection shader
-    //initSelectionShader();
+    initSelectionShaders();
 
     // Load grid line mesh
     loadGridLineMesh();
@@ -226,8 +242,6 @@ void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
 
 void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
 {
-    Q_UNUSED(defaultFboHandle)
-
     //qDebug() << "Surface3dRenderer::drawScene";
 
     GLfloat backgroundRotation = 0;
@@ -273,8 +287,78 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     //  Do the surface drawing
     //
 
+    if (m_querySelection && m_surfaceObj) {
+        m_selectionShader->bind();
+        glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+        glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
+        glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
+
+        glDisable(GL_CULL_FACE);
+
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+
+        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
+        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+                                    1.0f,
+                                    m_zLength / m_scaleFactor));
+
+        MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+
+        m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
+
+        // Activate texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
+        m_selectionShader->setUniformValue(m_selectionShader->texture(), 0);
+
+        // 1st attribute buffer : vertices
+        glEnableVertexAttribArray(m_selectionShader->posAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, m_surfaceObj->vertexBuf());
+        glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+        // 3rd attribute buffer : UVs
+        glEnableVertexAttribArray(m_selectionShader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, m_surfaceObj->uvBuf());
+        glVertexAttribPointer(m_selectionShader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+        // Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceObj->elementBuf());
+
+        // Draw the triangles
+        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), m_surfaceObj->indicesType(), (void *)0);
+        //m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture, 0);
+
+        // Free buffers
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDisableVertexAttribArray(m_selectionShader->uvAtt());
+        glDisableVertexAttribArray(m_selectionShader->posAtt());
+
+        glEnable(GL_DITHER);
+
+        m_querySelection = false;
+
+        QPoint point = m_controller->mousePosition();
+        GLubyte pixel[4] = {0};
+        glReadPixels(point.x(), height() - point.y(), 1, 1,
+                     GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+        //uint id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+
+        qDebug() << "pixel = " << pixel[0] << ", " << pixel[1] << ", " << pixel[2] << ", " << pixel[3];
+
+        glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
+
+        // Release selection shader
+        m_selectionShader->release();
+    }
+
     if (m_surfaceObj) {
         m_surfaceShader->bind();
+        // m_selectionShader->bind(); // IFDEF print selection
 
         // For surface we can see climpses from underneath
         glDisable(GL_CULL_FACE);
@@ -306,6 +390,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->nModel(), itModelMatrix.inverted().transposed());
         m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
+        //m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix); // IFDEF print selection
         m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         //IF QT_OPENGL_ES_2 TODO
@@ -316,7 +401,10 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
                                             m_cachedTheme.m_lightStrength * 2.0f);
 
         m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
+        //m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture, 0); // IFDEF print selection
+
         m_surfaceShader->release();
+        //m_selectionShader->release(); // IFDEF print selection
 
         if (m_cachedSurfaceGridOn) {
             // Draw the grid over the surface
@@ -461,7 +549,8 @@ void Surface3dRenderer::updateSurfaceGradient()
     pmp.setBrush(QBrush(m_cachedTheme.m_surfaceGradient));
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, 4, 100);
-    image.save("C:\\Users\\misalmel\\Work\\image.png", "png");
+
+//    QImage image(QStringLiteral("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavis3d_2\\grid.png"));
 
     if (m_gradientTexture) {
         m_textureHelper->deleteTexture(&m_gradientTexture);
@@ -469,6 +558,99 @@ void Surface3dRenderer::updateSurfaceGradient()
     }
 
     m_gradientTexture = m_textureHelper->create2DTexture(image, false, true);
+}
+
+void Surface3dRenderer::updateSelectionTexture()
+{
+    // Create the selection ID image. Each grid corner gets 2x2 pixel area of
+    // ID color so that each vertex (data point) has 4x4 pixel area of ID color
+    // TODO: power of two thing for ES
+    int idImageWidth = (m_tickXCount - 1) * 4;
+    int idImageHeight = (m_tickZCount - 1) * 4;
+    int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
+
+    uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
+    uint id = 1;
+    for (int i = 0; i < idImageHeight; i += 4) {
+        for (int j = 0; j < idImageWidth; j += 4) {
+            int p = (i * idImageWidth + j) * 4;
+            uchar r, g, b, a;
+            idToRGBA(id, &r, &g, &b, &a);
+            fillIdCorner(&bits[p], r, g, b, a, stride);
+
+            idToRGBA(id + 1, &r, &g, &b, &a);
+            fillIdCorner(&bits[p + 8], r, g, b, a, stride);
+
+            idToRGBA(id + m_tickXCount, &r, &g, &b, &a);
+            fillIdCorner(&bits[p + 2 * stride], r, g, b, a, stride);
+
+            idToRGBA(id + m_tickXCount + 1, &r, &g, &b, &a);
+            fillIdCorner(&bits[p + 2 * stride + 8], r, g, b, a, stride);
+
+            id++;
+        }
+        id++;
+    }
+
+    // Use this to save the ID image to file
+    //QImage image(bits, idImageWidth, idImageHeight, QImage::Format_ARGB32);
+    //image.save("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavis3d_2\\selection.png");
+
+    // If old texture exists, delete it
+    if (m_selectionTexture) {
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_selectionTexture = 0;
+    }
+
+    // Move the ID image (bits) to the texture
+    m_selectionTexture = m_textureHelper->create2DTexture(bits, idImageWidth, idImageHeight);
+
+    // Release the temp bits allocation
+    delete bits;
+
+    // Create the result selection texture and buffers
+    if (m_selectionResultTexture) {
+        m_textureHelper->deleteTexture(&m_selectionResultTexture);
+        m_selectionResultTexture = 0;
+    }
+
+    m_selectionResultTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
+                                                                       m_selectionFrameBuffer,
+                                                                       m_selectionDepthBuffer);
+}
+
+void Surface3dRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride)
+{
+    p[0] = r;
+    p[1] = g;
+    p[2] = b;
+    p[3] = a;
+    p[4] = r;
+    p[5] = g;
+    p[6] = b;
+    p[7] = a;
+    p[stride + 0] = r;
+    p[stride + 1] = g;
+    p[stride + 2] = b;
+    p[stride + 3] = a;
+    p[stride + 4] = r;
+    p[stride + 5] = g;
+    p[stride + 6] = b;
+    p[stride + 7] = a;
+}
+
+void Surface3dRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a)
+{
+    *r = id & ID_TO_RGBA_MASK;
+    *g = (id >> 8) & ID_TO_RGBA_MASK;
+    *b = (id >> 16) & ID_TO_RGBA_MASK;
+    *a = (id >> 24) & ID_TO_RGBA_MASK;
+}
+
+void Surface3dRenderer::getSelection()
+{
+    qDebug() << "Surface3dRenderer::getSelection";
+    m_querySelection = true;
 }
 
 void Surface3dRenderer::setSeries(QList<qreal> series)
@@ -483,6 +665,8 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
         m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange, true);
     else
         m_surfaceObj->setUpData(series, m_tickXCount, m_tickZCount, m_yRange, true);
+
+    updateSelectionTexture();
 }
 
 void Surface3dRenderer::calculateSceneScalingFactors()
@@ -682,6 +866,15 @@ void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
+void Surface3dRenderer::initSelectionShaders()
+{
+    if (m_selectionShader)
+        delete m_selectionShader;
+    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexLabel"),
+                                         QStringLiteral(":/shaders/fragmentLabel"));
+    m_selectionShader->initialize();
+}
+
 void Surface3dRenderer::initSurfaceShaders()
 {
     if (m_surfaceShader)
@@ -703,3 +896,22 @@ void Surface3dRenderer::initSurfaceShaders()
 }
 
 QT_DATAVIS3D_END_NAMESPACE
+
+
+//p = 90;
+//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
+//            bits[p + 2] << ", " << bits[p + 3];
+//p += 4;
+//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
+//            bits[p + 2] << ", " << bits[p + 3];
+//p += 4;
+//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
+//            bits[p + 2] << ", " << bits[p + 3];
+//p += 4;
+//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
+//            bits[p + 2] << ", " << bits[p + 3];
+//p += 4;
+//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
+//            bits[p + 2] << ", " << bits[p + 3];
+//p += 4;
+

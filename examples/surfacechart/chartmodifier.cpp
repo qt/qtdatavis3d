@@ -107,10 +107,10 @@ void ChartModifier::togglePlane(bool enable)
     if (enable) {
         QList<qreal> series;
 
-        qreal y = 2.0 / qreal(m_xCount - 1);
+        qreal y = 2.0 / qreal(m_zCount - 1);
         for (int i = 0; i < m_zCount; i++) {
             for (int j = 0; j < m_xCount; j++) {
-                series << j * y;
+                series << i * y;
             }
         }
 

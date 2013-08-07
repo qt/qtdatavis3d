@@ -138,7 +138,10 @@ void touchEvent(QTouchEvent *event)
 
 void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    if (Qt::RightButton == event->button()) {
+    if (Qt::LeftButton == event->button()) {
+        m_mousePos = mousePos;
+        emit leftMousePressed();
+    } else if (Qt::RightButton == event->button()) {
     #if !defined(Q_OS_ANDROID)
         m_mouseState = Abstract3DController::MouseRotating;
     #else
@@ -172,6 +175,12 @@ void Surface3dController::wheelEvent(QWheelEvent *event)
 {
     Q_UNUSED(event)
 }
+
+QPoint Surface3dController::mousePosition()
+{
+    return m_mousePos;
+}
+
 
 // TODO: abstract renderer should have accessor for Drawer instead
 Drawer *Surface3dController::drawer()

@@ -1,5 +1,3 @@
-#version 150
-
 varying highp vec2 UV;
 varying highp vec2 coords_mdl;
 varying highp vec3 position_wrld;

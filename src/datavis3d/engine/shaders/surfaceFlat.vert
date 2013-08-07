@@ -10,6 +10,7 @@ uniform highp mat4 M;
 uniform highp mat4 itM;
 uniform highp vec3 lightPosition_wrld;
 
+varying highp vec2 UV;
 varying highp vec3 position_wrld;
 flat out highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
@@ -25,5 +26,5 @@ void main() {
     vec3 lightPosition_cmr = (V * vec4(lightPosition_wrld, 1.0)).xyz;
     lightDirection_cmr = lightPosition_cmr + eyeDirection_cmr;
     normal_cmr = (V * itM * vec4(vertexNormal_mdl, 0.0)).xyz;
-    //normal_cmr = vertexNormal_mdl;
+    UV = vertexUV;
 }

@@ -101,6 +101,22 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     return textureId;
 }
 
+GLuint TextureHelper::create2DTexture(const uchar *image, int width, int height)
+{
+    GLuint textureId;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return textureId;
+}
+
 GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinearFiltering)
 {
     if (image.isNull())
@@ -139,8 +155,8 @@ GLuint TextureHelper::createSelectionBuffer(const QSize &size, GLuint &texture,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 //#if !defined(QT_OPENGL_ES_2)
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
-//                 GL_UNSIGNED_INT, NULL);
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGB,
+//                 GL_UNSIGNED_BYTE, NULL);
 //#else
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
                  GL_UNSIGNED_BYTE, NULL);
@@ -181,13 +197,13 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, textureid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//#if !defined(QT_OPENGL_ES_2)
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
-//                 GL_UNSIGNED_INT, NULL);
-//#else
+#if !defined(QT_OPENGL_ES_2)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, NULL);
+#else
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
                  GL_UNSIGNED_BYTE, NULL);
-//#endif
+#endif
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer

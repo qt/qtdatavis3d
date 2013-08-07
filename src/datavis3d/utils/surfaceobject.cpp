@@ -67,12 +67,15 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
     // Create vertice table
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;
-    for (int i = 0, row = 0; i < rows; i++, row += columns) {
-        for (int j = 0; j < columns; j++) {
-            vertices.append(QVector3D(float(j) / width - 1.0f,
-                                      series.at(row + j) / height - 1.0f,
-                                      float(i) / depth + 1.0f));
-            uvs.append(QVector2D(1.0f / float(j), 1.0f / float(i)));
+    float uvX = 1.0 / float(columns - 1);
+    float uvY = 1.0 / float(rows - 1);
+    int row = 0;
+    for (float i = 0.0f; i < float(rows); i += 1.0, row += columns) {
+        for (float j = 0; j < columns; j++) {
+            vertices.append(QVector3D(j / width - 1.0f,
+                                      series.at(row + int(j)) / height - 1.0f,
+                                      i / depth + 1.0f));
+            uvs.append(QVector2D(j * uvX, i * uvY));
         }
     }
 
@@ -99,7 +102,7 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
                           vertices.at(p - 1),
                           vertices.at(p - columns - 1)));
 
-    // Create indice table
+    // Create indices table
     GLint *indices = 0;
     if (changeGeometry) {
         m_indexCount = 6 * (columns - 1) * (rows - 1);
@@ -154,24 +157,27 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
     GLfloat height = yRange / 2.0f;
+    float uvX = 1.0 / float(columns - 1);
+    float uvY = 1.0 / float(rows - 1);
 
     // Create vertice table
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;
-    for (int i = 0, row = 0; i < rows; i++, row += columns) {
-        for (int j = 0; j < columns; j++) {
-            vertices.append(QVector3D(float(j) / width - 1.0f,
-                                      series.at(row + j) / height - 1.0f,
-                                      float(i) / depth + 1.0f));
-            uvs.append(QVector2D(1.0f / float(j), 1.0f / float(i)));
+    int row = 0;
+    for (float i = 0.0f; i < float(rows); i += 1.0f, row += columns) {
+        for (float j = 0.0f; j < float(columns); j += 1.0f) {
+            vertices.append(QVector3D(j / width - 1.0f,
+                                      series.at(row + int(j)) / height - 1.0f,
+                                      i / depth + 1.0f));
+            uvs.append(QVector2D(j * uvX, i * uvY));
             if (j > 0 && j < columns - 1) {
                 vertices.append(vertices.last());
-                uvs.append(QVector2D(1.0f / float(j), 1.0f / float(i)));
+                uvs.append(uvs.last());
             }
         }
     }
 
-    // Create normals & indice table
+    // Create normals & indices table
     QVector<QVector3D> normals;
     int doubleColumns = columns * 2 - 2;
 

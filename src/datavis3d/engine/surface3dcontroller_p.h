@@ -90,6 +90,8 @@ public:
     void initializeOpenGL();
     void render(const GLuint defaultFboHandle = 0);
 
+    QPoint mousePosition();
+
     QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
 
     void setWidth(const int width);
@@ -129,6 +131,7 @@ signals:
     void smoothStatusChanged(bool enable);
     void surfaceGridChanged(bool enable);
     void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
+    void leftMousePressed();
 
 private:
     Q_DISABLE_COPY(Surface3dController)
