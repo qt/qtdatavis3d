@@ -1423,6 +1423,8 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
     GLfloat zTrans = aspectRatio * item.position().z()
             / (m_areaSize.height() * m_scaleFactor);
     GLfloat yTrans = item.position().y() / (m_tickCount * m_tickStep * m_scaleFactor);
+    // TODO: Do we need to update m_heightNormalizer here based on item.position().y()? (can updateLimits be used?)
+    // TODO: Test if yTrans is always -1.0 ... 1.0
     //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
     //qDebug() << item.translation() << m_heightNormalizer;

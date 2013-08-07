@@ -49,25 +49,25 @@
 //
 // We mean it.
 
-#ifndef QITEMMODELMAPDATAPROXY_P_H
-#define QITEMMODELMAPDATAPROXY_P_H
+#ifndef QITEMMODELSCATTERDATAPROXY_P_H
+#define QITEMMODELSCATTERDATAPROXY_P_H
 
-#include "qitemmodelmapdataproxy.h"
-#include "qMapDataProxy_p.h"
+#include "qitemmodelscatterdataproxy.h"
+#include "qscatterdataproxy_p.h"
 #include <QPointer>
 #include <QTimer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelMapDataProxyPrivate : public QMapDataProxyPrivate
+class QItemModelScatterDataProxyPrivate : public QScatterDataProxyPrivate
 {
     Q_OBJECT
 public:
-    QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
-    virtual ~QItemModelMapDataProxyPrivate();
+    QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q);
+    virtual ~QItemModelScatterDataProxyPrivate();
 
     void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelMapDataMapping *mapping);
+    void setMapping(QItemModelScatterDataMapping *mapping);
 
 public slots:
     void handleColumnsInserted(const QModelIndex &parent, int start, int end);
@@ -89,14 +89,14 @@ public slots:
 
 private:
     void resolveModel();
-    QItemModelMapDataProxy *qptr();
+    QItemModelScatterDataProxy *qptr();
 
     QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
+    QPointer<QItemModelScatterDataMapping> m_mapping; // Not owned
     bool resolvePending;
     QTimer m_resolveTimer;
 
-    friend class QItemModelMapDataProxy;
+    friend class QItemModelScatterDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -31,7 +31,11 @@ HEADERS += \
     $$PWD/qitemmodelmapdatamapping.h \
     $$PWD/qitemmodelmapdatamapping_p.h \
     $$PWD/qitemmodelmapdataproxy.h \
-    $$PWD/qitemmodelmapdataproxy_p.h
+    $$PWD/qitemmodelmapdataproxy_p.h \
+    $$PWD/qitemmodelscatterdatamapping.h \
+    $$PWD/qitemmodelscatterdatamapping_p.h \
+    $$PWD/qitemmodelscatterdataproxy.h \
+    $$PWD/qitemmodelscatterdataproxy_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -52,4 +56,6 @@ SOURCES += \
     $$PWD/qscatterdataitem.cpp \
     $$PWD/qscatterdataproxy.cpp \
     $$PWD/qitemmodelmapdatamapping.cpp \
-    $$PWD/qitemmodelmapdataproxy.cpp
+    $$PWD/qitemmodelmapdataproxy.cpp \
+    $$PWD/qitemmodelscatterdatamapping.cpp \
+    $$PWD/qitemmodelscatterdataproxy.cpp

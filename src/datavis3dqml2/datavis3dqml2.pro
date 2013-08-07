@@ -19,20 +19,17 @@ INCLUDEPATH += ../datavis3d/engine \
 SOURCES += \
     datavis3dqml2_plugin.cpp \
     declarativebars.cpp \
-    declarativemaps.cpp  #\
-    #declarativedataitem.cpp \
-    #declarativedatarow.cpp \
-    #declarativedataset.cpp
+    declarativemaps.cpp  \
+    declarativescatter.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
     declarativebars.h \
     declarativebars_p.h \
     declarativemaps.h \
-    declarativemaps_p.h #\
-    #declarativedataitem.h \
-    #declarativedatarow.h \
-    #declarativedataset.h
+    declarativemaps_p.h \
+    declarativescatter.h \
+    declarativescatter_p.h
 
 OTHER_FILES = qmldir
 

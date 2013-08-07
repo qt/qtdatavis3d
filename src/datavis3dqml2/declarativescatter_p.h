@@ -49,56 +49,42 @@
 //
 // We mean it.
 
-#ifndef QITEMMODELMAPDATAPROXY_P_H
-#define QITEMMODELMAPDATAPROXY_P_H
+#ifndef DECLARATIVESCATTER_P_H
+#define DECLARATIVESCATTER_P_H
 
-#include "qitemmodelmapdataproxy.h"
-#include "qMapDataProxy_p.h"
-#include <QPointer>
-#include <QTimer>
+#include "datavis3dglobal_p.h"
+#include <QString>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelMapDataProxyPrivate : public QMapDataProxyPrivate
+class DeclarativeScatterCachedStatePrivate
 {
-    Q_OBJECT
 public:
-    QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
-    virtual ~QItemModelMapDataProxyPrivate();
+    explicit DeclarativeScatterCachedStatePrivate();
+    ~DeclarativeScatterCachedStatePrivate();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelMapDataMapping *mapping);
+    QString m_labelRow;
+    QString m_labelColumn;
+    QString m_labelHeight;
 
-public slots:
-    void handleColumnsInserted(const QModelIndex &parent, int start, int end);
-    void handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                            const QModelIndex &destinationParent, int destinationColumn);
-    void handleColumnsRemoved(const QModelIndex &parent, int start, int end);
-    void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                           const QVector<int> &roles = QVector<int> ());
-    void handleLayoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex> (),
-                             QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
-    void handleModelReset();
-    void handleRowsInserted(const QModelIndex &parent, int start, int end);
-    void handleRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                         const QModelIndex &destinationParent, int destinationRow);
-    void handleRowsRemoved(const QModelIndex &parent, int start, int end);
+    bool m_isSelectionModeSet;
+    SelectionMode m_selectionMode;
 
-    void handleMappingChanged();
-    void handlePendingResolve();
+    bool m_isLabelTransparencySet;
+    LabelTransparency m_labelTransparency;
 
-private:
-    void resolveModel();
-    QItemModelMapDataProxy *qptr();
+    bool m_isShadowQualitySet;
+    ShadowQuality m_shadowQuality;
 
-    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
-    bool resolvePending;
-    QTimer m_resolveTimer;
+    bool m_isGridSet;
+    bool m_isGridEnabled;
 
-    friend class QItemModelMapDataProxy;
+    bool m_isTickCountSet;
+    int m_tickCount;
+    qreal m_tickStep;
+    qreal m_tickMin;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif
+#endif // DECLARATIVESCATTER_P_H

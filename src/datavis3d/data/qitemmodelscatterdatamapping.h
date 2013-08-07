@@ -39,29 +39,55 @@
 **
 ****************************************************************************/
 
-#include "datavis3dqml2_plugin.h"
+#ifndef QITEMMODELSCATTERDATAMAPPING_H
+#define QITEMMODELSCATTERDATAMAPPING_H
 
-#include <qqml.h>
-#include <QDebug>
+#include "qdatavis3dnamespace.h"
+#include <QObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-void Datavis3dqml2Plugin::registerTypes(const char *uri)
+class QItemModelScatterDataMappingPrivate;
+
+class QT_DATAVIS3D_EXPORT QItemModelScatterDataMapping : public QObject
 {
-    qDebug() << "Datavis3dqml2Plugin::registerTypes()";
+    Q_OBJECT
+    //Q_PROPERTY(QString labelRole READ labelRole WRITE setLabelRole)
+    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole)
+    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole)
+    Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole)
+    //Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
+public:
+    explicit QItemModelScatterDataMapping();
+    QItemModelScatterDataMapping(const QItemModelScatterDataMapping &other);
+    QItemModelScatterDataMapping(const QString &labelRole, const QString &xPosRole,
+                                 const QString &yPosRole, const QString &zPosRole,
+                                 const QString &valueRole);
+    virtual ~QItemModelScatterDataMapping();
 
-    // @uri com.digia.QtDataVis3D
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
-                                                   QLatin1String("Trying to create uncreatable: AbstractItemModel."));
+    QItemModelScatterDataMapping &operator=(const QItemModelScatterDataMapping &other);
 
-    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelMapDataMapping>(uri, 1, 0, "MapDataMapping");
-    qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
+    //void setLabelRole(const QString &role);
+    //QString labelRole() const;
+    void setXPosRole(const QString &role);
+    QString xPosRole() const;
+    void setYPosRole(const QString &role);
+    QString yPosRole() const;
+    void setZPosRole(const QString &role);
+    QString zPosRole() const;
+    //void setValueRole(const QString &role);
+    //QString valueRole() const;
 
-    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");
-    qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
-}
+    void remap(const QString &labelRole, const QString &xPosRole,
+               const QString &yPosRole, const QString &zPosRole, const QString &valueRole);
+signals:
+    void mappingChanged();
+
+private:
+    QScopedPointer<QItemModelScatterDataMappingPrivate> d_ptr;
+};
+
 
 QT_DATAVIS3D_END_NAMESPACE
 
+#endif

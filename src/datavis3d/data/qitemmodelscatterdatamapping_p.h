@@ -49,54 +49,30 @@
 //
 // We mean it.
 
-#ifndef QITEMMODELMAPDATAPROXY_P_H
-#define QITEMMODELMAPDATAPROXY_P_H
+#include "qitemmodelscatterdatamapping.h"
 
-#include "qitemmodelmapdataproxy.h"
-#include "qMapDataProxy_p.h"
-#include <QPointer>
-#include <QTimer>
+#ifndef QITEMMODELSCATTERDATAMAPPING_P_H
+#define QITEMMODELSCATTERDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelMapDataProxyPrivate : public QMapDataProxyPrivate
+class QItemModelScatterDataMappingPrivate : public QObject
 {
     Q_OBJECT
 public:
-    QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
-    virtual ~QItemModelMapDataProxyPrivate();
-
-    void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelMapDataMapping *mapping);
-
-public slots:
-    void handleColumnsInserted(const QModelIndex &parent, int start, int end);
-    void handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                            const QModelIndex &destinationParent, int destinationColumn);
-    void handleColumnsRemoved(const QModelIndex &parent, int start, int end);
-    void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                           const QVector<int> &roles = QVector<int> ());
-    void handleLayoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex> (),
-                             QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
-    void handleModelReset();
-    void handleRowsInserted(const QModelIndex &parent, int start, int end);
-    void handleRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                         const QModelIndex &destinationParent, int destinationRow);
-    void handleRowsRemoved(const QModelIndex &parent, int start, int end);
-
-    void handleMappingChanged();
-    void handlePendingResolve();
+    QItemModelScatterDataMappingPrivate(QItemModelScatterDataMapping *q);
+    virtual ~QItemModelScatterDataMappingPrivate();
 
 private:
-    void resolveModel();
-    QItemModelMapDataProxy *qptr();
+    //QString m_labelRole;
+    QString m_xPosRole;
+    QString m_yPosRole;
+    QString m_zPosRole;
+    //QString m_valueRole;
 
-    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
-    bool resolvePending;
-    QTimer m_resolveTimer;
+    QItemModelScatterDataMapping *q_ptr;
 
-    friend class QItemModelMapDataProxy;
+    friend class QItemModelScatterDataMapping;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -39,64 +39,43 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QITEMMODELSCATTERDATAPROXY_H
+#define QITEMMODELSCATTERDATAPROXY_H
 
-#ifndef QITEMMODELMAPDATAPROXY_P_H
-#define QITEMMODELMAPDATAPROXY_P_H
-
-#include "qitemmodelmapdataproxy.h"
-#include "qMapDataProxy_p.h"
-#include <QPointer>
-#include <QTimer>
+#include "qscatterdataproxy.h"
+#include "qitemmodelscatterdatamapping.h"
+#include <QAbstractItemModel>
+#include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelMapDataProxyPrivate : public QMapDataProxyPrivate
+class QItemModelScatterDataProxyPrivate;
+
+class QT_DATAVIS3D_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
 {
     Q_OBJECT
+
 public:
-    QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
-    virtual ~QItemModelMapDataProxyPrivate();
+    explicit QItemModelScatterDataProxy();
+    explicit QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
+                                        QItemModelScatterDataMapping *mapping);
+    virtual ~QItemModelScatterDataProxy();
 
+    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
     void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelMapDataMapping *mapping);
+    QAbstractItemModel *itemModel();
 
-public slots:
-    void handleColumnsInserted(const QModelIndex &parent, int start, int end);
-    void handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                            const QModelIndex &destinationParent, int destinationColumn);
-    void handleColumnsRemoved(const QModelIndex &parent, int start, int end);
-    void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                           const QVector<int> &roles = QVector<int> ());
-    void handleLayoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex> (),
-                             QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
-    void handleModelReset();
-    void handleRowsInserted(const QModelIndex &parent, int start, int end);
-    void handleRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                         const QModelIndex &destinationParent, int destinationRow);
-    void handleRowsRemoved(const QModelIndex &parent, int start, int end);
+    // Map scatter role (xPos, yPos, zPos) to role in model
+    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
+    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
+    void setMapping(QItemModelScatterDataMapping *mapping);
+    QItemModelScatterDataMapping *mapping();
 
-    void handleMappingChanged();
-    void handlePendingResolve();
+protected:
+    QItemModelScatterDataProxyPrivate *dptr();
 
 private:
-    void resolveModel();
-    QItemModelMapDataProxy *qptr();
-
-    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
-    bool resolvePending;
-    QTimer m_resolveTimer;
-
-    friend class QItemModelMapDataProxy;
+    Q_DISABLE_COPY(QItemModelScatterDataProxy)
 };
 
 QT_DATAVIS3D_END_NAMESPACE
