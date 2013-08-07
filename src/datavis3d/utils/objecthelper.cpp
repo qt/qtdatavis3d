@@ -56,7 +56,6 @@ ObjectHelper::ObjectHelper(const QString &objectFile)
 
 ObjectHelper::~ObjectHelper()
 {
-    qDebug() << "ObjectHelper::~ObjectHelper()";
 }
 
 void ObjectHelper::setObjectFile(const QString &objectFile)

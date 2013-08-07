@@ -61,8 +61,16 @@ public:
     qreal min() const;
     qreal max() const;
 
+    void setTickCount(int count);
+    int tickCount() const;
+
+    void setAutoAdjustRange(bool autoAdjust);
+    bool isAutoAdjustRange() const;
+
 signals:
     void rangeChanged(qreal min, qreal max);
+    void tickCountChanged(int count);
+    void autoAdjustRangeChanged(bool autoAdjust);
 
 protected:
     QValueAxisPrivate *dptr();
@@ -70,6 +78,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(QValueAxis)
+    friend class Bars3dController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

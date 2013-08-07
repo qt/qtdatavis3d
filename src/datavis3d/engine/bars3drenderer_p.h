@@ -112,8 +112,6 @@ private:
     QList<BarRenderItem *> *m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
-    GLint m_tickCount;
-    GLfloat m_tickStep;
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
@@ -152,7 +150,6 @@ private:
     bool m_isSelectionPointRequestActive;
 
     bool m_hasHeightAdjustmentChanged;
-    QPair<GLfloat,GLfloat> m_limits;
     BarRenderItem m_dummyBarRenderItem;
     QBarDataProxy *m_dataProxy; // Only valid during render
 
@@ -180,13 +177,15 @@ public slots:
                         bool relative = true);
     void updateSelectionMode(SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
-    void updateLimits(QPair<GLfloat, GLfloat> newLimits);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
-    void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
     void updateMeshFileName(const QString &objFileName);
+
+    // Overloaded from abstract renderer
+    virtual void updateAxisTickCount(QAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.
     // Only one request can be queued per render pass at this point. New request will override any pending requests.
@@ -221,7 +220,7 @@ private:
     void updateDepthBuffer();
 #endif
     void calculateSceneScalingFactors();
-    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
+    void calculateHeightAdjustment();
     Bars3dController::SelectionType isSelected(GLint row, GLint bar);
 
     Q_DISABLE_COPY(Bars3dRenderer)

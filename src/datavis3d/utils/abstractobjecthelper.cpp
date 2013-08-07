@@ -53,12 +53,10 @@ AbstractObjectHelper::AbstractObjectHelper()
       m_indexCount(0),
       m_meshDataLoaded(false)
 {
-    qDebug() << "AbstractObjectHelper::AbstractObjectHelper";
 }
 
 AbstractObjectHelper::~AbstractObjectHelper()
 {
-    qDebug() << "AbstractObjectHelper::~AbstractObjectHelper";
     glDeleteBuffers(1, &m_vertexbuffer);
     glDeleteBuffers(1, &m_uvbuffer);
     glDeleteBuffers(1, &m_normalbuffer);

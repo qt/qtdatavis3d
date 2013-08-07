@@ -99,8 +99,8 @@ private:
     float m_barSpacingZ;
     int m_fontSize;
     int m_ticks;
-    float m_tickStep;
-    float m_minval;
+    qreal m_minval;
+    qreal m_maxval;
     QStringList m_genericRowLabels;
     QStringList m_genericColumnLabels;
 };

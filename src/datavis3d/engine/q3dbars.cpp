@@ -42,6 +42,7 @@
 #include "q3dbars.h"
 #include "q3dbars_p.h"
 #include "bars3dcontroller_p.h"
+#include "qvalueaxis.h"
 
 #include <QMouseEvent>
 
@@ -466,16 +467,16 @@ QCategoryAxis *Q3DBars::columnAxis()
     return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
-void Q3DBars::setValueAxis(QAbstractAxis *axis)
+void Q3DBars::setValueAxis(QValueAxis *axis)
 {
     Q_ASSERT(axis);
 
     return d_ptr->m_shared->setAxisY(axis);
 }
 
-QAbstractAxis *Q3DBars::valueAxis()
+QValueAxis *Q3DBars::valueAxis()
 {
-    return d_ptr->m_shared->axisY();
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
 
 void Q3DBars::setDataProxy(QBarDataProxy *proxy)
@@ -486,22 +487,6 @@ void Q3DBars::setDataProxy(QBarDataProxy *proxy)
 QBarDataProxy *Q3DBars::dataProxy()
 {
     return d_ptr->m_shared->dataProxy();
-}
-
-/*!
- * \a tickCount How many ticks will be drawn. \c 5 by default.
- *
- * \a step How large a step each tick is.
- *
- * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
- * important if values can be negative, or autoscaling won't work correctly.
- *
- * Sets tick count and step. Note; tickCount * step should be the maximum possible value of data
- * set.
- */
-void Q3DBars::setTickCount(int tickCount, qreal step, qreal minimum)
-{
-    d_ptr->m_shared->setTickCount(GLint(tickCount), GLfloat(step), GLfloat(minimum));
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

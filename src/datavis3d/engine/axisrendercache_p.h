@@ -74,31 +74,38 @@ public:
     inline const QString &title() { return m_title; }
     void setLabels(const QStringList &labels);
     inline const QStringList &labels() { return m_labels; }
-    inline void setMin(qreal min) { m_min = min; }
+    void setMin(qreal min);
     inline qreal min() { return m_min; }
-    inline void setMax(qreal max) { m_max = max; }
+    void setMax(qreal max);
     inline qreal max() { return m_max; }
+    void setTickCount(int count);
+    inline int tickCount() const { return m_tickCount; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
+    inline GLfloat tickStep() const { return m_tickStep; }
 
 public slots:
     void updateTextures();
 
 private:
+    void updateTickStep();
+
     // Cached axis values
     QAbstractAxis::AxisType m_type;
     QString m_title;
     QStringList m_labels;
     qreal m_min;
     qreal m_max;
+    int m_tickCount;
 
     // Renderer items
     Drawer *m_drawer; // Not owned
     LabelItem m_titleItem;
     QList<LabelItem *> m_labelItems;
+    GLfloat m_tickStep;
 
-    Q_DISABLE_COPY(AxisRenderCache);
+    Q_DISABLE_COPY(AxisRenderCache)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

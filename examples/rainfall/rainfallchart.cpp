@@ -40,6 +40,7 @@
 
 #include "rainfallchart.h"
 #include "qcategoryaxis.h"
+#include "qvalueaxis.h"
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>

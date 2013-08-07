@@ -65,11 +65,19 @@ public:
     QValueAxisPrivate(QValueAxis *q);
     virtual ~QValueAxisPrivate();
 
+    void setRange(qreal min, qreal max);
+    void setMin(qreal min);
+    void setMax (qreal max);
+
 protected:
     qreal m_min;
     qreal m_max;
+    int m_tickCount;
+    bool m_autoAdjust;
 
 private:
+    QValueAxis *qptr();
+
     friend class QValueAxis;
 };
 

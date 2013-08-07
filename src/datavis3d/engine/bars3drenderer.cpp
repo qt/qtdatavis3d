@@ -84,8 +84,6 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_sliceSelection(0),
       m_sliceCache(0),
       m_sliceTitleItem(0),
-      m_tickCount(0),
-      m_tickStep(0),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
@@ -161,8 +159,6 @@ void Bars3dRenderer::initializePreOpenGL()
                      &Bars3dRenderer::updateSelectionMode);
     QObject::connect(m_controller, &Bars3dController::slicingActiveChanged, this,
                      &Bars3dRenderer::updateSlicingActive);
-    QObject::connect(m_controller, &Bars3dController::limitsChanged, this,
-                     &Bars3dRenderer::updateLimits);
     QObject::connect(m_controller, &Bars3dController::sampleSpaceChanged, this,
                      &Bars3dRenderer::updateSampleSpace);
     QObject::connect(m_controller, &Bars3dController::barSpecsChanged, this,
@@ -175,8 +171,6 @@ void Bars3dRenderer::initializePreOpenGL()
                      &Bars3dRenderer::updateGridEnabled);
     QObject::connect(m_controller, &Bars3dController::backgroundEnabledChanged, this,
                      &Bars3dRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Bars3dController::tickCountChanged, this,
-                     &Bars3dRenderer::updateTickCount);
     QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
                      &Bars3dRenderer::updateZoomLevel);
 
@@ -184,7 +178,6 @@ void Bars3dRenderer::initializePreOpenGL()
     updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
     updateSelectionMode(m_controller->selectionMode());
     updateSlicingActive(m_controller->isSlicingActive());
-    updateLimits(m_controller->limits());
     updateZoomLevel(m_controller->zoomLevel());
     updateBarSpecs(m_controller->barThickness(), m_controller->barSpacing(),
                    m_controller->isBarSpecRelative());
@@ -1161,121 +1154,119 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             }
         }
 
-        // Wall lines: back wall
-        GLfloat heightStep = m_heightNormalizer / 5.0f; // default to 5 lines
-        GLfloat startLine;
+        if (m_axisCacheY.tickCount() > 0) {
+            // Wall lines: back wall
+            GLfloat heightStep = m_axisCacheY.tickStep();
+            GLfloat startLine;
 
-        if (m_tickCount > 0)
-            heightStep = m_tickStep;
+            if (m_hasNegativeValues)
+                startLine = -m_heightNormalizer;
+            else
+                startLine = heightStep;
 
-        if (m_hasNegativeValues)
-            startLine = -m_heightNormalizer;
-        else
-            startLine = heightStep;
+            for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
+                 lineHeight += heightStep) {
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+                QMatrix4x4 depthMVPMatrix;
+                QMatrix4x4 itModelMatrix;
 
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
-            QMatrix4x4 depthMVPMatrix;
-            QMatrix4x4 itModelMatrix;
+                if (m_zFlipped) {
+                    modelMatrix.translate(0.0f,
+                                          2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                          m_columnDepth / m_scaleFactor + zComp);
+                } else {
+                    modelMatrix.translate(0.0f,
+                                          2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                          -m_columnDepth / m_scaleFactor + zComp);
+                }
+                modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
+                                            gridLineWidth));
+                itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
+                                              gridLineWidth));
 
-            if (m_zFlipped) {
-                modelMatrix.translate(0.0f,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      m_columnDepth / m_scaleFactor + zComp);
-            } else {
-                modelMatrix.translate(0.0f,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      -m_columnDepth / m_scaleFactor + zComp);
-            }
-            modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                        gridLineWidth));
-            itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
-                                          gridLineWidth));
+                MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+                depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
-            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
-
-            // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+                // Set the rest of the shader bindings
+                m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
+                m_barShader->setUniformValue(m_barShader->nModel(),
+                                             itModelMatrix.inverted().transposed());
+                m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > ShadowNone) {
-                // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
-                                             m_cachedTheme.m_lightStrength / 10.0f);
+                if (m_cachedShadowQuality > ShadowNone) {
+                    // Set shadow shader bindings
+                    m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
+                    m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
+                    m_barShader->setUniformValue(m_barShader->lightS(),
+                                                 m_cachedTheme.m_lightStrength / 10.0f);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
-            } else
+                    // Draw the object
+                    m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                } else
 #endif
-            {
-                // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                {
+                    // Set shadowless shader bindings
+                    m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                    // Draw the object
+                    m_drawer->drawObject(m_barShader, m_gridLineObj);
+                }
             }
-        }
 
-        // Wall lines: side wall
-        for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
-             lineHeight += heightStep) {
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
-            QMatrix4x4 depthMVPMatrix;
-            QMatrix4x4 itModelMatrix;
+            // Wall lines: side wall
+            for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
+                 lineHeight += heightStep) {
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+                QMatrix4x4 depthMVPMatrix;
+                QMatrix4x4 itModelMatrix;
 
-            if (m_xFlipped) {
-                modelMatrix.translate(m_rowWidth / m_scaleFactor,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      zComp);
-            } else {
-                modelMatrix.translate(-m_rowWidth / m_scaleFactor,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
-                                      zComp);
-            }
-            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                        m_columnDepth / m_scaleFactor));
-            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
-                                          m_columnDepth / m_scaleFactor));
+                if (m_xFlipped) {
+                    modelMatrix.translate(m_rowWidth / m_scaleFactor,
+                                          2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                          zComp);
+                } else {
+                    modelMatrix.translate(-m_rowWidth / m_scaleFactor,
+                                          2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                          zComp);
+                }
+                modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                            m_columnDepth / m_scaleFactor));
+                itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                              m_columnDepth / m_scaleFactor));
 
-            MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
-            depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
+                MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
+                depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
-            // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+                // Set the rest of the shader bindings
+                m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
+                m_barShader->setUniformValue(m_barShader->nModel(),
+                                             itModelMatrix.inverted().transposed());
+                m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > ShadowNone) {
-                // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
-                                             m_cachedTheme.m_lightStrength / 10.0f);
+                if (m_cachedShadowQuality > ShadowNone) {
+                    // Set shadow shader bindings
+                    m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
+                    m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
+                    m_barShader->setUniformValue(m_barShader->lightS(),
+                                                 m_cachedTheme.m_lightStrength / 10.0f);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
-            } else
+                    // Draw the object
+                    m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                } else
 #endif
-            {
-                // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                {
+                    // Set shadowless shader bindings
+                    m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
 
-                // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                    // Draw the object
+                    m_drawer->drawObject(m_barShader, m_gridLineObj);
+                }
             }
         }
-
         // Release bar shader
         m_barShader->release();
     }
@@ -1514,6 +1505,33 @@ void Bars3dRenderer::updateMeshFileName(const QString &objFileName)
     loadBarMesh();
 }
 
+void Bars3dRenderer::updateAxisTickCount(QAbstractAxis::AxisOrientation orientation, int count)
+{
+    Abstract3DRenderer::updateAxisTickCount(orientation, count);
+    calculateHeightAdjustment();
+}
+
+void Bars3dRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
+{
+    Abstract3DRenderer::updateAxisRange(orientation, min, max);
+    calculateHeightAdjustment();
+
+    // Check if we have negative values
+    if (min < 0 && !m_hasNegativeValues) {
+        m_hasNegativeValues = true;
+        // Reload background
+        loadBackgroundMesh();
+    } else if (min >= 0 && m_hasNegativeValues) {
+        m_hasNegativeValues = false;
+        // Reload background
+        loadBackgroundMesh();
+    }
+
+    // TODO Currently barchart only supports zero centered or zero minimum ranges
+    if (min > 0.0 || (min != 0.0 && (qFabs(min) != qFabs(max))))
+        qWarning() << __FUNCTION__ << "Bar chart currently properly supports only zero-centered and zero minimum ranges for Y-axis.";
+}
+
 void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
 {
     // Destroy old render items and reallocate new array
@@ -1633,17 +1651,6 @@ void Bars3dRenderer::updateShadowQuality(ShadowQuality quality)
 #endif
 }
 
-void Bars3dRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
-{
-    m_tickCount = tickCount;
-    m_tickStep = step;
-    if (tickCount > 0 && step > 0) {
-        m_heightNormalizer = tickCount * step;
-        calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
-        m_valueUpdateNeeded = true;
-    }
-}
-
 void Bars3dRenderer::loadBarMesh()
 {
     QString objectFileName = m_cachedObjFile;
@@ -1704,15 +1711,20 @@ void Bars3dRenderer::calculateSceneScalingFactors()
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
 }
 
-void Bars3dRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
+void Bars3dRenderer::calculateHeightAdjustment()
 {
+    m_heightNormalizer = (GLfloat)qMax(qFabs(m_axisCacheY.min()), qFabs(m_axisCacheY.max()));
+
     // 2.0f = max difference between minimum and maximum value after scaling with m_heightNormalizer
-    GLfloat newAdjustment = 2.0f - ((limits.second - limits.first) / m_heightNormalizer);
+    GLfloat newAdjustment = 2.0f - ((m_heightNormalizer - m_axisCacheY.min()) / m_heightNormalizer);
     if (newAdjustment != m_yAdjustment) {
         m_hasHeightAdjustmentChanged = true;
         m_yAdjustment = newAdjustment;
     }
     //qDebug() << m_yAdjustment;
+
+    // If this function needs to be called, then value update is also needed
+    m_valueUpdateNeeded = true;
 }
 
 Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
@@ -1748,32 +1760,6 @@ Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
         isSelectedType = Bars3dController::SelectionRow;
     }
     return isSelectedType;
-}
-
-void Bars3dRenderer::updateLimits(QPair<GLfloat, GLfloat> limits)
-{
-    m_limits.first  = limits.first;
-    m_limits.second = limits.second;
-
-    // TODO: What if we have only negative values?
-
-    // Check if we have negative values
-    if (limits.first < 0 && !m_hasNegativeValues) {
-        m_hasNegativeValues = true;
-        // Reload background
-        loadBackgroundMesh();
-    } else if (limits.first >= 0 && m_hasNegativeValues) {
-        m_hasNegativeValues = false;
-        // Reload background
-        loadBackgroundMesh();
-    }
-
-    // Don't auto-adjust height if tick count is set
-    if (m_tickCount == 0) {
-        m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        calculateHeightAdjustment(limits);
-        m_valueUpdateNeeded = true;
-    }
 }
 
 void Bars3dRenderer::updateSlicingActive(bool isSlicing)

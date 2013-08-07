@@ -47,7 +47,8 @@ AxisRenderCache::AxisRenderCache()
     : m_type(QAbstractAxis::AxisTypeNone),
       m_min(0.0),
       m_max(0.0),
-      m_drawer(0)
+      m_drawer(0),
+      m_tickStep(0.0f)
 {
 }
 
@@ -112,6 +113,24 @@ void AxisRenderCache::setLabels(const QStringList &labels)
     }
 }
 
+void AxisRenderCache::setMin(qreal min)
+{
+    m_min = min;
+    updateTickStep();
+}
+
+void AxisRenderCache::setMax(qreal max)
+{
+    m_max = max;
+    updateTickStep();
+}
+
+void AxisRenderCache::setTickCount(int count)
+{
+    m_tickCount = count;
+    updateTickStep();
+}
+
 void AxisRenderCache::updateTextures()
 {
     if (m_title.isEmpty())
@@ -125,6 +144,15 @@ void AxisRenderCache::updateTextures()
         else
             m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i));
     }
+}
+
+void AxisRenderCache::updateTickStep()
+{
+    if (m_tickCount > 0)
+        m_tickStep = (m_max - m_min) / m_tickCount;
+    else
+        m_tickStep = 0.0f;
+
 }
 
 QT_DATAVIS3D_END_NAMESPACE

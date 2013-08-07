@@ -60,9 +60,9 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
-      m_ticks(20),
-      m_tickStep(1),
-      m_minval(-15.2f)
+      m_ticks(10),
+      m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
+      m_maxval(20.0)
 {
     // Don't set any styles or specifications, start from defaults
     // Generate generic labels
@@ -100,15 +100,14 @@ void ChartModifier::restart(bool dynamicData)
         // Set selection mode to zoom row
         m_chart->setSelectionMode(ModeZoomRow);
         m_chart->setFont(QFont("Times Roman", 20));
-        m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
     } else {
         m_chart->dataProxy()->resetArray(0);
         // Set up sample space
         m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
         m_chart->setSelectionMode(ModeBarRowAndColumn);
-        // Reset tick count to default
-        m_chart->setTickCount(0, 0);
+        m_chart->valueAxis()->setTickCount(m_ticks * 2);
+        m_chart->valueAxis()->setAutoAdjustRange(true);
 
         m_chart->rowAxis()->setTitle("Generic Row");
         m_chart->columnAxis()->setTitle("Generic Column");
@@ -155,6 +154,8 @@ void ChartModifier::addDataSet()
     m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
     m_chart->rowAxis()->setLabels(years);
     m_chart->columnAxis()->setLabels(months);
+    m_chart->valueAxis()->setTickCount(m_ticks);
+    m_chart->valueAxis()->setRange(m_minval, m_maxval);
 
     // Create data rows
     QBarDataArray *dataSet = new QBarDataArray;
@@ -171,11 +172,6 @@ void ChartModifier::addDataSet()
         // Add row to set
         dataSet->append(dataRow);
     }
-
-    // Set tick count (4 steps of 5 degrees, with absolute minimum of -16C, even though we don't have quite that low temperatures in the data)
-    //m_chart->setTickCount(4, 5, -16.0f);
-    // ..or 20 steps of 1 degree, with absolute minimum of -15.2C
-    m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
 
     // Set up sample space based on prepared data
     m_chart->setupSampleSpace(years.size(), months.size());

@@ -42,6 +42,7 @@
 #include "engine.h"
 #include "utils.h"
 #include "qbardataproxy.h"
+#include "qvalueaxis.h"
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -89,9 +90,10 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setupSampleSpace(SpectrumNumBands * 2, SpectrumNumBands);
     // Disable grid
     m_chart->setGridVisible(false);
-    // Disable auto-scaling of height by defining tick count and step, even though we don't draw grid
-    // By setting count to 1 and step to the max we can get, we lock the scale of the bars.
-    m_chart->setTickCount(1, 1.0f);
+    // Disable auto-scaling of height by defining explicit range
+    // By setting count to 0 we avoid getting any grid
+    m_chart->valueAxis()->setTickCount(0);
+    m_chart->valueAxis()->setRange(0.0, 1.0);
     // Disable shadows
     m_chart->setShadowQuality(ShadowNone);
 #if USE_CONES

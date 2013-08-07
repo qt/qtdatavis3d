@@ -44,7 +44,7 @@
 #include "camerahelper_p.h"
 #include "utils_p.h"
 #include "qabstractaxis_p.h"
-#include "qvalueaxis.h"
+#include "qvalueaxis_p.h"
 #include "qcategoryaxis.h"
 #include "qbardataproxy_p.h"
 
@@ -71,9 +71,6 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_objFile(QStringLiteral(":/defaultMeshes/bar")),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
-      m_tickCount(0),
-      m_tickStep(0),
-      m_tickMinimum(0.0f),
       m_renderer(0),
       m_data(0),
       m_valuesDirty(false)
@@ -284,7 +281,7 @@ QBarDataProxy *Bars3dController::dataProxy()
 void Bars3dController::handleArrayReset()
 {
     setSlicingActive(false);
-    handleLimitChange();
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -295,7 +292,7 @@ void Bars3dController::handleRowsAdded(int startIndex, int count)
     // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
-    handleLimitChange();
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -306,7 +303,7 @@ void Bars3dController::handleRowsChanged(int startIndex, int count)
     // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
-    handleLimitChange();
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -317,7 +314,7 @@ void Bars3dController::handleRowsRemoved(int startIndex, int count)
     // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
-    handleLimitChange();
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -328,8 +325,14 @@ void Bars3dController::handleRowsInserted(int startIndex, int count)
     // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
-    handleLimitChange();
+    adjustValueAxisRange();
     m_valuesDirty = true;
+}
+
+void Bars3dController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
+{
+    Q_UNUSED(autoAdjust)
+    adjustValueAxisRange();
 }
 
 void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
@@ -416,6 +419,8 @@ void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
     m_rowCount = rowCount;
     m_columnCount = columnCount;
 
+    adjustValueAxisRange();
+
     emit sampleSpaceChanged(rowCount, columnCount);
 }
 
@@ -460,14 +465,6 @@ bool Bars3dController::backgroundEnabled()
     return m_isBackgroundEnabled;
 }
 
-void Bars3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
-{
-    m_tickCount   = tickCount;
-    m_tickStep    = step;
-    m_tickMinimum = minimum;
-    emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
-}
-
 int Bars3dController::columnCount()
 {
     return m_columnCount;
@@ -478,12 +475,20 @@ int Bars3dController::rowCount()
     return m_rowCount;
 }
 
-void Bars3dController::handleLimitChange()
+void Bars3dController::adjustValueAxisRange()
 {
-    // Get the limits for data window
-    QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
-
-    emit limitsChanged(limits);
+    QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisY);
+    if (valueAxis && valueAxis->isAutoAdjustRange()) {
+        QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
+        if (limits.first < 0) {
+            // TODO: Currently we only support symmetric y-axis for bar chart if there are negative values
+            qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));
+            // Call private implementation to avoid unsetting auto adjust flag
+            valueAxis->dptr()->setRange(-maxAbs, maxAbs);
+        } else {
+            valueAxis->dptr()->setRange(0.0, limits.second);
+        }
+    }
 }
 
 QT_DATAVIS3D_END_NAMESPACE

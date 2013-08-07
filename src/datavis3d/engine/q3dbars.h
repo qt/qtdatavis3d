@@ -49,9 +49,8 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
-class LabelItem;
-class QAbstractAxis;
 class QCategoryAxis;
+class QValueAxis;
 class QBarDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
@@ -104,11 +103,6 @@ public:
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                      bool uniform = true);
 
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    void setTickCount(int tickCount, qreal step, qreal minimum = 0.0f);
-
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
     // TODO: light placement API
@@ -154,8 +148,8 @@ public:
     // customized.
     QCategoryAxis *rowAxis();
     QCategoryAxis *columnAxis();
-    void setValueAxis(QAbstractAxis *axis);
-    QAbstractAxis *valueAxis();
+    void setValueAxis(QValueAxis *axis);
+    QValueAxis *valueAxis();
 
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QBarDataProxy *proxy);

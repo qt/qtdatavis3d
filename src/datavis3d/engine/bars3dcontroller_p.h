@@ -103,9 +103,6 @@ private:
     QString m_objFile;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    GLfloat m_tickMinimum;
 
     Bars3dRenderer *m_renderer;
     QBarDataProxy *m_data;
@@ -151,11 +148,6 @@ public:
     // how many samples per row and column, and names for axes
     void setupSampleSpace(int samplesRow, int samplesColumn);
 
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
-
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
@@ -191,19 +183,19 @@ public slots:
     void handleRowsRemoved(int startIndex, int count);
     void handleRowsInserted(int startIndex, int count);
 
+    void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
+
 signals:
     void selectionModeChanged(SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
-    void limitsChanged(QPair<GLfloat, GLfloat> limits); // TODO should be handled via axis range
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
     void objFileChanged(QString fileName);
     void gridEnabledChanged(bool enable); // TODO should be handled via axis
     void backgroundEnabledChanged(bool enable);
-    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);  // TODO should be handled via axis
 
 private:
-    void handleLimitChange();
+    void adjustValueAxisRange();
 
     Q_DISABLE_COPY(Bars3dController)
 

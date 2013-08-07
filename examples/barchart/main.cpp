@@ -41,6 +41,7 @@
 #include "q3dbars.h"
 #include "qcategoryaxis.h"
 #include "qitemmodelbardataproxy.h"
+#include "qvalueaxis.h"
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -197,19 +198,17 @@ void ChartDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 7.0f},      // week 1
+    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 10.0f},     // week 1
                          {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
                          {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
                          {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
                          {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
 
-    // Set tick count and step, we want a line every hour -> 7 ticks, step 1 hour
-    m_chart->setTickCount(7, 1.0f);
-
     // Add labels
     m_chart->rowAxis()->setTitle("Week of year");
     m_chart->columnAxis()->setTitle("Day of week");
     m_chart->valueAxis()->setTitle("Hours playing banjo");
+    m_chart->valueAxis()->setTickCount(5);
     m_chart->rowAxis()->setLabels(weeks);
     m_chart->columnAxis()->setLabels(days);
 

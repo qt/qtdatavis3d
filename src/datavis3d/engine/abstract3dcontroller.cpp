@@ -302,6 +302,25 @@ void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
 }
 
+void Abstract3DController::handleAxisTickCountChanged(int count)
+{
+    if (sender() == m_axisX)
+        emit axisTickCountChanged(QAbstractAxis::AxisOrientationX, count);
+    else if (sender() == m_axisY)
+        emit axisTickCountChanged(QAbstractAxis::AxisOrientationY, count);
+    else if (sender() == m_axisZ)
+        emit axisTickCountChanged(QAbstractAxis::AxisOrientationZ, count);
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+}
+
+void Abstract3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
+{
+    Q_UNUSED(autoAdjust)
+    // Adjust axis range according to data. Default implementation does nothing,
+    // This needs to be implemented by subclass.
+}
+
 void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientation,
                                          QAbstractAxis *axis, QAbstractAxis **axisPtr)
 {
@@ -324,9 +343,14 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
         QValueAxis *valueAxis = static_cast<QValueAxis *>(axis);
         QObject::connect(valueAxis, &QValueAxis::rangeChanged,
                          this, &Abstract3DController::handleAxisRangeChanged);
+        QObject::connect(valueAxis, &QValueAxis::tickCountChanged,
+                         this, &Abstract3DController::handleAxisTickCountChanged);
+        QObject::connect(valueAxis, &QValueAxis::autoAdjustRangeChanged,
+                         this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
         emit axisRangeChanged(orientation, valueAxis->min(), valueAxis->max());
+        emit axisTickCountChanged(orientation, valueAxis->tickCount());
+        handleAxisAutoAdjustRangeChanged(valueAxis->isAutoAdjustRange());
     }
-
 }
 
 QT_DATAVIS3D_END_NAMESPACE

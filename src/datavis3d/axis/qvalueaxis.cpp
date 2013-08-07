@@ -55,33 +55,20 @@ QValueAxis::~QValueAxis()
 
 void QValueAxis::setRange(qreal min, qreal max)
 {
-    bool dirty = false;
-    if (dptr()->m_min != min) {
-        dptr()->m_min = min;
-        dirty = true;
-    }
-    if (dptr()->m_max != max) {
-        dptr()->m_max = max;
-        dirty = true;
-    }
-    if (dirty)
-        emit rangeChanged(min, max);
+    dptr()->setRange(min, max);
+    setAutoAdjustRange(false);
 }
 
 void QValueAxis::setMin(qreal min)
 {
-    if (dptr()->m_min != min) {
-        dptr()->m_min = min;
-        emit rangeChanged(min, dptr()->m_max);
-    }
+    dptr()->setMin(min);
+    setAutoAdjustRange(false);
 }
 
 void QValueAxis::setMax(qreal max)
 {
-    if (dptr()->m_max != max) {
-        dptr()->m_max = max;
-        emit rangeChanged(dptr()->m_min, max);
-    }
+    dptr()->setMax(max);
+    setAutoAdjustRange(false);
 }
 
 qreal QValueAxis::min() const
@@ -92,6 +79,32 @@ qreal QValueAxis::min() const
 qreal QValueAxis::max() const
 {
     return dptrc()->m_max;
+}
+
+void QValueAxis::setTickCount(int count)
+{
+    if (dptr()->m_tickCount != count){
+        dptr()->m_tickCount = count;
+        emit tickCountChanged(count);
+    }
+}
+
+int QValueAxis::tickCount() const
+{
+    return dptrc()->m_tickCount;
+}
+
+void QValueAxis::setAutoAdjustRange(bool autoAdjust)
+{
+    if (dptr()->m_autoAdjust != autoAdjust) {
+        dptr()->m_autoAdjust = autoAdjust;
+        emit autoAdjustRangeChanged(autoAdjust);
+    }
+}
+
+bool QValueAxis::isAutoAdjustRange() const
+{
+    return dptrc()->m_autoAdjust;
 }
 
 QValueAxisPrivate *QValueAxis::dptr()
@@ -107,12 +120,50 @@ const QValueAxisPrivate *QValueAxis::dptrc() const
 QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
     : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue),
       m_min(0.0),
-      m_max(0.0)
+      m_max(10.0),
+      m_tickCount(10),
+      m_autoAdjust(true)
 {
 }
 
 QValueAxisPrivate::~QValueAxisPrivate()
 {
+}
+
+void QValueAxisPrivate::setRange(qreal min, qreal max)
+{
+    bool dirty = false;
+    if (m_min != min) {
+        m_min = min;
+        dirty = true;
+    }
+    if (m_max != max) {
+        m_max = max;
+        dirty = true;
+    }
+    if (dirty)
+        emit qptr()->rangeChanged(min, max);
+}
+
+void QValueAxisPrivate::setMin(qreal min)
+{
+    if (m_min != min) {
+        m_min = min;
+        emit qptr()->rangeChanged(m_min, m_max);
+    }
+}
+
+void QValueAxisPrivate::setMax(qreal max)
+{
+    if (m_max != max) {
+        m_max = max;
+        emit qptr()->rangeChanged(m_min, m_max);
+    }
+}
+
+QValueAxis *QValueAxisPrivate::qptr()
+{
+    return static_cast<QValueAxis *>(q_ptr);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

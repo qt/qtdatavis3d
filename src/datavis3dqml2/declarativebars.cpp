@@ -42,6 +42,7 @@
 #include "declarativebars.h"
 #include "bars3dcontroller_p.h"
 #include "qitemmodelbardataproxy.h"
+#include "qvalueaxis.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
@@ -128,9 +129,13 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     }
 
     if (m_cachedState->m_isTickCountSet) {
-        m_shared->setTickCount(GLint(m_cachedState->m_tickCount),
-                               GLfloat(m_cachedState->m_tickStep),
-                               GLfloat(m_cachedState->m_tickMin));
+        // TODO needs proper axis support on QML side, too
+        QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
+        if (axis) {
+            axis->setTickCount(m_cachedState->m_tickCount);
+            axis->setRange(m_cachedState->m_tickMin,
+                          (m_cachedState->m_tickCount * m_cachedState->m_tickStep));
+        }
         m_cachedState->m_isTickCountSet = false;
     }
 
@@ -253,6 +258,7 @@ bool DeclarativeBars::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
+// TODO needs proper axis support also in QML
 void DeclarativeBars::setTickCount(int tickCount, qreal step, qreal minimum)
 {
     m_cachedState->m_isTickCountSet = true;

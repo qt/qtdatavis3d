@@ -164,6 +164,8 @@ public slots:
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();
     void handleAxisRangeChanged(qreal min, qreal max);
+    void handleAxisTickCountChanged(int count);
+    void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void boundingRectChanged(QRect boundingRect);
@@ -178,6 +180,7 @@ signals:
     void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
     void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);
     void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    void axisTickCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
 
 private:
     void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis, QAbstractAxis **axisPtr);
