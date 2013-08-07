@@ -1475,6 +1475,9 @@ void Bars3dRenderer::requestSelectionAtPoint(const QPoint &point)
 
 void Bars3dRenderer::handleResize()
 {
+    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
+        return;
+
     // Set view port
     if (m_cachedIsSlicingActivated) {
         m_mainViewPort = QRect(0,
@@ -1485,6 +1488,8 @@ void Bars3dRenderer::handleResize()
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
     }
     m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+
+    Abstract3DRenderer::handleResize();
 }
 
 void Bars3dRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)

@@ -1241,26 +1241,11 @@ void Scatter3DRenderer::handleResize()
     //qDebug() << __FUNCTION__;
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
-    qDebug() << "Scatter3DRenderer::resizeEvent " << m_cachedBoundingRect.width() << "x" <<m_cachedBoundingRect.height();
 
     // Set view port
     m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
 
-    // Calculate zoom level based on aspect ratio
-    GLfloat div;
-    GLfloat zoomAdjustment;
-    div = qMin(m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    zoomAdjustment = defaultRatio * ((m_cachedBoundingRect.width() / div) / (m_cachedBoundingRect.height() / div));
-    //qDebug() << "zoom adjustment" << zoomAdjustment;
-    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
-
-    // Re-init selection buffer
-    initSelectionBuffer();
-
-#if !defined(QT_OPENGL_ES_2)
-    // Re-init depth buffer
-    updateDepthBuffer();
-#endif
+    Abstract3DRenderer::handleResize();
 }
 
 void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
