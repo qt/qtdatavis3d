@@ -44,7 +44,7 @@
 
 using namespace QtDataVis3D;
 
-const int numberOfItems = 10000;
+const int numberOfItems = 100;//10000;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
@@ -71,12 +71,13 @@ void ScatterDataModifier::start()
 void ScatterDataModifier::addData()
 {
     QStringList rowLabels;
-    rowLabels << "something 1" << "something 2" << "something 3" << "something 4" << "something 5"
-                 << "something 6" << "something 7" << "something 8" << "something 9"
-                 << "something 10" << "something 11";
+    rowLabels << "something -1.0" << "something -0.8" << "something -0.6" << "something -0.4"
+              << "something -0.2" << "something 0.0" << "something 0.2" << "something 0.4"
+              << "something 0.6" << "something 0.8" << "something 1.0";
     QStringList columnLabels;
-    columnLabels << "other 1" << "other 2" << "other 3" << "other 4" << "other 5" << "other 6"
-                 << "other 7" << "other 8" << "other 9" << "other 10" << "other 11";
+    columnLabels << "other -1.0" << "other -0.8" << "other -0.6" << "other -0.4" << "other -0.2"
+                 << "other 0.0" << "other 0.2" << "other 0.4" << "other 0.6" << "other 0.8"
+                 << "other 1.0";
 
     // Set tick count and step
     m_chart->setTickCount(10, 0.1f, -1.0f);

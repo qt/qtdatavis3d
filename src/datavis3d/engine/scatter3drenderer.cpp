@@ -54,9 +54,9 @@
 #include <QDebug>
 #include <QMutexLocker>
 
-// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
-// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
-#define USE_WIDER_SHADOWS
+// Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
+// orthographic projection.
+//#define USE_WIDER_SHADOWS
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.
 // You should see the scene from  where the light is
@@ -70,7 +70,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
-const GLfloat aspectRatio = 2.0f; // TODO: Calculate
+const GLfloat aspectRatio = 1.66f; // TODO: Calculate
+// TODO: Make margin modifiable?
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
@@ -418,13 +419,19 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
         //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
-#ifdef USE_WIDER_SHADOWS
-        // Use this for a bit exaggerated shadows
-        depthProjectionMatrix.perspective(60.0f, (GLfloat)m_mainViewPort.width()
+#ifndef USE_WIDER_SHADOWS
+        // Use this for perspective shadows
+        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_mainViewPort.width()
                                           / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
 #else
-        // Use these for normal shadows, with the light further away
-        depthProjectionMatrix = projectionMatrix;
+        // Use these for orthographic shadows
+        //depthProjectionMatrix.ortho(-aspectRatio * 2.0f, aspectRatio * 2.0f,
+        //                            -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
+        //                            0.0f, 100.0f);
+        GLfloat testAspectRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+        depthProjectionMatrix.ortho(-testAspectRatio * 2.0f, testAspectRatio * 2.0f,
+                                    -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
+                                    0.0f, 100.0f);
 #endif
         // Draw bars to depth buffer
         for (int bar = 0; bar < m_renderItemArray.size(); bar++) {

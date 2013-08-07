@@ -60,9 +60,9 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-// Uncommenting this draws the shadow map with wider FOV than scene itself, making the light
-// seem to be closer to scene than it actually is. This way shadows look slightly better (to me anyway)
-#define USE_WIDER_SHADOWS
+// Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
+// orthographic projection.
+//#define USE_WIDER_SHADOWS
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.
 // You should see the scene from  where the light is
@@ -257,7 +257,7 @@ void Maps3DController::initializeOpenGL()
 
     // Update default light position
 #ifndef USE_WIDER_SHADOWS
-    distanceMod = 1.0f;
+    distanceMod = 5.0f;
 #endif
 }
 
@@ -428,13 +428,19 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
         //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
-#ifdef USE_WIDER_SHADOWS
-        // Use this for a bit exaggerated shadows
-        depthProjectionMatrix.perspective(60.0f, (GLfloat)m_sceneViewPort.width()
+#ifndef USE_WIDER_SHADOWS
+        // Use this for perspective shadows
+        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_sceneViewPort.width()
                                           / (GLfloat)m_sceneViewPort.height(), 3.0f, 100.0f);
 #else
-        // Use these for normal shadows, with the light further away
-        depthProjectionMatrix = projectionMatrix;
+        // Use these for orthographic shadows
+        //qDebug() << m_areaSize.width() / m_scaleFactor << m_yAdjustment;
+        GLfloat testAspectRatio = (GLfloat)m_sceneViewPort.width() / (GLfloat)m_sceneViewPort.height();
+        depthProjectionMatrix.ortho(-(2.0f * m_areaSize.width()) / m_scaleFactor,
+                                    (2.0f * m_areaSize.width()) / m_scaleFactor,
+                                    -m_yAdjustment * 4.0f * testAspectRatio,
+                                    m_yAdjustment * 4.0f * testAspectRatio,
+                                    0.0f, 100.0f);
 #endif
 #if 0
         // Draw background to depth buffer (You don't want to do this, except maybe for debugging purposes)
