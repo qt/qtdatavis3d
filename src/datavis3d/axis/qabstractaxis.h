@@ -82,7 +82,7 @@ public:
     virtual ~QAbstractAxis();
 
     QString title() const;
-    QStringList &labels() const;
+    QStringList labels() const;
 
     AxisOrientation orientation() const;
     AxisType type() const;

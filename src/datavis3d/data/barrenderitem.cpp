@@ -55,6 +55,7 @@ BarRenderItem::~BarRenderItem()
 {
 }
 
+// This should be accessed only under data mutex
 void BarRenderItem::formatLabel()
 {
     // Format the string on first access

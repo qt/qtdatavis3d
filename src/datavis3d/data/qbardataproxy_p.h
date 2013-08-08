@@ -80,8 +80,6 @@ private:
 
     QBarDataArray m_dataArray;
 
-    QString m_itemLabelFormat;
-
 private:
     friend class QBarDataProxy;
 };

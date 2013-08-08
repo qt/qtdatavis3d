@@ -49,6 +49,7 @@
 //
 // We mean it.
 
+#include "datavis3dglobal_p.h"
 #include "qabstractaxis.h"
 
 #ifndef QABSTRACTAXIS_P_H

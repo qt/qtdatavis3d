@@ -60,10 +60,10 @@ public:
     QMapDataItem &operator=(const QMapDataItem &other);
 
     void setMapPosition(const QPointF &position);
-    const QPointF &mapPosition() const;
+    QPointF mapPosition() const;
 
     void setLabel(const QString &label);
-    const QString &label() const;
+    QString label() const;
 
 protected:
     virtual void createExtraData();

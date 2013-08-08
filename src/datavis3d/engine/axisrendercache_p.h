@@ -80,16 +80,20 @@ public:
     inline qreal max() { return m_max; }
     void setTickCount(int count);
     inline int tickCount() const { return m_tickCount; }
+    void setSubTickCount(int count);
+    inline int subTickCount() const { return m_subTickCount; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
     inline GLfloat tickStep() const { return m_tickStep; }
+    inline GLfloat subTickStep() const { return m_subTickStep; }
 
 public slots:
     void updateTextures();
 
 private:
     void updateTickStep();
+    void updateSubTickStep();
 
     // Cached axis values
     QAbstractAxis::AxisType m_type;
@@ -98,12 +102,14 @@ private:
     qreal m_min;
     qreal m_max;
     int m_tickCount;
+    int m_subTickCount;
 
     // Renderer items
     Drawer *m_drawer; // Not owned
     LabelItem m_titleItem;
     QList<LabelItem *> m_labelItems;
     GLfloat m_tickStep;
+    GLfloat m_subTickStep;
 
     Q_DISABLE_COPY(AxisRenderCache)
 };

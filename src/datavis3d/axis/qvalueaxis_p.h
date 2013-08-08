@@ -70,10 +70,14 @@ public:
     void setMax (qreal max);
 
 protected:
+    void recreateLabels();
+
     qreal m_min;
     qreal m_max;
     int m_tickCount;
+    int m_subTickCount;
     bool m_autoAdjust;
+    QString m_labelFormat;
 
 private:
     QValueAxis *qptr();

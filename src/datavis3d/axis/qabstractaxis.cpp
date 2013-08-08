@@ -59,7 +59,7 @@ QString QAbstractAxis::title() const
     return d_ptr->m_title;
 }
 
-QStringList &QAbstractAxis::labels() const
+QStringList QAbstractAxis::labels() const
 {
     return d_ptr->m_labels;
 }

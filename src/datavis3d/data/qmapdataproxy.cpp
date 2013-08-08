@@ -72,9 +72,9 @@ int QMapDataProxy::itemCount()
     return dptr()->m_dataArray.size();
 }
 
-const QMapDataArray &QMapDataProxy::array() const
+const QMapDataArray *QMapDataProxy::array() const
 {
-    return dptrc()->m_dataArray;
+    return &dptrc()->m_dataArray;
 }
 
 const QMapDataItem *QMapDataProxy::itemAt(int index) const
@@ -126,7 +126,7 @@ bool QMapDataProxyPrivate::resetArray(QMapDataArray *newArray)
 QPair<GLfloat, GLfloat> QMapDataProxyPrivate::limitValues()
 {
     QMutexLocker locker(&m_mutex);
-    QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
+    QPair<GLfloat, GLfloat> limits = qMakePair(0.0f, 0.0f);
     for (int i = 0; i < m_dataArray.size(); i++) {
         const QMapDataItem &item = m_dataArray.at(i);
         qreal itemValue = item.value();

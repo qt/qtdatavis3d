@@ -71,7 +71,6 @@ public:
 
 private:
     QMapDataArray m_dataArray;
-    QString m_itemLabelFormat;
 
 private:
     friend class QMapDataProxy;

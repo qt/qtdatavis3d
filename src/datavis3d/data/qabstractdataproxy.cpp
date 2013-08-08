@@ -61,11 +61,11 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 
 void QAbstractDataProxy::setItemLabelFormat(const QString &format)
 {
-    d_ptr->m_itemLabelFormat = format;
+    d_ptr->setItemLabelFormat(format);
     emit itemLabelFormatChanged();
 }
 
-const QString &QAbstractDataProxy::itemLabelFormat() const
+QString QAbstractDataProxy::itemLabelFormat() const
 {
     return d_ptr->m_itemLabelFormat;
 }
@@ -87,6 +87,12 @@ QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbs
 
 QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
 {
+}
+
+void QAbstractDataProxyPrivate::setItemLabelFormat(const QString &format)
+{
+    QMutexLocker locker(&m_mutex);
+    m_itemLabelFormat = format;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

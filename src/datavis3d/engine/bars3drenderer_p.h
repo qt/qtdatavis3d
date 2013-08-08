@@ -184,7 +184,6 @@ public slots:
     void updateMeshFileName(const QString &objFileName);
 
     // Overloaded from abstract renderer
-    virtual void updateAxisTickCount(QAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.

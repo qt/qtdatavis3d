@@ -40,6 +40,7 @@
 ****************************************************************************/
 
 #include "axisrendercache_p.h"
+#include "qmath.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -47,8 +48,11 @@ AxisRenderCache::AxisRenderCache()
     : m_type(QAbstractAxis::AxisTypeNone),
       m_min(0.0),
       m_max(0.0),
+      m_tickCount(0),
+      m_subTickCount(0),
       m_drawer(0),
-      m_tickStep(0.0f)
+      m_tickStep(0.0f),
+      m_subTickStep(0.0f)
 {
 }
 
@@ -131,6 +135,12 @@ void AxisRenderCache::setTickCount(int count)
     updateTickStep();
 }
 
+void AxisRenderCache::setSubTickCount(int count)
+{
+    m_subTickCount = count;
+    updateSubTickStep();
+}
+
 void AxisRenderCache::updateTextures()
 {
     if (m_title.isEmpty())
@@ -149,10 +159,18 @@ void AxisRenderCache::updateTextures()
 void AxisRenderCache::updateTickStep()
 {
     if (m_tickCount > 0)
-        m_tickStep = (m_max - m_min) / m_tickCount;
+        m_tickStep = qFabs((m_max - m_min) / m_tickCount);
     else
-        m_tickStep = 0.0f;
+        m_tickStep = 0.0f; // Irrelevant
+    updateSubTickStep();
+}
 
+void AxisRenderCache::updateSubTickStep()
+{
+    if (m_subTickCount > 1)
+        m_subTickStep = m_tickStep / m_subTickCount;
+    else
+        m_subTickStep = m_tickStep;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

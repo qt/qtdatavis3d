@@ -72,11 +72,9 @@ public:
     inline const QVector3D &translation() const {return m_translation; }
 
     // Label item for formatted label
-    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
     LabelItem &labelItem();
 
     // Selection label item (containing special selection texture, if mode is activated)
-    // Ownership of the label texture (if any) transfers to QAbstractDataItemPrivate
     LabelItem &selectionLabel();
 
     // Formatted label for item.

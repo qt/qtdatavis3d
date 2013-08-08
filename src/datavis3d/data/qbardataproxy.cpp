@@ -105,9 +105,9 @@ int QBarDataProxy::rowCount()
     return dptrc()->m_dataArray.size();
 }
 
-const QBarDataArray &QBarDataProxy::array() const
+const QBarDataArray *QBarDataProxy::array() const
 {
-    return dptrc()->m_dataArray;
+    return &dptrc()->m_dataArray;
 }
 
 const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
@@ -218,7 +218,7 @@ void QBarDataProxyPrivate::clearArray()
 QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endRow, int startColumn, int endColumn)
 {
     QMutexLocker locker(&m_mutex);
-    QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
+    QPair<GLfloat, GLfloat> limits = qMakePair(0.0f, 0.0f);
     endRow = qMin(endRow, m_dataArray.size() - 1);
     for (int i = startRow; i <= endRow; i++) {
         QBarDataRow *row = m_dataArray.at(i);

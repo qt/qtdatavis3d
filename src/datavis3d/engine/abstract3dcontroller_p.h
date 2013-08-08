@@ -161,11 +161,12 @@ public:
     virtual LabelTransparency labelTransparency();
 
 public slots:
-    void handleAxisTitleChanged(const QString &title);
-    void handleAxisLabelsChanged();
-    void handleAxisRangeChanged(qreal min, qreal max);
-    void handleAxisTickCountChanged(int count);
-    void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
+    virtual void handleAxisTitleChanged(const QString &title);
+    virtual void handleAxisLabelsChanged();
+    virtual void handleAxisRangeChanged(qreal min, qreal max);
+    virtual void handleAxisTickCountChanged(int count);
+    virtual void handleAxisSubTickCountChanged(int count);
+    virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void boundingRectChanged(QRect boundingRect);
@@ -181,6 +182,7 @@ signals:
     void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);
     void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
     void axisTickCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
+    void axisSubTickCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
 
 private:
     void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis, QAbstractAxis **axisPtr);

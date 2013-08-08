@@ -1156,13 +1156,11 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
         if (m_axisCacheY.tickCount() > 0) {
             // Wall lines: back wall
-            GLfloat heightStep = m_axisCacheY.tickStep();
-            GLfloat startLine;
+            GLfloat heightStep = m_axisCacheY.subTickStep();
+            GLfloat startLine = 0.0f;
 
             if (m_hasNegativeValues)
                 startLine = -m_heightNormalizer;
-            else
-                startLine = heightStep;
 
             for (GLfloat lineHeight = startLine; lineHeight <= m_heightNormalizer;
                  lineHeight += heightStep) {
@@ -1271,8 +1269,6 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         m_barShader->release();
     }
 
-    // TODO: Draw y labels
-
     // Generate label textures for slice selection if m_updateLabels is set
     if (m_cachedIsSlicingActivated && m_updateLabels) {
         // Create label textures
@@ -1372,7 +1368,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             rowPos = (row + 1) * (m_cachedBarSpacing.height());
-            barPos = 0;
+            barPos = m_rowWidth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1380,7 +1376,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             if (m_zFlipped)
                 rotLabelY = 180.0f;
             if (m_xFlipped) {
-                barPos = (m_cachedColumnCount + 1) * (m_cachedBarSpacing.width());
+                barPos = -m_rowWidth;
                 alignment = Qt::AlignLeft;
             }
             if (m_yFlipped) {
@@ -1390,15 +1386,13 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     rotLabelY = 180.0f;
                 rotLabelZ = 180.0f;
             }
-            QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
+            QVector3D labelPos = QVector3D(barPos / m_scaleFactor,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                            (m_columnDepth - rowPos) / m_scaleFactor + zComp);
 
-            // TODO: Try it; draw the label here
-
             m_dummyBarRenderItem.setTranslation(labelPos);
             const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(row);
-            //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << dataSet->rowLabels().at(row);
+            //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_axisCacheX.labels().at(row);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1414,7 +1408,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             barPos = (bar + 1) * (m_cachedBarSpacing.width());
-            rowPos = 0;
+            rowPos = m_columnDepth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1422,7 +1416,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             if (m_xFlipped)
                 rotLabelY = -90.0f;
             if (m_zFlipped) {
-                rowPos = (m_cachedRowCount + 1) * (m_cachedBarSpacing.height());
+                rowPos = -m_columnDepth;
                 alignment = Qt::AlignRight;
             }
             if (m_yFlipped) {
@@ -1434,13 +1428,13 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             }
             QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                           (m_columnDepth - rowPos) / m_scaleFactor + zComp);
+                                           rowPos / m_scaleFactor + zComp);
 
             // TODO: Try it; draw the label here
 
             m_dummyBarRenderItem.setTranslation(labelPos);
             const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(bar);
-            //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << dataSet->columnLabels().at(bar);
+            //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << m_axisCacheZ.labels().at(bar);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -1450,6 +1444,73 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                                 alignment);
         }
     }
+
+    // Y Labels
+    int labelNbr = 0;
+    GLfloat heightStep = m_axisCacheY.tickStep();
+    GLfloat startLine = 0.0f;
+    int labelCount = m_axisCacheY.labels().size();
+    if (m_hasNegativeValues)
+        startLine = -m_heightNormalizer;
+    GLfloat labelPos = startLine;
+
+    for (int i = 0; i < labelCount; i++) {
+        if (m_axisCacheY.labelItems().size() > labelNbr) {
+            GLfloat labelXTrans = m_rowWidth / m_scaleFactor;
+            GLfloat labelZTrans = m_columnDepth / m_scaleFactor;
+            GLfloat labelYTrans = 2.0f * labelPos / m_heightNormalizer - m_yAdjustment;
+            GLfloat rotLabelX = 0.0f;
+            GLfloat rotLabelY = -90.0f;
+            GLfloat rotLabelZ = 0.0f;
+            Qt::AlignmentFlag alignment = Qt::AlignLeft;
+            if (!m_xFlipped) {
+                labelXTrans = -labelXTrans;
+                rotLabelY = 90.0f;
+            }
+            if (m_zFlipped) {
+                labelZTrans = -labelZTrans;
+                alignment = Qt::AlignRight;
+            }
+
+            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+
+            // Back wall
+            QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, labelZTrans + zComp);
+
+            //qDebug() << "labelPos, value:" << labelTrans;
+
+            m_dummyBarRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                alignment);
+
+            // Side wall
+            if (m_xFlipped)
+                alignment = Qt::AlignLeft;
+            else
+                alignment = Qt::AlignRight;
+            if (m_zFlipped)
+                rotLabelY = 180.0f;
+            else
+                rotLabelY = 0.0f;
+
+            labelTrans = QVector3D(-labelXTrans, labelYTrans, -labelZTrans + zComp);
+
+            m_dummyBarRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                alignment);
+        }
+        labelNbr++;
+        labelPos += heightStep;
+    }
+
     glDisable(GL_TEXTURE_2D);
     if (m_cachedLabelTransparency > TransparencyNone)
         glDisable(GL_BLEND);
@@ -1503,12 +1564,6 @@ void Bars3dRenderer::updateMeshFileName(const QString &objFileName)
 {
     m_cachedObjFile = objFileName;
     loadBarMesh();
-}
-
-void Bars3dRenderer::updateAxisTickCount(QAbstractAxis::AxisOrientation orientation, int count)
-{
-    Abstract3DRenderer::updateAxisTickCount(orientation, count);
-    calculateHeightAdjustment();
 }
 
 void Bars3dRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)

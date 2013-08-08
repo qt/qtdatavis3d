@@ -63,14 +63,21 @@ public:
 
     void setTickCount(int count);
     int tickCount() const;
+    void setSubTickCount(int count);
+    int subTickCount() const;
 
     void setAutoAdjustRange(bool autoAdjust);
     bool isAutoAdjustRange() const;
 
+    void setLabelFormat(const QString &format);
+    QString labelFormat() const;
+
 signals:
     void rangeChanged(qreal min, qreal max);
     void tickCountChanged(int count);
+    void subTickCountChanged(int count);
     void autoAdjustRangeChanged(bool autoAdjust);
+    void labelFormatChanged(QString format);
 
 protected:
     QValueAxisPrivate *dptr();

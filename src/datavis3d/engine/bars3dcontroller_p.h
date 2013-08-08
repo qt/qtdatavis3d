@@ -183,7 +183,7 @@ public slots:
     void handleRowsRemoved(int startIndex, int count);
     void handleRowsInserted(int startIndex, int count);
 
-    void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void selectionModeChanged(SelectionMode mode);

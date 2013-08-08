@@ -90,7 +90,7 @@ void QMapDataItem::setMapPosition(const QPointF &position)
     m_mapPosition = position;
 }
 
-const QPointF &QMapDataItem::mapPosition() const
+QPointF QMapDataItem::mapPosition() const
 {
     return m_mapPosition;
 }
@@ -100,7 +100,7 @@ void QMapDataItem::setLabel(const QString &label)
     m_label = label;
 }
 
-const QString &QMapDataItem::label() const
+QString QMapDataItem::label() const
 {
     return m_label;
 }

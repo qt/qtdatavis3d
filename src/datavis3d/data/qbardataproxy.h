@@ -68,8 +68,10 @@ public:
     // requires allocating additional data object for the bar.
 
     // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
+    // Row and item pointers are guaranteed to be valid only until next call that modifies data.
+    // Array pointer is guaranteed to be valid for lifetime of proxy.
     int rowCount();
-    const QBarDataArray &array() const;
+    const QBarDataArray *array() const;
     const QBarDataRow *rowAt(int rowIndex) const;
     const QBarDataItem *itemAt(int rowIndex, int columnIndex) const; // Row and column in said row need to exist or this crashes
 
@@ -86,6 +88,7 @@ public:
     // TODO Leaving them public gives user more options.
 
     // QBarDataProxy takes ownership of all QBarDataArrays, QBarDataRows, and QBarDataItems passed to it.
+    // The pointers passed to it are not guaranteed to be valid after the calls.
 
     // Clears the existing array and sets it data to new array.
     void resetArray(QBarDataArray *newArray);

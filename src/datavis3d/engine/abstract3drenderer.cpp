@@ -78,6 +78,8 @@ void Abstract3DRenderer::initializePreOpenGL()
                      &Abstract3DRenderer::updateAxisRange);
     QObject::connect(m_controller, &Abstract3DController::axisTickCountChanged, this,
                      &Abstract3DRenderer::updateAxisTickCount);
+    QObject::connect(m_controller, &Abstract3DController::axisSubTickCountChanged, this,
+                     &Abstract3DRenderer::updateAxisSubTickCount);
 
     updateTheme(m_controller->theme());
     updateFont(m_controller->font());
@@ -214,6 +216,11 @@ void Abstract3DRenderer::updateAxisTickCount(QAbstractAxis::AxisOrientation orie
     axisCacheForOrientation(orientation).setTickCount(count);
 }
 
+void Abstract3DRenderer::updateAxisSubTickCount(QAbstractAxis::AxisOrientation orientation, int count)
+{
+    axisCacheForOrientation(orientation).setSubTickCount(count);
+}
+
 // This method needs to be called under the controller-renderer sync mutex
 void Abstract3DRenderer::initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis)
 {
@@ -227,6 +234,7 @@ void Abstract3DRenderer::initializeAxisCache(QAbstractAxis::AxisOrientation orie
             const QValueAxis *valueAxis = static_cast<const QValueAxis *>(axis);
             updateAxisRange(orientation, valueAxis->min(), valueAxis->max());
             updateAxisTickCount(orientation, valueAxis->tickCount());
+            updateAxisSubTickCount(orientation, valueAxis->subTickCount());
         }
     }
 }

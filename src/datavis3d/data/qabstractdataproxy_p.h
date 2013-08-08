@@ -66,7 +66,7 @@ public:
     QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type);
     virtual ~QAbstractDataProxyPrivate();
 
-public slots:
+    void setItemLabelFormat(const QString &format);
 
 protected:
     QAbstractDataProxy *q_ptr;

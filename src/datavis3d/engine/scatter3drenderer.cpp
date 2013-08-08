@@ -257,7 +257,7 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
     // TODO this cache initialization assumes data window starts at 0,0 offset from array
     // Update cached values
     if (valuesDirty) {
-        const QScatterDataArray &dataArray = m_dataProxy->array();
+        const QScatterDataArray &dataArray = *m_dataProxy->array();
         int dataSize = dataArray.size();
         m_renderItemArray.resize(dataSize);
         for (int i = 0; i < dataSize ; i++) {

@@ -270,7 +270,8 @@ void Bars3dController::setDataProxy(QBarDataProxy *proxy)
     QObject::connect(m_data, &QBarDataProxy::rowsRemoved, this, &Bars3dController::handleRowsRemoved);
     QObject::connect(m_data, &QBarDataProxy::rowsInserted, this, &Bars3dController::handleRowsInserted);
 
-    // emit something? Renderer might be interested?
+    adjustValueAxisRange();
+    m_valuesDirty = true;
 }
 
 QBarDataProxy *Bars3dController::dataProxy()
@@ -478,13 +479,15 @@ int Bars3dController::rowCount()
 void Bars3dController::adjustValueAxisRange()
 {
     QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisY);
-    if (valueAxis && valueAxis->isAutoAdjustRange()) {
+    if (valueAxis && valueAxis->isAutoAdjustRange() && m_data) {
         QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
         if (limits.first < 0) {
             // TODO: Currently we only support symmetric y-axis for bar chart if there are negative values
             qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));
             // Call private implementation to avoid unsetting auto adjust flag
             valueAxis->dptr()->setRange(-maxAbs, maxAbs);
+        } else if (limits.second == 0.0) {
+            valueAxis->dptr()->setRange(0.0, 1.0); // Only zero value values in data set, set range to something.
         } else {
             valueAxis->dptr()->setRange(0.0, limits.second);
         }

@@ -72,9 +72,9 @@ int QScatterDataProxy::itemCount()
     return dptr()->m_dataArray.size();
 }
 
-const QScatterDataArray &QScatterDataProxy::array() const
+const QScatterDataArray *QScatterDataProxy::array() const
 {
-    return dptrc()->m_dataArray;
+    return &dptrc()->m_dataArray;
 }
 
 const QScatterDataItem *QScatterDataProxy::itemAt(int index) const

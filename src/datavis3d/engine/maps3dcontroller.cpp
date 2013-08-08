@@ -291,7 +291,7 @@ void Maps3DController::render(const GLuint defaultFboHandle)
     QMutexLocker(m_data->mutex());
     // Update cached values
     if (m_valuesDirty) {
-        const QMapDataArray &dataArray = m_data->array();
+        const QMapDataArray &dataArray = *m_data->array();
         int dataSize = dataArray.size();
         m_renderItemArray.resize(dataSize);
         for (int i = 0; i < dataSize ; i++) {
