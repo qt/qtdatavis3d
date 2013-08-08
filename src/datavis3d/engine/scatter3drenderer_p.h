@@ -137,8 +137,8 @@ private:
     QPoint m_selectionPointRequest;
     bool m_isSelectionPointRequestActive;
 
+    bool m_autoAdjust;
     bool m_hasHeightAdjustmentChanged;
-    QPair<GLfloat, GLfloat> m_limits;
     ScatterRenderItem m_dummyRenderItem;
     QScatterDataProxy *m_dataProxy; // Only valid during render
 
@@ -162,7 +162,7 @@ public:
 
 public slots:
     void updateSelectionMode(SelectionMode newMode);
-    //void updateLimits(QPair<GLfloat, GLfloat> newLimits);
+    void updateLimits(const QVector3D &limits);
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);

@@ -107,6 +107,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_scaleFactor(0),
       m_selection(selectionSkipColor),
       m_areaSize(QSizeF(2.0f, 2.0f)),
+      m_autoAdjust(true),
       m_hasHeightAdjustmentChanged(true),
       m_dataProxy(0),
       m_valueUpdateNeeded(false)
@@ -163,13 +164,12 @@ void Scatter3DRenderer::initializePreOpenGL()
 
     // TODO Should all this initial setup be mutexed?
     updateSelectionMode(m_controller->selectionMode());
-    //updateLimits(m_controller->limits());
     updateZoomLevel(m_controller->zoomLevel());
     updateMeshFileName(m_controller->objFile());
     updateGridEnabled(m_controller->gridEnabled());
     updateBackgroundEnabled(m_controller->backgroundEnabled());
 
-    calculateSceneScalingFactors();
+    calculateSceneScalingFactors(QRect(0, 0, m_areaSize.width(), m_areaSize.height()));
 }
 
 
@@ -267,6 +267,9 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
             m_renderItemArray[i].setPosition(dataArray.at(i).position());
             //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
             //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
+            updateLimits(dataArray.at(i).position());
+        }
+        for (int i = 0; i < dataSize ; i++) {
             calculateTranslation(m_renderItemArray[i]);
             m_renderItemArray[i].setRenderer(this);
         }
@@ -741,13 +744,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         modelMatrix.scale(
                     QVector3D(
                         (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        backgroundMargin / m_scaleFactor,
+                        backgroundMargin,
                         (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
         itModelMatrix.scale(
                     QVector3D(
                         (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        backgroundMargin / m_scaleFactor,
+                        backgroundMargin,
                         (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
@@ -813,19 +816,18 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
-        GLfloat lineStep = m_tickStep * 2.0f; // TODO: For now, multiply by two to keep the tick count correct (as we start from negative)
-        GLfloat startLine = -m_heightNormalizer;
+        GLfloat lineStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
+        GLfloat startLine = -m_scaleFactor * aspectRatio;
 
-        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+        for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            modelMatrix.translate(
-                        0.0f,
-                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
-                        (aspectRatio * linePos) / (m_heightNormalizer * m_scaleFactor) + zComp);
+            modelMatrix.translate(0.0f,
+                                  -m_yAdjustment - backgroundMargin,
+                                  linePos / m_scaleFactor + zComp);
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
@@ -866,16 +868,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Floor lines: columns
-        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+        for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            modelMatrix.translate(
-                        (aspectRatio * linePos) / (m_heightNormalizer * m_scaleFactor),
-                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
-                        zComp);
+            modelMatrix.translate(linePos / m_scaleFactor,
+                                  -m_yAdjustment - backgroundMargin,
+                                  zComp);
             modelMatrix.scale(
                         QVector3D(
                             gridLineWidth, gridLineWidth,
@@ -916,7 +917,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: back wall
-        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+        lineStep = 2.0f * m_tickStep;
+        startLine = -m_heightNormalizer;
+
+        for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
             QMatrix4x4 modelMatrix;
@@ -927,10 +931,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
-            modelMatrix.translate(
-                        0.0f,
-                        linePos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                        lineZTrans + zComp);
+            modelMatrix.translate(0.0f,
+                                  linePos / m_heightNormalizer - m_yAdjustment,
+                                  lineZTrans + zComp);
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
@@ -971,7 +974,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: side wall
-        for (GLfloat linePos = startLine; linePos <= m_heightNormalizer; linePos += lineStep) {
+        for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
             QMatrix4x4 modelMatrix;
@@ -982,10 +985,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
 
-            modelMatrix.translate(
-                        lineXTrans,
-                        linePos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment,
-                        zComp);
+            modelMatrix.translate(lineXTrans,
+                                  linePos / m_heightNormalizer - m_yAdjustment,
+                                  zComp);
             modelMatrix.scale(
                         QVector3D(
                             gridLineWidth, gridLineWidth,
@@ -1096,10 +1098,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
 
     // Z Labels
-    GLfloat posStep = m_tickStep * 2.0f; // TODO: For now, multiply by two to keep the tick count correct (as we start from negative)
-    GLfloat startPos = -m_heightNormalizer;
+    GLfloat posStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
+    GLfloat startPos = -m_scaleFactor * aspectRatio;
     int labelNbr = 0;
-    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+    for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
@@ -1115,8 +1117,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             }
             QVector3D labelTrans = QVector3D(
                         labelXTrans,
-                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
-                        (aspectRatio * labelPos) / (m_heightNormalizer * m_scaleFactor) + zComp);
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin),
+                        labelPos / m_scaleFactor + zComp);
 
             // TODO: Try it; draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1134,7 +1136,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
     // X Labels
     labelNbr = 0;
-    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+    for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
@@ -1149,8 +1151,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 alignment = Qt::AlignRight;
             }
             QVector3D labelTrans = QVector3D(
-                        (aspectRatio * labelPos) / (m_heightNormalizer * m_scaleFactor),
-                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin) / m_scaleFactor,
+                        labelPos / m_scaleFactor,
+                        -m_yAdjustment - (m_heightNormalizer * backgroundMargin),
                         labelZTrans + zComp);
 
             // TODO: Try it; draw the label here
@@ -1168,15 +1170,17 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         labelNbr++;
     }
     // Y Labels
+    posStep = 2.0f * m_tickStep;
+    startPos = -m_heightNormalizer;
     labelNbr = 0;
-    for (GLfloat labelPos = startPos; labelPos <= m_heightNormalizer; labelPos += posStep) {
+    for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         // TODO: Test with x labels
         if (m_axisCacheX.labelItems().size() > labelNbr) {
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
-            GLfloat labelYTrans = labelPos / (m_heightNormalizer * m_scaleFactor) - m_yAdjustment;
+            GLfloat labelYTrans = labelPos / m_heightNormalizer - m_yAdjustment;
             GLfloat rotLabelX = 0.0f;
             GLfloat rotLabelY = -90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1347,6 +1351,7 @@ void Scatter3DRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat m
     m_tickCount = tickCount;
     m_tickStep = step;
     if (tickCount > 0 && step > 0) {
+        m_autoAdjust = false;
         m_heightNormalizer = tickCount * step;
         calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
         m_valueUpdateNeeded = true;
@@ -1403,9 +1408,11 @@ void Scatter3DRenderer::updateTextures()
 void Scatter3DRenderer::calculateSceneScalingFactors(const QRect &areaRect)
 {
     //qDebug() << __FUNCTION__;
-    m_areaSize = areaRect.size();
-    // Calculate scaling factor so that we can be sure the whole area fits to positive z space
-    m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
+    if (!m_autoAdjust) {
+        m_areaSize = areaRect.size();
+        // Calculate scaling factor so that we can be sure the whole area fits to positive z space
+        m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
+    }
     qDebug() << "scaleFactor" << m_scaleFactor;
 }
 
@@ -1418,14 +1425,14 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
     // We need to normalize translation based on given area (if given)
 
-    GLfloat xTrans = aspectRatio * item.position().x()
-            / (m_areaSize.width() * m_scaleFactor);
-    GLfloat zTrans = aspectRatio * item.position().z()
-            / (m_areaSize.height() * m_scaleFactor);
-    GLfloat yTrans = item.position().y() / (m_tickCount * m_tickStep * m_scaleFactor);
-    // TODO: Do we need to update m_heightNormalizer here based on item.position().y()? (can updateLimits be used?)
-    // TODO: Test if yTrans is always -1.0 ... 1.0
-    //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
+    //    GLfloat xTrans = aspectRatio * item.position().x()
+    //            / (m_areaSize.width() * m_scaleFactor);
+    //    GLfloat zTrans = aspectRatio * item.position().z()
+    //            / (m_areaSize.height() * m_scaleFactor);
+    //    GLfloat yTrans = item.position().y() / (m_tickCount * m_tickStep * m_heightNormalizer);
+    GLfloat xTrans = (aspectRatio * 2.0f * item.position().x()) / m_scaleFactor;
+    GLfloat zTrans = (aspectRatio * 2.0f * item.position().z()) / m_scaleFactor;
+    GLfloat yTrans = item.position().y() / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
     //qDebug() << item.translation() << m_heightNormalizer;
 }
@@ -1476,20 +1483,18 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     return isSelectedType;
 }
 
-// TODO: Do we need this for autoscaling?
-/*void Scatter3DRenderer::updateLimits(QPair<GLfloat, GLfloat> limits)
+void Scatter3DRenderer::updateLimits(const QVector3D &limits)
 {
-    m_limits.first  = limits.first;
-    m_limits.second = limits.second;
-
-    // Don't auto-adjust height if tick count is set
-    if (m_tickCount == 0) {
-        m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-        calculateHeightAdjustment(limits);
-        m_valueUpdateNeeded = true;
+    if (m_autoAdjust) {
+        m_heightNormalizer = (GLfloat)qMax((qreal)m_heightNormalizer, qFabs(limits.y()));
+        m_tickStep = m_heightNormalizer / m_tickCount;
     }
+    // Auto-adjust these anyway (until axis -based ticks are taken into use)
+    m_areaSize.setHeight(qMax(m_areaSize.height(), (qreal)limits.z()));
+    m_areaSize.setWidth(qMax(m_areaSize.width(), (qreal)limits.x()));
+    m_scaleFactor = qMax(qMax((qreal)m_scaleFactor, m_areaSize.width()), m_areaSize.height());
+    qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_tickStep;
 }
-*/
 
 void Scatter3DRenderer::updateZoomLevel(int newZoomLevel)
 {
