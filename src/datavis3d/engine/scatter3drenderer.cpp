@@ -68,6 +68,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+//#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
+
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
@@ -106,11 +108,12 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_yAdjustment(0.0f),
       m_scaleFactor(0),
       m_selection(selectionSkipColor),
-      m_areaSize(QSizeF(2.0f, 2.0f)),
+      m_areaSize(QSizeF(0.0f, 0.0f)),
       m_autoAdjust(true),
       m_hasHeightAdjustmentChanged(true),
       m_dataProxy(0),
-      m_valueUpdateNeeded(false)
+      m_valueUpdateNeeded(false),
+      m_dotSizeScale(1.0f)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -269,6 +272,7 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
             calculateTranslation(m_renderItemArray[i]);
             m_renderItemArray[i].setRenderer(this);
         }
+        m_dotSizeScale = (GLfloat)qBound(0.1, (qreal)(20.0f / qSqrt((qreal)dataSize)), 1.0);
     }
 
     if (defaultFboHandle) {
@@ -339,10 +343,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
     QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
 
-    //    // Map adjustment direction to model matrix scaling
-    GLfloat heightMultiplier = 1.0f;
-    GLfloat widthMultiplier = 1.0f;
-    GLfloat depthMultiplier = 1.0f;
+    // Map adjustment direction to model matrix scaling
+    // TODO: Let's use these for testing the autoscaling of dots based on their number
+    GLfloat heightMultiplier = m_dotSizeScale; //1.0f;
+    GLfloat widthMultiplier = m_dotSizeScale; //1.0f;
+    GLfloat depthMultiplier = m_dotSizeScale; //1.0f;
     GLfloat heightScaler = 0.0f;
     GLfloat widthScaler = 0.0f;
     GLfloat depthScaler = 0.0f;
@@ -737,17 +742,20 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(0.0f, -m_yAdjustment, zComp);
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
         modelMatrix.scale(
                     QVector3D(
                         (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
                         backgroundMargin,
                         (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
+#else // ..and this if we want uniform scaling based on largest dimension
+        modelMatrix.scale(QVector3D((aspectRatio * backgroundMargin),
+                                    backgroundMargin,
+                                    (aspectRatio * backgroundMargin)));
+#endif
+        // We can copy modelMatrix to itModelMatrix as it has not been translated
+        itModelMatrix = modelMatrix;
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
-        itModelMatrix.scale(
-                    QVector3D(
-                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        backgroundMargin,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -812,8 +820,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
+#ifdef USE_UNIFORM_SCALING
         GLfloat lineStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
         GLfloat startLine = -m_scaleFactor * aspectRatio;
+#else
+        GLfloat lineStep = (2.0f * m_areaSize.height() * aspectRatio) / m_tickCount;
+        GLfloat startLine = -m_areaSize.height() * aspectRatio;
+#endif
 
         for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
@@ -824,6 +837,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(0.0f,
                                   -m_yAdjustment - backgroundMargin,
                                   linePos / m_scaleFactor + zComp);
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
@@ -832,6 +846,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
                             gridLineWidth, gridLineWidth));
+#else // ..and this if we want uniform scaling based on largest dimension
+            modelMatrix.scale(QVector3D((aspectRatio * backgroundMargin),
+                                        gridLineWidth, gridLineWidth));
+            itModelMatrix.scale(QVector3D(aspectRatio * backgroundMargin,
+                                          gridLineWidth, gridLineWidth));
+#endif
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -864,6 +884,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Floor lines: columns
+#ifndef USE_UNIFORM_SCALING
+        lineStep = (2.0f * m_areaSize.width() * aspectRatio) / m_tickCount;
+        startLine = -m_areaSize.width() * aspectRatio;
+#endif
+
         for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -873,6 +898,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(linePos / m_scaleFactor,
                                   -m_yAdjustment - backgroundMargin,
                                   zComp);
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             modelMatrix.scale(
                         QVector3D(
                             gridLineWidth, gridLineWidth,
@@ -881,6 +907,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                         QVector3D(
                             gridLineWidth, gridLineWidth,
                             (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
+#else // ..and this if we want uniform scaling based on largest dimension
+            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                        (aspectRatio * backgroundMargin)));
+            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                          aspectRatio * backgroundMargin)));
+#endif
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -917,8 +949,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         startLine = -m_heightNormalizer;
 
         for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
+#else // ..and this if we want uniform scaling based on largest dimension
+            GLfloat lineZTrans = aspectRatio * backgroundMargin;
+#endif
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -930,6 +966,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(0.0f,
                                   linePos / m_heightNormalizer - m_yAdjustment,
                                   lineZTrans + zComp);
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             modelMatrix.scale(
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
@@ -938,6 +975,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                         QVector3D(
                             (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
                             gridLineWidth, gridLineWidth));
+#else // ..and this if we want uniform scaling based on largest dimension
+            modelMatrix.scale(QVector3D((aspectRatio * backgroundMargin),
+                                        gridLineWidth, gridLineWidth));
+            itModelMatrix.scale(QVector3D(aspectRatio * backgroundMargin,
+                                          gridLineWidth, gridLineWidth));
+#endif
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -971,8 +1014,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Wall lines: side wall
         for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
+#else // ..and this if we want uniform scaling based on largest dimension
+            GLfloat lineXTrans = aspectRatio * backgroundMargin;
+#endif
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
@@ -984,6 +1031,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(lineXTrans,
                                   linePos / m_heightNormalizer - m_yAdjustment,
                                   zComp);
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             modelMatrix.scale(
                         QVector3D(
                             gridLineWidth, gridLineWidth,
@@ -993,6 +1041,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             gridLineWidth, gridLineWidth,
                             (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
 
+#else // ..and this if we want uniform scaling based on largest dimension
+            modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                        (aspectRatio * backgroundMargin)));
+            itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
+                                          aspectRatio * backgroundMargin));
+
+#endif
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
@@ -1094,13 +1149,22 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
 
     // Z Labels
+#ifdef USE_UNIFORM_SCALING
     GLfloat posStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
     GLfloat startPos = -m_scaleFactor * aspectRatio;
+#else
+    GLfloat posStep = (2.0f * m_areaSize.height() * aspectRatio) / m_tickCount;
+    GLfloat startPos = -m_areaSize.height() * aspectRatio;
+#endif
     int labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         if (m_axisCacheX.labelItems().size() > labelNbr) {
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
+#else // ..and this if we want uniform scaling based on largest dimension
+            GLfloat labelXTrans = aspectRatio * backgroundMargin;
+#endif
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1131,11 +1195,19 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         labelNbr++;
     }
     // X Labels
+#ifndef USE_UNIFORM_SCALING
+    posStep = (2.0f * m_areaSize.width() * aspectRatio) / m_tickCount;
+    startPos = -m_areaSize.width() * aspectRatio;
+#endif
     labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         if (m_axisCacheX.labelItems().size() > labelNbr) {
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
+#else // ..and this if we want uniform scaling based on largest dimension
+            GLfloat labelZTrans = aspectRatio * backgroundMargin;
+#endif
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1172,10 +1244,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
         // TODO: Test with x labels
         if (m_axisCacheX.labelItems().size() > labelNbr) {
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
             GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
+#else // ..and this if we want uniform scaling based on largest dimension
+            GLfloat labelXTrans = aspectRatio * backgroundMargin;
+            GLfloat labelZTrans = labelXTrans;
+#endif
             GLfloat labelYTrans = labelPos / m_heightNormalizer - m_yAdjustment;
             GLfloat rotLabelX = 0.0f;
             GLfloat rotLabelY = -90.0f;
@@ -1406,11 +1483,11 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
     // above background
 
     // We need to normalize translations
-    GLfloat xTrans = (aspectRatio * 2.0f * item.position().x()) / m_scaleFactor;
-    GLfloat zTrans = (aspectRatio * 2.0f * item.position().z()) / m_scaleFactor;
+    GLfloat xTrans = (aspectRatio * item.position().x()) / m_scaleFactor;
+    GLfloat zTrans = (aspectRatio * item.position().z()) / m_scaleFactor;
     GLfloat yTrans = item.position().y() / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
-    //qDebug() << item.translation() << m_heightNormalizer;
+    //qDebug() << item.translation();
 }
 
 void Scatter3DRenderer::calculateSceneScalingFactors(const QVector3D &limits)

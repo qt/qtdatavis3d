@@ -54,29 +54,28 @@ Item {
             ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0 }
             ListElement{ xPos: 0.0; yPos: 2.0; zPos: 0.0 }
             ListElement{ xPos: 0.0; yPos: -2.0; zPos: 0.0 }
-            ListElement{ xPos: -1.0; yPos: 4.9; zPos: -1.0 }
-            ListElement{ xPos: 1.0; yPos: 4.9; zPos: -1.0 }
-            ListElement{ xPos: -1.0; yPos: 4.9; zPos: 1.0 }
-            ListElement{ xPos: 1.0; yPos: 4.9; zPos: 1.0 }
-            ListElement{ xPos: -1.0; yPos: -4.9; zPos: -1.0 }
-            ListElement{ xPos: 1.0; yPos: -4.9; zPos: -1.0 }
-            ListElement{ xPos: -1.0; yPos: -4.9; zPos: 1.0 }
-            ListElement{ xPos: 1.0; yPos: -4.9; zPos: 1.0 }
+            ListElement{ xPos: -10.0; yPos: 4.9; zPos: -5.0 }
+            ListElement{ xPos: 10.0; yPos: 4.9; zPos: -5.0 }
+            ListElement{ xPos: -10.0; yPos: 4.9; zPos: 5.0 }
+            ListElement{ xPos: 10.0; yPos: 4.9; zPos: 5.0 }
+            ListElement{ xPos: -10.0; yPos: -4.9; zPos: -5.0 }
+            ListElement{ xPos: 10.0; yPos: -4.9; zPos: -5.0 }
+            ListElement{ xPos: -10.0; yPos: -4.9; zPos: 5.0 }
+            ListElement{ xPos: 10.0; yPos: -4.9; zPos: 5.0 }
         }
 
         Scatter3D {
             id: testscatter
             width: dataView.width
             height: dataView.height
-            fontSize: 300.0
+            fontSize: 30.0
             mapping: scatterMapping
 
             Component.onCompleted: {
                 console.log("testscatter complete");
-                //setTickCount(10, 0.5, -5.0);
                 shadowQuality = Scatter3D.ShadowNone
                 selectionMode = Scatter3D.ModeBar
-                labelTransparency = Scatter3D.TransparencyNoBackground//.TransparencyFromTheme
+                labelTransparency = Scatter3D.TransparencyNoBackground
                 data = dataModel
             }
         }

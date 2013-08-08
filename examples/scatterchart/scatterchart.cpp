@@ -44,7 +44,7 @@
 
 using namespace QtDataVis3D;
 
-const int numberOfItems = 100;//10000;
+const int numberOfItems = 10000;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
@@ -107,7 +107,7 @@ void ScatterDataModifier::addData()
 
 void ScatterDataModifier::changeStyle()
 {
-    static int model = 1;
+    static int model = 3;
     switch (model) {
     case 0:
         m_chart->setBarType(Dots, false);

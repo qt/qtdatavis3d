@@ -63,7 +63,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(ModeBar),
       m_isSlicingActivated(false),
-      m_objFile(QStringLiteral(":/defaultMeshes/dot")),
+      m_objFile(QStringLiteral(":/defaultMeshes/sphere")),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),

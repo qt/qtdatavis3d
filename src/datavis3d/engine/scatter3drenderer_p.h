@@ -133,6 +133,7 @@ private:
     GLfloat m_scaleFactor;
     QVector3D m_selection;
     QSizeF m_areaSize;
+    GLfloat m_dotSizeScale;
 
     QPoint m_selectionPointRequest;
     bool m_isSelectionPointRequestActive;
