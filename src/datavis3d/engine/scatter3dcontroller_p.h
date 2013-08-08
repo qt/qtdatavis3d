@@ -178,7 +178,6 @@ public slots:
 signals:
     void selectionModeChanged(SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
-    void limitsChanged(QPair<GLfloat, GLfloat> limits);
     void objFileChanged(QString fileName);
     void fontChanged(QFont font);
     void gridEnabledChanged(bool enable);

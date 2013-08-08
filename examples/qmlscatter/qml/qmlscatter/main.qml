@@ -73,14 +73,7 @@ Item {
 
             Component.onCompleted: {
                 console.log("testscatter complete");
-//                console.log(testimage);
-//                console.log(testimage.sourceSize);
-//                setBarSpecs(Qt.vector3d(10.0, 10.0, 10.0));
-//                setAreaSpecs(Qt.rect(0, 0, testimage.sourceSize.width, testimage.sourceSize.height),
-//                             testimage);
-//                //setImage(testimage);
-//                setImage(":/images/floorplan.jpg");
-                setTickCount(10, 0.5, -5.0);
+                //setTickCount(10, 0.5, -5.0);
                 shadowQuality = Scatter3D.ShadowNone
                 selectionMode = Scatter3D.ModeBar
                 labelTransparency = Scatter3D.TransparencyNoBackground//.TransparencyFromTheme

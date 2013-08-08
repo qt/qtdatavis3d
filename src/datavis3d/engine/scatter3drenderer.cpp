@@ -70,7 +70,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 #define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
 
-const GLfloat aspectRatio = 1.66f; // TODO: Calculate
+const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 // TODO: Make margin modifiable?
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat gridLineWidth = 0.005f;
@@ -147,8 +147,6 @@ void Scatter3DRenderer::initializePreOpenGL()
 
     QObject::connect(m_controller, &Scatter3DController::selectionModeChanged, this,
                      &Scatter3DRenderer::updateSelectionMode);
-    //QObject::connect(m_controller, &Scatter3DController::limitsChanged, this,
-    //                 &Scatter3DRenderer::updateLimits);
     QObject::connect(m_controller, &Scatter3DController::objFileChanged, this,
                      &Scatter3DRenderer::updateMeshFileName);
     QObject::connect(m_controller, &Scatter3DController::positionChanged, this,
@@ -168,8 +166,6 @@ void Scatter3DRenderer::initializePreOpenGL()
     updateMeshFileName(m_controller->objFile());
     updateGridEnabled(m_controller->gridEnabled());
     updateBackgroundEnabled(m_controller->backgroundEnabled());
-
-    calculateSceneScalingFactors(QRect(0, 0, m_areaSize.width(), m_areaSize.height()));
 }
 
 
@@ -267,7 +263,7 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
             m_renderItemArray[i].setPosition(dataArray.at(i).position());
             //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
             //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
-            updateLimits(dataArray.at(i).position());
+            calculateSceneScalingFactors(dataArray.at(i).position());
         }
         for (int i = 0; i < dataSize ; i++) {
             calculateTranslation(m_renderItemArray[i]);
@@ -1364,9 +1360,6 @@ void Scatter3DRenderer::loadBarMesh()
     QString objectFileName = m_cachedObjFile;
     if (m_dotObj)
         delete m_dotObj;
-    // If background is disabled, load full version of bar mesh
-    //    if (!m_cachedIsBackgroundEnabled)
-    //        objectFileName.append(QStringLiteral("Full"));
     m_dotObj = new ObjectHelper(objectFileName);
     m_dotObj->load();
 }
@@ -1405,17 +1398,6 @@ void Scatter3DRenderer::updateTextures()
     m_updateLabels = true;
 }
 
-void Scatter3DRenderer::calculateSceneScalingFactors(const QRect &areaRect)
-{
-    //qDebug() << __FUNCTION__;
-    if (!m_autoAdjust) {
-        m_areaSize = areaRect.size();
-        // Calculate scaling factor so that we can be sure the whole area fits to positive z space
-        m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    }
-    qDebug() << "scaleFactor" << m_scaleFactor;
-}
-
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
     //qDebug() << __FUNCTION__;
@@ -1423,18 +1405,25 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
     // Origin should be in the center of scene, ie. both positive and negative values are drawn
     // above background
 
-    // We need to normalize translation based on given area (if given)
-
-    //    GLfloat xTrans = aspectRatio * item.position().x()
-    //            / (m_areaSize.width() * m_scaleFactor);
-    //    GLfloat zTrans = aspectRatio * item.position().z()
-    //            / (m_areaSize.height() * m_scaleFactor);
-    //    GLfloat yTrans = item.position().y() / (m_tickCount * m_tickStep * m_heightNormalizer);
+    // We need to normalize translations
     GLfloat xTrans = (aspectRatio * 2.0f * item.position().x()) / m_scaleFactor;
     GLfloat zTrans = (aspectRatio * 2.0f * item.position().z()) / m_scaleFactor;
     GLfloat yTrans = item.position().y() / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
     //qDebug() << item.translation() << m_heightNormalizer;
+}
+
+void Scatter3DRenderer::calculateSceneScalingFactors(const QVector3D &limits)
+{
+    if (m_autoAdjust) {
+        m_heightNormalizer = (GLfloat)qMax((qreal)m_heightNormalizer, qFabs(limits.y()));
+        m_tickStep = m_heightNormalizer / m_tickCount;
+    }
+    // Auto-adjust these anyway (until axis -based ticks are taken into use)
+    m_areaSize.setHeight(qMax(m_areaSize.height(), (qreal)limits.z()));
+    m_areaSize.setWidth(qMax(m_areaSize.width(), (qreal)limits.x()));
+    m_scaleFactor = qMax(qMax((qreal)m_scaleFactor, m_areaSize.width()), m_areaSize.height());
+    //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_tickStep;
 }
 
 void Scatter3DRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)
@@ -1481,19 +1470,6 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
         isSelectedType = Scatter3DController::SelectionBar;
 
     return isSelectedType;
-}
-
-void Scatter3DRenderer::updateLimits(const QVector3D &limits)
-{
-    if (m_autoAdjust) {
-        m_heightNormalizer = (GLfloat)qMax((qreal)m_heightNormalizer, qFabs(limits.y()));
-        m_tickStep = m_heightNormalizer / m_tickCount;
-    }
-    // Auto-adjust these anyway (until axis -based ticks are taken into use)
-    m_areaSize.setHeight(qMax(m_areaSize.height(), (qreal)limits.z()));
-    m_areaSize.setWidth(qMax(m_areaSize.width(), (qreal)limits.x()));
-    m_scaleFactor = qMax(qMax((qreal)m_scaleFactor, m_areaSize.width()), m_areaSize.height());
-    qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_tickStep;
 }
 
 void Scatter3DRenderer::updateZoomLevel(int newZoomLevel)

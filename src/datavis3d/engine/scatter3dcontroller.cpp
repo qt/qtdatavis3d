@@ -280,7 +280,6 @@ QScatterDataProxy *Scatter3DController::dataProxy()
 void Scatter3DController::handleArrayReset()
 {
     setSlicingActive(false);
-    handleLimitChange();
     m_valuesDirty = true;
 }
 
@@ -289,7 +288,6 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    handleLimitChange();
     m_valuesDirty = true;
 }
 
@@ -298,7 +296,6 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    handleLimitChange();
     m_valuesDirty = true;
 }
 
@@ -307,7 +304,6 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    handleLimitChange();
     m_valuesDirty = true;
 }
 
@@ -316,7 +312,6 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    handleLimitChange();
     m_valuesDirty = true;
 }
 
@@ -421,16 +416,6 @@ void Scatter3DController::setTickCount(GLint tickCount, GLfloat step, GLfloat mi
     m_tickStep = step;
     m_tickMinimum = minimum;
     emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
-}
-
-void Scatter3DController::handleLimitChange()
-{
-    QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues();
-    // TODO do something with changed limits?
-    //m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
-    //calculateHeightAdjustment(limits);
-
-    emit limitsChanged(limits);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

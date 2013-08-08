@@ -162,7 +162,6 @@ public:
 
 public slots:
     void updateSelectionMode(SelectionMode newMode);
-    void updateLimits(const QVector3D &limits);
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
@@ -199,8 +198,8 @@ private:
     void initDepthShader();
     void updateDepthBuffer();
 #endif
-    void calculateSceneScalingFactors(const QRect &areaRect = QRect(0, 0, 1, 1));
     void calculateTranslation(ScatterRenderItem &item);
+    void calculateSceneScalingFactors(const QVector3D &limits);
     void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
     Scatter3DController::SelectionType isSelected(GLint bar, const QVector3D &selection);
 
