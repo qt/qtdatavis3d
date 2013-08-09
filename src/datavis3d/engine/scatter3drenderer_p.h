@@ -116,10 +116,8 @@ private:
 
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-    QScatterDataProxy *m_dataProxy; // Only valid during render
 
     ScatterRenderItemArray m_renderItemArray;
-    bool m_valueUpdateNeeded;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -131,8 +129,8 @@ public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void render(QScatterDataProxy *dataProxy, bool valuesDirty, CameraHelper *camera,
-                const GLuint defaultFboHandle = 0);
+    void updateDataModel(QScatterDataProxy *dataProxy);
+    void render(CameraHelper *camera, const GLuint defaultFboHandle);
 
     QRect mainViewPort();
 
@@ -155,7 +153,6 @@ signals:
     void selectionUpdated(QVector3D selection);
 
 private:
-    virtual void initializePreOpenGL();
     virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);

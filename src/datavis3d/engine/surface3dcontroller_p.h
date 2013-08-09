@@ -65,6 +65,7 @@ public:
     ~Surface3dController();
 
     void initializeOpenGL();
+    void synchDataToRenderer();
     void render(const GLuint defaultFboHandle = 0);
 
     QPoint mousePosition();
@@ -103,6 +104,7 @@ public:
 
     // TODO: abstract renderer should have accessor for Drawer instead
     virtual Drawer *drawer();
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
 signals:
     void smoothStatusChanged(bool enable);

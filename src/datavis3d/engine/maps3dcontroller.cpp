@@ -238,6 +238,12 @@ void Maps3DController::initializeOpenGL()
 #endif
 }
 
+void Maps3DController::synchDataToRenderer()
+{
+    // TODO: Implement!
+}
+
+
 /*!
  * \internal
  */
@@ -1622,9 +1628,9 @@ void Maps3DController::calculateTranslation(MapRenderItem &item)
     // We need to convert position (which is in coordinates), to translation (which has origin in the center and is scaled)
     // -> move pos(center, center) to trans(0, 0) and pos(0, 0) to trans(left, top)
     GLfloat xTrans = 2.0f * (item.mapPosition().x() - (m_areaSize.width() / 2.0f))
-            / m_scaleFactor;
+                     / m_scaleFactor;
     GLfloat zTrans = 2.0f * (item.mapPosition().y() - (m_areaSize.height() / 2.0f))
-            / m_scaleFactor;
+                     / m_scaleFactor;
     //qDebug() << "x, y" << item.mapPosition().x() << item.mapPosition().y();
     item.setTranslation(QVector3D(xTrans, 0.0f, zTrans + zComp));
     //qDebug() << item.translation();

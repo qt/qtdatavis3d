@@ -76,6 +76,7 @@ public:
     ~Maps3DController();
 
     void initializeOpenGL();
+    virtual void synchDataToRenderer();
     void render(const GLuint defaultFboHandle = 0);
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value

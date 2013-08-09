@@ -41,6 +41,66 @@ class QFont;
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class CameraHelper;
+class Abstract3DRenderer;
+
+struct Abstract3DChangeBitField {
+    bool positionChanged             : 1;
+    bool zoomLevelChanged            : 1;
+    bool themeChanged                : 1;
+    bool fontChanged                 : 1;
+    bool labelTransparencyChanged    : 1;
+    bool boundingRectChanged         : 1;
+    bool sizeChanged                 : 1;
+    bool shadowQualityChanged        : 1;
+    bool axisXTypeChanged            : 1;
+    bool axisYTypeChanged            : 1;
+    bool axisZTypeChanged            : 1;
+    bool axisXTitleChanged           : 1;
+    bool axisYTitleChanged           : 1;
+    bool axisZTitleChanged           : 1;
+    bool axisXLabelsChanged          : 1;
+    bool axisYLabelsChanged          : 1;
+    bool axisZLabelsChanged          : 1;
+    bool axisXRangeChanged           : 1;
+    bool axisYRangeChanged           : 1;
+    bool axisZRangeChanged           : 1;
+    bool axisXSegmentCountChanged    : 1;
+    bool axisYSegmentCountChanged    : 1;
+    bool axisZSegmentCountChanged    : 1;
+    bool axisXSubSegmentCountChanged : 1;
+    bool axisYSubSegmentCountChanged : 1;
+    bool axisZSubSegmentCountChanged : 1;
+
+    Abstract3DChangeBitField() :
+        positionChanged(true),
+        zoomLevelChanged(true),
+        themeChanged(true),
+        fontChanged(true),
+        labelTransparencyChanged(true),
+        boundingRectChanged(true),
+        sizeChanged(true),
+        shadowQualityChanged(true),
+        axisXTypeChanged(true),
+        axisYTypeChanged(true),
+        axisZTypeChanged(true),
+        axisXTitleChanged(true),
+        axisYTitleChanged(true),
+        axisZTitleChanged(true),
+        axisXLabelsChanged(true),
+        axisYLabelsChanged(true),
+        axisZLabelsChanged(true),
+        axisXRangeChanged(true),
+        axisYRangeChanged(true),
+        axisZRangeChanged(true),
+        axisXSegmentCountChanged(true),
+        axisYSegmentCountChanged(true),
+        axisZSegmentCountChanged(true),
+        axisXSubSegmentCountChanged(true),
+        axisYSubSegmentCountChanged(true),
+        axisZSubSegmentCountChanged(true)
+    {
+    }
+};
 
 class QT_DATAVIS3D_EXPORT Abstract3DController : public QObject
 {
@@ -57,6 +117,7 @@ public:
     };
 
 private:
+    Abstract3DChangeBitField m_changeTracker;
     QRect m_boundingRect;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
@@ -71,13 +132,29 @@ protected:
     QAbstractAxis *m_axisX;
     QAbstractAxis *m_axisY;
     QAbstractAxis *m_axisZ;
+    Abstract3DRenderer *m_renderer;
+    bool m_isDataDirty;
 
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
     ~Abstract3DController();
 
 public:
 
-    virtual void render(const GLuint defaultFboHandle)=0;
+    inline bool isInitialized() { return (m_renderer != 0); }
+
+    /**
+     * @brief synchDataToRenderer Called on the render thread while main GUI thread is blocked before rendering.
+     */
+    virtual void synchDataToRenderer();
+
+
+    virtual void render(const GLuint defaultFboHandle = 0);
+
+    /**
+     * @brief setRenderer Sets the renderer to be used. isInitialized returns true from this point onwards.
+     * @param renderer Renderer to be used.
+     */
+    void setRenderer(Abstract3DRenderer *renderer);
 
     // Size
     virtual void setSize(const int width, const int height);
@@ -137,13 +214,20 @@ public:
     virtual void setLabelTransparency(QDataVis::LabelTransparency transparency);
     virtual QDataVis::LabelTransparency labelTransparency();
 
+    virtual void handleAxisTitleChangedBySender(QObject *sender, const QString &title);
+    virtual void handleAxisLabelsChangedBySender(QObject *sender);
+    virtual void handleAxisRangeChangedBySender(QObject *sender, qreal min, qreal max);
+    virtual void handleAxisSegmentCountChangedBySender(QObject *sender, int count);
+    virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender, int count);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
+
 public slots:
-    virtual void handleAxisTitleChanged(const QString &title);
-    virtual void handleAxisLabelsChanged();
-    virtual void handleAxisRangeChanged(qreal min, qreal max);
-    virtual void handleAxisSegmentCountChanged(int count);
-    virtual void handleAxisSubSegmentCountChanged(int count);
-    virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
+    void handleAxisTitleChanged(const QString &title);
+    void handleAxisLabelsChanged();
+    void handleAxisRangeChanged(qreal min, qreal max);
+    void handleAxisSegmentCountChanged(int count);
+    void handleAxisSubSegmentCountChanged(int count);
+    void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void boundingRectChanged(QRect boundingRect);
@@ -153,7 +237,7 @@ signals:
     void themeChanged(Theme theme);
     void fontChanged(QFont font); // TODO should be handled via axis?? What about font for selection label?
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void labelTransparencyUpdated(QDataVis::LabelTransparency transparency);
+    void labelTransparencyChanged(QDataVis::LabelTransparency transparency);
     void axisTypeChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
     void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
     void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);

@@ -30,7 +30,8 @@ DeclarativeScatterRenderer::DeclarativeScatterRenderer(QQuickWindow *window,
       m_window(window),
       m_scatterRenderer(renderer)
 {
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
+    connect(m_window, SIGNAL(beforeSynchronizing()), this, SLOT(synchDataToRenderer()), Qt::DirectConnection);
+    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(renderFBO()), Qt::DirectConnection);
 }
 
 DeclarativeScatterRenderer::~DeclarativeScatterRenderer()
@@ -39,7 +40,13 @@ DeclarativeScatterRenderer::~DeclarativeScatterRenderer()
     delete m_fbo;
 }
 
-void DeclarativeScatterRenderer::render()
+void DeclarativeScatterRenderer::synchDataToRenderer()
+{
+    m_scatterRenderer->initializeOpenGL();
+    m_scatterRenderer->synchDataToRenderer();
+}
+
+void DeclarativeScatterRenderer::renderFBO()
 {
     QSize size = rect().size().toSize();
 

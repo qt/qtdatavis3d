@@ -35,7 +35,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Bars3dController::Bars3dController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_isInitialized(false),
       m_rowCount(0),
       m_columnCount(0),
       m_mouseState(MouseNone),
@@ -49,8 +48,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
       m_renderer(0),
-      m_data(0),
-      m_valuesDirty(false)
+      m_data(0)
 {
     // Default axes. Only Y axis can actually be changed by user.
     setAxisX(new QCategoryAxis());
@@ -68,23 +66,65 @@ Bars3dController::~Bars3dController()
 void Bars3dController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
-    if (m_isInitialized)
+    if (isInitialized())
         return;
 
     m_renderer = new Bars3dRenderer(this);
-    m_isInitialized = true;
+    setRenderer(m_renderer);
 }
 
-void Bars3dController::render(const GLuint defaultFboHandle)
+void Bars3dController::synchDataToRenderer()
 {
-    if (!m_isInitialized)
+    Abstract3DController::synchDataToRenderer();
+
+    if (!isInitialized())
         return;
 
-    // TODO do not give the entire data array, just the data window
-    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, defaultFboHandle);
+    // Notify changes to renderer
+    if (m_changeTracker.selectionModeChanged) {
+        m_renderer->updateSelectionMode(m_selectionMode);
+        m_changeTracker.selectionModeChanged = false;
+    }
 
-    m_valuesDirty = false;
+    if (m_changeTracker.slicingActiveChanged) {
+        m_renderer->updateSlicingActive(m_isSlicingActivated);
+        m_changeTracker.slicingActiveChanged = false;
+    }
 
+    if (m_changeTracker.sampleSpaceChanged) {
+        m_renderer->updateSampleSpace(m_rowCount, m_columnCount);
+        m_changeTracker.sampleSpaceChanged = false;
+    }
+
+    if (m_changeTracker.barSpecsChanged) {
+        m_renderer->updateBarSpecs(m_barThickness, m_barSpacing, m_isBarSpecRelative);
+        m_changeTracker.barSpecsChanged = false;
+    }
+
+    if (m_changeTracker.objFileChanged) {
+        m_renderer->updateMeshFileName(m_objFile);
+        m_changeTracker.objFileChanged = false;
+    }
+
+    if (m_changeTracker.gridEnabledChanged) {
+        m_renderer->updateGridEnabled(m_isGridEnabled);
+        m_changeTracker.gridEnabledChanged = false;
+    }
+
+    if (m_changeTracker.backgroundEnabledChanged) {
+        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
+        m_changeTracker.backgroundEnabledChanged = false;
+    }
+
+    if (m_changeTracker.zoomLevelChanged) {
+        m_renderer->updateZoomLevel(m_zoomLevel);
+        m_changeTracker.zoomLevelChanged = false;
+    }
+
+    if (m_isDataDirty) {
+        m_renderer->updateDataModel(m_data);
+        m_isDataDirty = false;
+    }
 }
 
 QMatrix4x4 Bars3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
@@ -104,6 +144,8 @@ bool Bars3dController::isSlicingActive()
 void Bars3dController::setSlicingActive(bool isSlicing)
 {
     m_isSlicingActivated = isSlicing;
+
+    m_changeTracker.slicingActiveChanged = true;
     emit slicingActiveChanged(m_isSlicingActivated);
 }
 
@@ -245,7 +287,7 @@ void Bars3dController::setDataProxy(QBarDataProxy *proxy)
     QObject::connect(m_data, &QBarDataProxy::itemChanged, this, &Bars3dController::handleItemChanged);
 
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 QBarDataProxy *Bars3dController::dataProxy()
@@ -257,7 +299,7 @@ void Bars3dController::handleArrayReset()
 {
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Bars3dController::handleRowsAdded(int startIndex, int count)
@@ -268,7 +310,7 @@ void Bars3dController::handleRowsAdded(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Bars3dController::handleRowsChanged(int startIndex, int count)
@@ -279,7 +321,7 @@ void Bars3dController::handleRowsChanged(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Bars3dController::handleRowsRemoved(int startIndex, int count)
@@ -290,7 +332,7 @@ void Bars3dController::handleRowsRemoved(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Bars3dController::handleRowsInserted(int startIndex, int count)
@@ -301,7 +343,7 @@ void Bars3dController::handleRowsInserted(int startIndex, int count)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Bars3dController::handleItemChanged(int rowIndex, int columnIndex)
@@ -312,11 +354,12 @@ void Bars3dController::handleItemChanged(int rowIndex, int columnIndex)
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
-void Bars3dController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
+void Bars3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
+    Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
 }
@@ -326,6 +369,8 @@ void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relati
     m_barThickness      = thickness;
     m_barSpacing        = spacing;
     m_isBarSpecRelative = relative;
+
+    m_changeTracker.barSpecsChanged = true;
     emit barSpecsChanged(thickness, spacing, relative);
 }
 
@@ -378,6 +423,8 @@ void Bars3dController::setBarType(QDataVis::MeshStyle style, bool smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/bevelbar");
     }
 
+
+    m_changeTracker.objFileChanged = true;
     emit objFileChanged(m_objFile);
 }
 
@@ -385,6 +432,7 @@ void Bars3dController::setMeshFileName(const QString &objFileName)
 {
     m_objFile = objFileName;
 
+    m_changeTracker.objFileChanged = true;
     emit objFileChanged(m_objFile);
 }
 
@@ -399,6 +447,7 @@ void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
 
     adjustValueAxisRange();
 
+    m_changeTracker.sampleSpaceChanged = true;
     emit sampleSpaceChanged(rowCount, columnCount);
 }
 
@@ -408,6 +457,8 @@ void Bars3dController::setSelectionMode(QDataVis::SelectionMode mode)
     m_selectionMode = mode;
     // Disable zoom if selection mode changes
     setSlicingActive(false);
+
+    m_changeTracker.selectionModeChanged = true;
     emit selectionModeChanged(m_selectionMode);
 }
 
@@ -424,6 +475,8 @@ QDataVis::SelectionMode Bars3dController::selectionMode()
 void Bars3dController::setGridEnabled(bool enable)
 {
     m_isGridEnabled = enable;
+
+    m_changeTracker.gridEnabledChanged = true;
     emit gridEnabledChanged(m_isGridEnabled);
 }
 
@@ -435,6 +488,8 @@ bool Bars3dController::gridEnabled()
 void Bars3dController::setBackgroundEnabled(bool enable)
 {
     m_isBackgroundEnabled = enable;
+
+    m_changeTracker.backgroundEnabledChanged = true;
     emit backgroundEnabledChanged(m_isBackgroundEnabled);
 }
 

@@ -99,6 +99,7 @@ Q3DScatter::~Q3DScatter()
  */
 void Q3DScatter::render()
 {
+    d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
 }
 

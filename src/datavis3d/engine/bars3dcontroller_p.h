@@ -47,6 +47,29 @@ class Bars3dRenderer;
 class LabelItem;
 class QBarDataProxy;
 
+struct Bars3DChangeBitField {
+    bool selectionModeChanged     : 1;
+    bool slicingActiveChanged     : 1;
+    bool sampleSpaceChanged       : 1;
+    bool barSpecsChanged          : 1;
+    bool objFileChanged           : 1;
+    bool gridEnabledChanged       : 1;
+    bool backgroundEnabledChanged : 1;
+    bool zoomLevelChanged         : 1;
+
+    Bars3DChangeBitField() :
+        selectionModeChanged(true),
+        slicingActiveChanged(true),
+        sampleSpaceChanged(true),
+        barSpecsChanged(true),
+        objFileChanged(true),
+        gridEnabledChanged(true),
+        backgroundEnabledChanged(true),
+        zoomLevelChanged(true)
+    {
+    }
+};
+
 class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
 {
     Q_OBJECT
@@ -60,7 +83,9 @@ public:
     };
 
 private:
-    bool m_isInitialized;
+
+
+    Bars3DChangeBitField m_changeTracker;
 
     // Data
     int m_rowCount;
@@ -83,14 +108,13 @@ private:
 
     Bars3dRenderer *m_renderer;
     QBarDataProxy *m_data;
-    bool m_valuesDirty;
 
 public:
     explicit Bars3dController(QRect rect);
     ~Bars3dController();
 
     void initializeOpenGL();
-    void render(const GLuint defaultFboHandle = 0);
+    virtual void synchDataToRenderer();
 
     int columnCount();
     int rowCount();
@@ -150,6 +174,7 @@ public:
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *dataProxy();
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
 public slots:
     void handleArrayReset();
@@ -159,7 +184,6 @@ public slots:
     void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
 
-    virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void selectionModeChanged(QDataVis::SelectionMode mode);

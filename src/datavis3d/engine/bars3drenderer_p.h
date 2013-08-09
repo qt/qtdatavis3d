@@ -128,10 +128,8 @@ private:
 
     bool m_hasHeightAdjustmentChanged;
     BarRenderItem m_dummyBarRenderItem;
-    QBarDataProxy *m_dataProxy; // Only valid during render
 
     BarRenderItemArray m_renderItemArray;
-    bool m_valueUpdateNeeded;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -143,8 +141,8 @@ public:
     explicit Bars3dRenderer(Bars3dController *controller);
     ~Bars3dRenderer();
 
-    void render(QBarDataProxy *dataProxy, bool valuesDirty, CameraHelper *camera,
-                const GLuint defaultFboHandle = 0);
+    void updateDataModel(QBarDataProxy *dataProxy);
+    void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
 
     QRect mainViewPort();
 
@@ -172,7 +170,6 @@ signals:
     void selectionUpdated(QVector3D selection);
 
 private:
-    virtual void initializePreOpenGL();
     virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);

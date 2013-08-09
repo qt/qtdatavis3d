@@ -68,9 +68,6 @@ void DeclarativeScatter::componentComplete()
 
 QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    // Call initialize on each update paint node and let the shared code worry about it.
-    m_shared->initializeOpenGL();
-
     // If old node exists and has right size, reuse it.
     if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
         // Update bounding rectangle (that has same size as before).
@@ -191,6 +188,10 @@ void DeclarativeScatter::setTheme(QDataVis::ColorTheme theme)
     // We need to save this locally, as there are no getters for it in controller
     m_theme = theme;
     m_shared->setColorTheme(theme);
+
+    // TODO: Investigate why the beforeSynchronizing() signal requires update and is not sent automatically when this value changes,
+    // but is sent wen e.g. enable/disable background changes.
+    update();
 }
 
 QDataVis::ColorTheme DeclarativeScatter::theme()

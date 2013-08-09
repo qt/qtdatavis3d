@@ -99,6 +99,7 @@ Q3DBars::~Q3DBars()
  */
 void Q3DBars::render()
 {
+    d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
 }
 
@@ -199,7 +200,7 @@ void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 }
 
 /*!
- * \a style One of the values in \c BarStyle. \c Bars by default.
+ * \a style One of the values in \c MeshStyle. \c Bars by default.
  *
  * \a smooth A flag to set shading to smooth. \c false by default.
  *

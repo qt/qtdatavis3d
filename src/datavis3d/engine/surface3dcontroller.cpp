@@ -52,12 +52,25 @@ void Surface3dController::initializeOpenGL()
     m_isInitialized = true;
 }
 
+void Surface3dController::synchDataToRenderer()
+{
+    // TODO: Implement
+}
+
 void Surface3dController::render(const GLuint defaultFboHandle)
 {
     if (!m_isInitialized)
         return;
 
     m_renderer->render(m_cameraHelper, defaultFboHandle);
+}
+
+void Surface3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+{
+    Q_UNUSED(orientation)
+    Q_UNUSED(autoAdjust)
+
+    // TODO: Implement!
 }
 
 QMatrix4x4 Surface3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)

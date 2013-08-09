@@ -90,16 +90,13 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
-      m_hasHeightAdjustmentChanged(true),
-      m_dataProxy(0),
-      m_valueUpdateNeeded(false)
+      m_hasHeightAdjustmentChanged(true)
     #ifdef DISPLAY_RENDER_SPEED
     ,m_isFirstFrame(true),
       m_numFrames(0)
     #endif
 {
     m_dummyBarRenderItem.setRenderer(this);
-    initializePreOpenGL();
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -126,41 +123,6 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_drawer;
 }
 
-void Bars3dRenderer::initializePreOpenGL()
-{
-    Abstract3DRenderer::initializePreOpenGL();
-
-    // Listen to changes in the controller
-    QObject::connect(m_controller, &Bars3dController::selectionModeChanged, this,
-                     &Bars3dRenderer::updateSelectionMode);
-    QObject::connect(m_controller, &Bars3dController::slicingActiveChanged, this,
-                     &Bars3dRenderer::updateSlicingActive);
-    QObject::connect(m_controller, &Bars3dController::sampleSpaceChanged, this,
-                     &Bars3dRenderer::updateSampleSpace);
-    QObject::connect(m_controller, &Bars3dController::barSpecsChanged, this,
-                     &Bars3dRenderer::updateBarSpecs);
-    QObject::connect(m_controller, &Bars3dController::objFileChanged, this,
-                     &Bars3dRenderer::updateMeshFileName);
-    QObject::connect(m_controller, &Bars3dController::positionChanged, this,
-                     &Bars3dRenderer::updatePosition);
-    QObject::connect(m_controller, &Bars3dController::gridEnabledChanged, this,
-                     &Bars3dRenderer::updateGridEnabled);
-    QObject::connect(m_controller, &Bars3dController::backgroundEnabledChanged, this,
-                     &Bars3dRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
-                     &Bars3dRenderer::updateZoomLevel);
-
-    updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
-    updateSelectionMode(m_controller->selectionMode());
-    updateSlicingActive(m_controller->isSlicingActive());
-    updateZoomLevel(m_controller->zoomLevel());
-    updateBarSpecs(m_controller->barThickness(), m_controller->barSpacing(),
-                   m_controller->isBarSpecRelative());
-    updateMeshFileName(m_controller->objFile());
-    updateGridEnabled(m_controller->gridEnabled());
-    updateBackgroundEnabled(m_controller->backgroundEnabled());
-}
-
 void Bars3dRenderer::initializeOpenGL()
 {
     m_textureHelper = new TextureHelper();
@@ -178,9 +140,6 @@ void Bars3dRenderer::initializeOpenGL()
 
     // Init selection shader
     initSelectionShader();
-
-    // Load default mesh
-    loadBarMesh();
 
     // Load grid line mesh
     loadGridLineMesh();
@@ -204,20 +163,39 @@ void Bars3dRenderer::initializeOpenGL()
     glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
                m_sliceViewPort.width(), m_sliceViewPort.height());
 
-    // Resize in case we've missed resize events
-    // Resize calls initSelectionBuffer and initDepthBuffer, so they don't need to be called here
-    handleResize();
-
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
 
     Abstract3DRenderer::initializeOpenGL();
 }
 
-void Bars3dRenderer::render(QBarDataProxy *dataProxy,
-                            bool valuesDirty,
-                            CameraHelper *camera,
-                            const GLuint defaultFboHandle)
+void Bars3dRenderer::updateDataModel(QBarDataProxy *dataProxy)
+{
+    // Update cached data window
+    int dataRowCount = dataProxy->rowCount();
+    for (int i = 0; i < m_renderItemArray.size(); i++) {
+        int j = 0;
+        if (i < dataRowCount) {
+            const QBarDataRow *dataRow = dataProxy->rowAt(i);
+            int updateSize = qMin(dataRow->size(), m_renderItemArray[i].size());
+            if (dataRow) {
+                for (; j < updateSize ; j++) {
+                    qreal value = dataRow->at(j).value();
+                    m_renderItemArray[i][j].setValue(value);
+                    m_renderItemArray[i][j].setHeight(value / m_heightNormalizer);
+                }
+            }
+        }
+        for (; j < m_renderItemArray[i].size(); j++) {
+            m_renderItemArray[i][j].setValue(0.0);
+            m_renderItemArray[i][j].setHeight(0.0f);
+        }
+    }
+
+    Abstract3DRenderer::updateDataModel(dataProxy);
+}
+
+void Bars3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
@@ -234,34 +212,6 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
         m_lastFrameTime.restart();
     }
 #endif
-
-    m_dataProxy = dataProxy;
-
-    // Update cached data window
-    // TODO Should data changes be notified via signal instead of reading data in render?
-    // TODO this cache initialization assumes data window starts at 0,0 offset from array
-    if (valuesDirty || m_valueUpdateNeeded) {
-        m_valueUpdateNeeded = false;
-        int dataRowCount = dataProxy->rowCount();
-        for (int i = 0; i < m_renderItemArray.size(); i++) {
-            int j = 0;
-            if (i < dataRowCount) {
-                const QBarDataRow *dataRow = dataProxy->rowAt(i);
-                int updateSize = qMin(dataRow->size(), m_renderItemArray[i].size());
-                if (dataRow) {
-                    for (; j < updateSize ; j++) {
-                        qreal value = dataRow->at(j).value();
-                        m_renderItemArray[i][j].setValue(value);
-                        m_renderItemArray[i][j].setHeight(value / m_heightNormalizer);
-                    }
-                }
-            }
-            for (; j < m_renderItemArray[i].size(); j++) {
-                m_renderItemArray[i][j].setValue(0.0);
-                m_renderItemArray[i][j].setHeight(0.0f);
-            }
-        }
-    }
 
     if (defaultFboHandle) {
         glDepthMask(true);
@@ -464,7 +414,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
             // If draw order of bars is flipped, label draw order should be too
             if (m_xFlipped) {
                 labelItem = m_sliceCache->labelItems().at(
-                            m_sliceCache->labelItems().size() - col - 1);
+                                m_sliceCache->labelItems().size() - col - 1);
             } else {
                 labelItem = m_sliceCache->labelItems().at(col);
             }
@@ -514,10 +464,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                m_cachedZoomLevel * m_autoScaleAdjustment,
-                m_mainViewPort.width(),
-                m_mainViewPort.height(),
-                m_hasNegativeValues);
+                                m_cachedZoomLevel * m_autoScaleAdjustment,
+                                m_mainViewPort.width(),
+                                m_mainViewPort.height(),
+                                m_hasNegativeValues);
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -841,14 +791,14 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
             QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
             QVector3D depthColor = Utils::vectorFromColor(m_cachedTheme.m_depthColor)
-                    * (float(row) / GLfloat(m_cachedRowCount));
+                                   * (float(row) / GLfloat(m_cachedRowCount));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 
             GLfloat lightStrength = m_cachedTheme.m_lightStrength;
 
             if (m_cachedSelectionMode > QDataVis::ModeNone) {
-               Bars3dController::SelectionType selectionType = isSelected(row, bar);
+                Bars3dController::SelectionType selectionType = isSelected(row, bar);
 
                 switch (selectionType) {
                 case Bars3dController::SelectionBar: {
@@ -1579,8 +1529,6 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
             m_renderItemArray[i][j].setRenderer(this);
     }
 
-    m_valueUpdateNeeded = true;
-
     // Force update for selection related items
     m_sliceCache = 0;
     m_sliceTitleItem = 0;
@@ -1757,9 +1705,6 @@ void Bars3dRenderer::calculateHeightAdjustment()
         m_yAdjustment = newAdjustment;
     }
     //qDebug() << m_yAdjustment;
-
-    // If this function needs to be called, then value update is also needed
-    m_valueUpdateNeeded = true;
 }
 
 Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)

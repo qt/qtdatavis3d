@@ -37,6 +37,7 @@
 #include <QAbstractItemModel>
 #include <QQuickItem>
 #include <QObject>
+#include <QQuickWindow>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -76,7 +77,7 @@ public:
     void classBegin();
     void componentComplete();
 
-     // how many samples per row and column
+    // how many samples per row and column
     Q_INVOKABLE void setupSampleSpace(int rowCount, int columnCount);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)

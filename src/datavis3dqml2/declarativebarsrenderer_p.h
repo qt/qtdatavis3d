@@ -48,7 +48,10 @@ public:
     ~DeclarativeBarsRenderer();
 
 public slots:
-    void render();
+    // Used to synch up data model from controller to renderer while main thread is locked
+    void synchDataToRenderer();
+    // Renders view to FBO before render cycle starts.
+    void renderFBO();
 
 private:
     QOpenGLFramebufferObject *m_fbo;

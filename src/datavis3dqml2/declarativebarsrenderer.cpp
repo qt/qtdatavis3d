@@ -29,7 +29,8 @@ DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dCon
       m_window(window),
       m_barsRenderer(renderer)
 {
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
+    connect(m_window, SIGNAL(beforeSynchronizing()), this, SLOT(synchDataToRenderer()), Qt::DirectConnection);
+    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(renderFBO()), Qt::DirectConnection);
 }
 
 DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
@@ -38,7 +39,13 @@ DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
     delete m_fbo;
 }
 
-void DeclarativeBarsRenderer::render()
+void DeclarativeBarsRenderer::synchDataToRenderer()
+{
+    m_barsRenderer->initializeOpenGL();
+    m_barsRenderer->synchDataToRenderer();
+}
+
+void DeclarativeBarsRenderer::renderFBO()
 {
     QSize size = rect().size().toSize();
 

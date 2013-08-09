@@ -24,55 +24,26 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(controller),
       m_controller(controller),
+      m_isInitialized(false),
       m_hasNegativeValues(false),
       m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
       m_autoScaleAdjustment(1.0f)
 {
-}
-
-void Abstract3DRenderer::initializePreOpenGL()
-{
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
-
-    QObject::connect(m_controller, &Abstract3DController::themeChanged, this,
-                     &Abstract3DRenderer::updateTheme);
-    QObject::connect(m_controller, &Abstract3DController::fontChanged, this,
-                     &Abstract3DRenderer::updateFont);
-    QObject::connect(m_controller, &Abstract3DController::labelTransparencyUpdated, this,
-                     &Abstract3DRenderer::updateLabelTransparency);
-    QObject::connect(m_controller, &Abstract3DController::boundingRectChanged, this,
-                     &Abstract3DRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Abstract3DController::sizeChanged, this,
-                     &Abstract3DRenderer::updateBoundingRect);
-    QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
-                     &Abstract3DRenderer::updateShadowQuality);
-    QObject::connect(m_controller, &Abstract3DController::axisTypeChanged, this,
-                     &Abstract3DRenderer::updateAxisType);
-    QObject::connect(m_controller, &Abstract3DController::axisTitleChanged, this,
-                     &Abstract3DRenderer::updateAxisTitle);
-    QObject::connect(m_controller, &Abstract3DController::axisLabelsChanged, this,
-                     &Abstract3DRenderer::updateAxisLabels);
-    QObject::connect(m_controller, &Abstract3DController::axisRangeChanged, this,
-                     &Abstract3DRenderer::updateAxisRange);
-    QObject::connect(m_controller, &Abstract3DController::axisSegmentCountChanged, this,
-                     &Abstract3DRenderer::updateAxisSegmentCount);
-    QObject::connect(m_controller, &Abstract3DController::axisSubSegmentCountChanged, this,
-                     &Abstract3DRenderer::updateAxisSubSegmentCount);
-
-    updateTheme(m_controller->theme());
-    updateFont(m_controller->font());
-    updateLabelTransparency(m_controller->labelTransparency());
 }
 
 void Abstract3DRenderer::initializeOpenGL()
 {
-    // OpenGL is initialized, safe to call these.
-    updateBoundingRect(m_controller->boundingRect());
-    updateShadowQuality(m_controller->shadowQuality());
+}
 
-    initializeAxisCache(QAbstractAxis::AxisOrientationX, m_controller->axisX());
-    initializeAxisCache(QAbstractAxis::AxisOrientationY, m_controller->axisY());
-    initializeAxisCache(QAbstractAxis::AxisOrientationZ, m_controller->axisZ());
+void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
+{
+    m_cachedItemLabelFormat = dataProxy->itemLabelFormat();
+}
+
+QString Abstract3DRenderer::itemLabelFormat() const
+{
+    return m_cachedItemLabelFormat;
 }
 
 void Abstract3DRenderer::updateBoundingRect(const QRect boundingRect)

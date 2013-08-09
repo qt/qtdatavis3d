@@ -69,7 +69,7 @@ public:
     // For example, in AdjustAll mode setting thickness to (0.1f, 1.0f, 0.5f) would apply value to
     // x at 10%, y at 100% and z at 50%. If a dimension is not included, given thickness states its absolute value.
     Q_INVOKABLE void setBarSpecs(const QVector3D &thickness = QVector3D(1.0f, 1.0f, 1.0f),
-                     Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
+                                 Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
     Q_INVOKABLE void setBarType(QDataVis::MeshStyle style, bool smooth = false);

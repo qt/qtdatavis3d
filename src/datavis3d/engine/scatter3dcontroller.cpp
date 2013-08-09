@@ -34,18 +34,15 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_isInitialized(false),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_selectionMode(QDataVis::ModeItem),
       m_isSlicingActivated(false),
       m_objFile(QStringLiteral(":/defaultMeshes/sphere")),
-      m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
       m_renderer(0),
-      m_data(0),
-      m_valuesDirty(false)
+      m_data(0)
 {
     // Default axes
     setAxisX(new QValueAxis());
@@ -63,23 +60,55 @@ Scatter3DController::~Scatter3DController()
 void Scatter3DController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
-    if (m_isInitialized)
+    if (isInitialized())
         return;
 
     m_renderer = new Scatter3DRenderer(this);
-    m_isInitialized = true;
+    setRenderer(m_renderer);
 }
 
-void Scatter3DController::render(const GLuint defaultFboHandle)
+void Scatter3DController::synchDataToRenderer()
 {
-    if (!m_isInitialized)
+    Abstract3DController::synchDataToRenderer();
+
+    if (!isInitialized())
         return;
 
-    // TODO do not give the entire data array, just the data window
-    m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, defaultFboHandle);
+    // Notify changes to renderer
+    if (m_changeTracker.selectionModeChanged) {
+        m_renderer->updateSelectionMode(m_selectionMode);
+        m_changeTracker.selectionModeChanged = false;
+    }
 
-    m_valuesDirty = false;
+    if (m_changeTracker.slicingActiveChanged) {
+        // TODO: Add notification.
+        m_changeTracker.slicingActiveChanged = false;
+    }
 
+    if (m_changeTracker.objFileChanged) {
+        m_renderer->updateMeshFileName(m_objFile);
+        m_changeTracker.objFileChanged = false;
+    }
+
+    if (m_changeTracker.gridEnabledChanged) {
+        m_renderer->updateGridEnabled(m_isGridEnabled);
+        m_changeTracker.gridEnabledChanged = false;
+    }
+
+    if (m_changeTracker.backgroundEnabledChanged) {
+        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
+        m_changeTracker.backgroundEnabledChanged = false;
+    }
+
+    if (m_changeTracker.zoomLevelChanged) {
+        m_renderer->updateZoomLevel(m_zoomLevel);
+        m_changeTracker.zoomLevelChanged = false;
+    }
+
+    if (m_isDataDirty) {
+        m_renderer->updateDataModel(m_data);
+        m_isDataDirty = false;
+    }
 }
 
 QMatrix4x4 Scatter3DController::calculateViewMatrix(int zoom, int viewPortWidth,
@@ -100,6 +129,8 @@ bool Scatter3DController::isSlicingActive()
 void Scatter3DController::setSlicingActive(bool isSlicing)
 {
     m_isSlicingActivated = isSlicing;
+
+    m_changeTracker.slicingActiveChanged = true;
     emit slicingActiveChanged(m_isSlicingActivated);
 }
 
@@ -239,7 +270,7 @@ void Scatter3DController::setDataProxy(QScatterDataProxy *proxy)
                      this, &Scatter3DController::handleItemsInserted);
 
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 QScatterDataProxy *Scatter3DController::dataProxy()
@@ -251,7 +282,7 @@ void Scatter3DController::handleArrayReset()
 {
     setSlicingActive(false);
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Scatter3DController::handleItemsAdded(int startIndex, int count)
@@ -260,7 +291,7 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Scatter3DController::handleItemsChanged(int startIndex, int count)
@@ -269,7 +300,7 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Scatter3DController::handleItemsRemoved(int startIndex, int count)
@@ -278,7 +309,7 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
 void Scatter3DController::handleItemsInserted(int startIndex, int count)
@@ -287,11 +318,12 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
-    m_valuesDirty = true;
+    m_isDataDirty = true;
 }
 
-void Scatter3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
+void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
+    Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
 }
@@ -315,6 +347,7 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/dot");
     }
 
+    m_changeTracker.objFileChanged = true;
     emit objFileChanged(m_objFile);
 }
 
@@ -322,6 +355,7 @@ void Scatter3DController::setMeshFileName(const QString &objFileName)
 {
     m_objFile = objFileName;
 
+    m_changeTracker.objFileChanged = true;
     emit objFileChanged(m_objFile);
 }
 
@@ -334,6 +368,8 @@ void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
     m_selectionMode = mode;
     // Disable zoom if selection mode changes
     setSlicingActive(false);
+
+    m_changeTracker.selectionModeChanged = true;
     emit selectionModeChanged(m_selectionMode);
 }
 
@@ -347,31 +383,11 @@ QDataVis::SelectionMode Scatter3DController::selectionMode()
     return m_selectionMode;
 }
 
-void Scatter3DController::setFontSize(float fontsize)
-{
-    m_font.setPointSizeF(fontsize);
-    emit fontChanged(m_font);
-}
-
-float Scatter3DController::fontSize()
-{
-    return m_font.pointSizeF();
-}
-
-void Scatter3DController::setFont(const QFont &font)
-{
-    m_font = font;
-    emit fontChanged(m_font);
-}
-
-QFont Scatter3DController::font()
-{
-    return m_font;
-}
-
 void Scatter3DController::setGridEnabled(bool enable)
 {
     m_isGridEnabled = enable;
+
+    m_changeTracker.gridEnabledChanged = true;
     emit gridEnabledChanged(m_isGridEnabled);
 }
 
@@ -383,6 +399,8 @@ bool Scatter3DController::gridEnabled()
 void Scatter3DController::setBackgroundEnabled(bool enable)
 {
     m_isBackgroundEnabled = enable;
+
+    m_changeTracker.backgroundEnabledChanged = true;
     emit backgroundEnabledChanged(m_isBackgroundEnabled);
 }
 

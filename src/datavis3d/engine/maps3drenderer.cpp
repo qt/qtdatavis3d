@@ -63,4 +63,10 @@ Maps3DRenderer::~Maps3DRenderer()
 {
 }
 
+void Maps3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+{
+    // TODO: Implement
+}
+
+
 QT_DATAVIS3D_END_NAMESPACE

@@ -45,7 +45,7 @@ void ScatterRenderItem::formatLabel()
     //m_label.append(m_itemLabel);
     //m_label.append(QStringLiteral(" "));
     m_label.append(numStr);
-    m_label.append(m_renderer->m_dataProxy->itemLabelFormat());
+    m_label.append(m_renderer->itemLabelFormat());
 }
 
 QT_DATAVIS3D_END_NAMESPACE

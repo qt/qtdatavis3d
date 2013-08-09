@@ -48,6 +48,25 @@ class Scatter3DRenderer;
 class LabelItem;
 class QScatterDataProxy;
 
+struct Scatter3DChangeBitField {
+    bool selectionModeChanged     : 1;
+    bool slicingActiveChanged     : 1;
+    bool objFileChanged           : 1;
+    bool gridEnabledChanged       : 1;
+    bool backgroundEnabledChanged : 1;
+    bool zoomLevelChanged         : 1;
+
+    Scatter3DChangeBitField() :
+        selectionModeChanged(true),
+        slicingActiveChanged(true),
+        objFileChanged(true),
+        gridEnabledChanged(true),
+        backgroundEnabledChanged(true),
+        zoomLevelChanged(true)
+    {
+    }
+};
+
 class QT_DATAVIS3D_EXPORT Scatter3DController : public Abstract3DController
 {
     Q_OBJECT
@@ -61,7 +80,7 @@ public:
     };
 
 private:
-    bool m_isInitialized;
+    Scatter3DChangeBitField m_changeTracker;
 
     // Interaction
     MouseState m_mouseState;
@@ -71,20 +90,17 @@ private:
 
     // Look'n'Feel
     QString m_objFile;
-    QFont m_font;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
 
     Scatter3DRenderer *m_renderer;
     QScatterDataProxy *m_data;
-    bool m_valuesDirty;
 
 public:
     explicit Scatter3DController(QRect rect);
     ~Scatter3DController();
 
     void initializeOpenGL();
-    void render(const GLuint defaultFboHandle = 0);
 
     MouseState mouseState();
     QPoint mousePosition();
@@ -105,14 +121,6 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
-
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
-
-    // Set font
-    void setFont(const QFont &font);
-    QFont font();
 
     // Enable or disable background grid
     void setGridEnabled(bool enable);
@@ -135,6 +143,10 @@ public:
     void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy();
 
+    void synchDataToRenderer();
+
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+
 public slots:
     void handleArrayReset();
     void handleItemsAdded(int startIndex, int count);
@@ -142,7 +154,6 @@ public slots:
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
 
-    virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
     void selectionModeChanged(QDataVis::SelectionMode mode);

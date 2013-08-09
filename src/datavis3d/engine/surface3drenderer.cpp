@@ -234,10 +234,10 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
-                m_mainViewPort.width(),
-                m_mainViewPort.height(),
-                m_hasNegativeValues);
+                                100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
+                                m_mainViewPort.width(),
+                                m_mainViewPort.height(),
+                                m_hasNegativeValues);
 
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
@@ -278,7 +278,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 MVPMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+        modelMatrix.scale(QVector3D(m_xLength / m_scaleFactor,
                                     1.0f,
                                     m_zLength / m_scaleFactor));
 
@@ -346,10 +346,10 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+        modelMatrix.scale(QVector3D(m_xLength / m_scaleFactor,
                                     1.0f,
                                     m_zLength / m_scaleFactor));
-        itModelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+        itModelMatrix.scale(QVector3D(m_xLength / m_scaleFactor,
                                       1.0f,
                                       m_zLength / m_scaleFactor));
 
@@ -375,7 +375,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         //m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(), m_shadowQualityToShader);
         //m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
-                                            m_cachedTheme.m_lightStrength * 2.0f);
+                                         m_cachedTheme.m_lightStrength * 2.0f);
 
         m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
         //m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture, 0); // IFDEF print selection
@@ -423,11 +423,11 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
-        modelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+        modelMatrix.scale(QVector3D(m_xLength / m_scaleFactor,
                                     1.0f,
                                     m_zLength / m_scaleFactor));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
-        itModelMatrix.scale(QVector3D( m_xLength / m_scaleFactor,
+        itModelMatrix.scale(QVector3D(m_xLength / m_scaleFactor,
                                       1.0f,
                                       m_zLength / m_scaleFactor));
 
@@ -527,7 +527,7 @@ void Surface3dRenderer::updateSurfaceGradient()
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, 4, 100);
 
-//    QImage image(QStringLiteral("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavis3d_2\\grid.png"));
+    //    QImage image(QStringLiteral("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavis3d_2\\grid.png"));
 
     if (m_gradientTexture) {
         m_textureHelper->deleteTexture(&m_gradientTexture);
@@ -649,13 +649,13 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
 void Surface3dRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
-//    m_rowWidth = ((m_columnCount + 1) * m_barSpacing.width()) / 2.0f;
-//    m_columnDepth = ((m_rowCount + 1) * m_barSpacing.height()) / 2.0f;
-//    m_maxDimension = qMax(m_rowWidth, m_columnDepth);
-//    m_scaleFactor = qMin((m_columnCount * (m_maxDimension / m_maxSceneSize)),
-//                         (m_rowCount * (m_maxDimension / m_maxSceneSize)));
-//    m_scaleX = m_barThickness.width() / m_scaleFactor;
-//    m_scaleZ = m_barThickness.height() / m_scaleFactor;
+    //    m_rowWidth = ((m_columnCount + 1) * m_barSpacing.width()) / 2.0f;
+    //    m_columnDepth = ((m_rowCount + 1) * m_barSpacing.height()) / 2.0f;
+    //    m_maxDimension = qMax(m_rowWidth, m_columnDepth);
+    //    m_scaleFactor = qMin((m_columnCount * (m_maxDimension / m_maxSceneSize)),
+    //                         (m_rowCount * (m_maxDimension / m_maxSceneSize)));
+    //    m_scaleX = m_barThickness.width() / m_scaleFactor;
+    //    m_scaleZ = m_barThickness.height() / m_scaleFactor;
 
     m_xLength = m_segmentXCount;
     m_zLength = m_segmentZCount;
@@ -812,30 +812,30 @@ void Surface3dRenderer::updateDepthBuffer()
                                                              m_shadowQuality);
         if (!m_depthTexture) {
             qDebug() << "Failed to create m_depthTexture";
-//            switch (m_shadowQuality) {
-//            case ShadowHigh:
-//                qWarning("Creating high quality shadows failed. Changing to medium quality.");
-//                (void)setShadowQuality(ShadowMedium);
-//                break;
-//            case ShadowMedium:
-//                qWarning("Creating medium quality shadows failed. Changing to low quality.");
-//                (void)setShadowQuality(ShadowLow);
-//                break;
-//            case ShadowLow:
-//                qWarning("Creating low quality shadows failed. Switching shadows off.");
-//                (void)setShadowQuality(ShadowNone);
-//                break;
-//            default:
-//                // You'll never get here
-//                break;
-//            }
+            //            switch (m_shadowQuality) {
+            //            case ShadowHigh:
+            //                qWarning("Creating high quality shadows failed. Changing to medium quality.");
+            //                (void)setShadowQuality(ShadowMedium);
+            //                break;
+            //            case ShadowMedium:
+            //                qWarning("Creating medium quality shadows failed. Changing to low quality.");
+            //                (void)setShadowQuality(ShadowLow);
+            //                break;
+            //            case ShadowLow:
+            //                qWarning("Creating low quality shadows failed. Switching shadows off.");
+            //                (void)setShadowQuality(ShadowNone);
+            //                break;
+            //            default:
+            //                // You'll never get here
+            //                break;
+            //            }
         }
     }
 }
 #endif
 
 void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
-                                           const QString &fragmentShader)
+                                              const QString &fragmentShader)
 {
     if (m_backgroundShader)
         delete m_backgroundShader;

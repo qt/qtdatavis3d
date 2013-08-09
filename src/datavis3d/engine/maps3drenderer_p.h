@@ -29,8 +29,10 @@
 #ifndef MAPS3DRENDERER_P_H
 #define MAPS3DRENDERER_P_H
 
-#include "datavis3dglobal_p.h"
 #include <QOpenGLFunctions>
+
+#include "datavis3dglobal_p.h"
+#include "camerahelper_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -42,6 +44,8 @@ class QT_DATAVIS3D_EXPORT Maps3DRenderer : public QObject, public QOpenGLFunctio
 public:
     explicit Maps3DRenderer(Maps3DController *controller);
     ~Maps3DRenderer();
+
+    void render(CameraHelper *camera, const GLuint defaultFboHandle);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

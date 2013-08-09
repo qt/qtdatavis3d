@@ -69,9 +69,6 @@ void DeclarativeBars::componentComplete()
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    // Call initialize on each update paint node and let the shared code worry about it.
-    m_shared->initializeOpenGL();
-
     // If old node exists and has right size, reuse it.
     if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
         // Update bounding rectangle (that has same size as before).

@@ -84,8 +84,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selection(selectionSkipColor),
       m_areaSize(QSizeF(0.0f, 0.0f)),
       m_hasHeightAdjustmentChanged(true),
-      m_dataProxy(0),
-      m_valueUpdateNeeded(false),
       m_dotSizeScale(1.0f)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
@@ -94,7 +92,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 {
     //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);
-    initializePreOpenGL();
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -117,30 +114,6 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_textureHelper;
 }
 
-void Scatter3DRenderer::initializePreOpenGL()
-{
-    Abstract3DRenderer::initializePreOpenGL();
-
-    QObject::connect(m_controller, &Scatter3DController::selectionModeChanged, this,
-                     &Scatter3DRenderer::updateSelectionMode);
-    QObject::connect(m_controller, &Scatter3DController::objFileChanged, this,
-                     &Scatter3DRenderer::updateMeshFileName);
-    QObject::connect(m_controller, &Scatter3DController::positionChanged, this,
-                     &Scatter3DRenderer::updatePosition);
-    QObject::connect(m_controller, &Scatter3DController::gridEnabledChanged, this,
-                     &Scatter3DRenderer::updateGridEnabled);
-    QObject::connect(m_controller, &Scatter3DController::backgroundEnabledChanged, this,
-                     &Scatter3DRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Scatter3DController::zoomLevelChanged, this,
-                     &Scatter3DRenderer::updateZoomLevel);
-
-    updateSelectionMode(m_controller->selectionMode());
-    updateZoomLevel(m_controller->zoomLevel());
-    updateMeshFileName(m_controller->objFile());
-    updateGridEnabled(m_controller->gridEnabled());
-    updateBackgroundEnabled(m_controller->backgroundEnabled());
-}
-
 void Scatter3DRenderer::initializeOpenGL()
 {
     //qDebug() << __FUNCTION__;
@@ -160,9 +133,6 @@ void Scatter3DRenderer::initializeOpenGL()
 
     // Init selection shader
     initSelectionShader();
-
-    // Load default mesh
-    loadBarMesh();
 
     // Load grid line mesh
     loadGridLineMesh();
@@ -196,10 +166,27 @@ void Scatter3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 }
 
-void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
-                               bool valuesDirty,
-                               CameraHelper *camera,
-                               const GLuint defaultFboHandle)
+void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
+{
+    const QScatterDataArray &dataArray = *dataProxy->array();
+    calculateSceneScalingFactors();
+    int dataSize = dataArray.size();
+    m_renderItemArray.resize(dataSize);
+    for (int i = 0; i < dataSize ; i++) {
+        qreal value = dataArray.at(i).position().y();
+        m_renderItemArray[i].setValue(value);
+        m_renderItemArray[i].setPosition(dataArray.at(i).position());
+        //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
+        //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
+        calculateTranslation(m_renderItemArray[i]);
+        m_renderItemArray[i].setRenderer(this);
+    }
+    m_dotSizeScale = (GLfloat)qBound(0.01, (qreal)(2.0f / qSqrt((qreal)dataSize)), 0.1);
+
+    Abstract3DRenderer::updateDataModel(dataProxy);
+}
+
+void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
     //qDebug() << __FUNCTION__;
 
@@ -218,29 +205,6 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
         m_lastFrameTime.restart();
     }
 #endif
-
-    m_dataProxy = dataProxy;
-
-    // TODO Should data changes be notified via signal instead of reading data in render?
-    // TODO this cache initialization assumes data window starts at 0,0 offset from array
-    // Update cached values
-    if (valuesDirty|| m_valueUpdateNeeded) {
-        m_valueUpdateNeeded = false;
-        const QScatterDataArray &dataArray = *m_dataProxy->array();
-        calculateSceneScalingFactors();
-        int dataSize = dataArray.size();
-        m_renderItemArray.resize(dataSize);
-        for (int i = 0; i < dataSize ; i++) {
-            qreal value = dataArray.at(i).position().y();
-            m_renderItemArray[i].setValue(value);
-            m_renderItemArray[i].setPosition(dataArray.at(i).position());
-            //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
-            //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
-            calculateTranslation(m_renderItemArray[i]);
-            m_renderItemArray[i].setRenderer(this);
-        }
-        m_dotSizeScale = (GLfloat)qBound(0.01, (qreal)(2.0f / qSqrt((qreal)dataSize)), 0.1);
-    }
 
     if (defaultFboHandle) {
         glDepthMask(true);
@@ -283,10 +247,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                m_cachedZoomLevel * m_autoScaleAdjustment,
-                m_mainViewPort.width(),
-                m_mainViewPort.height(),
-                true);
+                                m_cachedZoomLevel * m_autoScaleAdjustment,
+                                m_mainViewPort.width(),
+                                m_mainViewPort.height(),
+                                true);
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -971,7 +935,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             for (int segment = 0; segment <= lastSegment; segment++) {
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                        / m_scaleFactor;
+                                     / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
                 GLfloat lineZTrans = aspectRatio * backgroundMargin;
 #endif
@@ -1040,7 +1004,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             for (int segment = 0; segment <= lastSegment; segment++) {
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                        / m_scaleFactor;
+                                     / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
                 GLfloat lineXTrans = aspectRatio * backgroundMargin;
 #endif
@@ -1191,7 +1155,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                        / m_scaleFactor;
+                                      / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
             if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = aspectRatio * backgroundMargin;
@@ -1252,7 +1216,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             if (m_axisCacheX.labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                        / m_scaleFactor;
+                                      / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
             if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = aspectRatio * backgroundMargin;
@@ -1305,9 +1269,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (m_axisCacheY.labelItems().size() > labelNbr) {
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                        / m_scaleFactor;
+                                      / m_scaleFactor;
                 GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                        / m_scaleFactor;
+                                      / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
                 GLfloat labelXTrans = aspectRatio * backgroundMargin;
                 GLfloat labelZTrans = labelXTrans;
@@ -1528,8 +1492,6 @@ void Scatter3DRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientati
                                         qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
-    // If this function is called, then value update is also needed
-    m_valueUpdateNeeded = true;
 }
 
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)

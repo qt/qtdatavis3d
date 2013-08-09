@@ -35,6 +35,7 @@
 #include "datavis3dglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
+#include "qabstractdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -42,7 +43,7 @@ class Abstract3DRenderer : public QObject, protected QOpenGLFunctions
 {
 protected:
     Abstract3DController *m_controller;
-
+    bool m_isInitialized;
     bool m_hasNegativeValues;
     QRect m_cachedBoundingRect;
     QDataVis::ShadowQuality m_cachedShadowQuality;
@@ -51,14 +52,17 @@ protected:
     QDataVis::LabelTransparency m_cachedLabelTransparency;
     Drawer *m_drawer;
     GLfloat m_autoScaleAdjustment;
+    QString m_cachedItemLabelFormat;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
 
     Abstract3DRenderer(Abstract3DController *controller);
-    virtual void initializePreOpenGL();
     virtual void initializeOpenGL();
+
+public:
+    inline bool isInitialized() { return m_isInitialized; }
 
     virtual void updateBoundingRect(const QRect boundingRect);
     virtual void updatePosition(const QRect boundingRect);
@@ -70,13 +74,15 @@ protected:
 
     virtual void handleShadowQualityChange();
 
-    virtual void requestSelectionAtPoint(const QPoint &point)=0;
-    virtual void updateTextures()=0;
-    virtual void initSelectionBuffer()=0;
-    virtual void updateDepthBuffer()=0;
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality)=0;
-    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader)=0;
-    virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader)=0;
+    void updateDataModel(QAbstractDataProxy *dataProxy);
+    virtual QString itemLabelFormat() const;
+    virtual void requestSelectionAtPoint(const QPoint &point) = 0;
+    virtual void updateTextures() = 0;
+    virtual void initSelectionBuffer() = 0;
+    virtual void updateDepthBuffer() = 0;
+    virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
+    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
+    virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
     virtual void updateAxisTitle(QAbstractAxis::AxisOrientation orientation, const QString &title);
     virtual void updateAxisLabels(QAbstractAxis::AxisOrientation orientation, const QStringList &labels);
@@ -86,6 +92,13 @@ protected:
 
     void initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis);
     AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
+
+public:
+    /**
+     * @brief render Implements OpenGL rendering that occurs in the rendering thread.
+     * @param defaultFboHandle Defaults FBO handle (defaults to 0).
+     */
+    virtual void render(CameraHelper *camera, const GLuint defaultFboHandle) = 0;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
