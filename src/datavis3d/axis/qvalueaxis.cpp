@@ -83,6 +83,11 @@ qreal QValueAxis::max() const
 
 void QValueAxis::setSegmentCount(int count)
 {
+    if (count <= 0) {
+        qWarning() << "Warning: Illegal segment count automatically adjusted to a legal one:"
+                   << count << "-> 1";
+        count = 1;
+    }
     if (dptr()->m_segmentCount != count){
         dptr()->m_segmentCount = count;
         dptr()->recreateLabels();
@@ -97,6 +102,11 @@ int QValueAxis::segmentCount() const
 
 void QValueAxis::setSubSegmentCount(int count)
 {
+    if (count <= 0) {
+        qWarning() << "Warning: Illegal subsegment count automatically adjusted to a legal one:"
+                   << count << "-> 1";
+        count = 1;
+    }
     if (dptr()->m_subSegmentCount != count) {
         dptr()->m_subSegmentCount = count;
         emit subSegmentCountChanged(count);
@@ -149,8 +159,8 @@ QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
     : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue),
       m_min(0.0),
       m_max(10.0),
-      m_segmentCount(10),
-      m_subSegmentCount(0),
+      m_segmentCount(5),
+      m_subSegmentCount(1),
       m_autoAdjust(true)
 {
 }

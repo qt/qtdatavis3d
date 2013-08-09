@@ -47,12 +47,12 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 AxisRenderCache::AxisRenderCache()
     : m_type(QAbstractAxis::AxisTypeNone),
       m_min(0.0),
-      m_max(0.0),
-      m_segmentCount(0),
-      m_subSegmentCount(0),
+      m_max(10.0),
+      m_segmentCount(5),
+      m_subSegmentCount(1),
       m_drawer(0),
-      m_segmentStep(0.0f),
-      m_subSegmentStep(0.0f)
+      m_segmentStep(10.0f),
+      m_subSegmentStep(10.0f)
 {
 }
 
