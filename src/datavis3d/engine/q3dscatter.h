@@ -104,10 +104,10 @@ public:
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                      bool uniform = true);
 
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    void setTickCount(int tickCount, qreal step, qreal minimum = 0.0f);
+    void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);

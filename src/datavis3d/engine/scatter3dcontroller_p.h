@@ -97,9 +97,9 @@ private:
     QFont m_font;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    GLfloat m_tickMinimum;
+    GLint m_segmentCount;
+    GLfloat m_segmentStep;
+    GLfloat m_segmentMinimum;
 
     Scatter3DRenderer *m_renderer;
     QScatterDataProxy *m_data;
@@ -128,10 +128,10 @@ public:
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
 
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
 
     // TODO: light placement API
 
@@ -182,7 +182,7 @@ signals:
     void fontChanged(QFont font);
     void gridEnabledChanged(bool enable);
     void backgroundEnabledChanged(bool enable);
-    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
+    void segmentCountChanged(GLint segmentCount, GLfloat step, GLfloat minimum);
 
 private:
     void handleLimitChange();

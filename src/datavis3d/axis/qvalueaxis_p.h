@@ -74,8 +74,8 @@ protected:
 
     qreal m_min;
     qreal m_max;
-    int m_tickCount;
-    int m_subTickCount;
+    int m_segmentCount;
+    int m_subSegmentCount;
     bool m_autoAdjust;
     QString m_labelFormat;
 

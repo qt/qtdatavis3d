@@ -121,11 +121,11 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
         m_cachedState->m_isGridSet = false;
     }
 
-    if (m_cachedState->m_isTickCountSet) {
-        m_shared->setTickCount(GLint(m_cachedState->m_tickCount),
-                               GLfloat(m_cachedState->m_tickStep),
-                               GLfloat(m_cachedState->m_tickMin));
-        m_cachedState->m_isTickCountSet = false;
+    if (m_cachedState->m_isSegmentCountSet) {
+        m_shared->setSegmentCount(GLint(m_cachedState->m_segmentCount),
+                               GLfloat(m_cachedState->m_segmentStep),
+                               GLfloat(m_cachedState->m_segmentMin));
+        m_cachedState->m_isSegmentCountSet = false;
     }
 
 
@@ -233,12 +233,12 @@ bool DeclarativeScatter::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeScatter::setTickCount(int tickCount, qreal step, qreal minimum)
+void DeclarativeScatter::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
-    m_cachedState->m_isTickCountSet = true;
-    m_cachedState->m_tickCount = tickCount;
-    m_cachedState->m_tickStep = step;
-    m_cachedState->m_tickMin = minimum;
+    m_cachedState->m_isSegmentCountSet = true;
+    m_cachedState->m_segmentCount = segmentCount;
+    m_cachedState->m_segmentStep = step;
+    m_cachedState->m_segmentMin = minimum;
 
     update();
 }
@@ -385,10 +385,10 @@ DeclarativeScatterCachedStatePrivate::DeclarativeScatterCachedStatePrivate() :
     m_shadowQuality(ShadowNone),
     m_isGridSet(false),
     m_isGridEnabled(true),
-    m_isTickCountSet(false),
-    m_tickCount(5),
-    m_tickStep(1),
-    m_tickMin(0)
+    m_isSegmentCountSet(false),
+    m_segmentCount(5),
+    m_segmentStep(1),
+    m_segmentMin(0)
 {
 }
 

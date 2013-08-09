@@ -164,8 +164,8 @@ public slots:
     virtual void handleAxisTitleChanged(const QString &title);
     virtual void handleAxisLabelsChanged();
     virtual void handleAxisRangeChanged(qreal min, qreal max);
-    virtual void handleAxisTickCountChanged(int count);
-    virtual void handleAxisSubTickCountChanged(int count);
+    virtual void handleAxisSegmentCountChanged(int count);
+    virtual void handleAxisSubSegmentCountChanged(int count);
     virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
@@ -181,8 +181,8 @@ signals:
     void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
     void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);
     void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-    void axisTickCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
-    void axisSubTickCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
+    void axisSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
+    void axisSubSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
 
 private:
     void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis, QAbstractAxis **axisPtr);

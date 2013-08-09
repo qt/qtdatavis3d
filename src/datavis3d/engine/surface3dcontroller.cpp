@@ -191,13 +191,13 @@ Drawer *Surface3dController::drawer()
         return 0;
 }
 
-void Surface3dController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Surface3dController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
-    m_tickCount   = tickCount;
-    m_tickStep    = step;
-    m_tickMinimum = minimum;
+    m_segmentCount   = segmentCount;
+    m_segmentStep    = step;
+    m_segmentMinimum = minimum;
 
-    emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
+    emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
 }
 
 void Surface3dController::setGradientColorAt(qreal pos, const QColor &color)

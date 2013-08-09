@@ -456,20 +456,20 @@ QScatterDataProxy *Q3DScatter::dataProxy()
 }
 
 /*!
- * \a tickCount How many ticks will be drawn in addition to the start line. \c 5 by default.
- * \n There will be tickCount + 1 lines drawn, as there is always the start line.
+ * \a segmentCount How many segments will be drawn in addition to the start line. \c 5 by default.
+ * \n There will be segmentCount + 1 lines drawn, as there is always the start line.
  *
- * \a step How large a step each tick is.
+ * \a step How large a step each segment is.
  *
  * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
  * important if values can be negative, or autoscaling won't work correctly.
  *
- * Sets tick count and step. Note; tickCount * step should be the maximum possible value of data
+ * Sets segment count and step. Note; segmentCount * step should be the maximum possible value of data
  * set.
  */
-void Q3DScatter::setTickCount(int tickCount, qreal step, qreal minimum)
+void Q3DScatter::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
-    d_ptr->m_shared->setTickCount(GLint(tickCount), GLfloat(step), GLfloat(minimum));
+    d_ptr->m_shared->setSegmentCount(GLint(segmentCount), GLfloat(step), GLfloat(minimum));
 }
 
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q, QRect rect)

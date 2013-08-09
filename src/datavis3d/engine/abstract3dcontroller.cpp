@@ -302,26 +302,26 @@ void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
 }
 
-void Abstract3DController::handleAxisTickCountChanged(int count)
+void Abstract3DController::handleAxisSegmentCountChanged(int count)
 {
     if (sender() == m_axisX)
-        emit axisTickCountChanged(QAbstractAxis::AxisOrientationX, count);
+        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationX, count);
     else if (sender() == m_axisY)
-        emit axisTickCountChanged(QAbstractAxis::AxisOrientationY, count);
+        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationY, count);
     else if (sender() == m_axisZ)
-        emit axisTickCountChanged(QAbstractAxis::AxisOrientationZ, count);
+        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationZ, count);
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
 }
 
-void Abstract3DController::handleAxisSubTickCountChanged(int count)
+void Abstract3DController::handleAxisSubSegmentCountChanged(int count)
 {
     if (sender() == m_axisX)
-        emit axisSubTickCountChanged(QAbstractAxis::AxisOrientationX, count);
+        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationX, count);
     else if (sender() == m_axisY)
-        emit axisSubTickCountChanged(QAbstractAxis::AxisOrientationY, count);
+        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationY, count);
     else if (sender() == m_axisZ)
-        emit axisSubTickCountChanged(QAbstractAxis::AxisOrientationZ, count);
+        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationZ, count);
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
 }
@@ -355,15 +355,15 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
         QValueAxis *valueAxis = static_cast<QValueAxis *>(axis);
         QObject::connect(valueAxis, &QValueAxis::rangeChanged,
                          this, &Abstract3DController::handleAxisRangeChanged);
-        QObject::connect(valueAxis, &QValueAxis::tickCountChanged,
-                         this, &Abstract3DController::handleAxisTickCountChanged);
-        QObject::connect(valueAxis, &QValueAxis::subTickCountChanged,
-                         this, &Abstract3DController::handleAxisSubTickCountChanged);
+        QObject::connect(valueAxis, &QValueAxis::segmentCountChanged,
+                         this, &Abstract3DController::handleAxisSegmentCountChanged);
+        QObject::connect(valueAxis, &QValueAxis::subSegmentCountChanged,
+                         this, &Abstract3DController::handleAxisSubSegmentCountChanged);
         QObject::connect(valueAxis, &QValueAxis::autoAdjustRangeChanged,
                          this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
         emit axisRangeChanged(orientation, valueAxis->min(), valueAxis->max());
-        emit axisTickCountChanged(orientation, valueAxis->tickCount());
-        emit axisSubTickCountChanged(orientation, valueAxis->subTickCount());
+        emit axisSegmentCountChanged(orientation, valueAxis->segmentCount());
+        emit axisSubSegmentCountChanged(orientation, valueAxis->subSegmentCount());
         handleAxisAutoAdjustRangeChanged(valueAxis->isAutoAdjustRange());
     }
 }

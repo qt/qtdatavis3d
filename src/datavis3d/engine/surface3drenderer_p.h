@@ -108,10 +108,10 @@ public:
 private:
     // Data parameters
     QList<qreal> m_series; // TODO: TEMP
-    GLint m_tickYCount;
-    GLfloat m_tickYStep;
-    GLint m_tickXCount;
-    GLint m_tickZCount;
+    GLint m_segmentYCount;
+    GLfloat m_segmentYStep;
+    GLint m_segmentXCount;
+    GLint m_segmentZCount;
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
@@ -163,7 +163,7 @@ public slots:
     void updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient();
-    void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
 
     void getSelection();
 
@@ -191,7 +191,7 @@ public:
     void loadSurfaceObj();
 
     // TODO: temp
-    void setXZStuff(GLint tickXCount, GLint tickZCount);
+    void setXZStuff(GLint segmentXCount, GLint segmentZCount);
     void setSeries(QList<qreal> series);
 
 private:

@@ -61,10 +61,10 @@ public:
     qreal min() const;
     qreal max() const;
 
-    void setTickCount(int count);
-    int tickCount() const;
-    void setSubTickCount(int count);
-    int subTickCount() const;
+    void setSegmentCount(int count);
+    int segmentCount() const;
+    void setSubSegmentCount(int count);
+    int subSegmentCount() const;
 
     void setAutoAdjustRange(bool autoAdjust);
     bool isAutoAdjustRange() const;
@@ -74,8 +74,8 @@ public:
 
 signals:
     void rangeChanged(qreal min, qreal max);
-    void tickCountChanged(int count);
-    void subTickCountChanged(int count);
+    void segmentCountChanged(int count);
+    void subSegmentCountChanged(int count);
     void autoAdjustRangeChanged(bool autoAdjust);
     void labelFormatChanged(QString format);
 

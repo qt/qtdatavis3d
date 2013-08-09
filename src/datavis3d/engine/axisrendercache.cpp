@@ -48,11 +48,11 @@ AxisRenderCache::AxisRenderCache()
     : m_type(QAbstractAxis::AxisTypeNone),
       m_min(0.0),
       m_max(0.0),
-      m_tickCount(0),
-      m_subTickCount(0),
+      m_segmentCount(0),
+      m_subSegmentCount(0),
       m_drawer(0),
-      m_tickStep(0.0f),
-      m_subTickStep(0.0f)
+      m_segmentStep(0.0f),
+      m_subSegmentStep(0.0f)
 {
 }
 
@@ -120,25 +120,25 @@ void AxisRenderCache::setLabels(const QStringList &labels)
 void AxisRenderCache::setMin(qreal min)
 {
     m_min = min;
-    updateTickStep();
+    updateSegmentStep();
 }
 
 void AxisRenderCache::setMax(qreal max)
 {
     m_max = max;
-    updateTickStep();
+    updateSegmentStep();
 }
 
-void AxisRenderCache::setTickCount(int count)
+void AxisRenderCache::setSegmentCount(int count)
 {
-    m_tickCount = count;
-    updateTickStep();
+    m_segmentCount = count;
+    updateSegmentStep();
 }
 
-void AxisRenderCache::setSubTickCount(int count)
+void AxisRenderCache::setSubSegmentCount(int count)
 {
-    m_subTickCount = count;
-    updateSubTickStep();
+    m_subSegmentCount = count;
+    updateSubSegmentStep();
 }
 
 void AxisRenderCache::updateTextures()
@@ -156,21 +156,21 @@ void AxisRenderCache::updateTextures()
     }
 }
 
-void AxisRenderCache::updateTickStep()
+void AxisRenderCache::updateSegmentStep()
 {
-    if (m_tickCount > 0)
-        m_tickStep = qFabs((m_max - m_min) / m_tickCount);
+    if (m_segmentCount > 0)
+        m_segmentStep = qFabs((m_max - m_min) / m_segmentCount);
     else
-        m_tickStep = 0.0f; // Irrelevant
-    updateSubTickStep();
+        m_segmentStep = 0.0f; // Irrelevant
+    updateSubSegmentStep();
 }
 
-void AxisRenderCache::updateSubTickStep()
+void AxisRenderCache::updateSubSegmentStep()
 {
-    if (m_subTickCount > 1)
-        m_subTickStep = m_tickStep / m_subTickCount;
+    if (m_subSegmentCount > 1)
+        m_subSegmentStep = m_segmentStep / m_subSegmentCount;
     else
-        m_subTickStep = m_tickStep;
+        m_subSegmentStep = m_segmentStep;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

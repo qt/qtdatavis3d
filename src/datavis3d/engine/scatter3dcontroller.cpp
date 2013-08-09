@@ -67,9 +67,9 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
-      m_tickCount(0),
-      m_tickStep(0),
-      m_tickMinimum(0.0f),
+      m_segmentCount(0),
+      m_segmentStep(0),
+      m_segmentMinimum(0.0f),
       m_renderer(0),
       m_data(0),
       m_valuesDirty(false)
@@ -406,16 +406,16 @@ bool Scatter3DController::backgroundEnabled()
     return m_isBackgroundEnabled;
 }
 
-void Scatter3DController::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Scatter3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
-    if (tickCount <= 0) {
-        qCritical("Invalid tick count. It must be positive.");
+    if (segmentCount <= 0) {
+        qCritical("Invalid segment count. It must be positive.");
         return;
     }
-    m_tickCount = tickCount;
-    m_tickStep = step;
-    m_tickMinimum = minimum;
-    emit tickCountChanged(m_tickCount, m_tickStep, m_tickMinimum);
+    m_segmentCount = segmentCount;
+    m_segmentStep = step;
+    m_segmentMinimum = minimum;
+    emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

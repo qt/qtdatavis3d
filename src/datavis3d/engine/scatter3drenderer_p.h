@@ -105,8 +105,8 @@ private:
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
-    GLint m_tickCount;
-    GLfloat m_tickStep;
+    GLint m_segmentCount;
+    GLfloat m_segmentStep;
     bool m_xFlipped;
     bool m_zFlipped;
     QRect m_mainViewPort;
@@ -166,7 +166,7 @@ public slots:
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
-    void updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
     void updateMeshFileName(const QString &objFileName);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.

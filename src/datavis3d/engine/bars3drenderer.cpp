@@ -1154,9 +1154,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             }
         }
 
-        if (m_axisCacheY.tickCount() > 0) {
+        if (m_axisCacheY.segmentCount() > 0) {
             // Wall lines: back wall
-            GLfloat heightStep = m_axisCacheY.subTickStep();
+            GLfloat heightStep = m_axisCacheY.subSegmentStep();
             GLfloat startLine = 0.0f;
 
             if (m_hasNegativeValues)
@@ -1447,7 +1447,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     // Y Labels
     int labelNbr = 0;
-    GLfloat heightStep = m_axisCacheY.tickStep();
+    GLfloat heightStep = m_axisCacheY.segmentStep();
     GLfloat startLine = 0.0f;
     int labelCount = m_axisCacheY.labels().size();
     if (m_hasNegativeValues)

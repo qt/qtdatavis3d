@@ -110,7 +110,7 @@ Item {
 
     Component.onCompleted: {
         console.log("setting data!")
-        testchart.setTickCount(10, 3, 0)
+        testchart.setSegmentCount(10, 3, 0)
         testchart.data = dataModel
     }
 

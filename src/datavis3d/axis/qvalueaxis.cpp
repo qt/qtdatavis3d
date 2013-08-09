@@ -81,31 +81,31 @@ qreal QValueAxis::max() const
     return dptrc()->m_max;
 }
 
-void QValueAxis::setTickCount(int count)
+void QValueAxis::setSegmentCount(int count)
 {
-    if (dptr()->m_tickCount != count){
-        dptr()->m_tickCount = count;
+    if (dptr()->m_segmentCount != count){
+        dptr()->m_segmentCount = count;
         dptr()->recreateLabels();
-        emit tickCountChanged(count);
+        emit segmentCountChanged(count);
     }
 }
 
-int QValueAxis::tickCount() const
+int QValueAxis::segmentCount() const
 {
-    return dptrc()->m_tickCount;
+    return dptrc()->m_segmentCount;
 }
 
-void QValueAxis::setSubTickCount(int count)
+void QValueAxis::setSubSegmentCount(int count)
 {
-    if (dptr()->m_subTickCount != count) {
-        dptr()->m_subTickCount = count;
-        emit subTickCountChanged(count);
+    if (dptr()->m_subSegmentCount != count) {
+        dptr()->m_subSegmentCount = count;
+        emit subSegmentCountChanged(count);
     }
 }
 
-int QValueAxis::subTickCount() const
+int QValueAxis::subSegmentCount() const
 {
-    return dptrc()->m_subTickCount;
+    return dptrc()->m_subSegmentCount;
 }
 
 void QValueAxis::setAutoAdjustRange(bool autoAdjust)
@@ -149,8 +149,8 @@ QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
     : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue),
       m_min(0.0),
       m_max(10.0),
-      m_tickCount(10),
-      m_subTickCount(0),
+      m_segmentCount(10),
+      m_subSegmentCount(0),
       m_autoAdjust(true)
 {
 }
@@ -222,14 +222,14 @@ void QValueAxisPrivate::setMax(qreal max)
 void QValueAxisPrivate::recreateLabels()
 {
     QStringList newLabels;
-    newLabels.reserve(m_tickCount + 1);
+    newLabels.reserve(m_segmentCount + 1);
 
-    // First label is at axis min, which is an extra tick
-    qreal tickStep = (m_max - m_min) / m_tickCount;
+    // First label is at axis min, which is an extra segment
+    qreal segmentStep = (m_max - m_min) / m_segmentCount;
 
-    for (int i = 0; i < m_tickCount; i++) {
+    for (int i = 0; i < m_segmentCount; i++) {
         // TODO Actually do proper formatting
-        newLabels.append(QString::number(m_min + (tickStep * i)));
+        newLabels.append(QString::number(m_min + (segmentStep * i)));
     }
     // Ensure max label doesn't suffer from any rounding errors
     newLabels.append(QString::number(m_max));

@@ -92,7 +92,7 @@ void ChartModifier::toggleSqrtSin(bool enable)
             }
         }
 
-        m_chart->setTickCount(4, 0.5f);
+        m_chart->setSegmentCount(4, 0.5f);
         m_chart->appendSeries(series, m_xCount, m_zCount);
 
         qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
@@ -114,7 +114,7 @@ void ChartModifier::togglePlane(bool enable)
             }
         }
 
-        m_chart->setTickCount(4, 0.5f);
+        m_chart->setSegmentCount(4, 0.5f);
         m_chart->appendSeries(series, m_xCount, m_zCount);
     }
 }

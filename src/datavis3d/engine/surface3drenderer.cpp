@@ -74,10 +74,10 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_labelTransparency(TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_hasNegativeValues(false),
-      m_tickYCount(0),
-      m_tickYStep(0.0f),
-      m_tickXCount(0),
-      m_tickZCount(0),
+      m_segmentYCount(0),
+      m_segmentYStep(0.0f),
+      m_segmentXCount(0),
+      m_segmentZCount(0),
       m_backgroundShader(0),
       m_surfaceShader(0),
       m_surfaceGridShader(0),
@@ -111,8 +111,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
                      &Surface3dRenderer::updateSmoothStatus);
     QObject::connect(m_controller, &Surface3dController::surfaceGridChanged, this,
                      &Surface3dRenderer::updateSurfaceGridStatus);
-    QObject::connect(m_controller, &Surface3dController::tickCountChanged, this,
-                     &Surface3dRenderer::updateTickCount);
+    QObject::connect(m_controller, &Surface3dController::segmentCountChanged, this,
+                     &Surface3dRenderer::updateSegmentCount);
     QObject::connect(m_controller, &Surface3dController::themeChanged, this,
                      &Surface3dRenderer::updateTheme);
     QObject::connect(m_controller, &Surface3dController::leftMousePressed, this,
@@ -510,26 +510,26 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     }
 }
 
-void Surface3dRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Surface3dRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
-    m_tickYCount = tickCount;
-    m_tickYStep = step;
-    if (tickCount > 0 && step > 0.0) {
-        m_yRange = m_tickYCount * m_tickYStep;
+    m_segmentYCount = segmentCount;
+    m_segmentYStep = step;
+    if (segmentCount > 0 && step > 0.0) {
+        m_yRange = m_segmentYCount * m_segmentYStep;
         m_yAdjustment = 2.0f - ((m_yRange - minimum) / m_yRange); // TODO: to function
     }
 
     qDebug() << "m_yAdjustment = " << m_yAdjustment;
 }
 
-void Surface3dRenderer::setXZStuff(GLint tickXCount, GLint tickZCount)
+void Surface3dRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
 {
-    m_tickXCount = tickXCount;
-    m_tickZCount = tickZCount;
+    m_segmentXCount = segmentXCount;
+    m_segmentZCount = segmentZCount;
 
     // TODO: Invent "idiotproof" max scene size formula..
     // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
-    m_maxSceneSize = 2 * qSqrt(tickXCount * tickZCount);
+    m_maxSceneSize = 2 * qSqrt(segmentXCount * segmentZCount);
 
     calculateSceneScalingFactors();
 }
@@ -565,8 +565,8 @@ void Surface3dRenderer::updateSelectionTexture()
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
     // TODO: power of two thing for ES
-    int idImageWidth = (m_tickXCount - 1) * 4;
-    int idImageHeight = (m_tickZCount - 1) * 4;
+    int idImageWidth = (m_segmentXCount - 1) * 4;
+    int idImageHeight = (m_segmentZCount - 1) * 4;
     int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
 
     uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
@@ -581,10 +581,10 @@ void Surface3dRenderer::updateSelectionTexture()
             idToRGBA(id + 1, &r, &g, &b, &a);
             fillIdCorner(&bits[p + 8], r, g, b, a, stride);
 
-            idToRGBA(id + m_tickXCount, &r, &g, &b, &a);
+            idToRGBA(id + m_segmentXCount, &r, &g, &b, &a);
             fillIdCorner(&bits[p + 2 * stride], r, g, b, a, stride);
 
-            idToRGBA(id + m_tickXCount + 1, &r, &g, &b, &a);
+            idToRGBA(id + m_segmentXCount + 1, &r, &g, &b, &a);
             fillIdCorner(&bits[p + 2 * stride + 8], r, g, b, a, stride);
 
             id++;
@@ -662,9 +662,9 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
         loadSurfaceObj();
 
     if (m_cachedSmoothSurface)
-        m_surfaceObj->setUpSmoothData(series, m_tickXCount, m_tickZCount, m_yRange, true);
+        m_surfaceObj->setUpSmoothData(series, m_segmentXCount, m_segmentZCount, m_yRange, true);
     else
-        m_surfaceObj->setUpData(series, m_tickXCount, m_tickZCount, m_yRange, true);
+        m_surfaceObj->setUpData(series, m_segmentXCount, m_segmentZCount, m_yRange, true);
 
     updateSelectionTexture();
 }
@@ -680,11 +680,11 @@ void Surface3dRenderer::calculateSceneScalingFactors()
 //    m_scaleX = m_barThickness.width() / m_scaleFactor;
 //    m_scaleZ = m_barThickness.height() / m_scaleFactor;
 
-    m_xLength = m_tickXCount;
-    m_zLength = m_tickZCount;
+    m_xLength = m_segmentXCount;
+    m_zLength = m_segmentZCount;
     m_maxDimension = qMax(m_xLength, m_zLength);
-    m_scaleFactor = qMin((m_tickXCount * (m_maxDimension / m_maxSceneSize)),
-                         (m_tickZCount * (m_maxDimension / m_maxSceneSize)));
+    m_scaleFactor = qMin((m_segmentXCount * (m_maxDimension / m_maxSceneSize)),
+                         (m_segmentZCount * (m_maxDimension / m_maxSceneSize)));
     m_scaleX = 1.0f / m_scaleFactor; // TODO: correspondance to m_barThickness
     m_scaleZ = 1.0f / m_scaleFactor; // TODO: correspondance to m_barThickness
 
@@ -701,9 +701,9 @@ void Surface3dRenderer::updateSmoothStatus(bool enable)
         return;
 
     if (m_cachedSmoothSurface)
-        m_surfaceObj->setUpSmoothData(m_series, m_tickXCount, m_tickZCount, m_yRange, true);
+        m_surfaceObj->setUpSmoothData(m_series, m_segmentXCount, m_segmentZCount, m_yRange, true);
     else
-        m_surfaceObj->setUpData(m_series, m_tickXCount, m_tickZCount, m_yRange, true);
+        m_surfaceObj->setUpData(m_series, m_segmentXCount, m_segmentZCount, m_yRange, true);
 
     initSurfaceShaders();
 }

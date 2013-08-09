@@ -83,8 +83,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_controller(controller),
       m_selectedItem(0),
       m_previouslySelectedItem(0),
-      m_tickCount(5),
-      m_tickStep(0.2f),
+      m_segmentCount(5),
+      m_segmentStep(0.2f),
       m_xFlipped(false),
       m_zFlipped(false),
       m_updateLabels(false),
@@ -158,8 +158,8 @@ void Scatter3DRenderer::initializePreOpenGL()
                      &Scatter3DRenderer::updateGridEnabled);
     QObject::connect(m_controller, &Scatter3DController::backgroundEnabledChanged, this,
                      &Scatter3DRenderer::updateBackgroundEnabled);
-    QObject::connect(m_controller, &Scatter3DController::tickCountChanged, this,
-                     &Scatter3DRenderer::updateTickCount);
+    QObject::connect(m_controller, &Scatter3DController::segmentCountChanged, this,
+                     &Scatter3DRenderer::updateSegmentCount);
     QObject::connect(m_controller, &Scatter3DController::zoomLevelChanged, this,
                      &Scatter3DRenderer::updateZoomLevel);
 
@@ -806,7 +806,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     // Disable textures
     glDisable(GL_TEXTURE_2D);
 
-    // TODO: Grid lines cannot be done as in bars; we need configurable lines. Let's use ticks for now.
+    // TODO: Grid lines cannot be done as in bars; we need configurable lines. Let's use segments for now.
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         // Bind bar shader
@@ -821,10 +821,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Floor lines: rows
 #ifdef USE_UNIFORM_SCALING
-        GLfloat lineStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
+        GLfloat lineStep = (2.0f * m_scaleFactor * aspectRatio) / m_segmentCount;
         GLfloat startLine = -m_scaleFactor * aspectRatio;
 #else
-        GLfloat lineStep = (2.0f * m_areaSize.height() * aspectRatio) / m_tickCount;
+        GLfloat lineStep = (2.0f * m_areaSize.height() * aspectRatio) / m_segmentCount;
         GLfloat startLine = -m_areaSize.height() * aspectRatio;
 #endif
 
@@ -885,7 +885,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Floor lines: columns
 #ifndef USE_UNIFORM_SCALING
-        lineStep = (2.0f * m_areaSize.width() * aspectRatio) / m_tickCount;
+        lineStep = (2.0f * m_areaSize.width() * aspectRatio) / m_segmentCount;
         startLine = -m_areaSize.width() * aspectRatio;
 #endif
 
@@ -945,7 +945,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
 
         // Wall lines: back wall
-        lineStep = 2.0f * m_tickStep;
+        lineStep = 2.0f * m_segmentStep;
         startLine = -m_heightNormalizer;
 
         for (GLfloat linePos = startLine; linePos <= -startLine; linePos += lineStep) {
@@ -1150,10 +1150,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Z Labels
 #ifdef USE_UNIFORM_SCALING
-    GLfloat posStep = (2.0f * m_scaleFactor * aspectRatio) / m_tickCount;
+    GLfloat posStep = (2.0f * m_scaleFactor * aspectRatio) / m_segmentCount;
     GLfloat startPos = -m_scaleFactor * aspectRatio;
 #else
-    GLfloat posStep = (2.0f * m_areaSize.height() * aspectRatio) / m_tickCount;
+    GLfloat posStep = (2.0f * m_areaSize.height() * aspectRatio) / m_segmentCount;
     GLfloat startPos = -m_areaSize.height() * aspectRatio;
 #endif
     int labelNbr = 0;
@@ -1196,7 +1196,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     }
     // X Labels
 #ifndef USE_UNIFORM_SCALING
-    posStep = (2.0f * m_areaSize.width() * aspectRatio) / m_tickCount;
+    posStep = (2.0f * m_areaSize.width() * aspectRatio) / m_segmentCount;
     startPos = -m_areaSize.width() * aspectRatio;
 #endif
     labelNbr = 0;
@@ -1238,7 +1238,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         labelNbr++;
     }
     // Y Labels
-    posStep = 2.0f * m_tickStep;
+    posStep = 2.0f * m_segmentStep;
     startPos = -m_heightNormalizer;
     labelNbr = 0;
     for (GLfloat labelPos = startPos; labelPos <= -startPos; labelPos += posStep) {
@@ -1418,14 +1418,14 @@ void Scatter3DRenderer::updateShadowQuality(ShadowQuality quality)
 #endif
 }
 
-void Scatter3DRenderer::updateTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void Scatter3DRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
     //qDebug() << __FUNCTION__;
-    m_tickCount = tickCount;
-    m_tickStep = step;
-    if (tickCount > 0 && step > 0) {
+    m_segmentCount = segmentCount;
+    m_segmentStep = step;
+    if (segmentCount > 0 && step > 0) {
         m_autoAdjust = false;
-        m_heightNormalizer = tickCount * step;
+        m_heightNormalizer = segmentCount * step;
         calculateHeightAdjustment(QPair<float, float>(minimum, m_heightNormalizer));
         m_valueUpdateNeeded = true;
     }
@@ -1494,13 +1494,13 @@ void Scatter3DRenderer::calculateSceneScalingFactors(const QVector3D &limits)
 {
     if (m_autoAdjust) {
         m_heightNormalizer = (GLfloat)qMax((qreal)m_heightNormalizer, qFabs(limits.y()));
-        m_tickStep = m_heightNormalizer / m_tickCount;
+        m_segmentStep = m_heightNormalizer / m_segmentCount;
     }
-    // Auto-adjust these anyway (until axis -based ticks are taken into use)
+    // Auto-adjust these anyway (until axis -based segments are taken into use)
     m_areaSize.setHeight(qMax(m_areaSize.height(), (qreal)limits.z()));
     m_areaSize.setWidth(qMax(m_areaSize.width(), (qreal)limits.x()));
     m_scaleFactor = qMax(qMax((qreal)m_scaleFactor, m_areaSize.width()), m_areaSize.height());
-    //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_tickStep;
+    //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_segmentStep;
 }
 
 void Scatter3DRenderer::calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits)

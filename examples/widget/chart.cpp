@@ -60,8 +60,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
-      m_ticks(4),
-      m_subTicks(3),
+      m_segments(4),
+      m_subSegments(3),
       m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
       m_maxval(20.0)
 {
@@ -107,8 +107,8 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
         m_chart->setSelectionMode(ModeBarRowAndColumn);
-        m_chart->valueAxis()->setTickCount(m_ticks * 2);
-        m_chart->valueAxis()->setSubTickCount(0);
+        m_chart->valueAxis()->setSegmentCount(m_segments * 2);
+        m_chart->valueAxis()->setSubSegmentCount(0);
         m_chart->valueAxis()->setAutoAdjustRange(true);
 
         m_chart->rowAxis()->setTitle("Generic Row");
@@ -156,8 +156,8 @@ void ChartModifier::addDataSet()
     m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
     m_chart->rowAxis()->setLabels(years);
     m_chart->columnAxis()->setLabels(months);
-    m_chart->valueAxis()->setTickCount(m_ticks);
-    m_chart->valueAxis()->setSubTickCount(m_subTicks);
+    m_chart->valueAxis()->setSegmentCount(m_segments);
+    m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
     m_chart->valueAxis()->setRange(m_minval, m_maxval);
 
     // Create data rows

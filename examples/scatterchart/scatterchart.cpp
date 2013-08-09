@@ -79,8 +79,8 @@ void ScatterDataModifier::addData()
                  << "other 0.0" << "other 0.2" << "other 0.4" << "other 0.6" << "other 0.8"
                  << "other 1.0";
 
-    // Set tick count and step
-    m_chart->setTickCount(10, 0.1f, -1.0f);
+    // Set segment count and step
+    m_chart->setSegmentCount(10, 0.1f, -1.0f);
 
     // Add labels
     m_chart->rowAxis()->setTitle("Somethings");

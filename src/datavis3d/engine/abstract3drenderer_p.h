@@ -104,8 +104,8 @@ protected:
     virtual void updateAxisTitle(QAbstractAxis::AxisOrientation orientation, const QString &title);
     virtual void updateAxisLabels(QAbstractAxis::AxisOrientation orientation, const QStringList &labels);
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-    virtual void updateAxisTickCount(QAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubTickCount(QAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
 
     void initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis);
     AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);

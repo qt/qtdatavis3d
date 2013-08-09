@@ -128,15 +128,15 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
         m_cachedState->m_isGridSet = false;
     }
 
-    if (m_cachedState->m_isTickCountSet) {
+    if (m_cachedState->m_isSegmentCountSet) {
         // TODO needs proper axis support on QML side, too
         QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
         if (axis) {
-            axis->setTickCount(m_cachedState->m_tickCount);
-            axis->setRange(m_cachedState->m_tickMin,
-                          (m_cachedState->m_tickCount * m_cachedState->m_tickStep));
+            axis->setSegmentCount(m_cachedState->m_segmentCount);
+            axis->setRange(m_cachedState->m_segmentMin,
+                          (m_cachedState->m_segmentCount * m_cachedState->m_segmentStep));
         }
-        m_cachedState->m_isTickCountSet = false;
+        m_cachedState->m_isSegmentCountSet = false;
     }
 
 
@@ -259,12 +259,12 @@ bool DeclarativeBars::isBackgroundVisible()
 }
 
 // TODO needs proper axis support also in QML
-void DeclarativeBars::setTickCount(int tickCount, qreal step, qreal minimum)
+void DeclarativeBars::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
-    m_cachedState->m_isTickCountSet = true;
-    m_cachedState->m_tickCount = tickCount;
-    m_cachedState->m_tickStep = step;
-    m_cachedState->m_tickMin = minimum;
+    m_cachedState->m_isSegmentCountSet = true;
+    m_cachedState->m_segmentCount = segmentCount;
+    m_cachedState->m_segmentStep = step;
+    m_cachedState->m_segmentMin = minimum;
 
     update();
 }
@@ -435,10 +435,10 @@ DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
     m_shadowQuality(ShadowNone),
     m_isGridSet(false),
     m_isGridEnabled(true),
-    m_isTickCountSet(false),
-    m_tickCount(5),
-    m_tickStep(1),
-    m_tickMin(0)
+    m_isSegmentCountSet(false),
+    m_segmentCount(5),
+    m_segmentStep(1),
+    m_segmentMin(0)
 
 
 {

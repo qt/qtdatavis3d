@@ -92,7 +92,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining explicit range
     // By setting count to 0 we avoid getting any grid
-    m_chart->valueAxis()->setTickCount(0);
+    m_chart->valueAxis()->setSegmentCount(0);
     m_chart->valueAxis()->setRange(0.0, 1.0);
     // Disable shadows
     m_chart->setShadowQuality(ShadowNone);

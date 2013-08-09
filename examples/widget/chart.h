@@ -98,8 +98,8 @@ private:
     float m_barSpacingX;
     float m_barSpacingZ;
     int m_fontSize;
-    int m_ticks;
-    int m_subTicks;
+    int m_segments;
+    int m_subSegments;
     qreal m_minval;
     qreal m_maxval;
     QStringList m_genericRowLabels;

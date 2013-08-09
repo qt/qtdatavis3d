@@ -74,9 +74,9 @@ private:
     bool m_smoothSurface;
     bool m_surfaceGrid;
 
-    GLint m_tickCount;
-    GLfloat m_tickStep;
-    GLfloat m_tickMinimum;
+    GLint m_segmentCount;
+    GLfloat m_segmentStep;
+    GLfloat m_segmentMinimum;
 
     // Interaction
     MouseState m_mouseState;
@@ -107,10 +107,10 @@ public:
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
-    // Set tick count and step. Note; tickCount * step should be the maximum possible value of data
+    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
     // set. Minimum is the absolute minimum possible value a bar can have. This is especially
     // important to set if values can be negative.
-    void setTickCount(GLint tickCount, GLfloat step, GLfloat minimum = 0.0f);
+    void setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
 
     //TODO: Temp solution
     void setData(QList<qreal> series, int width, int depth);
@@ -130,7 +130,7 @@ public:
 signals:
     void smoothStatusChanged(bool enable);
     void surfaceGridChanged(bool enable);
-    void tickCountChanged(GLint tickCount, GLfloat step, GLfloat minimum);
+    void segmentCountChanged(GLint segmentCount, GLfloat step, GLfloat minimum);
     void leftMousePressed();
 
 private:
