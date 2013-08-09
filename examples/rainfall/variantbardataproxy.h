@@ -39,46 +39,51 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTDATASET_H
-#define QVARIANTDATASET_H
+#ifndef VARIANTBARDATAPROXY_H
+#define VARIANTBARDATAPROXY_H
 
-#include "qdatavis3dnamespace.h"
-#include <QScopedPointer>
-#include <QVariantList>
+#include "qbardataproxy.h"
+#include "variantdataset.h"
+#include "variantbardatamapping.h"
+#include <QStringList>
+#include <QMap>
+#include <QPointer>
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+using namespace QtDataVis3D;
 
-class QVariantDataSetPrivate;
-
-typedef QVariantList QVariantDataItem;
-typedef QList<QVariantDataItem *> QVariantDataItemList;
-
-class QT_DATAVIS3D_EXPORT QVariantDataSet : public QObject
+class VariantBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
 
 public:
-    explicit QVariantDataSet();
-    ~QVariantDataSet();
+    explicit VariantBarDataProxy();
+    explicit VariantBarDataProxy(VariantDataSet *newSet, VariantBarDataMapping *mapping);
+    virtual ~VariantBarDataProxy();
 
-    void clear();
+    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
+    void setDataSet(VariantDataSet *newSet);
+    VariantDataSet *dataSet();
 
-    int addItem(QVariantDataItem *item);
-    int addItems(QVariantDataItemList *itemList);
-    // TODO inserts/removes
+    // Map key (row, column, value) to value index in data item (VariantItem).
+    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
+    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
+    void setMapping(VariantBarDataMapping *mapping);
+    VariantBarDataMapping *mapping();
 
-    const QVariantDataItemList &itemList() const;
-
-signals:
-    void itemsAdded(int index, int count);
-    void dataCleared();
+public slots:
+    void handleItemsAdded(int index, int count);
+    void handleDataCleared();
+    void handleMappingChanged();
 
 private:
-    Q_DISABLE_COPY(QVariantDataSet)
+    void resolveDataSet();
 
-    QScopedPointer<QVariantDataSetPrivate> d_ptr;
+    QPointer<VariantDataSet> m_dataSet;
+    QPointer<VariantBarDataMapping> m_mapping;
+
+    Q_DISABLE_COPY(VariantBarDataProxy)
+
+    friend class VariantBarDataProxy;
 };
-
-QT_DATAVIS3D_END_NAMESPACE
 
 #endif

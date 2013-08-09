@@ -39,57 +39,41 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAMAPPING_H
-#define QVARIANTBARDATAMAPPING_H
+#ifndef VARIANTDATASET_H
+#define VARIANTDATASET_H
 
 #include "qdatavis3dnamespace.h"
-#include <QStringList>
+#include <QScopedPointer>
+#include <QVariantList>
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+using namespace QtDataVis3D;
 
-class QVariantBarDataMappingPrivate;
+typedef QVariantList VariantDataItem;
+typedef QList<VariantDataItem *> VariantDataItemList;
 
-class QT_DATAVIS3D_EXPORT QVariantBarDataMapping : public QObject
+class VariantDataSet : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex)
-    Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex)
-    Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex)
-    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
-    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
+
 public:
-    explicit QVariantBarDataMapping();
-    QVariantBarDataMapping(const QVariantBarDataMapping &other);
-    QVariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                           const QStringList &rowCategories,
-                           const QStringList &columnCategories);
-    virtual ~QVariantBarDataMapping();
+    explicit VariantDataSet();
+    ~VariantDataSet();
 
-    QVariantBarDataMapping &operator=(const QVariantBarDataMapping &other);
+    void clear();
 
-    void setRowIndex(int index);
-    int rowIndex() const;
-    void setColumnIndex(int index);
-    int columnIndex() const;
-    void setValueIndex(int index);
-    int valueIndex() const;
+    int addItem(VariantDataItem *item);
+    int addItems(VariantDataItemList *itemList);
 
-    void setRowCategories(const QStringList &categories);
-    const QStringList &rowCategories() const;
-    void setColumnCategories(const QStringList &categories);
-    const QStringList &columnCategories() const;
+    const VariantDataItemList &itemList() const;
 
-    void remap(int rowIndex, int columnIndex, int valueIndex,
-               const QStringList &rowCategories,
-               const QStringList &columnCategories);
 signals:
-    void mappingChanged();
+    void itemsAdded(int index, int count);
+    void dataCleared();
 
 private:
-    QScopedPointer<QVariantBarDataMappingPrivate> d_ptr;
+    VariantDataItemList m_variantData;
+
+    Q_DISABLE_COPY(VariantDataSet)
 };
-
-
-QT_DATAVIS3D_END_NAMESPACE
 
 #endif

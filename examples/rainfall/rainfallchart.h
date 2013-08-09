@@ -42,7 +42,7 @@
 #define RAINFALLCHART_H
 
 #include "q3dbars.h"
-#include "qvariantbardataproxy.h"
+#include "variantbardataproxy.h"
 #include <QTimer>
 
 using namespace QtDataVis3D;
@@ -68,10 +68,10 @@ private:
     QStringList m_years;
     QStringList m_numericMonths;
     QTimer m_timer;
-    QVariantBarDataProxy *m_proxy;
+    VariantBarDataProxy *m_proxy;
     int m_city;
-    QVariantBarDataMapping *m_mapping;
-    QVariantDataSet *m_dataSet;
+    VariantBarDataMapping *m_mapping;
+    VariantDataSet *m_dataSet;
 };
 
 

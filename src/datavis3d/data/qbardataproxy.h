@@ -44,6 +44,7 @@
 
 #include "qabstractdataproxy.h"
 #include "qbardataitem.h"
+#include <QVector>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

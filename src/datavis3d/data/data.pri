@@ -8,12 +8,6 @@ HEADERS += \
     $$PWD/barrenderitem_p.h \
     $$PWD/qbardataitem.h \
     $$PWD/qbardataitem_p.h \
-    $$PWD/qvariantdataset_p.h \
-    $$PWD/qvariantdataset.h \
-    $$PWD/qvariantbardataproxy_p.h \
-    $$PWD/qvariantbardataproxy.h \
-    $$PWD/qvariantbardatamapping.h \
-    $$PWD/qvariantbardatamapping_p.h \
     $$PWD/qitemmodelbardatamapping.h \
     $$PWD/qitemmodelbardatamapping_p.h \
     $$PWD/qitemmodelbardataproxy_p.h \
@@ -44,9 +38,6 @@ SOURCES += \
     $$PWD/abstractrenderitem.cpp \
     $$PWD/barrenderitem.cpp \
     $$PWD/qbardataitem.cpp \
-    $$PWD/qvariantdataset.cpp \
-    $$PWD/qvariantbardataproxy.cpp \
-    $$PWD/qvariantbardatamapping.cpp \
     $$PWD/qitemmodelbardatamapping.cpp \
     $$PWD/qitemmodelbardataproxy.cpp \
     $$PWD/maprenderitem.cpp \

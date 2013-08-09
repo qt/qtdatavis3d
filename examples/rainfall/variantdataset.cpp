@@ -39,46 +39,48 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#include "variantdataset.h"
 
-#ifndef QVARIANTDATASET_P_H
-#define QVARIANTDATASET_P_H
-
-#include "datavis3dglobal_p.h"
-#include "qvariantdataset.h"
-#include <QStringList>
-
-QT_DATAVIS3D_BEGIN_NAMESPACE
-
-class QVariantDataSetPrivate : public QObject
+VariantDataSet::VariantDataSet()
+    : QObject(0)
 {
-    Q_OBJECT
+}
 
-public:
-    explicit QVariantDataSetPrivate(QVariantDataSet *q);
-    ~QVariantDataSetPrivate();
+VariantDataSet::~VariantDataSet()
+{
+    clear();
+}
 
-    void clear();
+void VariantDataSet::clear()
+{
+    foreach (VariantDataItem *item, m_variantData) {
+        item->clear();
+        delete item;
+    }
+    m_variantData.clear();
+    emit dataCleared();
+}
 
-    int addItem(QVariantDataItem *item);
-    int addItems(QVariantDataItemList *itemList);
+int VariantDataSet::addItem(VariantDataItem *item)
+{
+    m_variantData.append(item);
+    int addIndex =  m_variantData.size();
 
-private:
-    QVariantDataSet *q_ptr;
+    emit itemsAdded(addIndex, 1);
+    return addIndex;
+}
 
-    QVariantDataItemList m_variantData;
+int VariantDataSet::addItems(VariantDataItemList *itemList)
+{
+    int newCount = itemList->size();
+    int addIndex = m_variantData.size();
+    m_variantData.append(*itemList);
+    delete itemList;
+    emit itemsAdded(addIndex, newCount);
+    return addIndex;
+}
 
-    friend class QVariantDataSet;
-};
-
-QT_DATAVIS3D_END_NAMESPACE
-
-#endif
+const VariantDataItemList &VariantDataSet::itemList() const
+{
+    return m_variantData;
+}

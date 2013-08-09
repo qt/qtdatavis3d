@@ -61,7 +61,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 
     m_columnCount = m_numericMonths.size();
 
-    m_proxy = new QVariantBarDataProxy;
+    m_proxy = new VariantBarDataProxy;
     m_proxy->setItemLabelFormat(QStringLiteral(" mm"));
     m_chart->setDataProxy(m_proxy);
 
@@ -146,8 +146,8 @@ void RainfallChart::updateYearsList(int start, int end)
 
 void RainfallChart::addDataSet()
 {
-    m_dataSet =  new QVariantDataSet;
-    QVariantDataItemList *itemList = new QVariantDataItemList;
+    m_dataSet =  new VariantDataSet;
+    VariantDataItemList *itemList = new VariantDataItemList;
     QTextStream stream;
     QFile dataFile(":/data/raindata.txt");
     if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -161,7 +161,7 @@ void RainfallChart::addDataSet()
                 qWarning() << "Invalid row read from data:" << line;
                 continue;
             }
-            QVariantDataItem *newItem = new QVariantDataItem;
+            VariantDataItem *newItem = new VariantDataItem;
             for (int i = 0; i < 2; i++)
                 newItem->append(strList.at(i).trimmed());
             for (int i = 2; i < 5; i++)
@@ -176,6 +176,6 @@ void RainfallChart::addDataSet()
 
     m_proxy->setDataSet(m_dataSet);
 
-    m_mapping =  new QVariantBarDataMapping(0, 1, m_city, m_years, m_numericMonths);
+    m_mapping =  new VariantBarDataMapping(0, 1, m_city, m_years, m_numericMonths);
     m_proxy->setMapping(m_mapping);
 }

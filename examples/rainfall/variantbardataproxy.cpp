@@ -39,64 +39,28 @@
 **
 ****************************************************************************/
 
-#include "qvariantbardataproxy_p.h"
+#include "variantbardataproxy.h"
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+using namespace QtDataVis3D;
 
-QVariantBarDataProxy::QVariantBarDataProxy() :
-    QBarDataProxy(new QVariantBarDataProxyPrivate(this))
+VariantBarDataProxy::VariantBarDataProxy() :
+    QBarDataProxy()
 {
 }
 
-QVariantBarDataProxy::QVariantBarDataProxy(QVariantDataSet *newSet,
-                                           QVariantBarDataMapping *mapping) :
-    QBarDataProxy(new QVariantBarDataProxyPrivate(this))
+VariantBarDataProxy::VariantBarDataProxy(VariantDataSet *newSet,
+                                         VariantBarDataMapping *mapping) :
+    QBarDataProxy()
 {
-    dptr()->setDataSet(newSet);
-    dptr()->setMapping(mapping);
+    setDataSet(newSet);
+    setMapping(mapping);
 }
 
-QVariantBarDataProxy::~QVariantBarDataProxy()
-{
-}
-
-void QVariantBarDataProxy::setDataSet(QVariantDataSet *newSet)
-{
-    dptr()->setDataSet(newSet);
-}
-
-QVariantDataSet *QVariantBarDataProxy::dataSet()
-{
-    return dptr()->m_dataSet.data();
-}
-
-void QVariantBarDataProxy::setMapping(QVariantBarDataMapping *mapping)
-{
-    dptr()->setMapping(mapping);
-}
-
-QVariantBarDataMapping *QVariantBarDataProxy::mapping()
-{
-    return dptr()->m_mapping.data();
-}
-
-QVariantBarDataProxyPrivate *QVariantBarDataProxy::dptr()
-{
-    return static_cast<QVariantBarDataProxyPrivate *>(d_ptr.data());
-}
-
-// QVariantBarDataProxyPrivate
-
-QVariantBarDataProxyPrivate::QVariantBarDataProxyPrivate(QVariantBarDataProxy *q)
-    : QBarDataProxyPrivate(q)
+VariantBarDataProxy::~VariantBarDataProxy()
 {
 }
 
-QVariantBarDataProxyPrivate::~QVariantBarDataProxyPrivate()
-{
-}
-
-void QVariantBarDataProxyPrivate::setDataSet(QVariantDataSet *newSet)
+void VariantBarDataProxy::setDataSet(VariantDataSet *newSet)
 {
     if (!m_dataSet.isNull())
         QObject::disconnect(m_dataSet.data(), 0, this, 0);
@@ -104,55 +68,63 @@ void QVariantBarDataProxyPrivate::setDataSet(QVariantDataSet *newSet)
     m_dataSet = newSet;
 
     if (!m_dataSet.isNull()) {
-        QObject::connect(m_dataSet.data(), &QVariantDataSet::itemsAdded, this, &QVariantBarDataProxyPrivate::handleItemsAdded);
-        QObject::connect(m_dataSet.data(), &QVariantDataSet::dataCleared, this, &QVariantBarDataProxyPrivate::handleDataCleared);
+        QObject::connect(m_dataSet.data(), &VariantDataSet::itemsAdded, this, &VariantBarDataProxy::handleItemsAdded);
+        QObject::connect(m_dataSet.data(), &VariantDataSet::dataCleared, this, &VariantBarDataProxy::handleDataCleared);
     }
     resolveDataSet();
 }
 
-void QVariantBarDataProxyPrivate::setMapping(QVariantBarDataMapping *mapping)
+VariantDataSet *VariantBarDataProxy::dataSet()
+{
+    return m_dataSet.data();
+}
+
+void VariantBarDataProxy::setMapping(VariantBarDataMapping *mapping)
 {
     if (!m_mapping.isNull())
-        QObject::disconnect(m_mapping.data(), &QVariantBarDataMapping::mappingChanged, this, &QVariantBarDataProxyPrivate::handleMappingChanged);
+        QObject::disconnect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this, &VariantBarDataProxy::handleMappingChanged);
 
     m_mapping = mapping;
 
     if (!m_mapping.isNull())
-        QObject::connect(m_mapping.data(), &QVariantBarDataMapping::mappingChanged, this, &QVariantBarDataProxyPrivate::handleMappingChanged);
+        QObject::connect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this, &VariantBarDataProxy::handleMappingChanged);
 
     resolveDataSet();
 }
 
-void QVariantBarDataProxyPrivate::handleItemsAdded(int index, int count)
+VariantBarDataMapping *VariantBarDataProxy::mapping()
+{
+    return m_mapping.data();
+}
+
+void VariantBarDataProxy::handleItemsAdded(int index, int count)
 {
     Q_UNUSED(index)
     Q_UNUSED(count)
-
-    qDebug() << __FUNCTION__;
 
     // Resolve new items
     resolveDataSet(); // TODO Resolving entire dataset is inefficient
 }
 
-void QVariantBarDataProxyPrivate::handleDataCleared()
+void VariantBarDataProxy::handleDataCleared()
 {
     // Data cleared, reset array
-    qptr()->resetArray(0);
+    resetArray(0);
 }
 
-void QVariantBarDataProxyPrivate::handleMappingChanged()
+void VariantBarDataProxy::handleMappingChanged()
 {
     resolveDataSet();
 }
 
 // Resolve entire dataset into QBarDataArray.
-void QVariantBarDataProxyPrivate::resolveDataSet()
+void VariantBarDataProxy::resolveDataSet()
 {
     if (m_dataSet.isNull() || m_mapping.isNull() || !m_mapping->rowCategories().size() || !m_mapping->columnCategories().size()) {
-        qptr()->resetArray(0);
+        resetArray(0);
         return;
     }
-    const QVariantDataItemList &itemList = m_dataSet->itemList();
+    const VariantDataItemList &itemList = m_dataSet->itemList();
 
     int rowIndex = m_mapping->rowIndex();
     int columnIndex = m_mapping->columnIndex();
@@ -163,7 +135,7 @@ void QVariantBarDataProxyPrivate::resolveDataSet()
     // Sort values into rows and columns
     typedef QHash<QString, qreal> ColumnValueMap;
     QHash <QString, ColumnValueMap> itemValueMap;
-    foreach (const QVariantDataItem *item, itemList)
+    foreach (const VariantDataItem *item, itemList)
         itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()] = item->at(valueIndex).toReal();
 
     // Create new data array from itemValueMap
@@ -175,14 +147,5 @@ void QVariantBarDataProxyPrivate::resolveDataSet()
         newProxyArray->append(newProxyRow);
     }
 
-    qDebug() << __FUNCTION__ << "RowCount:" << newProxyArray->size() << "Column count:" << (newProxyArray->size() ? newProxyArray->at(0)->size() : 0);
-
-    qptr()->resetArray(newProxyArray);
+    resetArray(newProxyArray);
 }
-
-QVariantBarDataProxy *QVariantBarDataProxyPrivate::qptr()
-{
-    return static_cast<QVariantBarDataProxy *>(q_ptr);
-}
-
-QT_DATAVIS3D_END_NAMESPACE

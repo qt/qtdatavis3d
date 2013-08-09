@@ -3,10 +3,16 @@
 }
 
 SOURCES += main.cpp \
-    rainfallchart.cpp
+    rainfallchart.cpp \
+    variantdataset.cpp \
+    variantbardataproxy.cpp \
+    variantbardatamapping.cpp \
 
 HEADERS += \
-    rainfallchart.h
+    rainfallchart.h \
+    variantdataset.h \
+    variantbardataproxy.h \
+    variantbardatamapping.h
 
 INSTALLS += target
 

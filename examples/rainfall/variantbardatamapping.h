@@ -39,45 +39,59 @@
 **
 ****************************************************************************/
 
-#ifndef QVARIANTBARDATAPROXY_H
-#define QVARIANTBARDATAPROXY_H
+#ifndef VARIANTBARDATAMAPPING_H
+#define VARIANTBARDATAMAPPING_H
 
-#include "qbardataproxy.h"
-#include "qvariantdataset.h"
-#include "qvariantbardatamapping.h"
+#include "qdatavis3dnamespace.h"
 #include <QStringList>
-#include <QMap>
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+using namespace QtDataVis3D;
 
-class QVariantBarDataProxyPrivate;
-
-class QT_DATAVIS3D_EXPORT QVariantBarDataProxy : public QBarDataProxy
+class VariantBarDataMapping : public QObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex)
+    Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex)
+    Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
 public:
-    explicit QVariantBarDataProxy();
-    explicit QVariantBarDataProxy(QVariantDataSet *newSet, QVariantBarDataMapping *mapping);
-    virtual ~QVariantBarDataProxy();
+    explicit VariantBarDataMapping();
+    VariantBarDataMapping(const VariantBarDataMapping &other);
+    VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
+                           const QStringList &rowCategories,
+                           const QStringList &columnCategories);
+    virtual ~VariantBarDataMapping();
 
-    // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
-    void setDataSet(QVariantDataSet *newSet);
-    QVariantDataSet *dataSet();
+    VariantBarDataMapping &operator=(const VariantBarDataMapping &other);
 
-    // Map key (row, column, value) to value index in data item (QVariantItem).
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
-    void setMapping(QVariantBarDataMapping *mapping);
-    QVariantBarDataMapping *mapping();
+    void setRowIndex(int index);
+    int rowIndex() const;
+    void setColumnIndex(int index);
+    int columnIndex() const;
+    void setValueIndex(int index);
+    int valueIndex() const;
 
-protected:
-    QVariantBarDataProxyPrivate *dptr();
+    void setRowCategories(const QStringList &categories);
+    const QStringList &rowCategories() const;
+    void setColumnCategories(const QStringList &categories);
+    const QStringList &columnCategories() const;
+
+    void remap(int rowIndex, int columnIndex, int valueIndex,
+               const QStringList &rowCategories,
+               const QStringList &columnCategories);
+signals:
+    void mappingChanged();
 
 private:
-    Q_DISABLE_COPY(QVariantBarDataProxy)
-};
+    // Indexes of the mapped items in the VariantDataItem
+    int m_rowIndex;
+    int m_columnIndex;
+    int m_valueIndex;
 
-QT_DATAVIS3D_END_NAMESPACE
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    QStringList m_rowCategories;
+    QStringList m_columnCategories;
+};
 
 #endif
