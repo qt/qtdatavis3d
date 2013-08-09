@@ -116,10 +116,10 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->valueAxis()->setTitle("Generic Value");
 
         if (m_chart->rowAxis()->labels().size() < m_rowCount)
-            m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
+            m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
 
         if (m_chart->columnAxis()->labels().size() < m_rowCount)
-            m_chart->columnAxis()->setLabels(m_genericColumnLabels.mid(0, m_columnCount));
+            m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
     }
 }
 
@@ -154,8 +154,8 @@ void ChartModifier::addDataSet()
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
     m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
-    m_chart->rowAxis()->setLabels(years);
-    m_chart->columnAxis()->setLabels(months);
+    m_chart->rowAxis()->setCategoryLabels(years);
+    m_chart->columnAxis()->setCategoryLabels(months);
     m_chart->valueAxis()->setSegmentCount(m_segments);
     m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
     m_chart->valueAxis()->setRange(m_minval, m_maxval);
@@ -390,7 +390,7 @@ void ChartModifier::setSampleCountX(int samples)
     m_columnCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
     if (m_chart->columnAxis()->labels().size() < m_columnCount)
-        m_chart->columnAxis()->setLabels(m_genericColumnLabels.mid(0, m_columnCount));
+        m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
 }
 
 void ChartModifier::setSampleCountZ(int samples)
@@ -398,5 +398,5 @@ void ChartModifier::setSampleCountZ(int samples)
     m_rowCount = samples;
     m_chart->setupSampleSpace(m_rowCount, m_columnCount);
     if (m_chart->rowAxis()->labels().size() < m_rowCount)
-        m_chart->rowAxis()->setLabels(m_genericRowLabels.mid(0, m_rowCount));
+        m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
 }

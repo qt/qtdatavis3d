@@ -86,8 +86,8 @@ void ScatterDataModifier::addData()
     m_chart->rowAxis()->setTitle("Somethings");
     m_chart->columnAxis()->setTitle("Others");
     m_chart->valueAxis()->setTitle("Values");
-    m_chart->rowAxis()->setLabels(columnLabels);
-    m_chart->columnAxis()->setLabels(rowLabels);
+    m_chart->rowAxis()->setCategoryLabels(columnLabels);
+    m_chart->columnAxis()->setCategoryLabels(rowLabels);
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);

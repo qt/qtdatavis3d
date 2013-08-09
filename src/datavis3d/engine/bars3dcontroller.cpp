@@ -364,14 +364,6 @@ QString Bars3dController::objFile()
     return m_objFile;
 }
 
-QPair<GLfloat, GLfloat> Bars3dController::limits()
-{
-    if (m_data)
-        return m_data->dptr()->limitValues(0, m_rowCount, 0, m_columnCount);
-
-    return qMakePair(0.f, 0.f);
-}
-
 void Bars3dController::setBarType(BarStyle style, bool smooth)
 {
     if (style == Bars) {

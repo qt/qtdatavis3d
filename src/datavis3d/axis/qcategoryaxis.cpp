@@ -53,7 +53,12 @@ QCategoryAxis::~QCategoryAxis()
 {
 }
 
-void QCategoryAxis::setLabels(const QStringList &labels)
+QStringList QCategoryAxis::categoryLabels() const
+{
+    return labels();
+}
+
+void QCategoryAxis::setCategoryLabels(const QStringList &labels)
 {
     if (d_ptr->m_labels != labels) {
         d_ptr->m_labels = labels;

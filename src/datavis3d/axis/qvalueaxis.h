@@ -51,26 +51,32 @@ class QValueAxisPrivate;
 class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
 {
     Q_OBJECT
+    Q_PROPERTY(qreal min READ min WRITE setMin NOTIFY rangeChanged)
+    Q_PROPERTY(qreal max READ max WRITE setMax NOTIFY rangeChanged)
+    Q_PROPERTY(int segmentCount READ segmentCount WRITE setSegmentCount NOTIFY segmentCountChanged)
+    Q_PROPERTY(int subSegmentCount READ subSegmentCount WRITE setSubSegmentCount NOTIFY subSegmentCountChanged)
+    Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
+    Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
+
 public:
     explicit QValueAxis();
     ~QValueAxis();
 
-    void setRange(qreal min, qreal max);
-    void setMin(qreal min);
-    void setMax (qreal max);
     qreal min() const;
     qreal max() const;
-
-    void setSegmentCount(int count);
     int segmentCount() const;
-    void setSubSegmentCount(int count);
     int subSegmentCount() const;
-
-    void setAutoAdjustRange(bool autoAdjust);
     bool isAutoAdjustRange() const;
-
-    void setLabelFormat(const QString &format);
     QString labelFormat() const;
+
+public slots:
+    void setRange(qreal min, qreal max);
+    void setMin(qreal min);
+    void setMax(qreal max);
+    void setSegmentCount(int count);
+    void setSubSegmentCount(int count);
+    void setAutoAdjustRange(bool autoAdjust);
+    void setLabelFormat(const QString &format);
 
 signals:
     void rangeChanged(qreal min, qreal max);

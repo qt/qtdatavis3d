@@ -209,8 +209,8 @@ void ChartDataGenerator::setupModel()
     m_chart->columnAxis()->setTitle("Day of week");
     m_chart->valueAxis()->setTitle("Hours playing banjo");
     m_chart->valueAxis()->setSegmentCount(5);
-    m_chart->rowAxis()->setLabels(weeks);
-    m_chart->columnAxis()->setLabels(days);
+    m_chart->rowAxis()->setCategoryLabels(weeks);
+    m_chart->columnAxis()->setCategoryLabels(days);
 
     m_tableWidget->setRowCount(5);
     m_tableWidget->setColumnCount(7);

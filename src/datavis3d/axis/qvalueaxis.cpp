@@ -201,13 +201,13 @@ void QValueAxisPrivate::setMin(qreal min)
 {
     if (m_min != min) {
         if (min >= m_max) {
-            m_min = m_max - 1.0;
+            qreal oldMax = m_max;
+            m_max = min + 1.0;
             qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
-                          " value axis. Minimum automatically adjusted to a valid one:"
-                       << min <<  "-->" << m_min;
-        } else {
-            m_min = min;
+                          " value axis. Maximum automatically adjusted to a valid one:"
+                       << oldMax <<  "-->" << m_max;
         }
+        m_min = min;
         recreateLabels();
         emit qptr()->rangeChanged(m_min, m_max);
     }
@@ -217,13 +217,13 @@ void QValueAxisPrivate::setMax(qreal max)
 {
     if (m_max != max) {
         if (max <= m_min) {
-            m_max = m_min + 1.0;
+            qreal oldMin = m_min;
+            m_min = max - 1.0;
             qWarning() << "Warning: Tried to set maximum to equal or smaller than minimum for"
-                          " value axis. Maximum automatically adjusted to a valid one:"
-                       << max <<  "-->" << m_max;
-        } else {
-            m_max = max;
+                          " value axis. Minimum automatically adjusted to a valid one:"
+                       << oldMin <<  "-->" << m_min;
         }
+        m_max = max;
         recreateLabels();
         emit qptr()->rangeChanged(m_min, m_max);
     }

@@ -58,6 +58,7 @@ class QT_DATAVIS3D_EXPORT QAbstractAxis : public QObject
     Q_ENUMS(AxisOrientation)
     Q_ENUMS(AxisType)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    Q_PROPERTY(QStringList labels READ labels NOTIFY labelsChanged)
     Q_PROPERTY(AxisOrientation orientation READ orientation)
     Q_PROPERTY(AxisType type READ type)
 

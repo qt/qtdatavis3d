@@ -77,8 +77,8 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
     m_chart->valueAxis()->setTitle(QString("rainfall (in mm) in city %1").arg(m_city - 1));
-    m_chart->rowAxis()->setLabels(m_years);
-    m_chart->columnAxis()->setLabels(months);
+    m_chart->rowAxis()->setCategoryLabels(m_years);
+    m_chart->columnAxis()->setCategoryLabels(months);
 
     // Set bar type to cylinder
     m_chart->setBarType(Cylinders, false);

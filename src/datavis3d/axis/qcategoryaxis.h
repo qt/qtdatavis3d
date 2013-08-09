@@ -51,11 +51,18 @@ class QCategoryAxisPrivate;
 class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
 {
     Q_OBJECT
+    // Note: categoryLabels actually reads/writes the labels property in abstract axis,
+    //       which is read only there. Since subclass cannot have property with same name,
+    //       this partially duplicate property is necessary.
+    Q_PROPERTY(QStringList categoryLabels READ categoryLabels WRITE setCategoryLabels)
 public:
     explicit QCategoryAxis();
     ~QCategoryAxis();
 
-    void setLabels(const QStringList &labels);
+    QStringList categoryLabels() const;
+
+public slots:
+    void setCategoryLabels(const QStringList &labels);
 
 protected:
     QCategoryAxisPrivate *dptr();
