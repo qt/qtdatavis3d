@@ -78,11 +78,6 @@ public:
 
     bool m_isGridSet;
     bool m_isGridEnabled;
-
-    bool m_isSegmentCountSet;
-    int m_segmentCount;
-    qreal m_segmentStep;
-    qreal m_segmentMin;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

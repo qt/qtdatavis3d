@@ -65,7 +65,6 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
         emit arrayReset();
 }
 
-
 // Mutexing data accessors should be done by user, if needed
 int QScatterDataProxy::itemCount()
 {
@@ -123,18 +122,23 @@ bool QScatterDataProxyPrivate::resetArray(QScatterDataArray *newArray)
 
 // Protected & private functions. Do not mutex as these are used from mutexed functions.
 
-QPair<GLfloat, GLfloat> QScatterDataProxyPrivate::limitValues()
+QVector3D QScatterDataProxyPrivate::limitValues()
 {
     QMutexLocker locker(&m_mutex);
-    QPair<GLfloat, GLfloat> limits = qMakePair(100.0f, -100.0f);
+    QVector3D limits;
     for (int i = 0; i < m_dataArray.size(); i++) {
         const QScatterDataItem &item = m_dataArray.at(i);
-        qreal itemValue = item.position().y();
-        if (limits.second < itemValue)
-            limits.second = itemValue;
-        if (limits.first > itemValue)
-            limits.first = itemValue;
+        float xValue = qAbs(item.position().x());
+        if (limits.x() < xValue)
+            limits.setX(xValue);
+        float yValue = qAbs(item.position().y());
+        if (limits.y() < yValue)
+            limits.setY(yValue);
+        float zValue = qAbs(item.position().z());
+        if (limits.z() < zValue)
+            limits.setZ(zValue);
     }
+    //qDebug() << __FUNCTION__ << limits << m_dataArray.size();
     return limits;
 }
 

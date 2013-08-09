@@ -42,6 +42,7 @@
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
+#include "qvalueaxis.h"
 
 #include <QMouseEvent>
 
@@ -423,26 +424,40 @@ ShadowQuality Q3DScatter::shadowQuality()
     return d_ptr->m_shared->shadowQuality();
 }
 
-QCategoryAxis *Q3DScatter::rowAxis()
+void Q3DScatter::setValueAxisX(QValueAxis *axis)
 {
-    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisX(axis);
 }
 
-QCategoryAxis *Q3DScatter::columnAxis()
+QValueAxis *Q3DScatter::valueAxisX()
 {
-    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisX());
 }
 
-void Q3DScatter::setValueAxis(QAbstractAxis *axis)
+void Q3DScatter::setValueAxisY(QValueAxis *axis)
 {
     Q_ASSERT(axis);
 
     return d_ptr->m_shared->setAxisY(axis);
 }
 
-QAbstractAxis *Q3DScatter::valueAxis()
+QValueAxis *Q3DScatter::valueAxisY()
 {
-    return d_ptr->m_shared->axisY();
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
+}
+
+void Q3DScatter::setValueAxisZ(QValueAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisZ(axis);
+}
+
+QValueAxis *Q3DScatter::valueAxisZ()
+{
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisZ());
 }
 
 void Q3DScatter::setDataProxy(QScatterDataProxy *proxy)
@@ -453,23 +468,6 @@ void Q3DScatter::setDataProxy(QScatterDataProxy *proxy)
 QScatterDataProxy *Q3DScatter::dataProxy()
 {
     return d_ptr->m_shared->dataProxy();
-}
-
-/*!
- * \a segmentCount How many segments will be drawn in addition to the start line. \c 5 by default.
- * \n There will be segmentCount + 1 lines drawn, as there is always the start line.
- *
- * \a step How large a step each segment is.
- *
- * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
- * important if values can be negative, or autoscaling won't work correctly.
- *
- * Sets segment count and step. Note; segmentCount * step should be the maximum possible value of data
- * set.
- */
-void Q3DScatter::setSegmentCount(int segmentCount, qreal step, qreal minimum)
-{
-    d_ptr->m_shared->setSegmentCount(GLint(segmentCount), GLfloat(step), GLfloat(minimum));
 }
 
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q, QRect rect)

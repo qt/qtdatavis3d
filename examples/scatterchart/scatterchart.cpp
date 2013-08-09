@@ -40,7 +40,7 @@
 
 #include "scatterchart.h"
 #include "qscatterdataproxy.h"
-#include "qcategoryaxis.h"
+#include "qvalueaxis.h"
 
 using namespace QtDataVis3D;
 
@@ -70,24 +70,10 @@ void ScatterDataModifier::start()
 
 void ScatterDataModifier::addData()
 {
-    QStringList rowLabels;
-    rowLabels << "something -1.0" << "something -0.8" << "something -0.6" << "something -0.4"
-              << "something -0.2" << "something 0.0" << "something 0.2" << "something 0.4"
-              << "something 0.6" << "something 0.8" << "something 1.0";
-    QStringList columnLabels;
-    columnLabels << "other -1.0" << "other -0.8" << "other -0.6" << "other -0.4" << "other -0.2"
-                 << "other 0.0" << "other 0.2" << "other 0.4" << "other 0.6" << "other 0.8"
-                 << "other 1.0";
-
-    // Set segment count and step
-    m_chart->setSegmentCount(10, 0.1f, -1.0f);
-
     // Add labels
-    m_chart->rowAxis()->setTitle("Somethings");
-    m_chart->columnAxis()->setTitle("Others");
-    m_chart->valueAxis()->setTitle("Values");
-    m_chart->rowAxis()->setCategoryLabels(columnLabels);
-    m_chart->columnAxis()->setCategoryLabels(rowLabels);
+    m_chart->valueAxisX()->setTitle("Somethings");
+    m_chart->valueAxisY()->setTitle("Values");
+    m_chart->valueAxisZ()->setTitle("Others");
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);
@@ -154,7 +140,7 @@ void ScatterDataModifier::changeTransparency()
     m_chart->setLabelTransparency((LabelTransparency)transparency);
 
     if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyFromTheme;
+        transparency = TransparencyNone;
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)

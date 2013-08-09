@@ -67,13 +67,12 @@ public:
 
     bool resetArray(QScatterDataArray *newArray);
 
-    QPair<GLfloat, GLfloat> limitValues();
+    QVector3D limitValues();
 
 private:
     QScatterDataArray m_dataArray;
     QString m_itemLabelFormat;
 
-private:
     friend class QScatterDataProxy;
 };
 

@@ -92,6 +92,7 @@ protected:
 private:
     Q_DISABLE_COPY(QValueAxis)
     friend class Bars3dController;
+    friend class Scatter3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

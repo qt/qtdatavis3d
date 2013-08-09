@@ -105,8 +105,6 @@ private:
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
-    GLint m_segmentCount;
-    GLfloat m_segmentStep;
     bool m_xFlipped;
     bool m_zFlipped;
     QRect m_mainViewPort;
@@ -129,7 +127,6 @@ private:
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
     GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
     GLfloat m_scaleFactor;
     QVector3D m_selection;
     QSizeF m_areaSize;
@@ -138,7 +135,6 @@ private:
     QPoint m_selectionPointRequest;
     bool m_isSelectionPointRequestActive;
 
-    bool m_autoAdjust;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
     QScatterDataProxy *m_dataProxy; // Only valid during render
@@ -166,8 +162,10 @@ public slots:
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
-    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
     void updateMeshFileName(const QString &objFileName);
+
+    // Overloaded from abstract renderer
+    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
     // Requests that upon next render pass the column and row under the given point is inspected for selection.
     // Only one request can be queued per render pass at this point. New request will override any pending requests.
@@ -200,8 +198,7 @@ private:
     void updateDepthBuffer();
 #endif
     void calculateTranslation(ScatterRenderItem &item);
-    void calculateSceneScalingFactors(const QVector3D &limits);
-    void calculateHeightAdjustment(const QPair<GLfloat, GLfloat> &limits);
+    void calculateSceneScalingFactors();
     Scatter3DController::SelectionType isSelected(GLint bar, const QVector3D &selection);
 
     Q_DISABLE_COPY(Scatter3DRenderer)

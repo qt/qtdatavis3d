@@ -44,8 +44,7 @@
 #include "camerahelper_p.h"
 #include "utils_p.h"
 #include "qabstractaxis_p.h"
-#include "qvalueaxis.h"
-#include "qcategoryaxis.h"
+#include "qvalueaxis_p.h"
 #include "qscatterdataproxy_p.h"
 
 #include <QMatrix4x4>
@@ -67,17 +66,14 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
-      m_segmentCount(0),
-      m_segmentStep(0),
-      m_segmentMinimum(0.0f),
       m_renderer(0),
       m_data(0),
       m_valuesDirty(false)
 {
-    // Default axes. Only Y axis can actually be changed by user.
-    setAxisX(new QCategoryAxis());
+    // Default axes
+    setAxisX(new QValueAxis());
     setAxisY(new QValueAxis());
-    setAxisZ(new QCategoryAxis());
+    setAxisZ(new QValueAxis());
 
     setDataProxy(new QScatterDataProxy);
 }
@@ -269,7 +265,8 @@ void Scatter3DController::setDataProxy(QScatterDataProxy *proxy)
     QObject::connect(m_data, &QScatterDataProxy::itemsInserted,
                      this, &Scatter3DController::handleItemsInserted);
 
-    // emit something? Renderer might be interested?
+    adjustValueAxisRange();
+    m_valuesDirty = true;
 }
 
 QScatterDataProxy *Scatter3DController::dataProxy()
@@ -280,6 +277,7 @@ QScatterDataProxy *Scatter3DController::dataProxy()
 void Scatter3DController::handleArrayReset()
 {
     setSlicingActive(false);
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -288,6 +286,7 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -296,6 +295,7 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -304,6 +304,7 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
+    adjustValueAxisRange();
     m_valuesDirty = true;
 }
 
@@ -312,7 +313,14 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
+    adjustValueAxisRange();
     m_valuesDirty = true;
+}
+
+void Scatter3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
+{
+    Q_UNUSED(autoAdjust)
+    adjustValueAxisRange();
 }
 
 QString Scatter3DController::objFile()
@@ -406,16 +414,34 @@ bool Scatter3DController::backgroundEnabled()
     return m_isBackgroundEnabled;
 }
 
-void Scatter3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
+void Scatter3DController::adjustValueAxisRange()
 {
-    if (segmentCount <= 0) {
-        qCritical("Invalid segment count. It must be positive.");
-        return;
+    if (m_data) {
+        QVector3D limits = m_data->dptr()->limitValues();
+        QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisX);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (limits.x() > 0)
+                valueAxis->dptr()->setRange(-limits.x(), limits.x());
+            else
+                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+        }
+
+        valueAxis = static_cast<QValueAxis *>(m_axisY);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (limits.y() > 0)
+                valueAxis->dptr()->setRange(-limits.y(), limits.y());
+            else
+                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+        }
+
+        valueAxis = static_cast<QValueAxis *>(m_axisZ);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (limits.z() > 0)
+                valueAxis->dptr()->setRange(-limits.z(), limits.z());
+            else
+                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+        }
     }
-    m_segmentCount = segmentCount;
-    m_segmentStep = step;
-    m_segmentMinimum = minimum;
-    emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -50,7 +50,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DScatterPrivate;
 class LabelItem;
-class QAbstractAxis;
+class QValueAxis;
 class QCategoryAxis;
 class QScatterDataProxy;
 
@@ -104,11 +104,6 @@ public:
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                      bool uniform = true);
 
-    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);
-
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
     // TODO: light placement API
@@ -150,12 +145,15 @@ public:
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality();
 
-    // Axes - row & column axes are fixed to category axes, value axis can be
-    // customized.
-    QCategoryAxis *rowAxis();
-    QCategoryAxis *columnAxis();
-    void setValueAxis(QAbstractAxis *axis);
-    QAbstractAxis *valueAxis();
+    // Axes
+    void setValueAxisX(QValueAxis *axis);
+    QValueAxis *valueAxisX();
+
+    void setValueAxisY(QValueAxis *axis);
+    QValueAxis *valueAxisY();
+
+    void setValueAxisZ(QValueAxis *axis);
+    QValueAxis *valueAxisZ();
 
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QtDataVis3D::QScatterDataProxy *proxy);

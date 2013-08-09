@@ -25,7 +25,7 @@ import com.digia.QtDataVis3D 1.0
 Item {
     id: mainview
     width: 800
-    height: 500
+    height: 700
     visible: true
 
     Item {
