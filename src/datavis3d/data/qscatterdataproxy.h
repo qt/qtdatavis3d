@@ -42,8 +42,8 @@
 #ifndef QSCATTERDATAPROXY_H
 #define QSCATTERDATAPROXY_H
 
-#include "qabstractdataproxy.h"
-#include "qscatterdataitem.h"
+#include <QtDataVis3D/qabstractdataproxy.h>
+#include <QtDataVis3D/qscatterdataitem.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

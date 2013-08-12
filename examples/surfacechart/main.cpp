@@ -38,7 +38,6 @@
 **
 ****************************************************************************/
 
-#include <Q3DSurface>
 #include "chartmodifier.h"
 
 #include <QApplication>

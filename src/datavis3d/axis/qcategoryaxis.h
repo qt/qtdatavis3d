@@ -42,7 +42,7 @@
 #ifndef QCATEGORYAXIS_H
 #define QCATEGORYAXIS_H
 
-#include "qabstractaxis.h"
+#include <QtDataVis3D/qabstractaxis.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

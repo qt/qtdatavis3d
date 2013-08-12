@@ -39,9 +39,9 @@
 ****************************************************************************/
 
 #include "chart.h"
-#include "qcategoryaxis.h"
-#include "qvalueaxis.h"
-#include "qbardataproxy.h"
+#include <QtDataVis3D/qcategoryaxis.h>
+#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/qbardataproxy.h>
 #include <QTime>
 
 QT_DATAVIS3D_USE_NAMESPACE

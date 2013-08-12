@@ -42,7 +42,7 @@
 #ifndef QABSTRACTAXIS_H
 #define QABSTRACTAXIS_H
 
-#include "qdatavis3dnamespace.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QVector>

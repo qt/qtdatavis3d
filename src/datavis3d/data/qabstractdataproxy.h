@@ -42,7 +42,7 @@
 #ifndef QABSTRACTDATAPROXY_H
 #define QABSTRACTDATAPROXY_H
 
-#include "qdatavis3dnamespace.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QMutex>

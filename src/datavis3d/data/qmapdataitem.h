@@ -42,8 +42,8 @@
 #ifndef QMAPDATAITEM_H
 #define QMAPDATAITEM_H
 
-#include "qdatavis3dnamespace.h"
-#include "qbardataitem.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qbardataitem.h>
 #include <QPointF>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

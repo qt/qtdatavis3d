@@ -42,7 +42,7 @@
 #ifndef QVIS3DNAMESPACE_H
 #define QVIS3DNAMESPACE_H
 
-#include "qdatavis3dglobal.h"
+#include <QtDataVis3D/qdatavis3dglobal.h>
 
 namespace QtDataVis3D {
 

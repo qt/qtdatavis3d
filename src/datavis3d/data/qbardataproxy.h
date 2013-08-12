@@ -42,8 +42,8 @@
 #ifndef QBARDATAPROXY_H
 #define QBARDATAPROXY_H
 
-#include "qabstractdataproxy.h"
-#include "qbardataitem.h"
+#include <QtDataVis3D/qabstractdataproxy.h>
+#include <QtDataVis3D/qbardataitem.h>
 #include <QVector>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

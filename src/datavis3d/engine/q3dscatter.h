@@ -42,8 +42,8 @@
 #ifndef Q3DSCATTER_H
 #define Q3DSCATTER_H
 
-#include "qdatavis3dnamespace.h"
-#include "q3dwindow.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/q3dwindow.h>
 #include <QFont>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

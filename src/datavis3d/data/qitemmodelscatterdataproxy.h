@@ -42,8 +42,8 @@
 #ifndef QITEMMODELSCATTERDATAPROXY_H
 #define QITEMMODELSCATTERDATAPROXY_H
 
-#include "qscatterdataproxy.h"
-#include "qitemmodelscatterdatamapping.h"
+#include <QtDataVis3D/qscatterdataproxy.h>
+#include <QtDataVis3D/qitemmodelscatterdatamapping.h>
 #include <QAbstractItemModel>
 #include <QStringList>
 

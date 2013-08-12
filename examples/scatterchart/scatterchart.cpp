@@ -39,8 +39,8 @@
 ****************************************************************************/
 
 #include "scatterchart.h"
-#include "qscatterdataproxy.h"
-#include "qvalueaxis.h"
+#include <QtDataVis3D/qscatterdataproxy.h>
+#include <QtDataVis3D/qvalueaxis.h>
 
 using namespace QtDataVis3D;
 

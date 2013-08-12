@@ -39,8 +39,8 @@
 ****************************************************************************/
 
 #include "rainfallchart.h"
-#include "qcategoryaxis.h"
-#include "qvalueaxis.h"
+#include <QtDataVis3D/qcategoryaxis.h>
+#include <QtDataVis3D/qvalueaxis.h>
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>

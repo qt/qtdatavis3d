@@ -42,7 +42,7 @@
 #ifndef QITEMMODELSCATTERDATAMAPPING_H
 #define QITEMMODELSCATTERDATAMAPPING_H
 
-#include "qdatavis3dnamespace.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
 #include <QObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

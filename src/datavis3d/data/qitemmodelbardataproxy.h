@@ -42,8 +42,8 @@
 #ifndef QITEMMODELBARDATAPROXY_H
 #define QITEMMODELBARDATAPROXY_H
 
-#include "qbardataproxy.h"
-#include "qitemmodelbardatamapping.h"
+#include <QtDataVis3D/qbardataproxy.h>
+#include <QtDataVis3D/qitemmodelbardatamapping.h>
 #include <QAbstractItemModel>
 #include <QStringList>
 

@@ -41,7 +41,7 @@
 #ifndef CHARTMODIFIER_H
 #define CHARTMODIFIER_H
 
-#include "q3dbars.h"
+#include <QtDataVis3D/q3dbars.h>
 
 #include <QFont>
 #include <QDebug>

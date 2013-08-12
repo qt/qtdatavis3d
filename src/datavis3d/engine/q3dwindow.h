@@ -42,7 +42,7 @@
 #ifndef Q3DWINDOW_H
 #define Q3DWINDOW_H
 
-#include "qdatavis3dnamespace.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
 
 #include <QWindow>
 #include <QOpenGLFunctions>

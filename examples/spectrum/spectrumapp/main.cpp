@@ -38,11 +38,12 @@
 **
 ****************************************************************************/
 
-#include "q3dbars.h"
 #include "engine.h"
 #include "utils.h"
-#include "qbardataproxy.h"
-#include "qvalueaxis.h"
+
+#include <QtDataVis3D/q3dbars.h>
+#include <QtDataVis3D/qbardataproxy.h>
+#include <QtDataVis3D/qvalueaxis.h>
 
 #include <QGuiApplication>
 #include <QAudio>

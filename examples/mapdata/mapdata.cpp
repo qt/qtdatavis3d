@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 #include "mapdata.h"
-#include "qmapdataproxy.h"
+#include <QtDataVis3D/qmapdataproxy.h>
 #include <QImage>
 #include <QFile>
 

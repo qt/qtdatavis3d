@@ -41,9 +41,9 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 
-#include <qglobal.h>
 #include "utils.h"
 #include "fftreal_wrapper.h" // For FFTLengthPowerOfTwo
+#include <qglobal.h>
 
 //-----------------------------------------------------------------------------
 // Constants

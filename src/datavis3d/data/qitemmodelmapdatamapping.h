@@ -42,7 +42,7 @@
 #ifndef QITEMMODELMAPDATAMAPPING_H
 #define QITEMMODELMAPDATAMAPPING_H
 
-#include "qdatavis3dnamespace.h"
+#include <QtDataVis3D/qdatavis3dnamespace.h>
 #include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

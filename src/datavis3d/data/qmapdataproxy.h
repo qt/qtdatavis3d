@@ -42,8 +42,8 @@
 #ifndef QMAPDATAPROXY_H
 #define QMAPDATAPROXY_H
 
-#include "qabstractdataproxy.h"
-#include "qmapdataitem.h"
+#include <QtDataVis3D/qabstractdataproxy.h>
+#include <QtDataVis3D/qmapdataitem.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

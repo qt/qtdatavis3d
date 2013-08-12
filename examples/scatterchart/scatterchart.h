@@ -41,7 +41,7 @@
 #ifndef SCATTERDATAMODIFIER_H
 #define SCATTERDATAMODIFIER_H
 
-#include "q3dscatter.h"
+#include <QtDataVis3D/q3dscatter.h>
 
 #include <QFont>
 #include <QDebug>

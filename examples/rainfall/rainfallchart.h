@@ -41,8 +41,8 @@
 #ifndef RAINFALLCHART_H
 #define RAINFALLCHART_H
 
-#include "q3dbars.h"
 #include "variantbardataproxy.h"
+#include <QtDataVis3D/q3dbars.h>
 #include <QTimer>
 
 using namespace QtDataVis3D;

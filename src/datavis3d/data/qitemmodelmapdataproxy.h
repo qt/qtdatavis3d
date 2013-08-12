@@ -42,8 +42,8 @@
 #ifndef QITEMMODELMAPDATAPROXY_H
 #define QITEMMODELMAPDATAPROXY_H
 
-#include "qmapdataproxy.h"
-#include "qitemmodelmapdatamapping.h"
+#include <QtDataVis3D/qmapdataproxy.h>
+#include <QtDataVis3D/qitemmodelmapdatamapping.h>
 #include <QAbstractItemModel>
 #include <QStringList>
 

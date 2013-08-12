@@ -41,7 +41,7 @@
 #ifndef CHARTMODIFIER_H
 #define CHARTMODIFIER_H
 
-#include <Q3DSurface>
+#include <QtDataVis3D/Q3DSurface>
 #include <QSlider>
 
 using namespace QtDataVis3D;

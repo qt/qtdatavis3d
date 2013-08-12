@@ -38,10 +38,10 @@
 **
 ****************************************************************************/
 
-#include "q3dbars.h"
-#include "qcategoryaxis.h"
-#include "qitemmodelbardataproxy.h"
-#include "qvalueaxis.h"
+#include <QtDataVis3D/q3dbars.h>
+#include <QtDataVis3D/qcategoryaxis.h>
+#include <QtDataVis3D/qitemmodelbardataproxy.h>
+#include <QtDataVis3D/qvalueaxis.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
