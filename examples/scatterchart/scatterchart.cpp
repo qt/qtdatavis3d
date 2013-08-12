@@ -41,8 +41,10 @@
 #include "scatterchart.h"
 #include <QtDataVis3D/qscatterdataproxy.h>
 #include <QtDataVis3D/qvalueaxis.h>
-
+#include <qmath.h>
 using namespace QtDataVis3D;
+
+//#define RANDOM_SCATTER
 
 const int numberOfItems = 10000;
 
@@ -51,8 +53,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_fontSize(30.0f)
 {
     m_chart->setFontSize(m_fontSize);
-
-    m_chart->setTheme(ThemeBlueIcy);
+    m_chart->setBarType(Spheres, true);
+    m_chart->setTheme(ThemeBrownSand);
+    m_chart->setShadowQuality(ShadowHigh);
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     m_chart->setDataProxy(proxy);
@@ -79,21 +82,30 @@ void ScatterDataModifier::addData()
     dataArray->resize(numberOfItems);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
 
+#if RANDOM_SCATTER
     for (int i = 0; i < numberOfItems; i++) {
-        //qDebug() << i << ptrToDataArray;
         ptrToDataArray->setPosition(
                     QVector3D((qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
                               (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0,
                               (qreal)(rand() % 100) / 100.0 - (qreal)(rand() % 100) / 100.0));
         ptrToDataArray++;
     }
+#else
+    float limit = qSqrt(numberOfItems) / 2.0f;
+    for (float i = -limit; i < limit; i++) {
+        for (float j = -limit; j < limit; j++) {
+            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 7.5)), j));
+            ptrToDataArray++;
+        }
+    }
+#endif
 
     static_cast<QScatterDataProxy *>(m_chart->dataProxy())->resetArray(dataArray);
 }
 
 void ScatterDataModifier::changeStyle()
 {
-    static int model = 3;
+    static int model = 0;
     switch (model) {
     case 0:
         m_chart->setBarType(Dots, false);

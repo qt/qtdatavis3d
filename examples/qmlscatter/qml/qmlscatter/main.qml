@@ -43,10 +43,6 @@ Item {
 
         ListModel {
             id: dataModel
-//            ListElement{ xPos: -100.0; yPos: 490.0; zPos: -50.0 }
-//            ListElement{ xPos: 100.0; yPos: 105.0; zPos: 50.0 }
-//            ListElement{ xPos: 50.0; yPos: 465.0; zPos: -50.0 }
-//            ListElement{ xPos: -50.0; yPos: 225.0; zPos: 50.0 }
             ListElement{ xPos: -1.0; yPos: 4.3; zPos: -0.5 }
             ListElement{ xPos: 1.0; yPos: 0.105; zPos: 0.5 }
             ListElement{ xPos: 0.5; yPos: -4.65; zPos: -0.5 }
