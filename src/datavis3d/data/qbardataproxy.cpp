@@ -71,6 +71,19 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
     emit rowsChanged(rowIndex, 1);
 }
 
+void QBarDataProxy::setRows(int rowIndex, QBarDataArray *rows)
+{
+    int count = rows->size();
+    dptr()->setRows(rowIndex, rows);
+    emit rowsChanged(rowIndex, count);
+}
+
+void QBarDataProxy::setItem(int rowIndex, int columnIndex, QBarDataItem *item)
+{
+    dptr()->setItem(rowIndex, columnIndex, item);
+    emit itemChanged(rowIndex, columnIndex);
+}
+
 int QBarDataProxy::addRow(QBarDataRow *row)
 {
     int addIndex = dptr()->addRow(row);
@@ -99,6 +112,14 @@ void QBarDataProxy::insertRows(int rowIndex, QBarDataArray *rows)
     emit rowsInserted(rowIndex, insertCount);
 }
 
+void QBarDataProxy::removeRows(int rowIndex, int removeCount)
+{
+    if (rowIndex < rowCount()) {
+        dptr()->removeRows(rowIndex, removeCount);
+        emit rowsRemoved(rowIndex, removeCount);
+    }
+}
+
 // Mutexing data accessors should be done by user, if needed
 int QBarDataProxy::rowCount()
 {
@@ -112,12 +133,18 @@ const QBarDataArray *QBarDataProxy::array() const
 
 const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
 {
-    return dptrc()->m_dataArray[rowIndex];
+    const QBarDataArray &dataArray = dptrc()->m_dataArray;
+    Q_ASSERT(rowIndex >= 0 && rowIndex < dataArray.size());
+    return dataArray[rowIndex];
 }
 
 const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 {
-    return &dptrc()->m_dataArray[rowIndex]->at(columnIndex);
+    const QBarDataArray &dataArray = dptrc()->m_dataArray;
+    Q_ASSERT(rowIndex >= 0 && rowIndex < dataArray.size());
+    const QBarDataRow &dataRow = *dataArray[rowIndex];
+    Q_ASSERT(columnIndex >= 0 && columnIndex < dataRow.size());
+    return &dataRow.at(columnIndex);
 }
 
 QBarDataProxyPrivate *QBarDataProxy::dptr()
@@ -162,8 +189,31 @@ bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
 void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row)
 {
     QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray.size());
     clearRow(rowIndex);
     m_dataArray[rowIndex] = row;
+}
+
+void QBarDataProxyPrivate::setRows(int rowIndex, QBarDataArray *rows)
+{
+    QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0 && (rowIndex + rows->size()) <= m_dataArray.size());
+    for (int i = 0; i < rows->size(); i++) {
+        clearRow(rowIndex);
+        m_dataArray[rowIndex] = rows->at(i);
+        rowIndex++;
+    }
+    delete rows;
+}
+
+void QBarDataProxyPrivate::setItem(int rowIndex, int columnIndex, QBarDataItem *item)
+{
+    QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray.size());
+    QBarDataRow &row = *m_dataArray[rowIndex];
+    Q_ASSERT(columnIndex < row.size());
+    row[columnIndex] = *item;
+    delete item;
 }
 
 int QBarDataProxyPrivate::addRow(QBarDataRow *row)
@@ -187,15 +237,29 @@ int QBarDataProxyPrivate::addRows(QBarDataArray *rows)
 void QBarDataProxyPrivate::insertRow(int rowIndex, QBarDataRow *row)
 {
     QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray.size());
     m_dataArray.insert(rowIndex, row);
 }
 
 void QBarDataProxyPrivate::insertRows(int rowIndex, QBarDataArray *rows)
 {
     QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray.size());
     for (int i = 0; i < rows->size(); i++)
-        m_dataArray.insert(rowIndex, rows->at(i));
+        m_dataArray.insert(rowIndex++, rows->at(i));
     delete rows;
+}
+
+void QBarDataProxyPrivate::removeRows(int rowIndex, int removeCount)
+{
+    QMutexLocker locker(&m_mutex);
+    Q_ASSERT(rowIndex >= 0);
+    int maxRemoveCount = m_dataArray.size() - rowIndex;
+    removeCount = qMin(removeCount, maxRemoveCount);
+    for (int i = 0; i < removeCount; i++) {
+        clearRow(rowIndex);
+        m_dataArray.removeAt(rowIndex);
+    }
 }
 
 // Protected & private functions. Do not mutex as these are used from mutexed functions.

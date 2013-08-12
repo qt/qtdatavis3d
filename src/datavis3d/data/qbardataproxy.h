@@ -77,7 +77,7 @@ public:
     const QBarDataItem *itemAt(int rowIndex, int columnIndex) const; // Row and column in said row need to exist or this crashes
 
     // The data array is a list of list (rows) of QBarDataItem instances.
-    // Each row can contain different amount of items.
+    // Each row can contain different amount of items or even be null.
 
     // All array/item manipulation functions are internally protected by data mutex.
 
@@ -88,33 +88,55 @@ public:
     // TODO Should data manipulation/access methods be protected rather than public to enforce subclassing use of proxy?
     // TODO Leaving them public gives user more options.
 
-    // QBarDataProxy takes ownership of all QBarDataArrays, QBarDataRows, and QBarDataItems passed to it.
-    // The pointers passed to it are not guaranteed to be valid after the calls.
+    // QBarDataProxy takes ownership of all QBarDataArrays, QBarDataRows, and QBarDataItems
+    // passed to it. The pointers passed to it are not guaranteed to be valid after the calls
+    // and should not be used to modify data further.
 
     // Clears the existing array and sets it data to new array.
     void resetArray(QBarDataArray *newArray);
 
+    // Change existing rows
     void setRow(int rowIndex, QBarDataRow *row);
-    // TODO? void setColumn(int columnIndex, QBarDataRow *column);
-    // TODO void setItem(int rowIndex, int columnIndex, QBarDataItem *item);
+    void setRows(int rowIndex, QBarDataArray *rows);
+
+    // Setting a column is comparatively inefficient as it changes all rows.
+    // Can resize rows that are shorter than columnIndex.
+    // TODO void setColumn(int columnIndex, QBarDataRow *column);
+    // TODO void setColumns(int columnIndex, QBarDataArray *columns);
+
+    // Change single item
+    void setItem(int rowIndex, int columnIndex, QBarDataItem *item);
+    // Change block of items
+    // TODO setItems(int rowIndex, int columnIndex, QBarDataArray *items);
 
     int addRow(QBarDataRow *row); // returns the index of added row
     int addRows(QBarDataArray *rows); // returns the index of first added row
-    // TODO? int addColumns(QBarDataArray *columns); // returns the index of first added column
+    // TODO int addColumn(QBarDataRow *column); // returns the index of the added column
+    // TODO int addColumns(QBarDataArray *columns); // returns the index of the first added column
 
+    // If rowIndex is equal to array size, rows are added to end of the array.
     void insertRow(int rowIndex, QBarDataRow *row);
     void insertRows(int rowIndex, QBarDataArray *rows);
-    // TODO? void insertColumns(int columnIndex, QBarDataArray *columns);
+    // TODO void insertColumn(int columnIndex, QBarDataRow *column);
+    // TODO void insertColumns(int columnIndex, QBarDataArray *columns);
 
-    // TODO void removeRows(int rowIndex, int removeCount);
-    // TODO? void removeColumns(int columnIndex, int removeCount);
+    // Attempting to remove rows past the end of the array does nothing.
+    void removeRows(int rowIndex, int removeCount);
+    // TODO void removeColumns(int columnIndex, int removeCount);
 
 signals:
     void arrayReset();
     void rowsAdded(int startIndex, int count);
     void rowsChanged(int startIndex, int count);
-    void rowsRemoved(int startIndex, int count); // Index may be over current array size if removed from end
+    // Index is the current array size if rows were removed from the end of the array
+    void rowsRemoved(int startIndex, int count);
     void rowsInserted(int startIndex, int count);
+    // TODO void columnsChanged(int startIndex, int count);
+    // TODO void columnsAdded(int startIndex, int count);
+    // TODO void columnsRemoved(int startIndex, int count);
+    // TODO void columnsInserted(int startIndex, int count);
+    void itemChanged(int rowIndex, int columnIndex);
+    // TODO void itemsChanged(int rowIndex, int columnIndex, int rowCount, int columnCount);
 
 protected:
     QBarDataProxyPrivate *dptr();

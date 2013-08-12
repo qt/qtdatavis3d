@@ -250,6 +250,11 @@ void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn)
     d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
 }
 
+QSize Q3DBars::sampleSpace()
+{
+    return QSize(d_ptr->m_shared->rowCount(), d_ptr->m_shared->columnCount());
+}
+
 /*!
  * \a preset Move camera to a predefined position from \c CameraPreset.
  *

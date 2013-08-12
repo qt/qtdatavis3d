@@ -617,7 +617,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
-        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_mainViewPort.width()
+        depthProjectionMatrix.perspective(20.0f, (GLfloat)m_mainViewPort.width()
                                           / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
 #else
         // Use these for orthographic shadows

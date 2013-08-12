@@ -82,6 +82,26 @@ int main(int argc, char **argv)
     multiDataButton->setText(QStringLiteral("Insert many rows of data"));
     multiDataButton->setEnabled(false);
 
+    QPushButton *changeSingleDataButton = new QPushButton(widget);
+    changeSingleDataButton->setText(QStringLiteral("Change selected bar value"));
+    changeSingleDataButton->setEnabled(false);
+
+    QPushButton *changeRowButton = new QPushButton(widget);
+    changeRowButton->setText(QStringLiteral("Change selected row values"));
+    changeRowButton->setEnabled(false);
+
+    QPushButton *changeRowsButton = new QPushButton(widget);
+    changeRowsButton->setText(QStringLiteral("Change three rows from selected"));
+    changeRowsButton->setEnabled(false);
+
+    QPushButton *removeRowButton = new QPushButton(widget);
+    removeRowButton->setText(QStringLiteral("Remove selected row"));
+    removeRowButton->setEnabled(false);
+
+    QPushButton *removeRowsButton = new QPushButton(widget);
+    removeRowsButton->setText(QStringLiteral("remove three rows from selected"));
+    removeRowsButton->setEnabled(false);
+
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
 
@@ -190,6 +210,11 @@ int main(int argc, char **argv)
     vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
     vLayout->addWidget(dataButton, 0, Qt::AlignTop);
     vLayout->addWidget(multiDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeSingleDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeRowButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeRowsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeRowButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeRowsButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -243,6 +268,11 @@ int main(int argc, char **argv)
                      &ChartModifier::changeTransparency);
     QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
     QObject::connect(multiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
+    QObject::connect(changeSingleDataButton, &QPushButton::clicked, modifier, &ChartModifier::changeItem);
+    QObject::connect(changeRowButton, &QPushButton::clicked, modifier, &ChartModifier::changeRow);
+    QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::changeRows);
+    QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &ChartModifier::removeRow);
+    QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::removeRows);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
 
@@ -266,6 +296,16 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, multiDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeSingleDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeRowButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeRowsButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, removeRowButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, removeRowsButton,
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
                      &QSlider::setEnabled);

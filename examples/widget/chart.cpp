@@ -208,6 +208,67 @@ void ChartModifier::addRows()
     qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
+void ChartModifier::changeItem()
+{
+    // TODO fix to use actual selected item, for now just assume some row/column are selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int column = qMin(4, (m_chart->dataProxy()->rowAt(row)->size() - 1));
+        if (column >= 0) {
+            QBarDataItem *item = new QBarDataItem();
+            item->setValue(qreal(rand() % 100));
+            m_chart->dataProxy()->setItem(row, column, item);
+        }
+    }
+}
+
+void ChartModifier::changeRow()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(row)->size());
+        for (int i = 0; i < newRow->size(); i++)
+            (*newRow)[i].setValue(qreal(rand() % 100));
+        m_chart->dataProxy()->setRow(row, newRow);
+    }
+}
+
+void ChartModifier::changeRows()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int startRow = qMax(row - 2, 0);
+        QBarDataArray *newArray = new QBarDataArray;
+        for (int i = startRow; i <= row; i++ ) {
+            QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(i)->size());
+            for (int j = 0; j < newRow->size(); j++)
+                (*newRow)[j].setValue(qreal(rand() % 100));
+            newArray->append(newRow);
+        }
+        m_chart->dataProxy()->setRows(startRow, newArray);
+    }
+}
+
+void ChartModifier::removeRow()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0)
+        m_chart->dataProxy()->removeRows(row, 1);
+}
+
+void ChartModifier::removeRows()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int startRow = qMax(row - 2, 0);
+        m_chart->dataProxy()->removeRows(startRow, 3);
+    }
+}
+
 void ChartModifier::changeStyle()
 {
     static int model = 0;

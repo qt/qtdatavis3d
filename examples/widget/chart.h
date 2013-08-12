@@ -59,6 +59,11 @@ public:
     void addDataSet();
     void addRow();
     void addRows();
+    void changeItem();
+    void changeRow();
+    void changeRows();
+    void removeRow();
+    void removeRows();
     void changeStyle();
     void changePresetCamera();
     void changeTheme();

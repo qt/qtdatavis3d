@@ -85,6 +85,7 @@ public:
     // how many samples per row and column, and names for axes
     // TODO: This defines the data window, needs additional parameters startRow, startColumn
     void setupSampleSpace(int samplesRow, int samplesColumn);
+    QSize sampleSpace(); // TODO: Return QRect once data window properly implemented?
 
     // Select preset camera placement
     void setCameraPreset(CameraPreset preset);

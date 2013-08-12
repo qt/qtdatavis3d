@@ -67,10 +67,13 @@ public:
 
     bool resetArray(QBarDataArray *newArray);
     void setRow(int rowIndex, QBarDataRow *row);
+    void setRows(int rowIndex, QBarDataArray *rows);
+    void setItem(int rowIndex, int columnIndex, QBarDataItem *item);
     int addRow(QBarDataRow *row);
     int addRows(QBarDataArray *rows);
     void insertRow(int rowIndex, QBarDataRow *row);
     void insertRows(int rowIndex, QBarDataArray *rows);
+    void removeRows(int rowIndex, int removeCount);
 
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
 

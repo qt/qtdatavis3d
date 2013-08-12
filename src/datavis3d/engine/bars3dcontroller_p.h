@@ -180,6 +180,7 @@ public slots:
     void handleRowsChanged(int startIndex, int count);
     void handleRowsRemoved(int startIndex, int count);
     void handleRowsInserted(int startIndex, int count);
+    void handleItemChanged(int rowIndex, int columnIndex);
 
     virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 

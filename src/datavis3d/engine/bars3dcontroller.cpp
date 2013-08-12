@@ -269,6 +269,7 @@ void Bars3dController::setDataProxy(QBarDataProxy *proxy)
     QObject::connect(m_data, &QBarDataProxy::rowsChanged, this, &Bars3dController::handleRowsChanged);
     QObject::connect(m_data, &QBarDataProxy::rowsRemoved, this, &Bars3dController::handleRowsRemoved);
     QObject::connect(m_data, &QBarDataProxy::rowsInserted, this, &Bars3dController::handleRowsInserted);
+    QObject::connect(m_data, &QBarDataProxy::itemChanged, this, &Bars3dController::handleItemChanged);
 
     adjustValueAxisRange();
     m_valuesDirty = true;
@@ -323,6 +324,17 @@ void Bars3dController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
+    // TODO check if affects data window
+    // TODO should update slice instead of deactivating?
+    setSlicingActive(false);
+    adjustValueAxisRange();
+    m_valuesDirty = true;
+}
+
+void Bars3dController::handleItemChanged(int rowIndex, int columnIndex)
+{
+    Q_UNUSED(rowIndex)
+    Q_UNUSED(columnIndex)
     // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     setSlicingActive(false);
