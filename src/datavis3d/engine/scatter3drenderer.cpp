@@ -263,7 +263,7 @@ void Scatter3DRenderer::render(QScatterDataProxy *dataProxy,
             calculateTranslation(m_renderItemArray[i]);
             m_renderItemArray[i].setRenderer(this);
         }
-        m_dotSizeScale = (GLfloat)qBound(0.1, (qreal)(20.0f / qSqrt((qreal)dataSize)), 1.0);
+        m_dotSizeScale = (GLfloat)qBound(0.01, (qreal)(2.0f / qSqrt((qreal)dataSize)), 0.1);
     }
 
     if (defaultFboHandle) {
@@ -440,10 +440,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(item.translation().x(),
                                   item.translation().y(),
                                   item.translation().z());
-            // TODO: We should adjust scaling of items based on item count?
-            modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
-                                        heightMultiplier * 0.1f + heightScaler,
-                                        depthMultiplier * 0.1f + depthScaler));
+            modelMatrix.scale(QVector3D(widthMultiplier + widthScaler,
+                                        heightMultiplier + heightScaler,
+                                        depthMultiplier + depthScaler));
             //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
             //                            heightMultiplier * item.size() + heightScaler,
             //                            depthMultiplier * item.size() + depthScaler));
@@ -529,10 +528,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             modelMatrix.translate(item.translation().x(),
                                   item.translation().y(),
                                   item.translation().z());
-            // TODO: We should adjust scaling of items based on item count?
-            modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
-                                        heightMultiplier * 0.1f + heightScaler,
-                                        depthMultiplier * 0.1f + depthScaler));
+            modelMatrix.scale(QVector3D(widthMultiplier + widthScaler,
+                                        heightMultiplier + heightScaler,
+                                        depthMultiplier + depthScaler));
             //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
             //                            heightMultiplier * item.size() + heightScaler,
             //                            depthMultiplier * item.size() + depthScaler));
@@ -635,16 +633,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         modelMatrix.translate(item.translation().x(),
                               item.translation().y(),
                               item.translation().z());
-        // TODO: We should adjust scaling of items based on item count?
-        modelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
-                                    heightMultiplier * 0.1f + heightScaler,
-                                    depthMultiplier * 0.1f + depthScaler));
+        modelMatrix.scale(QVector3D(widthMultiplier + widthScaler,
+                                    heightMultiplier + heightScaler,
+                                    depthMultiplier + depthScaler));
         //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
         //                            heightMultiplier * item.size() + heightScaler,
         //                            depthMultiplier * item.size() + depthScaler));
-        itModelMatrix.scale(QVector3D(widthMultiplier * 0.1f + widthScaler,
-                                      heightMultiplier * 0.1f + heightScaler,
-                                      depthMultiplier * 0.1f + depthScaler));
+        itModelMatrix.scale(QVector3D(widthMultiplier + widthScaler,
+                                      heightMultiplier + heightScaler,
+                                      depthMultiplier + depthScaler));
         //itModelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
         //                              heightMultiplier * item.size() + heightScaler,
         //                              depthMultiplier * item.size() + depthScaler));
@@ -669,7 +666,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             case Scatter3DController::SelectionBar: {
                 barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
-                // Insert data to QDataItem. We have no ownership, don't delete the previous one
+                // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 m_selectedItem = &item;
                 barSelectionFound = true;
                 break;
@@ -798,6 +795,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     glDisable(GL_TEXTURE_2D);
 
     // Draw grid lines
+#ifdef USE_UNIFORM_SCALING
+    AxisRenderCache *axisCacheMax;
+    if (m_axisCacheZ.max() > m_axisCacheX.max())
+        axisCacheMax = &m_axisCacheZ;
+    else
+        axisCacheMax = &m_axisCacheX;
+#endif
+
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         // Bind bar shader
         m_dotShader->bind();
@@ -814,12 +819,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheZ.subSegmentStep();
             GLfloat linePos = aspectRatio * m_axisCacheZ.min(); // Start line
-#else
-            GLfloat lineStep = aspectRatio * qMax(m_axisCacheX.subSegmentStep(),
-                                                  m_axisCacheZ.subSegmentStep());
-            GLfloat linePos = -aspectRatio * m_scaleFactor; // Start line
-#endif
             int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
+#else
+            GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
+            GLfloat linePos = -aspectRatio * m_scaleFactor; // Start line
+            int lastSegment = axisCacheMax->subSegmentCount() * axisCacheMax->segmentCount();
+#endif
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -869,7 +874,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
+                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                                                 m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_dotShader, m_gridLineObj);
@@ -883,12 +889,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheX.subSegmentStep();
             GLfloat linePos = aspectRatio * m_axisCacheX.min();
-#else
-            GLfloat lineStep = aspectRatio * qMax(m_axisCacheX.subSegmentStep(),
-                                                  m_axisCacheZ.subSegmentStep());
-            GLfloat linePos = -aspectRatio * m_scaleFactor;
-#endif
             int lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
+#else
+            GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
+            GLfloat linePos = -aspectRatio * m_scaleFactor;
+            int lastSegment = axisCacheMax->subSegmentCount() * axisCacheMax->segmentCount();
+#endif
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -1165,21 +1171,20 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
         GLfloat labelPos = aspectRatio * m_axisCacheZ.min();
+        int lastSegment = m_axisCacheZ.segmentCount();
 #else
-        // TODO: When using uniform scaling, we need to use labels from the larger dimension axis
-        // -> Check which axis is "bigger" and set it to a temp axis. Then use the temp for
-        // steps and labels.
-        GLfloat posStep = aspectRatio * qMax(m_axisCacheX.segmentStep(),
-                                             m_axisCacheZ.segmentStep());
+        GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = -aspectRatio * m_scaleFactor;
+        int lastSegment = axisCacheMax->segmentCount();
 #endif
         int labelNbr = 0;
-        for (int segment = 0; segment <= m_axisCacheZ.segmentCount(); segment++) {
-            if (m_axisCacheZ.labelItems().size() > labelNbr) {
+        for (int segment = 0; segment <= lastSegment; segment++) {
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
+            if (m_axisCacheZ.labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                         / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
+            if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = aspectRatio * backgroundMargin;
 #endif
                 GLfloat rotLabelX = -90.0f;
@@ -1198,7 +1203,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
+#ifndef USE_UNIFORM_SCALING
                 const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
+#else
+                const LabelItem &axisLabelItem = *axisCacheMax->labelItems().at(labelNbr);
+#endif
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     QVector3D(0.0f, 0.0f, zComp),
@@ -1216,18 +1225,20 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheX.segmentStep();
         GLfloat labelPos = aspectRatio * m_axisCacheX.min();
+        int lastSegment = m_axisCacheX.segmentCount();
 #else
-        GLfloat posStep = aspectRatio * qMax(m_axisCacheX.segmentStep(),
-                                             m_axisCacheZ.segmentStep());
+        GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = -aspectRatio * m_scaleFactor;
+        int lastSegment = axisCacheMax->segmentCount();
 #endif
         int labelNbr = 0;
-        for (int segment = 0; segment <= m_axisCacheX.segmentCount(); segment++) {
-            if (m_axisCacheX.labelItems().size() > labelNbr) {
+        for (int segment = 0; segment <= lastSegment; segment++) {
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
+            if (m_axisCacheX.labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                         / m_scaleFactor;
 #else // ..and this if we want uniform scaling based on largest dimension
+            if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = aspectRatio * backgroundMargin;
 #endif
                 GLfloat rotLabelX = -90.0f;
@@ -1246,7 +1257,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
+#ifndef USE_UNIFORM_SCALING
                 const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
+#else
+                const LabelItem &axisLabelItem = *axisCacheMax->labelItems().at(labelNbr);
+#endif
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     QVector3D(0.0f, 0.0f, zComp),
