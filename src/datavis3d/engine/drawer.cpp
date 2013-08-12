@@ -272,16 +272,16 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     switch (alignment) {
     case Qt::AlignLeft: {
         xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(qDegreesToRadians(rotation.y())));
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
         zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(qDegreesToRadians(rotation.y())));
+                * qFabs(qSin(qDegreesToRadians(rotation.y())));
         break;
     }
     case Qt::AlignRight: {
         xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(qDegreesToRadians(rotation.y())));
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
         zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(qDegreesToRadians(rotation.y())));
+                * qFabs(qSin(qDegreesToRadians(rotation.y())));
         break;
     }
     default: {
@@ -302,11 +302,11 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     // Rotate
     // TODO: We should convert rotations to use quaternions to avoid rotation order problems
-//    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-//    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-//    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-//    QQuaternion rotQuaternion = rotQuatX + rotQuatY + rotQuatZ;
-//    modelMatrix.rotate(rotQuaternion);
+    //QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
+    //QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
+    //QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
+    //QQuaternion rotQuaternion = rotQuatX + rotQuatY + rotQuatZ;
+    //modelMatrix.rotate(rotQuaternion);
     modelMatrix.rotate(rotation.y(), 0.0f, 1.0f, 0.0f);
     modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
     modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);

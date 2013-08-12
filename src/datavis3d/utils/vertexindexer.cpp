@@ -53,7 +53,7 @@ int unique_vertices = 0;
 // Returns true if v1 can be considered equal to v2
 bool VertexIndexer::is_near(float v1, float v2)
 {
-    return qFabs(v1 - v2) < 0.01f;
+    return qAbs(v1 - v2) < 0.01f;
 }
 
 // Searches through all already-exported vertices

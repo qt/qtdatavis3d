@@ -1728,7 +1728,7 @@ QMapDataProxy *Maps3DController::dataProxy()
 void Maps3DController::handleLimitChange()
 {
     QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues();
-    m_heightNormalizer = (GLfloat)qMax(qFabs(limits.second), qFabs(limits.first));
+    m_heightNormalizer = qMax(qAbs(limits.second), qAbs(limits.first));
     calculateHeightAdjustment(limits);
 
     //emit limitsChanged(limits);

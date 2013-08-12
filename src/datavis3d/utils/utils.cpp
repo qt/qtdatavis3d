@@ -110,23 +110,23 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
     if (absoluteCoords) {
         // This assumes absolute screen coordinates
         painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * cos(qDegreesToRadians(rotation)))
-                           + (((float)bgrHeight / 2.0f) * sin(qDegreesToRadians(rotation))),
+                                               * qCos(qDegreesToRadians(rotation)))
+                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
                            position.height()
-                           - ((((float)bgrHeight / 2.0f) * cos(qDegreesToRadians(rotation)))
-                              + (((float)bgrStrLen / 2.0f) * sin(qDegreesToRadians(rotation)))));
+                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
     } else {
         // This calculates y as a distance from screen bottom
         painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * cos(qDegreesToRadians(rotation)))
-                           + (((float)bgrHeight / 2.0f) * sin(qDegreesToRadians(rotation))),
+                                               * qCos(qDegreesToRadians(rotation)))
+                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
                            painter->window().height() - position.height()
-                           - ((((float)bgrHeight / 2.0f) * cos(qDegreesToRadians(rotation)))
-                              + (((float)bgrStrLen / 2.0f) * sin(qDegreesToRadians(rotation)))));
+                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
     }
     //qDebug() << painter->window().height() - position.height()
-    //            - ((((float)bgrHeight / 2.0f) * cos(qDegreesToRadians(rotation)))
-    //               + (((float)bgrStrLen / 2.0f) * sin(qDegreesToRadians(rotation))));
+    //            - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+    //               + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation))));
     painter->rotate(rotation);
     painter->drawText(0, 0,
                       bgrStrLen, bgrHeight,
