@@ -834,8 +834,6 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             BarRenderItem &item = m_renderItemArray[row][bar];
-            if (!item.value())
-                continue;
 
             if (item.height() < 0)
                 glCullFace(GL_FRONT);
@@ -930,6 +928,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 }
             }
 
+            // Skip drawing of 0 -height bars
             if (item.height() != 0) {
                 // Set shader bindings
                 m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
