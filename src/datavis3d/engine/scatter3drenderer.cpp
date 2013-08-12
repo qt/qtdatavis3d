@@ -85,6 +85,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_previouslySelectedItem(0),
       m_xFlipped(false),
       m_zFlipped(false),
+      m_yFlipped(false),
       m_updateLabels(false),
       m_dotShader(0),
       m_depthShader(0),
@@ -309,7 +310,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
                 m_cachedZoomLevel * m_autoScaleAdjustment,
                 m_mainViewPort.width(),
-                m_mainViewPort.height());
+                m_mainViewPort.height(),
+                true);
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -320,6 +322,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_xFlipped = false;
     else
         m_xFlipped = true;
+
+    // Check if we're viewing the scene from below
+    if (viewMatrix.row(2).y() < 0)
+        m_yFlipped = true;
+    else
+        m_yFlipped = false;
 
     // Calculate background rotation
     if (!m_zFlipped && !m_xFlipped)
@@ -743,7 +751,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
         // We can copy modelMatrix to itModelMatrix as it has not been translated
         itModelMatrix = modelMatrix;
-        modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
+        // If we're viewing from below, background object must be flipped
+        if (m_yFlipped) {
+            modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+            modelMatrix.rotate(270.0f - backgroundRotation, 0.0f, 1.0f, 0.0f);
+        } else {
+            modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
+        }
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -832,9 +846,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f,
-                                      -backgroundMargin,
-                                      linePos / m_scaleFactor + zComp);
+                if (m_yFlipped) {
+                    modelMatrix.translate(0.0f,
+                                          backgroundMargin,
+                                          linePos / m_scaleFactor + zComp);
+                } else {
+                    modelMatrix.translate(0.0f,
+                                          -backgroundMargin,
+                                          linePos / m_scaleFactor + zComp);
+                }
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -850,6 +870,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 itModelMatrix.scale(QVector3D(aspectRatio * backgroundMargin,
                                               gridLineWidth, gridLineWidth));
 #endif
+
+                // If we're viewing from below, grid line object must be flipped
+                if (m_yFlipped)
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -902,9 +926,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(linePos / m_scaleFactor,
-                                      -backgroundMargin,
-                                      zComp);
+                if (m_yFlipped) {
+                    modelMatrix.translate(linePos / m_scaleFactor,
+                                          backgroundMargin,
+                                          zComp);
+                } else {
+                    modelMatrix.translate(linePos / m_scaleFactor,
+                                          -backgroundMargin,
+                                          zComp);
+                }
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -920,6 +950,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 itModelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
                                               aspectRatio * backgroundMargin));
 #endif
+
+                // If we're viewing from below, grid line object must be flipped
+                if (m_yFlipped)
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1187,6 +1221,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = aspectRatio * backgroundMargin;
 #endif
+                GLfloat labelYTrans = -backgroundMargin;
                 GLfloat rotLabelX = -90.0f;
                 GLfloat rotLabelY = 0.0f;
                 GLfloat rotLabelZ = 0.0f;
@@ -1197,9 +1232,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     labelXTrans = -labelXTrans;
                     alignment = Qt::AlignLeft;
                 }
+                if (m_yFlipped) {
+                    rotLabelZ += 180.0f;
+                    rotLabelY += 180.0f;
+                    labelYTrans = -labelYTrans;
+                }
                 QVector3D labelTrans = QVector3D(labelXTrans,
-                                                 -backgroundMargin,
+                                                 labelYTrans,
                                                  labelPos / m_scaleFactor + zComp);
+
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1241,6 +1282,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             if (axisCacheMax->labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = aspectRatio * backgroundMargin;
 #endif
+                GLfloat labelYTrans = -backgroundMargin;
                 GLfloat rotLabelX = -90.0f;
                 GLfloat rotLabelY = 90.0f;
                 GLfloat rotLabelZ = 0.0f;
@@ -1251,8 +1293,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     labelZTrans = -labelZTrans;
                     alignment = Qt::AlignRight;
                 }
+                if (m_yFlipped) {
+                    rotLabelZ += 180.0f;
+                    rotLabelY += 180.0f;
+                    labelYTrans = -labelYTrans;
+                }
                 QVector3D labelTrans = QVector3D(labelPos / m_scaleFactor,
-                                                 -backgroundMargin,
+                                                 labelYTrans,
                                                  labelZTrans + zComp);
 
                 // Draw the label here

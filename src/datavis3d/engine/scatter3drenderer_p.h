@@ -107,6 +107,7 @@ private:
     ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
     bool m_xFlipped;
     bool m_zFlipped;
+    bool m_yFlipped;
     QRect m_mainViewPort;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
