@@ -19,14 +19,15 @@ INCLUDEPATH += ../datavis3d/engine \
 SOURCES += \
     datavis3dqml2_plugin.cpp \
     declarativebars.cpp \
+    declarativebarsrenderer.cpp \
     declarativemaps.cpp \
     declarativescatter.cpp \
     declarativescatterrenderer.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
-    declarativebars.h \
     declarativebars_p.h \
+    declarativebarsrenderer_p.h \
     declarativemaps.h \
     declarativemaps_p.h \
     declarativescatter_p.h \

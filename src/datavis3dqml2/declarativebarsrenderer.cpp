@@ -39,43 +39,65 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVIS3DQML2_PLUGIN_H
-#define DATAVIS3DQML2_PLUGIN_H
+#include "declarativebarsrenderer_p.h"
+#include "bars3dcontroller_p.h"
 
-#include "datavis3dglobal_p.h"
-#include "declarativebars_p.h"
-#include "declarativemaps.h"
-#include "declarativescatter_p.h"
-#include "qitemmodelbardatamapping.h"
-#include "qitemmodelmapdatamapping.h"
-#include "qitemmodelscatterdatamapping.h"
-
-#include <QQmlExtensionPlugin>
-
-QT_DATAVIS3D_USE_NAMESPACE
-
-Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeMaps *)
-Q_DECLARE_METATYPE(DeclarativeScatter *)
-
-Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
-Q_DECLARE_METATYPE(QItemModelMapDataMapping *)
-Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
-Q_DECLARE_METATYPE(QAbstractItemModel *)
-
+#include <QtQuick/QQuickWindow>
+#include <QtGui/QOpenGLFramebufferObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Datavis3dqml2Plugin : public QQmlExtensionPlugin
+DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *renderer)
+    : m_fbo(0),
+      m_texture(0),
+      m_window(window),
+      m_barsRenderer(renderer)
 {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
+    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
+}
 
-public:
-    void registerTypes(const char *uri);
-};
+DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
+{
+    delete m_texture;
+    delete m_fbo;
+}
+
+void DeclarativeBarsRenderer::render()
+{
+    QSize size = rect().size().toSize();
+
+    // Create FBO
+    if (!m_fbo) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::Depth);
+        m_fbo = new QOpenGLFramebufferObject(size, format);
+        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+
+        setTexture(m_texture);
+
+        // Flip texture
+        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
+        QSize ts = m_texture->textureSize();
+        QRectF sourceRect(0, 0, ts.width(), ts.height());
+        float tmp = sourceRect.top();
+        sourceRect.setTop(sourceRect.bottom());
+        sourceRect.setBottom(tmp);
+        QSGGeometry *geometry = this->geometry();
+        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
+                                                m_texture->convertToNormalizedSourceRect(sourceRect));
+        markDirty(DirtyMaterial);
+        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
+    }
+
+    // Call the shared rendering function
+    m_fbo->bind();
+
+    m_barsRenderer->render(m_fbo->handle());
+
+    m_fbo->release();
+
+    // New view is in the FBO, request repaint of scene graph
+    m_window->update();
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif // DATAVIS3DQML2_PLUGIN_H
-

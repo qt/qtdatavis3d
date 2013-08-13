@@ -39,25 +39,18 @@
 **
 ****************************************************************************/
 
-#include "declarativebars.h"
+#include "declarativebars_p.h"
+#include "declarativebarsrenderer_p.h"
 #include "bars3dcontroller_p.h"
 #include "qitemmodelbardataproxy.h"
 #include "qvalueaxis.h"
-
-#include <QtQuick/QQuickWindow>
-#include <QtGui/QOpenGLFramebufferObject>
-#include <QOpenGLContext>
-#include <QGuiApplication>
-#include <QThread>
-#include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_cachedState(new DeclarativeBarsCachedStatePrivate()),
-      m_initialisedSize(0,0)
+      m_initialisedSize(0, 0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -84,7 +77,6 @@ void DeclarativeBars::handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quali
     emit shadowQualityChanged(DeclarativeBars::ShadowQuality(quality));
 }
 
-
 void DeclarativeBars::classBegin()
 {
     qDebug() << "classBegin";
@@ -99,46 +91,6 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 {
     // Call initialize on each update paint node and let the shared code worry about it.
     m_shared->initializeOpenGL();
-
-    // TODO: Setting stuff to controller in render thread. Isn't this incorrect?
-
-    // Check if properites have changed that need to be applied while on the SGRenderThread
-    if (m_cachedState->m_isSampleSpaceSet) {
-        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
-        m_cachedState->m_isSampleSpaceSet = false;
-    }
-
-    if (m_cachedState->m_isSelectionModeSet) {
-        m_shared->setSelectionMode(m_cachedState->m_selectionMode);
-        m_cachedState->m_isSelectionModeSet = false;
-    }
-
-    if (m_cachedState->m_isLabelTransparencySet) {
-        m_shared->setLabelTransparency(m_cachedState->m_labelTransparency);
-        m_cachedState->m_isLabelTransparencySet = false;
-    }
-
-    if (m_cachedState->m_isShadowQualitySet) {
-        m_shared->setShadowQuality(m_cachedState->m_shadowQuality);
-        m_cachedState->m_isShadowQualitySet = false;
-    }
-
-    if (m_cachedState->m_isGridSet) {
-        m_shared->setGridEnabled(m_cachedState->m_isGridEnabled);
-        m_cachedState->m_isGridSet = false;
-    }
-
-    if (m_cachedState->m_isSegmentCountSet) {
-        // TODO needs proper axis support on QML side, too
-        QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
-        if (axis) {
-            axis->setSegmentCount(m_cachedState->m_segmentCount);
-            axis->setRange(m_cachedState->m_segmentMin,
-                          (m_cachedState->m_segmentCount * m_cachedState->m_segmentStep));
-        }
-        m_cachedState->m_isSegmentCountSet = false;
-    }
-
 
     // If old node exists and has right size, reuse it.
     if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
@@ -173,11 +125,7 @@ void DeclarativeBars::setBarType(BarStyle style, bool smooth)
 
 void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn)
 {
-    m_cachedState->m_samplesRow = samplesRow;
-    m_cachedState->m_samplesColumn = samplesColumn;
-    m_cachedState->m_isSampleSpaceSet = true;
-
-    update();
+    m_shared->setupSampleSpace(samplesRow, samplesColumn);
 }
 
 void DeclarativeBars::setCameraPreset(CameraPreset preset)
@@ -201,7 +149,6 @@ void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor d
     m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
 }
 
-
 void DeclarativeBars::setFontSize(float fontsize)
 {
     m_shared->setFontSize(fontsize);
@@ -224,10 +171,7 @@ QFont DeclarativeBars::font()
 
 void DeclarativeBars::setLabelTransparency(DeclarativeBars::LabelTransparency transparency)
 {
-    m_cachedState->m_labelTransparency = QtDataVis3D::LabelTransparency(transparency);
-    m_cachedState->m_isLabelTransparencySet = true;
-
-    update();
+    m_shared->setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
 }
 
 DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
@@ -237,10 +181,7 @@ DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
 
 void DeclarativeBars::setGridVisible(bool visible)
 {
-    m_cachedState->m_isGridEnabled = visible;
-    m_cachedState->m_isGridSet = true;
-
-    update();
+    m_shared->setGridEnabled(visible);
 }
 
 bool DeclarativeBars::isGridVisible()
@@ -261,12 +202,11 @@ bool DeclarativeBars::isBackgroundVisible()
 // TODO needs proper axis support also in QML
 void DeclarativeBars::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
-    m_cachedState->m_isSegmentCountSet = true;
-    m_cachedState->m_segmentCount = segmentCount;
-    m_cachedState->m_segmentStep = step;
-    m_cachedState->m_segmentMin = minimum;
-
-    update();
+    QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
+    if (axis) {
+        axis->setSegmentCount(segmentCount);
+        axis->setRange(minimum, segmentCount * step);
+    }
 }
 
 void DeclarativeBars::setData(QAbstractItemModel *data)
@@ -281,9 +221,7 @@ QAbstractItemModel *DeclarativeBars::data()
 
 void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
 {
-    m_cachedState->m_selectionMode = QtDataVis3D::SelectionMode(mode);
-    m_cachedState->m_isSelectionModeSet = true;
-    update();
+    m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
 }
 
 DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
@@ -293,9 +231,7 @@ DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
 
 void DeclarativeBars::setShadowQuality(DeclarativeBars::ShadowQuality quality)
 {
-    m_cachedState->m_shadowQuality = QtDataVis3D::ShadowQuality(quality);
-    m_cachedState->m_isShadowQualitySet = true;
-    update();
+    m_shared->setShadowQuality(QtDataVis3D::ShadowQuality(quality));
 }
 
 DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
@@ -310,30 +246,27 @@ QItemModelBarDataMapping *DeclarativeBars::mapping() const
 
 void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
 {
-    qDebug() << "Setting the mapping!!";
     static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
 }
 
 int DeclarativeBars::rows() const
 {
-    return m_cachedState->m_samplesRow;
+    return m_shared->rowCount();
 }
 
 void DeclarativeBars::setRows(int rows)
 {
-    m_cachedState->m_samplesRow = rows;
-    setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
+    setupSampleSpace(rows, columns());
 }
 
 int DeclarativeBars::columns() const
 {
-    return m_cachedState->m_samplesColumn;
+    return m_shared->columnCount();
 }
 
 void DeclarativeBars::setColumns(int columns)
 {
-    m_cachedState->m_samplesColumn = columns;
-    setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn);
+    setupSampleSpace(rows(), columns);
 }
 
 void DeclarativeBars::setMeshFileName(const QString &objFileName)
@@ -365,87 +298,6 @@ void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
 void DeclarativeBars::wheelEvent(QWheelEvent *event)
 {
     m_shared->wheelEvent(event);
-}
-
-DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *renderer)
-    : m_fbo(0),
-      m_texture(0),
-      m_window(window),
-      m_barsRenderer(renderer)
-{
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
-}
-
-DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
-{
-    delete m_texture;
-    delete m_fbo;
-}
-
-void DeclarativeBarsRenderer::render()
-{
-    QSize size = rect().size().toSize();
-
-    // Create FBO
-    if (!m_fbo) {
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::Depth);
-        m_fbo = new QOpenGLFramebufferObject(size, format);
-        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
-
-        setTexture(m_texture);
-
-        // Flip texture
-        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
-        QSize ts = m_texture->textureSize();
-        QRectF sourceRect(0, 0, ts.width(), ts.height());
-        float tmp = sourceRect.top();
-        sourceRect.setTop(sourceRect.bottom());
-        sourceRect.setBottom(tmp);
-        QSGGeometry *geometry = this->geometry();
-        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
-                                                m_texture->convertToNormalizedSourceRect(sourceRect));
-        markDirty(DirtyMaterial);
-        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
-    }
-
-    // Call the shared rendering function
-    m_fbo->bind();
-
-    m_barsRenderer->render(m_fbo->handle());
-
-    m_fbo->release();
-
-    // New view is in the FBO, request repaint of scene graph
-    m_window->update();
-}
-
-DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
-    m_isSampleSpaceSet(false),
-    m_samplesRow(0),
-    m_samplesColumn(0),
-    m_labelRow(QStringLiteral("")),
-    m_labelColumn(QStringLiteral("")),
-    m_labelHeight(QStringLiteral("")),
-    m_isSelectionModeSet(false),
-    m_selectionMode(ModeNone),
-    m_isLabelTransparencySet(false),
-    m_labelTransparency(TransparencyNone),
-    m_isShadowQualitySet(false),
-    m_shadowQuality(ShadowNone),
-    m_isGridSet(false),
-    m_isGridEnabled(true),
-    m_isSegmentCountSet(false),
-    m_segmentCount(5),
-    m_segmentStep(1),
-    m_segmentMin(0)
-
-
-{
-}
-
-DeclarativeBarsCachedStatePrivate::~DeclarativeBarsCachedStatePrivate()
-{
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -39,43 +39,47 @@
 **
 ****************************************************************************/
 
-#ifndef DATAVIS3DQML2_PLUGIN_H
-#define DATAVIS3DQML2_PLUGIN_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+
+#ifndef DECLARATIVEBARSRENDERER_H
+#define DECLARATIVEBARSRENDERER_H
 
 #include "datavis3dglobal_p.h"
-#include "declarativebars_p.h"
-#include "declarativemaps.h"
-#include "declarativescatter_p.h"
-#include "qitemmodelbardatamapping.h"
-#include "qitemmodelmapdatamapping.h"
-#include "qitemmodelscatterdatamapping.h"
+#include "bars3dcontroller_p.h"
+#include <qsgsimpletexturenode.h>
 
-#include <QQmlExtensionPlugin>
-
-QT_DATAVIS3D_USE_NAMESPACE
-
-Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeMaps *)
-Q_DECLARE_METATYPE(DeclarativeScatter *)
-
-Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
-Q_DECLARE_METATYPE(QItemModelMapDataMapping *)
-Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
-Q_DECLARE_METATYPE(QAbstractItemModel *)
-
+class QOpenGLFramebufferObject;
+class QSGTexture;
+class QQuickWindow;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Datavis3dqml2Plugin : public QQmlExtensionPlugin
+class DeclarativeBarsRenderer : public QObject, public QSGSimpleTextureNode
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
 
 public:
-    void registerTypes(const char *uri);
+    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *shared);
+    ~DeclarativeBarsRenderer();
+
+public slots:
+    void render();
+
+private:
+    QOpenGLFramebufferObject *m_fbo;
+    QSGTexture *m_texture;
+    QQuickWindow *m_window;
+    Bars3dController *m_barsRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // DATAVIS3DQML2_PLUGIN_H
-
+#endif
