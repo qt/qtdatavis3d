@@ -175,12 +175,12 @@ void ChartModifier::addRows()
 {
     QTime timer;
     timer.start();
-    QBarDataArray *dataArray = new QBarDataArray();
+    QBarDataArray dataArray;
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
             (*dataRow)[j].setValue(qreal(j + i + m_chart->dataProxy()->rowCount()));
-        dataArray->append(dataRow);
+        dataArray.append(dataRow);
     }
     m_chart->dataProxy()->insertRows(0, dataArray);
     qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
@@ -193,8 +193,8 @@ void ChartModifier::changeItem()
     if (row >= 0) {
         int column = qMin(4, (m_chart->dataProxy()->rowAt(row)->size() - 1));
         if (column >= 0) {
-            QBarDataItem *item = new QBarDataItem();
-            item->setValue(qreal(rand() % 100));
+            QBarDataItem item;
+            item.setValue(qreal(rand() % 100));
             m_chart->dataProxy()->setItem(row, column, item);
         }
     }
@@ -218,12 +218,12 @@ void ChartModifier::changeRows()
     int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
-        QBarDataArray *newArray = new QBarDataArray;
+        QBarDataArray newArray;
         for (int i = startRow; i <= row; i++ ) {
             QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
                 (*newRow)[j].setValue(qreal(rand() % 100));
-            newArray->append(newRow);
+            newArray.append(newRow);
         }
         m_chart->dataProxy()->setRows(startRow, newArray);
     }

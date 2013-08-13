@@ -258,8 +258,10 @@ void Bars3dRenderer::render(QBarDataProxy *dataProxy,
                     }
                 }
             }
-            for (; j < m_renderItemArray[i].size(); j++)
-                m_renderItemArray[i][j].setValue(0);
+            for (; j < m_renderItemArray[i].size(); j++) {
+                m_renderItemArray[i][j].setValue(0.0);
+                m_renderItemArray[i][j].setHeight(0.0f);
+            }
         }
     }
 

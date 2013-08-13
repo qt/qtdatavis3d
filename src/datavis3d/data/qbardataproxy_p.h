@@ -44,12 +44,12 @@ public:
 
     bool resetArray(QBarDataArray *newArray);
     void setRow(int rowIndex, QBarDataRow *row);
-    void setRows(int rowIndex, QBarDataArray *rows);
-    void setItem(int rowIndex, int columnIndex, QBarDataItem *item);
+    void setRows(int rowIndex, const QBarDataArray &rows);
+    void setItem(int rowIndex, int columnIndex, const QBarDataItem &item);
     int addRow(QBarDataRow *row);
-    int addRows(QBarDataArray *rows);
+    int addRows(const QBarDataArray &rows);
     void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, QBarDataArray *rows);
+    void insertRows(int rowIndex, const QBarDataArray &rows);
     void removeRows(int rowIndex, int removeCount);
 
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
@@ -58,7 +58,7 @@ private:
     void clearRow(int rowIndex);
     void clearArray();
 
-    QBarDataArray m_dataArray;
+    QBarDataArray *m_dataArray;
 
 private:
     friend class QBarDataProxy;
