@@ -39,24 +39,17 @@
 **
 ****************************************************************************/
 
-#include "declarativescatter.h"
+#include "declarativescatter_p.h"
+#include "declarativescatterrenderer_p.h"
 #include "scatter3dcontroller_p.h"
-#include "QItemModelScatterDataProxy.h" // TODO: Create own item model data proxy for scatter
-
-#include <QtQuick/QQuickWindow>
-#include <QtGui/QOpenGLFramebufferObject>
-#include <QOpenGLContext>
-#include <QGuiApplication>
-#include <QThread>
-#include <QDebug>
+#include "qitemmodelscatterdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_cachedState(new DeclarativeScatterCachedStatePrivate()),
-      m_initialisedSize(0,0)
+      m_initialisedSize(0, 0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -70,7 +63,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     QObject::connect(m_shared, &Scatter3DController::shadowQualityChanged, this,
                      &DeclarativeScatter::handleShadowQualityUpdate);
 
-    m_shared->setDataProxy(new QItemModelScatterDataProxy); // TODO: Create own item model data proxy for scatter
+    m_shared->setDataProxy(new QItemModelScatterDataProxy);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -98,29 +91,6 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     // Call initialize on each update paint node and let the shared code worry about it.
     m_shared->initializeOpenGL();
 
-    // TODO: Setting stuff to controller in render thread. Isn't this incorrect?
-
-    // Check if properites have changed that need to be applied while on the SGRenderThread
-    if (m_cachedState->m_isSelectionModeSet) {
-        m_shared->setSelectionMode(m_cachedState->m_selectionMode);
-        m_cachedState->m_isSelectionModeSet = false;
-    }
-
-    if (m_cachedState->m_isLabelTransparencySet) {
-        m_shared->setLabelTransparency(m_cachedState->m_labelTransparency);
-        m_cachedState->m_isLabelTransparencySet = false;
-    }
-
-    if (m_cachedState->m_isShadowQualitySet) {
-        m_shared->setShadowQuality(m_cachedState->m_shadowQuality);
-        m_cachedState->m_isShadowQualitySet = false;
-    }
-
-    if (m_cachedState->m_isGridSet) {
-        m_shared->setGridEnabled(m_cachedState->m_isGridEnabled);
-        m_cachedState->m_isGridSet = false;
-    }
-
     // If old node exists and has right size, reuse it.
     if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
         // Update bounding rectangle (that has same size as before).
@@ -146,7 +116,6 @@ void DeclarativeScatter::setBarType(BarStyle style, bool smooth)
 {
     m_shared->setBarType(style, smooth);
 }
-
 
 void DeclarativeScatter::setCameraPreset(CameraPreset preset)
 {
@@ -191,10 +160,7 @@ QFont DeclarativeScatter::font()
 
 void DeclarativeScatter::setLabelTransparency(DeclarativeScatter::LabelTransparency transparency)
 {
-    m_cachedState->m_labelTransparency = QtDataVis3D::LabelTransparency(transparency);
-    m_cachedState->m_isLabelTransparencySet = true;
-
-    update();
+    m_shared->setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
 }
 
 DeclarativeScatter::LabelTransparency DeclarativeScatter::labelTransparency()
@@ -204,10 +170,7 @@ DeclarativeScatter::LabelTransparency DeclarativeScatter::labelTransparency()
 
 void DeclarativeScatter::setGridVisible(bool visible)
 {
-    m_cachedState->m_isGridEnabled = visible;
-    m_cachedState->m_isGridSet = true;
-
-    update();
+    m_shared->setGridEnabled(visible);
 }
 
 bool DeclarativeScatter::isGridVisible()
@@ -237,9 +200,7 @@ QAbstractItemModel *DeclarativeScatter::data()
 
 void DeclarativeScatter::setSelectionMode(DeclarativeScatter::SelectionMode mode)
 {
-    m_cachedState->m_selectionMode = QtDataVis3D::SelectionMode(mode);
-    m_cachedState->m_isSelectionModeSet = true;
-    update();
+    m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
 }
 
 DeclarativeScatter::SelectionMode DeclarativeScatter::selectionMode()
@@ -249,9 +210,7 @@ DeclarativeScatter::SelectionMode DeclarativeScatter::selectionMode()
 
 void DeclarativeScatter::setShadowQuality(DeclarativeScatter::ShadowQuality quality)
 {
-    m_cachedState->m_shadowQuality = QtDataVis3D::ShadowQuality(quality);
-    m_cachedState->m_isShadowQualitySet = true;
-    update();
+    m_shared->setShadowQuality(QtDataVis3D::ShadowQuality(quality));
 }
 
 DeclarativeScatter::ShadowQuality DeclarativeScatter::shadowQuality()
@@ -266,7 +225,6 @@ QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
 
 void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
 {
-    qDebug() << "Setting the mapping!!";
     static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
 }
 
@@ -299,79 +257,6 @@ void DeclarativeScatter::mouseMoveEvent(QMouseEvent *event)
 void DeclarativeScatter::wheelEvent(QWheelEvent *event)
 {
     m_shared->wheelEvent(event);
-}
-
-DeclarativeScatterRenderer::DeclarativeScatterRenderer(QQuickWindow *window,
-                                                       Scatter3DController *renderer)
-    : m_fbo(0),
-      m_texture(0),
-      m_window(window),
-      m_scatterRenderer(renderer)
-{
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
-}
-
-DeclarativeScatterRenderer::~DeclarativeScatterRenderer()
-{
-    delete m_texture;
-    delete m_fbo;
-}
-
-void DeclarativeScatterRenderer::render()
-{
-    QSize size = rect().size().toSize();
-
-    // Create FBO
-    if (!m_fbo) {
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::Depth);
-        m_fbo = new QOpenGLFramebufferObject(size, format);
-        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
-
-        setTexture(m_texture);
-
-        // Flip texture
-        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
-        QSize ts = m_texture->textureSize();
-        QRectF sourceRect(0, 0, ts.width(), ts.height());
-        float tmp = sourceRect.top();
-        sourceRect.setTop(sourceRect.bottom());
-        sourceRect.setBottom(tmp);
-        QSGGeometry *geometry = this->geometry();
-        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
-                                                m_texture->convertToNormalizedSourceRect(sourceRect));
-        markDirty(DirtyMaterial);
-        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
-    }
-
-    // Call the shared rendering function
-    m_fbo->bind();
-
-    m_scatterRenderer->render(m_fbo->handle());
-
-    m_fbo->release();
-
-    // New view is in the FBO, request repaint of scene graph
-    m_window->update();
-}
-
-DeclarativeScatterCachedStatePrivate::DeclarativeScatterCachedStatePrivate() :
-    m_labelRow(QStringLiteral("")),
-    m_labelColumn(QStringLiteral("")),
-    m_labelHeight(QStringLiteral("")),
-    m_isSelectionModeSet(false),
-    m_selectionMode(ModeNone),
-    m_isLabelTransparencySet(false),
-    m_labelTransparency(TransparencyNone),
-    m_isShadowQualitySet(false),
-    m_shadowQuality(ShadowNone),
-    m_isGridSet(false),
-    m_isGridEnabled(true)
-{
-}
-
-DeclarativeScatterCachedStatePrivate::~DeclarativeScatterCachedStatePrivate()
-{
 }
 
 QT_DATAVIS3D_END_NAMESPACE
