@@ -87,7 +87,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
 
 #ifndef USE_STATIC_DATA
     // Set selection mode to full
-    m_chart->setSelectionMode(ModeBarRowAndColumn);
+    m_chart->setSelectionMode(ModeItemRowAndColumn);
 #else
     // Set selection mode to zoom row
     m_chart->setSelectionMode(ModeZoomRow);

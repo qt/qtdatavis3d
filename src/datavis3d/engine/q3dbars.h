@@ -57,7 +57,7 @@ public:
                      bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    void setBarType(MeshStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
     // TODO: This defines the data window, needs additional parameters startRow, startColumn

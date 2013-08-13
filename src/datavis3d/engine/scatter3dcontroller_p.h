@@ -96,13 +96,11 @@ public:
                                    bool showUnder = false);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    void setObjectType(MeshStyle style, bool smooth = false);
     QString objFile();
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
-
-    // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
@@ -158,9 +156,6 @@ private:
     void adjustValueAxisRange();
 
     Q_DISABLE_COPY(Scatter3DController)
-
-    friend class DeclarativeBars;
-    friend class DeclarativeBarsRenderer;
 };
 
 

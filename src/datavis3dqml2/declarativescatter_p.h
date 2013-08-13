@@ -60,10 +60,10 @@ public:
     // Duplicated here to be able to use the same enums
     enum SelectionMode {
         ModeNone = 0,
-        ModeBar,
-        ModeBarAndRow,
-        ModeBarAndColumn,
-        ModeBarRowAndColumn,
+        ModeItem,
+        ModeItemAndRow,
+        ModeItemAndColumn,
+        ModeItemRowAndColumn,
         ModeZoomRow,
         ModeZoomColumn
     };
@@ -93,10 +93,9 @@ public:
     QAbstractItemModel *data();
 
     // dot type
-    // TODO: Rename setBarType -> setItemType / setObjectType / setXXXType
-    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
+    Q_INVOKABLE void setObjectType(MeshStyle style, bool smooth = false);
 
-    // override bar type with own mesh
+    // override object type with own mesh
     Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // Select preset camera placement
@@ -107,16 +106,16 @@ public:
     // percentage (10...500))
     Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
 
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
+    // Set theme (object colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
     Q_INVOKABLE void setTheme(ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                 bool uniform = true);
+    Q_INVOKABLE void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                    bool uniform = true);
 
-    // Change selection mode; single bar, bar and row, bar and column, or all
+    // Change selection mode
     void setSelectionMode(SelectionMode mode);
     SelectionMode selectionMode();
 

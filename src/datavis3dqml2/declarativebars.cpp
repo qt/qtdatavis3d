@@ -94,7 +94,7 @@ void DeclarativeBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relativ
     m_shared->setBarSpecs(thickness, spacing, relative);
 }
 
-void DeclarativeBars::setBarType(BarStyle style, bool smooth)
+void DeclarativeBars::setBarType(MeshStyle style, bool smooth)
 {
     m_shared->setBarType(style, smooth);
 }
@@ -122,7 +122,7 @@ void DeclarativeBars::setTheme(ColorTheme theme)
 void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                                   bool uniform)
 {
-    m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 void DeclarativeBars::setFontSize(float fontsize)

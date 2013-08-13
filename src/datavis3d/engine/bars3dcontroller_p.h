@@ -114,7 +114,7 @@ public:
     bool isBarSpecRelative();
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    void setBarType(MeshStyle style, bool smooth = false);
     QString objFile();
 
     // override bar type with own mesh

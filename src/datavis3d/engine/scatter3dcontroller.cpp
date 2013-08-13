@@ -37,7 +37,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_isInitialized(false),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_selectionMode(ModeBar),
+      m_selectionMode(ModeItem),
       m_isSlicingActivated(false),
       m_objFile(QStringLiteral(":/defaultMeshes/sphere")),
       m_font(QFont(QStringLiteral("Arial"))),
@@ -305,7 +305,7 @@ QString Scatter3DController::objFile()
     return m_objFile;
 }
 
-void Scatter3DController::setBarType(BarStyle style, bool smooth)
+void Scatter3DController::setObjectType(MeshStyle style, bool smooth)
 {
     if (style == Spheres) {
         if (smooth)
@@ -331,6 +331,10 @@ void Scatter3DController::setMeshFileName(const QString &objFileName)
 
 void Scatter3DController::setSelectionMode(SelectionMode mode)
 {
+    if (mode > ModeItem) {
+        qWarning("Unsupported selection mode.");
+        return;
+    }
     m_selectionMode = mode;
     // Disable zoom if selection mode changes
     setSlicingActive(false);

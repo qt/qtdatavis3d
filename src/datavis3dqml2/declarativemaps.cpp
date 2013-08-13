@@ -95,7 +95,7 @@ void DeclarativeMaps::setBarSpecs(const QVector3D &thickness,
     m_shared->setBarSpecs(thickness, direction);
 }
 
-void DeclarativeMaps::setBarType(BarStyle style, bool smooth)
+void DeclarativeMaps::setBarType(MeshStyle style, bool smooth)
 {
     m_shared->setBarType(style, smooth);
 }

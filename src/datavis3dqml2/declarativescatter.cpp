@@ -88,9 +88,9 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     return node;
 }
 
-void DeclarativeScatter::setBarType(BarStyle style, bool smooth)
+void DeclarativeScatter::setObjectType(MeshStyle style, bool smooth)
 {
-    m_shared->setBarType(style, smooth);
+    m_shared->setObjectType(style, smooth);
 }
 
 void DeclarativeScatter::setCameraPreset(CameraPreset preset)
@@ -108,10 +108,10 @@ void DeclarativeScatter::setTheme(ColorTheme theme)
     m_shared->setColorTheme(theme);
 }
 
-void DeclarativeScatter::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+void DeclarativeScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
                                      bool uniform)
 {
-    m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 void DeclarativeScatter::setFontSize(float fontsize)

@@ -31,7 +31,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_fontSize(30.0f)
 {
     m_chart->setFontSize(m_fontSize);
-    m_chart->setBarType(Spheres, true);
+    m_chart->setObjectType(Spheres, true);
     m_chart->setTheme(ThemeBrownSand);
     m_chart->setShadowQuality(ShadowHigh);
 
@@ -86,16 +86,16 @@ void ScatterDataModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Dots, false);
+        m_chart->setObjectType(Dots, false);
         break;
     case 1:
-        m_chart->setBarType(Dots, true);
+        m_chart->setObjectType(Dots, true);
         break;
     case 2:
-        m_chart->setBarType(Spheres, false);
+        m_chart->setObjectType(Spheres, false);
         break;
     case 3:
-        m_chart->setBarType(Spheres, true);
+        m_chart->setObjectType(Spheres, true);
         break;
     }
     model++;

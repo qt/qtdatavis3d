@@ -68,7 +68,7 @@ Item {
             Component.onCompleted: {
                 console.log("testscatter complete");
                 shadowQuality = Scatter3D.ShadowNone
-                selectionMode = Scatter3D.ModeBar
+                selectionMode = Scatter3D.ModeItem
                 labelTransparency = Scatter3D.TransparencyNoBackground
                 data = dataModel
             }

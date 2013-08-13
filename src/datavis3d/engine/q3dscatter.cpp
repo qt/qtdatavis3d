@@ -77,7 +77,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D bar window.
+ * Constructs a new 3D scatter window.
  */
 Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
@@ -88,7 +88,7 @@ Q3DScatter::Q3DScatter()
 }
 
 /*!
- *  Destroys the 3d bar window.
+ *  Destroys the 3D scatter window.
  */
 Q3DScatter::~Q3DScatter()
 {
@@ -181,17 +181,17 @@ void Q3DScatter::setHeight(const int height)
 }
 
 /*!
- * \a style One of the values in \c BarStyle. \c Bars by default.
+ * \a style One of the values in \c MeshStyle. \c Spheres by default.
  *
  * \a smooth A flag to set shading to smooth. \c false by default.
  *
- * Sets the bar type to one of the supplied ones.
+ * Sets the object type to one of the supplied ones.
  *
  * \sa setMeshFileName()
  */
-void Q3DScatter::setBarType(BarStyle style, bool smooth)
+void Q3DScatter::setObjectType(MeshStyle style, bool smooth)
 {
-    d_ptr->m_shared->setBarType(style, smooth);
+    d_ptr->m_shared->setObjectType(style, smooth);
 }
 
 /*!
@@ -212,8 +212,7 @@ void Q3DScatter::setCameraPreset(CameraPreset preset)
  * \a distance Distance from the center. \c 100 by default.
  *
  * Move camera to a wanted position based on horizontal and veritcal angles. Angles are limited
- * to -180...180 in horizontal direction and either -90...90 or 0...90 in vertical, depending
- * on data values. Negative vertical angles are allowed only if there are negative bar values.
+ * to -180...180 in horizontal direction and -90...90 in vertical.
  * Distance is adjustable between 10 and 500.
  */
 void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distance)
@@ -224,7 +223,7 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
 /*!
  * \a theme Apply a predefined theme from \c ColorTheme.
  *
- * Sets a predefined theme. Theme affects bar colors, label colors, text color, background color,
+ * Sets a predefined theme. Theme affects object colors, label colors, text color, background color,
  * window color and grid color. Lighting is also adjusted by themes.
  */
 void Q3DScatter::setTheme(ColorTheme theme)
@@ -233,31 +232,32 @@ void Q3DScatter::setTheme(ColorTheme theme)
 }
 
 /*!
- * \a baseColor The base color of a bar. If all other colors are black, this sets the final color of
- * the bar.
+ * \a baseColor The base color of an object. If all other colors are black, this sets the final
+ * color of the object.
  *
- * \a heightColor This color is added to the bar based on its height. The higher the bar, the more
- * prominent this color becomes. Setting this black keeps the color unchanged regardless of height.
+ * \a heightColor This color is added to the object based on its y-position. The higher the object,
+ * the more prominent this color becomes. Setting this black keeps the color unchanged regardless
+ * of y-position.
  *
- * \a depthColor This color becomes more prominent the further away from the first row the bar is.
- * Setting this black keeps bars the same color regardless of "depth" in the set.
+ * \a depthColor This color becomes more prominent the further back in z-position the object is.
+ * Setting this black keeps objects the same color regardless of "depth" in the set.
  *
- * \a uniform A flag to define if color needs to be uniform throughout bar's length, or will the
+ * \a uniform A flag to define if color needs to be uniform throughout object's length, or will the
  * colors be applied by height. \c true by default.
  *
- * Set bar color using your own colors. This overrides colors from theme.
+ * Set object color using your own colors. This overrides colors from theme.
  */
-void Q3DScatter::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+void Q3DScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
 {
-    d_ptr->m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 /*!
  * \property Q3DScatter::selectionMode
  *
- * \a mode Set bar selection mode from \c SelectionMode. \c ModeBar by default.
+ * \a mode Set object selection mode from \c SelectionMode. \c ModeItem by default.
  *
- * Sets bar selection mode to be used.
+ * Sets object selection mode to be used.
  */
 void Q3DScatter::setSelectionMode(SelectionMode mode)
 {
@@ -290,7 +290,7 @@ QString Q3DScatter::windowTitle() const
  * \a objFileName File name of a mesh object. Object needs to be in Wavefront obj format
  * and include vertices, normals and UVs. It also needs to be in triangles.
  *
- * Override bar type with an object mesh. \sa setBarType()
+ * Override object type with an object mesh. \sa setObjectType()
  */
 void Q3DScatter::setMeshFileName(const QString &objFileName)
 {

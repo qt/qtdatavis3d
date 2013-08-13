@@ -98,7 +98,7 @@ Item {
             height: dataView.height
             gridVisible: true
             shadowQuality: Bars3D.ShadowNone
-            selectionMode: Bars3D.ModeBar
+            selectionMode: Bars3D.ModeItem
             labelTransparency: Bars3D.TransparencyNone
             rows: 5
             columns: 12

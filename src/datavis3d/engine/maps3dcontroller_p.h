@@ -86,7 +86,7 @@ public:
                      Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
-    void setBarType(BarStyle style, bool smooth = false);
+    void setBarType(MeshStyle style, bool smooth = false);
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);

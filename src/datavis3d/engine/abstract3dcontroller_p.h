@@ -112,8 +112,8 @@ public:
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    virtual void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                             bool uniform = true);
+    virtual void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                bool uniform = true);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)

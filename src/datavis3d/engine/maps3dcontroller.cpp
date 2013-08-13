@@ -81,7 +81,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_scaleFactor(1.0f),
       m_theme(new Theme()),
       m_isInitialized(false),
-      m_selectionMode(ModeBar),
+      m_selectionMode(ModeItem),
       m_selectedBar(0),
       m_previouslySelectedBar(0),
       m_axisLabelX(QStringLiteral("X")),
@@ -914,7 +914,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(rotLabelX, rotLabelY, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, true, true, LabelMid, alignment);
+                            m_labelObj, true, true, Drawer::LabelMid, alignment);
 
         delete label;
     }
@@ -952,7 +952,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(rotLabelX, rotLabelY, 0.0f), m_heightNormalizer,
                             m_selectionMode, m_labelShader,
-                            m_labelObj, true, true, LabelMid, alignment);
+                            m_labelObj, true, true, Drawer::LabelMid, alignment);
 
         delete label;
     }
@@ -1151,7 +1151,7 @@ void Maps3DController::setBarSpecs(const QVector3D &thickness,
     m_adjustDirection = direction;
 }
 
-void Maps3DController::setBarType(BarStyle style, bool smooth)
+void Maps3DController::setBarType(MeshStyle style, bool smooth)
 {
     if (style == Bars) {
         if (smooth)

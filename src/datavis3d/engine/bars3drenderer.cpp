@@ -423,32 +423,32 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, 0.0f), 0,
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, camera, false, false, LabelTop);
+                                m_labelObj, camera, false, false, Drawer::LabelTop);
         }
         m_drawer->drawLabel(*dummyItem, zLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, false, false, LabelBottom);
+                            m_labelObj, camera, false, false, Drawer::LabelBottom);
     } else {
         m_drawer->drawLabel(*dummyItem, xLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, false, false, LabelBottom);
+                            m_labelObj, camera, false, false, Drawer::LabelBottom);
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, 0.0f), 0,
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, camera, false, false, LabelTop);
+                                m_labelObj, camera, false, false, Drawer::LabelTop);
         }
     }
     m_drawer->drawLabel(*dummyItem, yLabel, viewMatrix, projectionMatrix,
                         QVector3D(0.0f, m_yAdjustment, zComp),
                         QVector3D(0.0f, 0.0f, 90.0f), 0,
                         m_cachedSelectionMode, m_labelShader,
-                        m_labelObj, camera, false, false, LabelLeft);
+                        m_labelObj, camera, false, false, Drawer::LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < m_sliceSelection->size(); col++) {
@@ -474,7 +474,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, -45.0f), item->height(),
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, camera, false, false, LabelBelow);
+                                m_labelObj, camera, false, false, Drawer::LabelBelow);
         }
     }
 
@@ -1376,7 +1376,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                 alignment);
         }
 
@@ -1418,7 +1418,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                 alignment);
         }
     }
@@ -1462,7 +1462,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                 alignment);
 
             // Side wall
@@ -1482,7 +1482,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                 alignment);
         }
         labelNbr++;
@@ -1782,13 +1782,13 @@ Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
     if (current == m_selection) {
         isSelectedType = Bars3dController::SelectionBar;
     }
-    else if (current.y() == m_selection.y() && (m_cachedSelectionMode == ModeBarAndColumn
-                                                || m_cachedSelectionMode == ModeBarRowAndColumn
+    else if (current.y() == m_selection.y() && (m_cachedSelectionMode == ModeItemAndColumn
+                                                || m_cachedSelectionMode == ModeItemRowAndColumn
                                                 || m_cachedSelectionMode == ModeZoomColumn)) {
         isSelectedType = Bars3dController::SelectionColumn;
     }
-    else if (current.x() == m_selection.x() && (m_cachedSelectionMode == ModeBarAndRow
-                                                || m_cachedSelectionMode == ModeBarRowAndColumn
+    else if (current.x() == m_selection.x() && (m_cachedSelectionMode == ModeItemAndRow
+                                                || m_cachedSelectionMode == ModeItemRowAndColumn
                                                 || m_cachedSelectionMode == ModeZoomRow)) {
         isSelectedType = Bars3dController::SelectionRow;
     }

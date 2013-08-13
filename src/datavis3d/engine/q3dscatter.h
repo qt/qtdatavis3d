@@ -50,42 +50,29 @@ public:
     explicit Q3DScatter();
     ~Q3DScatter();
 
-    // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
-    // y -component sets the thickness/spacing of z -direction
-    // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
-                     QSizeF spacing = QSizeF(1.0f, 1.0f),
-                     bool relative = true);
-
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(BarStyle style, bool smooth = false);
-
-    // how many samples per row and column, and names for axes
-    // TODO: This defines the data window, needs additional parameters startRow, startColumn
-    void setupSampleSpace(int samplesRow, int samplesColumn);
+    // object type; spheres, dots
+    void setObjectType(MeshStyle style, bool smooth = false);
 
     // Select preset camera placement
     void setCameraPreset(CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
-    // percentage (10...500))
+    // vertical (-90...90) angles and distance in percentage (10...500))
     void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
+    // Set theme (object colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
     void setTheme(ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                     bool uniform = true);
+    void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                        bool uniform = true);
 
-    // override bar type with own mesh
+    // override object type with own mesh
     void setMeshFileName(const QString &objFileName);
-    // TODO: light placement API
 
-    // Change selection mode; single bar, bar and row, bar and column, or all
+    // Change selection mode
     void setSelectionMode(SelectionMode mode);
     SelectionMode selectionMode() const;
 

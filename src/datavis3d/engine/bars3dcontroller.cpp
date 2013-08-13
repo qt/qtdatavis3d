@@ -40,7 +40,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_columnCount(0),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_selectionMode(ModeBar),
+      m_selectionMode(ModeItem),
       m_isSlicingActivated(false),
       m_isBarSpecRelative(true),
       m_barThickness(QSizeF(0.75f, 0.75f)),
@@ -353,7 +353,7 @@ QString Bars3dController::objFile()
     return m_objFile;
 }
 
-void Bars3dController::setBarType(BarStyle style, bool smooth)
+void Bars3dController::setBarType(MeshStyle style, bool smooth)
 {
     if (style == Bars) {
         if (smooth)

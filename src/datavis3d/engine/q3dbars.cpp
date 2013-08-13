@@ -207,7 +207,7 @@ void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
  *
  * \sa setMeshFileName()
  */
-void Q3DBars::setBarType(BarStyle style, bool smooth)
+void Q3DBars::setBarType(MeshStyle style, bool smooth)
 {
     d_ptr->m_shared->setBarType(style, smooth);
 }
@@ -287,13 +287,13 @@ void Q3DBars::setTheme(ColorTheme theme)
  */
 void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
 {
-    d_ptr->m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 /*!
  * \property Q3DBars::selectionMode
  *
- * \a mode Set bar selection mode from \c SelectionMode. \c ModeBar by default.
+ * \a mode Set bar selection mode from \c SelectionMode. \c ModeItem by default.
  *
  * Sets bar selection mode to be used.
  */

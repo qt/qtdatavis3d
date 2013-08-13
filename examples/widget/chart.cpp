@@ -84,7 +84,7 @@ void ChartModifier::restart(bool dynamicData)
         // Set up sample space
         m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
-        m_chart->setSelectionMode(ModeBarRowAndColumn);
+        m_chart->setSelectionMode(ModeItemRowAndColumn);
         m_chart->valueAxis()->setSegmentCount(m_segments * 2);
         m_chart->valueAxis()->setSubSegmentCount(0);
         m_chart->valueAxis()->setAutoAdjustRange(true);

@@ -50,6 +50,19 @@ class Drawer : public QObject, public QOpenGLFunctions
     Q_OBJECT
 
 public:
+    enum LabelPosition {
+        LabelBelow = 0,
+        LabelLow,
+        LabelMid,
+        LabelHigh,
+        LabelOver,
+        LabelBottom,    // Absolute positions from here onward, used for axes (QDataItem is ignored)
+        LabelTop,
+        LabelLeft,
+        LabelRight
+    };
+
+public:
     explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
     ~Drawer();
 

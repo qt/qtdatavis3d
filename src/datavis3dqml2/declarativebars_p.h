@@ -62,10 +62,10 @@ public:
     // Duplicated here to be able to use the same enums
     enum SelectionMode {
         ModeNone = 0,
-        ModeBar,
-        ModeBarAndRow,
-        ModeBarAndColumn,
-        ModeBarRowAndColumn,
+        ModeItem,
+        ModeItemAndRow,
+        ModeItemAndColumn,
+        ModeItemRowAndColumn,
         ModeZoomRow,
         ModeZoomColumn
     };
@@ -102,7 +102,7 @@ public:
                                  bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    Q_INVOKABLE void setBarType(BarStyle style, bool smooth = false);
+    Q_INVOKABLE void setBarType(MeshStyle style, bool smooth = false);
 
     // override bar type with own mesh
     Q_INVOKABLE void setMeshFileName(const QString &objFileName);

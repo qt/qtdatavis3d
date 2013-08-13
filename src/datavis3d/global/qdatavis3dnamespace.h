@@ -24,7 +24,7 @@
 namespace QtDataVis3D {
 
 // Enums used in several files
-enum BarStyle {
+enum MeshStyle {
     Bars = 0,
     Pyramids,
     Cones,
@@ -72,26 +72,12 @@ enum ColorTheme {
     ThemeLight
 };
 
-// TODO: Should this be moved to Q3DBarsPrivate? Not for use via API directly?
-enum LabelPosition {
-    LabelBelow = 0,
-    LabelLow,
-    LabelMid,
-    LabelHigh,
-    LabelOver,
-    LabelBottom,    // Absolute positions from here onward, used for axes (QDataItem is ignored)
-    LabelTop,
-    LabelLeft,
-    LabelRight
-};
-
-// TODO: Will these be used from other vis types than Q3DBars?
 enum SelectionMode {
     ModeNone = 0,
-    ModeBar,
-    ModeBarAndRow,
-    ModeBarAndColumn,
-    ModeBarRowAndColumn,
+    ModeItem,
+    ModeItemAndRow,         // From here onwards used for Q3DBars only
+    ModeItemAndColumn,
+    ModeItemRowAndColumn,
     ModeZoomRow,
     ModeZoomColumn
 };

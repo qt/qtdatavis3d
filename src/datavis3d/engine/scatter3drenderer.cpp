@@ -1151,7 +1151,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             QVector3D(0.0f, 0.0f, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, true, false, LabelMid);
+                            m_labelObj, camera, true, false, Drawer::LabelMid);
 #endif
         glDisable(GL_TEXTURE_2D);
         if (m_cachedLabelTransparency > TransparencyNone)
@@ -1231,7 +1231,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1291,7 +1291,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1339,7 +1339,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                     alignment);
 
                 // Side wall
@@ -1360,7 +1360,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, LabelMid,
+                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;

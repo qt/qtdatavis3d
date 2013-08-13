@@ -176,8 +176,8 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
-void Abstract3DController::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                   bool uniform)
+void Abstract3DController::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                          bool uniform)
 {
     m_theme.m_baseColor = baseColor;
     m_theme.m_heightColor = heightColor;
