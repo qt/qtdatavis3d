@@ -213,7 +213,7 @@ void Q3DMaps::setSelectionMode(SelectionMode mode)
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DMaps::selectionMode()
+SelectionMode Q3DMaps::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -223,7 +223,7 @@ void Q3DMaps::setWindowTitle(const QString &title)
     setTitle(title);
 }
 
-QString Q3DMaps::windowTitle()
+QString Q3DMaps::windowTitle() const
 {
     return title();
 }
@@ -233,7 +233,7 @@ void Q3DMaps::setFontSize(float fontsize)
     d_ptr->m_shared->setFontSize(fontsize);
 }
 
-float Q3DMaps::fontSize()
+float Q3DMaps::fontSize() const
 {
     return d_ptr->m_shared->fontSize();
 }
@@ -243,7 +243,7 @@ void Q3DMaps::setFont(const QFont &font)
     d_ptr->m_shared->setFont(font);
 }
 
-QFont Q3DMaps::font()
+QFont Q3DMaps::font() const
 {
     return d_ptr->m_shared->font();
 }
@@ -253,7 +253,7 @@ void Q3DMaps::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DMaps::labelTransparency()
+LabelTransparency Q3DMaps::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
@@ -263,7 +263,7 @@ ShadowQuality Q3DMaps::setShadowQuality(ShadowQuality quality)
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DMaps::shadowQuality()
+ShadowQuality Q3DMaps::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

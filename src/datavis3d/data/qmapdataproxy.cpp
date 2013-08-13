@@ -67,9 +67,9 @@ void QMapDataProxy::resetArray(QMapDataArray *newArray)
 
 
 // Mutexing data accessors should be done by user, if needed
-int QMapDataProxy::itemCount()
+int QMapDataProxy::itemCount() const
 {
-    return dptr()->m_dataArray.size();
+    return dptrc()->m_dataArray.size();
 }
 
 const QMapDataArray *QMapDataProxy::array() const

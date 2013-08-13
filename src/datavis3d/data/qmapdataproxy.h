@@ -67,7 +67,7 @@ public:
     // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
     // Item pointers are guaranteed to be valid only until next call that modifies data.
     // Array pointer is guaranteed to be valid for lifetime of proxy.
-    int itemCount();
+    int itemCount() const;
     const QMapDataArray *array() const;
     const QMapDataItem *itemAt(int index) const; // Index needs to exist or this crashes
 

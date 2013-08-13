@@ -104,7 +104,7 @@ void Q3DSurface::setSmoothSurface(bool enable)
     d_ptr->m_shared->setSmoothSurface(enable);
 }
 
-bool Q3DSurface::smoothSurface()
+bool Q3DSurface::smoothSurface() const
 {
     return d_ptr->m_shared->smoothSurface();
 }
@@ -114,7 +114,7 @@ void Q3DSurface::setSurfaceGrid(bool enable)
     d_ptr->m_shared->setSurfaceGrid(enable);
 }
 
-bool Q3DSurface::surfaceGrid()
+bool Q3DSurface::surfaceGrid() const
 {
     return d_ptr->m_shared->surfaceGrid();
 }
@@ -159,7 +159,7 @@ void Q3DSurface::appendSeries(QList<qreal> series, int width, int depth )
     d_ptr->m_shared->setData(series, width, depth);
 }
 
-void Q3DSurface::showData()
+void Q3DSurface::showData() const
 {
     for (int i = 0; i < d_ptr->numOfSeries(); i++) {
         QList<qreal> s = d_ptr->seriesAt(i);

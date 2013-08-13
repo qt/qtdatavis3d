@@ -66,9 +66,9 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
 }
 
 // Mutexing data accessors should be done by user, if needed
-int QScatterDataProxy::itemCount()
+int QScatterDataProxy::itemCount() const
 {
-    return dptr()->m_dataArray.size();
+    return dptrc()->m_dataArray.size();
 }
 
 const QScatterDataArray *QScatterDataProxy::array() const

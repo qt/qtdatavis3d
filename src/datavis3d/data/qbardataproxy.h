@@ -71,7 +71,7 @@ public:
     // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
     // Row and item pointers are guaranteed to be valid only until next call that modifies data.
     // Array pointer is guaranteed to be valid for lifetime of proxy.
-    int rowCount();
+    int rowCount() const;
     const QBarDataArray *array() const;
     const QBarDataRow *rowAt(int rowIndex) const;
     const QBarDataItem *itemAt(int rowIndex, int columnIndex) const; // Row and column in said row need to exist or this crashes

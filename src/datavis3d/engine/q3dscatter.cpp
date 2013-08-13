@@ -287,7 +287,7 @@ void Q3DScatter::setSelectionMode(SelectionMode mode)
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DScatter::selectionMode()
+SelectionMode Q3DScatter::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -304,7 +304,7 @@ void Q3DScatter::setWindowTitle(const QString &title)
     setTitle(title);
 }
 
-QString Q3DScatter::windowTitle()
+QString Q3DScatter::windowTitle() const
 {
     return title();
 }
@@ -332,7 +332,7 @@ void Q3DScatter::setFontSize(float fontsize)
     d_ptr->m_shared->setFontSize(fontsize);
 }
 
-float Q3DScatter::fontSize()
+float Q3DScatter::fontSize() const
 {
     return d_ptr->m_shared->fontSize();
 }
@@ -349,7 +349,7 @@ void Q3DScatter::setFont(const QFont &font)
     d_ptr->m_shared->setFont(font);
 }
 
-QFont Q3DScatter::font()
+QFont Q3DScatter::font() const
 {
     return d_ptr->m_shared->font();
 }
@@ -367,7 +367,7 @@ void Q3DScatter::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DScatter::labelTransparency()
+LabelTransparency Q3DScatter::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
@@ -384,7 +384,7 @@ void Q3DScatter::setGridVisible(bool visible)
     d_ptr->m_shared->setGridEnabled(visible);
 }
 
-bool Q3DScatter::isGridVisible()
+bool Q3DScatter::isGridVisible() const
 {
     return d_ptr->m_shared->gridEnabled();
 }
@@ -401,7 +401,7 @@ void Q3DScatter::setBackgroundVisible(bool visible)
     d_ptr->m_shared->setBackgroundEnabled(visible);
 }
 
-bool Q3DScatter::isBackgroundVisible()
+bool Q3DScatter::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
 }
@@ -419,7 +419,7 @@ void Q3DScatter::setShadowQuality(ShadowQuality quality)
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DScatter::shadowQuality()
+ShadowQuality Q3DScatter::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

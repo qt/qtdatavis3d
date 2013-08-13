@@ -117,27 +117,27 @@ public:
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    SelectionMode selectionMode() const;
 
     // Set window title
     void setWindowTitle(const QString &title);
-    QString windowTitle();
+    QString windowTitle() const;
 
     // Font size adjustment
     void setFontSize(float fontsize);
-    float fontSize();
+    float fontSize() const;
 
     // Set font
     void setFont(const QFont &font);
-    QFont font();
+    QFont font() const;
 
     // Label transparency adjustment
     void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+    LabelTransparency labelTransparency() const;
 
     // Adjust shadow quality
     ShadowQuality setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+    ShadowQuality shadowQuality() const;
 
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QMapDataProxy *proxy);

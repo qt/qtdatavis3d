@@ -121,7 +121,7 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount)
 }
 
 // Mutexing data accessors should be done by user, if needed
-int QBarDataProxy::rowCount()
+int QBarDataProxy::rowCount() const
 {
     return dptrc()->m_dataArray.size();
 }

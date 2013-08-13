@@ -110,40 +110,39 @@ public:
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    SelectionMode selectionMode() const;
 
     // Set window title
     void setWindowTitle(const QString &title);
-    QString windowTitle();
+    QString windowTitle() const;
 
     // Font size adjustment
     void setFontSize(float fontsize);
-    float fontSize();
+    float fontSize() const;
 
     // Set font
     void setFont(const QFont &font);
-    QFont font();
+    QFont font() const;
 
     // Label transparency adjustment
     void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+    LabelTransparency labelTransparency() const;
 
     // Enable or disable background grid
     void setGridVisible(bool visible);
-    bool isGridVisible();
+    bool isGridVisible() const;
 
-    // TODO: Do these need to be public? Where are they called from?
     // Size
     void setWidth(const int width);
     void setHeight(const int height);
 
     // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible();
+    bool isBackgroundVisible() const;
 
     // Adjust shadow quality
     void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+    ShadowQuality shadowQuality() const;
 
     // Axes
     void setValueAxisX(QValueAxis *axis);

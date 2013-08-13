@@ -250,7 +250,7 @@ void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn)
     d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
 }
 
-QSize Q3DBars::sampleSpace()
+QSize Q3DBars::sampleSpace() const
 {
     return QSize(d_ptr->m_shared->rowCount(), d_ptr->m_shared->columnCount());
 }
@@ -325,7 +325,7 @@ void Q3DBars::setSelectionMode(SelectionMode mode)
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DBars::selectionMode()
+SelectionMode Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -342,7 +342,7 @@ void Q3DBars::setWindowTitle(const QString &title)
     setTitle(title);
 }
 
-QString Q3DBars::windowTitle()
+QString Q3DBars::windowTitle() const
 {
     return title();
 }
@@ -387,7 +387,7 @@ void Q3DBars::setFont(const QFont &font)
     d_ptr->m_shared->setFont(font);
 }
 
-QFont Q3DBars::font()
+QFont Q3DBars::font() const
 {
     return d_ptr->m_shared->font();
 }
@@ -405,7 +405,7 @@ void Q3DBars::setLabelTransparency(LabelTransparency transparency)
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DBars::labelTransparency()
+LabelTransparency Q3DBars::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
@@ -422,7 +422,7 @@ void Q3DBars::setGridVisible(bool visible)
     d_ptr->m_shared->setGridEnabled(visible);
 }
 
-bool Q3DBars::isGridVisible()
+bool Q3DBars::isGridVisible() const
 {
     return d_ptr->m_shared->gridEnabled();
 }
@@ -439,7 +439,7 @@ void Q3DBars::setBackgroundVisible(bool visible)
     d_ptr->m_shared->setBackgroundEnabled(visible);
 }
 
-bool Q3DBars::isBackgroundVisible()
+bool Q3DBars::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
 }
@@ -457,7 +457,7 @@ void Q3DBars::setShadowQuality(ShadowQuality quality)
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DBars::shadowQuality()
+ShadowQuality Q3DBars::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

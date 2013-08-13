@@ -61,11 +61,11 @@ public:
 
     // Enable or disable the smoothes of the surface
     void setSmoothSurface(bool enable);
-    bool smoothSurface();
+    bool smoothSurface() const;
 
     // Enable or disable the grid on the surface
     void setSurfaceGrid(bool enable);
-    bool surfaceGrid();
+    bool surfaceGrid() const;
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
@@ -76,7 +76,7 @@ public:
 
 //TODO part
     void appendSeries(QList<qreal> series, int width, int depth);
-    void showData();
+    void showData() const;
 //END TODO
 
     // TODO: Do these need to be public? Where are they called from?
