@@ -41,7 +41,6 @@
 
 #include "declarativebars_p.h"
 #include "declarativebarsrenderer_p.h"
-#include "bars3dcontroller_p.h"
 #include "qitemmodelbardataproxy.h"
 #include "qvalueaxis.h"
 
@@ -123,9 +122,9 @@ void DeclarativeBars::setBarType(BarStyle style, bool smooth)
     m_shared->setBarType(style, smooth);
 }
 
-void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn)
+void DeclarativeBars::setupSampleSpace(int rowCount, int columnCount)
 {
-    m_shared->setupSampleSpace(samplesRow, samplesColumn);
+    m_shared->setupSampleSpace(rowCount, columnCount);
 }
 
 void DeclarativeBars::setCameraPreset(CameraPreset preset)

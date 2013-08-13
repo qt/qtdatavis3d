@@ -39,26 +39,47 @@
 **
 ****************************************************************************/
 
-#include "datavis3dqml2_plugin.h"
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include <qqml.h>
+#ifndef DECLARATIVEMAPSRENDERER_P_H
+#define DECLARATIVEMAPSRENDERER_P_H
+
+#include "datavis3dglobal_p.h"
+#include "maps3dcontroller_p.h"
+#include <qsgsimpletexturenode.h>
+
+class QOpenGLFramebufferObject;
+class QSGTexture;
+class QQuickWindow;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-void Datavis3dqml2Plugin::registerTypes(const char *uri)
+class DeclarativeMapsRenderer : public QObject, public QSGSimpleTextureNode
 {
-    // @uri com.digia.QtDataVis3D
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
-                                                   QLatin1String("Trying to create uncreatable: AbstractItemModel."));
+    Q_OBJECT
 
-    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelMapDataMapping>(uri, 1, 0, "MapDataMapping");
-    qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
+public:
+    DeclarativeMapsRenderer(QQuickWindow *window, Maps3DController *shared);
+    ~DeclarativeMapsRenderer();
 
-    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");
-    qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
-}
+public slots:
+    void render();
+
+private:
+    QOpenGLFramebufferObject *m_fbo;
+    QSGTexture *m_texture;
+    QQuickWindow *m_window;
+    Maps3DController *m_mapsRenderer;
+};
 
 QT_DATAVIS3D_END_NAMESPACE
 
+#endif

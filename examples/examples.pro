@@ -4,7 +4,7 @@ SUBDIRS += barchart \
            widget \
            mapdata \
            qmlbarchart \
-           qmlmaps \
+           #qmlmaps \
            qmlscatter \
            surfacechart \
            scatterchart

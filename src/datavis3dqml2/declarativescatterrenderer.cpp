@@ -40,7 +40,6 @@
 ****************************************************************************/
 
 #include "declarativescatterrenderer_p.h"
-#include "scatter3dcontroller_p.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>

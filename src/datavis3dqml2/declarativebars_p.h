@@ -130,8 +130,8 @@ public:
     // override bar type with own mesh
     Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
-    // how many samples per row and column, and names for axes
-    Q_INVOKABLE void setupSampleSpace(int samplesRow, int samplesColumn);
+    // how many samples per row and column
+    Q_INVOKABLE void setupSampleSpace(int rowCount, int columnCount);
 
     // Select preset camera placement
     Q_INVOKABLE void setCameraPreset(CameraPreset preset);

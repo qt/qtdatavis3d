@@ -20,18 +20,19 @@ SOURCES += \
     datavis3dqml2_plugin.cpp \
     declarativebars.cpp \
     declarativebarsrenderer.cpp \
-    declarativemaps.cpp \
     declarativescatter.cpp \
-    declarativescatterrenderer.cpp
+    declarativescatterrenderer.cpp \
+    declarativemaps.cpp \
+    declarativemapsrenderer.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
     declarativebars_p.h \
     declarativebarsrenderer_p.h \
-    declarativemaps.h \
-    declarativemaps_p.h \
     declarativescatter_p.h \
-    declarativescatterrenderer_p.h
+    declarativescatterrenderer_p.h \
+    declarativemaps_p.h \
+    declarativemapsrenderer_p.h
 
 OTHER_FILES = qmldir
 

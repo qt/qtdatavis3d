@@ -40,7 +40,6 @@
 ****************************************************************************/
 
 #include "declarativebarsrenderer_p.h"
-#include "bars3dcontroller_p.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>

@@ -39,26 +39,64 @@
 **
 ****************************************************************************/
 
-#include "datavis3dqml2_plugin.h"
+#include "declarativemapsrenderer_p.h"
 
-#include <qqml.h>
+#include <QtQuick/QQuickWindow>
+#include <QtGui/QOpenGLFramebufferObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-void Datavis3dqml2Plugin::registerTypes(const char *uri)
+DeclarativeMapsRenderer::DeclarativeMapsRenderer(QQuickWindow *window, Maps3DController *renderer)
+    : m_fbo(0),
+      m_texture(0),
+      m_window(window),
+      m_mapsRenderer(renderer)
 {
-    // @uri com.digia.QtDataVis3D
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
-                                                   QLatin1String("Trying to create uncreatable: AbstractItemModel."));
+    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
+}
 
-    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelMapDataMapping>(uri, 1, 0, "MapDataMapping");
-    qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
+DeclarativeMapsRenderer::~DeclarativeMapsRenderer()
+{
+    delete m_texture;
+    delete m_fbo;
+}
 
-    qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");
-    qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
+void DeclarativeMapsRenderer::render()
+{
+    QSize size = rect().size().toSize();
+
+    // Create FBO
+    if (!m_fbo) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::Depth);
+        m_fbo = new QOpenGLFramebufferObject(size, format);
+        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+
+        setTexture(m_texture);
+
+        // Flip texture
+        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
+        QSize ts = m_texture->textureSize();
+        QRectF sourceRect(0, 0, ts.width(), ts.height());
+        float tmp = sourceRect.top();
+        sourceRect.setTop(sourceRect.bottom());
+        sourceRect.setBottom(tmp);
+        QSGGeometry *geometry = this->geometry();
+        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
+                                                m_texture->convertToNormalizedSourceRect(sourceRect));
+        markDirty(DirtyMaterial);
+        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
+    }
+
+    // Call the shared rendering function
+    m_fbo->bind();
+
+    m_mapsRenderer->render(m_fbo->handle());
+
+    m_fbo->release();
+
+    // New view is in the FBO, request repaint of scene graph
+    m_window->update();
 }
 
 QT_DATAVIS3D_END_NAMESPACE
-

@@ -41,7 +41,6 @@
 
 #include "declarativescatter_p.h"
 #include "declarativescatterrenderer_p.h"
-#include "scatter3dcontroller_p.h"
 #include "qitemmodelscatterdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
