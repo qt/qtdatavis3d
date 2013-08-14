@@ -32,7 +32,6 @@ BarRenderItem::~BarRenderItem()
 {
 }
 
-// This should be accessed only under data mutex
 void BarRenderItem::formatLabel()
 {
     // Format the string on first access
@@ -41,7 +40,7 @@ void BarRenderItem::formatLabel()
     // TODO actually format instead of just prepending the value
     m_label.clear(); // Just in case
     m_label.append(numStr);
-    m_label.append(m_renderer->m_dataProxy->itemLabelFormat());
+    m_label.append(m_renderer->m_dataProxy->itemLabelFormat()); // TODO format needs to be cached
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -32,7 +32,6 @@
 #include <QThread>
 #include <qmath.h>
 #include <QDebug>
-#include <QMutexLocker>
 
 // Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
 // orthographic projection.
@@ -151,7 +150,6 @@ void Bars3dRenderer::initializePreOpenGL()
     QObject::connect(m_controller, &Bars3dController::zoomLevelChanged, this,
                      &Bars3dRenderer::updateZoomLevel);
 
-    // TODO Should all this initial setup be mutexed?
     updateSampleSpace(m_controller->rowCount(), m_controller->columnCount());
     updateSelectionMode(m_controller->selectionMode());
     updateSlicingActive(m_controller->isSlicingActive());

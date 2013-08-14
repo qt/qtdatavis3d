@@ -29,7 +29,6 @@
 #include <QThread>
 #include <qmath.h>
 #include <QDebug>
-#include <QMutexLocker>
 
 // Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
 // orthographic projection.
@@ -135,7 +134,6 @@ void Scatter3DRenderer::initializePreOpenGL()
     QObject::connect(m_controller, &Scatter3DController::zoomLevelChanged, this,
                      &Scatter3DRenderer::updateZoomLevel);
 
-    // TODO Should all this initial setup be mutexed?
     updateSelectionMode(m_controller->selectionMode());
     updateZoomLevel(m_controller->zoomLevel());
     updateMeshFileName(m_controller->objFile());

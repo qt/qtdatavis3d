@@ -30,6 +30,7 @@ class QT_DATAVIS3D_EXPORT QScatterDataItem
 {
 public:
     QScatterDataItem();
+    QScatterDataItem(const QVector3D &position);
     QScatterDataItem(const QScatterDataItem &other);
     ~QScatterDataItem();
 

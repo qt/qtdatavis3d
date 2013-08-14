@@ -42,36 +42,26 @@ public:
     // BarDataProxy is optimized for adding, inserting, and removing rows of data.
     // Adding a column essentially means modifying every row, which is comparatively very inefficient.
     // Proxy is also optimized to use cases where the only defining characteristic of an individual
-    // bar is its value. Modifying other data such as color or label format of individual bar
-    // requires allocating additional data object for the bar.
+    // bar is its value. Modifying other data that might be added in the future such as color of
+    // individual bar requires allocating additional data object for the bar.
 
-    // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
     // Row and item pointers are guaranteed to be valid only until next call that modifies data.
     // Array pointer is guaranteed to be valid for lifetime of proxy.
     int rowCount() const;
     const QBarDataArray *array() const;
     const QBarDataRow *rowAt(int rowIndex) const;
-    const QBarDataItem *itemAt(int rowIndex, int columnIndex) const; // Row and column in said row need to exist or this crashes
+    const QBarDataItem *itemAt(int rowIndex, int columnIndex) const;
 
-    // The data array is a list of list (rows) of QBarDataItem instances.
+    // The data array is a list of vectors (rows) of QBarDataItem instances.
     // Each row can contain different amount of items or even be null.
-
-    // All array/item manipulation functions are internally protected by data mutex.
-
-    // TODO: Should we remove internal mutexing and require user to mutex also on data manipulations?
-    // TODO: Upside would be enabling user to mix data setters and getters within same mutex scope.
-    // TODO: Downside would be signal emissions from inside the mutex scope, which has potential for deadlock.
-
-    // TODO Should data manipulation/access methods be protected rather than public to enforce subclassing use of proxy?
-    // TODO Leaving them public gives user more options.
 
     // QBarDataProxy takes ownership of all QBarDataRows passed to it, whether directly or
     // in a QBarDataArray container.
     // QBarDataRow pointers should not be used to modify data further after they have been passed to
     // the proxy, as such modifications will not trigger proper signals.
 
-    // Clears the existing array and sets it data to new array.
-    // Takes ownership of the array. Passing null array clears all data.
+    // Clears the existing array and takes ownership of the new array.
+    // Passing null array clears all data.
     void resetArray(QBarDataArray *newArray);
 
     // Change existing rows
@@ -114,7 +104,7 @@ signals:
     // TODO void columnsAdded(int startIndex, int count);
     // TODO void columnsRemoved(int startIndex, int count);
     // TODO void columnsInserted(int startIndex, int count);
-    void itemChanged(int rowIndex, int columnIndex);
+    void itemChanged(int rowIndex, int columnIndex); // TODO remove once itemsChanged is added?
     // TODO void itemsChanged(int rowIndex, int columnIndex, int rowCount, int columnCount);
 
 protected:

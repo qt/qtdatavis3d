@@ -18,7 +18,6 @@
 
 #include "qmapdataproxy.h"
 #include "qmapdataproxy_p.h"
-#include <QMutexLocker>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -43,7 +42,6 @@ void QMapDataProxy::resetArray(QMapDataArray *newArray)
 }
 
 
-// Mutexing data accessors should be done by user, if needed
 int QMapDataProxy::itemCount() const
 {
     return dptrc()->m_dataArray.size();
@@ -83,8 +81,6 @@ QMapDataProxyPrivate::~QMapDataProxyPrivate()
 
 bool QMapDataProxyPrivate::resetArray(QMapDataArray *newArray)
 {
-    QMutexLocker locker(&m_mutex);
-
     if (!m_dataArray.size() && (!newArray || !newArray->size()))
         return false;
 
@@ -98,11 +94,8 @@ bool QMapDataProxyPrivate::resetArray(QMapDataArray *newArray)
     return true;
 }
 
-// Protected & private functions. Do not mutex as these are used from mutexed functions.
-
 QPair<GLfloat, GLfloat> QMapDataProxyPrivate::limitValues()
 {
-    QMutexLocker locker(&m_mutex);
     QPair<GLfloat, GLfloat> limits = qMakePair(0.0f, 0.0f);
     for (int i = 0; i < m_dataArray.size(); i++) {
         const QMapDataItem &item = m_dataArray.at(i);

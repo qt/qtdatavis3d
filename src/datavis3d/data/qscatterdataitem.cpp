@@ -37,6 +37,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QScatterDataItem.
  */
 QScatterDataItem::QScatterDataItem()
+    : d_ptr(0) // private data doesn't exist by default (optimization)
+
+{
+}
+
+QScatterDataItem::QScatterDataItem(const QVector3D &position)
+    : d_ptr(0),
+      m_position(position)
 {
 }
 
@@ -56,6 +64,12 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
     //m_size = other.m_size;
+
+    if (other.d_ptr)
+        createExtraData();
+    else
+        d_ptr = 0;
+    // TODO set extra data
 
     return *this;
 }

@@ -60,10 +60,40 @@ int main(int argc, char **argv)
     labelButton->setText(QStringLiteral("Change label style"));
 
     QPushButton *styleButton = new QPushButton(widget);
-    styleButton->setText(QStringLiteral("Change bar style"));
+    styleButton->setText(QStringLiteral("Change item style"));
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
+
+    QPushButton *clearButton = new QPushButton(widget);
+    clearButton->setText(QStringLiteral("Clear chart"));
+
+    QPushButton *addOneButton = new QPushButton(widget);
+    addOneButton->setText(QStringLiteral("Add item"));
+
+    QPushButton *addBunchButton = new QPushButton(widget);
+    addBunchButton->setText(QStringLiteral("Add bunch of items"));
+
+    QPushButton *insertOneButton = new QPushButton(widget);
+    insertOneButton->setText(QStringLiteral("Insert item"));
+
+    QPushButton *insertBunchButton = new QPushButton(widget);
+    insertBunchButton->setText(QStringLiteral("Insert bunch of items"));
+
+    QPushButton *changeOneButton = new QPushButton(widget);
+    changeOneButton->setText(QStringLiteral("Change item"));
+
+    QPushButton *changeBunchButton = new QPushButton(widget);
+    changeBunchButton->setText(QStringLiteral("Change bunch of items"));
+
+    QPushButton *removeOneButton = new QPushButton(widget);
+    removeOneButton->setText(QStringLiteral("Remove item"));
+
+    QPushButton *removeBunchButton = new QPushButton(widget);
+    removeBunchButton->setText(QStringLiteral("Remove bunch of items"));
+
+    QPushButton *startTimerButton = new QPushButton(widget);
+    startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -92,6 +122,16 @@ int main(int argc, char **argv)
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(clearButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addOneButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addBunchButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertOneButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertBunchButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeOneButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeBunchButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
+    vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -112,6 +152,26 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
+    QObject::connect(clearButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::clear);
+    QObject::connect(addOneButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::addOne);
+    QObject::connect(addBunchButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::addBunch);
+    QObject::connect(insertOneButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::insertOne);
+    QObject::connect(insertBunchButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::insertBunch);
+    QObject::connect(changeOneButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::changeOne);
+    QObject::connect(changeBunchButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::changeBunch);
+    QObject::connect(removeOneButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::removeOne);
+    QObject::connect(removeBunchButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::removeBunch);
+    QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::startStopTimer);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,

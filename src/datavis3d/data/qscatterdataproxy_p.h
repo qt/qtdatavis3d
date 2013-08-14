@@ -43,11 +43,18 @@ public:
     virtual ~QScatterDataProxyPrivate();
 
     bool resetArray(QScatterDataArray *newArray);
+    void setItem(int index, const QScatterDataItem &item);
+    void setItems(int index, const QScatterDataArray &items);
+    int addItem(const QScatterDataItem &item);
+    int addItems(const QScatterDataArray &items);
+    void insertItem(int index, const QScatterDataItem &item);
+    void insertItems(int index, const QScatterDataArray &items);
+    void removeItems(int index, int removeCount);
 
     QVector3D limitValues();
 
 private:
-    QScatterDataArray m_dataArray;
+    QScatterDataArray *m_dataArray;
     QString m_itemLabelFormat;
 
     friend class QScatterDataProxy;

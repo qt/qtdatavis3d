@@ -68,7 +68,7 @@ private:
     Bars3dController *m_controller;
 
     // Mutex for sharing resources between render and main threads.
-    // Note: Data access mutex is separate and owned by data proxy.
+    // TODO this mutex needs to go, too...
     QMutex m_mutex;
 
     // Cached state based on emitted signals from the controller

@@ -76,10 +76,6 @@ void Scatter3DController::render(const GLuint defaultFboHandle)
         return;
 
     // TODO do not give the entire data array, just the data window
-    // TODO Would it be enough to just mutex cache update in renderer?
-    // TODO --> Only if there is no need to store m_dataProxy for later, e.g. for string formatting
-    // TODO Also, m_valuesDirty flag setting needs to be under same mutex
-    QMutexLocker(m_data->mutex());
     m_renderer->render(m_data, m_valuesDirty, m_cameraHelper, defaultFboHandle);
 
     m_valuesDirty = false;

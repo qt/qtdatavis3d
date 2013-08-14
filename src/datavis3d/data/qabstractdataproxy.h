@@ -22,7 +22,6 @@
 #include <QtDataVis3D/qdatavis3dnamespace.h>
 #include <QObject>
 #include <QScopedPointer>
-#include <QMutex>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -54,8 +53,6 @@ public:
     // item labels with something else.
     void setItemLabelFormat(const QString &format);
     QString itemLabelFormat() const;
-
-    QMutex *mutex();
 
 signals:
     void itemLabelFormatChanged();

@@ -47,12 +47,6 @@ QString QAbstractDataProxy::itemLabelFormat() const
     return d_ptr->m_itemLabelFormat;
 }
 
-QMutex *QAbstractDataProxy::mutex()
-{
-    return &d_ptr->m_mutex;
-}
-
-
 // QAbstractDataProxyPrivate
 
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
@@ -68,7 +62,6 @@ QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
 
 void QAbstractDataProxyPrivate::setItemLabelFormat(const QString &format)
 {
-    QMutexLocker locker(&m_mutex);
     m_itemLabelFormat = format;
 }
 

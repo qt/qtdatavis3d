@@ -18,7 +18,6 @@
 
 #include "qscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
-#include <QMutexLocker>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -42,20 +41,63 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
         emit arrayReset();
 }
 
-// Mutexing data accessors should be done by user, if needed
+void QScatterDataProxy::setItem(int index, const QScatterDataItem &item)
+{
+    dptr()->setItem(index, item);
+    emit itemsChanged(index, 1);
+}
+
+void QScatterDataProxy::setItems(int index, const QScatterDataArray &items)
+{
+    dptr()->setItems(index, items);
+    emit itemsChanged(index, items.size());
+}
+
+int QScatterDataProxy::addItem(const QScatterDataItem &item)
+{
+    int addIndex = dptr()->addItem(item);
+    emit itemsAdded(addIndex, 1);
+    return addIndex;
+}
+
+int QScatterDataProxy::addItems(const QScatterDataArray &items)
+{
+    int addIndex = dptr()->addItems(items);
+    emit itemsAdded(addIndex, items.size());
+    return addIndex;
+}
+
+void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
+{
+    dptr()->insertItem(index, item);
+    emit itemsInserted(index, 1);
+}
+
+void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
+{
+    dptr()->insertItems(index, items);
+    emit itemsInserted(index, items.size());
+}
+
+void QScatterDataProxy::removeItems(int index, int removeCount)
+{
+    dptr()->removeItems(index, removeCount);
+    emit itemsRemoved(index, removeCount);
+}
+
 int QScatterDataProxy::itemCount() const
 {
-    return dptrc()->m_dataArray.size();
+    return dptrc()->m_dataArray->size();
 }
 
 const QScatterDataArray *QScatterDataProxy::array() const
 {
-    return &dptrc()->m_dataArray;
+    return dptrc()->m_dataArray;
 }
 
 const QScatterDataItem *QScatterDataProxy::itemAt(int index) const
 {
-    return &dptrc()->m_dataArray.at(index);
+    return &dptrc()->m_dataArray->at(index);
 }
 
 QScatterDataProxyPrivate *QScatterDataProxy::dptr()
@@ -68,43 +110,89 @@ const QScatterDataProxyPrivate *QScatterDataProxy::dptrc() const
     return static_cast<const QScatterDataProxyPrivate *>(d_ptr.data());
 }
 
-// QBarDataProxyPrivate
+// QScatterDataProxyPrivate
 
 QScatterDataProxyPrivate::QScatterDataProxyPrivate(QScatterDataProxy *q)
-    : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeMap)
+    : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeScatter),
+      m_dataArray(new QScatterDataArray)
 {
 }
 
 QScatterDataProxyPrivate::~QScatterDataProxyPrivate()
 {
-    m_dataArray.clear();
+    m_dataArray->clear();
+    delete m_dataArray;
 }
 
 bool QScatterDataProxyPrivate::resetArray(QScatterDataArray *newArray)
 {
-    QMutexLocker locker(&m_mutex);
-
-    if (!m_dataArray.size() && (!newArray || !newArray->size()))
+    if (!m_dataArray->size() && (!newArray || !newArray->size()))
         return false;
 
-    m_dataArray.clear();
+    m_dataArray->clear();
+    delete m_dataArray;
 
-    if (newArray) {
-        m_dataArray = *newArray;
-        delete newArray;
-    }
+    if (newArray)
+        m_dataArray = newArray;
+    else
+        m_dataArray = new QScatterDataArray;
 
     return true;
 }
 
-// Protected & private functions. Do not mutex as these are used from mutexed functions.
+void QScatterDataProxyPrivate::setItem(int index, const QScatterDataItem &item)
+{
+    Q_ASSERT(index >= 0 && index < m_dataArray->size());
+    (*m_dataArray)[index] = item;
+}
+
+void QScatterDataProxyPrivate::setItems(int index, const QScatterDataArray &items)
+{
+    Q_ASSERT(index >= 0 && (index + items.size()) <= m_dataArray->size());
+    for (int i = 0; i < items.size(); i++)
+        (*m_dataArray)[index++] = items[i];
+}
+
+int QScatterDataProxyPrivate::addItem(const QScatterDataItem &item)
+{
+    int currentSize = m_dataArray->size();
+    m_dataArray->append(item);
+    return currentSize;
+}
+
+int QScatterDataProxyPrivate::addItems(const QScatterDataArray &items)
+{
+    int currentSize = m_dataArray->size();
+    (*m_dataArray) += items;
+    return currentSize;
+}
+
+void QScatterDataProxyPrivate::insertItem(int index, const QScatterDataItem &item)
+{
+    Q_ASSERT(index >= 0 && index <= m_dataArray->size());
+    m_dataArray->insert(index, item);
+}
+
+void QScatterDataProxyPrivate::insertItems(int index, const QScatterDataArray &items)
+{
+    Q_ASSERT(index >= 0 && index <= m_dataArray->size());
+    for (int i = 0; i < items.size(); i++)
+        m_dataArray->insert(index++, items.at(i));
+}
+
+void QScatterDataProxyPrivate::removeItems(int index, int removeCount)
+{
+    Q_ASSERT(index >= 0);
+    int maxRemoveCount = m_dataArray->size() - index;
+    removeCount = qMin(removeCount, maxRemoveCount);
+    m_dataArray->remove(index, removeCount);
+}
 
 QVector3D QScatterDataProxyPrivate::limitValues()
 {
-    QMutexLocker locker(&m_mutex);
     QVector3D limits;
-    for (int i = 0; i < m_dataArray.size(); i++) {
-        const QScatterDataItem &item = m_dataArray.at(i);
+    for (int i = 0; i < m_dataArray->size(); i++) {
+        const QScatterDataItem &item = m_dataArray->at(i);
         float xValue = qAbs(item.position().x());
         if (limits.x() < xValue)
             limits.setX(xValue);

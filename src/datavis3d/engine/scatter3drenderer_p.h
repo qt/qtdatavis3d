@@ -70,6 +70,7 @@ private:
     Scatter3DController *m_controller;
 
     // Mutex for sharing resources between render and main threads.
+    // TODO: this mutex needs to go, too
     QMutex m_mutex;
 
     // Cached state based on emitted signals from the controller

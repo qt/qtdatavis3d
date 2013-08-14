@@ -41,18 +41,11 @@ public:
     // map item are it's value and position. Modifying other data such as color or mesh of individual bar
     // requires allocating additional data object for the bar.
 
-    // If data is accessed from same thread that sets it, access doesn't need to be protected with mutex.
     // Item pointers are guaranteed to be valid only until next call that modifies data.
     // Array pointer is guaranteed to be valid for lifetime of proxy.
     int itemCount() const;
     const QMapDataArray *array() const;
     const QMapDataItem *itemAt(int index) const; // Index needs to exist or this crashes
-
-    // All array/item manipulation functions are internally protected by data mutex.
-
-    // TODO: Should we remove internal mutexing and require user to mutex also on data manipulations?
-    // TODO: Upside would be enabling user to mix data setters and getters within same mutex scope.
-    // TODO: Downside would be signal emissions from inside the mutex scope, which has potential for deadlock.
 
     // TODO Should data manipulation/access methods be protected rather than public to enforce subclassing use of proxy?
     // TODO Leaving them public gives user more options.

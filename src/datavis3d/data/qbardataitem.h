@@ -29,6 +29,7 @@ class QT_DATAVIS3D_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();
+    QBarDataItem(qreal value);
     QBarDataItem(const QBarDataItem &other);
     ~QBarDataItem();
 

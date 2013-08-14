@@ -36,7 +36,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QBarDataItem.
  */
 QBarDataItem::QBarDataItem()
-    : d_ptr(0) // private data doesn't exist by default (optimization)
+    : d_ptr(0), // private data doesn't exist by default (optimization)
+      m_value(0.0)
+{
+}
+
+QBarDataItem::QBarDataItem(qreal value)
+    : d_ptr(0),
+      m_value(value)
 {
 }
 

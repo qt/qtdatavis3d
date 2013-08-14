@@ -23,6 +23,7 @@
 
 #include <QFont>
 #include <QDebug>
+#include <QTimer>
 
 using namespace QtDataVis3D;
 
@@ -47,13 +48,27 @@ public:
 public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(ShadowQuality shadowQuality);
+    void clear();
+    void addOne();
+    void addBunch();
+    void insertOne();
+    void insertBunch();
+    void changeOne();
+    void changeBunch();
+    void removeOne();
+    void removeBunch();
+    void timeout();
+    void startStopTimer();
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
+    QVector3D randVector();
     Q3DScatter *m_chart;
     int m_fontSize;
+    QTimer m_timer;
+    int m_loopCounter;
 };
 
 #endif

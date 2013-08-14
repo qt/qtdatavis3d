@@ -193,8 +193,7 @@ void ChartModifier::changeItem()
     if (row >= 0) {
         int column = qMin(4, (m_chart->dataProxy()->rowAt(row)->size() - 1));
         if (column >= 0) {
-            QBarDataItem item;
-            item.setValue(qreal(rand() % 100));
+            QBarDataItem item(qreal(rand() % 100));
             m_chart->dataProxy()->setItem(row, column, item);
         }
     }

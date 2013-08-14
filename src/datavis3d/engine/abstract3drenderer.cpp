@@ -199,7 +199,6 @@ void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstractAxis::AxisOrientatio
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
 }
 
-// This method needs to be called under the controller-renderer sync mutex
 void Abstract3DRenderer::initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis)
 {
     axisCacheForOrientation(orientation).setDrawer(m_drawer);

@@ -18,7 +18,6 @@
 
 #include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
-#include <QMutexLocker>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -50,9 +49,8 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
 
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 {
-    int count = rows.size();
     dptr()->setRows(rowIndex, rows);
-    emit rowsChanged(rowIndex, count);
+    emit rowsChanged(rowIndex, rows.size());
 }
 
 void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &item)
@@ -95,7 +93,6 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount)
     }
 }
 
-// Mutexing data accessors should be done by user, if needed
 int QBarDataProxy::rowCount() const
 {
     return dptrc()->m_dataArray->size();
@@ -147,8 +144,6 @@ QBarDataProxyPrivate::~QBarDataProxyPrivate()
 
 bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
 {
-    QMutexLocker locker(&m_mutex);
-
     if (!m_dataArray->size() && (!newArray || !newArray->size()))
         return false;
 
@@ -164,7 +159,6 @@ bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray)
 
 void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row)
 {
-    QMutexLocker locker(&m_mutex);
     Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray->size());
     clearRow(rowIndex);
     (*m_dataArray)[rowIndex] = row;
@@ -172,7 +166,6 @@ void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row)
 
 void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows)
 {
-    QMutexLocker locker(&m_mutex);
     QBarDataArray &dataArray = *m_dataArray;
     Q_ASSERT(rowIndex >= 0 && (rowIndex + rows.size()) <= dataArray.size());
     for (int i = 0; i < rows.size(); i++) {
@@ -184,7 +177,6 @@ void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows)
 
 void QBarDataProxyPrivate::setItem(int rowIndex, int columnIndex, const QBarDataItem &item)
 {
-    QMutexLocker locker(&m_mutex);
     Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray->size());
     QBarDataRow &row = *(*m_dataArray)[rowIndex];
     Q_ASSERT(columnIndex < row.size());
@@ -193,7 +185,6 @@ void QBarDataProxyPrivate::setItem(int rowIndex, int columnIndex, const QBarData
 
 int QBarDataProxyPrivate::addRow(QBarDataRow *row)
 {
-    QMutexLocker locker(&m_mutex);
     int currentSize = m_dataArray->size();
     m_dataArray->append(row);
     return currentSize;
@@ -201,7 +192,6 @@ int QBarDataProxyPrivate::addRow(QBarDataRow *row)
 
 int QBarDataProxyPrivate::addRows(const QBarDataArray &rows)
 {
-    QMutexLocker locker(&m_mutex);
     int currentSize = m_dataArray->size();
     for (int i = 0; i < rows.size(); i++)
         m_dataArray->append(rows.at(i));
@@ -210,14 +200,12 @@ int QBarDataProxyPrivate::addRows(const QBarDataArray &rows)
 
 void QBarDataProxyPrivate::insertRow(int rowIndex, QBarDataRow *row)
 {
-    QMutexLocker locker(&m_mutex);
     Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
     m_dataArray->insert(rowIndex, row);
 }
 
 void QBarDataProxyPrivate::insertRows(int rowIndex, const QBarDataArray &rows)
 {
-    QMutexLocker locker(&m_mutex);
     Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
     for (int i = 0; i < rows.size(); i++)
         m_dataArray->insert(rowIndex++, rows.at(i));
@@ -225,7 +213,6 @@ void QBarDataProxyPrivate::insertRows(int rowIndex, const QBarDataArray &rows)
 
 void QBarDataProxyPrivate::removeRows(int rowIndex, int removeCount)
 {
-    QMutexLocker locker(&m_mutex);
     Q_ASSERT(rowIndex >= 0);
     int maxRemoveCount = m_dataArray->size() - rowIndex;
     removeCount = qMin(removeCount, maxRemoveCount);
@@ -234,8 +221,6 @@ void QBarDataProxyPrivate::removeRows(int rowIndex, int removeCount)
         m_dataArray->removeAt(rowIndex);
     }
 }
-
-// Protected & private functions. Do not mutex as these are used from mutexed functions.
 
 void QBarDataProxyPrivate::clearRow(int rowIndex)
 {
@@ -255,7 +240,6 @@ void QBarDataProxyPrivate::clearArray()
 
 QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endRow, int startColumn, int endColumn)
 {
-    QMutexLocker locker(&m_mutex);
     QPair<GLfloat, GLfloat> limits = qMakePair(0.0f, 0.0f);
     endRow = qMin(endRow, m_dataArray->size() - 1);
     for (int i = startRow; i <= endRow; i++) {
