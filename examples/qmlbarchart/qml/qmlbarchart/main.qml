@@ -23,7 +23,6 @@ import com.digia.QtDataVis3D 1.0
 
 Item {
     id: mainview
-    //title: "My MainWindow"
     width: 800
     height: 600
     visible: true
@@ -103,11 +102,14 @@ Item {
             rows: 5
             columns: 12
             mapping: valueMapping
+            barThickness: Qt.size(0.5, 1.0)
+            barSpacing: Qt.size(0.5, 0.5)
+            barSpacingRelative: false
+            barType: Bars3D.BevelBars
         }
     }
 
     Component.onCompleted: {
-        console.log("setting data!")
         testchart.setSegmentCount(10, 3, 0)
         testchart.data = dataModel
     }

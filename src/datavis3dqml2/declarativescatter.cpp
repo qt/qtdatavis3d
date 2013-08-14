@@ -22,10 +22,14 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+const QString smoothString(QStringLiteral("Smooth"));
+
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_initialisedSize(0, 0)
+      m_initialisedSize(0, 0),
+      m_cameraPreset(NoPreset),
+      m_theme(ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -88,30 +92,110 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     return node;
 }
 
-void DeclarativeScatter::setObjectType(MeshStyle style, bool smooth)
-{
-    m_shared->setObjectType(style, smooth);
-}
-
-void DeclarativeScatter::setCameraPreset(CameraPreset preset)
-{
-    m_shared->setCameraPreset(preset);
-}
-
 void DeclarativeScatter::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 {
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-void DeclarativeScatter::setTheme(ColorTheme theme)
-{
-    m_shared->setColorTheme(theme);
-}
-
 void DeclarativeScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                     bool uniform)
+                                        bool uniform)
 {
     m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+}
+
+void DeclarativeScatter::setData(QAbstractItemModel *data)
+{
+    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setItemModel(data);
+}
+
+QAbstractItemModel *DeclarativeScatter::data()
+{
+    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->itemModel();
+}
+
+void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
+{
+    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
+{
+    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->mapping();
+}
+
+void DeclarativeScatter::setObjectType(MeshStyle style)
+{
+    QString objFile = m_shared->objFile();
+    bool smooth = objFile.endsWith(smoothString);
+    m_shared->setObjectType(QtDataVis3D::MeshStyle(style), smooth);
+}
+
+DeclarativeScatter::MeshStyle DeclarativeScatter::objectType()
+{
+    QString objFile = m_shared->objFile();
+    if (objFile.contains("/sphere"))
+        return Spheres;
+    else
+        return Dots;
+}
+
+void DeclarativeScatter::setObjectSmooth(bool smooth)
+{
+    QString objFile = m_shared->objFile();
+    if (objFile.endsWith(smoothString)) {
+        if (smooth)
+            return; // Already smooth; do nothing
+        else // Rip Smooth off the end
+            objFile.resize(objFile.indexOf(smoothString));
+    } else {
+        if (!smooth) // Already flat; do nothing
+            return;
+        else // Append Smooth to the end
+            objFile.append(smoothString);
+    }
+    m_shared->setMeshFileName(objFile);
+}
+
+bool DeclarativeScatter::objectSmooth()
+{
+    QString objFile = m_shared->objFile();
+    return objFile.endsWith(smoothString);
+}
+
+void DeclarativeScatter::setMeshFileName(const QString &objFileName)
+{
+    m_shared->setMeshFileName(objFileName);
+}
+
+QString DeclarativeScatter::meshFileName()
+{
+    return m_shared->objFile();
+}
+
+void DeclarativeScatter::setCameraPreset(CameraPreset preset)
+{
+    // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_cameraPreset = preset;
+    m_shared->setCameraPreset(QtDataVis3D::CameraPreset(preset));
+}
+
+DeclarativeScatter::CameraPreset DeclarativeScatter::cameraPreset()
+{
+    return m_cameraPreset;
+}
+
+void DeclarativeScatter::setTheme(ColorTheme theme)
+{
+    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_theme = theme;
+    m_shared->setColorTheme(QtDataVis3D::ColorTheme(theme));
+}
+
+DeclarativeScatter::ColorTheme DeclarativeScatter::theme()
+{
+    return m_theme;
 }
 
 void DeclarativeScatter::setFontSize(float fontsize)
@@ -164,16 +248,6 @@ bool DeclarativeScatter::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeScatter::setData(QAbstractItemModel *data)
-{
-    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setItemModel(data);
-}
-
-QAbstractItemModel *DeclarativeScatter::data()
-{
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->itemModel();
-}
-
 void DeclarativeScatter::setSelectionMode(DeclarativeScatter::SelectionMode mode)
 {
     m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
@@ -192,21 +266,6 @@ void DeclarativeScatter::setShadowQuality(DeclarativeScatter::ShadowQuality qual
 DeclarativeScatter::ShadowQuality DeclarativeScatter::shadowQuality()
 {
     return DeclarativeScatter::ShadowQuality(m_shared->shadowQuality());
-}
-
-QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
-{
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->mapping();
-}
-
-void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
-{
-    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
-}
-
-void DeclarativeScatter::setMeshFileName(const QString &objFileName)
-{
-    m_shared->setMeshFileName(objFileName);
 }
 
 void DeclarativeScatter::mousePressEvent(QMouseEvent *event)

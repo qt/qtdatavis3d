@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 #endif
     viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+    viewer.setMinimumSize(QSize(640, 480));
     viewer.show();
 
     return app.exec();

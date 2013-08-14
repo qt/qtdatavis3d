@@ -23,10 +23,14 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+const QString smoothString(QStringLiteral("Smooth"));
+
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_initialisedSize(0, 0)
+      m_initialisedSize(0, 0),
+      m_cameraPreset(NoPreset),
+      m_theme(ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -89,24 +93,15 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     return node;
 }
 
-void DeclarativeBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
-{
-    m_shared->setBarSpecs(thickness, spacing, relative);
-}
-
-void DeclarativeBars::setBarType(MeshStyle style, bool smooth)
-{
-    m_shared->setBarType(style, smooth);
-}
-
 void DeclarativeBars::setupSampleSpace(int rowCount, int columnCount)
 {
     m_shared->setupSampleSpace(rowCount, columnCount);
 }
 
-void DeclarativeBars::setCameraPreset(CameraPreset preset)
+void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                  bool uniform)
 {
-    m_shared->setCameraPreset(preset);
+    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
@@ -114,15 +109,139 @@ void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int di
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-void DeclarativeBars::setTheme(ColorTheme theme)
+// TODO needs proper axis support also in QML
+void DeclarativeBars::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
-    m_shared->setColorTheme(theme);
+    QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
+    if (axis) {
+        axis->setSegmentCount(segmentCount);
+        axis->setRange(minimum, segmentCount * step);
+    }
 }
 
-void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                  bool uniform)
+void DeclarativeBars::setData(QAbstractItemModel *data)
 {
-    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
+}
+
+QAbstractItemModel *DeclarativeBars::data()
+{
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->itemModel();
+}
+
+void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
+{
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+QItemModelBarDataMapping *DeclarativeBars::mapping() const
+{
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
+}
+
+void DeclarativeBars::setBarThickness(QSizeF thickness)
+{
+    m_shared->setBarSpecs(thickness, barSpacing(), isBarSpacingRelative());
+}
+
+QSizeF DeclarativeBars::barThickness()
+{
+    return m_shared->barThickness();
+}
+
+void DeclarativeBars::setBarSpacing(QSizeF spacing)
+{
+    m_shared->setBarSpecs(barThickness(), spacing, isBarSpacingRelative());
+}
+
+QSizeF DeclarativeBars::barSpacing()
+{
+    return m_shared->barSpacing();
+}
+
+void DeclarativeBars::setBarSpacingRelative(bool relative)
+{
+    m_shared->setBarSpecs(barThickness(), barSpacing(), relative);
+}
+
+bool DeclarativeBars::isBarSpacingRelative()
+{
+    return m_shared->isBarSpecRelative();
+}
+
+void DeclarativeBars::setBarType(MeshStyle style)
+{
+    QString objFile = m_shared->objFile();
+    bool smooth = objFile.endsWith(smoothString);
+    m_shared->setBarType(QtDataVis3D::MeshStyle(style), smooth);
+}
+
+DeclarativeBars::MeshStyle DeclarativeBars::barType()
+{
+    QString objFile = m_shared->objFile();
+    if (objFile.contains("/sphere"))
+        return Spheres;
+    else
+        return Dots;
+}
+
+void DeclarativeBars::setBarSmooth(bool smooth)
+{
+    QString objFile = m_shared->objFile();
+    if (objFile.endsWith(smoothString)) {
+        if (smooth)
+            return; // Already smooth; do nothing
+        else // Rip Smooth off the end
+            objFile.resize(objFile.indexOf(smoothString));
+    } else {
+        if (!smooth) // Already flat; do nothing
+            return;
+        else // Append Smooth to the end
+            objFile.append(smoothString);
+    }
+    m_shared->setMeshFileName(objFile);
+}
+
+bool DeclarativeBars::barSmooth()
+{
+    QString objFile = m_shared->objFile();
+    return objFile.endsWith(smoothString);
+}
+
+void DeclarativeBars::setMeshFileName(const QString &objFileName)
+{
+    m_shared->setMeshFileName(objFileName);
+}
+
+QString DeclarativeBars::meshFileName()
+{
+    return m_shared->objFile();
+}
+
+void DeclarativeBars::setCameraPreset(CameraPreset preset)
+{
+    // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_cameraPreset = preset;
+    m_shared->setCameraPreset(QtDataVis3D::CameraPreset(preset));
+}
+
+DeclarativeBars::CameraPreset DeclarativeBars::cameraPreset()
+{
+    return m_cameraPreset;
+}
+
+void DeclarativeBars::setTheme(ColorTheme theme)
+{
+    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_theme = theme;
+    m_shared->setColorTheme(QtDataVis3D::ColorTheme(theme));
+}
+
+DeclarativeBars::ColorTheme DeclarativeBars::theme()
+{
+    return m_theme;
 }
 
 void DeclarativeBars::setFontSize(float fontsize)
@@ -175,26 +294,6 @@ bool DeclarativeBars::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-// TODO needs proper axis support also in QML
-void DeclarativeBars::setSegmentCount(int segmentCount, qreal step, qreal minimum)
-{
-    QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
-    if (axis) {
-        axis->setSegmentCount(segmentCount);
-        axis->setRange(minimum, segmentCount * step);
-    }
-}
-
-void DeclarativeBars::setData(QAbstractItemModel *data)
-{
-    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
-}
-
-QAbstractItemModel *DeclarativeBars::data()
-{
-    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->itemModel();
-}
-
 void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
 {
     m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
@@ -215,16 +314,6 @@ DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
     return DeclarativeBars::ShadowQuality(m_shared->shadowQuality());
 }
 
-QItemModelBarDataMapping *DeclarativeBars::mapping() const
-{
-    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
-}
-
-void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
-{
-    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
-}
-
 int DeclarativeBars::rows() const
 {
     return m_shared->rowCount();
@@ -243,11 +332,6 @@ int DeclarativeBars::columns() const
 void DeclarativeBars::setColumns(int columns)
 {
     setupSampleSpace(rows(), columns);
-}
-
-void DeclarativeBars::setMeshFileName(const QString &objFileName)
-{
-    m_shared->setMeshFileName(objFileName);
 }
 
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)
