@@ -95,7 +95,7 @@ void DeclarativeMaps::setBarSpecs(const QVector3D &thickness,
     m_shared->setBarSpecs(thickness, direction);
 }
 
-void DeclarativeMaps::setBarType(MeshStyle style, bool smooth)
+void DeclarativeMaps::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     m_shared->setBarType(style, smooth);
 }
@@ -105,7 +105,7 @@ void DeclarativeMaps::setMeshFileName(const QString &objFileName)
     m_shared->setMeshFileName(objFileName);
 }
 
-void DeclarativeMaps::setCameraPreset(CameraPreset preset)
+void DeclarativeMaps::setCameraPreset(QDataVis::CameraPreset preset)
 {
     m_shared->setCameraPreset(preset);
 }
@@ -115,7 +115,7 @@ void DeclarativeMaps::setCameraPosition(GLfloat horizontal, GLfloat vertical, GL
     m_shared->setCameraPosition(horizontal, vertical, distance);
 }
 
-void DeclarativeMaps::setTheme(ColorTheme theme)
+void DeclarativeMaps::setTheme(QDataVis::ColorTheme theme)
 {
     m_shared->setTheme(theme);
 }
@@ -140,14 +140,14 @@ void DeclarativeMaps::setImage(const QString &imageUrl)
     m_shared->setImage(QImage(imageUrl));
 }
 
-void DeclarativeMaps::setSelectionMode(DeclarativeMaps::SelectionMode mode)
+void DeclarativeMaps::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
+    m_shared->setSelectionMode(mode);
 }
 
-DeclarativeMaps::SelectionMode DeclarativeMaps::selectionMode()
+QDataVis::SelectionMode DeclarativeMaps::selectionMode()
 {
-    return DeclarativeMaps::SelectionMode(m_shared->selectionMode());
+    return m_shared->selectionMode();
 }
 
 void DeclarativeMaps::setFontSize(float fontsize)
@@ -170,24 +170,24 @@ QFont DeclarativeMaps::font()
     return m_shared->font();
 }
 
-void DeclarativeMaps::setLabelTransparency(DeclarativeMaps::LabelTransparency transparency)
+void DeclarativeMaps::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
-    m_shared->setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
+    m_shared->setLabelTransparency(transparency);
 }
 
-DeclarativeMaps::LabelTransparency DeclarativeMaps::labelTransparency()
+QDataVis::LabelTransparency DeclarativeMaps::labelTransparency()
 {
-    return DeclarativeMaps::LabelTransparency(m_shared->labelTransparency());
+    return m_shared->labelTransparency();
 }
 
-void DeclarativeMaps::setShadowQuality(DeclarativeMaps::ShadowQuality quality)
+void DeclarativeMaps::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_shared->setShadowQuality(QtDataVis3D::ShadowQuality(quality));
+    m_shared->setShadowQuality(quality);
 }
 
-DeclarativeMaps::ShadowQuality DeclarativeMaps::shadowQuality()
+QDataVis::ShadowQuality DeclarativeMaps::shadowQuality()
 {
-    return DeclarativeMaps::ShadowQuality(m_shared->shadowQuality());
+    return m_shared->shadowQuality();
 }
 
 QItemModelMapDataMapping *DeclarativeMaps::mapping() const

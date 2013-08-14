@@ -30,7 +30,7 @@
 #define Q3DBARS_p_H
 
 #include "bars3dcontroller_p.h"
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

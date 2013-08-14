@@ -47,8 +47,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_mousePos(QPoint(0, 0)),
       m_isGridEnabled(true),
       m_isBackgroundEnabled(true),
-      m_shadowQuality(ShadowLow),
-      m_labelTransparency(TransparencyFromTheme),
+      m_shadowQuality(QDataVis::ShadowLow),
+      m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_hasNegativeValues(false),
       m_segmentYCount(0),
@@ -138,7 +138,7 @@ void Surface3dRenderer::initializeOpenGL()
 
     // Initialize shaders
 #if !defined(QT_OPENGL_ES_2)
-    if (m_shadowQuality > ShadowNone) {
+    if (m_shadowQuality > QDataVis::ShadowNone) {
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
     } else {
@@ -452,7 +452,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_shadowQuality > ShadowNone) {
+        if (m_shadowQuality > QDataVis::ShadowNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
@@ -806,7 +806,7 @@ void Surface3dRenderer::updateDepthBuffer()
     }
 
     // TODO: bars uses some m_cachedShadowQuality
-    if (m_shadowQuality > ShadowNone && !m_mainViewPort.size().isEmpty()) {
+    if (m_shadowQuality > QDataVis::ShadowNone && !m_mainViewPort.size().isEmpty()) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_shadowQuality);

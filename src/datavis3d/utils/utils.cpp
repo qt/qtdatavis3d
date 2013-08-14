@@ -121,7 +121,7 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor, LabelTransparency transparency)
+                               const QColor &txtColor, QDataVis::LabelTransparency transparency)
 {
     GLuint paddingWidth = 15;
     GLuint paddingHeight = 15;
@@ -147,7 +147,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     paddingHeight /= 2;
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
-    if (TransparencyNoBackground == transparency)
+    if (QDataVis::TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
         labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
@@ -164,7 +164,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     switch (transparency) {
     // TODO: Texture size padding fix for Android f**ks this up for axis labels. Fix or disable for android.
-    case TransparencyNoBackground: {
+    case QDataVis::TransparencyNoBackground: {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
         painter.drawText(0, 0,
@@ -173,7 +173,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case TransparencyFromTheme: {
+    case QDataVis::TransparencyFromTheme: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
@@ -185,7 +185,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case TransparencyNone: {
+    case QDataVis::TransparencyNone: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());

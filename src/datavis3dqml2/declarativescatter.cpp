@@ -28,8 +28,8 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
       m_initialisedSize(0, 0),
-      m_cameraPreset(NoPreset),
-      m_theme(ThemeDefault)
+      m_cameraPreset(QDataVis::NoPreset),
+      m_theme(QDataVis::ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -51,9 +51,9 @@ DeclarativeScatter::~DeclarativeScatter()
     delete m_shared;
 }
 
-void DeclarativeScatter::handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quality)
+void DeclarativeScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit shadowQualityChanged(DeclarativeScatter::ShadowQuality(quality));
+    emit shadowQualityChanged(quality);
 }
 
 void DeclarativeScatter::classBegin()
@@ -123,20 +123,20 @@ QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
     return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->mapping();
 }
 
-void DeclarativeScatter::setObjectType(MeshStyle style)
+void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
 {
     QString objFile = m_shared->objFile();
     bool smooth = objFile.endsWith(smoothString);
-    m_shared->setObjectType(QtDataVis3D::MeshStyle(style), smooth);
+    m_shared->setObjectType(style, smooth);
 }
 
-DeclarativeScatter::MeshStyle DeclarativeScatter::objectType()
+QDataVis::MeshStyle DeclarativeScatter::objectType()
 {
     QString objFile = m_shared->objFile();
     if (objFile.contains("/sphere"))
-        return Spheres;
+        return QDataVis::Spheres;
     else
-        return Dots;
+        return QDataVis::Dots;
 }
 
 void DeclarativeScatter::setObjectSmooth(bool smooth)
@@ -172,28 +172,28 @@ QString DeclarativeScatter::meshFileName()
     return m_shared->objFile();
 }
 
-void DeclarativeScatter::setCameraPreset(CameraPreset preset)
+void DeclarativeScatter::setCameraPreset(QDataVis::CameraPreset preset)
 {
     // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
     // We need to save this locally, as there are no getters for it in controller
     m_cameraPreset = preset;
-    m_shared->setCameraPreset(QtDataVis3D::CameraPreset(preset));
+    m_shared->setCameraPreset(preset);
 }
 
-DeclarativeScatter::CameraPreset DeclarativeScatter::cameraPreset()
+QDataVis::CameraPreset DeclarativeScatter::cameraPreset()
 {
     return m_cameraPreset;
 }
 
-void DeclarativeScatter::setTheme(ColorTheme theme)
+void DeclarativeScatter::setTheme(QDataVis::ColorTheme theme)
 {
     // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
     // We need to save this locally, as there are no getters for it in controller
     m_theme = theme;
-    m_shared->setColorTheme(QtDataVis3D::ColorTheme(theme));
+    m_shared->setColorTheme(theme);
 }
 
-DeclarativeScatter::ColorTheme DeclarativeScatter::theme()
+QDataVis::ColorTheme DeclarativeScatter::theme()
 {
     return m_theme;
 }
@@ -218,14 +218,14 @@ QFont DeclarativeScatter::font()
     return m_shared->font();
 }
 
-void DeclarativeScatter::setLabelTransparency(DeclarativeScatter::LabelTransparency transparency)
+void DeclarativeScatter::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
-    m_shared->setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
+    m_shared->setLabelTransparency(transparency);
 }
 
-DeclarativeScatter::LabelTransparency DeclarativeScatter::labelTransparency()
+QDataVis::LabelTransparency DeclarativeScatter::labelTransparency()
 {
-    return DeclarativeScatter::LabelTransparency(m_shared->labelTransparency());
+    return m_shared->labelTransparency();
 }
 
 void DeclarativeScatter::setGridVisible(bool visible)
@@ -248,24 +248,24 @@ bool DeclarativeScatter::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeScatter::setSelectionMode(DeclarativeScatter::SelectionMode mode)
+void DeclarativeScatter::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
+    m_shared->setSelectionMode(mode);
 }
 
-DeclarativeScatter::SelectionMode DeclarativeScatter::selectionMode()
+QDataVis::SelectionMode DeclarativeScatter::selectionMode()
 {
-    return DeclarativeScatter::SelectionMode(m_shared->selectionMode());
+    return m_shared->selectionMode();
 }
 
-void DeclarativeScatter::setShadowQuality(DeclarativeScatter::ShadowQuality quality)
+void DeclarativeScatter::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_shared->setShadowQuality(QtDataVis3D::ShadowQuality(quality));
+    m_shared->setShadowQuality(quality);
 }
 
-DeclarativeScatter::ShadowQuality DeclarativeScatter::shadowQuality()
+QDataVis::ShadowQuality DeclarativeScatter::shadowQuality()
 {
-    return DeclarativeScatter::ShadowQuality(m_shared->shadowQuality());
+    return m_shared->shadowQuality();
 }
 
 void DeclarativeScatter::mousePressEvent(QMouseEvent *event)

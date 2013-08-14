@@ -30,7 +30,7 @@
 #define Q3DSURFACE_P_H
 
 #include "surface3dcontroller_p.h"
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 
 #include <QList>
 

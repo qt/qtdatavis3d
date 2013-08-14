@@ -16,7 +16,7 @@
 **
 ****************************************************************************/
 
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
@@ -41,7 +41,7 @@ StaticLibInitializer staticLibInitializer;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency)
+Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelTransparency transparency)
     : m_theme(theme),
       m_font(font),
       m_transparency(transparency),
@@ -73,7 +73,7 @@ void Drawer::setFont(const QFont &font)
     emit drawerChanged();
 }
 
-void Drawer::setTransparency(LabelTransparency transparency)
+void Drawer::setTransparency(QDataVis::LabelTransparency transparency)
 {
     m_transparency = transparency;
     emit drawerChanged();
@@ -173,7 +173,7 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat itemHeight, SelectionMode mode,
+                       GLfloat itemHeight, QDataVis::SelectionMode mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        CameraHelper *camera,
                        bool useDepth, bool rotateAlong,
@@ -270,7 +270,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (ModeZoomColumn == mode)
+        else if (QDataVis::ModeZoomColumn == mode)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 

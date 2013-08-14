@@ -59,23 +59,23 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->columnAxis()->setCategoryLabels(months);
 
     // Set bar type to cylinder
-    m_chart->setBarType(Cylinders, false);
+    m_chart->setBarType(QDataVis::Cylinders, false);
 
     // Set shadows to medium
-    m_chart->setShadowQuality(ShadowMedium);
+    m_chart->setShadowQuality(QDataVis::ShadowMedium);
 
     // Set font
     m_chart->setFont(QFont("Century Gothic", 40));
 
     // Set selection mode to bar and column
     //m_chart->setSelectionMode(ModeItemAndColumn);
-    m_chart->setSelectionMode(ModeZoomColumn);
+    m_chart->setSelectionMode(QDataVis::ModeZoomColumn);
 
     // Set theme
-    m_chart->setTheme(ThemeBlueNcs);
+    m_chart->setTheme(QDataVis::ThemeBlueNcs);
 
     // Set preset camera position
-    m_chart->setCameraPreset(PresetIsometricRightHigh);
+    m_chart->setCameraPreset(QDataVis::PresetIsometricRightHigh);
 
     // Disable grid
     m_chart->setGridVisible(false);

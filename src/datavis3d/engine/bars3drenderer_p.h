@@ -76,7 +76,7 @@ private:
     QSizeF m_cachedBarSpacing;
     QString m_cachedObjFile;
     bool m_cachedIsSlicingActivated;
-    SelectionMode m_cachedSelectionMode;
+    QDataVis::SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
     int m_cachedRowCount;
     int m_cachedColumnCount;
@@ -152,7 +152,7 @@ public slots:
     void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
                         QSizeF spacing = QSizeF(1.0f, 1.0f),
                         bool relative = true);
-    void updateSelectionMode(SelectionMode newMode);
+    void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateZoomLevel(int newZoomLevel);
@@ -175,7 +175,7 @@ private:
     virtual void initializePreOpenGL();
     virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(ShadowQuality quality);
+    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
 
     void drawSlicedScene(CameraHelper *camera,

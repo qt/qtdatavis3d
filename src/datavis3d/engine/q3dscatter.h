@@ -19,7 +19,7 @@
 #ifndef Q3DSCATTER_H
 #define Q3DSCATTER_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 #include <QtDataVis3D/q3dwindow.h>
 #include <QFont>
 
@@ -34,27 +34,27 @@ class QScatterDataProxy;
 class QT_DATAVIS3D_EXPORT Q3DScatter : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_ENUMS(SelectionMode)
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelTransparency)
+    Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
+    Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
+    Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
 
 public:
     explicit Q3DScatter();
     ~Q3DScatter();
 
     // object type; spheres, dots
-    void setObjectType(MeshStyle style, bool smooth = false);
+    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (-90...90) angles and distance in percentage (10...500))
@@ -62,7 +62,7 @@ public:
 
     // Set theme (object colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    void setTheme(ColorTheme theme);
+    void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
@@ -73,8 +73,8 @@ public:
     void setMeshFileName(const QString &objFileName);
 
     // Change selection mode
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode() const;
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode() const;
 
     // Set window title
     void setWindowTitle(const QString &title);
@@ -89,8 +89,8 @@ public:
     QFont font() const;
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency() const;
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency() const;
 
     // Enable or disable background grid
     void setGridVisible(bool visible);
@@ -105,8 +105,8 @@ public:
     bool isBackgroundVisible() const;
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality() const;
+    void setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality() const;
 
     // Axes
     void setValueAxisX(QValueAxis *axis);
@@ -124,11 +124,11 @@ public:
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(ShadowQuality quality);
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
 signals:
     // Signals shadow quality changes.
-    void shadowQualityChanged(ShadowQuality quality);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:
     void render();

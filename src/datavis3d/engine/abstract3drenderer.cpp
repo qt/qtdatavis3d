@@ -98,7 +98,7 @@ void Abstract3DRenderer::updateTheme(Theme theme)
 void Abstract3DRenderer::handleShadowQualityChange()
 {
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
         if (!m_cachedTheme.m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
                         QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
@@ -138,7 +138,7 @@ void Abstract3DRenderer::updateFont(const QFont &font)
     m_drawer->setFont(font);
 }
 
-void Abstract3DRenderer::updateLabelTransparency(LabelTransparency transparency)
+void Abstract3DRenderer::updateLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     m_cachedLabelTransparency = transparency;
     m_drawer->setTransparency(transparency);

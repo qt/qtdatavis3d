@@ -45,10 +45,10 @@ protected:
 
     bool m_hasNegativeValues;
     QRect m_cachedBoundingRect;
-    ShadowQuality m_cachedShadowQuality;
+    QDataVis::ShadowQuality m_cachedShadowQuality;
     Theme m_cachedTheme;
     QFont m_cachedFont;
-    LabelTransparency m_cachedLabelTransparency;
+    QDataVis::LabelTransparency m_cachedLabelTransparency;
     Drawer *m_drawer;
     GLfloat m_autoScaleAdjustment;
 
@@ -66,7 +66,7 @@ protected:
 
     virtual void updateTheme(Theme theme);
     virtual void updateFont(const QFont &font);
-    virtual void updateLabelTransparency(LabelTransparency transparency);
+    virtual void updateLabelTransparency(QDataVis::LabelTransparency transparency);
 
     virtual void handleShadowQualityChange();
 
@@ -74,7 +74,7 @@ protected:
     virtual void updateTextures()=0;
     virtual void initSelectionBuffer()=0;
     virtual void updateDepthBuffer()=0;
-    virtual void updateShadowQuality(ShadowQuality quality)=0;
+    virtual void updateShadowQuality(QDataVis::ShadowQuality quality)=0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader)=0;
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader)=0;
     virtual void updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);

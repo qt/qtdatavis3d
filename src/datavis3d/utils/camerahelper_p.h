@@ -82,7 +82,7 @@ public:
                                             GLfloat fixedRotation = 0.0f,
                                             GLfloat distanceModifier = 0.0f);
     void updateMousePos(const QPoint &mousePos);
-    void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(QDataVis::CameraPreset preset);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

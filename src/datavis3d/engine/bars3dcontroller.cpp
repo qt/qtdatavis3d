@@ -40,7 +40,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_columnCount(0),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_selectionMode(ModeItem),
+      m_selectionMode(QDataVis::ModeItem),
       m_isSlicingActivated(false),
       m_isBarSpecRelative(true),
       m_barThickness(QSizeF(0.75f, 0.75f)),
@@ -349,29 +349,29 @@ QString Bars3dController::objFile()
     return m_objFile;
 }
 
-void Bars3dController::setBarType(MeshStyle style, bool smooth)
+void Bars3dController::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
-    if (style == Bars) {
+    if (style == QDataVis::Bars) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/barSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/bar");
-    } else if (style == Pyramids) {
+    } else if (style == QDataVis::Pyramids) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/pyramidSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    } else if (style == Cones) {
+    } else if (style == QDataVis::Cones) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/coneSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/cone");
-    } else if (style == Cylinders) {
+    } else if (style == QDataVis::Cylinders) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    } else if (style == BevelBars) {
+    } else if (style == QDataVis::BevelBars) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
         else
@@ -403,7 +403,7 @@ void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
 }
 
 
-void Bars3dController::setSelectionMode(SelectionMode mode)
+void Bars3dController::setSelectionMode(QDataVis::SelectionMode mode)
 {
     m_selectionMode = mode;
     // Disable zoom if selection mode changes
@@ -416,7 +416,7 @@ QPoint Bars3dController::mousePosition()
     return m_mousePos;
 }
 
-SelectionMode Bars3dController::selectionMode()
+QDataVis::SelectionMode Bars3dController::selectionMode()
 {
     return m_selectionMode;
 }

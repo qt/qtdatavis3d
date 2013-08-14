@@ -53,16 +53,16 @@ Theme::~Theme()
 {
 }
 
-ColorTheme Theme::colorTheme()
+QDataVis::ColorTheme Theme::colorTheme()
 {
     return m_colorTheme;
 }
 
-void Theme::useColorTheme(ColorTheme colorTheme)
+void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
 {
     m_colorTheme = colorTheme;
     switch (colorTheme) {
-    case ThemeSystem: {
+    case QDataVis::ThemeSystem: {
 #ifdef Q_OS_WIN
         DWORD colorHighlight;
         colorHighlight = GetSysColor(COLOR_HIGHLIGHT);
@@ -145,7 +145,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeSystem");
         break;
     }
-    case ThemeBlueCerulean: {
+    case QDataVis::ThemeBlueCerulean: {
         m_baseColor = QColor(QRgb(0xc7e85b));
         m_heightColor = QColor(QRgb(0xee7392));
         m_depthColor = QColor(QRgb(0x1cb54f));
@@ -164,7 +164,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeBlueCerulean");
         break;
     }
-    case ThemeBlueIcy: {
+    case QDataVis::ThemeBlueIcy: {
         m_baseColor = QRgb(0x3daeda);
         m_heightColor = QRgb(0x2fa3b4);
         m_depthColor = QColor(QRgb(0x2685bf));
@@ -183,7 +183,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeBlueIcy");
         break;
     }
-    case ThemeBlueNcs: {
+    case QDataVis::ThemeBlueNcs: {
         m_baseColor = QColor(QRgb(0x1db0da));
         m_heightColor = QColor(QRgb(0x398ca3));
         m_depthColor = QColor(QRgb(0x1341a6));
@@ -202,7 +202,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeBlueNcs");
         break;
     }
-    case ThemeBrownSand: {
+    case QDataVis::ThemeBrownSand: {
         m_baseColor = QColor(QRgb(0xb39b72));
         m_heightColor = QColor(QRgb(0x494345));
         m_depthColor = QColor(QRgb(0xb3b376));
@@ -221,7 +221,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeBrownSand");
         break;
     }
-    case ThemeDark: {
+    case QDataVis::ThemeDark: {
         m_baseColor = QColor(QRgb(0x38ad6b));               // charts: series color 1
         m_heightColor = QColor(QRgb(0xbf593e));             // charts: series color 5
         m_depthColor = QColor(QRgb(0x3c84a7));              // charts: series color 2
@@ -240,7 +240,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeDark");
         break;
     }
-    case ThemeHighContrast: {
+    case QDataVis::ThemeHighContrast: {
         m_baseColor = QColor(QRgb(0x202020));
         m_heightColor = QColor(QRgb(0xff4a41));
         m_depthColor = QColor(QRgb(0x596a74));
@@ -259,7 +259,7 @@ void Theme::useColorTheme(ColorTheme colorTheme)
         qDebug("ThemeHighContrast");
         break;
     }
-    case ThemeLight: {
+    case QDataVis::ThemeLight: {
         m_baseColor = QColor(QRgb(0x209fdf));
         m_heightColor = QColor(QRgb(0xbf593e));
         m_depthColor = QColor(QRgb(0x99ca53));

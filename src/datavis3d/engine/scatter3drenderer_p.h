@@ -75,7 +75,7 @@ private:
 
     // Cached state based on emitted signals from the controller
     QString m_cachedObjFile;
-    SelectionMode m_cachedSelectionMode;
+    QDataVis::SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
@@ -137,7 +137,7 @@ public:
     QRect mainViewPort();
 
 public slots:
-    void updateSelectionMode(SelectionMode newMode);
+    void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateZoomLevel(int newZoomLevel);
     void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
@@ -158,7 +158,7 @@ private:
     virtual void initializePreOpenGL();
     virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(ShadowQuality quality);
+    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
 
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);

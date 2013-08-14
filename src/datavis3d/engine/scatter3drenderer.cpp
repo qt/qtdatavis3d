@@ -373,7 +373,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
         m_depthShader->bind();
@@ -486,7 +486,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
 
     // Skip selection mode drawing if we have no selection mode
-    if (m_cachedSelectionMode > ModeNone) {
+    if (m_cachedSelectionMode > QDataVis::ModeNone) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -643,7 +643,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QVector3D barColor = baseColor + heightColor;
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-        if (m_cachedSelectionMode > ModeNone) {
+        if (m_cachedSelectionMode > QDataVis::ModeNone) {
             Scatter3DController::SelectionType selectionType = isSelected(bar, m_selection);
             switch (selectionType) {
             case Scatter3DController::SelectionBar: {
@@ -678,7 +678,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > ShadowNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
             // Set shadow shader bindings
             m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
             m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
@@ -755,7 +755,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > ShadowNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
@@ -860,7 +860,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
                     m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
@@ -940,7 +940,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
                     m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
@@ -1012,7 +1012,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
                     m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
@@ -1082,7 +1082,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
                     m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
@@ -1117,7 +1117,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > TransparencyNone) {
+        if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -1152,7 +1152,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             m_labelObj, camera, true, false, Drawer::LabelMid);
 #endif
         glDisable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > TransparencyNone)
+        if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
             glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
@@ -1170,7 +1170,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     m_labelShader->bind();
 
     glEnable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > TransparencyNone) {
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -1366,7 +1366,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
     }
     glDisable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > TransparencyNone)
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
         glDisable(GL_BLEND);
 
     // Release label shader
@@ -1401,7 +1401,7 @@ void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
     loadBarMesh();
 }
 
-void Scatter3DRenderer::updateSelectionMode(SelectionMode mode)
+void Scatter3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
 {
     //qDebug() << __FUNCTION__;
     m_cachedSelectionMode = mode;
@@ -1423,18 +1423,18 @@ void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
     }
 }
 
-void Scatter3DRenderer::updateShadowQuality(ShadowQuality quality)
+void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     qDebug() << "Scatter3DRenderer::setShadowQuality" << quality;
     m_cachedShadowQuality = quality;
     switch (quality) {
-    case ShadowLow:
+    case QDataVis::ShadowLow:
         m_shadowQualityToShader = 33.3f;
         break;
-    case ShadowMedium:
+    case QDataVis::ShadowMedium:
         m_shadowQualityToShader = 100.0f;
         break;
-    case ShadowHigh:
+    case QDataVis::ShadowHigh:
         m_shadowQualityToShader = 200.0f;
         break;
     default:
@@ -1442,7 +1442,7 @@ void Scatter3DRenderer::updateShadowQuality(ShadowQuality quality)
         break;
     }
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
         // Re-init shaders
         if (!m_cachedTheme.m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -1657,23 +1657,23 @@ void Scatter3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_cachedShadowQuality > ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_cachedShadowQuality);
         if (!m_depthTexture) {
             switch (m_cachedShadowQuality) {
-            case ShadowHigh:
+            case QDataVis::ShadowHigh:
                 qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)m_controller->setShadowQuality(ShadowMedium);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
                 break;
-            case ShadowMedium:
+            case QDataVis::ShadowMedium:
                 qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)m_controller->setShadowQuality(ShadowLow);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
                 break;
-            case ShadowLow:
+            case QDataVis::ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(ShadowNone);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
                 break;
             default:
                 // You'll never get here

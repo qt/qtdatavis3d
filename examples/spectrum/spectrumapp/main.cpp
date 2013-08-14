@@ -74,13 +74,13 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->valueAxis()->setSegmentCount(0);
     m_chart->valueAxis()->setRange(0.0, 1.0);
     // Disable shadows
-    m_chart->setShadowQuality(ShadowNone);
+    m_chart->setShadowQuality(QDataVis::ShadowNone);
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
     m_chart->setBarSpecs(QSizeF(1.0f, 0.75f), QSizeF(0.2f, -0.75f));
     // Set bar type, smooth cones
-    m_chart->setBarType(Cones, true);
+    m_chart->setBarType(QDataVis::Cones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpecs)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
@@ -88,14 +88,14 @@ MainApp::MainApp(Q3DBars *window)
     // Set bar specifications; make them twice as wide as they're deep
     m_chart->setBarSpecs(QSizeF(1.0f, 0.5f), QSizeF(0.0f, 0.0f));
     // Set bar type, flat bars
-    m_chart->setBarType(Bars, false);
+    m_chart->setBarType(QDataVis::Bars, false);
     // Adjust camera position
     m_chart->setCameraPosition(10.0f, 7.5f, 75);
 #endif
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
     // Disable selection
-    m_chart->setSelectionMode(ModeNone);
+    m_chart->setSelectionMode(QDataVis::ModeNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);

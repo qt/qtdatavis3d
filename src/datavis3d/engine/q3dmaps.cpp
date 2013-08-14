@@ -145,7 +145,7 @@ void Q3DMaps::setBarSpecs(const QVector3D &thickness, AdjustmentDirection direct
     d_ptr->m_shared->setBarSpecs(thickness, direction);
 }
 
-void Q3DMaps::setBarType(MeshStyle style, bool smooth)
+void Q3DMaps::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     d_ptr->m_shared->setBarType(style, smooth);
 }
@@ -155,7 +155,7 @@ void Q3DMaps::setMeshFileName(const QString &objFileName)
     d_ptr->m_shared->setMeshFileName(objFileName);
 }
 
-void Q3DMaps::setCameraPreset(CameraPreset preset)
+void Q3DMaps::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
 }
@@ -165,7 +165,7 @@ void Q3DMaps::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint dist
     d_ptr->m_shared->setCameraPosition(horizontal, vertical, distance);
 }
 
-void Q3DMaps::setTheme(ColorTheme theme)
+void Q3DMaps::setTheme(QDataVis::ColorTheme theme)
 {
     d_ptr->m_shared->setTheme(theme);
 }
@@ -185,12 +185,12 @@ void Q3DMaps::setImage(const QImage &image)
     d_ptr->m_shared->setImage(image);
 }
 
-void Q3DMaps::setSelectionMode(SelectionMode mode)
+void Q3DMaps::setSelectionMode(QDataVis::SelectionMode mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DMaps::selectionMode() const
+QDataVis::SelectionMode Q3DMaps::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -225,22 +225,22 @@ QFont Q3DMaps::font() const
     return d_ptr->m_shared->font();
 }
 
-void Q3DMaps::setLabelTransparency(LabelTransparency transparency)
+void Q3DMaps::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DMaps::labelTransparency() const
+QDataVis::LabelTransparency Q3DMaps::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
 
-ShadowQuality Q3DMaps::setShadowQuality(ShadowQuality quality)
+QDataVis::ShadowQuality Q3DMaps::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DMaps::shadowQuality() const
+QDataVis::ShadowQuality Q3DMaps::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

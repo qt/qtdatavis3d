@@ -64,7 +64,7 @@ public:
 
 public slots:
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
 signals:
     void shadowQualityChanged(int quality);

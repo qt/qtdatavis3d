@@ -58,7 +58,7 @@ private:
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
-    SelectionMode m_selectionMode;
+    QDataVis::SelectionMode m_selectionMode;
 
 public:
     explicit Surface3dController(QRect rect);

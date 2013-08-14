@@ -30,15 +30,15 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_verticalRotation(15.0f),
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
-    m_shadowQuality(ShadowLow),
-    m_labelTransparency(TransparencyFromTheme),
+    m_shadowQuality(QDataVis::ShadowLow),
+    m_labelTransparency(QDataVis::TransparencyFromTheme),
     m_cameraHelper(new CameraHelper()),
     m_zoomLevel(100),
     m_axisX(0),
     m_axisY(0),
     m_axisZ(0)
 {
-    m_theme.useColorTheme(ThemeSystem);
+    m_theme.useColorTheme(QDataVis::ThemeSystem);
 }
 
 Abstract3DController::~Abstract3DController()
@@ -161,7 +161,7 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emit zoomLevelChanged(zoomLevel);
 }
 
-void Abstract3DController::setCameraPreset(CameraPreset preset)
+void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
 {
     m_cameraHelper->setCameraPreset(preset);
 }
@@ -187,7 +187,7 @@ void Abstract3DController::setObjectColor(QColor baseColor, QColor heightColor, 
     emit themeChanged(m_theme);
 }
 
-void Abstract3DController::setColorTheme(ColorTheme colorTheme)
+void Abstract3DController::setColorTheme(QDataVis::ColorTheme colorTheme)
 {
     m_theme.useColorTheme(colorTheme);
     emit themeChanged(m_theme);
@@ -221,25 +221,25 @@ QFont Abstract3DController::font()
 }
 
 
-void Abstract3DController::setShadowQuality(ShadowQuality quality)
+void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_shadowQuality = quality;
     emit shadowQualityChanged(m_shadowQuality);
 }
 
-ShadowQuality Abstract3DController::shadowQuality()
+QDataVis::ShadowQuality Abstract3DController::shadowQuality()
 {
     return m_shadowQuality;
 }
 
 
-void Abstract3DController::setLabelTransparency(LabelTransparency transparency)
+void Abstract3DController::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     m_labelTransparency = transparency;
     emit labelTransparencyUpdated(m_labelTransparency);
 }
 
-LabelTransparency Abstract3DController::labelTransparency()
+QDataVis::LabelTransparency Abstract3DController::labelTransparency()
 {
     return m_labelTransparency;
 }

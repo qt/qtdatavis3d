@@ -45,12 +45,12 @@ class DeclarativeBars : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
-    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(MeshStyle barType READ barType WRITE setBarType)
-    Q_PROPERTY(CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
-    Q_PROPERTY(ColorTheme theme READ theme WRITE setTheme)
+    Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVis3D::QDataVis::MeshStyle barType READ barType WRITE setBarType)
+    Q_PROPERTY(QtDataVis3D::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ColorTheme theme READ theme WRITE setTheme)
     Q_PROPERTY(QSizeF barThickness READ barThickness WRITE setBarThickness)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
@@ -62,87 +62,12 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(int rows READ rows WRITE setRows)
     Q_PROPERTY(int columns READ columns WRITE setColumns)
-    Q_ENUMS(SelectionMode)
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelTransparency)
-    Q_ENUMS(MeshStyle)
-    Q_ENUMS(CameraPreset)
-    Q_ENUMS(ColorTheme)
-
-public:
-    // Duplicated here to be able to use the same enums
-    enum SelectionMode {
-        ModeNone = 0,
-        ModeItem,
-        ModeItemAndRow,
-        ModeItemAndColumn,
-        ModeItemRowAndColumn,
-        ModeZoomRow,
-        ModeZoomColumn
-    };
-
-    enum ShadowQuality {
-        ShadowNone = 0,
-        ShadowLow = 1,
-        ShadowMedium = 3,
-        ShadowHigh = 5
-    };
-
-    enum LabelTransparency {
-        TransparencyNone = 0,       // Full solid, using colors from theme
-        TransparencyFromTheme,      // Use colors and transparencies from theme
-        TransparencyNoBackground    // Draw just text on transparent background
-    };
-
-    enum MeshStyle {
-        Bars = 0,
-        Pyramids,
-        Cones,
-        Cylinders,
-        BevelBars,
-        Spheres,
-        Dots
-    };
-
-    enum CameraPreset {
-        NoPreset = -1,
-        PresetFrontLow = 0,
-        PresetFront,
-        PresetFrontHigh,
-        PresetLeftLow,
-        PresetLeft,
-        PresetLeftHigh,
-        PresetRightLow,
-        PresetRight,
-        PresetRightHigh,
-        PresetBehindLow,
-        PresetBehind,
-        PresetBehindHigh,
-        PresetIsometricLeft,
-        PresetIsometricLeftHigh,
-        PresetIsometricRight,
-        PresetIsometricRightHigh,
-        PresetDirectlyAbove,
-        PresetDirectlyAboveCW45,
-        PresetDirectlyAboveCCW45,
-        PresetFrontBelow,           // These work only for graphs including negative values.
-        PresetLeftBelow,            // They act as Preset...Low for positive-only values.
-        PresetRightBelow,
-        PresetBehindBelow,
-        PresetDirectlyBelow
-    };
-
-    enum ColorTheme {
-        ThemeDefault = -1,
-        ThemeSystem = 0,
-        ThemeBlueCerulean,
-        ThemeBlueIcy,
-        ThemeBlueNcs,
-        ThemeBrownSand,
-        ThemeDark,
-        ThemeHighContrast,
-        ThemeLight
-    };
+    Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
+    Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
+    Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVis3D::QDataVis::MeshStyle)
+    Q_ENUMS(QtDataVis3D::QDataVis::CameraPreset)
+    Q_ENUMS(QtDataVis3D::QDataVis::ColorTheme)
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
@@ -190,8 +115,8 @@ public:
     bool isBarSpacingRelative();
 
     // Bar type
-    void setBarType(MeshStyle style);
-    MeshStyle barType();
+    void setBarType(QDataVis::MeshStyle style);
+    QDataVis::MeshStyle barType();
 
     // Bar smoothing
     void setBarSmooth(bool smooth);
@@ -202,17 +127,17 @@ public:
     QString meshFileName();
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
-    CameraPreset cameraPreset();
+    void setCameraPreset(QDataVis::CameraPreset preset);
+    QDataVis::CameraPreset cameraPreset();
 
     // Set theme (object colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    void setTheme(ColorTheme theme);
-    ColorTheme theme();
+    void setTheme(QDataVis::ColorTheme theme);
+    QDataVis::ColorTheme theme();
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode();
 
     // Font size adjustment
     void setFontSize(float fontsize);
@@ -223,8 +148,8 @@ public:
     QFont font();
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency();
 
     // Enable or disable background grid
     void setGridVisible(bool visible);
@@ -235,8 +160,8 @@ public:
     bool isBackgroundVisible();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+    void setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality();
 
     int rows() const;
     void setRows(int rows);
@@ -246,11 +171,11 @@ public:
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quality);
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
 signals:
     // Signals shadow quality changes.
-    void shadowQualityChanged(DeclarativeBars::ShadowQuality quality);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:
     Bars3dController *m_shared;
@@ -264,8 +189,8 @@ protected:
 
 private:
     QSize m_initialisedSize;
-    CameraPreset m_cameraPreset;
-    ColorTheme m_theme;
+    QDataVis::CameraPreset m_cameraPreset;
+    QDataVis::ColorTheme m_theme;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

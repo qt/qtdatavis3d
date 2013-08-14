@@ -43,8 +43,8 @@ public:
     explicit Theme();
     ~Theme();
 
-    void useColorTheme(ColorTheme theme);
-    ColorTheme colorTheme();
+    void useColorTheme(QDataVis::ColorTheme theme);
+    QDataVis::ColorTheme colorTheme();
     void setFromTheme(Theme &theme);
 
 private:
@@ -57,7 +57,7 @@ private:
     friend class Scatter3DRenderer;
     friend class Drawer;
 
-    ColorTheme m_colorTheme;
+    QDataVis::ColorTheme m_colorTheme;
     QColor m_baseColor;
     QColor m_heightColor;
     QColor m_depthColor;

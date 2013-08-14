@@ -19,7 +19,7 @@
 #ifndef VARIANTBARDATAMAPPING_H
 #define VARIANTBARDATAMAPPING_H
 
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 #include <QStringList>
 
 using namespace QtDataVis3D;

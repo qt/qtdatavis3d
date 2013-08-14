@@ -66,7 +66,7 @@ private:
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
-    SelectionMode m_selectionMode;
+    QDataVis::SelectionMode m_selectionMode;
     bool m_isSlicingActivated;
 
     // Look'n'Feel
@@ -96,15 +96,15 @@ public:
                                    bool showUnder = false);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setObjectType(MeshStyle style, bool smooth = false);
+    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
     QString objFile();
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode();
 
     // Font size adjustment
     void setFontSize(float fontsize);
@@ -145,7 +145,7 @@ public slots:
     virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
-    void selectionModeChanged(SelectionMode mode);
+    void selectionModeChanged(QDataVis::SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
     void objFileChanged(QString fileName);
     void fontChanged(QFont font);

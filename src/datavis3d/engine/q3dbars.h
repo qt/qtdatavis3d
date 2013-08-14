@@ -19,7 +19,7 @@
 #ifndef Q3DBARS_H
 #define Q3DBARS_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 #include <QtDataVis3D/q3dwindow.h>
 #include <QFont>
 
@@ -33,17 +33,17 @@ class QBarDataProxy;
 class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_ENUMS(SelectionMode)
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelTransparency)
+    Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
+    Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
+    Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
 
 public:
     explicit Q3DBars();
@@ -57,7 +57,7 @@ public:
                      bool relative = true);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(MeshStyle style, bool smooth = false);
+    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
     // TODO: This defines the data window, needs additional parameters startRow, startColumn
@@ -65,7 +65,7 @@ public:
     QSize sampleSpace() const; // TODO: Return QRect once data window properly implemented?
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
@@ -74,7 +74,7 @@ public:
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    void setTheme(ColorTheme theme);
+    void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
@@ -86,8 +86,8 @@ public:
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode() const;
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode() const;
 
     // Set window title
     void setWindowTitle(const QString &title);
@@ -102,8 +102,8 @@ public:
     QFont font() const;
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency() const;
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency() const;
 
     // Enable or disable background grid
     void setGridVisible(bool visible);
@@ -118,8 +118,8 @@ public:
     bool isBackgroundVisible() const;
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality() const;
+    void setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality() const;
 
     // Axes - row & column axes are fixed to category axes, value axis can be
     // customized.
@@ -134,11 +134,11 @@ public:
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(ShadowQuality quality);
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
 signals:
     // Signals shadow quality changes.
-    void shadowQualityChanged(ShadowQuality quality);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:
     void render();

@@ -37,7 +37,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_isInitialized(false),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_selectionMode(ModeItem),
+      m_selectionMode(QDataVis::ModeItem),
       m_isSlicingActivated(false),
       m_objFile(QStringLiteral(":/defaultMeshes/sphere")),
       m_font(QFont(QStringLiteral("Arial"))),
@@ -301,9 +301,9 @@ QString Scatter3DController::objFile()
     return m_objFile;
 }
 
-void Scatter3DController::setObjectType(MeshStyle style, bool smooth)
+void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
 {
-    if (style == Spheres) {
+    if (style == QDataVis::Spheres) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else
@@ -325,9 +325,9 @@ void Scatter3DController::setMeshFileName(const QString &objFileName)
     emit objFileChanged(m_objFile);
 }
 
-void Scatter3DController::setSelectionMode(SelectionMode mode)
+void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    if (mode > ModeItem) {
+    if (mode > QDataVis::ModeItem) {
         qWarning("Unsupported selection mode.");
         return;
     }
@@ -342,7 +342,7 @@ QPoint Scatter3DController::mousePosition()
     return m_mousePos;
 }
 
-SelectionMode Scatter3DController::selectionMode()
+QDataVis::SelectionMode Scatter3DController::selectionMode()
 {
     return m_selectionMode;
 }

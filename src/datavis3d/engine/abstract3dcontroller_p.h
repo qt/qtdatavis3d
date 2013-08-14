@@ -62,8 +62,8 @@ private:
     GLfloat m_verticalRotation;
     Theme m_theme;
     QFont m_font;
-    ShadowQuality m_shadowQuality;
-    LabelTransparency m_labelTransparency;
+    QDataVis::ShadowQuality m_shadowQuality;
+    QDataVis::LabelTransparency m_labelTransparency;
 
 protected:
     CameraHelper *m_cameraHelper;
@@ -103,7 +103,7 @@ public:
     virtual void setZoomLevel(int zoomLevel);
 
     // Select preset camera placement
-    virtual void setCameraPreset(CameraPreset preset);
+    virtual void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
@@ -117,7 +117,7 @@ public:
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    virtual void setColorTheme(ColorTheme colorTheme);
+    virtual void setColorTheme(QDataVis::ColorTheme colorTheme);
     virtual Theme theme();
 
     // Font size adjustment
@@ -130,12 +130,12 @@ public:
 
 
     // Adjust shadow quality
-    virtual void setShadowQuality(ShadowQuality quality);
-    virtual ShadowQuality shadowQuality();
+    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
+    virtual QDataVis::ShadowQuality shadowQuality();
 
     // Label transparency adjustment
-    virtual void setLabelTransparency(LabelTransparency transparency);
-    virtual LabelTransparency labelTransparency();
+    virtual void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    virtual QDataVis::LabelTransparency labelTransparency();
 
 public slots:
     virtual void handleAxisTitleChanged(const QString &title);
@@ -152,8 +152,8 @@ signals:
     void zoomLevelChanged(int zoomLevel);
     void themeChanged(Theme theme);
     void fontChanged(QFont font); // TODO should be handled via axis?? What about font for selection label?
-    void shadowQualityChanged(ShadowQuality quality);
-    void labelTransparencyUpdated(LabelTransparency transparency);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void labelTransparencyUpdated(QDataVis::LabelTransparency transparency);
     void axisTypeChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
     void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
     void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);

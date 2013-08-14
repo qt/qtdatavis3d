@@ -63,14 +63,14 @@ public:
     };
 
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency);
+    explicit Drawer(const Theme &theme, const QFont &font, QDataVis::LabelTransparency transparency);
     ~Drawer();
 
     void initializeOpenGL();
 
     void setTheme(const Theme &theme);
     void setFont(const QFont &font);
-    void setTransparency(LabelTransparency transparency);
+    void setTransparency(QDataVis::LabelTransparency transparency);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
@@ -78,7 +78,7 @@ public:
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
+                   QDataVis::SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
                    CameraHelper *camera,
                    bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
@@ -93,7 +93,7 @@ Q_SIGNALS:
 private:
     Theme m_theme;
     QFont m_font;
-    LabelTransparency m_transparency;
+    QDataVis::LabelTransparency m_transparency;
     TextureHelper *m_textureHelper;
 };
 

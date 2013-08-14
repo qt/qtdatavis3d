@@ -19,7 +19,7 @@
 #ifndef Q3DMAPS_H
 #define Q3DMAPS_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 #include <QtDataVis3D/q3dwindow.h>
 
 #include <QFont>
@@ -66,20 +66,20 @@ public:
                      AdjustmentDirection direction = AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
-    void setBarType(MeshStyle style, bool smooth = false);
+    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
     void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
-    void setTheme(ColorTheme theme);
+    void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
@@ -93,8 +93,8 @@ public:
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode() const;
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode() const;
 
     // Set window title
     void setWindowTitle(const QString &title);
@@ -109,12 +109,12 @@ public:
     QFont font() const;
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency() const;
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency() const;
 
     // Adjust shadow quality
-    ShadowQuality setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality() const;
+    QDataVis::ShadowQuality setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality() const;
 
     // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QMapDataProxy *proxy);

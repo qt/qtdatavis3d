@@ -19,7 +19,7 @@
 #ifndef Q3DSURFACE_H
 #define Q3DSURFACE_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 #include <QtDataVis3D/q3dwindow.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE

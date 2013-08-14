@@ -29,8 +29,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
       m_initialisedSize(0, 0),
-      m_cameraPreset(NoPreset),
-      m_theme(ThemeDefault)
+      m_cameraPreset(QDataVis::NoPreset),
+      m_theme(QDataVis::ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -52,9 +52,9 @@ DeclarativeBars::~DeclarativeBars()
     delete m_shared;
 }
 
-void DeclarativeBars::handleShadowQualityUpdate(QtDataVis3D::ShadowQuality quality)
+void DeclarativeBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit shadowQualityChanged(DeclarativeBars::ShadowQuality(quality));
+    emit shadowQualityChanged(quality);
 }
 
 void DeclarativeBars::classBegin()
@@ -169,20 +169,20 @@ bool DeclarativeBars::isBarSpacingRelative()
     return m_shared->isBarSpecRelative();
 }
 
-void DeclarativeBars::setBarType(MeshStyle style)
+void DeclarativeBars::setBarType(QDataVis::MeshStyle style)
 {
     QString objFile = m_shared->objFile();
     bool smooth = objFile.endsWith(smoothString);
-    m_shared->setBarType(QtDataVis3D::MeshStyle(style), smooth);
+    m_shared->setBarType(style, smooth);
 }
 
-DeclarativeBars::MeshStyle DeclarativeBars::barType()
+QDataVis::MeshStyle DeclarativeBars::barType()
 {
     QString objFile = m_shared->objFile();
     if (objFile.contains("/sphere"))
-        return Spheres;
+        return QDataVis::Spheres;
     else
-        return Dots;
+        return QDataVis::Dots;
 }
 
 void DeclarativeBars::setBarSmooth(bool smooth)
@@ -218,28 +218,28 @@ QString DeclarativeBars::meshFileName()
     return m_shared->objFile();
 }
 
-void DeclarativeBars::setCameraPreset(CameraPreset preset)
+void DeclarativeBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
     // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
     // We need to save this locally, as there are no getters for it in controller
     m_cameraPreset = preset;
-    m_shared->setCameraPreset(QtDataVis3D::CameraPreset(preset));
+    m_shared->setCameraPreset(preset);
 }
 
-DeclarativeBars::CameraPreset DeclarativeBars::cameraPreset()
+QDataVis::CameraPreset DeclarativeBars::cameraPreset()
 {
     return m_cameraPreset;
 }
 
-void DeclarativeBars::setTheme(ColorTheme theme)
+void DeclarativeBars::setTheme(QDataVis::ColorTheme theme)
 {
     // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
     // We need to save this locally, as there are no getters for it in controller
     m_theme = theme;
-    m_shared->setColorTheme(QtDataVis3D::ColorTheme(theme));
+    m_shared->setColorTheme(theme);
 }
 
-DeclarativeBars::ColorTheme DeclarativeBars::theme()
+QDataVis::ColorTheme DeclarativeBars::theme()
 {
     return m_theme;
 }
@@ -264,14 +264,14 @@ QFont DeclarativeBars::font()
     return m_shared->font();
 }
 
-void DeclarativeBars::setLabelTransparency(DeclarativeBars::LabelTransparency transparency)
+void DeclarativeBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
-    m_shared->setLabelTransparency(QtDataVis3D::LabelTransparency(transparency));
+    m_shared->setLabelTransparency(transparency);
 }
 
-DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
+QDataVis::LabelTransparency DeclarativeBars::labelTransparency()
 {
-    return DeclarativeBars::LabelTransparency(m_shared->labelTransparency());
+    return m_shared->labelTransparency();
 }
 
 void DeclarativeBars::setGridVisible(bool visible)
@@ -294,24 +294,24 @@ bool DeclarativeBars::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
+void DeclarativeBars::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    m_shared->setSelectionMode(QtDataVis3D::SelectionMode(mode));
+    m_shared->setSelectionMode(mode);
 }
 
-DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
+QDataVis::SelectionMode DeclarativeBars::selectionMode()
 {
-    return DeclarativeBars::SelectionMode(m_shared->selectionMode());
+    return m_shared->selectionMode();
 }
 
-void DeclarativeBars::setShadowQuality(DeclarativeBars::ShadowQuality quality)
+void DeclarativeBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_shared->setShadowQuality(QtDataVis3D::ShadowQuality(quality));
+    m_shared->setShadowQuality(quality);
 }
 
-DeclarativeBars::ShadowQuality DeclarativeBars::shadowQuality()
+QDataVis::ShadowQuality DeclarativeBars::shadowQuality()
 {
-    return DeclarativeBars::ShadowQuality(m_shared->shadowQuality());
+    return m_shared->shadowQuality();
 }
 
 int DeclarativeBars::rows() const

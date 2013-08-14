@@ -216,40 +216,40 @@ void MapsModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Cylinders, false);
+        m_chart->setBarType(QDataVis::Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Cylinders, true);
+        m_chart->setBarType(QDataVis::Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Cones, false);
+        m_chart->setBarType(QDataVis::Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Cones, true);
+        m_chart->setBarType(QDataVis::Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Bars, false);
+        m_chart->setBarType(QDataVis::Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Bars, true);
+        m_chart->setBarType(QDataVis::Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Pyramids, false);
+        m_chart->setBarType(QDataVis::Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Pyramids, true);
+        m_chart->setBarType(QDataVis::Pyramids, true);
         break;
     case 8:
-        m_chart->setBarType(BevelBars, false);
+        m_chart->setBarType(QDataVis::BevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(BevelBars, true);
+        m_chart->setBarType(QDataVis::BevelBars, true);
         break;
     case 10:
-        m_chart->setBarType(Spheres, false);
+        m_chart->setBarType(QDataVis::Spheres, false);
         break;
     case 11:
-        m_chart->setBarType(Spheres, true);
+        m_chart->setBarType(QDataVis::Spheres, true);
         break;
     }
     model++;
@@ -259,32 +259,32 @@ void MapsModifier::changeStyle()
 
 void MapsModifier::changePresetCamera()
 {
-    static int preset = PresetFrontLow;
+    static int preset = QDataVis::PresetFrontLow;
 
-    m_chart->setCameraPreset((CameraPreset)preset);
+    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > PresetDirectlyAboveCCW45)
-        preset = PresetFrontLow;
+    if (++preset > QDataVis::PresetDirectlyAboveCCW45)
+        preset = QDataVis::PresetFrontLow;
 }
 
 void MapsModifier::changeTheme()
 {
-    static int theme = ThemeSystem;
+    static int theme = QDataVis::ThemeSystem;
 
-    m_chart->setTheme((ColorTheme)theme);
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > ThemeLight)
-        theme = ThemeSystem;
+    if (++theme > QDataVis::ThemeLight)
+        theme = QDataVis::ThemeSystem;
 }
 
 void MapsModifier::changeTransparency()
 {
-    static int transparency = TransparencyNone;
+    static int transparency = QDataVis::TransparencyNone;
 
-    m_chart->setLabelTransparency((LabelTransparency)transparency);
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
-    if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyFromTheme;
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyFromTheme;
 }
 
 void MapsModifier::changeValueDimension(int dimension)
@@ -308,29 +308,29 @@ void MapsModifier::changeFontSize(int fontsize)
 
 void MapsModifier::changeShadowQuality(int quality)
 {
-    ShadowQuality sq = ShadowNone;
+    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
     switch (quality) {
     case 1:
-        sq = ShadowLow;
+        sq = QDataVis::ShadowLow;
         break;
     case 2:
-        sq = ShadowMedium;
+        sq = QDataVis::ShadowMedium;
         break;
     case 3:
-        sq = ShadowHigh;
+        sq = QDataVis::ShadowHigh;
         break;
     }
-    ShadowQuality realquality = m_chart->setShadowQuality(sq);
+    QDataVis::ShadowQuality realquality = m_chart->setShadowQuality(sq);
     // Check if it setting quality was successful
     if (realquality != sq) {
         switch (realquality) {
-        case ShadowLow:
+        case QDataVis::ShadowLow:
             quality = 1;
             break;
-        case ShadowMedium:
+        case QDataVis::ShadowMedium:
             quality = 2;
             break;
-        case ShadowHigh:
+        case QDataVis::ShadowHigh:
             quality = 3;
             break;
         }

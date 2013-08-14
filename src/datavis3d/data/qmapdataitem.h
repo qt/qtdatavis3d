@@ -19,7 +19,7 @@
 #ifndef QMAPDATAITEM_H
 #define QMAPDATAITEM_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 #include <QtDataVis3D/qbardataitem.h>
 #include <QPointF>
 

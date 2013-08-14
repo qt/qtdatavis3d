@@ -102,7 +102,7 @@ void Q3DScatter::render()
     d_ptr->m_shared->render();
 }
 
-void Q3DScatter::handleShadowQualityUpdate(ShadowQuality quality)
+void Q3DScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
     emit shadowQualityChanged(quality);
 }
@@ -181,7 +181,7 @@ void Q3DScatter::setHeight(const int height)
 }
 
 /*!
- * \a style One of the values in \c MeshStyle. \c Spheres by default.
+ * \a style One of the values in \c QDataVis::MeshStyle. \c Spheres by default.
  *
  * \a smooth A flag to set shading to smooth. \c false by default.
  *
@@ -189,17 +189,17 @@ void Q3DScatter::setHeight(const int height)
  *
  * \sa setMeshFileName()
  */
-void Q3DScatter::setObjectType(MeshStyle style, bool smooth)
+void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
 {
     d_ptr->m_shared->setObjectType(style, smooth);
 }
 
 /*!
- * \a preset Move camera to a predefined position from \c CameraPreset.
+ * \a preset Move camera to a predefined position from \c QDataVis::CameraPreset.
  *
  * Moves camera to a predefined position.
  */
-void Q3DScatter::setCameraPreset(CameraPreset preset)
+void Q3DScatter::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
 }
@@ -221,12 +221,12 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
 }
 
 /*!
- * \a theme Apply a predefined theme from \c ColorTheme.
+ * \a theme Apply a predefined theme from \c QDataVis::ColorTheme.
  *
  * Sets a predefined theme. Theme affects object colors, label colors, text color, background color,
  * window color and grid color. Lighting is also adjusted by themes.
  */
-void Q3DScatter::setTheme(ColorTheme theme)
+void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
 {
     d_ptr->m_shared->setColorTheme(theme);
 }
@@ -255,16 +255,16 @@ void Q3DScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor dep
 /*!
  * \property Q3DScatter::selectionMode
  *
- * \a mode Set object selection mode from \c SelectionMode. \c ModeItem by default.
+ * \a mode Set object selection mode from \c QDataVis::SelectionMode. \c ModeItem by default.
  *
  * Sets object selection mode to be used.
  */
-void Q3DScatter::setSelectionMode(SelectionMode mode)
+void Q3DScatter::setSelectionMode(QDataVis::SelectionMode mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DScatter::selectionMode() const
+QDataVis::SelectionMode Q3DScatter::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -334,17 +334,17 @@ QFont Q3DScatter::font() const
 /*!
  * \property Q3DScatter::labelTransparency
  *
- * \a transparency Transparency level of labels from \c LabelTransparency.
+ * \a transparency Transparency level of labels from \c QDataVis::LabelTransparency.
  * \c TransparencyFromTheme by default.
  *
  * Sets label transparency.
  */
-void Q3DScatter::setLabelTransparency(LabelTransparency transparency)
+void Q3DScatter::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DScatter::labelTransparency() const
+QDataVis::LabelTransparency Q3DScatter::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
@@ -386,17 +386,17 @@ bool Q3DScatter::isBackgroundVisible() const
 /*!
  * \property Q3DScatter::shadowQuality
  *
- * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
+ * \a quality Shadow quality from \c QDataVis::ShadowQuality. \c ShadowLow by default.
  *
- * Sets shadow quality. If setting ShadowQuality of a certain level fails, a level is lowered
+ * Sets shadow quality. If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is done.
  */
-void Q3DScatter::setShadowQuality(ShadowQuality quality)
+void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DScatter::shadowQuality() const
+QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

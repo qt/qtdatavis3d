@@ -19,7 +19,7 @@
 #ifndef VARIANTDATASET_H
 #define VARIANTDATASET_H
 
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 #include <QScopedPointer>
 #include <QVariantList>
 

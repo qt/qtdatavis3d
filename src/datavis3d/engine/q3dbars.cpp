@@ -102,7 +102,7 @@ void Q3DBars::render()
     d_ptr->m_shared->render();
 }
 
-void Q3DBars::handleShadowQualityUpdate(ShadowQuality quality)
+void Q3DBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
     emit shadowQualityChanged(quality);
 }
@@ -207,7 +207,7 @@ void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
  *
  * \sa setMeshFileName()
  */
-void Q3DBars::setBarType(MeshStyle style, bool smooth)
+void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     d_ptr->m_shared->setBarType(style, smooth);
 }
@@ -233,11 +233,11 @@ QSize Q3DBars::sampleSpace() const
 }
 
 /*!
- * \a preset Move camera to a predefined position from \c CameraPreset.
+ * \a preset Move camera to a predefined position from \c QDataVis::CameraPreset.
  *
  * Moves camera to a predefined position.
  */
-void Q3DBars::setCameraPreset(CameraPreset preset)
+void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
 }
@@ -260,12 +260,12 @@ void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 }
 
 /*!
- * \a theme Apply a predefined theme from \c ColorTheme.
+ * \a theme Apply a predefined theme from \c QDataVis::ColorTheme.
  *
  * Sets a predefined theme. Theme affects bar colors, label colors, text color, background color,
  * window color and grid color. Lighting is also adjusted by themes.
  */
-void Q3DBars::setTheme(ColorTheme theme)
+void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 {
     d_ptr->m_shared->setColorTheme(theme);
 }
@@ -293,16 +293,16 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 /*!
  * \property Q3DBars::selectionMode
  *
- * \a mode Set bar selection mode from \c SelectionMode. \c ModeItem by default.
+ * \a mode Set bar selection mode from \c QDataVis::SelectionMode. \c ModeItem by default.
  *
  * Sets bar selection mode to be used.
  */
-void Q3DBars::setSelectionMode(SelectionMode mode)
+void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-SelectionMode Q3DBars::selectionMode() const
+QDataVis::SelectionMode Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -372,17 +372,17 @@ QFont Q3DBars::font() const
 /*!
  * \property Q3DBars::labelTransparency
  *
- * \a transparency Transparency level of labels from \c LabelTransparency.
+ * \a transparency Transparency level of labels from \c QDataVis::LabelTransparency.
  * \c TransparencyFromTheme by default.
  *
  * Sets label transparency.
  */
-void Q3DBars::setLabelTransparency(LabelTransparency transparency)
+void Q3DBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-LabelTransparency Q3DBars::labelTransparency() const
+QDataVis::LabelTransparency Q3DBars::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
@@ -424,17 +424,17 @@ bool Q3DBars::isBackgroundVisible() const
 /*!
  * \property Q3DBars::shadowQuality
  *
- * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
+ * \a quality Shadow quality from \c QDataVis::ShadowQuality. \c ShadowLow by default.
  *
- * Sets shadow quality. If setting ShadowQuality of a certain level fails, a level is lowered
+ * Sets shadow quality. If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is done.
  */
-void Q3DBars::setShadowQuality(ShadowQuality quality)
+void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-ShadowQuality Q3DBars::shadowQuality() const
+QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }

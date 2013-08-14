@@ -69,7 +69,7 @@ private:
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
-    SelectionMode m_selectionMode;
+    QDataVis::SelectionMode m_selectionMode;
     bool m_isSlicingActivated;
 
     bool m_isBarSpecRelative;
@@ -114,7 +114,7 @@ public:
     bool isBarSpecRelative();
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(MeshStyle style, bool smooth = false);
+    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
     QString objFile();
 
     // override bar type with own mesh
@@ -126,8 +126,8 @@ public:
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode();
 
 
     // Enable or disable background grid
@@ -162,7 +162,7 @@ public slots:
     virtual void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
 
 signals:
-    void selectionModeChanged(SelectionMode mode);
+    void selectionModeChanged(QDataVis::SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);

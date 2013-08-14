@@ -70,16 +70,16 @@ public:
     // Interaction related parameters // TODO: Moved to controller
     MousePressType m_mousePressed;
     QPoint m_mousePos;
-    SelectionMode m_selectionMode;
+    QDataVis::SelectionMode m_selectionMode;
 
     // Visual parameters
     QRect m_boundingRect;
     Theme m_cachedTheme;
-    LabelTransparency m_labelTransparency;
+    QDataVis::LabelTransparency m_labelTransparency;
     QFont m_font;
     bool m_isGridEnabled;
     bool m_isBackgroundEnabled;
-    ShadowQuality m_shadowQuality;
+    QDataVis::ShadowQuality m_shadowQuality;
     bool m_hasNegativeValues;
 
 private:

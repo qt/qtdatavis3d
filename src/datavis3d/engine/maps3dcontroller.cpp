@@ -81,7 +81,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_scaleFactor(1.0f),
       m_theme(new Theme()),
       m_isInitialized(false),
-      m_selectionMode(ModeItem),
+      m_selectionMode(QDataVis::ModeItem),
       m_selectedBar(0),
       m_previouslySelectedBar(0),
       m_axisLabelX(QStringLiteral("X")),
@@ -91,7 +91,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_zoomViewPort(rect.x(), rect.y(), rect.width(), rect.height()),
       m_zoomActivated(false),
       m_textureHelper(new TextureHelper()),
-      m_labelTransparency(TransparencyFromTheme),
+      m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
       m_areaSize(QSizeF(1.0f, 1.0f)),
@@ -103,7 +103,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_selectionDepthBuffer(0),
       m_updateLabels(true),
       m_adjustDirection(Q3DMaps::AdjustHeight),
-      m_shadowQuality(ShadowLow),
+      m_shadowQuality(QDataVis::ShadowLow),
       m_shadowQualityToShader(33.3f),
       m_bgrHasAlpha(false),
       m_boundingRect(rect.x(), rect.y(), rect.width(), rect.height()),
@@ -146,7 +146,7 @@ void Maps3DController::initializeOpenGL()
 
     // Initialize shaders
 #if !defined(QT_OPENGL_ES_2)
-    if (m_shadowQuality > ShadowNone) {
+    if (m_shadowQuality > QDataVis::ShadowNone) {
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
                         QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
@@ -380,7 +380,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_shadowQuality > ShadowNone) {
+    if (m_shadowQuality > QDataVis::ShadowNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
         m_depthShader->bind();
@@ -526,7 +526,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
 
 #if 1
     // Skip selection mode drawing if we're zoomed or have no selection mode
-    if (!m_zoomActivated && m_selectionMode > ModeNone) {
+    if (!m_zoomActivated && m_selectionMode > QDataVis::ModeNone) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -665,7 +665,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         QVector3D barColor = baseColor + heightColor;
 
         GLfloat lightStrength = m_theme->m_lightStrength;
-        if (m_selectionMode > ModeNone) {
+        if (m_selectionMode > QDataVis::ModeNone) {
             Maps3DController::SelectionType selectionType = isSelected(bar, selection);
             switch (selectionType) {
             case Maps3DController::SelectionBar: {
@@ -703,7 +703,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             m_barShader->setUniformValue(m_barShader->ambientS(), m_theme->m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_shadowQuality > ShadowNone) {
+            if (m_shadowQuality > QDataVis::ShadowNone) {
                 // Set shadow shader bindings
                 m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
                 m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
@@ -767,7 +767,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                                             m_theme->m_ambientStrength * 3.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_shadowQuality > ShadowNone) {
+        if (m_shadowQuality > QDataVis::ShadowNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
@@ -823,7 +823,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
         m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
-        if (m_labelTransparency > TransparencyNone) {
+        if (m_labelTransparency > QDataVis::TransparencyNone) {
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
@@ -857,7 +857,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
                             m_labelObj, true, false);
 #endif
         glDisable(GL_TEXTURE_2D);
-        if (m_labelTransparency > TransparencyNone)
+        if (m_labelTransparency > QDataVis::TransparencyNone)
             glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
@@ -1150,34 +1150,34 @@ void Maps3DController::setBarSpecs(const QVector3D &thickness,
     m_adjustDirection = direction;
 }
 
-void Maps3DController::setBarType(MeshStyle style, bool smooth)
+void Maps3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
-    if (style == Bars) {
+    if (style == QDataVis::Bars) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/barSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/bar");
-    } else if (style == Pyramids) {
+    } else if (style == QDataVis::Pyramids) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/pyramidSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    } else if (style == Cones) {
+    } else if (style == QDataVis::Cones) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/coneSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/cone");
-    } else if (style == Cylinders) {
+    } else if (style == QDataVis::Cylinders) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    } else if (style == BevelBars) {
+    } else if (style == QDataVis::BevelBars) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
         else
             m_objFile = QStringLiteral(":/defaultMeshes/bevelbar");
-    } else if (style == Spheres) {
+    } else if (style == QDataVis::Spheres) {
         if (smooth)
             m_objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else
@@ -1193,7 +1193,7 @@ void Maps3DController::setMeshFileName(const QString &objFileName)
     m_objFile = objFileName;
 }
 
-void Maps3DController::setCameraPreset(CameraPreset preset)
+void Maps3DController::setCameraPreset(QDataVis::CameraPreset preset)
 {
     m_camera->setCameraPreset(preset);
 }
@@ -1207,12 +1207,12 @@ void Maps3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, G
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
 }
 
-void Maps3DController::setTheme(ColorTheme colorTheme)
+void Maps3DController::setTheme(QDataVis::ColorTheme colorTheme)
 {
     m_theme->useColorTheme(colorTheme);
     m_drawer->setTheme(*m_theme);
 #if !defined(QT_OPENGL_ES_2)
-    if (m_shadowQuality > ShadowNone) {
+    if (m_shadowQuality > QDataVis::ShadowNone) {
         // Re-init shaders
         if (!m_theme->m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -1249,7 +1249,7 @@ void Maps3DController::setBarColor(QColor baseColor, QColor heightColor, bool un
     m_theme->m_heightColor = heightColor;
     if (m_theme->m_uniformColor != uniform) {
 #if !defined(QT_OPENGL_ES_2)
-        if (m_shadowQuality > ShadowNone) {
+        if (m_shadowQuality > QDataVis::ShadowNone) {
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -1295,7 +1295,7 @@ void Maps3DController::setImage(const QImage &image)
     m_bgrTexture = m_textureHelper->create2DTexture(image, true, true);
 }
 
-void Maps3DController::setSelectionMode(SelectionMode mode)
+void Maps3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
     m_selectionMode = mode;
     // Disable zoom if mode changes
@@ -1303,7 +1303,7 @@ void Maps3DController::setSelectionMode(SelectionMode mode)
     //m_sceneViewPort = QRect(0, 0, width(), height());
 }
 
-SelectionMode Maps3DController::selectionMode()
+QDataVis::SelectionMode Maps3DController::selectionMode()
 {
     return m_selectionMode;
 }
@@ -1332,31 +1332,31 @@ QFont Maps3DController::font()
     return m_font;
 }
 
-void Maps3DController::setLabelTransparency(LabelTransparency transparency)
+void Maps3DController::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     m_labelTransparency = transparency;
     m_drawer->setTransparency(transparency);
     m_updateLabels = true;
 }
 
-LabelTransparency Maps3DController::labelTransparency()
+QDataVis::LabelTransparency Maps3DController::labelTransparency()
 {
     return m_labelTransparency;
 }
 
-ShadowQuality Maps3DController::setShadowQuality(ShadowQuality quality)
+QDataVis::ShadowQuality Maps3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_shadowQuality = quality;
     switch (quality) {
-    case ShadowLow:
+    case QDataVis::ShadowLow:
         //qDebug() << "ShadowLow";
         m_shadowQualityToShader = 33.3f;
         break;
-    case ShadowMedium:
+    case QDataVis::ShadowMedium:
         //qDebug() << "ShadowMedium";
         m_shadowQualityToShader = 100.0f;
         break;
-    case ShadowHigh:
+    case QDataVis::ShadowHigh:
         //qDebug() << "ShadowHigh";
         m_shadowQualityToShader = 200.0f;
         break;
@@ -1366,7 +1366,7 @@ ShadowQuality Maps3DController::setShadowQuality(ShadowQuality quality)
     }
     if (m_isInitialized) {
 #if !defined(QT_OPENGL_ES_2)
-        if (m_shadowQuality > ShadowNone) {
+        if (m_shadowQuality > QDataVis::ShadowNone) {
             // Re-init shaders
             if (!m_theme->m_uniformColor) {
                 initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -1406,7 +1406,7 @@ ShadowQuality Maps3DController::setShadowQuality(ShadowQuality quality)
     return m_shadowQuality;
 }
 
-ShadowQuality Maps3DController::shadowQuality()
+QDataVis::ShadowQuality Maps3DController::shadowQuality()
 {
     return m_shadowQuality;
 }
@@ -1550,22 +1550,22 @@ void Maps3DController::initDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_shadowQuality > ShadowNone) {
+    if (m_shadowQuality > QDataVis::ShadowNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(this->size(), m_depthFrameBuffer,
                                                              m_shadowQuality);
         if (!m_depthTexture) {
             switch (m_shadowQuality) {
-            case ShadowHigh:
+            case QDataVis::ShadowHigh:
                 qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)setShadowQuality(ShadowMedium);
+                (void)setShadowQuality(QDataVis::ShadowMedium);
                 break;
-            case ShadowMedium:
+            case QDataVis::ShadowMedium:
                 qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)setShadowQuality(ShadowLow);
+                (void)setShadowQuality(QDataVis::ShadowLow);
                 break;
-            case ShadowLow:
+            case QDataVis::ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)setShadowQuality(ShadowNone);
+                (void)setShadowQuality(QDataVis::ShadowNone);
                 break;
             default:
                 // Cannot get here

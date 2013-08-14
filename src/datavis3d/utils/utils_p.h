@@ -52,7 +52,7 @@ class Utils
                                    const QString &text,
                                    const QColor &bgrColor,
                                    const QColor &txtColor,
-                                   LabelTransparency transparency);
+                                   QDataVis::LabelTransparency transparency);
     static QVector3D getSelection(QPoint mousepos, int height);
 };
 

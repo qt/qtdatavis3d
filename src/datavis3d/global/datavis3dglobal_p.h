@@ -30,7 +30,7 @@
 #define DATAVIS3DGLOBAL_P_H
 
 #include "qdatavis3dglobal.h"
-#include "qdatavis3dnamespace.h"
+#include "qdatavis3denums.h"
 #include <QOpenGLFunctions>
 #include <QVector3D>
 #include <QDebug>

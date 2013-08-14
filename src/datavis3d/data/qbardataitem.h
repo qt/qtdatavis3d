@@ -19,7 +19,7 @@
 #ifndef QBARDATAITEM_H
 #define QBARDATAITEM_H
 
-#include <QtDataVis3D/qdatavis3dnamespace.h>
+#include <QtDataVis3D/qdatavis3denums.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

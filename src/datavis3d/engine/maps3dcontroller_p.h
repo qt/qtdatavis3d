@@ -86,20 +86,20 @@ public:
                      Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
-    void setBarType(MeshStyle style, bool smooth = false);
+    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
 
     // Select preset camera placement
-    void setCameraPreset(CameraPreset preset);
+    void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
     void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
-    void setTheme(ColorTheme theme);
+    void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
@@ -113,8 +113,8 @@ public:
     // TODO: light placement API
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode();
 
     // Font size adjustment
     void setFontSize(float fontsize);
@@ -125,12 +125,12 @@ public:
     QFont font();
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency();
 
     // Adjust shadow quality
-    ShadowQuality setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+    QDataVis::ShadowQuality setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality();
 
     // Size
     const QSize size();
@@ -216,7 +216,7 @@ private:
     GLfloat m_scaleFactor;
     Theme *m_theme;
     bool m_isInitialized;
-    SelectionMode m_selectionMode;
+    QDataVis::SelectionMode m_selectionMode;
     BarRenderItem *m_selectedBar; // points to renderitem array
     BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QString m_axisLabelX;
@@ -226,7 +226,7 @@ private:
     QRect m_zoomViewPort;
     bool m_zoomActivated;
     TextureHelper *m_textureHelper;
-    LabelTransparency m_labelTransparency;
+    QDataVis::LabelTransparency m_labelTransparency;
     QFont m_font;
     Drawer *m_drawer;
     QSizeF m_areaSize;
@@ -238,7 +238,7 @@ private:
     GLuint m_selectionDepthBuffer;
     bool m_updateLabels;
     Q3DMaps::AdjustmentDirection m_adjustDirection;
-    ShadowQuality m_shadowQuality;
+    QDataVis::ShadowQuality m_shadowQuality;
     GLfloat m_shadowQualityToShader;
     bool m_bgrHasAlpha;
     QRect m_boundingRect;

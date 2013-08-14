@@ -44,40 +44,15 @@ class DeclarativeMaps : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
-    Q_PROPERTY(SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(QItemModelMapDataMapping *mapping READ mapping WRITE setMapping)
-    Q_ENUMS(SelectionMode)
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelTransparency)
-
-public:
-    // Duplicated here to be able to use the same enums
-    enum SelectionMode {
-        ModeNone = 0,
-        ModeItem,
-        ModeItemAndRow,
-        ModeItemAndColumn,
-        ModeItemRowAndColumn,
-        ModeZoomRow,
-        ModeZoomColumn
-    };
-
-    enum ShadowQuality {
-        ShadowNone = 0,
-        ShadowLow = 1,
-        ShadowMedium = 3,
-        ShadowHigh = 5
-    };
-
-    enum LabelTransparency {
-        TransparencyNone = 0,       // Full solid, using colors from theme
-        TransparencyFromTheme,      // Use colors and transparencies from theme
-        TransparencyNoBackground    // Draw just text on transparent background
-    };
+    Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
+    Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
+    Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
 
 public:
     explicit DeclarativeMaps(QQuickItem *parent = 0);
@@ -97,20 +72,20 @@ public:
                      Q3DMaps::AdjustmentDirection direction = Q3DMaps::AdjustHeight);
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, balls, etc.
-    Q_INVOKABLE void setBarType(MeshStyle style, bool smooth = false);
+    Q_INVOKABLE void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     // override bar type with own mesh
     Q_INVOKABLE void setMeshFileName(const QString &objFileName);
 
     // Select preset camera placement
-    Q_INVOKABLE void setCameraPreset(CameraPreset preset);
+    Q_INVOKABLE void setCameraPreset(QDataVis::CameraPreset preset);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (180...180) and
     // vertical (0...90) angles and distance in percentage (10...500))
     Q_INVOKABLE void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text colors are affected)
-    Q_INVOKABLE void setTheme(ColorTheme theme);
+    Q_INVOKABLE void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
     Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
@@ -123,8 +98,8 @@ public:
     Q_INVOKABLE void setImage(const QString &imageUrl);
 
     // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(SelectionMode mode);
-    SelectionMode selectionMode();
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode();
 
     // Font size adjustment
     void setFontSize(float fontsize);
@@ -135,12 +110,12 @@ public:
     QFont font();
 
     // Label transparency adjustment
-    void setLabelTransparency(LabelTransparency transparency);
-    LabelTransparency labelTransparency();
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency();
 
     // Adjust shadow quality
-    void setShadowQuality(ShadowQuality quality);
-    ShadowQuality shadowQuality();
+    void setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality();
 
     QItemModelMapDataMapping *mapping() const;
     void setMapping(QItemModelMapDataMapping *mapping);

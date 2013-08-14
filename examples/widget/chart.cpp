@@ -77,14 +77,14 @@ void ChartModifier::restart(bool dynamicData)
     if (m_static) {
         start();
         // Set selection mode to zoom row
-        m_chart->setSelectionMode(ModeZoomRow);
+        m_chart->setSelectionMode(QDataVis::ModeZoomRow);
         m_chart->setFont(QFont("Times Roman", 20));
     } else {
         m_chart->dataProxy()->resetArray(0);
         // Set up sample space
         m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
-        m_chart->setSelectionMode(ModeItemRowAndColumn);
+        m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
         m_chart->valueAxis()->setSegmentCount(m_segments * 2);
         m_chart->valueAxis()->setSubSegmentCount(0);
         m_chart->valueAxis()->setAutoAdjustRange(true);
@@ -251,34 +251,34 @@ void ChartModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Cylinders, false);
+        m_chart->setBarType(QDataVis::Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Cylinders, true);
+        m_chart->setBarType(QDataVis::Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Cones, false);
+        m_chart->setBarType(QDataVis::Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Cones, true);
+        m_chart->setBarType(QDataVis::Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Bars, false);
+        m_chart->setBarType(QDataVis::Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Bars, true);
+        m_chart->setBarType(QDataVis::Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Pyramids, false);
+        m_chart->setBarType(QDataVis::Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Pyramids, true);
+        m_chart->setBarType(QDataVis::Pyramids, true);
         break;
     case 8:
-        m_chart->setBarType(BevelBars, false);
+        m_chart->setBarType(QDataVis::BevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(BevelBars, true);
+        m_chart->setBarType(QDataVis::BevelBars, true);
         break;
     }
     model++;
@@ -288,42 +288,42 @@ void ChartModifier::changeStyle()
 
 void ChartModifier::changePresetCamera()
 {
-    static int preset = PresetFrontLow;
+    static int preset = QDataVis::PresetFrontLow;
 
-    m_chart->setCameraPreset((CameraPreset)preset);
+    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > PresetDirectlyBelow)
-        preset = PresetFrontLow;
+    if (++preset > QDataVis::PresetDirectlyBelow)
+        preset = QDataVis::PresetFrontLow;
 }
 
 void ChartModifier::changeTheme()
 {
-    static int theme = ThemeSystem;
+    static int theme = QDataVis::ThemeSystem;
 
-    m_chart->setTheme((ColorTheme)theme);
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > ThemeLight)
-        theme = ThemeSystem;
+    if (++theme > QDataVis::ThemeLight)
+        theme = QDataVis::ThemeSystem;
 }
 
 void ChartModifier::changeTransparency()
 {
-    static int transparency = TransparencyNone;
+    static int transparency = QDataVis::TransparencyNone;
 
-    m_chart->setLabelTransparency((LabelTransparency)transparency);
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
-    if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyFromTheme;
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyFromTheme;
 }
 
 void ChartModifier::changeSelectionMode()
 {
-    static int selectionMode = ModeNone;
+    static int selectionMode = QDataVis::ModeNone;
 
-    m_chart->setSelectionMode((SelectionMode)selectionMode);
+    m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 
-    if (++selectionMode > ModeZoomColumn)
-        selectionMode = ModeNone;
+    if (++selectionMode > QDataVis::ModeZoomColumn)
+        selectionMode = QDataVis::ModeNone;
 }
 
 void ChartModifier::changeFont(const QFont &font)
@@ -340,17 +340,17 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
-void ChartModifier::shadowQualityUpdatedByVisual(ShadowQuality sq)
+void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
     int quality = 0;
     switch (sq) {
-    case ShadowLow:
+    case QDataVis::ShadowLow:
         quality = 1;
         break;
-    case ShadowMedium:
+    case QDataVis::ShadowMedium:
         quality = 2;
         break;
-    case ShadowHigh:
+    case QDataVis::ShadowHigh:
         quality = 3;
         break;
     }
@@ -361,16 +361,16 @@ void ChartModifier::shadowQualityUpdatedByVisual(ShadowQuality sq)
 
 void ChartModifier::changeShadowQuality(int quality)
 {
-    ShadowQuality sq = ShadowNone;
+    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
     switch (quality) {
     case 1:
-        sq = ShadowLow;
+        sq = QDataVis::ShadowLow;
         break;
     case 2:
-        sq = ShadowMedium;
+        sq = QDataVis::ShadowMedium;
         break;
     case 3:
-        sq = ShadowHigh;
+        sq = QDataVis::ShadowHigh;
         break;
     }
     m_chart->setShadowQuality(sq);

@@ -31,9 +31,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_fontSize(30.0f)
 {
     m_chart->setFontSize(m_fontSize);
-    m_chart->setObjectType(Spheres, true);
-    m_chart->setTheme(ThemeBrownSand);
-    m_chart->setShadowQuality(ShadowHigh);
+    m_chart->setObjectType(QDataVis::Spheres, true);
+    m_chart->setTheme(QDataVis::ThemeBrownSand);
+    m_chart->setShadowQuality(QDataVis::ShadowHigh);
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     m_chart->setDataProxy(proxy);
@@ -88,16 +88,16 @@ void ScatterDataModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setObjectType(Dots, false);
+        m_chart->setObjectType(QDataVis::Dots, false);
         break;
     case 1:
-        m_chart->setObjectType(Dots, true);
+        m_chart->setObjectType(QDataVis::Dots, true);
         break;
     case 2:
-        m_chart->setObjectType(Spheres, false);
+        m_chart->setObjectType(QDataVis::Spheres, false);
         break;
     case 3:
-        m_chart->setObjectType(Spheres, true);
+        m_chart->setObjectType(QDataVis::Spheres, true);
         break;
     }
     model++;
@@ -107,32 +107,32 @@ void ScatterDataModifier::changeStyle()
 
 void ScatterDataModifier::changePresetCamera()
 {
-    static int preset = PresetFrontLow;
+    static int preset = QDataVis::PresetFrontLow;
 
-    m_chart->setCameraPreset((CameraPreset)preset);
+    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > PresetDirectlyAboveCCW45)
-        preset = PresetFrontLow;
+    if (++preset > QDataVis::PresetDirectlyAboveCCW45)
+        preset = QDataVis::PresetFrontLow;
 }
 
 void ScatterDataModifier::changeTheme()
 {
-    static int theme = ThemeSystem;
+    static int theme = QDataVis::ThemeSystem;
 
-    m_chart->setTheme((ColorTheme)theme);
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > ThemeLight)
-        theme = ThemeSystem;
+    if (++theme > QDataVis::ThemeLight)
+        theme = QDataVis::ThemeSystem;
 }
 
 void ScatterDataModifier::changeTransparency()
 {
-    static int transparency = TransparencyNone;
+    static int transparency = QDataVis::TransparencyNone;
 
-    m_chart->setLabelTransparency((LabelTransparency)transparency);
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
-    if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyNone;
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyNone;
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
@@ -148,17 +148,17 @@ void ScatterDataModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
     int quality = 0;
     switch (sq) {
-    case ShadowLow:
+    case QDataVis::ShadowLow:
         quality = 1;
         break;
-    case ShadowMedium:
+    case QDataVis::ShadowMedium:
         quality = 2;
         break;
-    case ShadowHigh:
+    case QDataVis::ShadowHigh:
         quality = 3;
         break;
     }
@@ -290,16 +290,16 @@ void ScatterDataModifier::startStopTimer()
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    ShadowQuality sq = ShadowNone;
+    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
     switch (quality) {
     case 1:
-        sq = ShadowLow;
+        sq = QDataVis::ShadowLow;
         break;
     case 2:
-        sq = ShadowMedium;
+        sq = QDataVis::ShadowMedium;
         break;
     case 3:
-        sq = ShadowHigh;
+        sq = QDataVis::ShadowHigh;
         break;
     }
     m_chart->setShadowQuality(sq);
