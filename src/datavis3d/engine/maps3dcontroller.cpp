@@ -405,7 +405,9 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -m_yAdjustment, zComp),
+        QVector3D depthLightPos = m_camera->calculateLightPosition(
+                    defaultLightPos, 0.0f, (distanceMod + 1.5f) / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, -m_yAdjustment, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
         //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
@@ -413,7 +415,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
         depthProjectionMatrix.perspective(15.0f, (GLfloat)m_sceneViewPort.width()
-                                          / (GLfloat)m_sceneViewPort.height(), 3.0f, 100.0f);
+                                          / (GLfloat)m_sceneViewPort.height(), 3.0f, 200.0f);
 #else
         // Use these for orthographic shadows
         //qDebug() << m_areaSize.width() / m_scaleFactor << m_yAdjustment;

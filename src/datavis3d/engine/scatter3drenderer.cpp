@@ -247,10 +247,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                                m_cachedZoomLevel * m_autoScaleAdjustment,
-                                m_mainViewPort.width(),
-                                m_mainViewPort.height(),
-                                true);
+                m_cachedZoomLevel * m_autoScaleAdjustment,
+                m_mainViewPort.width(),
+                m_mainViewPort.height(),
+                true);
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -356,14 +356,16 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 0.0f, zComp),
+        QVector3D depthLightPos = camera->calculateLightPosition(
+                    defaultLightPos, 0.0f, 1.0f / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
         //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
-        depthProjectionMatrix.perspective(20.0f, (GLfloat)m_mainViewPort.width()
+        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_mainViewPort.width()
                                           / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
 #else
         // Use these for orthographic shadows

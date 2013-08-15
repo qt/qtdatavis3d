@@ -189,7 +189,7 @@ private:
 #endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
-    Bars3dController::SelectionType isSelected(GLint row, GLint bar);
+    Abstract3DController::SelectionType isSelected(GLint row, GLint bar);
 
     Q_DISABLE_COPY(Bars3dRenderer)
 

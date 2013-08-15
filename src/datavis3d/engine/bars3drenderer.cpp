@@ -512,7 +512,6 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
     QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
-    //lightPos = QVector3D(0.0f, 4.0f, zComp); // center of bars, 4.0f above - for testing
 
     // Skip depth rendering if we're in slice mode
     // TODO: Fix this, causes problems if depth rendering is off in slice mode
@@ -537,8 +536,8 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = lightPos;
-        depthLightPos.setY(lightPos.y() - 0.5f);
+        QVector3D depthLightPos = camera->calculateLightPosition(
+                    QVector3D(0.0f, 0.0f, zComp), 0.0f, 1.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, -m_yAdjustment, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
@@ -546,7 +545,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
-        depthProjectionMatrix.perspective(20.0f, (GLfloat)m_mainViewPort.width()
+        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_mainViewPort.width()
                                           / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
 #else
         // Use these for orthographic shadows
