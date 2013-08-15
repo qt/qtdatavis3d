@@ -640,7 +640,10 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
 
     delete *axisPtr;
     *axisPtr = axis;
+
+    axis->setParent(0); // Assume ownership
     axis->d_ptr->setOrientation(orientation);
+
 
     QObject::connect(axis, &QAbstractAxis::titleChanged,
                      this, &Abstract3DController::handleAxisTitleChanged);

@@ -87,7 +87,9 @@ public:
     virtual void requestSelectionAtPoint(const QPoint &point) = 0;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
+#if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
+#endif
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;

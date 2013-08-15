@@ -33,6 +33,8 @@
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
 #include "qitemmodelbardatamapping.h"
+#include "qvalueaxis.h"
+#include "qcategoryaxis.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -46,6 +48,9 @@ class DeclarativeBars : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(QCategoryAxis *axisX READ axisX WRITE setAxisX)
+    Q_PROPERTY(QValueAxis *axisY READ axisY WRITE setAxisY)
+    Q_PROPERTY(QCategoryAxis *axisZ READ axisZ WRITE setAxisZ)
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -90,17 +95,19 @@ public:
     // percentage (10...500))
     Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
 
-    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    Q_INVOKABLE void setSegmentCount(int segmentCount, qreal step, qreal minimum);
-
     // Add whole data set.
     void setData(QAbstractItemModel *data);
     QAbstractItemModel *data();
 
     QItemModelBarDataMapping *mapping() const;
     void setMapping(QItemModelBarDataMapping *mapping);
+
+    QCategoryAxis *axisX() const;
+    void setAxisX(QCategoryAxis *axis);
+    QValueAxis *axisY() const;
+    void setAxisY(QValueAxis *axis);
+    QCategoryAxis *axisZ() const;
+    void setAxisZ(QCategoryAxis *axis);
 
     // Set bar thickness. Y -component sets the thickness of z -direction.
     void setBarThickness(QSizeF thickness);

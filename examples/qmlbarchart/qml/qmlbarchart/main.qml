@@ -39,58 +39,73 @@ Item {
             columnRole: "month"
             valueRole: "expenses"
             rowCategories: ["2000", "2001", "2002", "2003", "2004"]
-            columnCategories: ["January","February","March","April","May","June",
-                "July","August","September","October","November","December"]
+            columnCategories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
         }
 
         ListModel {
             id: dataModel
-            ListElement{ year: "2000"; month: "January";   expenses: "3";  income: "8" }
-            ListElement{ year: "2000"; month: "February";  expenses: "8";  income: "14" }
-            ListElement{ year: "2000"; month: "March";     expenses: "10"; income: "20" }
-            ListElement{ year: "2000"; month: "April";     expenses: "12"; income: "24" }
-            ListElement{ year: "2000"; month: "May";       expenses: "10"; income: "19" }
-            ListElement{ year: "2000"; month: "June";      expenses: "5";  income: "8" }
-            ListElement{ year: "2000"; month: "July";      expenses: "1";  income: "4" }
-            ListElement{ year: "2000"; month: "August";    expenses: "7";  income: "12" }
-            ListElement{ year: "2000"; month: "September"; expenses: "4";  income: "16" }
-            ListElement{ year: "2000"; month: "October";   expenses: "22"; income: "33" }
-            ListElement{ year: "2000"; month: "November";  expenses: "16"; income: "25" }
-            ListElement{ year: "2000"; month: "December";  expenses: "2";  income: "7" }
+            ListElement{ year: "2000"; month: "Jan"; expenses: "3";  income: "8" }
+            ListElement{ year: "2000"; month: "Feb"; expenses: "8";  income: "14" }
+            ListElement{ year: "2000"; month: "Mar"; expenses: "10"; income: "20" }
+            ListElement{ year: "2000"; month: "Apr"; expenses: "12"; income: "24" }
+            ListElement{ year: "2000"; month: "May"; expenses: "10"; income: "19" }
+            ListElement{ year: "2000"; month: "Jun"; expenses: "5";  income: "8" }
+            ListElement{ year: "2000"; month: "Jul"; expenses: "1";  income: "4" }
+            ListElement{ year: "2000"; month: "Aug"; expenses: "7";  income: "12" }
+            ListElement{ year: "2000"; month: "Sep"; expenses: "4";  income: "16" }
+            ListElement{ year: "2000"; month: "Oct"; expenses: "22"; income: "33" }
+            ListElement{ year: "2000"; month: "Nov"; expenses: "16"; income: "25" }
+            ListElement{ year: "2000"; month: "Dec"; expenses: "2";  income: "7" }
 
-            ListElement{ year: "2001"; month: "January";   expenses: "4";  income: "5"  }
-            ListElement{ year: "2001"; month: "February";  expenses: "4";  income: "7"  }
-            ListElement{ year: "2001"; month: "March";     expenses: "11"; income: "14"  }
-            ListElement{ year: "2001"; month: "April";     expenses: "16"; income: "22"  }
-            ListElement{ year: "2001"; month: "May";       expenses: "3";  income: "5"  }
-            ListElement{ year: "2001"; month: "June";      expenses: "4";  income: "8"  }
-            ListElement{ year: "2001"; month: "July";      expenses: "7";  income: "9"  }
-            ListElement{ year: "2001"; month: "August";    expenses: "9";  income: "13"  }
-            ListElement{ year: "2001"; month: "September"; expenses: "1";  income: "6"  }
-            ListElement{ year: "2001"; month: "October";   expenses: "14"; income: "25"  }
-            ListElement{ year: "2001"; month: "November";  expenses: "19"; income: "29"  }
-            ListElement{ year: "2001"; month: "December";  expenses: "5";  income: "7"  }
+            ListElement{ year: "2001"; month: "Jan"; expenses: "4";  income: "5"  }
+            ListElement{ year: "2001"; month: "Feb"; expenses: "4";  income: "7"  }
+            ListElement{ year: "2001"; month: "Mar"; expenses: "11"; income: "14"  }
+            ListElement{ year: "2001"; month: "Apr"; expenses: "16"; income: "22"  }
+            ListElement{ year: "2001"; month: "May"; expenses: "3";  income: "5"  }
+            ListElement{ year: "2001"; month: "Jun"; expenses: "4";  income: "8"  }
+            ListElement{ year: "2001"; month: "Jul"; expenses: "7";  income: "9"  }
+            ListElement{ year: "2001"; month: "Aug"; expenses: "9";  income: "13"  }
+            ListElement{ year: "2001"; month: "Sep"; expenses: "1";  income: "6"  }
+            ListElement{ year: "2001"; month: "Oct"; expenses: "14"; income: "25"  }
+            ListElement{ year: "2001"; month: "Nov"; expenses: "19"; income: "29"  }
+            ListElement{ year: "2001"; month: "Dec"; expenses: "5";  income: "7"  }
 
-            ListElement{ year: "2002"; month: "January";   expenses: "14"; income: "22"  }
-            ListElement{ year: "2002"; month: "February";  expenses: "5";  income: "7"  }
-            ListElement{ year: "2002"; month: "March";     expenses: "1";  income: "9"  }
-            ListElement{ year: "2002"; month: "April";     expenses: "1";  income: "12"  }
-            ListElement{ year: "2002"; month: "May";       expenses: "5";  income: "9"  }
-            ListElement{ year: "2002"; month: "June";      expenses: "5";  income: "8"  }
-            ListElement{ year: "2002"; month: "July";      expenses: "3";  income: "7"  }
-            ListElement{ year: "2002"; month: "August";    expenses: "1";  income: "5"  }
-            ListElement{ year: "2002"; month: "September"; expenses: "2";  income: "4"  }
-            ListElement{ year: "2002"; month: "October";   expenses: "10"; income: "13"  }
-            ListElement{ year: "2002"; month: "November";  expenses: "12"; income: "17"  }
-            ListElement{ year: "2002"; month: "December";  expenses: "6";  income: "9"  }
+            ListElement{ year: "2002"; month: "Jan"; expenses: "14"; income: "22"  }
+            ListElement{ year: "2002"; month: "Feb"; expenses: "5";  income: "7"  }
+            ListElement{ year: "2002"; month: "Mar"; expenses: "1";  income: "9"  }
+            ListElement{ year: "2002"; month: "Apr"; expenses: "1";  income: "12"  }
+            ListElement{ year: "2002"; month: "May"; expenses: "5";  income: "9"  }
+            ListElement{ year: "2002"; month: "Jun"; expenses: "5";  income: "8"  }
+            ListElement{ year: "2002"; month: "Jul"; expenses: "3";  income: "7"  }
+            ListElement{ year: "2002"; month: "Aug"; expenses: "1";  income: "5"  }
+            ListElement{ year: "2002"; month: "Sep"; expenses: "2";  income: "4"  }
+            ListElement{ year: "2002"; month: "Oct"; expenses: "10"; income: "13"  }
+            ListElement{ year: "2002"; month: "Nov"; expenses: "12"; income: "17"  }
+            ListElement{ year: "2002"; month: "Dec"; expenses: "6";  income: "9"  }
 
-            ListElement{ year: "2003"; month: "January";   expenses: "2";  income: "6"  }
-            ListElement{ year: "2003"; month: "February";  expenses: "4";  income: "8"  }
-            ListElement{ year: "2003"; month: "March";     expenses: "7";  income: "12"  }
-            ListElement{ year: "2003"; month: "April";     expenses: "9";  income: "15"  }
+            ListElement{ year: "2003"; month: "Jan"; expenses: "2";  income: "6"  }
+            ListElement{ year: "2003"; month: "Feb"; expenses: "4";  income: "8"  }
+            ListElement{ year: "2003"; month: "Mar"; expenses: "7";  income: "12"  }
+            ListElement{ year: "2003"; month: "Apr"; expenses: "9";  income: "15"  }
             // rest of 2003 missing on purpose, as well as whole of 2004
         }
 
+        CategoryAxis {
+            id: rowAxis
+            categoryLabels: ["2000", "2001", "2002", "2003", "2004"]
+        }
+        CategoryAxis {
+            id: columnAxis
+            categoryLabels: ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"]
+        }
+        ValueAxis {
+            id: valueAxis
+            min: 0
+            max: 35
+            labelFormat: "M\u20AC"
+        }
         Bars3D {
             id: testchart
             width: dataView.width
@@ -106,11 +121,13 @@ Item {
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
             barType: Bars3D.BevelBars
+            axisX: rowAxis
+            axisY: valueAxis
+            axisZ: columnAxis
         }
     }
 
     Component.onCompleted: {
-        testchart.setSegmentCount(10, 3, 0)
         testchart.data = dataModel
     }
 

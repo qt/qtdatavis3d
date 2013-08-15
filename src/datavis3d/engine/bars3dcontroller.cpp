@@ -43,7 +43,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_renderer(0),
       m_data(0)
 {
-    // Default axes. Only Y axis can actually be changed by user.
+    // Default axes
     setAxisX(new QCategoryAxis());
     setAxisY(new QValueAxis());
     setAxisZ(new QCategoryAxis());

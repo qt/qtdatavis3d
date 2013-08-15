@@ -120,6 +120,36 @@ QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
     return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->mapping();
 }
 
+QValueAxis *DeclarativeScatter::axisX() const
+{
+    return static_cast<QValueAxis *>(m_shared->axisX());
+}
+
+void DeclarativeScatter::setAxisX(QValueAxis *axis)
+{
+    m_shared->setAxisX(axis);
+}
+
+QValueAxis *DeclarativeScatter::axisY() const
+{
+    return static_cast<QValueAxis *>(m_shared->axisY());
+}
+
+void DeclarativeScatter::setAxisY(QValueAxis *axis)
+{
+    m_shared->setAxisY(axis);
+}
+
+QValueAxis *DeclarativeScatter::axisZ() const
+{
+    return static_cast<QValueAxis *>(m_shared->axisZ());
+}
+
+void DeclarativeScatter::setAxisZ(QValueAxis *axis)
+{
+    m_shared->setAxisZ(axis);
+}
+
 void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
 {
     QString objFile = m_shared->meshFileName();

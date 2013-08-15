@@ -106,16 +106,6 @@ void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int di
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-// TODO needs proper axis support also in QML
-void DeclarativeBars::setSegmentCount(int segmentCount, qreal step, qreal minimum)
-{
-    QValueAxis *axis = static_cast<QValueAxis *>(m_shared->axisY());
-    if (axis) {
-        axis->setSegmentCount(segmentCount);
-        axis->setRange(minimum, segmentCount * step);
-    }
-}
-
 void DeclarativeBars::setData(QAbstractItemModel *data)
 {
     static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
@@ -129,6 +119,36 @@ QAbstractItemModel *DeclarativeBars::data()
 void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
 {
     static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+QCategoryAxis *DeclarativeBars::axisX() const
+{
+    return static_cast<QCategoryAxis *>(m_shared->axisX());
+}
+
+void DeclarativeBars::setAxisX(QCategoryAxis *axis)
+{
+    m_shared->setAxisX(axis);
+}
+
+QValueAxis *DeclarativeBars::axisY() const
+{
+    return static_cast<QValueAxis *>(m_shared->axisY());
+}
+
+void DeclarativeBars::setAxisY(QValueAxis *axis)
+{
+    m_shared->setAxisY(axis);
+}
+
+QCategoryAxis *DeclarativeBars::axisZ() const
+{
+    return static_cast<QCategoryAxis *>(m_shared->axisZ());
+}
+
+void DeclarativeBars::setAxisZ(QCategoryAxis *axis)
+{
+    m_shared->setAxisZ(axis);
 }
 
 QItemModelBarDataMapping *DeclarativeBars::mapping() const

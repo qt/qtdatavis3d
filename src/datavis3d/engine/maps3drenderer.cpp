@@ -65,6 +65,8 @@ Maps3DRenderer::~Maps3DRenderer()
 
 void Maps3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
+    Q_UNUSED(camera)
+    Q_UNUSED(defaultFboHandle)
     // TODO: Implement
 }
 
