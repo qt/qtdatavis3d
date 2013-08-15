@@ -1743,12 +1743,6 @@ void Bars3dRenderer::updateSlicingActive(bool isSlicing)
     }
 }
 
-void Bars3dRenderer::updateZoomLevel(int newZoomLevel)
-{
-    m_cachedZoomLevel = newZoomLevel;
-}
-
-
 QRect Bars3dRenderer::mainViewPort()
 {
     return m_mainViewPort;

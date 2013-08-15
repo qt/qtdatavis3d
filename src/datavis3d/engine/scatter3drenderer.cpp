@@ -1544,13 +1544,6 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     return isSelectedType;
 }
 
-void Scatter3DRenderer::updateZoomLevel(int newZoomLevel)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedZoomLevel = newZoomLevel;
-}
-
-
 QRect Scatter3DRenderer::mainViewPort()
 {
     //qDebug() << __FUNCTION__;

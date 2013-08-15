@@ -43,13 +43,11 @@ struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
     bool sampleSpaceChanged       : 1;
     bool barSpecsChanged          : 1;
-    bool zoomLevelChanged         : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
         sampleSpaceChanged(true),
-        barSpecsChanged(true),
-        zoomLevelChanged(true)
+        barSpecsChanged(true)
     {
     }
 };

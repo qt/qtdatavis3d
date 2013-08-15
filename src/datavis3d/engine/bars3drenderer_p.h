@@ -75,7 +75,6 @@ private:
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;
     bool m_cachedIsSlicingActivated;
-    int m_cachedZoomLevel;
     int m_cachedRowCount;
     int m_cachedColumnCount;
 
@@ -149,7 +148,6 @@ public slots:
     void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
-    void updateZoomLevel(int newZoomLevel);
     void updateBackgroundEnabled(bool enable);
     void updateMeshFileName(const QString &objFileName);
 

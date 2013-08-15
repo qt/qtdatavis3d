@@ -71,6 +71,11 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.positionChanged = false;
     }
 
+    if (m_changeTracker.zoomLevelChanged) {
+        m_renderer->updateZoomLevel(m_zoomLevel);
+        m_changeTracker.zoomLevelChanged = false;
+    }
+
     if (m_changeTracker.themeChanged) {
         m_renderer->updateTheme(m_theme);
         m_changeTracker.themeChanged = false;

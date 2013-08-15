@@ -27,7 +27,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_isInitialized(false),
       m_hasNegativeValues(false),
       m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
-      m_autoScaleAdjustment(1.0f)
+      m_autoScaleAdjustment(1.0f),
+      m_cachedZoomLevel(100)
+
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
 }
@@ -159,6 +161,11 @@ void Abstract3DRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
+}
+
+void Abstract3DRenderer::updateZoomLevel(int newZoomLevel)
+{
+    m_cachedZoomLevel = newZoomLevel;
 }
 
 void Abstract3DRenderer::updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type)

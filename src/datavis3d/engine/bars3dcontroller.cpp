@@ -91,11 +91,6 @@ void Bars3dController::synchDataToRenderer()
         m_changeTracker.barSpecsChanged = false;
     }
 
-    if (m_changeTracker.zoomLevelChanged) {
-        m_renderer->updateZoomLevel(m_zoomLevel);
-        m_changeTracker.zoomLevelChanged = false;
-    }
-
     if (m_isDataDirty) {
         m_renderer->updateDataModel(m_data);
         m_isDataDirty = false;

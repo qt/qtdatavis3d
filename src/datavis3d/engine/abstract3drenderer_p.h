@@ -57,6 +57,7 @@ protected:
     QDataVis::SelectionMode m_cachedSelectionMode;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
+    int m_cachedZoomLevel;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -72,6 +73,7 @@ public:
     virtual void updatePosition(const QRect boundingRect);
     virtual void handleResize();
 
+    virtual void updateZoomLevel(int newZoomLevel);
     virtual void updateTheme(Theme theme);
     virtual void updateFont(const QFont &font);
     virtual void updateLabelTransparency(QDataVis::LabelTransparency transparency);

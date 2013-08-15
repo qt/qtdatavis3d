@@ -73,9 +73,6 @@ private:
     // TODO: this mutex needs to go, too
     QMutex m_mutex;
 
-    // Cached state based on emitted signals from the controller
-    int m_cachedZoomLevel;
-
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
@@ -131,7 +128,6 @@ public:
     QRect mainViewPort();
 
 public slots:
-    void updateZoomLevel(int newZoomLevel);
     void updateBackgroundEnabled(bool enable);
     void updateMeshFileName(const QString &objFileName);
 

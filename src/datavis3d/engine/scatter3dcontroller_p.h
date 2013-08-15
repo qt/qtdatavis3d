@@ -41,11 +41,9 @@ class QScatterDataProxy;
 
 struct Scatter3DChangeBitField {
     bool slicingActiveChanged     : 1;
-    bool zoomLevelChanged         : 1;
 
     Scatter3DChangeBitField() :
-        slicingActiveChanged(true),
-        zoomLevelChanged(true)
+        slicingActiveChanged(true)
     {
     }
 };
