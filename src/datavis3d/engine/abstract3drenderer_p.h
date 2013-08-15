@@ -100,7 +100,6 @@ public:
     virtual void updateAxisSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
 
-    void initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis);
     AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
 
 public:

@@ -34,6 +34,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 void Abstract3DRenderer::initializeOpenGL()
 {
+    axisCacheForOrientation(QAbstractAxis::AxisOrientationX).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstractAxis::AxisOrientationY).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
 }
 
 void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
@@ -188,23 +191,6 @@ void Abstract3DRenderer::updateAxisSegmentCount(QAbstractAxis::AxisOrientation o
 void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count)
 {
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
-}
-
-void Abstract3DRenderer::initializeAxisCache(QAbstractAxis::AxisOrientation orientation, const QAbstractAxis *axis)
-{
-    axisCacheForOrientation(orientation).setDrawer(m_drawer);
-
-    if (axis) {
-        updateAxisType(orientation, axis->type());
-        updateAxisTitle(orientation, axis->title());
-        updateAxisLabels(orientation, axis->labels());
-        if (axis->type() & QAbstractAxis::AxisTypeValue) {
-            const QValueAxis *valueAxis = static_cast<const QValueAxis *>(axis);
-            updateAxisRange(orientation, valueAxis->min(), valueAxis->max());
-            updateAxisSegmentCount(orientation, valueAxis->segmentCount());
-            updateAxisSubSegmentCount(orientation, valueAxis->subSegmentCount());
-        }
-    }
 }
 
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation)
