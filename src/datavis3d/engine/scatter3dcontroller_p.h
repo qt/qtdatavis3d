@@ -29,39 +29,22 @@
 #ifndef Q3DSCATTERCONTROLLER_p_H
 #define Q3DSCATTERCONTROLLER_p_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QWindow>
-
-#include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
+#include "abstract3dcontroller_p.h"
 
 //#define DISPLAY_RENDER_SPEED
-
-class QFont;
-class QPoint;
-class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Scatter3DRenderer;
-class LabelItem;
 class QScatterDataProxy;
 
 struct Scatter3DChangeBitField {
-    bool selectionModeChanged     : 1;
     bool slicingActiveChanged     : 1;
-    bool objFileChanged           : 1;
-    bool gridEnabledChanged       : 1;
-    bool backgroundEnabledChanged : 1;
     bool zoomLevelChanged         : 1;
 
     Scatter3DChangeBitField() :
-        selectionModeChanged(true),
         slicingActiveChanged(true),
-        objFileChanged(true),
-        gridEnabledChanged(true),
-        backgroundEnabledChanged(true),
         zoomLevelChanged(true)
     {
     }
@@ -71,28 +54,15 @@ class QT_DATAVIS3D_EXPORT Scatter3DController : public Abstract3DController
 {
     Q_OBJECT
 
-public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
-
 private:
     Scatter3DChangeBitField m_changeTracker;
 
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
-    QDataVis::SelectionMode m_selectionMode;
     bool m_isSlicingActivated;
 
-    // Look'n'Feel
-    QString m_objFile;
-    bool m_isGridEnabled;
-    bool m_isBackgroundEnabled;
-
+    // Rendering
     Scatter3DRenderer *m_renderer;
     QScatterDataProxy *m_data;
 
@@ -111,24 +81,11 @@ public:
     QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight,
                                    bool showUnder = false);
 
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
+    // Object type
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
-    QString objFile();
 
-    // override bar type with own mesh
-    void setMeshFileName(const QString &objFileName);
-
-    // Change selection mode; single bar, bar and row, bar and column, or all
+    // Change selection mode
     void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode();
-
-    // Enable or disable background grid
-    void setGridEnabled(bool enable);
-    bool gridEnabled();
-
-    // Enable or disable background mesh
-    void setBackgroundEnabled(bool enable);
-    bool backgroundEnabled();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -154,14 +111,8 @@ public slots:
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
 
-
 signals:
-    void selectionModeChanged(QDataVis::SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
-    void objFileChanged(QString fileName);
-    void fontChanged(QFont font);
-    void gridEnabledChanged(bool enable);
-    void backgroundEnabledChanged(bool enable);
 
 private:
     void adjustValueAxisRange();

@@ -74,11 +74,7 @@ private:
     QMutex m_mutex;
 
     // Cached state based on emitted signals from the controller
-    QString m_cachedObjFile;
-    QDataVis::SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
-    bool m_cachedIsGridEnabled;
-    bool m_cachedIsBackgroundEnabled;
 
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
@@ -135,9 +131,7 @@ public:
     QRect mainViewPort();
 
 public slots:
-    void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateZoomLevel(int newZoomLevel);
-    void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
     void updateMeshFileName(const QString &objFileName);
 

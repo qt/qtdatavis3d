@@ -168,14 +168,14 @@ bool DeclarativeBars::isBarSpacingRelative()
 
 void DeclarativeBars::setBarType(QDataVis::MeshStyle style)
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     bool smooth = objFile.endsWith(smoothString);
     m_shared->setBarType(style, smooth);
 }
 
 QDataVis::MeshStyle DeclarativeBars::barType()
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     if (objFile.contains("/sphere"))
         return QDataVis::Spheres;
     else
@@ -184,7 +184,7 @@ QDataVis::MeshStyle DeclarativeBars::barType()
 
 void DeclarativeBars::setBarSmooth(bool smooth)
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     if (objFile.endsWith(smoothString)) {
         if (smooth)
             return; // Already smooth; do nothing
@@ -201,7 +201,7 @@ void DeclarativeBars::setBarSmooth(bool smooth)
 
 bool DeclarativeBars::barSmooth()
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);
 }
 
@@ -212,7 +212,7 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
 
 QString DeclarativeBars::meshFileName()
 {
-    return m_shared->objFile();
+    return m_shared->meshFileName();
 }
 
 void DeclarativeBars::setCameraPreset(QDataVis::CameraPreset preset)

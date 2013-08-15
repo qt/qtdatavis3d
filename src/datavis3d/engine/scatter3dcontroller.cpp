@@ -19,15 +19,12 @@
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "utils_p.h"
 #include "qabstractaxis_p.h"
 #include "qvalueaxis_p.h"
 #include "qscatterdataproxy_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
-#include <QThread>
-#include <QDebug>
 #include <qmath.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -36,11 +33,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
-      m_selectionMode(QDataVis::ModeItem),
       m_isSlicingActivated(false),
-      m_objFile(QStringLiteral(":/defaultMeshes/sphere")),
-      m_isGridEnabled(true),
-      m_isBackgroundEnabled(true),
       m_renderer(0),
       m_data(0)
 {
@@ -48,6 +41,8 @@ Scatter3DController::Scatter3DController(QRect boundRect)
     setAxisX(new QValueAxis());
     setAxisY(new QValueAxis());
     setAxisZ(new QValueAxis());
+
+    setObjectType(QDataVis::Spheres, false); // default object type
 
     setDataProxy(new QScatterDataProxy);
 }
@@ -75,29 +70,9 @@ void Scatter3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
-    if (m_changeTracker.selectionModeChanged) {
-        m_renderer->updateSelectionMode(m_selectionMode);
-        m_changeTracker.selectionModeChanged = false;
-    }
-
     if (m_changeTracker.slicingActiveChanged) {
         // TODO: Add notification.
         m_changeTracker.slicingActiveChanged = false;
-    }
-
-    if (m_changeTracker.objFileChanged) {
-        m_renderer->updateMeshFileName(m_objFile);
-        m_changeTracker.objFileChanged = false;
-    }
-
-    if (m_changeTracker.gridEnabledChanged) {
-        m_renderer->updateGridEnabled(m_isGridEnabled);
-        m_changeTracker.gridEnabledChanged = false;
-    }
-
-    if (m_changeTracker.backgroundEnabledChanged) {
-        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
-        m_changeTracker.backgroundEnabledChanged = false;
     }
 
     if (m_changeTracker.zoomLevelChanged) {
@@ -185,8 +160,8 @@ void Scatter3DController::mousePressEvent(QMouseEvent *event, const QPoint &mous
     QRect mainViewPort = m_renderer->mainViewPort();
     if (Qt::LeftButton == event->button()) {
         if (m_isSlicingActivated) {
-            if (event->pos().x() <= mainViewPort.width()
-                    && event->pos().y() <= mainViewPort.height()) {
+            if (mousePos.x() <= mainViewPort.width()
+                    && mousePos.y() <= mainViewPort.height()) {
                 m_mouseState = Scatter3DController::MouseOnOverview;
                 //qDebug() << "Mouse pressed on overview";
             } else {
@@ -200,7 +175,7 @@ void Scatter3DController::mousePressEvent(QMouseEvent *event, const QPoint &mous
             m_mouseState = Scatter3DController::MouseRotating;
 #endif
             // update mouse positions to prevent jumping when releasing or repressing a button
-            m_mousePos = event->pos();
+            m_mousePos = mousePos;
             //qDebug() << "Mouse pressed on scene";
         }
     } else if (Qt::MiddleButton == event->button()) {
@@ -213,7 +188,7 @@ void Scatter3DController::mousePressEvent(QMouseEvent *event, const QPoint &mous
         m_mouseState = Scatter3DController::MouseOnScene;
 #endif
         // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos; //event->pos();
+        m_mousePos = mousePos;
     }
     m_cameraHelper->updateMousePos(m_mousePos);
 }
@@ -223,8 +198,8 @@ void Scatter3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
     Q_UNUSED(event);
     if (Scatter3DController::MouseRotating == m_mouseState) {
         // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos; //event->pos();
-        m_cameraHelper->updateMousePos(mousePos); //event->pos());
+        m_mousePos = mousePos;
+        m_cameraHelper->updateMousePos(mousePos);
     }
     m_mouseState = Scatter3DController::MouseNone;
 }
@@ -233,7 +208,7 @@ void Scatter3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mouse
 {
     Q_UNUSED(event);
     if (Scatter3DController::MouseRotating == m_mouseState)
-        m_mousePos = mousePos; //event->pos();
+        m_mousePos = mousePos;
 }
 
 void Scatter3DController::wheelEvent(QWheelEvent *event)
@@ -321,42 +296,29 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     m_isDataDirty = true;
 }
 
-void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
+        QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
 }
 
-QString Scatter3DController::objFile()
-{
-    return m_objFile;
-}
-
 void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
 {
+    QString objFile;
     if (style == QDataVis::Spheres) {
         if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
+            objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else
-            m_objFile = QStringLiteral(":/defaultMeshes/sphere");
+            objFile = QStringLiteral(":/defaultMeshes/sphere");
     } else {
         if (smooth)
-            m_objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
+            objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
         else
-            m_objFile = QStringLiteral(":/defaultMeshes/dot");
+            objFile = QStringLiteral(":/defaultMeshes/dot");
     }
-
-    m_changeTracker.objFileChanged = true;
-    emit objFileChanged(m_objFile);
-}
-
-void Scatter3DController::setMeshFileName(const QString &objFileName)
-{
-    m_objFile = objFileName;
-
-    m_changeTracker.objFileChanged = true;
-    emit objFileChanged(m_objFile);
+    Abstract3DController::setMeshFileName(objFile);
 }
 
 void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
@@ -365,48 +327,14 @@ void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
         qWarning("Unsupported selection mode.");
         return;
     }
-    m_selectionMode = mode;
     // Disable zoom if selection mode changes
     setSlicingActive(false);
-
-    m_changeTracker.selectionModeChanged = true;
-    emit selectionModeChanged(m_selectionMode);
+    Abstract3DController::setSelectionMode(mode);
 }
 
 QPoint Scatter3DController::mousePosition()
 {
     return m_mousePos;
-}
-
-QDataVis::SelectionMode Scatter3DController::selectionMode()
-{
-    return m_selectionMode;
-}
-
-void Scatter3DController::setGridEnabled(bool enable)
-{
-    m_isGridEnabled = enable;
-
-    m_changeTracker.gridEnabledChanged = true;
-    emit gridEnabledChanged(m_isGridEnabled);
-}
-
-bool Scatter3DController::gridEnabled()
-{
-    return m_isGridEnabled;
-}
-
-void Scatter3DController::setBackgroundEnabled(bool enable)
-{
-    m_isBackgroundEnabled = enable;
-
-    m_changeTracker.backgroundEnabledChanged = true;
-    emit backgroundEnabledChanged(m_isBackgroundEnabled);
-}
-
-bool Scatter3DController::backgroundEnabled()
-{
-    return m_isBackgroundEnabled;
 }
 
 void Scatter3DController::adjustValueAxisRange()

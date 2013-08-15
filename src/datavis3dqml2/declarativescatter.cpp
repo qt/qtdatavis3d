@@ -122,14 +122,14 @@ QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
 
 void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     bool smooth = objFile.endsWith(smoothString);
     m_shared->setObjectType(style, smooth);
 }
 
 QDataVis::MeshStyle DeclarativeScatter::objectType()
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     if (objFile.contains("/sphere"))
         return QDataVis::Spheres;
     else
@@ -138,7 +138,7 @@ QDataVis::MeshStyle DeclarativeScatter::objectType()
 
 void DeclarativeScatter::setObjectSmooth(bool smooth)
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     if (objFile.endsWith(smoothString)) {
         if (smooth)
             return; // Already smooth; do nothing
@@ -155,7 +155,7 @@ void DeclarativeScatter::setObjectSmooth(bool smooth)
 
 bool DeclarativeScatter::objectSmooth()
 {
-    QString objFile = m_shared->objFile();
+    QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);
 }
 
@@ -166,7 +166,7 @@ void DeclarativeScatter::setMeshFileName(const QString &objFileName)
 
 QString DeclarativeScatter::meshFileName()
 {
-    return m_shared->objFile();
+    return m_shared->meshFileName();
 }
 
 void DeclarativeScatter::setCameraPreset(QDataVis::CameraPreset preset)

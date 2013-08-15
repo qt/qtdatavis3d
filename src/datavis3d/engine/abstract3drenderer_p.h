@@ -53,6 +53,10 @@ protected:
     Drawer *m_drawer;
     GLfloat m_autoScaleAdjustment;
     QString m_cachedItemLabelFormat;
+    QString m_cachedObjFile;
+    QDataVis::SelectionMode m_cachedSelectionMode;
+    bool m_cachedIsGridEnabled;
+    bool m_cachedIsBackgroundEnabled;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -71,6 +75,10 @@ public:
     virtual void updateTheme(Theme theme);
     virtual void updateFont(const QFont &font);
     virtual void updateLabelTransparency(QDataVis::LabelTransparency transparency);
+    virtual void updateSelectionMode(QDataVis::SelectionMode newMode);
+    virtual void updateGridEnabled(bool enable);
+    virtual void updateBackgroundEnabled(bool enable);
+    virtual void updateMeshFileName(const QString &objFileName);
 
     virtual void handleShadowQualityChange();
 

@@ -74,14 +74,10 @@ private:
     // Cached state based on emitted signals from the controller
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;
-    QString m_cachedObjFile;
     bool m_cachedIsSlicingActivated;
-    QDataVis::SelectionMode m_cachedSelectionMode;
     int m_cachedZoomLevel;
     int m_cachedRowCount;
     int m_cachedColumnCount;
-    bool m_cachedIsGridEnabled;
-    bool m_cachedIsBackgroundEnabled;
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
@@ -154,7 +150,6 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateZoomLevel(int newZoomLevel);
-    void updateGridEnabled(bool enable);
     void updateBackgroundEnabled(bool enable);
     void updateMeshFileName(const QString &objFileName);
 

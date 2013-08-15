@@ -115,6 +115,26 @@ void Abstract3DRenderer::updateLabelTransparency(QDataVis::LabelTransparency tra
     m_drawer->setTransparency(transparency);
 }
 
+void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)
+{
+    m_cachedObjFile = objFileName;
+}
+
+void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
+{
+    m_cachedSelectionMode = mode;
+}
+
+void Abstract3DRenderer::updateGridEnabled(bool enable)
+{
+    m_cachedIsGridEnabled = enable;
+}
+
+void Abstract3DRenderer::updateBackgroundEnabled(bool enable)
+{
+    m_cachedIsBackgroundEnabled = enable;
+}
+
 void Abstract3DRenderer::handleResize()
 {
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)

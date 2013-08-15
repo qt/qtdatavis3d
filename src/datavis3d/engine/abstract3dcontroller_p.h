@@ -52,6 +52,10 @@ struct Abstract3DChangeBitField {
     bool boundingRectChanged         : 1;
     bool sizeChanged                 : 1;
     bool shadowQualityChanged        : 1;
+    bool selectionModeChanged        : 1;
+    bool objFileChanged              : 1;
+    bool gridEnabledChanged          : 1;
+    bool backgroundEnabledChanged    : 1;
     bool axisXTypeChanged            : 1;
     bool axisYTypeChanged            : 1;
     bool axisZTypeChanged            : 1;
@@ -80,6 +84,10 @@ struct Abstract3DChangeBitField {
         boundingRectChanged(true),
         sizeChanged(true),
         shadowQualityChanged(true),
+        selectionModeChanged(true),
+        objFileChanged(true),
+        gridEnabledChanged(true),
+        backgroundEnabledChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -107,6 +115,13 @@ class QT_DATAVIS3D_EXPORT Abstract3DController : public QObject
     Q_OBJECT
 
 public:
+    enum SelectionType {
+        SelectionNone = 0,
+        SelectionItem,
+        SelectionRow,
+        SelectionColumn
+    };
+
     enum MouseState {
         MouseNone = 0,
         MouseOnScene,
@@ -123,8 +138,12 @@ private:
     GLfloat m_verticalRotation;
     Theme m_theme;
     QFont m_font;
+    QDataVis::SelectionMode m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
     QDataVis::LabelTransparency m_labelTransparency;
+    bool m_isBackgroundEnabled;
+    bool m_isGridEnabled;
+    QString m_objFile;
 
 protected:
     CameraHelper *m_cameraHelper;
@@ -205,6 +224,9 @@ public:
     virtual void setFont(const QFont &font);
     virtual QFont font();
 
+    // Selection mode
+    virtual void setSelectionMode(QDataVis::SelectionMode mode);
+    virtual QDataVis::SelectionMode selectionMode();
 
     // Adjust shadow quality
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
@@ -213,6 +235,18 @@ public:
     // Label transparency adjustment
     virtual void setLabelTransparency(QDataVis::LabelTransparency transparency);
     virtual QDataVis::LabelTransparency labelTransparency();
+
+    // Enable or disable background mesh
+    virtual void setBackgroundEnabled(bool enable);
+    virtual bool backgroundEnabled();
+
+    // Enable or disable background grid
+    virtual void setGridEnabled(bool enable);
+    virtual bool gridEnabled();
+
+    // override bar type with own mesh
+    virtual void setMeshFileName(const QString &fileName);
+    virtual QString meshFileName();
 
     virtual void handleAxisTitleChangedBySender(QObject *sender, const QString &title);
     virtual void handleAxisLabelsChangedBySender(QObject *sender);
@@ -244,9 +278,14 @@ signals:
     void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
     void axisSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
     void axisSubSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
+    void selectionModeChanged(QDataVis::SelectionMode mode);
+    void backgroundEnabledChanged(bool enable);
+    void gridEnabledChanged(bool enable); // TODO: Should be handled via axes?
+    void meshFileNameChanged(QString fileName);
 
 private:
-    void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis, QAbstractAxis **axisPtr);
+    void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis,
+                       QAbstractAxis **axisPtr);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

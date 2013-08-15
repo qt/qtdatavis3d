@@ -801,7 +801,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 Bars3dController::SelectionType selectionType = isSelected(row, bar);
 
                 switch (selectionType) {
-                case Bars3dController::SelectionBar: {
+                case Bars3dController::SelectionItem: {
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert data to QDataItem. We have no ownership, don't delete the previous one
@@ -1492,7 +1492,7 @@ void Bars3dRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relat
 
 void Bars3dRenderer::updateMeshFileName(const QString &objFileName)
 {
-    m_cachedObjFile = objFileName;
+    Abstract3DRenderer::updateMeshFileName(objFileName);
     loadBarMesh();
 }
 
@@ -1545,10 +1545,9 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
     calculateSceneScalingFactors();
 }
 
-
 void Bars3dRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
 {
-    m_cachedSelectionMode      = mode;
+    Abstract3DRenderer::updateSelectionMode(mode);
 
     // Create zoom selection if there isn't one
     if (mode >= QDataVis::ModeZoomRow && !m_sliceSelection) {
@@ -1560,20 +1559,11 @@ void Bars3dRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
     }
 }
 
-
-
-
-void Bars3dRenderer::updateGridEnabled(bool enable)
-{
-    m_cachedIsGridEnabled = enable;
-}
-
 void Bars3dRenderer::updateBackgroundEnabled(bool enable)
 {
-    if (m_cachedIsBackgroundEnabled != enable) {
-        m_cachedIsBackgroundEnabled = enable;
-        // Load changed bar type
-        loadBarMesh();
+    if (enable != m_cachedIsBackgroundEnabled) {
+        Abstract3DRenderer::updateBackgroundEnabled(enable);
+        loadBarMesh(); // Load changed bar type
     }
 }
 
@@ -1727,7 +1717,7 @@ Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
     //    prevSel = selection;
     //}
     if (current == m_selection) {
-        isSelectedType = Bars3dController::SelectionBar;
+        isSelectedType = Bars3dController::SelectionItem;
     }
     else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::ModeItemAndColumn
                                                 || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn

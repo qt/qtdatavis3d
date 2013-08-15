@@ -29,42 +29,26 @@
 #ifndef Q3DBARSCONTROLLER_p_H
 #define Q3DBARSCONTROLLER_p_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QWindow>
-
-#include "abstract3dcontroller_p.h"
 #include "datavis3dglobal_p.h"
+#include "abstract3dcontroller_p.h"
 
 //#define DISPLAY_RENDER_SPEED
-
-class QPoint;
-class QSizeF;
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Bars3dRenderer;
-class LabelItem;
 class QBarDataProxy;
 
 struct Bars3DChangeBitField {
-    bool selectionModeChanged     : 1;
     bool slicingActiveChanged     : 1;
     bool sampleSpaceChanged       : 1;
     bool barSpecsChanged          : 1;
-    bool objFileChanged           : 1;
-    bool gridEnabledChanged       : 1;
-    bool backgroundEnabledChanged : 1;
     bool zoomLevelChanged         : 1;
 
     Bars3DChangeBitField() :
-        selectionModeChanged(true),
         slicingActiveChanged(true),
         sampleSpaceChanged(true),
         barSpecsChanged(true),
-        objFileChanged(true),
-        gridEnabledChanged(true),
-        backgroundEnabledChanged(true),
         zoomLevelChanged(true)
     {
     }
@@ -73,14 +57,6 @@ struct Bars3DChangeBitField {
 class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
 {
     Q_OBJECT
-
-public:
-    enum SelectionType {
-        SelectionNone = 0,
-        SelectionBar,
-        SelectionRow,
-        SelectionColumn
-    };
 
 private:
 
@@ -94,18 +70,14 @@ private:
     // Interaction
     MouseState m_mouseState;
     QPoint m_mousePos;
-    QDataVis::SelectionMode m_selectionMode;
     bool m_isSlicingActivated;
 
+    // Look'n'feel
     bool m_isBarSpecRelative;
     QSizeF m_barThickness;
     QSizeF m_barSpacing;
 
-    // Look'n'Feel
-    QString m_objFile;
-    bool m_isGridEnabled;
-    bool m_isBackgroundEnabled;
-
+    // Rendering
     Bars3dRenderer *m_renderer;
     QBarDataProxy *m_data;
 
@@ -139,28 +111,12 @@ public:
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
-    QString objFile();
-
-    // override bar type with own mesh
-    void setMeshFileName(const QString &objFileName);
 
     // how many samples per row and column, and names for axes
     void setupSampleSpace(int samplesRow, int samplesColumn);
 
-    // TODO: light placement API
-
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode();
-
-
-    // Enable or disable background grid
-    void setGridEnabled(bool enable);
-    bool gridEnabled();
-
-    // Enable or disable background mesh
-    void setBackgroundEnabled(bool enable);
-    bool backgroundEnabled();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -186,21 +142,15 @@ public slots:
 
 
 signals:
-    void selectionModeChanged(QDataVis::SelectionMode mode);
     void slicingActiveChanged(bool isSlicing);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
-    void objFileChanged(QString fileName);
-    void gridEnabledChanged(bool enable); // TODO should be handled via axis
-    void backgroundEnabledChanged(bool enable);
 
 private:
     void adjustValueAxisRange();
 
     Q_DISABLE_COPY(Bars3dController)
 
-    friend class DeclarativeBars;
-    friend class DeclarativeBarsRenderer;
 };
 
 

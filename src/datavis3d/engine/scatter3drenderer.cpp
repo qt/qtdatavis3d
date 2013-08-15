@@ -610,7 +610,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         if (m_cachedSelectionMode > QDataVis::ModeNone) {
             Scatter3DController::SelectionType selectionType = isSelected(bar, m_selection);
             switch (selectionType) {
-            case Scatter3DController::SelectionBar: {
+            case Scatter3DController::SelectionItem: {
                 barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
@@ -1360,30 +1360,15 @@ void Scatter3DRenderer::handleResize()
 
 void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
 {
-    //qDebug() << __FUNCTION__;
-    m_cachedObjFile = objFileName;
+    Abstract3DRenderer::updateMeshFileName(objFileName);
     loadBarMesh();
-}
-
-void Scatter3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedSelectionMode = mode;
-}
-
-void Scatter3DRenderer::updateGridEnabled(bool enable)
-{
-    //qDebug() << __FUNCTION__;
-    m_cachedIsGridEnabled = enable;
 }
 
 void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
 {
-    //qDebug() << __FUNCTION__;
-    if (m_cachedIsBackgroundEnabled != enable) {
-        m_cachedIsBackgroundEnabled = enable;
-        // Load changed bar type
-        loadBarMesh();
+    if (enable != m_cachedIsBackgroundEnabled) {
+        Abstract3DRenderer::updateBackgroundEnabled(enable);
+        loadBarMesh(); // Load changed bar type
     }
 }
 
@@ -1552,7 +1537,7 @@ Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
     //}
 
     if (current == selection)
-        isSelectedType = Scatter3DController::SelectionBar;
+        isSelectedType = Scatter3DController::SelectionItem;
 
     return isSelectedType;
 }

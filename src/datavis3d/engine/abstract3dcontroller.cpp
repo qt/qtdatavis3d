@@ -31,8 +31,11 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_verticalRotation(15.0f),
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
+    m_selectionMode(QDataVis::ModeItem),
     m_shadowQuality(QDataVis::ShadowLow),
     m_labelTransparency(QDataVis::TransparencyFromTheme),
+    m_isBackgroundEnabled(true),
+    m_isGridEnabled(true),
     m_cameraHelper(new CameraHelper()),
     m_zoomLevel(100),
     m_axisX(0),
@@ -94,47 +97,67 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.shadowQualityChanged = false;
     }
 
+    if (m_changeTracker.selectionModeChanged) {
+        m_renderer->updateSelectionMode(m_selectionMode);
+        m_changeTracker.selectionModeChanged = false;
+    }
+
+    if (m_changeTracker.objFileChanged) {
+        m_renderer->updateMeshFileName(m_objFile);
+        m_changeTracker.objFileChanged = false;
+    }
+
+    if (m_changeTracker.gridEnabledChanged) {
+        m_renderer->updateGridEnabled(m_isGridEnabled);
+        m_changeTracker.gridEnabledChanged = false;
+    }
+
+    if (m_changeTracker.backgroundEnabledChanged) {
+        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
+        m_changeTracker.backgroundEnabledChanged = false;
+    }
+
     if (m_changeTracker.axisXTypeChanged) {
-        m_renderer->updateAxisType(QAbstractAxis::AxisOrientation::AxisOrientationX, m_axisX->type());
+        m_renderer->updateAxisType(QAbstractAxis::AxisOrientationX, m_axisX->type());
         m_changeTracker.axisXTypeChanged = false;
     }
 
     if (m_changeTracker.axisYTypeChanged) {
-        m_renderer->updateAxisType(QAbstractAxis::AxisOrientation::AxisOrientationY, m_axisY->type());
+        m_renderer->updateAxisType(QAbstractAxis::AxisOrientationY, m_axisY->type());
         m_changeTracker.axisYTypeChanged = false;
     }
 
     if (m_changeTracker.axisZTypeChanged) {
-        m_renderer->updateAxisType(QAbstractAxis::AxisOrientation::AxisOrientationZ, m_axisZ->type());
+        m_renderer->updateAxisType(QAbstractAxis::AxisOrientationZ, m_axisZ->type());
         m_changeTracker.axisZTypeChanged = false;
     }
 
     if (m_changeTracker.axisXTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientation::AxisOrientationX, m_axisX->title());
+        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientationX, m_axisX->title());
         m_changeTracker.axisXTitleChanged = false;
     }
 
     if (m_changeTracker.axisYTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientation::AxisOrientationY, m_axisY->title());
+        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientationY, m_axisY->title());
         m_changeTracker.axisYTitleChanged = false;
     }
 
     if (m_changeTracker.axisZTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientation::AxisOrientationZ, m_axisZ->title());
+        m_renderer->updateAxisTitle(QAbstractAxis::AxisOrientationZ, m_axisZ->title());
         m_changeTracker.axisZTitleChanged = false;
     }
 
     if (m_changeTracker.axisXLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientation::AxisOrientationX, m_axisX->labels());
+        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientationX, m_axisX->labels());
         m_changeTracker.axisXLabelsChanged = false;
     }
 
     if (m_changeTracker.axisYLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientation::AxisOrientationY, m_axisY->labels());
+        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientationY, m_axisY->labels());
         m_changeTracker.axisYLabelsChanged = false;
     }
     if (m_changeTracker.axisZLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientation::AxisOrientationZ, m_axisZ->labels());
+        m_renderer->updateAxisLabels(QAbstractAxis::AxisOrientationZ, m_axisZ->labels());
         m_changeTracker.axisZLabelsChanged = false;
     }
 
@@ -142,7 +165,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisXRangeChanged = false;
         if (m_axisX->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisX = static_cast<QValueAxis *>(m_axisX);
-            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientation::AxisOrientationX, valueAxisX->min(), valueAxisX->max());
+            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientationX,
+                                        valueAxisX->min(), valueAxisX->max());
         }
     }
 
@@ -150,7 +174,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisYRangeChanged = false;
         if (m_axisY->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisY = static_cast<QValueAxis *>(m_axisY);
-            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientation::AxisOrientationY, valueAxisY->min(), valueAxisY->max());
+            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientationY,
+                                        valueAxisY->min(), valueAxisY->max());
         }
     }
 
@@ -158,7 +183,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisZRangeChanged = false;
         if (m_axisZ->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisZ = static_cast<QValueAxis *>(m_axisZ);
-            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientation::AxisOrientationZ, valueAxisZ->min(), valueAxisZ->max());
+            m_renderer->updateAxisRange(QAbstractAxis::AxisOrientationZ,
+                                        valueAxisZ->min(), valueAxisZ->max());
         }
     }
 
@@ -166,7 +192,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisXSegmentCountChanged = false;
         if (m_axisX->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisX = static_cast<QValueAxis *>(m_axisX);
-            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationX, valueAxisX->segmentCount());
+            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientationX,
+                                               valueAxisX->segmentCount());
         }
     }
 
@@ -174,7 +201,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisYSegmentCountChanged = false;
         if (m_axisY->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisY = static_cast<QValueAxis *>(m_axisY);
-            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationY, valueAxisY->segmentCount());
+            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientationY,
+                                               valueAxisY->segmentCount());
         }
     }
 
@@ -182,7 +210,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisZSegmentCountChanged = false;
         if (m_axisZ->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisZ = static_cast<QValueAxis *>(m_axisZ);
-            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationZ, valueAxisZ->segmentCount());
+            m_renderer->updateAxisSegmentCount(QAbstractAxis::AxisOrientationZ,
+                                               valueAxisZ->segmentCount());
         }
     }
 
@@ -190,7 +219,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisXSubSegmentCountChanged = false;
         if (m_axisX->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisX = static_cast<QValueAxis *>(m_axisX);
-            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationX, valueAxisX->subSegmentCount());
+            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientationX,
+                                                  valueAxisX->subSegmentCount());
         }
     }
 
@@ -198,7 +228,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisYSubSegmentCountChanged = false;
         if (m_axisY->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisY = static_cast<QValueAxis *>(m_axisY);
-            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationY, valueAxisY->subSegmentCount());
+            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientationY,
+                                                  valueAxisY->subSegmentCount());
         }
     }
 
@@ -206,7 +237,8 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisZSubSegmentCountChanged = false;
         if (m_axisZ->type() & QAbstractAxis::AxisTypeValue) {
             QValueAxis *valueAxisZ = static_cast<QValueAxis *>(m_axisZ);
-            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation::AxisOrientationZ, valueAxisZ->subSegmentCount());
+            m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientationZ,
+                                                  valueAxisZ->subSegmentCount());
         }
     }
 }
@@ -408,6 +440,17 @@ QFont Abstract3DController::font()
     return m_font;
 }
 
+void Abstract3DController::setSelectionMode(QDataVis::SelectionMode mode)
+{
+    m_selectionMode = mode;
+    m_changeTracker.selectionModeChanged = true;
+    emit selectionModeChanged(m_selectionMode);
+}
+
+QDataVis::SelectionMode Abstract3DController::selectionMode()
+{
+    return m_selectionMode;
+}
 
 void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 {
@@ -422,7 +465,6 @@ QDataVis::ShadowQuality Abstract3DController::shadowQuality()
     return m_shadowQuality;
 }
 
-
 void Abstract3DController::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     m_labelTransparency = transparency;
@@ -434,6 +476,42 @@ void Abstract3DController::setLabelTransparency(QDataVis::LabelTransparency tran
 QDataVis::LabelTransparency Abstract3DController::labelTransparency()
 {
     return m_labelTransparency;
+}
+
+void Abstract3DController::setBackgroundEnabled(bool enable)
+{
+    m_isBackgroundEnabled = enable;
+    m_changeTracker.backgroundEnabledChanged = true;
+    emit backgroundEnabledChanged(m_isBackgroundEnabled);
+}
+
+bool Abstract3DController::backgroundEnabled()
+{
+    return m_isBackgroundEnabled;
+}
+
+void Abstract3DController::setGridEnabled(bool enable)
+{
+    m_isGridEnabled = enable;
+    m_changeTracker.gridEnabledChanged = true;
+    emit gridEnabledChanged(m_isGridEnabled);
+}
+
+bool Abstract3DController::gridEnabled()
+{
+    return m_isGridEnabled;
+}
+
+void Abstract3DController::setMeshFileName(const QString &fileName)
+{
+    m_objFile = fileName;
+    m_changeTracker.objFileChanged = true;
+    emit meshFileNameChanged(m_objFile);
+}
+
+QString Abstract3DController::meshFileName()
+{
+    return m_objFile;
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
@@ -570,11 +648,11 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
                      this, &Abstract3DController::handleAxisLabelsChanged);
 
 
-    if (orientation == QAbstractAxis::AxisOrientation::AxisOrientationX)
+    if (orientation == QAbstractAxis::AxisOrientationX)
         m_changeTracker.axisXTypeChanged = true;
-    else if (orientation == QAbstractAxis::AxisOrientation::AxisOrientationY)
+    else if (orientation == QAbstractAxis::AxisOrientationY)
         m_changeTracker.axisYTypeChanged = true;
-    else if (orientation == QAbstractAxis::AxisOrientation::AxisOrientationZ)
+    else if (orientation == QAbstractAxis::AxisOrientationZ)
         m_changeTracker.axisZTypeChanged = true;
     emit axisTypeChanged(orientation, axis->type());
 
@@ -604,7 +682,8 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
         handleAxisSubSegmentCountChangedBySender(valueAxis, valueAxis->subSegmentCount());
         emit axisSubSegmentCountChanged(orientation, valueAxis->subSegmentCount());
 
-        handleAxisAutoAdjustRangeChangedInOrientation(valueAxis->orientation(), valueAxis->isAutoAdjustRange());
+        handleAxisAutoAdjustRangeChangedInOrientation(valueAxis->orientation(),
+                                                      valueAxis->isAutoAdjustRange());
     }
 }
 
