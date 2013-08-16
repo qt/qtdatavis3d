@@ -83,7 +83,7 @@ Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Scatter3DController::shadowQualityChanged, this,
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DScatter::handleShadowQualityUpdate);
 }
 

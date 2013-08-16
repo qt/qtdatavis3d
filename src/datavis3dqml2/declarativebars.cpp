@@ -41,7 +41,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3dController(boundingRect().toRect());
-    QObject::connect(m_shared, &Bars3dController::shadowQualityChanged, this,
+    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
 
     m_shared->setDataProxy(new QItemModelBarDataProxy);

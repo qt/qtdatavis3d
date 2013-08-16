@@ -40,7 +40,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Scatter3DController(boundingRect().toRect());
-    QObject::connect(m_shared, &Scatter3DController::shadowQualityChanged, this,
+    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeScatter::handleShadowQualityUpdate);
 
     m_shared->setDataProxy(new QItemModelScatterDataProxy);

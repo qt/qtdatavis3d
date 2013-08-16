@@ -42,7 +42,8 @@ Scatter3DController::Scatter3DController(QRect boundRect)
     setAxisY(new QValueAxis());
     setAxisZ(new QValueAxis());
 
-    setObjectType(QDataVis::Spheres, false); // default object type
+    // Default object type; specific to scatter
+    setObjectType(QDataVis::Spheres, false);
 
     setDataProxy(new QScatterDataProxy);
 }
@@ -60,6 +61,7 @@ void Scatter3DController::initializeOpenGL()
 
     m_renderer = new Scatter3DRenderer(this);
     setRenderer(m_renderer);
+    synchDataToRenderer();
 }
 
 void Scatter3DController::synchDataToRenderer()

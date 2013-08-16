@@ -48,7 +48,8 @@ Bars3dController::Bars3dController(QRect boundRect)
     setAxisY(new QValueAxis());
     setAxisZ(new QCategoryAxis());
 
-    setBarType(QDataVis::Bars, false); // default object type
+    // Default bar type; specific to bars
+    setBarType(QDataVis::Bars, false);
 
     setDataProxy(new QBarDataProxy);
 }
@@ -66,6 +67,7 @@ void Bars3dController::initializeOpenGL()
 
     m_renderer = new Bars3dRenderer(this);
     setRenderer(m_renderer);
+    synchDataToRenderer();
 }
 
 void Bars3dController::synchDataToRenderer()
