@@ -85,10 +85,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_areaSize(QSizeF(0.0f, 0.0f)),
       m_hasHeightAdjustmentChanged(true),
       m_dotSizeScale(1.0f)
-    #ifdef DISPLAY_RENDER_SPEED
-    , m_isFirstFrame(true),
-      m_numFrames(0)
-    #endif
 {
     //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);
@@ -138,18 +134,6 @@ void Scatter3DRenderer::initializeOpenGL()
     // Load label mesh
     loadLabelMesh();
 
-    // Set OpenGL features
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-#if !defined(QT_OPENGL_ES_2)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-#endif
-
     // Set view port
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
                m_mainViewPort.width(), m_mainViewPort.height());
@@ -182,33 +166,8 @@ void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
 {
     //qDebug() << __FUNCTION__;
 
-#ifdef DISPLAY_RENDER_SPEED
-    // For speed computation
-    if (m_isFirstFrame) {
-        m_lastFrameTime.start();
-        m_isFirstFrame = false;
-    }
-
-    // Measure speed (as milliseconds per frame)
-    m_numFrames++;
-    if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << qreal(m_lastFrameTime.elapsed()) / qreal(m_numFrames) << "ms/frame (=" << qreal(m_numFrames) << "fps)";
-        m_numFrames = 0;
-        m_lastFrameTime.restart();
-    }
-#endif
-
-    if (defaultFboHandle) {
-        glDepthMask(true);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }
-
-    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Handle GL state setup for FBO buffers and clearing of the render surface
+    Abstract3DRenderer::render(camera, defaultFboHandle);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
@@ -1352,17 +1311,11 @@ void Scatter3DRenderer::handleResize()
     Abstract3DRenderer::handleResize();
 }
 
-void Scatter3DRenderer::updateMeshFileName(const QString &objFileName)
-{
-    Abstract3DRenderer::updateMeshFileName(objFileName);
-    loadBarMesh();
-}
-
 void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
 {
     if (enable != m_cachedIsBackgroundEnabled) {
         Abstract3DRenderer::updateBackgroundEnabled(enable);
-        loadBarMesh(); // Load changed bar type
+        loadMeshFile(); // Load changed bar type
     }
 }
 
@@ -1393,7 +1346,7 @@ void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
-void Scatter3DRenderer::loadBarMesh()
+void Scatter3DRenderer::loadMeshFile()
 {
     //qDebug() << __FUNCTION__;
     QString objectFileName = m_cachedObjFile;

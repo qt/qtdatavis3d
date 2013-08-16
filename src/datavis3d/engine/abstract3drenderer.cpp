@@ -19,6 +19,7 @@
 #include "abstract3drenderer_p.h"
 #include "qvalueaxis.h"
 #include "texturehelper_p.h"
+#include "utils_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -34,7 +35,14 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedBoundingRect(QRect(0,0,0,0)),
       m_cachedShadowQuality(QDataVis::ShadowMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedZoomLevel(100)
+      m_cachedZoomLevel(100),
+      m_cachedSelectionMode(QDataVis::ModeNone),
+      m_cachedIsGridEnabled(false),
+      m_cachedIsBackgroundEnabled(false)
+    #ifdef DISPLAY_RENDER_SPEED
+    , m_isFirstFrame(true),
+      m_numFrames(0)
+    #endif
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -48,12 +56,55 @@ Abstract3DRenderer::~Abstract3DRenderer()
 
 void Abstract3DRenderer::initializeOpenGL()
 {
+    // Set OpenGL features
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+#if !defined(QT_OPENGL_ES_2)
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+#endif
+
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
     axisCacheForOrientation(QAbstractAxis::AxisOrientationX).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstractAxis::AxisOrientationY).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
+}
+
+void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+{
+#ifdef DISPLAY_RENDER_SPEED
+    // For speed computation
+    if (m_isFirstFrame) {
+        m_lastFrameTime.start();
+        m_isFirstFrame = false;
+    }
+
+    // Measure speed (as milliseconds per frame)
+    m_numFrames++;
+    if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
+        qDebug() << qreal(m_lastFrameTime.elapsed()) / qreal(m_numFrames) << "ms/frame (=" << qreal(m_numFrames) << "fps)";
+        m_numFrames = 0;
+        m_lastFrameTime.restart();
+    }
+#endif
+
+    if (defaultFboHandle) {
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
+    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
+    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
@@ -137,7 +188,10 @@ void Abstract3DRenderer::updateLabelTransparency(QDataVis::LabelTransparency tra
 
 void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)
 {
-    m_cachedObjFile = objFileName;
+    if (objFileName != m_cachedObjFile) {
+        m_cachedObjFile = objFileName;
+        loadMeshFile();
+    }
 }
 
 void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)

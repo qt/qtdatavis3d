@@ -125,23 +125,11 @@ public:
 
     QRect mainViewPort();
 
-public slots:
-    void updateBackgroundEnabled(bool enable);
-    void updateMeshFileName(const QString &objFileName);
-
-    // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-
-    // Requests that upon next render pass the column and row under the given point is inspected for selection.
-    // Only one request can be queued per render pass at this point. New request will override any pending requests.
-    // After inspection the selectionUpdated signal is emitted.
-    virtual void requestSelectionAtPoint(const QPoint &point);
-
-signals:
-    void selectionUpdated(QVector3D selection);
+protected:
+    virtual void initializeOpenGL();
+    virtual void loadMeshFile();
 
 private:
-    virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
@@ -149,7 +137,6 @@ private:
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 
-    void loadBarMesh();
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
@@ -168,6 +155,20 @@ private:
     Q_DISABLE_COPY(Scatter3DRenderer)
 
     friend class ScatterRenderItem;
+
+public slots:
+    void updateBackgroundEnabled(bool enable);
+
+    // Overloaded from abstract renderer
+    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+
+    // Requests that upon next render pass the column and row under the given point is inspected for selection.
+    // Only one request can be queued per render pass at this point. New request will override any pending requests.
+    // After inspection the selectionUpdated signal is emitted.
+    virtual void requestSelectionAtPoint(const QPoint &point);
+
+signals:
+    void selectionUpdated(QVector3D selection);
 };
 
 

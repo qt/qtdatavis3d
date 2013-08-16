@@ -60,6 +60,7 @@ protected:
     QRect m_cachedBoundingRect;
     QDataVis::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
+    int m_cachedZoomLevel;
 
     QString m_cachedItemLabelFormat;
     QString m_cachedObjFile;
@@ -67,25 +68,22 @@ protected:
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
 
-    int m_cachedZoomLevel;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
 
-    Abstract3DRenderer(Abstract3DController *controller);
-
-    virtual void initializeOpenGL();
-
 public:
     ~Abstract3DRenderer();
 
     inline bool isInitialized() { return m_isInitialized; }
+    void updateDataModel(QAbstractDataProxy *dataProxy);
+
+    virtual void render(CameraHelper *camera, const GLuint defaultFboHandle);
 
     virtual void updateBoundingRect(const QRect boundingRect);
     virtual void updatePosition(const QRect boundingRect);
-    virtual void handleResize();
 
     virtual void updateZoomLevel(int newZoomLevel);
     virtual void updateTheme(Theme theme);
@@ -96,9 +94,6 @@ public:
     virtual void updateBackgroundEnabled(bool enable);
     virtual void updateMeshFileName(const QString &objFileName);
 
-    virtual void handleShadowQualityChange();
-
-    void updateDataModel(QAbstractDataProxy *dataProxy);
     virtual QString itemLabelFormat() const;
     virtual void requestSelectionAtPoint(const QPoint &point) = 0;
     virtual void updateTextures() = 0;
@@ -116,14 +111,16 @@ public:
     virtual void updateAxisSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
 
-    AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
+protected:
+    Abstract3DRenderer(Abstract3DController *controller);
 
-public:
-    /**
-     * @brief render Implements OpenGL rendering that occurs in the rendering thread.
-     * @param defaultFboHandle Defaults FBO handle (defaults to 0).
-     */
-    virtual void render(CameraHelper *camera, const GLuint defaultFboHandle) = 0;
+    virtual void initializeOpenGL();
+
+    virtual void handleShadowQualityChange();
+    virtual void handleResize();
+    virtual void loadMeshFile() = 0;
+
+    AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

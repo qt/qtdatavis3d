@@ -137,6 +137,10 @@ public:
 
     QRect mainViewPort();
 
+protected:
+    virtual void initializeOpenGL();
+    virtual void loadMeshFile();
+
 public slots:
     void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
                         QSizeF spacing = QSizeF(1.0f, 1.0f),
@@ -145,7 +149,6 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateBackgroundEnabled(bool enable);
-    void updateMeshFileName(const QString &objFileName);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
@@ -159,7 +162,6 @@ signals:
     void selectionUpdated(QVector3D selection);
 
 private:
-    virtual void initializeOpenGL();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
@@ -169,7 +171,6 @@ private:
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
 
-    void loadBarMesh();
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();

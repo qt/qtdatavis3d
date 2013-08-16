@@ -91,10 +91,6 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
       m_maxSceneSize(40.0),
       m_selection(selectionSkipColor),
       m_hasHeightAdjustmentChanged(true)
-    #ifdef DISPLAY_RENDER_SPEED
-    ,m_isFirstFrame(true),
-      m_numFrames(0)
-    #endif
 {
     m_dummyBarRenderItem.setRenderer(this);
 
@@ -146,18 +142,6 @@ void Bars3dRenderer::initializeOpenGL()
     // Load label mesh
     loadLabelMesh();
 
-    // Set OpenGL features
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-#if !defined(QT_OPENGL_ES_2)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-#endif
-
     // Set view port
     glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
                m_sliceViewPort.width(), m_sliceViewPort.height());
@@ -194,33 +178,8 @@ void Bars3dRenderer::updateDataModel(QBarDataProxy *dataProxy)
 
 void Bars3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
-#ifdef DISPLAY_RENDER_SPEED
-    // For speed computation
-    if (m_isFirstFrame) {
-        m_lastFrameTime.start();
-        m_isFirstFrame = false;
-    }
-
-    // Measure speed (as milliseconds per frame)
-    m_numFrames++;
-    if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << qreal(m_lastFrameTime.elapsed()) / qreal(m_numFrames) << "ms/frame (=" << qreal(m_numFrames) << "fps)";
-        m_numFrames = 0;
-        m_lastFrameTime.restart();
-    }
-#endif
-
-    if (defaultFboHandle) {
-        glDepthMask(true);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }
-
-    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Handle GL state setup for FBO buffers and clearing of the render surface
+    Abstract3DRenderer::render(camera, defaultFboHandle);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
@@ -1484,12 +1443,6 @@ void Bars3dRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relat
     calculateSceneScalingFactors();
 }
 
-void Bars3dRenderer::updateMeshFileName(const QString &objFileName)
-{
-    Abstract3DRenderer::updateMeshFileName(objFileName);
-    loadBarMesh();
-}
-
 void Bars3dRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
@@ -1557,7 +1510,7 @@ void Bars3dRenderer::updateBackgroundEnabled(bool enable)
 {
     if (enable != m_cachedIsBackgroundEnabled) {
         Abstract3DRenderer::updateBackgroundEnabled(enable);
-        loadBarMesh(); // Load changed bar type
+        loadMeshFile(); // Load changed bar type
     }
 }
 
@@ -1588,7 +1541,7 @@ void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
-void Bars3dRenderer::loadBarMesh()
+void Bars3dRenderer::loadMeshFile()
 {
     QString objectFileName = m_cachedObjFile;
     if (m_barObj)
