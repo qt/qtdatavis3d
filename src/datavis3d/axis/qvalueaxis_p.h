@@ -47,7 +47,8 @@ public:
     void setMax (qreal max);
 
 protected:
-    void recreateLabels();
+    void emitLabelsChanged();
+    virtual void updateLabels();
 
     qreal m_min;
     qreal m_max;
@@ -55,6 +56,7 @@ protected:
     int m_subSegmentCount;
     bool m_autoAdjust;
     QString m_labelFormat;
+    bool m_labelsDirty;
 
 private:
     QValueAxis *qptr();

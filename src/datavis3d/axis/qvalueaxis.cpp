@@ -18,6 +18,7 @@
 
 #include "qvalueaxis.h"
 #include "qvalueaxis_p.h"
+#include "utils_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -67,7 +68,7 @@ void QValueAxis::setSegmentCount(int count)
     }
     if (dptr()->m_segmentCount != count){
         dptr()->m_segmentCount = count;
-        dptr()->recreateLabels();
+        dptr()->emitLabelsChanged();
         emit segmentCountChanged(count);
     }
 }
@@ -112,7 +113,7 @@ void QValueAxis::setLabelFormat(const QString &format)
 {
     if (dptr()->m_labelFormat != format) {
         dptr()->m_labelFormat = format;
-        dptr()->recreateLabels();
+        dptr()->emitLabelsChanged();
         emit labelFormatChanged(format);
     }
 }
@@ -169,7 +170,7 @@ void QValueAxisPrivate::setRange(qreal min, qreal max)
         dirty = true;
     }
     if (dirty) {
-        recreateLabels();
+        emitLabelsChanged();
         emit qptr()->rangeChanged(min, max);
     }
 }
@@ -185,7 +186,7 @@ void QValueAxisPrivate::setMin(qreal min)
                        << oldMax <<  "-->" << m_max;
         }
         m_min = min;
-        recreateLabels();
+        emitLabelsChanged();
         emit qptr()->rangeChanged(m_min, m_max);
     }
 }
@@ -201,30 +202,47 @@ void QValueAxisPrivate::setMax(qreal max)
                        << oldMin <<  "-->" << m_min;
         }
         m_max = max;
-        recreateLabels();
+        emitLabelsChanged();
         emit qptr()->rangeChanged(m_min, m_max);
     }
 }
 
-void QValueAxisPrivate::recreateLabels()
+void QValueAxisPrivate::emitLabelsChanged()
 {
+    m_labelsDirty = true;
+    emit q_ptr->labelsChanged();
+}
+
+void QValueAxisPrivate::updateLabels()
+{
+    if (!m_labelsDirty)
+        return;
+
+    m_labelsDirty = false;
+
     QStringList newLabels;
     newLabels.reserve(m_segmentCount + 1);
 
     // First label is at axis min, which is an extra segment
     qreal segmentStep = (m_max - m_min) / m_segmentCount;
 
-    for (int i = 0; i < m_segmentCount; i++) {
-        // TODO Actually do proper formatting
-        newLabels.append(QString::number(m_min + (segmentStep * i)));
-    }
-    // Ensure max label doesn't suffer from any rounding errors
-    newLabels.append(QString::number(m_max));
+    QString formatString(m_labelFormat);
+    if (formatString.isEmpty())
+        formatString = QStringLiteral("%.2f");
 
-    if (m_labels != newLabels) {
-        m_labels = newLabels;
-        emit q_ptr->labelsChanged();
+    Utils::ParamType paramType = Utils::findFormatParamType(formatString);
+    QByteArray formatArray = formatString.toUtf8();
+
+    for (int i = 0; i < m_segmentCount; i++) {
+        qreal value = m_min + (segmentStep * i);
+        newLabels.append(Utils::formatLabel(formatArray, paramType, value));
     }
+
+    // Ensure max label doesn't suffer from any rounding errors
+    newLabels.append(Utils::formatLabel(formatArray, paramType, m_max));
+
+    if (m_labels != newLabels)
+        m_labels = newLabels;
 }
 
 QValueAxis *QValueAxisPrivate::qptr()

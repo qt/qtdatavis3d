@@ -248,11 +248,11 @@ public:
     virtual void setMeshFileName(const QString &fileName);
     virtual QString meshFileName();
 
-    virtual void handleAxisTitleChangedBySender(QObject *sender, const QString &title);
+    virtual void handleAxisTitleChangedBySender(QObject *sender);
     virtual void handleAxisLabelsChangedBySender(QObject *sender);
-    virtual void handleAxisRangeChangedBySender(QObject *sender, qreal min, qreal max);
-    virtual void handleAxisSegmentCountChangedBySender(QObject *sender, int count);
-    virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender, int count);
+    virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void handleAxisSegmentCountChangedBySender(QObject *sender);
+    virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
 
 public slots:
@@ -272,12 +272,6 @@ signals:
     void fontChanged(QFont font); // TODO should be handled via axis?? What about font for selection label?
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void labelTransparencyChanged(QDataVis::LabelTransparency transparency);
-    void axisTypeChanged(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
-    void axisTitleChanged(QAbstractAxis::AxisOrientation orientation, QString title);
-    void axisLabelsChanged(QAbstractAxis::AxisOrientation orientation, QStringList labels);
-    void axisRangeChanged(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-    void axisSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
-    void axisSubSegmentCountChanged(QAbstractAxis::AxisOrientation orientation, int count);
     void selectionModeChanged(QDataVis::SelectionMode mode);
     void backgroundEnabledChanged(bool enable);
     void gridEnabledChanged(bool enable); // TODO: Should be handled via axes?

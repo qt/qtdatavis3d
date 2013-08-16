@@ -86,8 +86,9 @@ void ChartModifier::restart(bool dynamicData)
         // Set selection mode to full
         m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
         m_chart->valueAxis()->setSegmentCount(m_segments * 2);
-        m_chart->valueAxis()->setSubSegmentCount(0);
+        m_chart->valueAxis()->setSubSegmentCount(1);
         m_chart->valueAxis()->setAutoAdjustRange(true);
+        m_chart->valueAxis()->setLabelFormat(QString(QStringLiteral("%.3f")));
 
         m_chart->rowAxis()->setTitle("Generic Row");
         m_chart->columnAxis()->setTitle("Generic Column");
@@ -137,6 +138,7 @@ void ChartModifier::addDataSet()
     m_chart->valueAxis()->setSegmentCount(m_segments);
     m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
     m_chart->valueAxis()->setRange(m_minval, m_maxval);
+    m_chart->valueAxis()->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
 
     // Create data rows
     QBarDataArray *dataSet = new QBarDataArray;

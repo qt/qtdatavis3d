@@ -521,23 +521,20 @@ QString Abstract3DController::meshFileName()
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
 {
-    handleAxisTitleChangedBySender(sender(), title);
+    Q_UNUSED(title)
+    handleAxisTitleChangedBySender(sender());
 }
 
-void Abstract3DController::handleAxisTitleChangedBySender(QObject *sender, const QString &title)
+void Abstract3DController::handleAxisTitleChangedBySender(QObject *sender)
 {
-    if (sender == m_axisX) {
+    if (sender == m_axisX)
         m_changeTracker.axisXTitleChanged = true;
-        emit axisTitleChanged(QAbstractAxis::AxisOrientationX, title);
-    } else if (sender == m_axisY) {
+    else if (sender == m_axisY)
         m_changeTracker.axisYTitleChanged = true;
-        emit axisTitleChanged(QAbstractAxis::AxisOrientationY, title);
-    } else if (sender == m_axisZ) {
+    else if (sender == m_axisZ)
         m_changeTracker.axisZTitleChanged = true;
-        emit axisTitleChanged(QAbstractAxis::AxisOrientationZ, title);
-    } else {
+    else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
-    }
 }
 
 void Abstract3DController::handleAxisLabelsChanged()
@@ -547,40 +544,34 @@ void Abstract3DController::handleAxisLabelsChanged()
 
 void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
 {
-    if (sender == m_axisX) {
+    if (sender == m_axisX)
         m_changeTracker.axisXLabelsChanged = true;
-        emit axisLabelsChanged(QAbstractAxis::AxisOrientationX, m_axisX->labels());
-    } else if (sender == m_axisY) {
+    else if (sender == m_axisY)
         m_changeTracker.axisYLabelsChanged = true;
-        emit axisLabelsChanged(QAbstractAxis::AxisOrientationY, m_axisY->labels());
-    } else if (sender == m_axisZ) {
+    else if (sender == m_axisZ)
         m_changeTracker.axisZLabelsChanged = true;
-        emit axisLabelsChanged(QAbstractAxis::AxisOrientationZ, m_axisZ->labels());
-    } else {
+    else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
-    }
 }
 
 void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
 {
-    handleAxisRangeChangedBySender(sender(), min, max);
+    Q_UNUSED(min)
+    Q_UNUSED(max)
+    handleAxisRangeChangedBySender(sender());
 }
 
-void Abstract3DController::handleAxisRangeChangedBySender(QObject *sender, qreal min, qreal max)
+void Abstract3DController::handleAxisRangeChangedBySender(QObject *sender)
 {
     if (sender == m_axisX) {
         m_isDataDirty = true;
         m_changeTracker.axisXRangeChanged = true;
-        emit axisRangeChanged(QAbstractAxis::AxisOrientationX, min, max);
     } else if (sender == m_axisY) {
         m_isDataDirty = true;
         m_changeTracker.axisYRangeChanged = true;
-        emit axisRangeChanged(QAbstractAxis::AxisOrientationY, min, max);
     } else if (sender == m_axisZ) {
         m_isDataDirty = true;
-
         m_changeTracker.axisZRangeChanged = true;
-        emit axisRangeChanged(QAbstractAxis::AxisOrientationZ, min, max);
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
@@ -588,44 +579,38 @@ void Abstract3DController::handleAxisRangeChangedBySender(QObject *sender, qreal
 
 void Abstract3DController::handleAxisSegmentCountChanged(int count)
 {
-    handleAxisSegmentCountChangedBySender(sender(), count);
+    Q_UNUSED(count)
+    handleAxisSegmentCountChangedBySender(sender());
 }
 
-void Abstract3DController::handleAxisSegmentCountChangedBySender(QObject *sender, int count)
+void Abstract3DController::handleAxisSegmentCountChangedBySender(QObject *sender)
 {
-    if (sender == m_axisX) {
+    if (sender == m_axisX)
         m_changeTracker.axisXSegmentCountChanged = true;
-        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationX, count);
-    } else if (sender == m_axisY) {
+    else if (sender == m_axisY)
         m_changeTracker.axisYSegmentCountChanged = true;
-        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationY, count);
-    } else if (sender == m_axisZ) {
+    else if (sender == m_axisZ)
         m_changeTracker.axisZSegmentCountChanged = true;
-        emit axisSegmentCountChanged(QAbstractAxis::AxisOrientationZ, count);
-    } else {
+    else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
-    }
 }
 
 void Abstract3DController::handleAxisSubSegmentCountChanged(int count)
 {
-    handleAxisSubSegmentCountChangedBySender(sender(), count);
+    Q_UNUSED(count)
+    handleAxisSubSegmentCountChangedBySender(sender());
 }
 
-void Abstract3DController::handleAxisSubSegmentCountChangedBySender(QObject *sender, int count)
+void Abstract3DController::handleAxisSubSegmentCountChangedBySender(QObject *sender)
 {
-    if (sender == m_axisX) {
+    if (sender == m_axisX)
         m_changeTracker.axisXSubSegmentCountChanged = true;
-        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationX, count);
-    } else if (sender == m_axisY) {
+    else if (sender == m_axisY)
         m_changeTracker.axisYSubSegmentCountChanged = true;
-        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationY, count);
-    } else if (sender == m_axisZ) {
+    else if (sender == m_axisZ)
         m_changeTracker.axisZSubSegmentCountChanged = true;
-        emit axisSubSegmentCountChanged(QAbstractAxis::AxisOrientationZ, count);
-    } else {
+    else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
-    }
 }
 
 void Abstract3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
@@ -649,12 +634,10 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
     axis->setParent(0); // Assume ownership
     axis->d_ptr->setOrientation(orientation);
 
-
     QObject::connect(axis, &QAbstractAxis::titleChanged,
                      this, &Abstract3DController::handleAxisTitleChanged);
     QObject::connect(axis, &QAbstractAxis::labelsChanged,
                      this, &Abstract3DController::handleAxisLabelsChanged);
-
 
     if (orientation == QAbstractAxis::AxisOrientationX)
         m_changeTracker.axisXTypeChanged = true;
@@ -662,13 +645,9 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
         m_changeTracker.axisYTypeChanged = true;
     else if (orientation == QAbstractAxis::AxisOrientationZ)
         m_changeTracker.axisZTypeChanged = true;
-    emit axisTypeChanged(orientation, axis->type());
 
-    handleAxisTitleChangedBySender(axis, axis->title());
-    emit axisTitleChanged(orientation, axis->title());
-
+    handleAxisTitleChangedBySender(axis);
     handleAxisLabelsChangedBySender(axis);
-    emit axisLabelsChanged(orientation, axis->labels());
 
     if (axis->type() & QAbstractAxis::AxisTypeValue) {
         QValueAxis *valueAxis = static_cast<QValueAxis *>(axis);
@@ -681,15 +660,9 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
         QObject::connect(valueAxis, &QValueAxis::autoAdjustRangeChanged,
                          this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
 
-        handleAxisRangeChangedBySender(valueAxis, valueAxis->min(), valueAxis->max());
-        emit axisRangeChanged(orientation, valueAxis->min(), valueAxis->max());
-
-        handleAxisSegmentCountChangedBySender(valueAxis, valueAxis->segmentCount());
-        emit axisSegmentCountChanged(orientation, valueAxis->segmentCount());
-
-        handleAxisSubSegmentCountChangedBySender(valueAxis, valueAxis->subSegmentCount());
-        emit axisSubSegmentCountChanged(orientation, valueAxis->subSegmentCount());
-
+        handleAxisRangeChangedBySender(valueAxis);
+        handleAxisSegmentCountChangedBySender(valueAxis);
+        handleAxisSubSegmentCountChangedBySender(valueAxis);
         handleAxisAutoAdjustRangeChangedInOrientation(valueAxis->orientation(),
                                                       valueAxis->isAutoAdjustRange());
     }

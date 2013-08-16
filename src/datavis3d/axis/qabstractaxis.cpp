@@ -38,6 +38,7 @@ QString QAbstractAxis::title() const
 
 QStringList QAbstractAxis::labels() const
 {
+    d_ptr->updateLabels();
     return d_ptr->m_labels;
 }
 
@@ -79,6 +80,11 @@ void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orienta
         m_orientation = orientation;
     else
         Q_ASSERT("Attempted to reset axis orientation.");
+}
+
+void QAbstractAxisPrivate::updateLabels()
+{
+    // Default implementation does nothing
 }
 
 QT_DATAVIS3D_END_NAMESPACE

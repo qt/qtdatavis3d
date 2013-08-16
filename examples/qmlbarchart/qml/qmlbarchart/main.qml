@@ -104,7 +104,7 @@ Item {
             id: valueAxis
             min: 0
             max: 35
-            labelFormat: "M\u20AC"
+            labelFormat: "%.1f M\u20AC"
         }
         Bars3D {
             id: testchart

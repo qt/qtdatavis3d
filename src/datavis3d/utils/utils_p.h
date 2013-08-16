@@ -43,7 +43,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Utils
 {
-    public:
+public:
+    enum ParamType {
+        ParamTypeUnknown = 0,
+        ParamTypeInt,
+        ParamTypeUInt,
+        ParamTypeReal
+    };
+
     static GLuint getNearestPowerOfTwo(GLuint value, GLuint &padding);
     static QVector3D vectorFromColor(const QColor &color);
     static void printText(QPainter *painter, const QString &text, const QSize &position,
@@ -54,6 +61,12 @@ class Utils
                                    const QColor &txtColor,
                                    QDataVis::LabelTransparency transparency);
     static QVector3D getSelection(QPoint mousepos, int height);
+
+    static ParamType findFormatParamType(const QString &format);
+    static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
+
+private:
+    static ParamType mapFormatCharToParamType(const QChar &formatChar);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

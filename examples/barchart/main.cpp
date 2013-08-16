@@ -187,6 +187,7 @@ void ChartDataGenerator::setupModel()
     m_chart->columnAxis()->setTitle("Day of week");
     m_chart->valueAxis()->setTitle("Hours playing banjo");
     m_chart->valueAxis()->setSegmentCount(5);
+    m_chart->valueAxis()->setLabelFormat("%.1f h");
     m_chart->rowAxis()->setCategoryLabels(weeks);
     m_chart->columnAxis()->setCategoryLabels(days);
 

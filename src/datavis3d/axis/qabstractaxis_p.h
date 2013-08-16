@@ -44,6 +44,8 @@ public:
     void setOrientation(QAbstractAxis::AxisOrientation orientation);
 
 protected:
+    virtual void updateLabels();
+
     QAbstractAxis *q_ptr;
 
     QString m_title;

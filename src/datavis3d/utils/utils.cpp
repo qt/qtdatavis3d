@@ -23,10 +23,8 @@
 #include <QPainter>
 #include <QPoint>
 #include <QImage>
-
+#include <QRegExp>
 #include <qmath.h>
-
-#include <QDebug>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -229,6 +227,59 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     //qDebug() << selectedColor;
 
     return selectedColor;
+}
+
+Utils::ParamType Utils::mapFormatCharToParamType(const QChar &formatChar)
+{
+    ParamType retVal = ParamTypeUnknown;
+    if (formatChar == QLatin1Char('d')
+        || formatChar == QLatin1Char('i')
+        || formatChar == QLatin1Char('c')) {
+        retVal = ParamTypeInt;
+    } else if (formatChar == QLatin1Char('u')
+             || formatChar == QLatin1Char('o')
+             || formatChar == QLatin1Char('x')
+             || formatChar == QLatin1Char('X')) {
+        retVal = ParamTypeUInt;
+    } else if (formatChar == QLatin1Char('f')
+               || formatChar == QLatin1Char('F')
+               || formatChar == QLatin1Char('e')
+               || formatChar == QLatin1Char('E')
+               || formatChar == QLatin1Char('g')
+               || formatChar == QLatin1Char('G')) {
+        retVal = ParamTypeReal;
+    }
+
+    return retVal;
+}
+
+Utils::ParamType Utils::findFormatParamType(const QString &format)
+{
+    static QRegExp formatMatcher(QStringLiteral("%[\\-\\+#\\s\\d\\.lhjztL]*([dicuoxfegXFEG])"));
+
+    if (formatMatcher.indexIn(format, 0) != -1) {
+        QString capStr = formatMatcher.cap(1);
+        if (capStr.isEmpty())
+            return ParamTypeUnknown;
+        else
+            return mapFormatCharToParamType(capStr.at(0));
+    }
+
+    return ParamTypeUnknown;
+}
+
+QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
+{
+    switch (paramType) {
+    case ParamTypeInt:
+        return QString().sprintf(format, (qint64)value);
+    case ParamTypeUInt:
+        return QString().sprintf(format, (quint64)value);
+    case ParamTypeReal:
+        return QString().sprintf(format, value);
+    default:
+        return QString::number(value);
+    }
 }
 
 QT_DATAVIS3D_END_NAMESPACE
