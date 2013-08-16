@@ -39,34 +39,48 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+class TextureHelper;
+class Theme;
+class Drawer;
+
 class Abstract3DRenderer : public QObject, protected QOpenGLFunctions
 {
-protected:
+    Q_OBJECT
+
+private:
     Abstract3DController *m_controller;
     bool m_isInitialized;
+
+protected:
     bool m_hasNegativeValues;
-    QRect m_cachedBoundingRect;
-    QDataVis::ShadowQuality m_cachedShadowQuality;
     Theme m_cachedTheme;
     QFont m_cachedFont;
     QDataVis::LabelTransparency m_cachedLabelTransparency;
     Drawer *m_drawer;
+    QRect m_cachedBoundingRect;
+    QDataVis::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
+
     QString m_cachedItemLabelFormat;
     QString m_cachedObjFile;
     QDataVis::SelectionMode m_cachedSelectionMode;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
+
     int m_cachedZoomLevel;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
+    TextureHelper *m_textureHelper;
 
     Abstract3DRenderer(Abstract3DController *controller);
+
     virtual void initializeOpenGL();
 
 public:
+    ~Abstract3DRenderer();
+
     inline bool isInitialized() { return m_isInitialized; }
 
     virtual void updateBoundingRect(const QRect boundingRect);

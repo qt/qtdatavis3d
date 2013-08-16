@@ -97,6 +97,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
     #endif
 {
     m_dummyBarRenderItem.setRenderer(this);
+
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -119,17 +120,15 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_barObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
-    delete m_textureHelper;
-    delete m_drawer;
 }
 
 void Bars3dRenderer::initializeOpenGL()
 {
-    m_textureHelper = new TextureHelper();
-    m_drawer->initializeOpenGL();
+    Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
     handleShadowQualityChange();
+
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
 
@@ -165,8 +164,6 @@ void Bars3dRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
-
-    Abstract3DRenderer::initializeOpenGL();
 }
 
 void Bars3dRenderer::updateDataModel(QBarDataProxy *dataProxy)

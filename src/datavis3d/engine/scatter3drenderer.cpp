@@ -92,6 +92,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 {
     //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);
+
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -111,14 +112,11 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_dotObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
-    delete m_textureHelper;
 }
 
 void Scatter3DRenderer::initializeOpenGL()
 {
-    //qDebug() << __FUNCTION__;
-    m_textureHelper = new TextureHelper();
-    m_drawer->initializeOpenGL();
+    Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
     handleShadowQualityChange();
@@ -156,14 +154,8 @@ void Scatter3DRenderer::initializeOpenGL()
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
                m_mainViewPort.width(), m_mainViewPort.height());
 
-    // Resize in case we've missed resize events
-    // Resize calls initSelectionBuffer and initDepthBuffer, so they don't need to be called here
-    handleResize();
-
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
-
-    Abstract3DRenderer::initializeOpenGL();
 }
 
 void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)

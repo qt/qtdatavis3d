@@ -53,9 +53,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class ObjectHelper;
-class TextureHelper;
-class Theme;
-class Drawer;
 class LabelItem;
 class CameraHelper;
 
@@ -99,7 +96,6 @@ private:
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
-    TextureHelper *m_textureHelper;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;

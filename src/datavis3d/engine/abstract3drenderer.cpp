@@ -18,6 +18,7 @@
 
 #include "abstract3drenderer_p.h"
 #include "qvalueaxis.h"
+#include "texturehelper_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -26,7 +27,12 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_controller(controller),
       m_isInitialized(false),
       m_hasNegativeValues(false),
+      m_cachedTheme(),
+      m_cachedFont(QFont(QStringLiteral("Arial"))),
+      m_cachedLabelTransparency(QDataVis::TransparencyFromTheme),
       m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
+      m_cachedBoundingRect(QRect(0,0,0,0)),
+      m_cachedShadowQuality(QDataVis::ShadowNone),
       m_autoScaleAdjustment(1.0f),
       m_cachedZoomLevel(100)
 
@@ -34,8 +40,17 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
 }
 
+Abstract3DRenderer::~Abstract3DRenderer()
+{
+    delete m_drawer;
+    delete m_textureHelper;
+}
+
 void Abstract3DRenderer::initializeOpenGL()
 {
+    m_textureHelper = new TextureHelper();
+    m_drawer->initializeOpenGL();
+
     axisCacheForOrientation(QAbstractAxis::AxisOrientationX).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstractAxis::AxisOrientationY).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
