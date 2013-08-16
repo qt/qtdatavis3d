@@ -1568,7 +1568,7 @@ void Bars3dRenderer::updateBackgroundEnabled(bool enable)
 
 void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    qDebug() << "Bars3dRenderer::setShadowQuality" << quality;
+    qDebug() << __FUNCTION__ << quality;
     m_cachedShadowQuality = quality;
     switch (quality) {
     case QDataVis::ShadowLow:
@@ -1584,42 +1584,12 @@ void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
         m_shadowQualityToShader = 0.0f;
         break;
     }
+
+    handleShadowQualityChange();
+
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
-        // Re-init shaders
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                              QStringLiteral(":/shaders/fragmentShadowNoTex"));
-    } else {
-        // Re-init shaders
-        if (!m_cachedTheme.m_uniformColor) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                              QStringLiteral(":/shaders/fragment"));
-    }
     // Re-init depth buffer
     updateDepthBuffer();
-#else
-    if (!m_cachedTheme.m_uniformColor) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
-    initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
-                          QStringLiteral(":/shaders/fragmentES2"));
 #endif
 }
 

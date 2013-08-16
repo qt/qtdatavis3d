@@ -83,7 +83,7 @@ Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Bars3dController::shadowQualityChanged, this,
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::handleShadowQualityUpdate);
 }
 
