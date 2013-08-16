@@ -1,44 +1,23 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the documentation of QtDataVis3D module.
+** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
 #include "mapdata.h"
+#include <QtDataVis3D/qmapdataproxy.h>
 #include <QImage>
 #include <QFile>
 
@@ -64,6 +43,8 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustAll);
     m_chart->setMeshFileName(QStringLiteral(":/meshes/weirdthing"));
 #endif
+    QMapDataProxy *proxy = new QMapDataProxy;
+    m_chart->setDataProxy(proxy);
 }
 
 MapsModifier::~MapsModifier()
@@ -78,132 +59,156 @@ void MapsModifier::start()
 
 void MapsModifier::addData()
 {
-    QDataItem *item;
-    item = new QDataItem();
+    QMapDataArray *dataArray = new QMapDataArray;
+    QMapDataItem *item;
+    item = new QMapDataItem();
     item->setValue(191050);
-    item->setLabel("Oulu", true);
-    item->setPosition(QPoint(963, 1604));
-    m_chart->addDataItem(item);
+    item->setLabel("Oulu");
+    item->setMapPosition(QPointF(963, 1604));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(22274);
-    item->setLabel("Kemi", true);
-    item->setPosition(QPoint(857, 1383));
-    m_chart->addDataItem(item);
+    item->setLabel("Kemi");
+    item->setMapPosition(QPointF(857, 1383));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(60887);
-    item->setLabel("Rovaniemi", true);
-    item->setPosition(QPoint(1061, 1119));
-    m_chart->addDataItem(item);
+    item->setLabel("Rovaniemi");
+    item->setMapPosition(QPointF(1061, 1119));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(16176);
-    item->setLabel("Kuusamo", true);
-    item->setPosition(QPoint(1459, 1284));
-    m_chart->addDataItem(item);
+    item->setLabel("Kuusamo");
+    item->setMapPosition(QPointF(1459, 1284));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(3998);
-    item->setLabel("Ivalo", true);
-    item->setPosition(QPoint(1239, 474));
-    m_chart->addDataItem(item);
+    item->setLabel("Ivalo");
+    item->setMapPosition(QPointF(1239, 474));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(37978);
-    item->setLabel("Kajaani", true);
-    item->setPosition(QPoint(1285, 1859));
-    m_chart->addDataItem(item);
+    item->setLabel("Kajaani");
+    item->setMapPosition(QPointF(1285, 1859));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(46809);
-    item->setLabel("Kokkola", true);
-    item->setPosition(QPoint(580, 1973));
-    m_chart->addDataItem(item);
+    item->setLabel("Kokkola");
+    item->setMapPosition(QPointF(580, 1973));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(105236);
-    item->setLabel("Kuopio", true);
-    item->setPosition(QPoint(1292, 2283));
-    m_chart->addDataItem(item);
+    item->setLabel("Kuopio");
+    item->setMapPosition(QPointF(1292, 2283));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(133557);
-    item->setLabel("Jyväskylä", true);
-    item->setPosition(QPoint(991, 2496));
-    m_chart->addDataItem(item);
+    item->setLabel("Jyväskylä");
+    item->setMapPosition(QPointF(991, 2496));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(65771);
-    item->setLabel("Vaasa", true);
-    item->setPosition(QPoint(441, 2184));
-    m_chart->addDataItem(item);
+    item->setLabel("Vaasa");
+    item->setMapPosition(QPointF(441, 2184));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(217603);
-    item->setLabel("Tampere", true);
-    item->setPosition(QPoint(686, 2656));
-    m_chart->addDataItem(item);
+    item->setLabel("Tampere");
+    item->setMapPosition(QPointF(686, 2656));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(180350);
-    item->setLabel("Turku", true);
-    item->setPosition(QPoint(430, 3046));
-    m_chart->addDataItem(item);
+    item->setLabel("Turku");
+    item->setMapPosition(QPointF(430, 3046));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(72400);
-    item->setLabel("Lappeenranta", true);
-    item->setPosition(QPoint(1365, 2852));
-    m_chart->addDataItem(item);
+    item->setLabel("Lappeenranta");
+    item->setMapPosition(QPoint(1365, 2852));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(14754);
-    item->setLabel("Tammisaari", true);
-    item->setPosition(QPoint(605, 3215));
-    m_chart->addDataItem(item);
+    item->setLabel("Tammisaari");
+    item->setMapPosition(QPointF(605, 3215));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(1879);
-    item->setLabel("Enontekiö", true);
-    item->setPosition(QPoint(752, 556));
-    m_chart->addDataItem(item);
+    item->setLabel("Enontekiö");
+    item->setMapPosition(QPointF(752, 556));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(36624);
-    item->setLabel("Savonlinna", true);
-    item->setPosition(QPoint(1445, 2586));
-    m_chart->addDataItem(item);
+    item->setLabel("Savonlinna");
+    item->setMapPosition(QPointF(1445, 2586));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(605022);
-    item->setLabel("Helsinki", true);
-    item->setPosition(QPoint(822, 3130));
-    m_chart->addDataItem(item);
+    item->setLabel("Helsinki");
+    item->setMapPosition(QPointF(822, 3130));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(54887);
-    item->setLabel("Kotka", true);
-    item->setPosition(QPoint(1162, 3051));
-    m_chart->addDataItem(item);
+    item->setLabel("Kotka");
+    item->setMapPosition(QPointF(1162, 3051));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(11372);
-    item->setLabel("Maarianhamina", true);
-    item->setPosition(QPoint(56, 3101));
-    m_chart->addDataItem(item);
+    item->setLabel("Maarianhamina");
+    item->setMapPosition(QPointF(56, 3101));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(9266);
-    item->setLabel("Hanko", true);
-    item->setPosition(QPoint(527, 3228));
-    m_chart->addDataItem(item);
+    item->setLabel("Hanko");
+    item->setMapPosition(QPointF(527, 3228));
+    dataArray->append(*item);
+    delete item;
 
-    item = new QDataItem();
+    item = new QMapDataItem();
     item->setValue(1287);
-    item->setLabel("Utsjoki", true);
-    item->setPosition(QPoint(1180, 72));
-    m_chart->addDataItem(item);
+    item->setLabel("Utsjoki");
+    item->setMapPosition(QPointF(1180, 72));
+    dataArray->append(*item);
+    delete item;
+
+    static_cast<QMapDataProxy *>(m_chart->dataProxy())->resetArray(dataArray);
 }
 
 void MapsModifier::changeStyle()
@@ -211,40 +216,40 @@ void MapsModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Cylinders, false);
+        m_chart->setBarType(QDataVis::Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Cylinders, true);
+        m_chart->setBarType(QDataVis::Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Cones, false);
+        m_chart->setBarType(QDataVis::Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Cones, true);
+        m_chart->setBarType(QDataVis::Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Bars, false);
+        m_chart->setBarType(QDataVis::Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Bars, true);
+        m_chart->setBarType(QDataVis::Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Pyramids, false);
+        m_chart->setBarType(QDataVis::Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Pyramids, true);
+        m_chart->setBarType(QDataVis::Pyramids, true);
         break;
     case 8:
-        m_chart->setBarType(BevelBars, false);
+        m_chart->setBarType(QDataVis::BevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(BevelBars, true);
+        m_chart->setBarType(QDataVis::BevelBars, true);
         break;
     case 10:
-        m_chart->setBarType(Spheres, false);
+        m_chart->setBarType(QDataVis::Spheres, false);
         break;
     case 11:
-        m_chart->setBarType(Spheres, true);
+        m_chart->setBarType(QDataVis::Spheres, true);
         break;
     }
     model++;
@@ -254,32 +259,32 @@ void MapsModifier::changeStyle()
 
 void MapsModifier::changePresetCamera()
 {
-    static int preset = PresetFrontLow;
+    static int preset = QDataVis::PresetFrontLow;
 
-    m_chart->setCameraPreset((CameraPreset)preset);
+    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > PresetDirectlyAboveCCW45)
-        preset = PresetFrontLow;
+    if (++preset > QDataVis::PresetDirectlyAboveCCW45)
+        preset = QDataVis::PresetFrontLow;
 }
 
 void MapsModifier::changeTheme()
 {
-    static int theme = ThemeSystem;
+    static int theme = QDataVis::ThemeSystem;
 
-    m_chart->setTheme((ColorTheme)theme);
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > ThemeLight)
-        theme = ThemeSystem;
+    if (++theme > QDataVis::ThemeLight)
+        theme = QDataVis::ThemeSystem;
 }
 
 void MapsModifier::changeTransparency()
 {
-    static int transparency = TransparencyNone;
+    static int transparency = QDataVis::TransparencyNone;
 
-    m_chart->setLabelTransparency((LabelTransparency)transparency);
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
-    if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyFromTheme;
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyFromTheme;
 }
 
 void MapsModifier::changeValueDimension(int dimension)
@@ -303,19 +308,34 @@ void MapsModifier::changeFontSize(int fontsize)
 
 void MapsModifier::changeShadowQuality(int quality)
 {
-    ShadowQuality sq = ShadowNone;
+    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
     switch (quality) {
     case 1:
-        sq = ShadowLow;
+        sq = QDataVis::ShadowLow;
         break;
     case 2:
-        sq = ShadowMedium;
+        sq = QDataVis::ShadowMedium;
         break;
     case 3:
-        sq = ShadowHigh;
+        sq = QDataVis::ShadowHigh;
         break;
     }
-    m_chart->setShadowQuality(sq);
+    QDataVis::ShadowQuality realquality = m_chart->setShadowQuality(sq);
+    // Check if it setting quality was successful
+    if (realquality != sq) {
+        switch (realquality) {
+        case QDataVis::ShadowLow:
+            quality = 1;
+            break;
+        case QDataVis::ShadowMedium:
+            quality = 2;
+            break;
+        case QDataVis::ShadowHigh:
+            quality = 3;
+            break;
+        }
+        emit shadowQuality(quality);
+    }
 }
 
 //void MapsModifier::setGridEnabled(int enabled)

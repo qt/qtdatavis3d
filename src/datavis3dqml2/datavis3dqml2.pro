@@ -6,27 +6,33 @@ CONFIG += qt plugin
 TARGET = $$qtLibraryTarget($$TARGET)
 uri = com.digia.QtDataVis3D
 
-staticlib:DEFINES+=QTENTERPRISE_DATAVIS3D_STATICLIB
+static {
+    DEFINES += QT_DATAVIS3D_STATICLIB
+    CONFIG -= static staticlib
+}
 
 # Input
-INCLUDEPATH += ../datavis3d/engine
+INCLUDEPATH += ../datavis3d/engine \
+               ../datavis3d/global \
+               ../datavis3d/data
 
 SOURCES += \
     datavis3dqml2_plugin.cpp \
     declarativebars.cpp \
-    declarativemaps.cpp  #\
-    #declarativedataitem.cpp \
-    #declarativedatarow.cpp \
-    #declarativedataset.cpp
+    declarativebarsrenderer.cpp \
+    declarativescatter.cpp \
+    declarativescatterrenderer.cpp \
+    declarativemaps.cpp \
+    declarativemapsrenderer.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
-    declarativebars.h \
-    declarativemaps.h \  #\
-    declarativebars_p.h
-    #declarativedataitem.h \
-    #declarativedatarow.h \
-    #declarativedataset.h
+    declarativebars_p.h \
+    declarativebarsrenderer_p.h \
+    declarativescatter_p.h \
+    declarativescatterrenderer_p.h \
+    declarativemaps_p.h \
+    declarativemapsrenderer_p.h
 
 OTHER_FILES = qmldir
 

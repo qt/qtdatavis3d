@@ -1,3 +1,3 @@
 TEMPLATE = subdirs
 SUBDIRS += datavis3d \
-    datavis3dqml2
+           datavis3dqml2

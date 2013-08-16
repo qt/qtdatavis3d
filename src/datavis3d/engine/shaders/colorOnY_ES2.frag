@@ -31,5 +31,6 @@ void main() {
         materialAmbientColor +
         materialDiffuseColor * lightStrength * (cosTheta * cosTheta) / (distance * distance) +
         materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / (distance * distance);
+    gl_FragColor.a = 1.0;
 }
 

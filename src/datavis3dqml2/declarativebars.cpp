@@ -1,63 +1,50 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
-#include "declarativebars.h"
-#include "bars3dshared_p.h"
+#include "declarativebars_p.h"
+#include "declarativebarsrenderer_p.h"
+#include "qitemmodelbardataproxy.h"
+#include "qvalueaxis.h"
 
-#include <QtQuick/QQuickWindow>
-#include <QtGui/QOpenGLFramebufferObject>
-#include <QOpenGLContext>
-#include <QGuiApplication>
-#include <QThread>
-#include <QDebug>
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+const QString smoothString(QStringLiteral("Smooth"));
 
-DeclarativeBars::DeclarativeBars(QQuickItem *parent): QQuickItem(parent), m_cachedState(new DeclarativeBarsCachedStatePrivate()), m_shared(0)
+DeclarativeBars::DeclarativeBars(QQuickItem *parent)
+    : QQuickItem(parent),
+      m_shared(0),
+      m_initialisedSize(0, 0),
+      m_cameraPreset(QDataVis::NoPreset),
+      m_theme(QDataVis::ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
+    setAcceptedMouseButtons(Qt::AllButtons);
 
-    setRotation(180.0);
+    // TODO: These seem to have no effect; find a way to activate anti-aliasing
     setAntialiasing(true);
     setSmooth(true);
+
+    // Create the shared component on the main GUI thread.
+    m_shared = new Bars3dController(boundingRect().toRect());
+    QObject::connect(m_shared, &Bars3dController::shadowQualityChanged, this,
+                     &DeclarativeBars::handleShadowQualityUpdate);
+
+    m_shared->setDataProxy(new QItemModelBarDataProxy);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -65,103 +52,214 @@ DeclarativeBars::~DeclarativeBars()
     delete m_shared;
 }
 
+void DeclarativeBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
+{
+    emit shadowQualityChanged(quality);
+}
+
+void DeclarativeBars::classBegin()
+{
+    qDebug() << "classBegin";
+}
+
+void DeclarativeBars::componentComplete()
+{
+    qDebug() << "componentComplete";
+}
+
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    qDebug() << "Enter DeclarativeBars::updatePaintNode";
-    // Delete old node and recreate it. This function gets called when window geometry changes.
+    // If old node exists and has right size, reuse it.
+    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
+        // Update bounding rectangle (that has same size as before).
+        static_cast<DeclarativeBarsRenderer *>( oldNode )->setRect(boundingRect());
+        return oldNode;
+    }
+
+    // Create a new render node when size changes or if there is no node yet
+    m_initialisedSize = boundingRect().size().toSize();
+
+    // Delete old node
     if (oldNode)
         delete oldNode;
 
-    if (!m_shared)
-        m_shared = new Bars3dShared(boundingRect().toRect());
-
-    // Lazy initialization of shared object on the SGRenderThread
-    m_shared->initializeOpenGL();
-
-    // We need to create a node class that does the rendering (ie. a node that "captures" the rendering we do)
-    qDebug() << "DeclarativeBars::updatePaintNode Creating new node";
-
-    // Create the new render node
+    // Create a new one and set it's bounding rectangle
     DeclarativeBarsRenderer *node = new DeclarativeBarsRenderer(window(), m_shared);
     node->setRect(boundingRect());
     m_shared->setBoundingRect(boundingRect().toRect());
-
-    if (m_cachedState->m_isSampleSpaceSet) {
-        m_shared->setupSampleSpace(m_cachedState->m_samplesRow, m_cachedState->m_samplesColumn, m_cachedState->m_labelRow, m_cachedState->m_labelColumn, m_cachedState->m_labelHeight);
-        m_cachedState->m_isSampleSpaceSet = false;
-    }
-
-    if (m_cachedState->m_dataRow) {
-        m_shared->addDataRow(m_cachedState->m_dataRow);
-        m_cachedState->m_dataRow = 0;
-    }
-
-    if (m_cachedState->m_isSelectionModeSet) {
-        m_shared->setSelectionMode(m_cachedState->m_selectionMode);
-        m_cachedState->m_isSelectionModeSet = false;
-    }
-
-    if (m_cachedState->m_isLabelTransparencySet) {
-        m_shared->setLabelTransparency(m_cachedState->m_labelTransparency);
-        m_cachedState->m_isLabelTransparencySet = false;
-    }
-
-    if (m_cachedState->m_isShadowQualitySet) {
-        m_shared->setShadowQuality(m_cachedState->m_shadowQuality);
-        m_cachedState->m_isShadowQualitySet = false;
-    }
-
-    if (m_cachedState->m_isGridSet) {
-        m_shared->setGridEnabled(m_cachedState->m_isGridEnabled);
-        m_cachedState->m_isGridSet = false;
-    }
-
-    qDebug() << "Exit DeclarativeBars::updatePaintNode";
     return node;
 }
 
-void DeclarativeBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
+void DeclarativeBars::setupSampleSpace(int rowCount, int columnCount)
 {
-    m_shared->setBarSpecs(thickness, spacing, relative);
+    m_shared->setupSampleSpace(rowCount, columnCount);
 }
 
-void DeclarativeBars::setBarType(BarStyle style, bool smooth)
+void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
+                                  bool uniform)
 {
+    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+}
+
+void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
+{
+    m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
+}
+
+void DeclarativeBars::setData(QAbstractItemModel *data)
+{
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
+}
+
+QAbstractItemModel *DeclarativeBars::data()
+{
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->itemModel();
+}
+
+void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
+{
+    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+QCategoryAxis *DeclarativeBars::axisX() const
+{
+    return static_cast<QCategoryAxis *>(m_shared->axisX());
+}
+
+void DeclarativeBars::setAxisX(QCategoryAxis *axis)
+{
+    m_shared->setAxisX(axis);
+}
+
+QValueAxis *DeclarativeBars::axisY() const
+{
+    return static_cast<QValueAxis *>(m_shared->axisY());
+}
+
+void DeclarativeBars::setAxisY(QValueAxis *axis)
+{
+    m_shared->setAxisY(axis);
+}
+
+QCategoryAxis *DeclarativeBars::axisZ() const
+{
+    return static_cast<QCategoryAxis *>(m_shared->axisZ());
+}
+
+void DeclarativeBars::setAxisZ(QCategoryAxis *axis)
+{
+    m_shared->setAxisZ(axis);
+}
+
+QItemModelBarDataMapping *DeclarativeBars::mapping() const
+{
+    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
+}
+
+void DeclarativeBars::setBarThickness(QSizeF thickness)
+{
+    m_shared->setBarSpecs(thickness, barSpacing(), isBarSpacingRelative());
+}
+
+QSizeF DeclarativeBars::barThickness()
+{
+    return m_shared->barThickness();
+}
+
+void DeclarativeBars::setBarSpacing(QSizeF spacing)
+{
+    m_shared->setBarSpecs(barThickness(), spacing, isBarSpacingRelative());
+}
+
+QSizeF DeclarativeBars::barSpacing()
+{
+    return m_shared->barSpacing();
+}
+
+void DeclarativeBars::setBarSpacingRelative(bool relative)
+{
+    m_shared->setBarSpecs(barThickness(), barSpacing(), relative);
+}
+
+bool DeclarativeBars::isBarSpacingRelative()
+{
+    return m_shared->isBarSpecRelative();
+}
+
+void DeclarativeBars::setBarType(QDataVis::MeshStyle style)
+{
+    QString objFile = m_shared->meshFileName();
+    bool smooth = objFile.endsWith(smoothString);
     m_shared->setBarType(style, smooth);
 }
 
-void DeclarativeBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                                       const QString &labelColumn, const QString &labelHeight)
+QDataVis::MeshStyle DeclarativeBars::barType()
 {
-    m_cachedState->m_samplesRow = samplesRow;
-    m_cachedState->m_samplesColumn = samplesColumn;
-    m_cachedState->m_labelRow = labelRow;
-    m_cachedState->m_labelColumn = labelColumn;
-    m_cachedState->m_labelHeight = labelHeight;
-    m_cachedState->m_isSampleSpaceSet = true;
+    QString objFile = m_shared->meshFileName();
+    if (objFile.contains("/sphere"))
+        return QDataVis::Spheres;
+    else
+        return QDataVis::Dots;
 }
 
-
-void DeclarativeBars::setCameraPreset(CameraPreset preset)
+void DeclarativeBars::setBarSmooth(bool smooth)
 {
+    QString objFile = m_shared->meshFileName();
+    if (objFile.endsWith(smoothString)) {
+        if (smooth)
+            return; // Already smooth; do nothing
+        else // Rip Smooth off the end
+            objFile.resize(objFile.indexOf(smoothString));
+    } else {
+        if (!smooth) // Already flat; do nothing
+            return;
+        else // Append Smooth to the end
+            objFile.append(smoothString);
+    }
+    m_shared->setMeshFileName(objFile);
+}
+
+bool DeclarativeBars::barSmooth()
+{
+    QString objFile = m_shared->meshFileName();
+    return objFile.endsWith(smoothString);
+}
+
+void DeclarativeBars::setMeshFileName(const QString &objFileName)
+{
+    m_shared->setMeshFileName(objFileName);
+}
+
+QString DeclarativeBars::meshFileName()
+{
+    return m_shared->meshFileName();
+}
+
+void DeclarativeBars::setCameraPreset(QDataVis::CameraPreset preset)
+{
+    // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_cameraPreset = preset;
     m_shared->setCameraPreset(preset);
 }
 
-void DeclarativeBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
+QDataVis::CameraPreset DeclarativeBars::cameraPreset()
 {
-    m_shared->setCameraPosition(horizontal, vertical, distance);
+    return m_cameraPreset;
 }
 
-void DeclarativeBars::setTheme(ColorTheme theme)
+void DeclarativeBars::setTheme(QDataVis::ColorTheme theme)
 {
-    m_shared->setTheme(theme);
+    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
+    // We need to save this locally, as there are no getters for it in controller
+    m_theme = theme;
+    m_shared->setColorTheme(theme);
 }
 
-void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+QDataVis::ColorTheme DeclarativeBars::theme()
 {
-    m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    return m_theme;
 }
-
 
 void DeclarativeBars::setFontSize(float fontsize)
 {
@@ -183,198 +281,100 @@ QFont DeclarativeBars::font()
     return m_shared->font();
 }
 
-void DeclarativeBars::setLabelTransparency(DeclarativeBars::LabelTransparency transparency)
+void DeclarativeBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
-    m_cachedState->m_labelTransparency = QtDataVis3D::LabelTransparency(transparency);
-    m_cachedState->m_isLabelTransparencySet = true;
+    m_shared->setLabelTransparency(transparency);
 }
 
-DeclarativeBars::LabelTransparency DeclarativeBars::labelTransparency()
+QDataVis::LabelTransparency DeclarativeBars::labelTransparency()
 {
-    return DeclarativeBars::LabelTransparency(m_shared->labelTransparency());
+    return m_shared->labelTransparency();
 }
 
-void DeclarativeBars::setGridEnabled(bool enable)
+void DeclarativeBars::setGridVisible(bool visible)
 {
-    m_cachedState->m_isGridEnabled = enable;
-    m_cachedState->m_isGridSet = true;
+    m_shared->setGridEnabled(visible);
 }
 
-bool DeclarativeBars::gridEnabled()
+bool DeclarativeBars::isGridVisible()
 {
     return m_shared->gridEnabled();
 }
 
-void DeclarativeBars::setBackgroundEnabled(bool enable)
+void DeclarativeBars::setBackgroundVisible(bool visible)
 {
-    m_shared->setBackgroundEnabled(enable);
+    m_shared->setBackgroundEnabled(visible);
 }
 
-bool DeclarativeBars::backgroundEnabled()
+bool DeclarativeBars::isBackgroundVisible()
 {
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+void DeclarativeBars::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    m_shared->setTickCount(tickCount, step, minimum);
+    m_shared->setSelectionMode(mode);
 }
 
-void DeclarativeBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                                 const QVector<QString> &labelsColumn)
+QDataVis::SelectionMode DeclarativeBars::selectionMode()
 {
-    qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<float> &dataRow...)";
-    m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    return m_shared->selectionMode();
 }
 
-void DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                                 const QVector<QString> &labelsColumn)
+void DeclarativeBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    qDebug() << "Enter DeclarativeBars::addDataRow(const QVector<QDataItem*> &dataRow...)";
-    m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    m_shared->setShadowQuality(quality);
 }
 
-void DeclarativeBars::addDataRow(QDataRow *dataRow)
+QDataVis::ShadowQuality DeclarativeBars::shadowQuality()
 {
-    qDebug() << "Enter DeclarativeBars::addDataRow(QDataRow *dataRow)";
-    m_cachedState->m_dataRow = dataRow;
+    return m_shared->shadowQuality();
 }
 
-void DeclarativeBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
-                                 const QVector<QString> &labelsColumn)
+int DeclarativeBars::rows() const
 {
-    m_shared->addDataSet(data, labelsRow,labelsColumn);
+    return m_shared->rowCount();
 }
 
-void DeclarativeBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                                 const QVector<QString> &labelsRow,
-                                 const QVector<QString> &labelsColumn)
+void DeclarativeBars::setRows(int rows)
 {
-    m_shared->addDataSet(data, labelsRow, labelsColumn);
+    setupSampleSpace(rows, columns());
 }
 
-void DeclarativeBars::addDataSet(QDataSet* dataSet)
+int DeclarativeBars::columns() const
 {
-    m_shared->addDataSet(dataSet);
+    return m_shared->columnCount();
 }
 
-void DeclarativeBars::setSelectionMode(DeclarativeBars::SelectionMode mode)
+void DeclarativeBars::setColumns(int columns)
 {
-    m_cachedState->m_selectionMode = QtDataVis3D::SelectionMode(mode);
-    m_cachedState->m_isSelectionModeSet = true;
+    setupSampleSpace(rows(), columns);
 }
 
-DeclarativeBars::SelectionMode DeclarativeBars::selectionMode()
+void DeclarativeBars::mousePressEvent(QMouseEvent *event)
 {
-    return DeclarativeBars::SelectionMode(m_shared->selectionMode());
+    QPoint mousePos = event->pos();
+    //mousePos.setY(height() - mousePos.y());
+    m_shared->mousePressEvent(event, mousePos);
 }
 
-void DeclarativeBars::setShadow(DeclarativeBars::ShadowQuality quality)
+void DeclarativeBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_cachedState->m_shadowQuality = QtDataVis3D::ShadowQuality(quality);
-    m_cachedState->m_isShadowQualitySet = true;
+    QPoint mousePos = event->pos();
+    //mousePos.setY(height() - mousePos.y());
+    m_shared->mouseReleaseEvent(event, mousePos);
 }
 
-DeclarativeBars::ShadowQuality DeclarativeBars::shadow()
+void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
 {
-    return DeclarativeBars::ShadowQuality(m_shared->shadowQuality());
+    QPoint mousePos = event->pos();
+    //mousePos.setY(height() - mousePos.y());
+    m_shared->mouseMoveEvent(event, mousePos);
 }
 
-void DeclarativeBars::setMeshFileName(const QString &objFileName)
+void DeclarativeBars::wheelEvent(QWheelEvent *event)
 {
-    m_shared->setMeshFileName(objFileName);
+    m_shared->wheelEvent(event);
 }
 
-
-
-
-DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dShared *renderer)
-    : m_fbo(0),
-      m_texture(0),
-      m_window(window),
-      m_barsRenderer(renderer)
-{
-    qDebug() << "DeclarativeBarsRenderer::DeclarativeBarsRenderer()";
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(render()), Qt::DirectConnection);
-    qDebug() << "QQuickWindow::openglContext()->thread()" << m_window->openglContext()->thread();
-    qDebug() << "QGuiApplication::instance()->thread()" << QGuiApplication::instance()->thread();
-}
-
-DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
-{
-    delete m_texture;
-    delete m_fbo;
-}
-
-void DeclarativeBarsRenderer::render()
-{
-    static bool firstRender = true;
-    if (firstRender) qDebug() << "DeclarativeBarsRenderer::render() running on thread "<< QThread::currentThread();
-    firstRender = false;
-
-    QSize size = rect().size().toSize();
-
-    if (!m_fbo) {
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-        m_fbo = new QOpenGLFramebufferObject(size, format);
-        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
-
-        // TODO: If we create the vis3d this way, how do we connect it with QML?
-        // Should we create it at QML and give it to DataVisView using a property (setVisualizer or similar)?
-        // DataVisView can then give it here as an argument in constructor?
-
-        // TODO: For testing. Add some data to scene.
-        QVector< QVector<float> > data;
-        QVector<float> row;
-        for (float j = 0.0f; j < 5.0f; j++) {
-            for (float i = 0.0f; i < 5.0f; i++)
-                row.append(j / 10.0f + i / 10.0f);
-            data.append(row);
-            row.clear();
-        }
-
-        setTexture(m_texture);
-    }
-
-    m_fbo->bind();
-
-    // SGRendering State resets between calls...
-    glDepthMask(true);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    // Emulate mouse movement
-    // TODO: Remove this and implement properly
-    static int rot = 0;
-    rot += 5;
-    if (rot > 2870) rot = 0;
-    m_barsRenderer->m_mousePos.setX(rot);
-    m_barsRenderer->m_mousePos.setY(100);
-
-    // Call the shared rendering function
-    m_barsRenderer->render();
-
-    m_fbo->bindDefault();
-
-    m_window->update();
-}
-
-
-DeclarativeBarsCachedStatePrivate::DeclarativeBarsCachedStatePrivate() :
-    m_isSampleSpaceSet(false),
-    m_labelRow(QStringLiteral("")),
-    m_labelColumn(QStringLiteral("")),
-    m_labelHeight(QStringLiteral("")),
-    m_dataRow(0)
-{
-}
-
-DeclarativeBarsCachedStatePrivate::~DeclarativeBarsCachedStatePrivate()
-{
-}
-
-
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

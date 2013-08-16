@@ -1,46 +1,28 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the documentation of QtDataVis3D module.
+** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
 #include "chart.h"
+#include <QtDataVis3D/qcategoryaxis.h>
+#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/qbardataproxy.h>
+#include <QTime>
 
-using namespace QtDataVis3D;
+QT_DATAVIS3D_USE_NAMESPACE
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -56,11 +38,25 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
-      m_ticks(20),
-      m_tickStep(1),
-      m_minval(-15.2f)
+      m_segments(4),
+      m_subSegments(3),
+      m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
+      m_maxval(20.0)
 {
     // Don't set any styles or specifications, start from defaults
+    // Generate generic labels
+    for (int i = 0; i < 200; i++) {
+        if (i % 5)
+            m_genericRowLabels << QString();
+        else
+            m_genericRowLabels << QStringLiteral("Row %1").arg(i);
+    }
+    for (int i = 0; i < 200; i++) {
+        if (i % 5)
+            m_genericColumnLabels << QString();
+        else
+            m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
+    }
 }
 
 ChartModifier::~ChartModifier()
@@ -81,16 +77,27 @@ void ChartModifier::restart(bool dynamicData)
     if (m_static) {
         start();
         // Set selection mode to zoom row
-        m_chart->setSelectionMode(ModeZoomRow);
+        m_chart->setSelectionMode(QDataVis::ModeZoomRow);
         m_chart->setFont(QFont("Times Roman", 20));
-        m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
     } else {
+        m_chart->dataProxy()->resetArray(0);
         // Set up sample space
-        m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+        m_chart->setupSampleSpace(m_rowCount, m_columnCount);
         // Set selection mode to full
-        m_chart->setSelectionMode(ModeBarRowAndColumn);
-        // Reset tick count to default
-        m_chart->setTickCount(0, 0);
+        m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
+        m_chart->valueAxis()->setSegmentCount(m_segments * 2);
+        m_chart->valueAxis()->setSubSegmentCount(0);
+        m_chart->valueAxis()->setAutoAdjustRange(true);
+
+        m_chart->rowAxis()->setTitle("Generic Row");
+        m_chart->columnAxis()->setTitle("Generic Column");
+        m_chart->valueAxis()->setTitle("Generic Value");
+
+        if (m_chart->rowAxis()->labels().size() < m_rowCount)
+            m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
+
+        if (m_chart->columnAxis()->labels().size() < m_rowCount)
+            m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
     }
 }
 
@@ -103,9 +110,9 @@ void ChartModifier::addDataSet()
     m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     // Set up row and column names
-    QVector<QString> months;
+    QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QVector<QString> years;
+    QStringList years;
     years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
     // Set up data
@@ -117,46 +124,126 @@ void ChartModifier::addDataSet()
                          {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
                          {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};    // 2012
 
-    // Create data set
-    QDataSet *dataSet = new QDataSet();
+    // Use default data proxy to feed data directly in expected format
+    QBarDataProxy *proxy = m_chart->dataProxy();
+    proxy->setItemLabelFormat(celsiusString);
 
     // Add labels
-    dataSet->setLabels("Year", "Month", "Average temperature (" + celsiusString + ")",
-                       years, months);
+    m_chart->rowAxis()->setTitle("Year");
+    m_chart->columnAxis()->setTitle("Month");
+    m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
+    m_chart->rowAxis()->setCategoryLabels(years);
+    m_chart->columnAxis()->setCategoryLabels(months);
+    m_chart->valueAxis()->setSegmentCount(m_segments);
+    m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
+    m_chart->valueAxis()->setRange(m_minval, m_maxval);
 
     // Create data rows
-    QDataRow *dataRow;
+    QBarDataArray *dataSet = new QBarDataArray;
+    QBarDataRow *dataRow;
+
+    dataSet->reserve(years.size());
     for (int year = 0; year < years.size(); year++) {
-        dataRow = new QDataRow(years.at(year));
+        dataRow = new QBarDataRow(months.size());
         // Create data items
         for (int month = 0; month < months.size(); month++) {
             // Add data to rows
-            dataRow->addItem(new QDataItem(temp[year][month], celsiusString));
+            (*dataRow)[month].setValue(temp[year][month]);
         }
         // Add row to set
-        dataSet->addRow(dataRow);
-        // Get next pointer
-        dataRow++;
+        dataSet->append(dataRow);
     }
 
-    // Set tick count (4 steps of 5 degrees, with absolute minimum of -16C, even though we don't have quite that low temperatures in the data)
-    //m_chart->setTickCount(4, 5, -16.0f);
-    // ..or 20 steps of 1 degree, with absolute minimum of -15.2C
-    m_chart->setTickCount(m_ticks, m_tickStep, m_minval);
-
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(months.size(), years.size());
+    m_chart->setupSampleSpace(years.size(), months.size());
 
-    // Add data to chart
-    m_chart->addDataSet(dataSet);
+    // Add data to chart (chart assumes ownership)
+    proxy->resetArray(dataSet);
 }
 
-void ChartModifier::addBars()
+void ChartModifier::addRow()
 {
-    QVector<float> data;
-    for (float i = 0; i < m_columnCount; i++)
-        data.append(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
-    m_chart->addDataRow(data);
+    QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+    for (float i = 0; i < m_columnCount; i++) {
+        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+        //(*dataRow)[i].setValue(i + m_chart->dataProxy()->rowCount());
+    }
+    m_chart->dataProxy()->insertRow(0, dataRow);
+}
+
+void ChartModifier::addRows()
+{
+    QTime timer;
+    timer.start();
+    QBarDataArray dataArray;
+    for (int i = 0; i < m_rowCount; i++) {
+        QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+        for (int j = 0; j < m_columnCount; j++)
+            (*dataRow)[j].setValue(qreal(j + i + m_chart->dataProxy()->rowCount()));
+        dataArray.append(dataRow);
+    }
+    m_chart->dataProxy()->insertRows(0, dataArray);
+    qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
+}
+
+void ChartModifier::changeItem()
+{
+    // TODO fix to use actual selected item, for now just assume some row/column are selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int column = qMin(4, (m_chart->dataProxy()->rowAt(row)->size() - 1));
+        if (column >= 0) {
+            QBarDataItem item(qreal(rand() % 100));
+            m_chart->dataProxy()->setItem(row, column, item);
+        }
+    }
+}
+
+void ChartModifier::changeRow()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(row)->size());
+        for (int i = 0; i < newRow->size(); i++)
+            (*newRow)[i].setValue(qreal(rand() % 100));
+        m_chart->dataProxy()->setRow(row, newRow);
+    }
+}
+
+void ChartModifier::changeRows()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int startRow = qMax(row - 2, 0);
+        QBarDataArray newArray;
+        for (int i = startRow; i <= row; i++ ) {
+            QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(i)->size());
+            for (int j = 0; j < newRow->size(); j++)
+                (*newRow)[j].setValue(qreal(rand() % 100));
+            newArray.append(newRow);
+        }
+        m_chart->dataProxy()->setRows(startRow, newArray);
+    }
+}
+
+void ChartModifier::removeRow()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0)
+        m_chart->dataProxy()->removeRows(row, 1);
+}
+
+void ChartModifier::removeRows()
+{
+    // TODO fix to use actual selected item, for now just assume some is selected
+    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    if (row >= 0) {
+        int startRow = qMax(row - 2, 0);
+        m_chart->dataProxy()->removeRows(startRow, 3);
+    }
 }
 
 void ChartModifier::changeStyle()
@@ -164,34 +251,34 @@ void ChartModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(Cylinders, false);
+        m_chart->setBarType(QDataVis::Cylinders, false);
         break;
     case 1:
-        m_chart->setBarType(Cylinders, true);
+        m_chart->setBarType(QDataVis::Cylinders, true);
         break;
     case 2:
-        m_chart->setBarType(Cones, false);
+        m_chart->setBarType(QDataVis::Cones, false);
         break;
     case 3:
-        m_chart->setBarType(Cones, true);
+        m_chart->setBarType(QDataVis::Cones, true);
         break;
     case 4:
-        m_chart->setBarType(Bars, false);
+        m_chart->setBarType(QDataVis::Bars, false);
         break;
     case 5:
-        m_chart->setBarType(Bars, true);
+        m_chart->setBarType(QDataVis::Bars, true);
         break;
     case 6:
-        m_chart->setBarType(Pyramids, false);
+        m_chart->setBarType(QDataVis::Pyramids, false);
         break;
     case 7:
-        m_chart->setBarType(Pyramids, true);
+        m_chart->setBarType(QDataVis::Pyramids, true);
         break;
     case 8:
-        m_chart->setBarType(BevelBars, false);
+        m_chart->setBarType(QDataVis::BevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(BevelBars, true);
+        m_chart->setBarType(QDataVis::BevelBars, true);
         break;
     }
     model++;
@@ -201,42 +288,42 @@ void ChartModifier::changeStyle()
 
 void ChartModifier::changePresetCamera()
 {
-    static int preset = PresetFrontLow;
+    static int preset = QDataVis::PresetFrontLow;
 
-    m_chart->setCameraPreset((CameraPreset)preset);
+    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > PresetDirectlyBelow)
-        preset = PresetFrontLow;
+    if (++preset > QDataVis::PresetDirectlyBelow)
+        preset = QDataVis::PresetFrontLow;
 }
 
 void ChartModifier::changeTheme()
 {
-    static int theme = ThemeSystem;
+    static int theme = QDataVis::ThemeSystem;
 
-    m_chart->setTheme((ColorTheme)theme);
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > ThemeLight)
-        theme = ThemeSystem;
+    if (++theme > QDataVis::ThemeLight)
+        theme = QDataVis::ThemeSystem;
 }
 
 void ChartModifier::changeTransparency()
 {
-    static int transparency = TransparencyNone;
+    static int transparency = QDataVis::TransparencyNone;
 
-    m_chart->setLabelTransparency((LabelTransparency)transparency);
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
-    if (++transparency > TransparencyNoBackground)
-        transparency = TransparencyFromTheme;
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyFromTheme;
 }
 
 void ChartModifier::changeSelectionMode()
 {
-    static int selectionMode = ModeNone;
+    static int selectionMode = QDataVis::ModeNone;
 
-    m_chart->setSelectionMode((SelectionMode)selectionMode);
+    m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 
-    if (++selectionMode > ModeZoomColumn)
-        selectionMode = ModeNone;
+    if (++selectionMode > QDataVis::ModeZoomColumn)
+        selectionMode = QDataVis::ModeNone;
 }
 
 void ChartModifier::changeFont(const QFont &font)
@@ -253,31 +340,51 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFontSize((GLfloat)m_fontSize);
 }
 
+void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+{
+    int quality = 0;
+    switch (sq) {
+    case QDataVis::ShadowLow:
+        quality = 1;
+        break;
+    case QDataVis::ShadowMedium:
+        quality = 2;
+        break;
+    case QDataVis::ShadowHigh:
+        quality = 3;
+        break;
+    }
+
+    // Updates the UI component to show correct shadow quality
+    emit shadowQualityChanged(quality);
+}
+
 void ChartModifier::changeShadowQuality(int quality)
 {
-    ShadowQuality sq = ShadowNone;
+    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
     switch (quality) {
     case 1:
-        sq = ShadowLow;
+        sq = QDataVis::ShadowLow;
         break;
     case 2:
-        sq = ShadowMedium;
+        sq = QDataVis::ShadowMedium;
         break;
     case 3:
-        sq = ShadowHigh;
+        sq = QDataVis::ShadowHigh;
         break;
     }
     m_chart->setShadowQuality(sq);
+    emit shadowQualityChanged(quality);
 }
 
 void ChartModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->setBackgroundEnabled((bool)enabled);
+    m_chart->setBackgroundVisible((bool)enabled);
 }
 
 void ChartModifier::setGridEnabled(int enabled)
 {
-    m_chart->setGridEnabled((bool)enabled);
+    m_chart->setGridVisible((bool)enabled);
 }
 
 void ChartModifier::rotateX(int rotation)
@@ -319,11 +426,15 @@ void ChartModifier::setSpacingSpecsZ(int spacing)
 void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    if (m_chart->columnAxis()->labels().size() < m_columnCount)
+        m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
-    m_chart->setupSampleSpace(m_columnCount, m_rowCount);
+    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    if (m_chart->rowAxis()->labels().size() < m_rowCount)
+        m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
 }

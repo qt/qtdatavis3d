@@ -1,41 +1,18 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
@@ -45,21 +22,26 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
-// Initial camera position
-QVector3D m_position = QVector3D(0, 0.25, 3);
-QVector3D m_target = QVector3D(0, 0, 0);
-QVector3D m_up = QVector3D(0, 1, 0);
+CameraHelper::CameraHelper(QObject *parent) :
+    QObject(parent),
+    m_position(0, 0.25, 3),
+    m_target(0, 0, 0),
+    m_up(0, 1, 0),
+    m_previousMousePos(0,0),
+    m_xRotation(0),
+    m_yRotation(0),
+    m_defaultXRotation(0),
+    m_defaultYRotation(0),
+    m_rotationSpeed(100)
+{
+}
 
-QPoint m_previousMousePos(0, 0);
+CameraHelper::~CameraHelper()
+{
+}
 
-GLfloat m_xRotation = 0;
-GLfloat m_yRotation = 0;
-GLfloat m_defaultXRotation = 0;
-GLfloat m_defaultYRotation = 0;
-
-GLfloat m_rotationSpeed = 100;
 
 // FUNCTIONS
 void CameraHelper::setRotationSpeed(int speed)
@@ -89,10 +71,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
                                              int screenWidth, int screenHeight, bool showUnder)
 {
     QMatrix4x4 viewMatrix;
-    GLint lowerLimit = 0;
+    GLfloat lowerLimit = 0.0f;
 
     if (showUnder)
-        lowerLimit = -90;
+        lowerLimit = -90.0f;
 
     // Calculate mouse movement since last frame
     GLfloat mouseMoveX = GLfloat(m_previousMousePos.x() - mousePos.x())
@@ -103,10 +85,10 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     m_xRotation -= mouseMoveX;
     m_yRotation -= mouseMoveY;
     // Reset at 360 in x and limit to 0...90 in y
-    if (qFabs(m_xRotation) >= 360)
-        m_xRotation = 0;
-    if (m_yRotation >= 90)
-        m_yRotation = 90;
+    if (qAbs(m_xRotation) >= 360.0f)
+        m_xRotation = 0.0f;
+    if (m_yRotation >= 90.0f)
+        m_yRotation = 90.0f;
     else if (m_yRotation <= lowerLimit)
         m_yRotation = lowerLimit;
 
@@ -116,8 +98,8 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
     // Apply rotations
     // Handle x and z rotation when y -angle is other than 0
-    viewMatrix.rotate(m_xRotation, 0, cos(m_yRotation * m_pi / 180.0f),
-                      sin(m_yRotation * m_pi / 180.0f));
+    viewMatrix.rotate(m_xRotation, 0, qCos(qDegreesToRadians(m_yRotation)),
+                      qSin(qDegreesToRadians(m_yRotation)));
     // y rotation is always "clean"
     viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
     // handle zoom by scaling
@@ -125,11 +107,6 @@ QMatrix4x4 CameraHelper::calculateViewMatrix(const QPoint &mousePos, int zoom,
     // Compensate for translation (if m_target is off origin)
     viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
     //qDebug() << m_xRotation << m_yRotation;
-
-    //qDebug() << "sin(m_yRotation)" << sin(m_yRotation*m_pi/180);
-    //qDebug() << "asin(m_yRotation)" << asin(m_yRotation*m_pi/180);
-    //qDebug() << "cos(m_yRotation)" << cos(m_yRotation*m_pi/180);
-    //qDebug() << "tan(m_yRotation)" << tan(m_yRotation*m_pi/180);
 
     m_previousMousePos = mousePos;
     return viewMatrix;
@@ -144,18 +121,17 @@ QVector3D CameraHelper::calculateLightPosition(const QVector3D &lightPosition,
     GLfloat xAngle;
     GLfloat yAngle;
     if (!fixedRotation) {
-        xAngle = m_xRotation * m_pi / 180.0f;
-        yAngle = m_yRotation * m_pi / 180.0f;
+        xAngle = qDegreesToRadians(m_xRotation);
+        yAngle = qDegreesToRadians(m_yRotation);
     } else {
-        xAngle = fixedRotation * m_pi / 180.0f;
+        xAngle = qDegreesToRadians(fixedRotation);
         yAngle = 0;
     }
     GLfloat radius = (radiusFactor + lightPosition.y()); // set radius to match the highest height of the light
-    GLfloat zPos = radius * cos(xAngle) * cos(yAngle);
-    GLfloat xPos = radius * sin(xAngle) * cos(yAngle);
-    GLfloat yPos = (radiusFactor + lightPosition.y()) * sin(yAngle);
+    GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
+    GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
+    GLfloat yPos = (radiusFactor + lightPosition.y()) * qSin(yAngle);
     // Keep light in the set position in relation to camera
-    // TODO: Does not work perfectly yet; Light seems wrong when viewing scene from sides (or isometrically)
     newLightPosition = QVector3D(-xPos + lightPosition.x(),
                                  yPos + lightPosition.y(),
                                  zPos + lightPosition.z());
@@ -179,125 +155,125 @@ QPointF CameraHelper::getCameraRotations()
     return rotations;
 }
 
-void CameraHelper::setCameraPreset(CameraPreset preset)
+void CameraHelper::setCameraPreset(QDataVis::CameraPreset preset)
 {
     switch (preset) {
-    case PresetFrontLow: {
+    case QDataVis::PresetFrontLow: {
         qDebug("PresetFrontLow");
         CameraHelper::setCameraRotation(QPointF(0.0f, 0.0f));
         break;
     }
-    case PresetFront: {
+    case QDataVis::PresetFront: {
         qDebug("PresetFront");
         CameraHelper::setCameraRotation(QPointF(0.0f, 22.5f));
         break;
     }
-    case PresetFrontHigh: {
+    case QDataVis::PresetFrontHigh: {
         qDebug("PresetFrontHigh");
         CameraHelper::setCameraRotation(QPointF(0.0f, 45.0f));
         break;
     }
-    case PresetLeftLow: {
+    case QDataVis::PresetLeftLow: {
         qDebug("PresetLeftLow");
         CameraHelper::setCameraRotation(QPointF(90.0f, 0.0f));
         break;
     }
-    case PresetLeft: {
+    case QDataVis::PresetLeft: {
         qDebug("PresetLeft");
         CameraHelper::setCameraRotation(QPointF(90.0f, 22.5f));
         break;
     }
-    case PresetLeftHigh: {
+    case QDataVis::PresetLeftHigh: {
         qDebug("PresetLeftHigh");
         CameraHelper::setCameraRotation(QPointF(90.0f, 45.0f));
         break;
     }
-    case PresetRightLow: {
+    case QDataVis::PresetRightLow: {
         qDebug("PresetRightLow");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 0.0f));
         break;
     }
-    case PresetRight: {
+    case QDataVis::PresetRight: {
         qDebug("PresetRight");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 22.5f));
         break;
     }
-    case PresetRightHigh: {
+    case QDataVis::PresetRightHigh: {
         qDebug("PresetRightHigh");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 45.0f));
         break;
     }
-    case PresetBehindLow: {
+    case QDataVis::PresetBehindLow: {
         qDebug("PresetBehindLow");
         CameraHelper::setCameraRotation(QPointF(180.0f, 0.0f));
         break;
     }
-    case PresetBehind: {
+    case QDataVis::PresetBehind: {
         qDebug("PresetBehind");
         CameraHelper::setCameraRotation(QPointF(180.0f, 22.5f));
         break;
     }
-    case PresetBehindHigh: {
+    case QDataVis::PresetBehindHigh: {
         qDebug("PresetBehindHigh");
         CameraHelper::setCameraRotation(QPointF(180.0f, 45.0f));
         break;
     }
-    case PresetIsometricLeft: {
+    case QDataVis::PresetIsometricLeft: {
         qDebug("PresetIsometricLeft");
         CameraHelper::setCameraRotation(QPointF(45.0f, 22.5f));
         break;
     }
-    case PresetIsometricLeftHigh: {
+    case QDataVis::PresetIsometricLeftHigh: {
         qDebug("PresetIsometricLeftHigh");
         CameraHelper::setCameraRotation(QPointF(45.0f, 45.0f));
         break;
     }
-    case PresetIsometricRight: {
+    case QDataVis::PresetIsometricRight: {
         qDebug("PresetIsometricRight");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 22.5f));
         break;
     }
-    case PresetIsometricRightHigh: {
+    case QDataVis::PresetIsometricRightHigh: {
         qDebug("PresetIsometricRightHigh");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 45.0f));
         break;
     }
-    case PresetDirectlyAbove: {
+    case QDataVis::PresetDirectlyAbove: {
         qDebug("PresetDirectlyAbove");
         CameraHelper::setCameraRotation(QPointF(0.0f, 90.0f));
         break;
     }
-    case PresetDirectlyAboveCW45: {
+    case QDataVis::PresetDirectlyAboveCW45: {
         qDebug("PresetDirectlyAboveCW45");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 90.0f));
         break;
     }
-    case PresetDirectlyAboveCCW45: {
+    case QDataVis::PresetDirectlyAboveCCW45: {
         qDebug("PresetDirectlyAboveCCW45");
         CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
         break;
     }
-    case PresetFrontBelow: {
+    case QDataVis::PresetFrontBelow: {
         qDebug("PresetFrontBelow");
         CameraHelper::setCameraRotation(QPointF(0.0f, -45.0f));
         break;
     }
-    case PresetLeftBelow: {
+    case QDataVis::PresetLeftBelow: {
         qDebug("PresetLeftBelow");
         CameraHelper::setCameraRotation(QPointF(90.0f, -45.0f));
         break;
     }
-    case PresetRightBelow: {
+    case QDataVis::PresetRightBelow: {
         qDebug("PresetRightBelow");
         CameraHelper::setCameraRotation(QPointF(-90.0f, -45.0f));
         break;
     }
-    case PresetBehindBelow: {
+    case QDataVis::PresetBehindBelow: {
         qDebug("PresetBehindBelow");
         CameraHelper::setCameraRotation(QPointF(180.0f, -45.0f));
         break;
     }
-    case PresetDirectlyBelow: {
+    case QDataVis::PresetDirectlyBelow: {
         qDebug("PresetDirectlyBelow");
         CameraHelper::setCameraRotation(QPointF(0.0f, -90.0f));
         break;
@@ -307,4 +283,4 @@ void CameraHelper::setCameraPreset(CameraPreset preset)
     }
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

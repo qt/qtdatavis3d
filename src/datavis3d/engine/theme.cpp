@@ -1,41 +1,18 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
@@ -46,7 +23,7 @@
 #include <stdio.h>
 #endif
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Theme::Theme()
     : m_baseColor(QColor(Qt::gray)),
@@ -60,21 +37,32 @@ Theme::Theme()
       m_highlightBarColor(QColor(Qt::red)),
       m_highlightRowColor(QColor(Qt::darkRed)),
       m_highlightColumnColor(QColor(Qt::darkMagenta)),
+      m_surfaceGradient(QLinearGradient(1, 100, 0, 0)),
       m_lightStrength(4.0f),
       m_ambientStrength(0.3f),
       m_highlightLightStrength(8.0f),
       m_uniformColor(true)
 {
+    // Default values for surface gradient
+    m_surfaceGradient.setColorAt(0.0, Qt::green);
+    m_surfaceGradient.setColorAt(0.5, Qt::yellow);
+    m_surfaceGradient.setColorAt(1.0, Qt::red);
 }
 
 Theme::~Theme()
 {
 }
 
-void Theme::useTheme(ColorTheme theme)
+QDataVis::ColorTheme Theme::colorTheme()
 {
-    switch (theme) {
-    case ThemeSystem: {
+    return m_colorTheme;
+}
+
+void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
+{
+    m_colorTheme = colorTheme;
+    switch (colorTheme) {
+    case QDataVis::ThemeSystem: {
 #ifdef Q_OS_WIN
         DWORD colorHighlight;
         colorHighlight = GetSysColor(COLOR_HIGHLIGHT);
@@ -157,7 +145,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeSystem");
         break;
     }
-    case ThemeBlueCerulean: {
+    case QDataVis::ThemeBlueCerulean: {
         m_baseColor = QColor(QRgb(0xc7e85b));
         m_heightColor = QColor(QRgb(0xee7392));
         m_depthColor = QColor(QRgb(0x1cb54f));
@@ -176,7 +164,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeBlueCerulean");
         break;
     }
-    case ThemeBlueIcy: {
+    case QDataVis::ThemeBlueIcy: {
         m_baseColor = QRgb(0x3daeda);
         m_heightColor = QRgb(0x2fa3b4);
         m_depthColor = QColor(QRgb(0x2685bf));
@@ -195,7 +183,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeBlueIcy");
         break;
     }
-    case ThemeBlueNcs: {
+    case QDataVis::ThemeBlueNcs: {
         m_baseColor = QColor(QRgb(0x1db0da));
         m_heightColor = QColor(QRgb(0x398ca3));
         m_depthColor = QColor(QRgb(0x1341a6));
@@ -214,7 +202,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeBlueNcs");
         break;
     }
-    case ThemeBrownSand: {
+    case QDataVis::ThemeBrownSand: {
         m_baseColor = QColor(QRgb(0xb39b72));
         m_heightColor = QColor(QRgb(0x494345));
         m_depthColor = QColor(QRgb(0xb3b376));
@@ -233,7 +221,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeBrownSand");
         break;
     }
-    case ThemeDark: {
+    case QDataVis::ThemeDark: {
         m_baseColor = QColor(QRgb(0x38ad6b));               // charts: series color 1
         m_heightColor = QColor(QRgb(0xbf593e));             // charts: series color 5
         m_depthColor = QColor(QRgb(0x3c84a7));              // charts: series color 2
@@ -252,7 +240,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeDark");
         break;
     }
-    case ThemeHighContrast: {
+    case QDataVis::ThemeHighContrast: {
         m_baseColor = QColor(QRgb(0x202020));
         m_heightColor = QColor(QRgb(0xff4a41));
         m_depthColor = QColor(QRgb(0x596a74));
@@ -271,7 +259,7 @@ void Theme::useTheme(ColorTheme theme)
         qDebug("ThemeHighContrast");
         break;
     }
-    case ThemeLight: {
+    case QDataVis::ThemeLight: {
         m_baseColor = QColor(QRgb(0x209fdf));
         m_heightColor = QColor(QRgb(0xbf593e));
         m_depthColor = QColor(QRgb(0x99ca53));
@@ -295,4 +283,25 @@ void Theme::useTheme(ColorTheme theme)
     }
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+void Theme::setFromTheme(Theme &theme)
+{
+    m_colorTheme = theme.m_colorTheme;
+    m_baseColor = theme.m_baseColor;
+    m_heightColor = theme.m_heightColor;
+    m_depthColor = theme.m_depthColor;
+    m_backgroundColor = theme.m_backgroundColor;
+    m_windowColor = theme.m_windowColor;
+    m_textColor = theme.m_textColor;
+    m_textBackgroundColor = theme.m_textBackgroundColor;
+    m_gridLine = theme.m_gridLine;
+    m_highlightBarColor = theme.m_highlightBarColor;
+    m_highlightRowColor = theme.m_highlightRowColor;
+    m_highlightColumnColor = theme.m_highlightColumnColor;
+    m_surfaceGradient = theme.m_surfaceGradient;
+    m_lightStrength = theme.m_lightStrength;
+    m_ambientStrength = theme.m_ambientStrength;
+    m_highlightLightStrength = theme.m_highlightLightStrength;
+    m_uniformColor = theme.m_uniformColor;
+}
+
+QT_DATAVIS3D_END_NAMESPACE

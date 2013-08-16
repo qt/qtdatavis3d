@@ -1,40 +1,18 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the documentation of QtDataVis3D module.
+** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:BSD$
-** You may use this file under the terms of the BSD license as follows:
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
 **
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of Digia Plc and its Subsidiary(-ies) nor the names
-**     of its contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
@@ -75,8 +53,32 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     QPushButton *dataButton = new QPushButton(widget);
-    dataButton->setText(QStringLiteral("Add a row of random data"));
+    dataButton->setText(QStringLiteral("Insert a row of data"));
     dataButton->setEnabled(false);
+
+    QPushButton *multiDataButton = new QPushButton(widget);
+    multiDataButton->setText(QStringLiteral("Insert many rows of data"));
+    multiDataButton->setEnabled(false);
+
+    QPushButton *changeSingleDataButton = new QPushButton(widget);
+    changeSingleDataButton->setText(QStringLiteral("Change selected bar value"));
+    changeSingleDataButton->setEnabled(false);
+
+    QPushButton *changeRowButton = new QPushButton(widget);
+    changeRowButton->setText(QStringLiteral("Change selected row values"));
+    changeRowButton->setEnabled(false);
+
+    QPushButton *changeRowsButton = new QPushButton(widget);
+    changeRowsButton->setText(QStringLiteral("Change three rows from selected"));
+    changeRowsButton->setEnabled(false);
+
+    QPushButton *removeRowButton = new QPushButton(widget);
+    removeRowButton->setText(QStringLiteral("Remove selected row"));
+    removeRowButton->setEnabled(false);
+
+    QPushButton *removeRowsButton = new QPushButton(widget);
+    removeRowsButton->setText(QStringLiteral("remove three rows from selected"));
+    removeRowsButton->setEnabled(false);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -147,13 +149,13 @@ int main(int argc, char **argv)
     sampleSliderX->setTickInterval(1);
     sampleSliderX->setMinimum(2);
     sampleSliderX->setValue(10);
-    sampleSliderX->setMaximum(100);
+    sampleSliderX->setMaximum(200);
     sampleSliderX->setEnabled(false);
     QSlider *sampleSliderZ = new QSlider(Qt::Horizontal, widget);
     sampleSliderZ->setTickInterval(1);
     sampleSliderZ->setMinimum(2);
     sampleSliderZ->setValue(10);
-    sampleSliderZ->setMaximum(100);
+    sampleSliderZ->setMaximum(200);
     sampleSliderZ->setEnabled(false);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
@@ -185,6 +187,12 @@ int main(int argc, char **argv)
     vLayout->addWidget(sampleSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
     vLayout->addWidget(dataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(multiDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeSingleDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeRowButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeRowsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeRowButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeRowsButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -222,6 +230,10 @@ int main(int argc, char **argv)
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
+    QObject::connect(modifier, &ChartModifier::shadowQualityChanged, shadowQuality,
+                     &QComboBox::setCurrentIndex);
+    QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,
+                     &ChartModifier::shadowQualityUpdatedByVisual);
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ChartModifier::changeFontSize);
@@ -232,7 +244,13 @@ int main(int argc, char **argv)
     QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeTransparency);
-    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addBars);
+    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
+    QObject::connect(multiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
+    QObject::connect(changeSingleDataButton, &QPushButton::clicked, modifier, &ChartModifier::changeItem);
+    QObject::connect(changeRowButton, &QPushButton::clicked, modifier, &ChartModifier::changeRow);
+    QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::changeRows);
+    QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &ChartModifier::removeRow);
+    QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::removeRows);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
 
@@ -254,6 +272,18 @@ int main(int argc, char **argv)
                      &QSlider::setValue);
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, multiDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeSingleDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeRowButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeRowsButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, removeRowButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, removeRowsButton,
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
                      &QSlider::setEnabled);

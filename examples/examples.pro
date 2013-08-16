@@ -3,6 +3,10 @@ SUBDIRS += barchart \
            rainfall \
            widget \
            mapdata \
-           qmlbarchart
+           qmlbarchart \
+           #qmlmaps \
+           qmlscatter \
+           surfacechart \
+           scatterchart
 
-qtHaveModule(multimedia): SUBDIRS += spectrum
+qtHaveModule(multimedia):!android: SUBDIRS += spectrum

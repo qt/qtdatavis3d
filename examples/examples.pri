@@ -11,6 +11,10 @@ win32 {
     DESTDIR = $$OUT_PWD
 }
 
+LIBS += -L$$OUT_PWD/../../lib
+
+QT += datavis3d
+
 contains(TARGET, qml.*) {
     uri = com.digia.QtDataVis3D
     lib_name = datavis3dqml2
@@ -46,7 +50,8 @@ contains(TARGET, qml.*) {
                 src_lib = lib$${lib_name}.dylib
             }
         } else {
-            src_lib = $${lib_name}.so
+            # linux, android
+            src_lib = lib$${lib_name}.so
         }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib
@@ -54,14 +59,12 @@ contains(TARGET, qml.*) {
     copy_lib.commands = $(COPY_FILE) \"$$replace(copy_lib.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_lib.target, /, $$QMAKE_DIR_SEP)\"
     QMAKE_EXTRA_TARGETS += copy_lib
     PRE_TARGETDEPS += $$copy_lib.target
-}
 
-#android {
-#    contains(TARGET, qml.*) {
-#        charts_qmldir.files = $$CHART_BUILD_QML_PLUGIN_DIR/qmldir
-#        charts_qmldir.path = /assets/imports/QtCommercial/Chart
-#        charts_qmlplugin.files = $$CHART_BUILD_QML_PLUGIN_DIR/libqtcommercialchartqml.so
-#        charts_qmlplugin.path = /libs/$$ANDROID_TARGET_ARCH
-#        INSTALLS += charts_qmldir charts_qmlplugin
-#    }
-#}
+    android {
+        android_qmldir.files = $$copy_qmldir_examples.target
+        android_qmldir.path = /assets/imports/$$make_qmldir_target
+        android_qmlplugin.files = $$copy_lib.target
+        android_qmlplugin.path = $$target.path
+        INSTALLS += android_qmldir android_qmlplugin
+    }
+}

@@ -1,58 +1,31 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
 #include "q3dbars.h"
 #include "q3dbars_p.h"
-#include "bars3dshared_p.h"
+#include "bars3dcontroller_p.h"
+#include "qvalueaxis.h"
 
-#include <QOpenGLPaintDevice>
-#include <QPainter>
-#include <QScreen>
 #include <QMouseEvent>
-
-#include <qmath.h>
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DBars
@@ -104,138 +77,14 @@ QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
-    \enum BarStyle
-
-    Predefined bar types.
-
-    \value Bars
-           Basic cubic bar.
-    \value Pyramids
-           Four -sided pyramid.
-    \value Cones
-           Basic cone.
-    \value Cylinders
-           Basic cylinder.
-    \value BevelBars
-           Slilghtly beveled (rounded) cubic bar.
-    \value Spheres
-           Sphere. Not usable in Q3DBars.
-*/
-
-/*!
-    \enum CameraPreset
-
-    Predefined positions for camera.
-
-    \value PresetFrontLow
-    \value PresetFront
-    \value PresetFrontHigh
-    \value PresetLeftLow
-    \value PresetLeft
-    \value PresetLeftHigh
-    \value PresetRightLow
-    \value PresetRight
-    \value PresetRightHigh
-    \value PresetBehindLow
-    \value PresetBehind
-    \value PresetBehindHigh
-    \value PresetIsometricLeft
-    \value PresetIsometricLeftHigh
-    \value PresetIsometricRight
-    \value PresetIsometricRightHigh
-    \value PresetDirectlyAbove
-    \value PresetDirectlyAboveCW45
-    \value PresetDirectlyAboveCCW45
-    \value PresetFrontBelow
-           From PresetFrontBelow onward these only  work for graphs including negative values.
-           They act as Preset...Low for positive-only values.
-    \value PresetLeftBelow
-    \value PresetRightBelow
-    \value PresetBehindBelow
-    \value PresetDirectlyBelow
-           Acts as PresetFrontLow for positive -only bars.
-*/
-
-/*!
-    \enum ColorTheme
-
-    Predefined color themes.
-
-    \value ThemeSystem
-    \value ThemeBlueCerulean
-    \value ThemeBlueIcy
-    \value ThemeBlueNcs
-    \value ThemeBrownSand
-    \value ThemeDark
-    \value ThemeHighContrast
-    \value ThemeLight
-*/
-
-/*!
-    \enum SelectionMode
-
-    Bar selection modes.
-
-    \value ModeNone
-           Selection mode disabled.
-    \value ModeBar
-           Selection selects a single bar.
-    \value ModeBarAndRow
-           Selection selects a single bar and highlights the row it is on.
-    \value ModeBarAndColumn
-           Selection selects a single bar and highlights the column it is on.
-    \value ModeBarRowAndColumn
-           Selection selects a single bar and highlights the row and the column it is on.
-    \value ModeZoomRow
-           Selection selects a single bar and displays the row it is on in a separate view. The
-           original view is shrunk into upper left corner. Original view is restored by clicking
-           on it.
-    \value ModeZoomColumn
-           Selection selects a single bar and displays the column it is on in a separate view. The
-           original view is shrunk into upper left corner. Original view is restored by clicking
-           on it.
-*/
-
-/*!
-    \enum ShadowQuality
-
-    Quality of shadows.
-
-    \value ShadowNone
-           Shadows are disabled.
-    \value ShadowLow
-           Shadows are rendered in low quality.
-    \value ShadowMedium
-           Shadows are rendered in medium quality.
-    \value ShadowHigh
-           Shadows are rendered in high quality.
-*/
-
-/*!
-    \enum LabelTransparency
-
-    Label transparencies.
-
-    \value TransparencyNone
-           Full solid, using colors from theme.
-    \value TransparencyFromTheme
-           Use colors and transparencies from theme.
-    \value TransparencyNoBackground
-           Draw just text on transparent background.
-*/
-
-/*!
- * \a fbohandle Handle to QML2 scene graph's framebuffer object. Developers should not need to
- * ever use this directly. Not used when using C++ API.
- *
- * \a windowsize QML2 window size Developers should not need to ever use this directly. Not
- * used when using C++ API.
- *
- * Constructs a new 3D bar window. Parameters are not used unless instantiating from Qt Quick 2.
+ * Constructs a new 3D bar window.
  */
-Q3DBars::Q3DBars(GLuint fbohandle, const QSize &windowsize)
-    : d_ptr(new Q3DBarsPrivate(this, geometry(), fbohandle))
+Q3DBars::Q3DBars()
+    : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
+    d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Bars3dController::shadowQualityChanged, this,
+                     &Q3DBars::handleShadowQualityUpdate);
 }
 
 /*!
@@ -248,19 +97,15 @@ Q3DBars::~Q3DBars()
 /*!
  * \internal
  */
-void Q3DBars::initialize()
-{
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    d_ptr->m_shared->initializeOpenGL();
-}
-
-/*!
- * \internal
- */
 void Q3DBars::render()
 {
+    d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
+}
+
+void Q3DBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
+{
+    emit shadowQualityChanged(quality);
 }
 
 #if defined(Q_OS_ANDROID)
@@ -286,7 +131,7 @@ void Q3DBars::touchEvent(QTouchEvent *event)
  */
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event);
+    d_ptr->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -294,7 +139,7 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event);
+    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -302,7 +147,7 @@ void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event);
+    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -319,10 +164,7 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
 void Q3DBars::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
-    if (d_ptr->m_shared->m_isInitialized)
-        d_ptr->m_shared->resizeNotify();
+    d_ptr->m_shared->setSize(width(), height());
 }
 
 // TODO: Document
@@ -358,7 +200,7 @@ void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
 }
 
 /*!
- * \a style One of the values in \c BarStyle. \c Bars by default.
+ * \a style One of the values in \c MeshStyle. \c Bars by default.
  *
  * \a smooth A flag to set shading to smooth. \c false by default.
  *
@@ -366,7 +208,7 @@ void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
  *
  * \sa setMeshFileName()
  */
-void Q3DBars::setBarType(BarStyle style, bool smooth)
+void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     d_ptr->m_shared->setBarType(style, smooth);
 }
@@ -376,30 +218,27 @@ void Q3DBars::setBarType(BarStyle style, bool smooth)
  *
  * \a samplesColumn How many items there are per row.
  *
- * \a labelRow QString label for the rows, ie. x -axis label.
- *
- * \a labelColumn QString label for the columns, ie. z -axis label.
- *
- * \a labelHeight QString label for height, ie. y -axis label.
- *
  * Set up sample space. This must be called to initialize the sample space before adding data to the
  * Q3DBars.
  *
  * \sa addDataRow(), addDataSet()
  */
-void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn, const QString &labelRow,
-                               const QString &labelColumn, const QString &labelHeight)
+void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn)
 {
-    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn, labelRow, labelColumn,
-                                      labelHeight);
+    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
+}
+
+QSize Q3DBars::sampleSpace() const
+{
+    return QSize(d_ptr->m_shared->rowCount(), d_ptr->m_shared->columnCount());
 }
 
 /*!
- * \a preset Move camera to a predefined position from \c CameraPreset.
+ * \a preset Move camera to a predefined position from \c QDataVis::CameraPreset.
  *
  * Moves camera to a predefined position.
  */
-void Q3DBars::setCameraPreset(CameraPreset preset)
+void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
 }
@@ -416,20 +255,20 @@ void Q3DBars::setCameraPreset(CameraPreset preset)
  * on data values. Negative vertical angles are allowed only if there are negative bar values.
  * Distance is adjustable between 10 and 500.
  */
-void Q3DBars::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
+void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 {
-    d_ptr->m_shared->setCameraPosition(horizontal, vertical, distance);
+    d_ptr->m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
 /*!
- * \a theme Apply a predefined theme from \c ColorTheme.
+ * \a theme Apply a predefined theme from \c QDataVis::ColorTheme.
  *
  * Sets a predefined theme. Theme affects bar colors, label colors, text color, background color,
  * window color and grid color. Lighting is also adjusted by themes.
  */
-void Q3DBars::setTheme(ColorTheme theme)
+void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    d_ptr->m_shared->setColorTheme(theme);
 }
 
 /*!
@@ -449,23 +288,22 @@ void Q3DBars::setTheme(ColorTheme theme)
  */
 void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
 {
-    d_ptr->m_shared->setBarColor(baseColor, heightColor, depthColor, uniform);
+    d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
 /*!
- * \a mode Set bar selection mode from \c SelectionMode. \c ModeBar by default.
+ * \property Q3DBars::selectionMode
+ *
+ * \a mode Set bar selection mode from \c QDataVis::SelectionMode. \c ModeItem by default.
  *
  * Sets bar selection mode to be used.
  */
-void Q3DBars::setSelectionMode(SelectionMode mode)
+void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-/*!
- * \return \c SelectionMode.
- */
-SelectionMode Q3DBars::selectionMode()
+QDataVis::SelectionMode Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -482,7 +320,7 @@ void Q3DBars::setWindowTitle(const QString &title)
     setTitle(title);
 }
 
-QString Q3DBars::windowTitle()
+QString Q3DBars::windowTitle() const
 {
     return title();
 }
@@ -527,192 +365,116 @@ void Q3DBars::setFont(const QFont &font)
     d_ptr->m_shared->setFont(font);
 }
 
-QFont Q3DBars::font()
+QFont Q3DBars::font() const
 {
     return d_ptr->m_shared->font();
 }
 
 /*!
- * \a transparency Transparency level of labels from \c LabelTransparency.
+ * \property Q3DBars::labelTransparency
+ *
+ * \a transparency Transparency level of labels from \c QDataVis::LabelTransparency.
  * \c TransparencyFromTheme by default.
  *
  * Sets label transparency.
  */
-void Q3DBars::setLabelTransparency(LabelTransparency transparency)
+void Q3DBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
     d_ptr->m_shared->setLabelTransparency(transparency);
 }
 
-/*!
- * \return \c LabelTransparency.
- */
-LabelTransparency Q3DBars::labelTransparency()
+QDataVis::LabelTransparency Q3DBars::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
 }
 
 /*!
- * \property Q3DBars::grid
+ * \property Q3DBars::gridVisible
  *
- * \a enable Flag to enable or disable grid. \c true by default.
+ * \a visible Flag to enable or disable grid. \c true by default.
  *
  * Sets grid drawing on or off.
  */
-void Q3DBars::setGridEnabled(bool enable)
+void Q3DBars::setGridVisible(bool visible)
 {
-    d_ptr->m_shared->setGridEnabled(enable);
+    d_ptr->m_shared->setGridEnabled(visible);
 }
 
-bool Q3DBars::gridEnabled()
+bool Q3DBars::isGridVisible() const
 {
     return d_ptr->m_shared->gridEnabled();
 }
 
 /*!
- * \property Q3DBars::background
+ * \property Q3DBars::backgroundVisible
  *
- * \a enable Flag to enable or disable background. \c true by default.
+ * \a visible Flag to enable or disable background. \c true by default.
  *
  * Sets backround rendering on or off.
  */
-void Q3DBars::setBackgroundEnabled(bool enable)
+void Q3DBars::setBackgroundVisible(bool visible)
 {
-    d_ptr->m_shared->setBackgroundEnabled(enable);
+    d_ptr->m_shared->setBackgroundEnabled(visible);
 }
 
-bool Q3DBars::backgroundEnabled()
+bool Q3DBars::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
 }
 
 /*!
- * \a quality Shadow quality from \c ShadowQuality. \c ShadowLow by default.
+ * \property Q3DBars::shadowQuality
+ *
+ * \a quality Shadow quality from \c QDataVis::ShadowQuality. \c ShadowLow by default.
+ *
+ * Sets shadow quality. If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
+ * until it is successful and shadowQualityChanged signal is emitted for each time the change is done.
  */
-void Q3DBars::setShadowQuality(ShadowQuality quality)
+void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    d_ptr->m_shared->setShadowQuality(quality);
+    return d_ptr->m_shared->setShadowQuality(quality);
 }
 
-/*!
- * \return \c ShadowQuality.
- */
-ShadowQuality Q3DBars::shadowQuality()
+QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
 }
 
-/*!
- * \a tickCount How many ticks will be drawn. \c 5 by default.
- *
- * \a step How large a step each tick is.
- *
- * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
- * important if values can be negative, or autoscaling won't work correctly.
- *
- * Sets tick count and step. Note; tickCount * step should be the maximum possible value of data
- * set.
- */
-void Q3DBars::setTickCount(GLint tickCount, GLfloat step, GLfloat minimum)
+QCategoryAxis *Q3DBars::rowAxis()
 {
-    d_ptr->m_shared->setTickCount(tickCount, step, minimum);
+    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
 }
 
-/*!
- * \a dataRow A vector of floats representing a single row of data. Sample space must be large
- * enough to hold the row.
- *
- * \a labelRow A QString label for the row.
- *
- * \a labelsColumn A vector of strings, one for each item in the row.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(const QVector<float> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+QCategoryAxis *Q3DBars::columnAxis()
 {
-    d_ptr->m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
-/*!
- * \a dataRow A vector of QDataItems representing a single row of data. Sample space must be
- * large enough to hold the row. Ownership of QDataItems is transferred to Q3DBars.
- *
- * \a labelRow A QString label for the row.
- *
- * \a labelsColumn A vector of strings, one for each item in the row.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(const QVector<QDataItem*> &dataRow, const QString &labelRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::setValueAxis(QValueAxis *axis)
 {
-    d_ptr->m_shared->addDataRow(dataRow, labelRow, labelsColumn);
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisY(axis);
 }
 
-/*!
- * \a dataRow A QDataRow instance representing a single row of data. Sample space must be
- * large enough to hold the row. Ownership of QDataRow is transferred to Q3DBars.
- *
- * Add a row of data. Each new row is added to the front of the sample space, moving previous
- * rows back (if sample space is more than one row deep).
- */
-void Q3DBars::addDataRow(QDataRow *dataRow)
+QValueAxis *Q3DBars::valueAxis()
 {
-    d_ptr->m_shared->addDataRow(dataRow);
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
 
-/*!
- * \a data A vector of vector of floats representing the whole data set. Sample space must be
- * large enough to hold the set.
- *
- * \a labelsRow A vector of strings, one for each column in the row.
- *
- * \a labelsColumn A vector of strings, one for each row in the column.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(const QVector< QVector<float> > &data, const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+void Q3DBars::setDataProxy(QBarDataProxy *proxy)
 {
-    d_ptr->m_shared->addDataSet(data, labelsRow, labelsColumn);
+    d_ptr->m_shared->setDataProxy(proxy);
 }
 
-/*!
- * \a data A vector of vector of QDataItems representing the whole data set. Sample space must
- * be large enough to hold the set. Ownership of QDataItems is transferred to Q3DBars.
- *
- * \a labelsRow A vector of strings, one for each column in the row.
- *
- * \a labelsColumn A vector of strings, one for each row in the column.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(const QVector< QVector<QDataItem*> > &data,
-                         const QVector<QString> &labelsRow,
-                         const QVector<QString> &labelsColumn)
+QBarDataProxy *Q3DBars::dataProxy()
 {
-    d_ptr->m_shared->addDataSet(data, labelsRow, labelsColumn);
+    return d_ptr->m_shared->dataProxy();
 }
 
-/*!
- * \a dataSet A QDataSet instance holding the whole data set. Sample space must
- * be large enough to hold the set. Ownership of QDataSet is transferred to Q3DBars.
- *
- * Adds a whole data set at once. If an old data set exists, it is deleted and replaced with the
- * new one.
- */
-void Q3DBars::addDataSet(QDataSet *dataSet)
-{
-    d_ptr->m_shared->addDataSet(dataSet);
-}
-
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect, GLuint fbohandle)
+Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),
-      m_shared(new Bars3dShared(rect, fbohandle))
+      m_shared(new Bars3dController(rect))
 {
 }
 
@@ -722,4 +484,4 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
     delete m_shared;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

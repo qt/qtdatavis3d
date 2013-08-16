@@ -244,3 +244,8 @@ work
 
 .obj/
 
+mkspecs/
+examples/spectrum/*.dll*
+examples/spectrum/*.exe*
+examples/spectrum/*.lib
+examples/spectrum/*.exp

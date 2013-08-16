@@ -5,6 +5,6 @@
 SOURCES += main.cpp chart.cpp
 HEADERS += chart.h
 
-QT += datavis3d widgets
+QT += widgets
 
 INSTALLS += target

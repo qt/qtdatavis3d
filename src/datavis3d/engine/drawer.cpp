@@ -1,51 +1,28 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
-#include "qdatavis3namespace.h"
+#include "qdatavis3denums.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
+#include "abstractobjecthelper_p.h"
+#include "surfaceobject_p.h"
 #include "camerahelper_p.h"
-#include "qdataitem.h"
-#include "qdataitem_p.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
 #include <QMatrix4x4>
@@ -62,9 +39,9 @@ public:
 };
 StaticLibInitializer staticLibInitializer;
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
-Drawer::Drawer(const Theme &theme, const QFont &font, LabelTransparency transparency)
+Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelTransparency transparency)
     : m_theme(theme),
       m_font(font),
       m_transparency(transparency),
@@ -96,15 +73,21 @@ void Drawer::setFont(const QFont &font)
     emit drawerChanged();
 }
 
-void Drawer::setTransparency(LabelTransparency transparency)
+void Drawer::setTransparency(QDataVis::LabelTransparency transparency)
 {
     m_transparency = transparency;
     emit drawerChanged();
 }
 
-void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textureId,
+void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
                         GLuint depthTextureId)
 {
+    // Store the GL state before changing
+    GLint oldActiveTex[1];
+    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
+    GLint oldTexId[1];
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
+
     if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
@@ -140,29 +123,63 @@ void Drawer::drawObject(ShaderHelper *shader, ObjectHelper *object, GLuint textu
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
 
     // Draw the triangles
-    glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_SHORT, (void*)0);
+    glDrawElements(GL_TRIANGLES, object->indexCount(), object->indicesType(), (void*)0);
 
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    if (textureId || depthTextureId) {
-        glBindTexture(GL_TEXTURE_2D, 0);
+    if (textureId || depthTextureId)
         glDisableVertexAttribArray(shader->uvAtt());
-    }
+
     glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
+
+    // Restore the GL state
+    glActiveTexture(*oldActiveTex);
+    glBindTexture(GL_TEXTURE_2D, *oldTexId);
 }
 
-void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
+void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
+{
+    // Store the GL state before changing
+    GLint oldActiveTex[1];
+    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
+    GLint oldTexId[1];
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->gridElementBuf());
+
+    // Draw the lines
+    glDrawElements(GL_LINES, object->gridIndexCount(), object->indicesType(), (void*)0);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+
+    // Restore the GL state
+    glActiveTexture(*oldActiveTex);
+    glBindTexture(GL_TEXTURE_2D, *oldTexId);
+}
+
+void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat maxHeight, SelectionMode mode,
-                       ShaderHelper *shader, ObjectHelper *object, bool useDepth, bool rotateAlong,
+                       GLfloat itemHeight, QDataVis::SelectionMode mode,
+                       ShaderHelper *shader, ObjectHelper *object,
+                       CameraHelper *camera,
+                       bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment)
 {
     // Draw label
-    LabelItem labelItem = label;
     if (!labelItem.textureId())
         return; // No texture, skip
 
@@ -184,20 +201,20 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     }
     case LabelMid: {
         // Use this for positioning with absolute item y position value
-        yPosition = item.d_ptr->translation().y();
+        yPosition = item.translation().y();
         break;
     }
     case LabelHigh: {
         // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
-        yPosition = item.d_ptr->translation().y() + (item.d_ptr->value() / maxHeight) / 2.0f;
+        yPosition = item.translation().y() + itemHeight / 2.0f;
         break;
     }
     case LabelOver: {
         float mod = 0.1f;
-        if (item.d_ptr->value() < 0)
+        if (itemHeight < 0)
             mod = -0.1f;
-        yPosition = item.d_ptr->translation().y() - (positionComp.y() / 2.0f - 0.2f)
-                + (item.d_ptr->value() / maxHeight) + mod;
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f - 0.2f)
+                + itemHeight + mod;
         break;
     }
     case LabelBottom: {
@@ -232,16 +249,16 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     switch (alignment) {
     case Qt::AlignLeft: {
         xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
         zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+                * qFabs(qSin(qDegreesToRadians(rotation.y())));
         break;
     }
     case Qt::AlignRight: {
         xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(cos(rotation.y() * m_pi / 180.0f));
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
         zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(sin(rotation.y() * m_pi / 180.0f));
+                * qFabs(qSin(qDegreesToRadians(rotation.y())));
         break;
     }
     default: {
@@ -250,24 +267,30 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     }
 
     if (position < LabelBottom) {
-        xPosition = item.d_ptr->translation().x();
+        xPosition = item.translation().x();
         if (useDepth)
-            zPosition = item.d_ptr->translation().z();
-        else if (ModeZoomColumn == mode)
-            xPosition = -(item.d_ptr->translation().z()) + positionComp.z(); // flip first to left
+            zPosition = item.translation().z();
+        else if (QDataVis::ModeZoomColumn == mode)
+            xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 
     // Position label
     modelMatrix.translate(xPosition + xAlignment, yPosition, zPosition + zAlignment);
 
     // Rotate
-    modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
+    // TODO: We should convert rotations to use quaternions to avoid rotation order problems
+    //QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
+    //QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
+    //QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
+    //QQuaternion rotQuaternion = rotQuatX + rotQuatY + rotQuatZ;
+    //modelMatrix.rotate(rotQuaternion);
     modelMatrix.rotate(rotation.y(), 0.0f, 1.0f, 0.0f);
+    modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
     modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);
 
     if (useDepth && !rotateAlong) {
         // Apply negative camera rotations to keep labels facing camera
-        QPointF camRotations = CameraHelper::getCameraRotations();
+        QPointF camRotations = camera->getCameraRotations();
         modelMatrix.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
     }
@@ -286,21 +309,17 @@ void Drawer::drawLabel(const QDataItem &item, const LabelItem &label,
     drawObject(shader, object, labelItem.textureId());
 }
 
-void Drawer::generateLabelTexture(QDataItem *item)
+void Drawer::generateLabelTexture(AbstractRenderItem *item)
 {
-    LabelItem labelItem = item->d_ptr->label();
-    generateLabelItem(&labelItem, item->d_ptr->valueStr());
-    item->d_ptr->setLabel(labelItem);
+    LabelItem &labelItem = item->labelItem();
+    generateLabelItem(labelItem, item->label());
 }
 
-void Drawer::generateLabelItem(LabelItem *item, const QString &text)
+void Drawer::generateLabelItem(LabelItem &item, const QString &text)
 {
     initializeOpenGL();
 
-    // Delete previous texture, if there is one
-    GLuint labelTexture = item->textureId();
-    if (labelTexture)
-        glDeleteTextures(1, &labelTexture);
+    item.clear();
 
     // Create labels
     // Print label into a QImage using QPainter
@@ -311,9 +330,9 @@ void Drawer::generateLabelItem(LabelItem *item, const QString &text)
                                            m_transparency);
 
     // Set label size
-    item->setSize(label.size());
-    // Insert text texture into label
-    item->setTextureId(m_textureHelper->create2DTexture(label, true, true));
+    item.setSize(label.size());
+    // Insert text texture into label (also deletes the old texture)
+    item.setTextureId(m_textureHelper->create2DTexture(label, true, true));
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

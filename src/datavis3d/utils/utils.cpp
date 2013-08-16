@@ -1,41 +1,18 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
-** Contact: http://www.qt-project.org/legal
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
 **
 ** This file is part of the QtDataVis3D module.
 **
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.  For licensing terms and
-** conditions see http://qt.digia.com/licensing.  For further information
-** use the contact form at http://qt.digia.com/contact-us.
+** a written agreement between you and Digia.
 **
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU Lesser General Public License version 2.1 requirements
-** will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
-**
-** In addition, as a special exception, Digia gives you certain additional
-** rights.  These rights are described in the Digia Qt LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 3.0 as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL included in the
-** packaging of this file.  Please review the following information to
-** ensure the GNU General Public License version 3.0 requirements will be
-** met: http://www.gnu.org/copyleft/gpl.html.
-**
-**
-** $QT_END_LICENSE$
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
 **
 ****************************************************************************/
 
@@ -51,7 +28,7 @@
 
 #include <QDebug>
 
-QTENTERPRISE_DATAVIS3D_BEGIN_NAMESPACE
+QT_DATAVIS3D_BEGIN_NAMESPACE
 
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 32
@@ -110,23 +87,23 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
     if (absoluteCoords) {
         // This assumes absolute screen coordinates
         painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * cos(rotation * m_pi / 180.0f))
-                           + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f)),
+                                               * qCos(qDegreesToRadians(rotation)))
+                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
                            position.height()
-                           - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
-                              + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
+                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
     } else {
         // This calculates y as a distance from screen bottom
         painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * cos(rotation * m_pi / 180.0f))
-                           + (((float)bgrHeight / 2.0f) * sin(rotation * m_pi / 180.0f)),
+                                               * qCos(qDegreesToRadians(rotation)))
+                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
                            painter->window().height() - position.height()
-                           - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
-                              + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f))));
+                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
     }
     //qDebug() << painter->window().height() - position.height()
-    //            - ((((float)bgrHeight / 2.0f) * cos(rotation * m_pi / 180.0f))
-    //               + (((float)bgrStrLen / 2.0f) * sin(rotation * m_pi / 180.0f)));
+    //            - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
+    //               + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation))));
     painter->rotate(rotation);
     painter->drawText(0, 0,
                       bgrStrLen, bgrHeight,
@@ -144,7 +121,7 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor, LabelTransparency transparency)
+                               const QColor &txtColor, QDataVis::LabelTransparency transparency)
 {
     GLuint paddingWidth = 15;
     GLuint paddingHeight = 15;
@@ -170,7 +147,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     paddingHeight /= 2;
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
-    if (TransparencyNoBackground == transparency)
+    if (QDataVis::TransparencyNoBackground == transparency)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
         labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
@@ -187,7 +164,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     switch (transparency) {
     // TODO: Texture size padding fix for Android f**ks this up for axis labels. Fix or disable for android.
-    case TransparencyNoBackground: {
+    case QDataVis::TransparencyNoBackground: {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
         painter.drawText(0, 0,
@@ -196,7 +173,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case TransparencyFromTheme: {
+    case QDataVis::TransparencyFromTheme: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
@@ -208,7 +185,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case TransparencyNone: {
+    case QDataVis::TransparencyNone: {
         painter.setBrush(QBrush(bgrColor));
         painter.setPen(bgrColor);
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());
@@ -254,4 +231,4 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     return selectedColor;
 }
 
-QTENTERPRISE_DATAVIS3D_END_NAMESPACE
+QT_DATAVIS3D_END_NAMESPACE

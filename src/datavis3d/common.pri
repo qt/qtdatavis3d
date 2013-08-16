@@ -3,5 +3,6 @@
 
 INCLUDEPATH += $$PWD/engine \
                $$PWD/global \
-               $$PWD/utils
-
+               $$PWD/utils \
+               $$PWD/axis \
+               $$PWD/data

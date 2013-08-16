@@ -1,4 +1,10 @@
-include(../spectrum.pri)
+!include( ../../examples.pri ) {
+    error( "Couldn't find the examples.pri file!" )
+}
+
+!include( ../spectrum.pri ) {
+    error( "Couldn't find the spectrum.pri file!" )
+}
 
 static: error(This application cannot be statically linked to the fftreal library)
 
@@ -6,7 +12,7 @@ TEMPLATE = app
 
 TARGET = spectrum
 
-QT       += multimedia datavis3d
+QT       += multimedia
 
 SOURCES  += main.cpp \
             engine.cpp \
