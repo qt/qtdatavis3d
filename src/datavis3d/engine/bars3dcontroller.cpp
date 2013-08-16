@@ -67,6 +67,7 @@ void Bars3dController::initializeOpenGL()
 
     m_renderer = new Bars3dRenderer(this);
     setRenderer(m_renderer);
+    synchDataToRenderer();
 }
 
 void Bars3dController::synchDataToRenderer()

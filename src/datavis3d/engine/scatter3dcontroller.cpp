@@ -61,6 +61,7 @@ void Scatter3DController::initializeOpenGL()
 
     m_renderer = new Scatter3DRenderer(this);
     setRenderer(m_renderer);
+    synchDataToRenderer();
 }
 
 void Scatter3DController::synchDataToRenderer()
