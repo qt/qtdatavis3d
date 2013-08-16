@@ -159,7 +159,6 @@ Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
-    qDebug() << "Q3DSurfacePrivate::~Q3DSurfacePrivate";
     delete m_shared;
 }
 

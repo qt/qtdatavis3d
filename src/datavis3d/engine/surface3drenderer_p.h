@@ -50,6 +50,7 @@ class TextureHelper;
 class Theme;
 class Drawer;
 class CameraHelper;
+class SelectionPointer;
 
 class QT_DATAVIS3D_EXPORT Surface3dRenderer : public QObject, protected QOpenGLFunctions
 {
@@ -122,6 +123,8 @@ private:
     bool m_querySelection;
     bool m_cachedSmoothSurface;
     bool m_cachedSurfaceGridOn;
+    SelectionPointer *m_selectionPointer;
+    bool m_selectionActive;
 
     Drawer *m_drawer;
 
@@ -180,6 +183,9 @@ private:
     void updateSelectionTexture();
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
+    void surfacePointSelected(qreal value, int column, int row);
+    void surfacePointCleared();
+    QVector3D normalize(float x, float y, float z);
 
     Q_DISABLE_COPY(Surface3dRenderer)
 };

@@ -23,6 +23,7 @@
 #include "objecthelper_p.h"
 #include "surfaceobject_p.h"
 #include "texturehelper_p.h"
+#include "selectionpointer_p.h"
 #include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
@@ -81,6 +82,8 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
       m_querySelection(false),
+      m_selectionPointer(0),
+      m_selectionActive(false),
       m_drawer(new Drawer(m_cachedTheme, m_font, m_labelTransparency))
 {
     // Listen to changes in the controller
@@ -123,6 +126,9 @@ Surface3dRenderer::~Surface3dRenderer()
     delete m_surfaceObj;
     delete m_textureHelper;
     delete m_drawer;
+
+    if (m_selectionPointer)
+        delete m_selectionPointer;
 }
 
 void Surface3dRenderer::initializeOpenGL()
@@ -215,6 +221,9 @@ void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
                                         QVector3D(0.0f, 1.0f, 0.0f));
 
     drawScene(camera, defaultFboHandle);
+
+    if (m_selectionPointer && m_selectionActive)
+        m_selectionPointer->render(camera, defaultFboHandle);
 }
 
 void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
@@ -323,14 +332,20 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         GLubyte pixel[4] = {0};
         glReadPixels(point.x(), height() - point.y(), 1, 1,
                      GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
-        //uint id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
-
-        qDebug() << "pixel = " << pixel[0] << ", " << pixel[1] << ", " << pixel[2] << ", " << pixel[3];
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Release selection shader
         m_selectionShader->release();
+
+        // Put the RGBA value back to uint
+        uint id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+        if (id) {
+            surfacePointSelected(m_series.at(id - 1), (id - 1) % m_segmentXCount, (id - 1) / m_segmentXCount);
+        } else {
+            //surfacePointCleared();
+            m_selectionActive = false;
+        }
     }
 
     if (m_surfaceObj) {
@@ -495,8 +510,6 @@ void Surface3dRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLf
         m_yRange = m_segmentYCount * m_segmentYStep;
         m_yAdjustment = 2.0f - ((m_yRange - minimum) / m_yRange); // TODO: to function
     }
-
-    qDebug() << "m_yAdjustment = " << m_yAdjustment;
 }
 
 void Surface3dRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
@@ -526,8 +539,6 @@ void Surface3dRenderer::updateSurfaceGradient()
     pmp.setBrush(QBrush(m_cachedTheme.m_surfaceGradient));
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, 4, 100);
-
-    //    QImage image(QStringLiteral("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavis3d_2\\grid.png"));
 
     if (m_gradientTexture) {
         m_textureHelper->deleteTexture(&m_gradientTexture);
@@ -626,7 +637,6 @@ void Surface3dRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 
 void Surface3dRenderer::getSelection()
 {
-    qDebug() << "Surface3dRenderer::getSelection";
     m_querySelection = true;
 }
 
@@ -795,6 +805,9 @@ void Surface3dRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
+
+    if (m_selectionPointer)
+        m_selectionPointer->updateBoundingRect(m_mainViewPort);
 }
 
 #if !defined(QT_OPENGL_ES_2)
@@ -833,6 +846,40 @@ void Surface3dRenderer::updateDepthBuffer()
     }
 }
 #endif
+
+void Surface3dRenderer::surfacePointSelected(qreal value, int column, int row)
+{
+    if (!m_selectionPointer)
+        m_selectionPointer = new SelectionPointer(m_controller);
+
+    m_selectionPointer->setPosition(normalize(float(column), value, float(row)));
+    m_selectionPointer->setScaling(QVector3D(m_xLength / m_scaleFactor,
+                                              1.0f,
+                                              m_zLength / m_scaleFactor));
+    m_selectionPointer->setLabel(QString::number(value));
+    m_selectionPointer->updateBoundingRect(m_mainViewPort);
+
+    //Put the selection pointer flag active
+    m_selectionActive = true;
+}
+
+QVector3D Surface3dRenderer::normalize(float x, float y, float z)
+{
+    float resX = x / ((float(m_segmentXCount) - 1.0f) / 2.0f) - 1.0f;
+    float resY = y / (m_yRange / 2.0f) - 1.0f;
+    float resZ = z / ((float(m_segmentZCount) - 1.0f) / -2.0f) + 1.0f;
+
+    return QVector3D(resX, resY, resZ);
+}
+
+void Surface3dRenderer::surfacePointCleared()
+{
+    if (m_selectionPointer) {
+        delete m_selectionPointer;
+        m_selectionPointer = 0;
+        m_selectionActive = false;
+    }
+}
 
 void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
                                               const QString &fragmentShader)

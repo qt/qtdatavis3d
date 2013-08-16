@@ -55,6 +55,7 @@ private:
     friend class Surface3dRenderer;
     friend class Surface3dController;
     friend class Scatter3DRenderer;
+    friend class SelectionPointer;
     friend class Drawer;
 
     QDataVis::ColorTheme m_colorTheme;
