@@ -445,7 +445,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     GLfloat backgroundRotation = 0;
 
-    GLfloat barPos = 0;
+    GLfloat colPos = 0;
     GLfloat rowPos = 0;
 
     //m_selection = selectionSkipColor;
@@ -569,10 +569,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                barPos = (bar + 1) * (m_cachedBarSpacing.width());
+                colPos = (bar + 1) * (m_cachedBarSpacing.width());
                 rowPos = (row + 1) * (m_cachedBarSpacing.height());
 
-                modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
+                modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                       item.height() - m_yAdjustment,
                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
                 modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
@@ -661,10 +661,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                barPos = (bar + 1) * (m_cachedBarSpacing.width());
+                colPos = (bar + 1) * (m_cachedBarSpacing.width());
                 rowPos = (row + 1) * (m_cachedBarSpacing.height());
 
-                modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
+                modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                       item.height() - m_yAdjustment,
                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
                 modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
@@ -770,9 +770,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
 
-            barPos = (bar + 1) * (m_cachedBarSpacing.width());
+            colPos = (bar + 1) * (m_cachedBarSpacing.width());
             rowPos = (row + 1) * (m_cachedBarSpacing.height());
-            modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
+
+            modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                   item.height() - m_yAdjustment,
                                   (m_columnDepth - rowPos) / m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
@@ -1037,8 +1038,8 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            barPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
-            modelMatrix.translate((m_rowWidth - barPos) / m_scaleFactor,
+            colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
+            modelMatrix.translate((m_rowWidth - colPos) / m_scaleFactor,
                                   -m_yAdjustment, zComp);
             modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
                                         m_columnDepth / m_scaleFactor));
@@ -1294,7 +1295,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             rowPos = (row + 1) * (m_cachedBarSpacing.height());
-            barPos = m_rowWidth;
+            colPos = m_rowWidth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1302,7 +1303,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             if (m_zFlipped)
                 rotLabelY = 180.0f;
             if (m_xFlipped) {
-                barPos = -m_rowWidth;
+                colPos = -m_rowWidth;
                 alignment = Qt::AlignLeft;
             }
             if (m_yFlipped) {
@@ -1312,7 +1313,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     rotLabelY = 180.0f;
                 rotLabelZ = 180.0f;
             }
-            QVector3D labelPos = QVector3D(barPos / m_scaleFactor,
+            QVector3D labelPos = QVector3D(colPos / m_scaleFactor,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                            (m_columnDepth - rowPos) / m_scaleFactor + zComp);
 
@@ -1329,11 +1330,11 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         }
 
     }
-    for (int bar = 0; bar != m_cachedColumnCount; bar += 1) {
-        if (m_axisCacheZ.labelItems().size() > bar) {
+    for (int column = 0; column != m_cachedColumnCount; column += 1) {
+        if (m_axisCacheZ.labelItems().size() > column) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            barPos = (bar + 1) * (m_cachedBarSpacing.width());
+            colPos = (column + 1) * (m_cachedBarSpacing.width());
             rowPos = m_columnDepth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
@@ -1352,15 +1353,12 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     rotLabelY = 90.0f;
                 rotLabelZ = 180.0f;
             }
-            QVector3D labelPos = QVector3D((m_rowWidth - barPos) / m_scaleFactor,
+            QVector3D labelPos = QVector3D((colPos - m_rowWidth) / m_scaleFactor,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                            rowPos / m_scaleFactor + zComp);
 
-            // TODO: Try it; draw the label here
-
             m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(bar);
-            //qDebug() << "labelPos, col" << bar + 1 << ":" << labelPos << m_axisCacheZ.labels().at(bar);
+            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(column);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
