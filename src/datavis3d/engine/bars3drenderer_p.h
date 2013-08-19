@@ -142,7 +142,7 @@ protected:
     virtual void loadMeshFile();
 
 public slots:
-    void updateBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+    void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         QSizeF spacing = QSizeF(1.0f, 1.0f),
                         bool relative = true);
     void updateSelectionMode(QDataVis::SelectionMode newMode);

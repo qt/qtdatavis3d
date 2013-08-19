@@ -117,7 +117,7 @@ Item {
             rows: 5
             columns: 12
             mapping: valueMapping
-            barThickness: Qt.size(0.5, 1.0)
+            barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
             barType: Bars3D.BevelBars

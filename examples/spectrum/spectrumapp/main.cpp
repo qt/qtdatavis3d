@@ -66,7 +66,7 @@ MainApp::MainApp(Q3DBars *window)
       m_lowFreq(SpectrumLowFreq),
       m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setupSampleSpace(SpectrumNumBands * 2, SpectrumNumBands);
+    m_chart->setDataWindow(SpectrumNumBands * 2, SpectrumNumBands);
     // Disable grid
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining explicit range
@@ -78,7 +78,7 @@ MainApp::MainApp(Q3DBars *window)
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
-    m_chart->setBarSpecs(QSizeF(1.0f, 0.75f), QSizeF(0.2f, -0.75f));
+    m_chart->setBarSpecs(1.25), QSizeF(0.2f, -0.75f));
     // Set bar type, smooth cones
     m_chart->setBarType(QDataVis::Cones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
@@ -86,7 +86,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
 #else
     // Set bar specifications; make them twice as wide as they're deep
-    m_chart->setBarSpecs(QSizeF(1.0f, 0.5f), QSizeF(0.0f, 0.0f));
+    m_chart->setBarSpecs(2.0, QSizeF(0.0f, 0.0f));
     // Set bar type, flat bars
     m_chart->setBarType(QDataVis::Bars, false);
     // Adjust camera position

@@ -72,11 +72,11 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(1.0, QSizeF(0.2f, 0.2f));
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
-    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_chart->setDataWindow(m_rowCount, m_columnCount);
     m_tableWidget->setColumnCount(m_columnCount);
 #endif
 
@@ -204,7 +204,7 @@ void ChartDataGenerator::setupModel()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(weeks.size(), days.size());
+    m_chart->setDataWindow(weeks.size(), days.size());
 }
 
 void ChartDataGenerator::addRow()

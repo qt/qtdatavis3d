@@ -24,16 +24,16 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     //! [0]
-    Q3DBars bars;
-    bars.setupSampleSpace(5, 5);
+    Q3DBars *bars = new Q3DBars();
+    bars->setDataWindow(5, 5);
     //! [0]
     //! [1]
-    QVector<float> data;
-    data << 1.0f << 3.0f << 7.5f << 5.0f << 2.2f;
-    bars.addDataRow(data);
+    QBarDataRow data;
+    data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
+    bars->dataProxy()->addRow(&data);
     //! [1]
     //! [2]
-    bars.show();
+    bars->show();
     //! [2]
 
     return app.exec();

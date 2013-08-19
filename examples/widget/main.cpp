@@ -123,16 +123,11 @@ int main(int argc, char **argv)
     rotationSliderY->setMaximum(90);
     rotationSliderY->setEnabled(false);
 
-    QSlider *sizeSliderX = new QSlider(Qt::Horizontal, widget);
-    sizeSliderX->setTickInterval(1);
-    sizeSliderX->setMinimum(1);
-    sizeSliderX->setValue(100);
-    sizeSliderX->setMaximum(100);
-    QSlider *sizeSliderZ = new QSlider(Qt::Horizontal, widget);
-    sizeSliderZ->setTickInterval(1);
-    sizeSliderZ->setMinimum(1);
-    sizeSliderZ->setValue(100);
-    sizeSliderZ->setMaximum(100);
+    QSlider *ratioSlider = new QSlider(Qt::Horizontal, widget);
+    ratioSlider->setTickInterval(1);
+    ratioSlider->setMinimum(10);
+    ratioSlider->setValue(30);
+    ratioSlider->setMaximum(100);
 
     QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
     spacingSliderX->setTickInterval(1);
@@ -171,15 +166,14 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low"));
     shadowQuality->addItem(QStringLiteral("Medium"));
     shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->setCurrentIndex(1);
+    shadowQuality->setCurrentIndex(2);
 
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
-    vLayout->addWidget(sizeSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(sizeSliderZ, 0, Qt::AlignTop);
+    vLayout->addWidget(ratioSlider, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")));
     vLayout->addWidget(spacingSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(spacingSliderZ, 0, Qt::AlignTop);
@@ -215,8 +209,7 @@ int main(int argc, char **argv)
     QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &ChartModifier::rotateX);
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &ChartModifier::rotateY);
 
-    QObject::connect(sizeSliderX, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsX);
-    QObject::connect(sizeSliderZ, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsZ);
+    QObject::connect(ratioSlider, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsRatio);
 
     QObject::connect(spacingSliderX, &QSlider::valueChanged, modifier,
                      &ChartModifier::setSpacingSpecsX);

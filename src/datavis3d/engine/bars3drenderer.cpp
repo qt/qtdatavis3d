@@ -1429,14 +1429,17 @@ void Bars3dRenderer::handleResize()
     Abstract3DRenderer::handleResize();
 }
 
-void Bars3dRenderer::updateBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
+void Bars3dRenderer::updateBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
 {
-    m_cachedBarThickness = thickness;
+    // Convert ratio to QSizeF, as we need it in that format for autoscaling calculations
+    m_cachedBarThickness.setWidth(1.0f);
+    m_cachedBarThickness.setHeight(1.0f / thicknessRatio);
+
     if (relative) {
-        m_cachedBarSpacing.setWidth((thickness.width() * 2) * (spacing.width() + 1.0f));
-        m_cachedBarSpacing.setHeight((thickness.height() * 2) * (spacing.height() + 1.0f));
+        m_cachedBarSpacing.setWidth((m_cachedBarThickness.width() * 2) * (spacing.width() + 1.0f));
+        m_cachedBarSpacing.setHeight((m_cachedBarThickness.height() * 2) * (spacing.height() + 1.0f));
     } else {
-        m_cachedBarSpacing = thickness * 2 + spacing * 2;
+        m_cachedBarSpacing = m_cachedBarThickness * 2 + spacing * 2;
     }
 
     // Calculate here and at setting sample space

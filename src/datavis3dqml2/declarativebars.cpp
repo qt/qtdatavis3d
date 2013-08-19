@@ -90,9 +90,9 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     return node;
 }
 
-void DeclarativeBars::setupSampleSpace(int rowCount, int columnCount)
+void DeclarativeBars::setDataWindow(int rowCount, int columnCount)
 {
-    m_shared->setupSampleSpace(rowCount, columnCount);
+    m_shared->setDataWindow(rowCount, columnCount);
 }
 
 void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
@@ -156,19 +156,19 @@ QItemModelBarDataMapping *DeclarativeBars::mapping() const
     return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
 }
 
-void DeclarativeBars::setBarThickness(QSizeF thickness)
+void DeclarativeBars::setBarThickness(qreal thicknessRatio)
 {
-    m_shared->setBarSpecs(thickness, barSpacing(), isBarSpacingRelative());
+    m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
 }
 
-QSizeF DeclarativeBars::barThickness()
+qreal DeclarativeBars::barThickness()
 {
     return m_shared->barThickness();
 }
 
 void DeclarativeBars::setBarSpacing(QSizeF spacing)
 {
-    m_shared->setBarSpecs(barThickness(), spacing, isBarSpacingRelative());
+    m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
 }
 
 QSizeF DeclarativeBars::barSpacing()
@@ -178,7 +178,7 @@ QSizeF DeclarativeBars::barSpacing()
 
 void DeclarativeBars::setBarSpacingRelative(bool relative)
 {
-    m_shared->setBarSpecs(barThickness(), barSpacing(), relative);
+    m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
 }
 
 bool DeclarativeBars::isBarSpacingRelative()
@@ -338,7 +338,7 @@ int DeclarativeBars::rows() const
 
 void DeclarativeBars::setRows(int rows)
 {
-    setupSampleSpace(rows, columns());
+    setDataWindow(rows, columns());
 }
 
 int DeclarativeBars::columns() const
@@ -348,7 +348,7 @@ int DeclarativeBars::columns() const
 
 void DeclarativeBars::setColumns(int columns)
 {
-    setupSampleSpace(rows(), columns);
+    setDataWindow(rows(), columns);
 }
 
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)

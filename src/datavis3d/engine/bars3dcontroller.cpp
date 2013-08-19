@@ -32,14 +32,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Bars3dController::Bars3dController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_rowCount(0),
-      m_columnCount(0),
+      m_rowCount(10),
+      m_columnCount(10),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_isSlicingActivated(false),
       m_isBarSpecRelative(true),
-      m_barThickness(QSizeF(0.75f, 0.75f)),
-      m_barSpacing(m_barThickness * 3.0f),
+      m_barThicknessRatio(1.0f),
+      m_barSpacing(QSizeF(1.0f, 1.0f)),
       m_renderer(0),
       m_data(0)
 {
@@ -89,7 +89,7 @@ void Bars3dController::synchDataToRenderer()
     }
 
     if (m_changeTracker.barSpecsChanged) {
-        m_renderer->updateBarSpecs(m_barThickness, m_barSpacing, m_isBarSpecRelative);
+        m_renderer->updateBarSpecs(m_barThicknessRatio, m_barSpacing, m_isBarSpecRelative);
         m_changeTracker.barSpecsChanged = false;
     }
 
@@ -336,26 +336,27 @@ void Bars3dController::handleItemChanged(int rowIndex, int columnIndex)
     m_isDataDirty = true;
 }
 
-void Bars3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Bars3dController::handleAxisAutoAdjustRangeChangedInOrientation(
+        QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
 }
 
-void Bars3dController::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
+void Bars3dController::setBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
 {
-    m_barThickness      = thickness;
+    m_barThicknessRatio = thicknessRatio;
     m_barSpacing        = spacing;
     m_isBarSpecRelative = relative;
 
     m_changeTracker.barSpecsChanged = true;
-    emit barSpecsChanged(thickness, spacing, relative);
+    emit barSpecsChanged(thicknessRatio, spacing, relative);
 }
 
-QSizeF Bars3dController::barThickness()
+GLfloat Bars3dController::barThickness()
 {
-    return m_barThickness;
+    return m_barThicknessRatio;
 }
 
 QSizeF Bars3dController::barSpacing()
@@ -389,7 +390,7 @@ void Bars3dController::setBarType(QDataVis::MeshStyle style, bool smooth)
 }
 
 // TODO: This sets data window. Needs more parameters, now assumes window always starts at 0,0.
-void Bars3dController::setupSampleSpace(int rowCount, int columnCount)
+void Bars3dController::setDataWindow(int rowCount, int columnCount)
 {
     // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
     setSlicingActive(false);

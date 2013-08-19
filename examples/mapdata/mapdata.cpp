@@ -354,15 +354,3 @@ void MapsModifier::changeShadowQuality(int quality)
 //    m_yRotation = rotation;
 //    m_chart->setCameraPosition(m_xRotation, m_yRotation);
 //}
-
-//void MapsModifier::setSpecsX(int barwidth)
-//{
-//    m_barWidth = (float)barwidth / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}
-
-//void MapsModifier::setSpecsZ(int bardepth)
-//{
-//    m_barDepth = (float)bardepth / 100.0f;
-//    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-//}

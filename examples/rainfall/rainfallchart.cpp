@@ -47,7 +47,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(QSizeF(1.0f, 1.0f), QSizeF(0.2f, 0.2f), true);
+    m_chart->setBarSpecs(1.0, QSizeF(0.2f, 0.2f), true);
 
     // Set axis labels and titles
     QStringList months;
@@ -120,7 +120,7 @@ void RainfallChart::updateYearsList(int start, int end)
     m_rowCount = m_years.size();
 
     // Set up sample space; make it match actual resolved data size
-    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_chart->setDataWindow(m_rowCount, m_columnCount);
 }
 
 void RainfallChart::addDataSet()

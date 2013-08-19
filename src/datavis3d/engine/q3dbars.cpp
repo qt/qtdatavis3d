@@ -44,12 +44,13 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  *
  * \section1 How to construct a minimal Q3DBars chart
  *
- * After constructing Q3DBars, you need to set up sample space using setupSampleSpace(). Let's
- * set the sample space to 5 rows and 5 columns:
+ * After constructing Q3DBars, you should set data window using setDataWindow(). It is not
+ * mandatory, as data window has default value of 10 x 10. For the example, let's set the data
+ * window to 5 rows and 5 columns:
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
  *
- * Now Q3DBars is ready to receive data to be rendered. Add one row of 5 floats into the data
+ * Now Q3DBars is ready to receive data to be rendered. Add one row of 5 qreals into the data
  * set:
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
@@ -69,11 +70,12 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  *
  * \image q3dbars-minimal.png
  *
- * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
- * code example. You can learn more by familiarizing yourself with the examples provided, like
- * the \l{Rainfall Example} or the \l{Widget Example}.
+ * The scene can be rotated, zoomed into, and a bar can be selected to view it's value,
+ * but no other interaction is included in this minimal code example. You can learn more by
+ * familiarizing yourself with the examples provided, like the \l{Rainfall Example} or
+ * the \l{Widget Example}.
  *
- * \sa Q3DMaps, {Qt Data Visualization 3D C++ Classes}
+ * \sa Q3DScatter, Q3DSurface and {Qt Data Visualization 3D C++ Classes}
  */
 
 /*!
@@ -103,6 +105,9 @@ void Q3DBars::render()
     d_ptr->m_shared->render();
 }
 
+/*!
+ * \internal
+ */
 void Q3DBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
     emit shadowQualityChanged(quality);
@@ -167,14 +172,18 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
     d_ptr->m_shared->setSize(width(), height());
 }
 
-// TODO: Document
-// Size
+/*!
+ * Sets window \a width.
+ */
 void Q3DBars::setWidth(const int width)
 {
     d_ptr->m_shared->setWidth(width);
     QWindow::setWidth(width);
 }
 
+/*!
+ * Sets window \a height.
+ */
 void Q3DBars::setHeight(const int height)
 {
     d_ptr->m_shared->setHeight(height);
@@ -182,29 +191,22 @@ void Q3DBars::setHeight(const int height)
 }
 
 /*!
- * \a thickness Thickness of a bar in x and z axes.
- *
- * \a spacing Spacing between bars in x and z axes. If relative -flag is true, value of 0.0f
- * means the bars are side-to-side and for example 1.0f means there is one thickness in between the
- * bars.
- *
- * \a relative A flag to indicate if spacing is meant to be absolute or relative. \c true by
- * default.
- *
- * Sets bar specifications. Bar thickness is relative, as scene is automatically scaled to fit into
- * the view.
+ * Sets bar specifications. Bar \a thicknessRatio specifies the ratio of a bar thickness between x
+ * and z axes. For example, setting the ratio to 2.0 means bars are twice as wide in x dimension
+ * as they are in z dimension. Bar \a spacing sets the spacing between bars in x and z axes.
+ * \a relative -flag is used to indicate if spacing is meant to be absolute or relative to bar
+ * thickness. If it is true, value of 0.0 means the bars are side-to-side and for example 1.0 means
+ * there is one thickness in between the bars. It is \c true by default.
  */
-void Q3DBars::setBarSpecs(QSizeF thickness, QSizeF spacing, bool relative)
+void Q3DBars::setBarSpecs(qreal thicknessRatio, QSizeF spacing, bool relative)
 {
-    d_ptr->m_shared->setBarSpecs(thickness, spacing, relative);
+    d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), spacing, relative);
 }
 
 /*!
- * \a style One of the values in \c MeshStyle. \c Bars by default.
- *
- * \a smooth A flag to set shading to smooth. \c false by default.
- *
- * Sets the bar type to one of the supplied ones.
+ * Sets the bar \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
+ * \c QDataVis::Bars by default. A \a smooth flag can be used to set shading to smooth.
+ * It is \c false by default.
  *
  * \sa setMeshFileName()
  */
@@ -214,29 +216,24 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * \a samplesRow How many rows of data there will be.
- *
- * \a samplesColumn How many items there are per row.
- *
- * Set up sample space. This must be called to initialize the sample space before adding data to the
- * Q3DBars.
- *
- * \sa addDataRow(), addDataSet()
+ * Set up data window to \a samplesRow rows and \a samplesColumn columns. Both are preset to \c 10
+ * by default.
  */
-void Q3DBars::setupSampleSpace(int samplesRow, int samplesColumn)
+void Q3DBars::setDataWindow(int samplesRow, int samplesColumn)
 {
-    d_ptr->m_shared->setupSampleSpace(samplesRow, samplesColumn);
+    d_ptr->m_shared->setDataWindow(samplesRow, samplesColumn);
 }
 
-QSize Q3DBars::sampleSpace() const
+/*!
+ * \return size of the sample space in QSize.
+ */
+QSize Q3DBars::dataWindow() const
 {
     return QSize(d_ptr->m_shared->rowCount(), d_ptr->m_shared->columnCount());
 }
 
 /*!
- * \a preset Move camera to a predefined position from \c QDataVis::CameraPreset.
- *
- * Moves camera to a predefined position.
+ * Moves camera to a \a preset position. The position can be one of \c QDataVis::CameraPreset.
  */
 void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
@@ -244,16 +241,10 @@ void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
 }
 
 /*!
- * \a horizontal Horizontal angle for camera.
- *
- * \a vertical Vertical angle for camera.
- *
- * \a distance Distance from the center. \c 100 by default.
- *
- * Move camera to a wanted position based on horizontal and veritcal angles. Angles are limited
+ * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
  * to -180...180 in horizontal direction and either -90...90 or 0...90 in vertical, depending
  * on data values. Negative vertical angles are allowed only if there are negative bar values.
- * Distance is adjustable between 10 and 500.
+ * \a distance is adjustable between 10 and 500, being \c 100 by default.
  */
 void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 {
@@ -261,10 +252,11 @@ void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
 }
 
 /*!
- * \a theme Apply a predefined theme from \c QDataVis::ColorTheme.
+ * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeSystem by
+ * default. Theme affects bar colors, label colors, text color, background color, window color and
+ * grid color. Lighting is also adjusted by themes.
  *
- * Sets a predefined theme. Theme affects bar colors, label colors, text color, background color,
- * window color and grid color. Lighting is also adjusted by themes.
+ * \sa setBarColor()
  */
 void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 {
@@ -272,19 +264,20 @@ void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 }
 
 /*!
- * \a baseColor The base color of a bar. If all other colors are black, this sets the final color of
- * the bar.
+ * Set bar color using your own colors. \a baseColor sets the base color of a bar. If all other
+ * colors are black, this sets the final color of the bar if uniform is set to false.
+ * \a heightColor is added to the bar based on its height. The higher the bar, the more prominent
+ * this color becomes. Setting this black keeps the color unchanged regardless of height.
+ * \a depthColor becomes more prominent the further away from the first row the bar is.
+ * Setting this black keeps bars the same color regardless of "depth" in the set. \a uniform -flag
+ * is used to define if color needs to be uniform throughout bar's length, or will the colors be
+ * applied by height. It is \c true by default.
  *
- * \a heightColor This color is added to the bar based on its height. The higher the bar, the more
- * prominent this color becomes. Setting this black keeps the color unchanged regardless of height.
+ * Calling this method overrides colors from theme.
  *
- * \a depthColor This color becomes more prominent the further away from the first row the bar is.
- * Setting this black keeps bars the same color regardless of "depth" in the set.
+ * \sa setTheme()
  *
- * \a uniform A flag to define if color needs to be uniform throughout bar's length, or will the
- * colors be applied by height. \c true by default.
- *
- * Set bar color using your own colors. This overrides colors from theme.
+ * \warning This method is subject to change.
  */
 void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
 {
@@ -294,9 +287,8 @@ void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColo
 /*!
  * \property Q3DBars::selectionMode
  *
- * \a mode Set bar selection mode from \c QDataVis::SelectionMode. \c ModeItem by default.
- *
- * Sets bar selection mode to be used.
+ * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
+ * \c QDataVis::ModeItem by default.
  */
 void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
 {
@@ -311,9 +303,7 @@ QDataVis::SelectionMode Q3DBars::selectionMode() const
 /*!
  * \property Q3DBars::windowTitle
  *
- * \a title QString label to be used as window title.
- *
- * Sets the window title. The default is application executable name.
+ * Sets the window \a title. The default is application executable name.
  */
 void Q3DBars::setWindowTitle(const QString &title)
 {
@@ -326,10 +316,11 @@ QString Q3DBars::windowTitle() const
 }
 
 /*!
- * \a objFileName File name of a mesh object. Object needs to be in Wavefront obj format
- * and include vertices, normals and UVs. It also needs to be in triangles.
+ * Override bar type with a mesh object located in \a objFileName.
+ * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
+ * It also needs to be in triangles.
  *
- * Override bar type with an object mesh. \sa setBarType()
+ * \sa setBarType()
  */
 void Q3DBars::setMeshFileName(const QString &objFileName)
 {
@@ -339,9 +330,7 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
 /*!
  * \property Q3DBars::fontSize
  *
- * \a fontsize Size of the font.
- *
- * Sets font size.
+ * Sets font size to \a fontsize.
  */
 void Q3DBars::setFontSize(float fontsize)
 {
@@ -356,9 +345,7 @@ float Q3DBars::fontSize()
 /*!
  * \property Q3DBars::font
  *
- * \a font QFont to be used for labels. \c Arial by default.
- *
- * Sets the font for labels.
+ * Sets the \a font for labels. It is preset to \c Arial by default.
  */
 void Q3DBars::setFont(const QFont &font)
 {
@@ -373,10 +360,8 @@ QFont Q3DBars::font() const
 /*!
  * \property Q3DBars::labelTransparency
  *
- * \a transparency Transparency level of labels from \c QDataVis::LabelTransparency.
- * \c TransparencyFromTheme by default.
- *
- * Sets label transparency.
+ * Sets label \a transparency to one of \c QDataVis::LabelTransparency. It is preset to
+ * \c QDataVis::TransparencyFromTheme by default.
  */
 void Q3DBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
 {
@@ -391,9 +376,7 @@ QDataVis::LabelTransparency Q3DBars::labelTransparency() const
 /*!
  * \property Q3DBars::gridVisible
  *
- * \a visible Flag to enable or disable grid. \c true by default.
- *
- * Sets grid drawing on or off.
+ * Sets grid visibility to \a visible. It is preset to \c true by default.
  */
 void Q3DBars::setGridVisible(bool visible)
 {
@@ -408,9 +391,7 @@ bool Q3DBars::isGridVisible() const
 /*!
  * \property Q3DBars::backgroundVisible
  *
- * \a visible Flag to enable or disable background. \c true by default.
- *
- * Sets backround rendering on or off.
+ * Sets background visibility to \a visible. It is preset to \c true by default.
  */
 void Q3DBars::setBackgroundVisible(bool visible)
 {
@@ -425,10 +406,12 @@ bool Q3DBars::isBackgroundVisible() const
 /*!
  * \property Q3DBars::shadowQuality
  *
- * \a quality Shadow quality from \c QDataVis::ShadowQuality. \c ShadowLow by default.
+ * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
+ * \c QDataVis::ShadowMedium by default.
  *
- * Sets shadow quality. If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is done.
+ * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
+ * until it is successful and shadowQualityChanged signal is emitted for each time the change is
+ * done.
  */
 void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
@@ -440,16 +423,25 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
     return d_ptr->m_shared->shadowQuality();
 }
 
+/*!
+ * \return category axis for rows.
+ */
 QCategoryAxis *Q3DBars::rowAxis()
 {
     return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
 }
 
+/*!
+ * \return category axis for columns.
+ */
 QCategoryAxis *Q3DBars::columnAxis()
 {
     return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
+/*!
+ * Sets a user-defined value \a axis (Y-axis). Ownership of the axis is transferred to Q3DBars.
+ */
 void Q3DBars::setValueAxis(QValueAxis *axis)
 {
     Q_ASSERT(axis);
@@ -457,20 +449,35 @@ void Q3DBars::setValueAxis(QValueAxis *axis)
     return d_ptr->m_shared->setAxisY(axis);
 }
 
+/*!
+ * \return used value axis (Y-axis).
+ */
 QValueAxis *Q3DBars::valueAxis()
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
 
+/*!
+ * Sets a user-defined data \a proxy. Ownership of the proxy is transferred to Q3DBars.
+ */
 void Q3DBars::setDataProxy(QBarDataProxy *proxy)
 {
     d_ptr->m_shared->setDataProxy(proxy);
 }
 
+/*!
+ * \return used data proxy.
+ */
 QBarDataProxy *Q3DBars::dataProxy()
 {
     return d_ptr->m_shared->dataProxy();
 }
+
+/*!
+ * \fn void Q3DBars::shadowQualityChanged(QDataVis::ShadowQuality quality)
+ *
+ * This signal is emitted when shadow quality changes.
+ */
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),

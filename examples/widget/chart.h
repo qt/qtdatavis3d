@@ -53,7 +53,7 @@ public:
     void rotateY(int rotation);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
-    void setSpecsX(int barwidth);
+    void setSpecsRatio(int barwidth);
     void setSpecsZ(int bardepth);
     void setSpacingSpecsX(int spacing);
     void setSpacingSpecsZ(int spacing);
@@ -76,8 +76,7 @@ private:
     float m_xRotation;
     float m_yRotation;
     bool m_static;
-    float m_barWidth;
-    float m_barDepth;
+    qreal m_barThicknessRatio;
     float m_barSpacingX;
     float m_barSpacingZ;
     int m_fontSize;

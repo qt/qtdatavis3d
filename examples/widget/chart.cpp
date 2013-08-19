@@ -33,8 +33,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_xRotation(0.0f),
       m_yRotation(0.0f),
       m_static(true),
-      m_barWidth(1.0f),
-      m_barDepth(1.0f),
+      m_barThicknessRatio(1.0),
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
@@ -82,7 +81,7 @@ void ChartModifier::restart(bool dynamicData)
     } else {
         m_chart->dataProxy()->resetArray(0);
         // Set up sample space
-        m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+        m_chart->setDataWindow(m_rowCount, m_columnCount);
         // Set selection mode to full
         m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
         m_chart->valueAxis()->setSegmentCount(m_segments * 2);
@@ -157,7 +156,7 @@ void ChartModifier::addDataSet()
     }
 
     // Set up sample space based on prepared data
-    m_chart->setupSampleSpace(years.size(), months.size());
+    m_chart->setDataWindow(years.size(), months.size());
 
     // Add data to chart (chart assumes ownership)
     proxy->resetArray(dataSet);
@@ -401,34 +400,28 @@ void ChartModifier::rotateY(int rotation)
     m_chart->setCameraPosition(m_xRotation, m_yRotation);
 }
 
-void ChartModifier::setSpecsX(int barwidth)
+void ChartModifier::setSpecsRatio(int barwidth)
 {
-    m_barWidth = (float)barwidth / 100.0f;
-    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
-}
-
-void ChartModifier::setSpecsZ(int bardepth)
-{
-    m_barDepth = (float)bardepth / 100.0f;
-    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_barThicknessRatio = (float)barwidth / 30.0f;
+    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsX(int spacing)
 {
     m_barSpacingX = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(QSizeF(m_barWidth, m_barDepth), QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
-    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_chart->setDataWindow(m_rowCount, m_columnCount);
     if (m_chart->columnAxis()->labels().size() < m_columnCount)
         m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
 }
@@ -436,7 +429,7 @@ void ChartModifier::setSampleCountX(int samples)
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
-    m_chart->setupSampleSpace(m_rowCount, m_columnCount);
+    m_chart->setDataWindow(m_rowCount, m_columnCount);
     if (m_chart->rowAxis()->labels().size() < m_rowCount)
         m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
 }

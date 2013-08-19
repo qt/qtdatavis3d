@@ -49,86 +49,59 @@ public:
     explicit Q3DBars();
     ~Q3DBars();
 
-    // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
-    // y -component sets the thickness/spacing of z -direction
-    // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+    void setBarSpecs(qreal thicknessRatio = 1.0,
                      QSizeF spacing = QSizeF(1.0f, 1.0f),
                      bool relative = true);
 
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
-    // how many samples per row and column, and names for axes
     // TODO: This defines the data window, needs additional parameters startRow, startColumn
-    void setupSampleSpace(int samplesRow, int samplesColumn);
-    QSize sampleSpace() const; // TODO: Return QRect once data window properly implemented?
+    void setDataWindow(int samplesRow, int samplesColumn);
+    QSize dataWindow() const; // TODO: Return QRect once data window properly implemented?
 
-    // Select preset camera placement
     void setCameraPreset(QDataVis::CameraPreset preset);
 
-    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
-    // percentage (10...500))
     void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
     void setTheme(QDataVis::ColorTheme theme);
 
-    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
-    // color to change from bottom to top
     void setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
                      bool uniform = true);
 
-    // override bar type with own mesh
     void setMeshFileName(const QString &objFileName);
-    // TODO: light placement API
 
-    // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;
 
-    // Set window title
     void setWindowTitle(const QString &title);
     QString windowTitle() const;
 
-    // Font size adjustment
     void setFontSize(float fontsize);
     float fontSize();
 
-    // Set font
     void setFont(const QFont &font);
     QFont font() const;
 
-    // Label transparency adjustment
     void setLabelTransparency(QDataVis::LabelTransparency transparency);
     QDataVis::LabelTransparency labelTransparency() const;
 
-    // Enable or disable background grid
     void setGridVisible(bool visible);
     bool isGridVisible() const;
 
-    // Size
     void setWidth(const int width);
     void setHeight(const int height);
 
-    // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
-    // Adjust shadow quality
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    // Axes - row & column axes are fixed to category axes, value axis can be
-    // customized.
     QCategoryAxis *rowAxis();
     QCategoryAxis *columnAxis();
     void setValueAxis(QValueAxis *axis);
     QValueAxis *valueAxis();
 
-    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
     void setDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *dataProxy();
 
@@ -137,7 +110,6 @@ public slots:
     void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
 signals:
-    // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:

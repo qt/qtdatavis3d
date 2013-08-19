@@ -57,7 +57,7 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(QtDataVis3D::QDataVis::MeshStyle barType READ barType WRITE setBarType)
     Q_PROPERTY(QtDataVis3D::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(QtDataVis3D::QDataVis::ColorTheme theme READ theme WRITE setTheme)
-    Q_PROPERTY(QSizeF barThickness READ barThickness WRITE setBarThickness)
+    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
     Q_PROPERTY(bool barSmooth READ barSmooth WRITE setBarSmooth)
@@ -83,7 +83,7 @@ public:
     void componentComplete();
 
     // how many samples per row and column
-    Q_INVOKABLE void setupSampleSpace(int rowCount, int columnCount);
+    Q_INVOKABLE void setDataWindow(int rowCount, int columnCount);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
@@ -110,8 +110,8 @@ public:
     void setAxisZ(QCategoryAxis *axis);
 
     // Set bar thickness. Y -component sets the thickness of z -direction.
-    void setBarThickness(QSizeF thickness);
-    QSizeF barThickness();
+    void setBarThickness(qreal thicknessRatio);
+    qreal barThickness();
 
     // Set spacing between bars. Y -component sets the spacing of z -direction.
     // If spacing is relative, 0.0f means side-to-side and 1.0f = one thickness in between.

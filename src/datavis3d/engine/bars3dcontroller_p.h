@@ -72,7 +72,7 @@ private:
 
     // Look'n'feel
     bool m_isBarSpecRelative;
-    QSizeF m_barThickness;
+    GLfloat m_barThicknessRatio;
     QSizeF m_barSpacing;
 
     // Rendering
@@ -100,10 +100,10 @@ public:
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
-    void setBarSpecs(QSizeF thickness = QSizeF(1.0f, 1.0f),
+    void setBarSpecs(GLfloat thicknessRatio = 1.0f,
                      QSizeF spacing = QSizeF(1.0f, 1.0f),
                      bool relative = true);
-    QSizeF barThickness();
+    GLfloat barThickness();
     QSizeF barSpacing();
     bool isBarSpecRelative();
 
@@ -111,7 +111,7 @@ public:
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     // how many samples per row and column, and names for axes
-    void setupSampleSpace(int samplesRow, int samplesColumn);
+    void setDataWindow(int samplesRow, int samplesColumn);
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
@@ -142,7 +142,7 @@ public slots:
 signals:
     void slicingActiveChanged(bool isSlicing);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
-    void barSpecsChanged(QSizeF thickness, QSizeF spacing, bool relative);
+    void barSpecsChanged(GLfloat thicknessRatio, QSizeF spacing, bool relative);
 
 private:
     void adjustValueAxisRange();
