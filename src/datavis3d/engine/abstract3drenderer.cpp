@@ -32,7 +32,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedLabelTransparency(QDataVis::TransparencyFromTheme),
       m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
       m_cachedBoundingRect(QRect(0,0,0,0)),
-      m_cachedShadowQuality(QDataVis::ShadowNone),
+      m_cachedShadowQuality(QDataVis::ShadowMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedZoomLevel(100)
 

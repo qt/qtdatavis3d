@@ -285,7 +285,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
 
     // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
     QVector3D sliceLightPos = defaultLightPos;
-    sliceLightPos.setY(-10.0f);
+    sliceLightPos.setY(-15.0f);
     if (QDataVis::ModeZoomColumn == m_cachedSelectionMode)
         lightPos = camera->calculateLightPosition(sliceLightPos, -85.0f);
     else
