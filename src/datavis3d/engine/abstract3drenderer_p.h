@@ -49,7 +49,6 @@ class Abstract3DRenderer : public QObject, protected QOpenGLFunctions
 
 private:
     Abstract3DController *m_controller;
-    bool m_isInitialized;
 
 protected:
     bool m_hasNegativeValues;
@@ -77,7 +76,6 @@ protected:
 public:
     ~Abstract3DRenderer();
 
-    inline bool isInitialized() { return m_isInitialized; }
     void updateDataModel(QAbstractDataProxy *dataProxy);
 
     virtual void render(CameraHelper *camera, const GLuint defaultFboHandle);

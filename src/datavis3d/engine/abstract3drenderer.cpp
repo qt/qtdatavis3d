@@ -26,7 +26,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(controller),
       m_controller(controller),
-      m_isInitialized(false),
       m_hasNegativeValues(false),
       m_cachedTheme(),
       m_cachedFont(QFont(QStringLiteral("Arial"))),

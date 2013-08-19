@@ -371,32 +371,20 @@ bool Bars3dController::isBarSpecRelative()
 void Bars3dController::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     QString objFile;
-    if (style == QDataVis::Bars) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/barSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/bar");
-    } else if (style == QDataVis::Pyramids) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/pyramidSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    } else if (style == QDataVis::Cones) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/coneSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/cone");
-    } else if (style == QDataVis::Cylinders) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/cylinderSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    } else if (style == QDataVis::BevelBars) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/bevelbarSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/bevelbar");
-    }
+    if (style == QDataVis::Bars)
+        objFile = QStringLiteral(":/defaultMeshes/bar");
+    else if (style == QDataVis::Pyramids)
+        objFile = QStringLiteral(":/defaultMeshes/pyramid");
+    else if (style == QDataVis::Cones)
+        objFile = QStringLiteral(":/defaultMeshes/cone");
+    else if (style == QDataVis::Cylinders)
+        objFile = QStringLiteral(":/defaultMeshes/cylinder");
+    else if (style == QDataVis::BevelBars)
+        objFile = QStringLiteral(":/defaultMeshes/bevelbar");
+
+    if (smooth)
+        objFile += QStringLiteral("Smooth");
+
     Abstract3DController::setMeshFileName(objFile);
 }
 
