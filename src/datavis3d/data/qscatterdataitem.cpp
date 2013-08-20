@@ -42,12 +42,18 @@ QScatterDataItem::QScatterDataItem()
 {
 }
 
+/*!
+ * Constructs QScatterDataItem with \a position.
+ */
 QScatterDataItem::QScatterDataItem(const QVector3D &position)
     : d_ptr(0),
       m_position(position)
 {
 }
 
+/*!
+ * Constructs a copy of \a other.
+ */
 QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
 {
     operator=(other);
@@ -60,6 +66,9 @@ QScatterDataItem::~QScatterDataItem()
 {
 }
 
+/*!
+ *  Assigns a copy of \a other to this object.
+ */
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
@@ -74,11 +83,17 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
     return *this;
 }
 
+/*!
+ * Sets \a position to this data item.
+ */
 void QScatterDataItem::setPosition(const QVector3D &position)
 {
     m_position = position;
 }
 
+/*!
+ * \return position of this data item.
+ */
 const QVector3D &QScatterDataItem::position() const
 {
     return m_position;
@@ -94,6 +109,9 @@ const QVector3D &QScatterDataItem::position() const
 //    return m_size;
 //}
 
+/*!
+ * \internal
+ */
 void QScatterDataItem::createExtraData()
 {
     if (!d_ptr)

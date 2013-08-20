@@ -21,31 +21,78 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QAbstractDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Base class for all QtDataVis3D data proxies.
+ * \since 1.0.0
+ *
+ * You use the visualization type specific inherited classes instead of the base class.
+ * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy
+ */
+
+/*!
+ * \enum QAbstractDataProxy::DataType
+ *
+ * Data type of the proxy.
+ *
+ * \value DataTypeNone
+ *        No data type.
+ * \value DataTypeBar
+ *        Data type for Q3DBars.
+ * \value DataTypeScatter
+ *        Data type for Q3DScatter.
+ * \value DataTypeSurface
+ *        Data type for Q3DSurface.
+ */
+
+/*!
+ * Constructs QAbstractDataProxy with \a d.
+ */
 QAbstractDataProxy::QAbstractDataProxy(QAbstractDataProxyPrivate *d) :
     QObject(0),
     d_ptr(d)
 {
 }
 
+/*!
+ * Destroys QAbstractDataProxy.
+ */
 QAbstractDataProxy::~QAbstractDataProxy()
 {
 }
 
+/*!
+ * \property QAbstractDataProxy::type
+ */
 QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 {
     return d_ptr->m_type;
 }
 
+/*!
+ * Sets label \a format for data items in this proxy. This format is used for single item labels,
+ * e.g. when an item is selected.
+ */
 void QAbstractDataProxy::setItemLabelFormat(const QString &format)
 {
     d_ptr->setItemLabelFormat(format);
     emit itemLabelFormatChanged();
 }
 
+/*!
+ * \return label format for data items in this proxy.
+ */
 QString QAbstractDataProxy::itemLabelFormat() const
 {
     return d_ptr->m_itemLabelFormat;
 }
+
+/*!
+ * \fn void QAbstractDataProxy::itemLabelFormatChanged()
+ *
+ * Emitted when label format changes.
+ */
 
 // QAbstractDataProxyPrivate
 

@@ -40,6 +40,9 @@ QMapDataItem::QMapDataItem()
 {
 }
 
+/*!
+ * Constructs a copy of \a other.
+ */
 QMapDataItem::QMapDataItem(const QMapDataItem &other)
     : QBarDataItem(other)
 {
@@ -53,6 +56,9 @@ QMapDataItem::~QMapDataItem()
 {
 }
 
+/*!
+ *  Assigns a copy of \a other to this object.
+ */
 QMapDataItem &QMapDataItem::operator=(const QMapDataItem &other)
 {
     QBarDataItem::operator =(other);
@@ -62,26 +68,41 @@ QMapDataItem &QMapDataItem::operator=(const QMapDataItem &other)
     return *this;
 }
 
+/*!
+ * Sets \a position on the map to this data item.
+ */
 void QMapDataItem::setMapPosition(const QPointF &position)
 {
     m_mapPosition = position;
 }
 
+/*!
+ * \return position of this data item.
+ */
 QPointF QMapDataItem::mapPosition() const
 {
     return m_mapPosition;
 }
 
+/*!
+ * Sets \a label to this data item.
+ */
 void QMapDataItem::setLabel(const QString &label)
 {
     m_label = label;
 }
 
+/*!
+ * \return label of this data item.
+ */
 QString QMapDataItem::label() const
 {
     return m_label;
 }
 
+/*!
+ * \internal
+ */
 void QMapDataItem::createExtraData()
 {
     if (!d_ptr)

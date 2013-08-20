@@ -21,44 +21,90 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QBarDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Proxy class for Q3DBars.
+ * \since 1.0.0
+ *
+ * QBarDataProxy handles adding, inserting, changing and removing rows of data.
+ *
+ * The data array is a list of vectors (rows) of QBarDataItem instances.
+ * Each row can contain different amount of items or even be null.
+ *
+ * QBarDataProxy takes ownership of all QBarDataRows passed to it, whether directly or
+ * in a QBarDataArray container.
+ * QBarDataRow pointers should not be used to modify data further after they have been passed to
+ * the proxy, as such modifications will not trigger proper signals.
+ */
+
+/*!
+ * Constructs QBarDataProxy.
+ */
 QBarDataProxy::QBarDataProxy() :
     QAbstractDataProxy(new QBarDataProxyPrivate(this))
 {
 }
 
+/*!
+ * Constructs QBarDataProxy with \a d.
+ */
 QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d) :
     QAbstractDataProxy(d)
 {
 }
 
+/*!
+ * Destroys QBarDataProxy.
+ */
 QBarDataProxy::~QBarDataProxy()
 {
 }
 
+/*!
+ * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
+ * to further modify data after QBarDataProxy assumes ownership of it, as such modifications will
+ * not trigger proper signals.
+ * Passing null array clears all data.
+ */
 void QBarDataProxy::resetArray(QBarDataArray *newArray)
 {
     if (dptr()->resetArray(newArray))
         emit arrayReset();
 }
 
+/*!
+ * Changes existing rows by replacing a row at \a rowIndex with \a row.
+ */
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
 {
     dptr()->setRow(rowIndex, row);
     emit rowsChanged(rowIndex, 1);
 }
 
+/*!
+ * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
+ */
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 {
     dptr()->setRows(rowIndex, rows);
     emit rowsChanged(rowIndex, rows.size());
 }
 
+/*!
+ * Changes a single item at \a rowIndex, \a columnIndex with \a item.
+ */
 void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &item)
 {
     dptr()->setItem(rowIndex, columnIndex, item);
     emit itemChanged(rowIndex, columnIndex);
 }
 
+/*!
+ * Adds a new \a row to the end of array.
+ *
+ * \return index of the added row.
+ */
 int QBarDataProxy::addRow(QBarDataRow *row)
 {
     int addIndex = dptr()->addRow(row);
@@ -66,6 +112,11 @@ int QBarDataProxy::addRow(QBarDataRow *row)
     return addIndex;
 }
 
+/*!
+ * Adds new \a rows to the end of array.
+ *
+ * \return index of the first added row.
+ */
 int QBarDataProxy::addRows(const QBarDataArray &rows)
 {
     int addIndex = dptr()->addRows(rows);
@@ -73,18 +124,30 @@ int QBarDataProxy::addRows(const QBarDataArray &rows)
     return addIndex;
 }
 
+/*!
+ * Inserts a new \a row to \a rowIndex. If rowIndex is equal to array size, rows are added to end
+ * of the array.
+ */
 void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row)
 {
     dptr()->insertRow(rowIndex, row);
     emit rowsInserted(rowIndex, 1);
 }
 
+/*!
+ * Inserts new \a rows to \a rowIndex. If rowIndex is equal to array size, rows are added to end
+ * of the array.
+ */
 void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows)
 {
     dptr()->insertRows(rowIndex, rows);
     emit rowsInserted(rowIndex, rows.size());
 }
 
+/*!
+ * Removes \a removeCount rows staring at \a rowIndex. Attempting to remove rows past the end of the
+ * array does nothing.
+ */
 void QBarDataProxy::removeRows(int rowIndex, int removeCount)
 {
     if (rowIndex < rowCount()) {
@@ -93,16 +156,26 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount)
     }
 }
 
+/*!
+ * \return row count in the array.
+ */
 int QBarDataProxy::rowCount() const
 {
     return dptrc()->m_dataArray->size();
 }
 
+/*!
+ * \return pointer to the data array.
+ */
 const QBarDataArray *QBarDataProxy::array() const
 {
     return dptrc()->m_dataArray;
 }
 
+/*!
+ * \return pointer to the row at \a rowIndex. It is guaranteed to be valid only until next call
+ * that modifies data.
+ */
 const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
 {
     const QBarDataArray &dataArray = *dptrc()->m_dataArray;
@@ -110,6 +183,10 @@ const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
     return dataArray[rowIndex];
 }
 
+/*!
+ * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * until next call that modifies data.
+ */
 const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 {
     const QBarDataArray &dataArray = *dptrc()->m_dataArray;
@@ -119,15 +196,58 @@ const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
     return &dataRow.at(columnIndex);
 }
 
+/*!
+ * \internal
+ */
 QBarDataProxyPrivate *QBarDataProxy::dptr()
 {
     return static_cast<QBarDataProxyPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
 {
     return static_cast<const QBarDataProxyPrivate *>(d_ptr.data());
 }
+
+/*!
+ * \fn void QBarDataProxy::arrayReset()
+ *
+ * Emitted when data array is reset.
+ */
+
+/*!
+ * \fn void QBarDataProxy::rowsAdded(int startIndex, int count)
+ *
+ * Emitted when rows have been added. Provides \a startIndex and \a count of rows added.
+ */
+
+/*!
+ * \fn void QBarDataProxy::rowsChanged(int startIndex, int count)
+ *
+ * Emitted when rows have changed. Provides \a startIndex and \a count of changed rows.
+ */
+
+/*!
+ * \fn void QBarDataProxy::rowsRemoved(int startIndex, int count)
+ *
+ * Emitted when rows have been removed. Provides \a startIndex and \a count of rows removed.
+ * Index is the current array size if rows were removed from the end of the array.
+ */
+
+/*!
+ * \fn void QBarDataProxy::rowsInserted(int startIndex, int count)
+ *
+ * Emitted when rows have been inserted. Provides \a startIndex and \a count of inserted rows.
+ */
+
+/*!
+ * \fn void QBarDataProxy::itemChanged(int rowIndex, int columnIndex)
+ *
+ * Emitted when an item has changed. Provides \a rowIndex and \a columnIndex of changed item.
+ */
 
 // QBarDataProxyPrivate
 

@@ -21,38 +21,75 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QScatterDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Proxy class for Q3DScatter.
+ * \since 1.0.0
+ *
+ * QScatterDataProxy handles adding, inserting, changing and removing data items.
+ *
+ * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
+ */
+
+/*!
+ * Constructs QScatterDataProxy.
+ */
 QScatterDataProxy::QScatterDataProxy() :
     QAbstractDataProxy(new QScatterDataProxyPrivate(this))
 {
 }
 
+/*!
+ * Constructs QScatterDataProxy with \a d.
+ */
 QScatterDataProxy::QScatterDataProxy(QScatterDataProxyPrivate *d) :
     QAbstractDataProxy(d)
 {
 }
 
+/*!
+ * Destroys QScatterDataProxy.
+ */
 QScatterDataProxy::~QScatterDataProxy()
 {
 }
 
+/*!
+ * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
+ * to further modify data after QScatterDataProxy assumes ownership of it, as such modifications will
+ * not trigger proper signals.
+ * Passing null array clears all data.
+ */
 void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
 {
     if (dptr()->resetArray(newArray))
         emit arrayReset();
 }
 
+/*!
+ * Changes a single item at \a index with \a item.
+ */
 void QScatterDataProxy::setItem(int index, const QScatterDataItem &item)
 {
     dptr()->setItem(index, item);
     emit itemsChanged(index, 1);
 }
 
+/*!
+ * Changes items starting from \a index with \a items.
+ */
 void QScatterDataProxy::setItems(int index, const QScatterDataArray &items)
 {
     dptr()->setItems(index, items);
     emit itemsChanged(index, items.size());
 }
 
+/*!
+ * Adds a single \a item to the end of the array.
+ *
+ * \return index of the added item.
+ */
 int QScatterDataProxy::addItem(const QScatterDataItem &item)
 {
     int addIndex = dptr()->addItem(item);
@@ -60,6 +97,11 @@ int QScatterDataProxy::addItem(const QScatterDataItem &item)
     return addIndex;
 }
 
+/*!
+ * Adds \a items to the end of the array.
+ *
+ * \return index of the first added item.
+ */
 int QScatterDataProxy::addItems(const QScatterDataArray &items)
 {
     int addIndex = dptr()->addItems(items);
@@ -67,48 +109,106 @@ int QScatterDataProxy::addItems(const QScatterDataArray &items)
     return addIndex;
 }
 
+/*!
+ * Inserts a single \a item to \a index. If index is equal to data array size, item is added to
+ * the array.
+ */
 void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
 {
     dptr()->insertItem(index, item);
     emit itemsInserted(index, 1);
 }
 
+/*!
+ * Inserts \a items to \a index. If index is equal to data array size, items are added to the array.
+ */
 void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
 {
     dptr()->insertItems(index, items);
     emit itemsInserted(index, items.size());
 }
 
+/*!
+ * Removes \a removeCount items starting from \a index. Attempting to remove items past the end of
+ * the array does nothing.
+ */
 void QScatterDataProxy::removeItems(int index, int removeCount)
 {
     dptr()->removeItems(index, removeCount);
     emit itemsRemoved(index, removeCount);
 }
 
+/*!
+ * \return item count in the array.
+ */
 int QScatterDataProxy::itemCount() const
 {
     return dptrc()->m_dataArray->size();
 }
 
+/*!
+ * \return pointer to the data array.
+ */
 const QScatterDataArray *QScatterDataProxy::array() const
 {
     return dptrc()->m_dataArray;
 }
 
+/*!
+ * \return pointer to the item at \a index. It is guaranteed to be valid only until next call
+ * that modifies data.
+ */
 const QScatterDataItem *QScatterDataProxy::itemAt(int index) const
 {
     return &dptrc()->m_dataArray->at(index);
 }
 
+/*!
+ * \internal
+ */
 QScatterDataProxyPrivate *QScatterDataProxy::dptr()
 {
     return static_cast<QScatterDataProxyPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QScatterDataProxyPrivate *QScatterDataProxy::dptrc() const
 {
     return static_cast<const QScatterDataProxyPrivate *>(d_ptr.data());
 }
+
+/*!
+ * \fn void QScatterDataProxy::arrayReset()
+ *
+ * Emitted when data array is reset.
+ */
+
+/*!
+ * \fn void QScatterDataProxy::itemsAdded(int startIndex, int count)
+ *
+ * Emitted when items have been added. Provides \a startIndex and \a count of items added.
+ */
+
+/*!
+ * \fn void QScatterDataProxy::itemsChanged(int startIndex, int count)
+ *
+ * Emitted when items have changed. Provides \a startIndex and \a count of changed items.
+ */
+
+/*!
+ * \fn void QScatterDataProxy::itemsRemoved(int startIndex, int count)
+ *
+ * Emitted when items have been removed. Provides \a startIndex and \a count of items removed.
+ * Index may be over current array size if removed from end.
+ */
+
+/*!
+ * \fn void QScatterDataProxy::itemsInserted(int startIndex, int count)
+ *
+ * Emitted when items have been inserted. Provides \a startIndex and \a count of inserted items.
+ */
 
 // QScatterDataProxyPrivate
 
@@ -203,7 +303,6 @@ QVector3D QScatterDataProxyPrivate::limitValues()
         if (limits.z() < zValue)
             limits.setZ(zValue);
     }
-    //qDebug() << __FUNCTION__ << limits << m_dataArray.size();
     return limits;
 }
 

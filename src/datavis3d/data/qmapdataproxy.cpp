@@ -21,51 +21,123 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QMapDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Proxy class for Q3DMaps.
+ * \since 1.0.0
+ *
+ * QMapDataProxy handles adding, inserting, changing and removing data.
+ *
+ * QMapDataProxy takes ownership of all QMapDataArrays and QMapDataItems passed to it.
+ */
+
+/*!
+ * Constructs QMapDataProxy.
+ */
 QMapDataProxy::QMapDataProxy() :
     QAbstractDataProxy(new QMapDataProxyPrivate(this))
 {
 }
 
+/*!
+ * Constructs QMapDataProxy with \a d.
+ */
 QMapDataProxy::QMapDataProxy(QMapDataProxyPrivate *d) :
     QAbstractDataProxy(d)
 {
 }
 
+/*!
+ * Destroys QMapDataProxy.
+ */
 QMapDataProxy::~QMapDataProxy()
 {
 }
 
+/*!
+ * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
+ * to further modify data after QMapDataProxy assumes ownership of it, as such modifications will
+ * not trigger proper signals.
+ * Passing null array clears all data.
+ */
 void QMapDataProxy::resetArray(QMapDataArray *newArray)
 {
     if (dptr()->resetArray(newArray))
         emit arrayReset();
 }
 
-
+/*!
+ * \return item count in the array.
+ */
 int QMapDataProxy::itemCount() const
 {
     return dptrc()->m_dataArray.size();
 }
 
+/*!
+ * \return pointer to the data array.
+ */
 const QMapDataArray *QMapDataProxy::array() const
 {
     return &dptrc()->m_dataArray;
 }
 
+/*!
+ * \return pointer to the item at \a index. It is guaranteed to be valid only until next call
+ * that modifies data.
+ */
 const QMapDataItem *QMapDataProxy::itemAt(int index) const
 {
     return &dptrc()->m_dataArray.at(index);
 }
 
+/*!
+ * \internal
+ */
 QMapDataProxyPrivate *QMapDataProxy::dptr()
 {
     return static_cast<QMapDataProxyPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QMapDataProxyPrivate *QMapDataProxy::dptrc() const
 {
     return static_cast<const QMapDataProxyPrivate *>(d_ptr.data());
 }
+
+/*!
+ * \fn void QMapDataProxy::arrayReset()
+ *
+ * Emitted when data array is reset.
+ */
+
+/*!
+ * \fn void QMapDataProxy::itemsAdded(int startIndex, int count)
+ *
+ * Emitted when items have been added. Provides \a startIndex and \a count of items added.
+ */
+
+/*!
+ * \fn void QMapDataProxy::itemsChanged(int startIndex, int count)
+ *
+ * Emitted when items have changed. Provides \a startIndex and \a count of changed items.
+ */
+
+/*!
+ * \fn void QMapDataProxy::itemsRemoved(int startIndex, int count)
+ *
+ * Emitted when items have been removed. Provides \a startIndex and \a count of items removed.
+ * Index may be over current array size if removed from end.
+ */
+
+/*!
+ * \fn void QMapDataProxy::itemsInserted(int startIndex, int count)
+ *
+ * Emitted when items have been inserted. Provides \a startIndex and \a count of inserted items.
+ */
 
 // QBarDataProxyPrivate
 

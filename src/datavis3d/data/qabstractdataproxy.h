@@ -49,8 +49,6 @@ public:
 
     DataType type() const;
 
-    // Items use this string to format single item labels, unless custom proxy initializes
-    // item labels with something else.
     void setItemLabelFormat(const QString &format);
     QString itemLabelFormat() const;
 

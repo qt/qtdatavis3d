@@ -41,12 +41,18 @@ QBarDataItem::QBarDataItem()
 {
 }
 
+/*!
+ * Constructs QBarDataItem with \a value.
+ */
 QBarDataItem::QBarDataItem(qreal value)
     : d_ptr(0),
       m_value(value)
 {
 }
 
+/*!
+ * Constructs a copy of \a other.
+ */
 QBarDataItem::QBarDataItem(const QBarDataItem &other)
 {
     operator=(other);
@@ -60,6 +66,9 @@ QBarDataItem::~QBarDataItem()
     delete d_ptr;
 }
 
+/*!
+ *  Assigns a copy of \a other to this object.
+ */
 QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 {
     m_value = other.m_value;
@@ -71,22 +80,30 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
     return *this;
 }
 
+/*!
+ * Sets \a value to this data item.
+ */
 void QBarDataItem::setValue(qreal value)
 {
     m_value = value;
 }
 
+/*!
+ * \return value of this data item.
+ */
 qreal QBarDataItem::value() const
 {
     return m_value;
 }
 
+/*!
+ * \internal
+ */
 void QBarDataItem::createExtraData()
 {
     if (!d_ptr)
         d_ptr = new QBarDataItemPrivate;
 }
-
 
 QBarDataItemPrivate::QBarDataItemPrivate()
 {

@@ -37,22 +37,18 @@ public:
     explicit QMapDataProxy(QMapDataProxyPrivate *d);
     virtual ~QMapDataProxy();
 
-    // QMapDataProxy is also optimized to use cases where the only defining characteristics of an individual
-    // map item are it's value and position. Modifying other data such as color or mesh of individual bar
-    // requires allocating additional data object for the bar.
+    // TODO: Replace first part of class description in docs with this once all TODOs are done:
+    /*
+    * QMapDataProxy handles adding, inserting, changing and removing data.
+    * QMapDataProxy is optimized to use cases where the only defining characteristics of an individual
+    * map item are its value and position. Modifying other data such as color or mesh of individual bar
+    * requires allocating additional data object for the bar.
+    */
 
-    // Item pointers are guaranteed to be valid only until next call that modifies data.
-    // Array pointer is guaranteed to be valid for lifetime of proxy.
     int itemCount() const;
     const QMapDataArray *array() const;
     const QMapDataItem *itemAt(int index) const; // Index needs to exist or this crashes
 
-    // TODO Should data manipulation/access methods be protected rather than public to enforce subclassing use of proxy?
-    // TODO Leaving them public gives user more options.
-
-    // QMapDataProxy takes ownership of all QMapDataArrays and QMapDataItems passed to it.
-
-    // Clears the existing array and sets it data to new array.
     void resetArray(QMapDataArray *newArray);
 
     // TODO void setItem(int index, QMapDataItem *item);
@@ -70,7 +66,7 @@ signals:
     void arrayReset();
     void itemsAdded(int startIndex, int count);
     void itemsChanged(int startIndex, int count);
-    void itemsRemoved(int startIndex, int count); // Index may be over current array size if removed from end
+    void itemsRemoved(int startIndex, int count);
     void itemsInserted(int startIndex, int count);
 
 protected:
