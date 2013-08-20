@@ -75,7 +75,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * familiarizing yourself with the examples provided, like the \l{Rainfall Example} or
  * the \l{Widget Example}.
  *
- * \sa Q3DScatter, Q3DSurface and {Qt Data Visualization 3D C++ Classes}
+ * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization 3D C++ Classes}
  */
 
 /*!

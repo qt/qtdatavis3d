@@ -218,7 +218,7 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
  * default. Theme affects bar colors, label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
- * \sa setBarColor()
+ * \sa setObjectColor()
  */
 void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
 {

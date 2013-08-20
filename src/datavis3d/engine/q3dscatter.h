@@ -99,7 +99,7 @@ public:
     void setValueAxisZ(QValueAxis *axis);
     QValueAxis *valueAxisZ();
 
-    void setDataProxy(QtDataVis3D::QScatterDataProxy *proxy);
+    void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy();
 
 public slots:

@@ -38,7 +38,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * This class creates a QWindow and provides render loop for visualization types inheriting it.
  * \warning This class is not intended to be used directly by developers.
  *
- * \sa Q3DBars, Q3DScatter, Q3DSurface and {Qt Data Visualization 3D C++ Classes}
+ * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Data Visualization 3D C++ Classes}
  */
 
 /*!
