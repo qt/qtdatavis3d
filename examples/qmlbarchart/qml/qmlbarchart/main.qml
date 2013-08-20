@@ -105,6 +105,7 @@ Item {
             min: 0
             max: 35
             labelFormat: "%.1f M\u20AC"
+            title: "Annual expenses"
         }
         Bars3D {
             id: testchart
@@ -124,6 +125,7 @@ Item {
             axisX: rowAxis
             axisY: valueAxis
             axisZ: columnAxis
+            itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
         }
     }
 
@@ -195,9 +197,11 @@ Item {
                 if (valueMapping.valueRole == "expenses") {
                     valueMapping.valueRole = "income"
                     mappingButtonText.text = "Show Expenses"
+                    valueAxis.title = "Annual income"
                 } else {
                     valueMapping.valueRole = "expenses"
                     mappingButtonText.text = "Show Income"
+                    valueAxis.title = "Annual expenses"
                 }
             }
         }

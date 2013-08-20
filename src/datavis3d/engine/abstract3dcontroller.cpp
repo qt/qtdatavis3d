@@ -42,7 +42,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisY(0),
     m_axisZ(0),
     m_renderer(0),
-    m_isDataDirty(false)
+    m_isDataDirty(true)
 {
     m_theme.useColorTheme(QDataVis::ThemeSystem);
 }
@@ -244,6 +244,33 @@ void Abstract3DController::synchDataToRenderer()
             QValueAxis *valueAxisZ = static_cast<QValueAxis *>(m_axisZ);
             m_renderer->updateAxisSubSegmentCount(QAbstractAxis::AxisOrientationZ,
                                                   valueAxisZ->subSegmentCount());
+        }
+    }
+
+    if (m_changeTracker.axisXLabelFormatChanged) {
+        m_changeTracker.axisXLabelFormatChanged = false;
+        if (m_axisX->type() & QAbstractAxis::AxisTypeValue) {
+            QValueAxis *valueAxisX = static_cast<QValueAxis *>(m_axisX);
+            m_renderer->updateAxisLabelFormat(QAbstractAxis::AxisOrientationX,
+                                              valueAxisX->labelFormat());
+        }
+    }
+
+    if (m_changeTracker.axisYLabelFormatChanged) {
+        m_changeTracker.axisYLabelFormatChanged = false;
+        if (m_axisY->type() & QAbstractAxis::AxisTypeValue) {
+            QValueAxis *valueAxisY = static_cast<QValueAxis *>(m_axisY);
+            m_renderer->updateAxisLabelFormat(QAbstractAxis::AxisOrientationY,
+                                              valueAxisY->labelFormat());
+        }
+    }
+
+    if (m_changeTracker.axisZLabelFormatChanged) {
+        m_changeTracker.axisZLabelFormatChanged = false;
+        if (m_axisZ->type() & QAbstractAxis::AxisTypeValue) {
+            QValueAxis *valueAxisZ = static_cast<QValueAxis *>(m_axisZ);
+            m_renderer->updateAxisLabelFormat(QAbstractAxis::AxisOrientationZ,
+                                              valueAxisZ->labelFormat());
         }
     }
 }
@@ -623,6 +650,24 @@ void Abstract3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
     handleAxisAutoAdjustRangeChangedInOrientation(axis->orientation(), autoAdjust);
 }
 
+void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
+{
+    Q_UNUSED(format)
+    handleAxisLabelFormatChangedBySender(sender());
+}
+
+void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
+{
+    if (sender == m_axisX)
+        m_changeTracker.axisXLabelFormatChanged = true;
+    else if (sender == m_axisY)
+        m_changeTracker.axisYLabelFormatChanged = true;
+    else if (sender == m_axisZ)
+        m_changeTracker.axisZLabelFormatChanged = true;
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+}
+
 void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientation,
                                          QAbstractAxis *axis, QAbstractAxis **axisPtr)
 {
@@ -659,12 +704,15 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
                          this, &Abstract3DController::handleAxisSubSegmentCountChanged);
         QObject::connect(valueAxis, &QValueAxis::autoAdjustRangeChanged,
                          this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
+        QObject::connect(valueAxis, &QValueAxis::labelFormatChanged,
+                         this, &Abstract3DController::handleAxisLabelFormatChanged);
 
         handleAxisRangeChangedBySender(valueAxis);
         handleAxisSegmentCountChangedBySender(valueAxis);
         handleAxisSubSegmentCountChangedBySender(valueAxis);
         handleAxisAutoAdjustRangeChangedInOrientation(valueAxis->orientation(),
                                                       valueAxis->isAutoAdjustRange());
+        handleAxisLabelFormatChangedBySender(valueAxis);
     }
 }
 

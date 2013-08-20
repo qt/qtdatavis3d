@@ -351,6 +351,16 @@ void DeclarativeBars::setColumns(int columns)
     setDataWindow(rows(), columns);
 }
 
+void DeclarativeBars::setItemLabelFormat(const QString &format)
+{
+    m_shared->dataProxy()->setItemLabelFormat(format);
+}
+
+QString DeclarativeBars::itemLabelFormat()
+{
+    return m_shared->dataProxy()->itemLabelFormat();
+}
+
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();

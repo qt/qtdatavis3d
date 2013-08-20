@@ -79,6 +79,7 @@ Item {
             shadowQuality: Scatter3D.ShadowNone
             selectionMode: Scatter3D.ModeItem
             labelTransparency: Scatter3D.TransparencyNoBackground
+            itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
 
             Component.onCompleted: {
                 console.log("testscatter complete");

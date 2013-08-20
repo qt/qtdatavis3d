@@ -36,6 +36,32 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * in a QBarDataArray container.
  * QBarDataRow pointers should not be used to modify data further after they have been passed to
  * the proxy, as such modifications will not trigger proper signals.
+ *
+ * QBarDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
+ * \table
+ *   \row
+ *     \li @rowTitle      \li Title from row axis
+ *   \row
+ *     \li @colTitle      \li Title from column axis
+ *   \row
+ *     \li @valueTitle    \li Title from value axis
+ *   \row
+ *     \li @rowIdx        \li Visible row index
+ *   \row
+ *     \li @colIdx        \li Visible Column index
+ *   \row
+ *     \li @rowLabel      \li Label from row axis
+ *   \row
+ *     \li @colLabel      \li Label from column axis
+ *   \row
+ *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
+ *                            see \l{QValueAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li %<format spec> \li Item value in specified format.
+ * \endtable
+ *
+ * For example:
+ * \snippet doc_src_qtdatavis3d.cpp 1
  */
 
 /*!
@@ -255,6 +281,7 @@ QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
       m_dataArray(new QBarDataArray)
 {
+    m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
 }
 
 QBarDataProxyPrivate::~QBarDataProxyPrivate()

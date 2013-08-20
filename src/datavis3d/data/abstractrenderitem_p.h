@@ -48,23 +48,17 @@ public:
     inline void setTranslation(const QVector3D &translation) { m_translation = translation; }
     inline const QVector3D &translation() const {return m_translation; }
 
-    // Label item for formatted label
-    LabelItem &labelItem();
-
     // Selection label item (containing special selection texture, if mode is activated)
-    LabelItem &selectionLabel();
+    LabelItem &selectionLabelItem();
 
-    // Formatted label for item.
-    void setLabel(const QString &label);
-    QString &label(); // Formats label if not previously formatted
+    // Formatted selection label for item.
+    void setSelectionLabel(const QString &label);
+    QString &selectionLabel(); // Formats selection label if not previously formatted
 
 protected:
-    virtual void formatLabel() = 0;
-
-    QString m_label;
+    QString m_selectionLabel;
     QVector3D m_translation;
-    LabelItem *m_labelItem;
-    LabelItem *m_selectionLabel;
+    LabelItem *m_selectionLabelItem;
 
     friend class QAbstractDataItem;
 };

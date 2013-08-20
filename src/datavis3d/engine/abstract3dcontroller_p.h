@@ -74,6 +74,9 @@ struct Abstract3DChangeBitField {
     bool axisXSubSegmentCountChanged : 1;
     bool axisYSubSegmentCountChanged : 1;
     bool axisZSubSegmentCountChanged : 1;
+    bool axisXLabelFormatChanged     : 1;
+    bool axisYLabelFormatChanged     : 1;
+    bool axisZLabelFormatChanged     : 1;
 
     Abstract3DChangeBitField() :
         positionChanged(true),
@@ -105,7 +108,10 @@ struct Abstract3DChangeBitField {
         axisZSegmentCountChanged(true),
         axisXSubSegmentCountChanged(true),
         axisYSubSegmentCountChanged(true),
-        axisZSubSegmentCountChanged(true)
+        axisZSubSegmentCountChanged(true),
+        axisXLabelFormatChanged(true),
+        axisYLabelFormatChanged(true),
+        axisZLabelFormatChanged(true)
     {
     }
 };
@@ -254,6 +260,7 @@ public:
     virtual void handleAxisSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
+    virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
 
 public slots:
     void handleAxisTitleChanged(const QString &title);
@@ -262,6 +269,7 @@ public slots:
     void handleAxisSegmentCountChanged(int count);
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
+    void handleAxisLabelFormatChanged(const QString &format);
 
 signals:
     void boundingRectChanged(QRect boundingRect);

@@ -61,6 +61,7 @@ class DeclarativeScatter : public QQuickItem
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
@@ -142,6 +143,9 @@ public:
     // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible();
+
+    void setItemLabelFormat(const QString &format);
+    QString itemLabelFormat();
 
     // Adjust shadow quality
     void setShadowQuality(QDataVis::ShadowQuality quality);

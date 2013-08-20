@@ -31,21 +31,4 @@ ScatterRenderItem::~ScatterRenderItem()
 {
 }
 
-void ScatterRenderItem::formatLabel()
-{
-    // TODO The label format specified in proxy should probably have additional custom formatting
-    // TODO specifiers in addition to standard printf specifiers for placement of item labels
-    // TODO and selection data (like row/column in bar selection)
-
-    // Format the string on first access
-    QString numStr;
-    numStr.setNum(m_value);
-    // TODO actually format instead of just prepending the value
-    m_label.clear(); // Just in case
-    //m_label.append(m_itemLabel);
-    //m_label.append(QStringLiteral(" "));
-    m_label.append(numStr);
-    m_label.append(m_renderer->itemLabelFormat());
-}
-
 QT_DATAVIS3D_END_NAMESPACE

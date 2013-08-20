@@ -309,10 +309,10 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     drawObject(shader, object, labelItem.textureId());
 }
 
-void Drawer::generateLabelTexture(AbstractRenderItem *item)
+void Drawer::generateSelectionLabelTexture(AbstractRenderItem *item)
 {
-    LabelItem &labelItem = item->labelItem();
-    generateLabelItem(labelItem, item->label());
+    LabelItem &labelItem = item->selectionLabelItem();
+    generateLabelItem(labelItem, item->selectionLabel());
 }
 
 void Drawer::generateLabelItem(LabelItem &item, const QString &text)

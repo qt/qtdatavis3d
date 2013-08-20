@@ -40,7 +40,6 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_columnCount = m_numericMonths.size();
 
     m_proxy = new VariantBarDataProxy;
-    m_proxy->setItemLabelFormat(QStringLiteral(" mm"));
     m_chart->setDataProxy(m_proxy);
 
     updateYearsList(2000, 2012);
@@ -54,7 +53,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
-    m_chart->valueAxis()->setTitle(QString("rainfall (in mm) in city %1").arg(m_city - 1));
+    m_chart->valueAxis()->setTitle(QString("rainfall in city %1").arg(m_city - 1));
     m_chart->valueAxis()->setLabelFormat("%d mm");
     m_chart->rowAxis()->setCategoryLabels(m_years);
     m_chart->columnAxis()->setCategoryLabels(months);
@@ -108,7 +107,7 @@ void RainfallChart::timeout()
         m_city = 2;
 
     m_proxy->mapping()->setValueIndex(m_city);
-    m_chart->valueAxis()->setTitle(QString("rainfall (in mm) in city %1").arg(m_city - 1));
+    m_chart->valueAxis()->setTitle(QString("rainfall in city %1").arg(m_city - 1));
 }
 
 void RainfallChart::updateYearsList(int start, int end)

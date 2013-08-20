@@ -72,7 +72,10 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 
 /*!
  * Sets label \a format for data items in this proxy. This format is used for single item labels,
- * e.g. when an item is selected.
+ * e.g. when an item is selected. How the format is interpreted depends on proxy type. See
+ * each proxy class documentation for more information.
+ *
+ * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy
  */
 void QAbstractDataProxy::setItemLabelFormat(const QString &format)
 {

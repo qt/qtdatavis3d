@@ -64,6 +64,7 @@ public:
 
     static ParamType findFormatParamType(const QString &format);
     static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
+    static QString defaultLabelFormat();
 
 private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);

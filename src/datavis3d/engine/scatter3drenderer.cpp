@@ -1024,7 +1024,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // We have no ownership, don't delete. Just NULL the pointer.
         m_selectedItem = NULL;
     } else {
-        // Print value of selected bar
+        // Draw the selection label
         m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -1032,26 +1032,43 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
-#ifndef DISPLAY_FULL_DATA_ON_SELECTION
-        // Draw just the value string of the selected bar
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
-            m_drawer->generateLabelTexture(m_selectedBar);
-            m_previouslySelectedBar = m_selectedBar;
-        }
 
-        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->labelItem(),
-                            viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_camera, true);
-#else
-        // Draw the value string followed by row label and column label
-        LabelItem &labelItem = m_selectedItem->selectionLabel();
+        LabelItem &labelItem = m_selectedItem->selectionLabelItem();
         if (m_previouslySelectedItem != m_selectedItem || m_updateLabels
                 || !labelItem.textureId()) {
-            QString labelText = m_selectedItem->label();
-            // TODO More elaborate label?
+            QString labelText = m_selectedItem->selectionLabel();
+            if (labelText.isNull()) {
+                static const QString xTitleTag(QStringLiteral("@xTitle"));
+                static const QString yTitleTag(QStringLiteral("@yTitle"));
+                static const QString zTitleTag(QStringLiteral("@zTitle"));
+                static const QString xLabelTag(QStringLiteral("@xLabel"));
+                static const QString yLabelTag(QStringLiteral("@yLabel"));
+                static const QString zLabelTag(QStringLiteral("@zLabel"));
+
+                labelText = itemLabelFormat();
+
+                labelText.replace(xTitleTag, m_axisCacheX.title());
+                labelText.replace(yTitleTag, m_axisCacheY.title());
+                labelText.replace(zTitleTag, m_axisCacheZ.title());
+
+                if (labelText.contains(xLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheX.labelFormat(),
+                                                                m_selectedItem->position().x());
+                    labelText.replace(xLabelTag, valueLabelText);
+                }
+                if (labelText.contains(yLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(),
+                                                                m_selectedItem->position().y());
+                    labelText.replace(yLabelTag, valueLabelText);
+                }
+                if (labelText.contains(zLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheZ.labelFormat(),
+                                                                m_selectedItem->position().z());
+                    labelText.replace(zLabelTag, valueLabelText);
+                }
+
+                m_selectedItem->setSelectionLabel(labelText);
+            }
             m_drawer->generateLabelItem(labelItem, labelText);
             m_previouslySelectedItem = m_selectedItem;
         }
@@ -1061,7 +1078,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera, true, false, Drawer::LabelMid);
-#endif
+
         glDisable(GL_TEXTURE_2D);
         if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
             glDisable(GL_BLEND);

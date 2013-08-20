@@ -299,6 +299,16 @@ QDataVis::ShadowQuality DeclarativeScatter::shadowQuality()
     return m_shared->shadowQuality();
 }
 
+void DeclarativeScatter::setItemLabelFormat(const QString &format)
+{
+    m_shared->dataProxy()->setItemLabelFormat(format);
+}
+
+QString DeclarativeScatter::itemLabelFormat()
+{
+    return m_shared->dataProxy()->itemLabelFormat();
+}
+
 void DeclarativeScatter::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();

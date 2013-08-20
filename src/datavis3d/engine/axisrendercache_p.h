@@ -59,6 +59,8 @@ public:
     inline int segmentCount() const { return m_segmentCount; }
     void setSubSegmentCount(int count);
     inline int subSegmentCount() const { return m_subSegmentCount; }
+    inline void setLabelFormat(const QString &format) { m_labelFormat = format; }
+    inline const QString &labelFormat() { return m_labelFormat; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
@@ -80,6 +82,7 @@ private:
     qreal m_max;
     int m_segmentCount;
     int m_subSegmentCount;
+    QString m_labelFormat;
 
     // Renderer items
     Drawer *m_drawer; // Not owned

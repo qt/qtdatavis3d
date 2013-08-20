@@ -73,6 +73,8 @@ protected:
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
 
+    QString generateValueLabel(const QString &format, qreal value);
+
 public:
     ~Abstract3DRenderer();
 
@@ -108,6 +110,7 @@ public:
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
     virtual void updateAxisSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisLabelFormat(QAbstractAxis::AxisOrientation orientation, const QString &format);
 
 protected:
     Abstract3DRenderer(Abstract3DController *controller);

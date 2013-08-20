@@ -24,23 +24,34 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_renderer(0),
-      m_value(0)
+      m_value(0),
+      m_sliceLabelItem(0)
 {
 }
 
 BarRenderItem::~BarRenderItem()
 {
+    delete m_sliceLabelItem;
 }
 
-void BarRenderItem::formatLabel()
+LabelItem &BarRenderItem::sliceLabelItem()
 {
-    // Format the string on first access
-    QString numStr;
-    numStr.setNum(m_value);
-    // TODO actually format instead of just prepending the value
-    m_label.clear(); // Just in case
-    m_label.append(numStr);
-    m_label.append(m_renderer->itemLabelFormat()); // TODO format needs to be cached
+    if (!m_sliceLabelItem)
+        m_sliceLabelItem = new LabelItem;
+    return *m_sliceLabelItem;
 }
+
+void BarRenderItem::setSliceLabel(const QString &label)
+{
+    if (m_sliceLabelItem)
+        m_sliceLabelItem->clear();
+    m_sliceLabel = label;
+}
+
+QString &BarRenderItem::sliceLabel()
+{
+    return m_sliceLabel;
+}
+
 
 QT_DATAVIS3D_END_NAMESPACE

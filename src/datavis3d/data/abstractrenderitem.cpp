@@ -21,45 +21,33 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 AbstractRenderItem::AbstractRenderItem()
-    : m_labelItem(0),
-      m_selectionLabel(0)
+    : m_selectionLabelItem(0)
 {
 }
 
 AbstractRenderItem::~AbstractRenderItem()
 {
-    delete m_labelItem;
-    delete m_selectionLabel;
+    delete m_selectionLabelItem;
 }
 
-LabelItem &AbstractRenderItem::labelItem()
+LabelItem &AbstractRenderItem::selectionLabelItem()
 {
-    if (!m_labelItem)
-        m_labelItem = new LabelItem;
-    return *m_labelItem;
+    if (!m_selectionLabelItem)
+        m_selectionLabelItem = new LabelItem;
+    return *m_selectionLabelItem;
 }
 
-LabelItem &AbstractRenderItem::selectionLabel()
+void AbstractRenderItem::setSelectionLabel(const QString &label)
 {
-    if (!m_selectionLabel)
-        m_selectionLabel = new LabelItem;
-    return *m_selectionLabel;
+    if (m_selectionLabelItem)
+        m_selectionLabelItem->clear();
+    m_selectionLabel = label;
 }
 
-QString &AbstractRenderItem::label()
+QString &AbstractRenderItem::selectionLabel()
 {
-    if (m_label.isNull())
-        formatLabel();
-    return m_label;
+    return m_selectionLabel;
 }
 
-void AbstractRenderItem::setLabel(const QString &label)
-{
-    if (m_labelItem)
-        m_labelItem->clear();
-    if (m_selectionLabel)
-        m_selectionLabel->clear();
-    m_label = label;
-}
 
 QT_DATAVIS3D_END_NAMESPACE

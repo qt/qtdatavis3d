@@ -19,3 +19,11 @@
 //! [0]
 #include <QtDataVis3D>
 //! [0]
+
+//! [1]
+proxy->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowLabel, @colLabel): %.1f"));
+//! [1]
+
+//! [2]
+proxy->setItemLabelFormat(QStringLiteral("@xTitle: @xValue, @yTitle: @yValue, @zTitle: @zValue"));
+//! [2]

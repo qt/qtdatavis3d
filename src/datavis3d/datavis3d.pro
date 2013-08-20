@@ -22,3 +22,9 @@ wince* {
         QMAKE_CXXFLAGS_RELEASE ~= s/-O1/-Os -Oy -Ob2/
     }
 }
+
+OTHER_FILES += doc/qtdatavis3d.qdocconf \
+               doc/src/* \
+               doc/images/* \
+               doc/snippets/*
+

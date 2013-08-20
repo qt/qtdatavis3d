@@ -80,6 +80,7 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setFont(QFont("Times Roman", 20));
     } else {
         m_chart->dataProxy()->resetArray(0);
+        m_chart->dataProxy()->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
         // Set up sample space
         m_chart->setDataWindow(m_rowCount, m_columnCount);
         // Set selection mode to full
@@ -126,12 +127,11 @@ void ChartModifier::addDataSet()
 
     // Use default data proxy to feed data directly in expected format
     QBarDataProxy *proxy = m_chart->dataProxy();
-    proxy->setItemLabelFormat(celsiusString);
 
     // Add labels
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
-    m_chart->valueAxis()->setTitle("Average temperature (" + celsiusString + ")");
+    m_chart->valueAxis()->setTitle("Average temperature");
     m_chart->rowAxis()->setCategoryLabels(years);
     m_chart->columnAxis()->setCategoryLabels(months);
     m_chart->valueAxis()->setSegmentCount(m_segments);
@@ -160,6 +160,7 @@ void ChartModifier::addDataSet()
 
     // Add data to chart (chart assumes ownership)
     proxy->resetArray(dataSet);
+    proxy->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
 }
 
 void ChartModifier::addRow()

@@ -84,7 +84,7 @@ public:
                    LabelPosition position = LabelOver,
                    Qt::AlignmentFlag alignment = Qt::AlignCenter);
 
-    void generateLabelTexture(AbstractRenderItem *item);
+    void generateSelectionLabelTexture(AbstractRenderItem *item);
     void generateLabelItem(LabelItem &item, const QString &text);
 
 Q_SIGNALS:

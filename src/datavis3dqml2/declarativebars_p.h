@@ -68,6 +68,7 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(int rows READ rows WRITE setRows)
     Q_PROPERTY(int columns READ columns WRITE setColumns)
+    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
@@ -176,6 +177,9 @@ public:
 
     int columns() const;
     void setColumns(int columns);
+
+    void setItemLabelFormat(const QString &format);
+    QString itemLabelFormat();
 
 public slots:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.

@@ -55,7 +55,6 @@ public:
 
 private:
     QScatterDataArray *m_dataArray;
-    QString m_itemLabelFormat;
 
     friend class QScatterDataProxy;
 };

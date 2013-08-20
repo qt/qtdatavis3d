@@ -51,8 +51,6 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-//#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
-
 const GLfloat gridLineWidth = 0.005f;
 GLfloat distanceMod = 0.0f;
 static QVector3D skipColor = QVector3D(255, 255, 255); // Selection texture's background color
@@ -827,7 +825,7 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             m_drawer->generateLabelTexture(item);
         }
     }*/ else {
-        // Print value of selected bar
+        // Draw the selection label
         m_labelShader->bind();
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
@@ -835,35 +833,20 @@ void Maps3DController::drawScene(const GLuint defaultFboHandle)
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
-#ifndef DISPLAY_FULL_DATA_ON_SELECTION
-        // Draw just the value string of the selected bar
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels) {
-            m_drawer->generateLabelTexture(m_selectedBar);
+
+        LabelItem &labelItem = m_selectedBar->selectionLabelItem();
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
+            m_drawer->generateLabelItem(labelItem, m_selectedBar->selectionLabel());
             m_previouslySelectedBar = m_selectedBar;
         }
 
-        m_drawer->drawLabel(*m_selectedBar, m_selectedBar->labelItem(),
+        m_drawer->drawLabel(*m_selectedBar, labelItem,
                             viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
                             m_selectionMode, m_labelShader,
                             m_labelObj, m_camera, true);
-#else
-        // Draw the value string followed by row label and column label
-        LabelItem &labelItem = m_selectedBar->selectionLabel();
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
-            QString labelText = m_selectedBar->label();
-            // TODO More elaborate label?
-            m_drawer->generateLabelItem(&labelItem, labelText);
-            m_previouslySelectedBar = m_selectedBar;
-        }
 
-        m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
-                            m_selectionMode, m_labelShader,
-                            m_labelObj, true, false);
-#endif
         glDisable(GL_TEXTURE_2D);
         if (m_labelTransparency > QDataVis::TransparencyNone)
             glDisable(GL_BLEND);

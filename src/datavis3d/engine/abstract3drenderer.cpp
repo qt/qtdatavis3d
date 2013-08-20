@@ -77,6 +77,8 @@ void Abstract3DRenderer::initializeOpenGL()
 
 void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
+    Q_UNUSED(camera)
+
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
     if (m_isFirstFrame) {
@@ -104,6 +106,16 @@ void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHan
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+QString Abstract3DRenderer::generateValueLabel(const QString &format, qreal value)
+{
+    QString valueLabelFormat = format;
+    if (valueLabelFormat.isEmpty())
+        valueLabelFormat = Utils::defaultLabelFormat();
+    Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
+    QByteArray valueFormatArray = valueLabelFormat.toUtf8();
+    return Utils::formatLabel(valueFormatArray, valueParamType, value);
 }
 
 void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
@@ -266,6 +278,11 @@ void Abstract3DRenderer::updateAxisSegmentCount(QAbstractAxis::AxisOrientation o
 void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count)
 {
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
+}
+
+void Abstract3DRenderer::updateAxisLabelFormat(QAbstractAxis::AxisOrientation orientation, const QString &format)
+{
+    axisCacheForOrientation(orientation).setLabelFormat(format);
 }
 
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation)

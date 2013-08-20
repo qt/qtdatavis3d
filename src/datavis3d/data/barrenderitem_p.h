@@ -53,16 +53,23 @@ public:
     inline void setHeight(GLfloat height) { m_height = height; }
     inline GLfloat height() const { return m_height; }
 
+    // Label item for formatted label
+    LabelItem &sliceLabelItem();
+
+    // Formatted label for item.
+    void setSliceLabel(const QString &label);
+    QString &sliceLabel(); // Formats label if not previously formatted
+
     // TODO should be in abstract, but currently there is no abstract renderer
     inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
 
 protected:
-    virtual void formatLabel();
-
     Bars3dRenderer *m_renderer;
     qreal m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;
+    QString m_sliceLabel;
+    LabelItem *m_sliceLabelItem;
 
     friend class QBarDataItem;
 };
@@ -71,8 +78,11 @@ void BarRenderItem::setValue(qreal value)
 {
     if (m_value != value) {
         m_value = value;
-        if (!m_label.isNull())
-            setLabel(QString()); // Forces reformatting on next access
+         // Force reformatting on next access by setting label string to null string
+        if (!m_sliceLabel.isNull())
+            setSliceLabel(QString());
+        if (!m_selectionLabel.isNull())
+            setSelectionLabel(QString());
     }
 }
 

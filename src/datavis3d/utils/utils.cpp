@@ -278,8 +278,14 @@ QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal 
     case ParamTypeReal:
         return QString().sprintf(format, value);
     default:
-        return QString::number(value);
+        return QString::fromUtf8(format); // To detect errors
     }
+}
+
+QString Utils::defaultLabelFormat()
+{
+    static const QString defaultFormat(QStringLiteral("%.2f"));
+    return defaultFormat;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

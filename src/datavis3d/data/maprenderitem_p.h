@@ -53,8 +53,6 @@ public:
     inline void setRenderer(Maps3DController *renderer) { m_renderer = renderer; }
 
 protected:
-    virtual void formatLabel();
-
     Maps3DController *m_renderer;
     QPointF m_mapPosition;
     QString m_itemLabel; // from QMapDataItem::label() - unformatted item label

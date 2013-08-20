@@ -308,7 +308,7 @@ void QValueAxisPrivate::updateLabels()
 
     QString formatString(m_labelFormat);
     if (formatString.isEmpty())
-        formatString = QStringLiteral("%.2f");
+        formatString = Utils::defaultLabelFormat();
 
     Utils::ParamType paramType = Utils::findFormatParamType(formatString);
     QByteArray formatArray = formatString.toUtf8();
