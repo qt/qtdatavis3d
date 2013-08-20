@@ -65,7 +65,7 @@ void ScatterDataModifier::addData()
     dataArray->resize(numberOfItems);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
 
-#if RANDOM_SCATTER
+#ifdef RANDOM_SCATTER
     for (int i = 0; i < numberOfItems; i++) {
         ptrToDataArray->setPosition(randVector());
         ptrToDataArray++;

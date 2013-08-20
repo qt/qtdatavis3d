@@ -331,8 +331,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // Draw bars to depth buffer
         for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
             const ScatterRenderItem &item = m_renderItemArray.at(bar);
-            if (!item.value())
-                continue;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -419,8 +417,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         GLint barIdxBlue = 0;
         for (int bar = 0; bar < m_renderItemArray.size(); bar++, barIdxRed++) {
             const ScatterRenderItem &item = m_renderItemArray.at(bar);
-            if (!item.value())
-                continue;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -522,8 +518,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     bool barSelectionFound = false;
     for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
         ScatterRenderItem &item = m_renderItemArray[bar];
-        if (!item.value())
-            continue;
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
