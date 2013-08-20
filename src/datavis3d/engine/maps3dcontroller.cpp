@@ -94,7 +94,7 @@ Maps3DController::Maps3DController(const QRect &rect)
       m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(new Drawer(*m_theme, m_font, m_labelTransparency)),
-      m_areaSize(QSizeF(1.0f, 1.0f)),
+      m_areaSize(QSizeF(1.0, 1.0)),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),

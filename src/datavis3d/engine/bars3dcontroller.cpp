@@ -39,7 +39,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_isSlicingActivated(false),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
-      m_barSpacing(QSizeF(1.0f, 1.0f)),
+      m_barSpacing(QSizeF(1.0, 1.0)),
       m_renderer(0),
       m_data(0)
 {

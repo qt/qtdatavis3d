@@ -72,7 +72,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
 {
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_chart->setBarSpecs(1.0, QSizeF(0.2f, 0.2f));
+    m_chart->setBarSpecs(1.0, QSizeF(0.2, 0.2));
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide

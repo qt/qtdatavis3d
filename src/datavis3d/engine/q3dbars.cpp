@@ -476,7 +476,7 @@ QBarDataProxy *Q3DBars::dataProxy()
 /*!
  * \fn void Q3DBars::shadowQualityChanged(QDataVis::ShadowQuality quality)
  *
- * This signal is emitted when shadow quality changes.
+ * This signal is emitted when shadow \a quality changes.
  */
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

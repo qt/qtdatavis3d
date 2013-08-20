@@ -143,7 +143,7 @@ protected:
 
 public slots:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
-                        QSizeF spacing = QSizeF(1.0f, 1.0f),
+                        QSizeF spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
     void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
