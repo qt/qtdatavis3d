@@ -19,36 +19,37 @@
 /*!
     \namespace QtDataVis3D
     \inmodule QtDataVis3D
-    \target QtDataVis3D Namespace
-
-    \brief The QtDataVis3D namespace contains miscellaneous identifiers
-    used throughout the QtDataVis3D library.
+    \target QtDataVis3D Enums
 */
 
 /*!
-    \enum QtDataVis3D::BarStyle
+    \enum QtDataVis3D::QDataVis::MeshStyle
 
-    Predefined bar types.
+    Predefined mesh types. All styles are not usable with all visualization types.
 
     \value Bars
            Basic cubic bar.
     \value Pyramids
-           Four -sided pyramid.
+           Four-sided pyramid.
     \value Cones
            Basic cone.
     \value Cylinders
            Basic cylinder.
     \value BevelBars
-           Slilghtly beveled (rounded) cubic bar.
+           Slightly beveled (rounded) cubic bar.
     \value Spheres
            Sphere. Not usable in Q3DBars.
+    \value Dots
+           Triangular pyramid. Usable only with Q3DScatter.
 */
 
 /*!
-    \enum QtDataVis3D::CameraPreset
+    \enum QtDataVis3D::QDataVis::CameraPreset
 
     Predefined positions for camera.
 
+    \value NoPreset
+           Used only in QML to indicate a preset has not been set.
     \value PresetFrontLow
     \value PresetFront
     \value PresetFrontHigh
@@ -69,8 +70,8 @@
     \value PresetDirectlyAboveCW45
     \value PresetDirectlyAboveCCW45
     \value PresetFrontBelow
-           From PresetFrontBelow onward these only  work for graphs including negative values.
-           They act as Preset...Low for positive-only values.
+           In Q3DBars from PresetFrontBelow onward these only work for graphs including negative
+           values. They act as Preset...Low for positive-only values.
     \value PresetLeftBelow
     \value PresetRightBelow
     \value PresetBehindBelow
@@ -79,10 +80,12 @@
 */
 
 /*!
-    \enum QtDataVis3D::ColorTheme
+    \enum QtDataVis3D::QDataVis::ColorTheme
 
     Predefined color themes.
 
+    \value ThemeDefault
+           Used only in QML to indicate a theme has not been set.
     \value ThemeSystem
     \value ThemeBlueCerulean
     \value ThemeBlueIcy
@@ -94,48 +97,33 @@
 */
 
 /*!
-    \enum QtDataVis3D::LabelPosition
+    \enum QtDataVis3D::QDataVis::SelectionMode
 
-    Predefined positions for labels.
-
-    \value LabelBelow
-    \value LabelLow
-    \value LabelMid
-    \value LabelHigh
-    \value LabelOver
-    \value LabelBottom
-    \value LabelTop
-    \value LabelLeft
-    \value LabelRight
-*/
-
-/*!
-    \enum QtDataVis3D::SelectionMode
-
-    Bar selection modes.
+    Item selection modes.
 
     \value ModeNone
            Selection mode disabled.
-    \value ModeBar
-           Selection selects a single bar.
-    \value ModeBarAndRow
-           Selection selects a single bar and highlights the row it is on.
-    \value ModeBarAndColumn
-           Selection selects a single bar and highlights the column it is on.
-    \value ModeBarRowAndColumn
-           Selection selects a single bar and highlights the row and the column it is on.
-    \value ModeZoomRow
-           Selection selects a single bar and displays the row it is on in a separate view. The
+    \value ModeItem
+           Selection selects a single item.
+    \value ModeItemAndRow
+           Selection selects a single item and highlights the row it is on. In Q3DBars only.
+    \value ModeItemAndColumn
+           Selection selects a single item and highlights the column it is on. In Q3DBars only.
+    \value ModeItemRowAndColumn
+           Selection selects a single item and highlights the row and the column it is on. In
+           Q3DBars only.
+    \value ModeSliceRow
+           Selection selects a single item and displays the row it is on in a separate view. The
            original view is shrunk into upper left corner. Original view is restored by clicking
-           on it.
-    \value ModeZoomColumn
-           Selection selects a single bar and displays the column it is on in a separate view. The
+           on it. In Q3DBars only.
+    \value ModeSliceColumn
+           Selection selects a single item and displays the column it is on in a separate view. The
            original view is shrunk into upper left corner. Original view is restored by clicking
-           on it.
+           on it. In Q3DBars only.
 */
 
 /*!
-    \enum QtDataVis3D::ShadowQuality
+    \enum QtDataVis3D::QDataVis::ShadowQuality
 
     Quality of shadows.
 
@@ -150,7 +138,7 @@
 */
 
 /*!
-    \enum QtDataVis3D::LabelTransparency
+    \enum QtDataVis3D::QDataVis::LabelTransparency
 
     Label transparencies.
 

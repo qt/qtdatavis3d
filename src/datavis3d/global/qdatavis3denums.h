@@ -22,7 +22,8 @@
 #include <QtDataVis3D/qdatavis3dglobal.h>
 #include <QObject>
 
-QT_DATAVIS3D_BEGIN_NAMESPACE
+// namespace must be declared without using macros for qdoc
+namespace QtDataVis3D {
 
 class QT_DATAVIS3D_EXPORT QDataVis : public QObject
 {
@@ -109,7 +110,6 @@ public:
         TransparencyNoBackground    // Draw just text on transparent background
     };
 };
-
-QT_DATAVIS3D_END_NAMESPACE
+}
 
 #endif
