@@ -83,8 +83,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_scaleFactor(0),
       m_selection(selectionSkipColor),
       m_areaSize(QSizeF(0.0, 0.0)),
-      m_hasHeightAdjustmentChanged(true),
-      m_dotSizeScale(1.0f)
+      m_dotSizeScale(1.0f),
+      m_hasHeightAdjustmentChanged(true)
 {
     //qDebug() << __FUNCTION__;
     m_dummyRenderItem.setRenderer(this);

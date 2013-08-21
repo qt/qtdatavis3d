@@ -86,23 +86,23 @@ void QItemModelScatterDataProxyPrivate::setItemModel(QAbstractItemModel *itemMod
     m_itemModel = itemModel;
 
     if (!m_itemModel.isNull()) {
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsInserted, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsInserted, this,
                          &QItemModelScatterDataProxyPrivate::handleColumnsInserted);
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsMoved, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsMoved, this,
                          &QItemModelScatterDataProxyPrivate::handleColumnsMoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsRemoved, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsRemoved, this,
                          &QItemModelScatterDataProxyPrivate::handleColumnsRemoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::dataChanged, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::dataChanged, this,
                          &QItemModelScatterDataProxyPrivate::handleDataChanged);
-        QObject::connect(m_itemModel, &QAbstractItemModel::layoutChanged, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::layoutChanged, this,
                          &QItemModelScatterDataProxyPrivate::handleLayoutChanged);
-        QObject::connect(m_itemModel, &QAbstractItemModel::modelReset, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::modelReset, this,
                          &QItemModelScatterDataProxyPrivate::handleModelReset);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsInserted, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsInserted, this,
                          &QItemModelScatterDataProxyPrivate::handleRowsInserted);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsMoved, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsMoved, this,
                          &QItemModelScatterDataProxyPrivate::handleRowsMoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsRemoved, this,
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsRemoved, this,
                          &QItemModelScatterDataProxyPrivate::handleRowsRemoved);
     }
     if (!m_resolveTimer.isActive())

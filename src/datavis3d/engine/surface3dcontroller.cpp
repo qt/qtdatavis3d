@@ -29,12 +29,12 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Surface3dController::Surface3dController(QRect rect)
     : Abstract3DController(rect),
-      m_mouseState(MouseNone),
-      m_mousePos(QPoint(0, 0)),
       m_renderer(0),
       m_isInitialized(false),
       m_smoothSurface(false),
-      m_surfaceGrid(true)
+      m_surfaceGrid(true),
+      m_mouseState(MouseNone),
+      m_mousePos(QPoint(0, 0))
 {
 }
 
@@ -120,9 +120,11 @@ bool Surface3dController::surfaceGrid()
 #if defined(Q_OS_ANDROID)
 void Surface3dController::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
 }
 void touchEvent(QTouchEvent *event)
 {
+    Q_UNUSED(event)
 }
 #endif
 

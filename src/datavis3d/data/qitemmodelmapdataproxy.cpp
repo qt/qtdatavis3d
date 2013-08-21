@@ -70,7 +70,8 @@ QItemModelMapDataProxyPrivate::QItemModelMapDataProxyPrivate(QItemModelMapDataPr
       resolvePending(0)
 {
     m_resolveTimer.setSingleShot(true);
-    QObject::connect(&m_resolveTimer, &QTimer::timeout, this, &QItemModelMapDataProxyPrivate::handlePendingResolve);
+    QObject::connect(&m_resolveTimer, &QTimer::timeout,
+                     this, &QItemModelMapDataProxyPrivate::handlePendingResolve);
 }
 
 QItemModelMapDataProxyPrivate::~QItemModelMapDataProxyPrivate()
@@ -85,15 +86,24 @@ void QItemModelMapDataProxyPrivate::setItemModel(QAbstractItemModel *itemModel)
     m_itemModel = itemModel;
 
     if (!m_itemModel.isNull()) {
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsInserted, this, &QItemModelMapDataProxyPrivate::handleColumnsInserted);
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsMoved, this, &QItemModelMapDataProxyPrivate::handleColumnsMoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::columnsRemoved, this, &QItemModelMapDataProxyPrivate::handleColumnsRemoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::dataChanged, this, &QItemModelMapDataProxyPrivate::handleDataChanged);
-        QObject::connect(m_itemModel, &QAbstractItemModel::layoutChanged, this, &QItemModelMapDataProxyPrivate::handleLayoutChanged);
-        QObject::connect(m_itemModel, &QAbstractItemModel::modelReset, this, &QItemModelMapDataProxyPrivate::handleModelReset);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsInserted, this, &QItemModelMapDataProxyPrivate::handleRowsInserted);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsMoved, this, &QItemModelMapDataProxyPrivate::handleRowsMoved);
-        QObject::connect(m_itemModel, &QAbstractItemModel::rowsRemoved, this, &QItemModelMapDataProxyPrivate::handleRowsRemoved);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsInserted,
+                         this, &QItemModelMapDataProxyPrivate::handleColumnsInserted);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsMoved,
+                         this, &QItemModelMapDataProxyPrivate::handleColumnsMoved);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsRemoved,
+                         this, &QItemModelMapDataProxyPrivate::handleColumnsRemoved);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::dataChanged,
+                         this, &QItemModelMapDataProxyPrivate::handleDataChanged);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::layoutChanged,
+                         this, &QItemModelMapDataProxyPrivate::handleLayoutChanged);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::modelReset,
+                         this, &QItemModelMapDataProxyPrivate::handleModelReset);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsInserted,
+                         this, &QItemModelMapDataProxyPrivate::handleRowsInserted);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsMoved,
+                         this, &QItemModelMapDataProxyPrivate::handleRowsMoved);
+        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsRemoved,
+                         this, &QItemModelMapDataProxyPrivate::handleRowsRemoved);
     }
     if (!m_resolveTimer.isActive())
         m_resolveTimer.start(0);
@@ -101,19 +111,24 @@ void QItemModelMapDataProxyPrivate::setItemModel(QAbstractItemModel *itemModel)
 
 void QItemModelMapDataProxyPrivate::setMapping(QItemModelMapDataMapping *mapping)
 {
-    if (!m_mapping.isNull())
-        QObject::disconnect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged, this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
+    if (!m_mapping.isNull()) {
+        QObject::disconnect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged,
+                            this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
+    }
 
     m_mapping = mapping;
 
-    if (!m_mapping.isNull())
-        QObject::connect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged, this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
+    if (!m_mapping.isNull()) {
+        QObject::connect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged,
+                         this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
+    }
 
     if (!m_resolveTimer.isActive())
         m_resolveTimer.start(0);
 }
 
-void QItemModelMapDataProxyPrivate::handleColumnsInserted(const QModelIndex &parent, int start, int end)
+void QItemModelMapDataProxyPrivate::handleColumnsInserted(const QModelIndex &parent,
+                                                          int start, int end)
 {
     Q_UNUSED(parent)
     Q_UNUSED(start)
@@ -124,7 +139,11 @@ void QItemModelMapDataProxyPrivate::handleColumnsInserted(const QModelIndex &par
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationColumn)
+void QItemModelMapDataProxyPrivate::handleColumnsMoved(const QModelIndex &sourceParent,
+                                                       int sourceStart,
+                                                       int sourceEnd,
+                                                       const QModelIndex &destinationParent,
+                                                       int destinationColumn)
 {
     Q_UNUSED(sourceParent)
     Q_UNUSED(sourceStart)
@@ -137,7 +156,8 @@ void QItemModelMapDataProxyPrivate::handleColumnsMoved(const QModelIndex &source
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleColumnsRemoved(const QModelIndex &parent, int start, int end)
+void QItemModelMapDataProxyPrivate::handleColumnsRemoved(const QModelIndex &parent,
+                                                         int start, int end)
 {
     Q_UNUSED(parent)
     Q_UNUSED(start)
@@ -148,7 +168,9 @@ void QItemModelMapDataProxyPrivate::handleColumnsRemoved(const QModelIndex &pare
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void QItemModelMapDataProxyPrivate::handleDataChanged(const QModelIndex &topLeft,
+                                                      const QModelIndex &bottomRight,
+                                                      const QVector<int> &roles)
 {
     Q_UNUSED(topLeft)
     Q_UNUSED(bottomRight)
@@ -159,7 +181,8 @@ void QItemModelMapDataProxyPrivate::handleDataChanged(const QModelIndex &topLeft
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleLayoutChanged(const QList<QPersistentModelIndex> &parents, QAbstractItemModel::LayoutChangeHint hint)
+void QItemModelMapDataProxyPrivate::handleLayoutChanged(const QList<QPersistentModelIndex> &parents,
+                                                        QAbstractItemModel::LayoutChangeHint hint)
 {
     Q_UNUSED(parents)
     Q_UNUSED(hint)
@@ -176,7 +199,8 @@ void QItemModelMapDataProxyPrivate::handleModelReset()
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleRowsInserted(const QModelIndex &parent, int start, int end)
+void QItemModelMapDataProxyPrivate::handleRowsInserted(const QModelIndex &parent,
+                                                       int start, int end)
 {
     Q_UNUSED(parent)
     Q_UNUSED(start)
@@ -187,7 +211,11 @@ void QItemModelMapDataProxyPrivate::handleRowsInserted(const QModelIndex &parent
         m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
 }
 
-void QItemModelMapDataProxyPrivate::handleRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destinationParent, int destinationRow)
+void QItemModelMapDataProxyPrivate::handleRowsMoved(const QModelIndex &sourceParent,
+                                                    int sourceStart,
+                                                    int sourceEnd,
+                                                    const QModelIndex &destinationParent,
+                                                    int destinationRow)
 {
     Q_UNUSED(sourceParent)
     Q_UNUSED(sourceStart)

@@ -43,9 +43,11 @@ void Q3DSurface::render()
 #if defined(Q_OS_ANDROID)
 void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event)
 }
 void Q3DSurface::touchEvent(QTouchEvent *event)
 {
+    Q_UNUSED(event)
 }
 #endif
 
@@ -152,8 +154,9 @@ void Q3DSurface::showData() const
 /////////////////// PRIVATE ///////////////////////////////////
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Surface3dController(rect))
+    : m_shared(new Surface3dController(rect)),
+      q_ptr(q)
+
 {
 }
 

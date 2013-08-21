@@ -186,8 +186,8 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     QSize textureSize = labelItem.size();
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
-    GLfloat xPosition;
-    GLfloat yPosition;
+    GLfloat xPosition = 0.0f;
+    GLfloat yPosition = 0.0f;
     GLfloat zPosition = positionComp.z();
 
     switch (position) {
