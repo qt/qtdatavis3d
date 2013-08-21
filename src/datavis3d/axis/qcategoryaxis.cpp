@@ -21,15 +21,40 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QCategoryAxis
+ * \inmodule QtDataVis3D
+ * \brief The QCategoryAxis class is used for manipulating an axis of a graph.
+ * \since 1.0.0
+ *
+ * QCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
+ * categories based on \l {Q3DBars::setDataWindow()}{data window} size.
+ *
+ * Grid lines are drawn between categories, if visible. Labels are drawn to positions of categories
+ * if provided.
+ */
+
+/*!
+ * Constructs QCategoryAxis.
+ */
 QCategoryAxis::QCategoryAxis() :
     QAbstractAxis(new QCategoryAxisPrivate(this))
 {
 }
 
+/*!
+ * Destroys QCategoryAxis.
+ */
 QCategoryAxis::~QCategoryAxis()
 {
 }
 
+/*!
+ * \property QCategoryAxis::categoryLabels
+ *
+ * Defines labels for axis applied to categories. If there are fewer labels than categories, the
+ * remaining ones do not have a label.
+ */
 QStringList QCategoryAxis::categoryLabels() const
 {
     return labels();
@@ -43,6 +68,9 @@ void QCategoryAxis::setCategoryLabels(const QStringList &labels)
     }
 }
 
+/*!
+ * \internal
+ */
 QCategoryAxisPrivate *QCategoryAxis::dptr()
 {
     return static_cast<QCategoryAxisPrivate *>(d_ptr.data());

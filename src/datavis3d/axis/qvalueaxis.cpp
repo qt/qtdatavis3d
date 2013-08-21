@@ -22,27 +22,65 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QValueAxis
+ * \inmodule QtDataVis3D
+ * \brief The QValueAxis class is used for manipulating an axis of a graph.
+ * \since 1.0.0
+ *
+ * QValueAxis provides an axis that can be given a range of values and segment and subsegment
+ * counts to divide the range into.
+ *
+ * Labels are drawn between each segment. Grid lines are drawn between each segment and each
+ * subsegment. \note If visible, there will always be at least two grid lines and labels indicating
+ * the minimum and the maximum values of the range, as there is always at least one segment.
+ */
+
+/*!
+ * Constructs QValueAxis.
+ */
 QValueAxis::QValueAxis() :
     QAbstractAxis(new QValueAxisPrivate(this))
 {
 }
 
+/*!
+ * Destroys QValueAxis.
+ */
 QValueAxis::~QValueAxis()
 {
 }
 
+/*!
+ * Sets value range of the axis from \a min to \a max.
+ * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
+ */
 void QValueAxis::setRange(qreal min, qreal max)
 {
     dptr()->setRange(min, max);
     setAutoAdjustRange(false);
 }
 
+/*!
+ * \property QValueAxis::min
+ *
+ * Defines the minimum value on the axis.
+ * When setting this property the max is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
 void QValueAxis::setMin(qreal min)
 {
     dptr()->setMin(min);
     setAutoAdjustRange(false);
 }
 
+/*!
+ * \property QValueAxis::max
+ *
+ * Defines the maximum value on the axis.
+ * When setting this property the min is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
 void QValueAxis::setMax(qreal max)
 {
     dptr()->setMax(max);
@@ -59,6 +97,15 @@ qreal QValueAxis::max() const
     return dptrc()->m_max;
 }
 
+/*!
+ * \property QValueAxis::segmentCount
+ *
+ * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
+ * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
+ * The preset default is \c 5, and it can not be below \c 1.
+ *
+ * \sa setSubSegmentCount()
+ */
 void QValueAxis::setSegmentCount(int count)
 {
     if (count <= 0) {
@@ -78,6 +125,15 @@ int QValueAxis::segmentCount() const
     return dptrc()->m_segmentCount;
 }
 
+/*!
+ * \property QValueAxis::subSegmentCount
+ *
+ * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
+ * each subsegment, in addition to each segment.
+ * The preset default is \c 1, and it can not be below \c 1.
+ *
+ * \sa setSegmentCount()
+ **/
 void QValueAxis::setSubSegmentCount(int count)
 {
     if (count <= 0) {
@@ -96,6 +152,14 @@ int QValueAxis::subSegmentCount() const
     return dptrc()->m_subSegmentCount;
 }
 
+/*!
+ * \property QValueAxis::autoAdjustRange
+ *
+ * Tells the axis to automatically calculate the range instead of setting range or adjusting min or
+ * max property.
+ *
+ * \sa setRange(), setMin(), setMax()
+ */
 void QValueAxis::setAutoAdjustRange(bool autoAdjust)
 {
     if (dptr()->m_autoAdjust != autoAdjust) {
@@ -109,6 +173,16 @@ bool QValueAxis::isAutoAdjustRange() const
     return dptrc()->m_autoAdjust;
 }
 
+/*!
+ * \property QValueAxis::labelFormat
+ *
+ * Defines the label format to be used for the labels on this axis. Supported specifiers are:
+ * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
+ *
+ * Usage example:
+ *
+ * \c {axis->setLabelFormat("%.2f mm");}
+ */
 void QValueAxis::setLabelFormat(const QString &format)
 {
     if (dptr()->m_labelFormat != format) {
@@ -123,11 +197,17 @@ QString QValueAxis::labelFormat() const
     return dptrc()->m_labelFormat;
 }
 
+/*!
+ * \internal
+ */
 QValueAxisPrivate *QValueAxis::dptr()
 {
     return static_cast<QValueAxisPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QValueAxisPrivate *QValueAxis::dptrc() const
 {
     return static_cast<const QValueAxisPrivate *>(d_ptr.data());
