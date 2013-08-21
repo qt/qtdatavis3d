@@ -93,8 +93,8 @@ public:
         ModeItemAndRow,         // From here onwards used for Q3DBars only
         ModeItemAndColumn,
         ModeItemRowAndColumn,
-        ModeZoomRow,
-        ModeZoomColumn
+        ModeSliceRow,
+        ModeSliceColumn
     };
 
     enum ShadowQuality {

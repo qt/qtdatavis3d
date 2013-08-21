@@ -90,7 +90,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
 #else
     // Set selection mode to zoom row
-    m_chart->setSelectionMode(QDataVis::ModeZoomRow);
+    m_chart->setSelectionMode(QDataVis::ModeSliceRow);
     m_chart->setFont(QFont("Courier", 25));
 #endif
 

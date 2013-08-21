@@ -69,7 +69,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
 
     // Set selection mode to bar and column
     //m_chart->setSelectionMode(ModeItemAndColumn);
-    m_chart->setSelectionMode(QDataVis::ModeZoomColumn);
+    m_chart->setSelectionMode(QDataVis::ModeSliceColumn);
 
     // Set theme
     m_chart->setTheme(QDataVis::ThemeBlueNcs);

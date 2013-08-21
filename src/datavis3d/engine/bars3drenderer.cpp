@@ -243,7 +243,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
     QVector3D sliceLightPos = defaultLightPos;
     sliceLightPos.setY(-15.0f);
-    if (QDataVis::ModeZoomColumn == m_cachedSelectionMode)
+    if (QDataVis::ModeSliceColumn == m_cachedSelectionMode)
         lightPos = camera->calculateLightPosition(sliceLightPos, -85.0f);
     else
         lightPos = camera->calculateLightPosition(sliceLightPos, 5.0f);
@@ -269,7 +269,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
         QMatrix4x4 itModelMatrix;
 
         GLfloat barPosY = item->translation().y() - m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
-        if (QDataVis::ModeZoomRow == m_cachedSelectionMode)
+        if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
             barPosX = item->translation().x();
         else
             barPosX = -(item->translation().z() - zComp); // flip z; frontmost bar to the left
@@ -319,7 +319,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     // Draw labels for axes
     BarRenderItem *dummyItem(0);
     const LabelItem &sliceSelectionLabel = *m_sliceTitleItem;
-    if (QDataVis::ModeZoomRow == m_cachedSelectionMode) {
+    if (QDataVis::ModeSliceRow == m_cachedSelectionMode) {
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
@@ -764,7 +764,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                         m_selectedBar->setPosition(QPoint(row, bar));
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         barSelectionFound = true;
-                        if (m_cachedSelectionMode >= QDataVis::ModeZoomRow) {
+                        if (m_cachedSelectionMode >= QDataVis::ModeSliceRow) {
                             item.setTranslation(modelMatrix.column(3).toVector3D());
                             m_sliceSelection->append(&item);
                         }
@@ -775,7 +775,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
-                    if (!m_cachedIsSlicingActivated && QDataVis::ModeZoomRow == m_cachedSelectionMode) {
+                    if (!m_cachedIsSlicingActivated && QDataVis::ModeSliceRow == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->append(&item);
                         if (!m_sliceCache) {
@@ -792,7 +792,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     if (!m_cachedIsSlicingActivated
-                            && QDataVis::ModeZoomColumn == m_cachedSelectionMode) {
+                            && QDataVis::ModeSliceColumn == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         m_sliceSelection->append(&item);
                         if (!m_sliceCache) {
@@ -1159,7 +1159,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         if (m_cachedIsSlicingActivated
                 && Bars3dController::MouseOnOverview == m_controller->mouseState())
             m_controller->setSlicingActive(false);
-    } else if (m_cachedSelectionMode >= QDataVis::ModeZoomRow
+    } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow
                && Bars3dController::MouseOnScene == m_controller->mouseState()) {
         // Activate slice mode
         m_controller->setSlicingActive(true);
@@ -1496,9 +1496,9 @@ void Bars3dRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
     Abstract3DRenderer::updateSelectionMode(mode);
 
     // Create zoom selection if there isn't one
-    if (mode >= QDataVis::ModeZoomRow && !m_sliceSelection) {
+    if (mode >= QDataVis::ModeSliceRow && !m_sliceSelection) {
         m_sliceSelection = new QList<BarRenderItem *>;
-        if (mode == QDataVis::ModeZoomRow)
+        if (mode == QDataVis::ModeSliceRow)
             m_sliceSelection->reserve(m_cachedRowCount);
         else
             m_sliceSelection->reserve(m_cachedColumnCount);
@@ -1637,12 +1637,12 @@ Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
     }
     else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::ModeItemAndColumn
                                                 || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::ModeZoomColumn)) {
+                                                || m_cachedSelectionMode == QDataVis::ModeSliceColumn)) {
         isSelectedType = Bars3dController::SelectionColumn;
     }
     else if (current.x() == m_selection.x() && (m_cachedSelectionMode == QDataVis::ModeItemAndRow
                                                 || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::ModeZoomRow)) {
+                                                || m_cachedSelectionMode == QDataVis::ModeSliceRow)) {
         isSelectedType = Bars3dController::SelectionRow;
     }
     return isSelectedType;

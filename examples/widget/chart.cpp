@@ -76,7 +76,7 @@ void ChartModifier::restart(bool dynamicData)
     if (m_static) {
         start();
         // Set selection mode to zoom row
-        m_chart->setSelectionMode(QDataVis::ModeZoomRow);
+        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
         m_chart->setFont(QFont("Times Roman", 20));
     } else {
         m_chart->dataProxy()->resetArray(0);
@@ -324,7 +324,7 @@ void ChartModifier::changeSelectionMode()
 
     m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 
-    if (++selectionMode > QDataVis::ModeZoomColumn)
+    if (++selectionMode > QDataVis::ModeSliceColumn)
         selectionMode = QDataVis::ModeNone;
 }
 
