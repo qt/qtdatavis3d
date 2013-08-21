@@ -157,7 +157,7 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
         calculateTranslation(m_renderItemArray[i]);
         m_renderItemArray[i].setRenderer(this);
     }
-    m_dotSizeScale = (GLfloat)qBound(0.01, (qreal)(2.0f / qSqrt((qreal)dataSize)), 0.1);
+    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)dataSize)), 0.1);
 
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
