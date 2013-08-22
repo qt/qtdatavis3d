@@ -61,10 +61,12 @@ public:
     void setSampleCountZ(int samples);
     void start();
     void restart(bool dynamicData);
+    void selectBar();
 
 public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void handleSelectionChange(const QPoint &position);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -86,6 +88,7 @@ private:
     qreal m_maxval;
     QStringList m_genericRowLabels;
     QStringList m_genericColumnLabels;
+    QPoint m_selectedBarPos;
 };
 
 #endif

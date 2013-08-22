@@ -40,7 +40,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_segments(4),
       m_subSegments(3),
       m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
-      m_maxval(20.0)
+      m_maxval(20.0),
+      m_selectedBarPos(-1, -1)
 {
     // Don't set any styles or specifications, start from defaults
     // Generate generic labels
@@ -84,7 +85,7 @@ void ChartModifier::restart(bool dynamicData)
         // Set up sample space
         m_chart->setDataWindow(m_rowCount, m_columnCount);
         // Set selection mode to full
-        m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
+        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
         m_chart->valueAxis()->setSegmentCount(m_segments * 2);
         m_chart->valueAxis()->setSubSegmentCount(1);
         m_chart->valueAxis()->setAutoAdjustRange(true);
@@ -100,6 +101,16 @@ void ChartModifier::restart(bool dynamicData)
         if (m_chart->columnAxis()->labels().size() < m_rowCount)
             m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
     }
+}
+
+void ChartModifier::selectBar()
+{
+    QPoint targetBar(5, 5);
+    QPoint noSelection(-1, -1);
+    if (m_selectedBarPos != targetBar)
+        m_chart->setSelectedBarPos(targetBar);
+    else
+        m_chart->setSelectedBarPos(noSelection);
 }
 
 void ChartModifier::addDataSet()
@@ -138,6 +149,7 @@ void ChartModifier::addDataSet()
     m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
     m_chart->valueAxis()->setRange(m_minval, m_maxval);
     m_chart->valueAxis()->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
+    m_chart->setSelectionMode(QDataVis::ModeSliceRow);
 
     // Create data rows
     QBarDataArray *dataSet = new QBarDataArray;
@@ -170,7 +182,10 @@ void ChartModifier::addRow()
         (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
         //(*dataRow)[i].setValue(i + m_chart->dataProxy()->rowCount());
     }
-    m_chart->dataProxy()->insertRow(0, dataRow);
+
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = qMax(m_selectedBarPos.x(), 0);
+    m_chart->dataProxy()->insertRow(row, dataRow);
 }
 
 void ChartModifier::addRows()
@@ -184,27 +199,28 @@ void ChartModifier::addRows()
             (*dataRow)[j].setValue(qreal(j + i + m_chart->dataProxy()->rowCount()));
         dataArray.append(dataRow);
     }
-    m_chart->dataProxy()->insertRows(0, dataArray);
+
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = qMax(m_selectedBarPos.x(), 0);
+    m_chart->dataProxy()->insertRows(row, dataArray);
     qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
 void ChartModifier::changeItem()
 {
-    // TODO fix to use actual selected item, for now just assume some row/column are selected
-    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
-    if (row >= 0) {
-        int column = qMin(4, (m_chart->dataProxy()->rowAt(row)->size() - 1));
-        if (column >= 0) {
-            QBarDataItem item(qreal(rand() % 100));
-            m_chart->dataProxy()->setItem(row, column, item);
-        }
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = m_selectedBarPos.x();
+    int column = m_selectedBarPos.y();
+    if (row >= 0 && column >= 0) {
+        QBarDataItem item(qreal(rand() % 100));
+        m_chart->dataProxy()->setItem(row, column, item);
     }
 }
 
 void ChartModifier::changeRow()
 {
-    // TODO fix to use actual selected item, for now just assume some is selected
-    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = m_selectedBarPos.x();
     if (row >= 0) {
         QBarDataRow *newRow = new QBarDataRow(m_chart->dataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
@@ -215,8 +231,8 @@ void ChartModifier::changeRow()
 
 void ChartModifier::changeRows()
 {
-    // TODO fix to use actual selected item, for now just assume some is selected
-    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = m_selectedBarPos.x();
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
         QBarDataArray newArray;
@@ -232,16 +248,16 @@ void ChartModifier::changeRows()
 
 void ChartModifier::removeRow()
 {
-    // TODO fix to use actual selected item, for now just assume some is selected
-    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = m_selectedBarPos.x();
     if (row >= 0)
         m_chart->dataProxy()->removeRows(row, 1);
 }
 
 void ChartModifier::removeRows()
 {
-    // TODO fix to use actual selected item, for now just assume some is selected
-    int row = qMin(4, (m_chart->dataProxy()->rowCount() - 1));
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = m_selectedBarPos.x();
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
         m_chart->dataProxy()->removeRows(startRow, 3);
@@ -320,12 +336,12 @@ void ChartModifier::changeTransparency()
 
 void ChartModifier::changeSelectionMode()
 {
-    static int selectionMode = QDataVis::ModeNone;
-
-    m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
+    static int selectionMode = m_chart->selectionMode();
 
     if (++selectionMode > QDataVis::ModeSliceColumn)
         selectionMode = QDataVis::ModeNone;
+
+    m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 }
 
 void ChartModifier::changeFont(const QFont &font)
@@ -359,6 +375,12 @@ void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 
     // Updates the UI component to show correct shadow quality
     emit shadowQualityChanged(quality);
+}
+
+void ChartModifier::handleSelectionChange(const QPoint &position)
+{
+    m_selectedBarPos = position;
+    qDebug() << "Selected bar position:" << position;
 }
 
 void ChartModifier::changeShadowQuality(int quality)

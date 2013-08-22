@@ -64,10 +64,6 @@ private:
     // TODO: Filter to the set of attributes to be moved to the model object.
     Bars3dController *m_controller;
 
-    // Mutex for sharing resources between render and main threads.
-    // TODO this mutex needs to go, too...
-    QMutex m_mutex;
-
     // Cached state based on emitted signals from the controller
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;
@@ -113,9 +109,7 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
     QVector3D m_selection;
-
-    QPoint m_selectionPointRequest;
-    bool m_isSelectionPointRequestActive;
+    QVector3D m_previousSelection;
 
     bool m_hasHeightAdjustmentChanged;
     BarRenderItem m_dummyBarRenderItem;
@@ -149,17 +143,13 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateBackgroundEnabled(bool enable);
+    void updateSelectedBarPos(QPoint selectedBarPos);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
-    // Requests that upon next render pass the column and row under the given point is inspected for selection.
-    // Only one request can be queued per render pass at this point. New request will override any pending requests.
-    // After inspection the selectionUpdated signal is emitted.
-    virtual void requestSelectionAtPoint(const QPoint &point);
-
 signals:
-    void selectionUpdated(QVector3D selection);
+    void selectedBarPosChanged(QPoint position);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

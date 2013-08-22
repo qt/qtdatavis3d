@@ -87,6 +87,8 @@ Q3DBars::Q3DBars()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::handleShadowQualityUpdate);
+    QObject::connect(d_ptr->m_shared, &Bars3dController::selectedBarPosChanged, this,
+                     &Q3DBars::selectedBarPosChanged);
 }
 
 /*!
@@ -404,6 +406,22 @@ bool Q3DBars::isBackgroundVisible() const
 }
 
 /*!
+ * \property Q3DBars::selectedBarPos
+ *
+ * Selects a bar in a \a position. Only one bar can be selected at a time.
+ * To clear selection, specify an illegal \a position, e.g. (-1, -1).
+ */
+void Q3DBars::setSelectedBarPos(const QPoint &position)
+{
+    d_ptr->m_shared->setSelectedBarPos(position);
+}
+
+QPoint Q3DBars::selectedBarPos() const
+{
+    return d_ptr->m_shared->selectedBarPos();
+}
+
+/*!
  * \property Q3DBars::shadowQuality
  *
  * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
@@ -472,12 +490,6 @@ QBarDataProxy *Q3DBars::dataProxy()
 {
     return d_ptr->m_shared->dataProxy();
 }
-
-/*!
- * \fn void Q3DBars::shadowQualityChanged(QDataVis::ShadowQuality quality)
- *
- * This signal is emitted when shadow \a quality changes.
- */
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),

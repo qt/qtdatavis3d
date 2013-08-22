@@ -95,7 +95,6 @@ public:
     virtual void updateMeshFileName(const QString &objFileName);
 
     virtual QString itemLabelFormat() const;
-    virtual void requestSelectionAtPoint(const QPoint &point) = 0;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
 #if !defined(QT_OPENGL_ES_2)

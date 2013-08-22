@@ -35,12 +35,13 @@ class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
     Q_OBJECT
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_PROPERTY(QPoint selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
     Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
@@ -94,6 +95,9 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
+    void setSelectedBarPos(const QPoint &position);
+    QPoint selectedBarPos() const;
+
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
@@ -111,6 +115,7 @@ public slots:
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void selectedBarPosChanged(QPoint position);
 
 protected:
     void render();

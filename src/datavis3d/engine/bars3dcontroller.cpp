@@ -37,6 +37,7 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0)),
       m_isSlicingActivated(false),
+      m_selectedBarPos(noSelectionPoint()),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
@@ -68,6 +69,9 @@ void Bars3dController::initializeOpenGL()
     m_renderer = new Bars3dRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
+
+    QObject::connect(m_renderer, &Bars3dRenderer::selectedBarPosChanged, this,
+                     &Bars3dController::handleSelectedBarPosChanged, Qt::QueuedConnection);
 }
 
 void Bars3dController::synchDataToRenderer()
@@ -91,6 +95,11 @@ void Bars3dController::synchDataToRenderer()
     if (m_changeTracker.barSpecsChanged) {
         m_renderer->updateBarSpecs(m_barThicknessRatio, m_barSpacing, m_isBarSpecRelative);
         m_changeTracker.barSpecsChanged = false;
+    }
+
+    if (m_changeTracker.selectedBarPosChanged) {
+        m_renderer->updateSelectedBarPos(m_selectedBarPos);
+        m_changeTracker.selectedBarPosChanged = false;
     }
 
     if (m_isDataDirty) {
@@ -267,6 +276,7 @@ void Bars3dController::setDataProxy(QBarDataProxy *proxy)
 
     adjustValueAxisRange();
     m_isDataDirty = true;
+    setSelectedBarPos(noSelectionPoint());
 }
 
 QBarDataProxy *Bars3dController::dataProxy()
@@ -279,6 +289,7 @@ void Bars3dController::handleArrayReset()
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    setSelectedBarPos(noSelectionPoint());
 }
 
 void Bars3dController::handleRowsAdded(int startIndex, int count)
@@ -312,6 +323,9 @@ void Bars3dController::handleRowsRemoved(int startIndex, int count)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    // TODO this will break once data window offset is implemented
+    if (startIndex >= m_data->rowCount())
+        setSelectedBarPos(noSelectionPoint());
 }
 
 void Bars3dController::handleRowsInserted(int startIndex, int count)
@@ -336,12 +350,29 @@ void Bars3dController::handleItemChanged(int rowIndex, int columnIndex)
     m_isDataDirty = true;
 }
 
+void Bars3dController::handleSelectedBarPosChanged(const QPoint &position)
+{
+    QPoint pos = position;
+    if (pos == QPoint(255, 255))
+        pos = noSelectionPoint();
+    if (pos != m_selectedBarPos) {
+        m_selectedBarPos = pos;
+        emit selectedBarPosChanged(pos);
+    }
+}
+
 void Bars3dController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
+}
+
+QPoint Bars3dController::noSelectionPoint()
+{
+    static QPoint noSelectionPos(-1, -1);
+    return noSelectionPos;
 }
 
 void Bars3dController::setBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
@@ -400,6 +431,9 @@ void Bars3dController::setDataWindow(int rowCount, int columnCount)
 
     adjustValueAxisRange();
 
+    if (m_selectedBarPos.x() >= rowCount || m_selectedBarPos.y() >= columnCount)
+        setSelectedBarPos(noSelectionPoint());
+
     m_changeTracker.sampleSpaceChanged = true;
     emit sampleSpaceChanged(rowCount, columnCount);
 }
@@ -409,6 +443,28 @@ void Bars3dController::setSelectionMode(QDataVis::SelectionMode mode)
     // Disable zoom if selection mode changes
     setSlicingActive(false);
     Abstract3DController::setSelectionMode(mode);
+}
+
+void Bars3dController::setSelectedBarPos(const QPoint &position)
+{
+    // TODO this will break once data window offset is implemented
+    QPoint pos = position;
+    if (pos.x() < 0 || pos.y() < 0
+            || pos.x() >= m_data->rowCount()
+            || pos.y() >= m_data->rowAt(pos.x())->size()) {
+        pos = noSelectionPoint();
+    }
+
+    if (pos != m_selectedBarPos) {
+        m_selectedBarPos = pos;
+        m_changeTracker.selectedBarPosChanged = true;
+        emit selectedBarPosChanged(pos);
+    }
+}
+
+QPoint Bars3dController::selectedBarPos() const
+{
+    return m_selectedBarPos;
 }
 
 QPoint Bars3dController::mousePosition()

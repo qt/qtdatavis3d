@@ -44,7 +44,11 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
 
-    m_shared->setDataProxy(new QItemModelBarDataProxy);
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
+    m_shared->setDataProxy(proxy);
+
+    QObject::connect(proxy, &QBarDataProxy::arrayReset, this,
+                     &DeclarativeBars::dataResolved);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -359,6 +363,16 @@ void DeclarativeBars::setItemLabelFormat(const QString &format)
 QString DeclarativeBars::itemLabelFormat()
 {
     return m_shared->dataProxy()->itemLabelFormat();
+}
+
+void DeclarativeBars::setSelectedBarPos(const QPoint &position)
+{
+    m_shared->setSelectedBarPos(position);
+}
+
+QPoint DeclarativeBars::selectedBarPos() const
+{
+    return m_shared->selectedBarPos();
 }
 
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)

@@ -209,7 +209,9 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     GLubyte pixel[4];
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
                  GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
-    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
+
+    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2] << pixel[3] << "mousepos:" << mousepos << "height:" << height;
+
     //#else
     //// These work with desktop OpenGL
     //// They offer a lot higher possible object count and a possibility to use object ids

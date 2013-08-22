@@ -43,11 +43,13 @@ struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
     bool sampleSpaceChanged       : 1;
     bool barSpecsChanged          : 1;
+    bool selectedBarPosChanged    : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
         sampleSpaceChanged(true),
-        barSpecsChanged(true)
+        barSpecsChanged(true),
+        selectedBarPosChanged(true)
     {
     }
 };
@@ -57,8 +59,6 @@ class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
     Q_OBJECT
 
 private:
-
-
     Bars3DChangeBitField m_changeTracker;
 
     // Data
@@ -69,6 +69,7 @@ private:
     MouseState m_mouseState;
     QPoint m_mousePos;
     bool m_isSlicingActivated;
+    QPoint m_selectedBarPos;     // Points to row & column in data window.
 
     // Look'n'feel
     bool m_isBarSpecRelative;
@@ -116,6 +117,9 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
 
+    void setSelectedBarPos(const QPoint &position);
+    QPoint selectedBarPos() const;
+
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);
@@ -130,6 +134,8 @@ public:
     QBarDataProxy *dataProxy();
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
+    static QPoint noSelectionPoint();
+
 public slots:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
@@ -138,11 +144,13 @@ public slots:
     void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
 
+    void handleSelectedBarPosChanged(const QPoint &position);
 
 signals:
     void slicingActiveChanged(bool isSlicing);
     void sampleSpaceChanged(int samplesRow, int samplesColumn);
     void barSpecsChanged(GLfloat thicknessRatio, QSizeF spacing, bool relative);
+    void selectedBarPosChanged(QPoint position);
 
 private:
     void adjustValueAxisRange();

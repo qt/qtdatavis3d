@@ -95,6 +95,9 @@ int main(int argc, char **argv)
     QPushButton *selectionButton = new QPushButton(widget);
     selectionButton->setText(QStringLiteral("Change selection mode"));
 
+    QPushButton *setSelectedBarButton = new QPushButton(widget);
+    setSelectedBarButton->setText(QStringLiteral("Select/deselect bar at (5,5)"));
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -192,6 +195,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
+    vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -227,6 +231,8 @@ int main(int argc, char **argv)
                      &QComboBox::setCurrentIndex);
     QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,
                      &ChartModifier::shadowQualityUpdatedByVisual);
+    QObject::connect(widgetchart, &Q3DBars::selectedBarPosChanged, modifier,
+                     &ChartModifier::handleSelectionChange);
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ChartModifier::changeFontSize);
@@ -246,6 +252,8 @@ int main(int argc, char **argv)
     QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::removeRows);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
+    QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::selectBar);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);

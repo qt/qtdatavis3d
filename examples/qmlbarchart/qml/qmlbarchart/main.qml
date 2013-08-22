@@ -126,12 +126,19 @@ Item {
             axisY: valueAxis
             axisZ: columnAxis
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+            onDataResolved: {
+                // Can't select a bar until data has been resolved from model to proxy
+                selectedBarPos = Qt.point(0, 5)
+            }
         }
+
     }
 
     Component.onCompleted: {
         testchart.data = dataModel
     }
+
 
     TableView {
         id: tableView

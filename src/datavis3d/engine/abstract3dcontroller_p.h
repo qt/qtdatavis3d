@@ -172,7 +172,6 @@ public:
      */
     virtual void synchDataToRenderer();
 
-
     virtual void render(const GLuint defaultFboHandle = 0);
 
     /**
