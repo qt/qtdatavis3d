@@ -1640,6 +1640,7 @@ void Bars3dRenderer::updateSlicingActive(bool isSlicing)
         m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
                                this->m_cachedBoundingRect.height());
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+        updateDepthBuffer(); // Re-init depth buffer as well
     }
 }
 
@@ -1690,6 +1691,9 @@ void Bars3dRenderer::initDepthShader()
 
 void Bars3dRenderer::updateDepthBuffer()
 {
+    if (m_cachedIsSlicingActivated)
+        return;
+
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
