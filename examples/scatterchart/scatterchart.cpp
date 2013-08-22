@@ -28,7 +28,8 @@ const int numberOfItems = 10000;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
-      m_fontSize(30.0f)
+      m_fontSize(30.0f),
+      m_selectedItem(-1)
 {
     QFont font = m_chart->font();
     font.setPointSize(m_fontSize);
@@ -213,9 +214,9 @@ void ScatterDataModifier::insertBunch()
 
 void ScatterDataModifier::changeOne()
 {
-    if (m_chart->dataProxy()->array()->size()) {
+    if (m_selectedItem >= 0 && m_chart->dataProxy()->array()->size()) {
         QScatterDataItem item(randVector());
-        m_chart->dataProxy()->setItem(0, item);
+        m_chart->dataProxy()->setItem(m_selectedItem, item);
         qDebug() << m_loopCounter << "Changed one, array size:" << m_chart->dataProxy()->array()->size();
     }
 }
@@ -234,8 +235,10 @@ void ScatterDataModifier::changeBunch()
 
 void ScatterDataModifier::removeOne()
 {
-    m_chart->dataProxy()->removeItems(0, 1);
-    qDebug() << m_loopCounter << "Removed one, array size:" << m_chart->dataProxy()->array()->size();
+    if (m_selectedItem >= 0) {
+        m_chart->dataProxy()->removeItems(m_selectedItem, 1);
+        qDebug() << m_loopCounter << "Removed one, array size:" << m_chart->dataProxy()->array()->size();
+    }
 }
 
 void ScatterDataModifier::removeBunch()
@@ -292,6 +295,22 @@ void ScatterDataModifier::startStopTimer()
         m_loopCounter = 0;
         m_timer.start(0);
     }
+}
+
+void ScatterDataModifier::selectItem()
+{
+    int targetItem(3);
+    int noSelection(-1);
+    if (m_selectedItem != targetItem)
+        m_chart->setSelectedItemIndex(targetItem);
+    else
+        m_chart->setSelectedItemIndex(noSelection);
+}
+
+void ScatterDataModifier::handleSelectionChange(int index)
+{
+    m_selectedItem = index;
+    qDebug() << "Selected item index:" << index;
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)

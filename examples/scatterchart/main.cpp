@@ -81,16 +81,19 @@ int main(int argc, char **argv)
     insertBunchButton->setText(QStringLiteral("Insert bunch of items"));
 
     QPushButton *changeOneButton = new QPushButton(widget);
-    changeOneButton->setText(QStringLiteral("Change item"));
+    changeOneButton->setText(QStringLiteral("Change selected item"));
 
     QPushButton *changeBunchButton = new QPushButton(widget);
     changeBunchButton->setText(QStringLiteral("Change bunch of items"));
 
     QPushButton *removeOneButton = new QPushButton(widget);
-    removeOneButton->setText(QStringLiteral("Remove item"));
+    removeOneButton->setText(QStringLiteral("Remove selected item"));
 
     QPushButton *removeBunchButton = new QPushButton(widget);
     removeBunchButton->setText(QStringLiteral("Remove bunch of items"));
+
+    QPushButton *setSelectedItemButton = new QPushButton(widget);
+    setSelectedItemButton->setText(QStringLiteral("Select/deselect item 3"));
 
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
@@ -131,6 +134,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(changeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
+    vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
@@ -170,6 +174,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::removeOne);
     QObject::connect(removeBunchButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::removeBunch);
+    QObject::connect(setSelectedItemButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::selectItem);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
@@ -183,6 +189,8 @@ int main(int argc, char **argv)
                      &QComboBox::setCurrentIndex);
     QObject::connect(chart, &Q3DScatter::shadowQualityChanged, modifier,
                      &ScatterDataModifier::shadowQualityUpdatedByVisual);
+    QObject::connect(chart, &Q3DScatter::selectedItemIndexChanged, modifier,
+                     &ScatterDataModifier::handleSelectionChange);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);

@@ -40,6 +40,7 @@ class MapRenderItem : public BarRenderItem
 {
 public:
     MapRenderItem();
+    MapRenderItem(const MapRenderItem &other);
     virtual ~MapRenderItem();
 
     inline const QPointF &mapPosition() const { return m_mapPosition; }

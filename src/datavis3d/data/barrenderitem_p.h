@@ -39,6 +39,7 @@ class BarRenderItem : public AbstractRenderItem
 {
 public:
     BarRenderItem();
+    BarRenderItem(const BarRenderItem &other);
     virtual ~BarRenderItem();
 
     // Position relative to data window (for bar label generation)

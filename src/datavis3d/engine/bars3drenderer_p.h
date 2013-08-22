@@ -63,7 +63,6 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    BarRenderItem *m_previouslySelectedBar; // points to renderitem array
     QList<BarRenderItem *> *m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
@@ -127,7 +126,7 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateBackgroundEnabled(bool enable);
-    void updateSelectedBarPos(QPoint selectedBarPos);
+    void updateSelectedBarPos(QPoint position);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);

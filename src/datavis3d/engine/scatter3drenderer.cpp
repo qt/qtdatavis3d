@@ -52,7 +52,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
       m_selectedItem(0),
-      m_previouslySelectedItem(0),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
@@ -76,6 +75,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
       m_selection(selectionSkipColor),
+      m_previousSelection(selectionSkipColor),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true)
@@ -143,15 +143,12 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
     int dataSize = dataArray.size();
     m_renderItemArray.resize(dataSize);
     for (int i = 0; i < dataSize ; i++) {
-        qreal value = dataArray.at(i).position().y();
-        m_renderItemArray[i].setValue(value);
         m_renderItemArray[i].setPosition(dataArray.at(i).position());
-        //m_renderItemArray[i].setHeight(value / m_heightNormalizer);
-        //m_renderItemArray[i].setItemLabel(dataArray.at(i).label());
         calculateTranslation(m_renderItemArray[i]);
         m_renderItemArray[i].setRenderer(this);
     }
     m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)dataSize)), 0.1);
+    m_selectedItem = 0;
 
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
@@ -402,14 +399,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
-        glClearColor(selectionSkipColor.x() / 255, selectionSkipColor.y() / 255,
-                     selectionSkipColor.z() / 255, 1.0f); // Set clear color to white (= skipColor)
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white (= skipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-        GLint dotIdxRed = 0;
-        GLint dotIdxGreen = 0;
-        GLint dotIdxBlue = 0;
-        for (int dot = 0; dot < m_renderItemArray.size(); dot++, dotIdxRed++) {
+
+        int arraySize = m_renderItemArray.size();
+        if (arraySize > 0xfffffe) // Max possible different selection colors, 0xffffff being skipColor
+            qFatal("Too many objects");
+
+        for (int dot = 0; dot < arraySize; dot++) {
             const ScatterRenderItem &item = m_renderItemArray.at(dot);
 
             QMatrix4x4 modelMatrix;
@@ -427,20 +425,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            if (dotIdxRed > 0 && dotIdxRed % 256 == 0) {
-                dotIdxRed = 0;
-                dotIdxGreen++;
-            }
-            if (dotIdxGreen > 0 && dotIdxGreen % 256 == 0) {
-                dotIdxGreen = 0;
-                dotIdxBlue++;
-            }
-            if (dotIdxBlue > 255)
-                qFatal("Too many objects");
-
-            QVector3D dotColor = QVector3D((GLfloat)dotIdxRed / 255.0f,
-                                           (GLfloat)dotIdxGreen / 255.0f,
-                                           (GLfloat)dotIdxBlue / 255.0f);
+            QVector3D dotColor = indexToSelectionColor(dot);
+            dotColor /= 255.0f;
 
             m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
             m_selectionShader->setUniformValue(m_selectionShader->color(), dotColor);
@@ -501,6 +487,22 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Draw dots
     bool dotSelectionFound = false;
+    int selectedIndex;
+    if (m_selection == selectionSkipColor) {
+        selectedIndex = Scatter3DController::noSelectionIndex();
+    } else {
+        selectedIndex = int(m_selection.x())
+                + (int(m_selection.y()) << 8)
+                + (int(m_selection.z()) << 16);
+    }
+
+    if (m_selection != m_previousSelection) {
+        emit selectedItemIndexChanged(selectedIndex);
+        m_previousSelection = m_selection;
+    }
+
+    ScatterRenderItem *selectedItem(0);
+
     for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
         ScatterRenderItem &item = m_renderItemArray[dot];
 
@@ -539,28 +541,12 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QVector3D dotColor = baseColor + heightColor;
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-        if (m_cachedSelectionMode > QDataVis::ModeNone) {
-            Scatter3DController::SelectionType selectionType = isSelected(dot, m_selection);
-            switch (selectionType) {
-            case Scatter3DController::SelectionItem: {
-                dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
-                lightStrength = m_cachedTheme.m_highlightLightStrength;
-                // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
-                m_selectedItem = &item;
-                dotSelectionFound = true;
-                break;
-            }
-            case Scatter3DController::SelectionNone: {
-                // Current dot is not selected, nor on a row or column
-                // do nothing
-                break;
-            }
-            default: {
-                // Unsupported selection mode
-                // do nothing
-                break;
-            }
-            }
+        if (m_cachedSelectionMode > QDataVis::ModeNone && (selectedIndex == dot)) {
+            dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
+            lightStrength = m_cachedTheme.m_highlightLightStrength;
+            // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
+            selectedItem = &item;
+            dotSelectionFound = true;
         }
 
         // Set shader bindings
@@ -1214,10 +1200,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     } else {
         glDisable(GL_DEPTH_TEST);
         // Draw the selection label
-        LabelItem &labelItem = m_selectedItem->selectionLabelItem();
-        if (m_previouslySelectedItem != m_selectedItem || m_updateLabels
+        LabelItem &labelItem = selectedItem->selectionLabelItem();
+        if (m_selectedItem != selectedItem || m_updateLabels
                 || !labelItem.textureId()) {
-            QString labelText = m_selectedItem->selectionLabel();
+            QString labelText = selectedItem->selectionLabel();
             if (labelText.isNull()) {
                 static const QString xTitleTag(QStringLiteral("@xTitle"));
                 static const QString yTitleTag(QStringLiteral("@yTitle"));
@@ -1234,29 +1220,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
                 if (labelText.contains(xLabelTag)) {
                     QString valueLabelText = generateValueLabel(m_axisCacheX.labelFormat(),
-                                                                m_selectedItem->position().x());
+                                                                selectedItem->position().x());
                     labelText.replace(xLabelTag, valueLabelText);
                 }
                 if (labelText.contains(yLabelTag)) {
                     QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(),
-                                                                m_selectedItem->position().y());
+                                                                selectedItem->position().y());
                     labelText.replace(yLabelTag, valueLabelText);
                 }
                 if (labelText.contains(zLabelTag)) {
                     QString valueLabelText = generateValueLabel(m_axisCacheZ.labelFormat(),
-                                                                m_selectedItem->position().z());
+                                                                selectedItem->position().z());
                     labelText.replace(zLabelTag, valueLabelText);
                 }
 
-                m_selectedItem->setSelectionLabel(labelText);
+                selectedItem->setSelectionLabel(labelText);
             }
             m_drawer->generateLabelItem(labelItem, labelText);
-            m_previouslySelectedItem = m_selectedItem;
+            m_selectedItem = selectedItem;
         }
 
-        m_drawer->drawLabel(*m_selectedItem, labelItem, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*selectedItem, labelItem, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, 0.0f, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
+                            QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera, true, false, Drawer::LabelMid);
 
@@ -1271,6 +1257,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Release label shader
     m_labelShader->release();
+}
+
+void Scatter3DRenderer::updateSelectedItemIndex(int index)
+{
+    if (index == Scatter3DController::noSelectionIndex())
+        m_selection = selectionSkipColor;
+    else
+        m_selection = indexToSelectionColor(index);
 }
 
 void Scatter3DRenderer::handleResize()
@@ -1395,44 +1389,6 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_axisCacheY.max() << m_axisCacheX.max() << m_axisCacheZ.max();
 }
 
-Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint dot,
-                                                                 const QVector3D &selection)
-{
-    //qDebug() << __FUNCTION__;
-    GLubyte dotIdxRed = 0;
-    GLubyte dotIdxGreen = 0;
-    GLubyte dotIdxBlue = 0;
-    //static QVector3D prevSel = selection; // TODO: For debugging
-    Scatter3DController::SelectionType isSelectedType = Scatter3DController::SelectionNone;
-
-    if (selection == selectionSkipColor)
-        return isSelectedType; // skip window
-
-    if (dot <= 255) {
-        dotIdxRed = dot;
-    } else if (dot <= 65535) {
-        dotIdxGreen = dot / 256;
-        dotIdxRed = dot % 256;
-    } else {
-        dotIdxBlue = dot / 65535;
-        dotIdxGreen = dot % 65535;
-        dotIdxRed = dot % 256;
-    }
-
-    QVector3D current = QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
-
-    // TODO: For debugging
-    //if (selection != prevSel) {
-    //    qDebug() << selection.x() << selection .y() << selection.z();
-    //    prevSel = selection;
-    //}
-
-    if (current == selection)
-        isSelectedType = Scatter3DController::SelectionItem;
-
-    return isSelectedType;
-}
-
 QRect Scatter3DRenderer::mainViewPort()
 {
     //qDebug() << __FUNCTION__;
@@ -1532,6 +1488,15 @@ void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_labelShader->initialize();
+}
+
+QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
+{
+    GLubyte dotIdxRed = index & 0xff;
+    GLubyte dotIdxGreen = (index & 0xff00) >> 8;
+    GLubyte dotIdxBlue = (index & 0xff0000) >> 16;
+
+    return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

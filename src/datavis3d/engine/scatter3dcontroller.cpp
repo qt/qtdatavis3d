@@ -35,7 +35,8 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_mousePos(QPoint(0, 0)),
       m_isSlicingActivated(false),
       m_renderer(0),
-      m_data(0)
+      m_data(0),
+      m_selectedItemIndex(noSelectionIndex())
 {
     // Default axes
     setAxisX(new QValueAxis());
@@ -62,6 +63,9 @@ void Scatter3DController::initializeOpenGL()
     m_renderer = new Scatter3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
+
+    QObject::connect(m_renderer, &Scatter3DRenderer::selectedItemIndexChanged, this,
+                     &Scatter3DController::handleSelectedItemIndexChanged, Qt::QueuedConnection);
 }
 
 void Scatter3DController::synchDataToRenderer()
@@ -75,6 +79,11 @@ void Scatter3DController::synchDataToRenderer()
     if (m_changeTracker.slicingActiveChanged) {
         // TODO: Add notification.
         m_changeTracker.slicingActiveChanged = false;
+    }
+
+    if (m_changeTracker.selectedItemIndexChanged) {
+        m_renderer->updateSelectedItemIndex(m_selectedItemIndex);
+        m_changeTracker.selectedItemIndexChanged = false;
     }
 
     if (m_isDataDirty) {
@@ -243,6 +252,7 @@ void Scatter3DController::setDataProxy(QScatterDataProxy *proxy)
 
     adjustValueAxisRange();
     m_isDataDirty = true;
+    setSelectedItemIndex(noSelectionIndex());
 }
 
 QScatterDataProxy *Scatter3DController::dataProxy()
@@ -255,6 +265,7 @@ void Scatter3DController::handleArrayReset()
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    setSelectedItemIndex(noSelectionIndex());
 }
 
 void Scatter3DController::handleItemsAdded(int startIndex, int count)
@@ -282,6 +293,8 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
+    if (startIndex >= m_data->itemCount())
+        setSelectedItemIndex(noSelectionIndex());
 }
 
 void Scatter3DController::handleItemsInserted(int startIndex, int count)
@@ -291,6 +304,14 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
+}
+
+void Scatter3DController::handleSelectedItemIndexChanged(int index)
+{
+    if (index != m_selectedItemIndex) {
+        m_selectedItemIndex = index;
+        emit selectedItemIndexChanged(index);
+    }
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -327,6 +348,25 @@ void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
     // Disable zoom if selection mode changes
     setSlicingActive(false);
     Abstract3DController::setSelectionMode(mode);
+}
+
+void Scatter3DController::setSelectedItemIndex(int index)
+{
+    // TODO If items not within axis ranges are culled from drawing, should they be
+    // TODO unselectable as well?
+    if (index < 0 || index >= m_data->itemCount())
+        index = noSelectionIndex();
+
+    if (index != m_selectedItemIndex) {
+        m_selectedItemIndex = index;
+        m_changeTracker.selectedItemIndexChanged = true;
+        emit selectedItemIndexChanged(index);
+    }
+}
+
+int Scatter3DController::selectedItemIndex() const
+{
+    return m_selectedItemIndex;
 }
 
 QPoint Scatter3DController::mousePosition()

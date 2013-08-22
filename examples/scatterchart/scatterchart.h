@@ -59,6 +59,8 @@ public slots:
     void removeBunch();
     void timeout();
     void startStopTimer();
+    void selectItem();
+    void handleSelectionChange(int index);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -69,6 +71,7 @@ private:
     int m_fontSize;
     QTimer m_timer;
     int m_loopCounter;
+    int m_selectedItem;
 };
 
 #endif

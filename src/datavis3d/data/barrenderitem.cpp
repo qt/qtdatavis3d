@@ -29,6 +29,17 @@ BarRenderItem::BarRenderItem()
 {
 }
 
+BarRenderItem::BarRenderItem(const BarRenderItem &other)
+    : AbstractRenderItem(other)
+{
+    m_renderer = other.m_renderer;
+    m_value = other.m_value;
+    m_position = other.m_position;
+    m_height = other.m_height;
+    m_sliceLabel = other.m_sliceLabel;
+    m_sliceLabelItem = 0;
+}
+
 BarRenderItem::~BarRenderItem()
 {
     delete m_sliceLabelItem;

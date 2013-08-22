@@ -28,6 +28,14 @@ MapRenderItem::MapRenderItem()
 {
 }
 
+MapRenderItem::MapRenderItem(const MapRenderItem &other)
+    : BarRenderItem(other)
+{
+    m_renderer = other.m_renderer;
+    m_mapPosition = other.m_mapPosition;
+    m_itemLabel = other.m_itemLabel;
+}
+
 MapRenderItem::~MapRenderItem()
 {
 }

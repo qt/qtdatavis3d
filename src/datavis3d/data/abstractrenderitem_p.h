@@ -42,6 +42,7 @@ class AbstractRenderItem
 {
 public:
     AbstractRenderItem();
+    AbstractRenderItem(const AbstractRenderItem &other);
     virtual ~AbstractRenderItem();
 
     // Position in 3D scene

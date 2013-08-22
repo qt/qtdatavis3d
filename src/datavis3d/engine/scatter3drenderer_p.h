@@ -60,7 +60,6 @@ private:
 
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
-    ScatterRenderItem *m_previouslySelectedItem; // points to renderitem array
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
@@ -85,6 +84,7 @@ private:
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     QVector3D m_selection;
+    QVector3D m_previousSelection;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
 
@@ -127,7 +127,6 @@ private:
 #endif
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
-    Scatter3DController::SelectionType isSelected(GLint dot, const QVector3D &selection);
 
     Q_DISABLE_COPY(Scatter3DRenderer)
 
@@ -138,8 +137,16 @@ public slots:
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-};
 
+    void updateSelectedItemIndex(int index);
+
+signals:
+    void selectionUpdated(QVector3D selection);
+    void selectedItemIndexChanged(int index);
+
+private:
+    QVector3D indexToSelectionColor(GLint index);
+};
 
 QT_DATAVIS3D_END_NAMESPACE
 

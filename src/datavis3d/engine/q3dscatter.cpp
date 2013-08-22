@@ -78,6 +78,8 @@ Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
+                     &Q3DScatter::selectedItemIndexChanged);
 }
 
 /*!
@@ -324,6 +326,22 @@ void Q3DScatter::setBackgroundVisible(bool visible)
 bool Q3DScatter::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
+}
+
+/*!
+ * \property Q3DScatter::selectedItemIndex
+ *
+ * Selects an item in the \a index. Only one item can be selected at a time.
+ * To clear selection, specify an illegal \a index, e.g. -1.
+ */
+void Q3DScatter::setSelectedItemIndex(int index)
+{
+    d_ptr->m_shared->setSelectedItemIndex(index);
+}
+
+int Q3DScatter::selectedItemIndex() const
+{
+    return d_ptr->m_shared->selectedItemIndex();
 }
 
 /*!

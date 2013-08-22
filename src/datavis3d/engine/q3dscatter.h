@@ -40,6 +40,7 @@ class QT_DATAVIS3D_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVis3D::QDataVis::LabelTransparency)
@@ -79,6 +80,9 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
+    void setSelectedItemIndex(int index);
+    int selectedItemIndex() const;
+
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
@@ -96,6 +100,7 @@ public:
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void selectedItemIndexChanged(int index);
 
 protected:
     void render();

@@ -41,9 +41,11 @@ class QScatterDataProxy;
 
 struct Scatter3DChangeBitField {
     bool slicingActiveChanged     : 1;
+    bool selectedItemIndexChanged : 1;
 
     Scatter3DChangeBitField() :
-        slicingActiveChanged(true)
+        slicingActiveChanged(true),
+        selectedItemIndexChanged(true)
     {
     }
 };
@@ -63,6 +65,7 @@ private:
     // Rendering
     Scatter3DRenderer *m_renderer;
     QScatterDataProxy *m_data;
+    int m_selectedItemIndex;
 
 public:
     explicit Scatter3DController(QRect rect);
@@ -84,6 +87,10 @@ public:
 
     // Change selection mode
     void setSelectionMode(QDataVis::SelectionMode mode);
+
+    void setSelectedItemIndex(int index);
+    int selectedItemIndex() const;
+    static inline int noSelectionIndex() { return -1; }
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -108,9 +115,11 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
+    void handleSelectedItemIndexChanged(int index);
 
 signals:
     void slicingActiveChanged(bool isSlicing);
+    void selectedItemIndexChanged(int index);
 
 private:
     void adjustValueAxisRange();

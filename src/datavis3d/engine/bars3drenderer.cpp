@@ -50,7 +50,6 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
       m_selectedBar(0),
-      m_previouslySelectedBar(0),
       m_sliceSelection(0),
       m_sliceCache(0),
       m_sliceTitleItem(0),
@@ -709,6 +708,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     // Draw bars
     bool barSelectionFound = false;
+    BarRenderItem *selectedBar(0);
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             BarRenderItem &item = m_renderItemArray[row][bar];
@@ -756,8 +756,8 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert position data into render item. We have no ownership, don't delete the previous one
                     if (!m_cachedIsSlicingActivated) {
-                        m_selectedBar = &item;
-                        m_selectedBar->setPosition(QPoint(row, bar));
+                        selectedBar = &item;
+                        selectedBar->setPosition(QPoint(row, bar));
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         barSelectionFound = true;
                     }
@@ -1335,9 +1335,9 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         // Print value of selected bar
         glDisable(GL_DEPTH_TEST);
         // Draw the selection label
-        LabelItem &labelItem = m_selectedBar->selectionLabelItem();
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
-            QString labelText = m_selectedBar->selectionLabel();
+        LabelItem &labelItem = selectedBar->selectionLabelItem();
+        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()) {
+            QString labelText = selectedBar->selectionLabel();
             if (labelText.isNull()) {
                 static const QString rowIndexTag(QStringLiteral("@rowIdx"));
                 static const QString rowLabelTag(QStringLiteral("@rowLabel"));
@@ -1349,30 +1349,30 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 static const QString valueLabelTag(QStringLiteral("@valueLabel"));
 
                 // Custom format expects printf format specifier. There is no tag for it.
-                labelText = generateValueLabel(itemLabelFormat(), m_selectedBar->value());
+                labelText = generateValueLabel(itemLabelFormat(), selectedBar->value());
 
-                labelText.replace(rowIndexTag, QString::number(m_selectedBar->position().x()));
-                labelText.replace(rowLabelTag, m_axisCacheX.labels().at(m_selectedBar->position().x()));
+                labelText.replace(rowIndexTag, QString::number(selectedBar->position().x()));
+                labelText.replace(rowLabelTag, m_axisCacheX.labels().at(selectedBar->position().x()));
                 labelText.replace(rowTitleTag, m_axisCacheX.title());
-                labelText.replace(colIndexTag, QString::number(m_selectedBar->position().y()));
-                labelText.replace(colLabelTag, m_axisCacheZ.labels().at(m_selectedBar->position().y()));
+                labelText.replace(colIndexTag, QString::number(selectedBar->position().y()));
+                labelText.replace(colLabelTag, m_axisCacheZ.labels().at(selectedBar->position().y()));
                 labelText.replace(colTitleTag, m_axisCacheZ.title());
                 labelText.replace(valueTitleTag, m_axisCacheY.title());
 
                 if (labelText.contains(valueLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(), m_selectedBar->value());
+                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(), selectedBar->value());
                     labelText.replace(valueLabelTag, valueLabelText);
                 }
 
-                m_selectedBar->setSelectionLabel(labelText);
+                selectedBar->setSelectionLabel(labelText);
             }
             m_drawer->generateLabelItem(labelItem, labelText);
-            m_previouslySelectedBar = m_selectedBar;
+            m_selectedBar = selectedBar;
         }
 
-        m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
+                            QVector3D(0.0f, 0.0f, 0.0f), selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, camera, true, false);
 
@@ -1497,12 +1497,12 @@ void Bars3dRenderer::updateBackgroundEnabled(bool enable)
     }
 }
 
-void Bars3dRenderer::updateSelectedBarPos(QPoint selectedBarPos)
+void Bars3dRenderer::updateSelectedBarPos(QPoint position)
 {
-    if (selectedBarPos == Bars3dController::noSelectionPoint())
+    if (position == Bars3dController::noSelectionPoint())
         m_selection = selectionSkipColor;
     else
-        m_selection = QVector3D(selectedBarPos.x(), selectedBarPos.y(), 0);
+        m_selection = QVector3D(position.x(), position.y(), 0);
 }
 
 void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)

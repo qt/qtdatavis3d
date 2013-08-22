@@ -25,6 +25,13 @@ AbstractRenderItem::AbstractRenderItem()
 {
 }
 
+AbstractRenderItem::AbstractRenderItem(const AbstractRenderItem &other)
+{
+    m_selectionLabel = other.m_selectionLabel;
+    m_translation = other.m_translation;
+    m_selectionLabelItem = 0;
+}
+
 AbstractRenderItem::~AbstractRenderItem()
 {
     delete m_selectionLabelItem;

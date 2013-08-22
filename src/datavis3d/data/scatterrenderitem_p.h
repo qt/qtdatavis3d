@@ -29,20 +29,21 @@
 #ifndef SCATTERRENDERITEM_P_H
 #define SCATTERRENDERITEM_P_H
 
-#include "barrenderitem_p.h"
+#include "abstractrenderitem_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Scatter3DRenderer;
 
-class ScatterRenderItem : public BarRenderItem
+class ScatterRenderItem : public AbstractRenderItem
 {
 public:
     ScatterRenderItem();
+    ScatterRenderItem(const ScatterRenderItem &other);
     virtual ~ScatterRenderItem();
 
     inline const QVector3D &position() const { return m_position; }
-    inline void setPosition(const QVector3D &pos) { m_position = pos; }
+    inline void setPosition(const QVector3D &pos);
 
     //inline void setSize(qreal size);
     //inline qreal size() const { return m_size; }
@@ -58,6 +59,16 @@ protected:
 
     friend class QScatterDataItem;
 };
+
+void ScatterRenderItem::setPosition(const QVector3D &pos)
+{
+    if (m_position != pos) {
+        m_position = pos;
+        // Force reformatting on next access by setting label string to null string
+        if (!m_selectionLabel.isNull())
+            setSelectionLabel(QString());
+    }
+}
 
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 

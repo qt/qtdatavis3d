@@ -23,8 +23,16 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 ScatterRenderItem::ScatterRenderItem()
-    : BarRenderItem()
+    : AbstractRenderItem(),
+    m_renderer(0)
 {
+}
+
+ScatterRenderItem::ScatterRenderItem(const ScatterRenderItem &other)
+    : AbstractRenderItem(other)
+{
+    m_renderer = other.m_renderer;
+    m_position = other.m_position;
 }
 
 ScatterRenderItem::~ScatterRenderItem()
