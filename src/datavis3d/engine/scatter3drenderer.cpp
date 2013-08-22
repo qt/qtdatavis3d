@@ -46,8 +46,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
-#define DISPLAY_FULL_DATA_ON_SELECTION // Append selection value text with row and column labels
-
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 // TODO: Make margin modifiable?
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
@@ -1107,11 +1105,11 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     if (m_axisCacheZ.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
-        GLfloat labelPos = aspectRatio * m_axisCacheZ.min();
+        GLfloat labelPos = aspectRatio * m_axisCacheZ.max();
         int lastSegment = m_axisCacheZ.segmentCount();
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
-        GLfloat labelPos = -aspectRatio * m_scaleFactor;
+        GLfloat labelPos = aspectRatio * m_scaleFactor;
         int lastSegment = axisCacheMax->segmentCount();
 #endif
         int labelNbr = 0;
@@ -1161,7 +1159,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     alignment);
             }
             labelNbr++;
-            labelPos += posStep;
+            labelPos -= posStep;
         }
     }
     // X Labels
@@ -1416,7 +1414,7 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
     // We need to normalize translations
     GLfloat xTrans = (aspectRatio * item.position().x()) / m_scaleFactor;
-    GLfloat zTrans = (aspectRatio * item.position().z()) / m_scaleFactor;
+    GLfloat zTrans = -(aspectRatio * item.position().z()) / m_scaleFactor;
     GLfloat yTrans = item.position().y() / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
     //qDebug() << item.translation();
