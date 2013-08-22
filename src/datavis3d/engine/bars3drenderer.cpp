@@ -240,13 +240,8 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
-    // Set light position a bit below the camera to reduce glare (depends on do we have row or column zoom)
-    QVector3D sliceLightPos = defaultLightPos;
-    sliceLightPos.setY(-15.0f);
-    if (QDataVis::ModeSliceColumn == m_cachedSelectionMode)
-        lightPos = camera->calculateLightPosition(sliceLightPos, -85.0f);
-    else
-        lightPos = camera->calculateLightPosition(sliceLightPos, 5.0f);
+    // Set light position
+    lightPos = QVector3D(0.0f, -m_yAdjustment, zComp);
 #endif
 
     // Bind bar shader
@@ -284,8 +279,6 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
 
         QVector3D barColor = baseColor + heightColor;
 
-        GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-
         if (item->height() != 0) {
             // Set shader bindings
             m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
@@ -295,8 +288,9 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
                                          itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
             m_barShader->setUniformValue(m_barShader->color(), barColor);
-            m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
-            m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+            m_barShader->setUniformValue(m_barShader->lightS(), 0.25f);
+            m_barShader->setUniformValue(m_barShader->ambientS(),
+                                         m_cachedTheme.m_ambientStrength * 1.5f);
 
             // Draw the object
             m_drawer->drawObject(m_barShader, m_barObj);
