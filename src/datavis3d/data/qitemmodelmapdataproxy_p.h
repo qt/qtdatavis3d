@@ -30,7 +30,7 @@
 #define QITEMMODELMAPDATAPROXY_P_H
 
 #include "qitemmodelmapdataproxy.h"
-#include "qMapDataProxy_p.h"
+#include "qmapdataproxy_p.h"
 #include <QPointer>
 #include <QTimer>
 
