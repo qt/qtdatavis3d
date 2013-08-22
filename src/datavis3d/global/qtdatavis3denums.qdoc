@@ -23,6 +23,25 @@
 */
 
 /*!
+    \enum QtDataVis3D::QDataVis::InputState
+
+    Predefined input states for mouse and touch based input handlers. All states are not valid with all input handlers.
+
+    \value InputNone
+           Default "no input received" state.
+    \value InputOnScene
+           Mouse or touch input received on the 3D scene.
+    \value InputOnOverview
+           Mouse or touch input received on the overview area.
+    \value InputOnSlice
+           Mouse or touch input received on the slice view area.
+    \value InputRotating
+           Rotation of the 3D geometry ongoing.
+    \value InputOnPinch
+           Pinch/punch multitouch input received.
+*/
+
+/*!
     \enum QtDataVis3D::QDataVis::MeshStyle
 
     Predefined mesh types. All styles are not usable with all visualization types.

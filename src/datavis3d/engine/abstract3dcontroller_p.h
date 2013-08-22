@@ -35,6 +35,7 @@
 #include "theme_p.h"
 #include "qabstractaxis.h"
 #include "drawer_p.h"
+#include "qabstract3dinputhandler.h"
 
 class QFont;
 
@@ -152,6 +153,7 @@ private:
     QString m_objFile;
 
 protected:
+    QAbstract3DInputHandler *m_inputHandler;
     CameraHelper *m_cameraHelper;
     int m_zoomLevel;
     QAbstractAxis *m_axisX;

@@ -36,6 +36,14 @@ class QT_DATAVIS3D_EXPORT QDataVis : public QObject
     Q_ENUMS(LabelTransparency)
 
 public:
+    enum InputState {
+        InputNone = 0,
+        InputOnScene,
+        InputOnOverview,
+        InputOnSlice,
+        InputRotating,
+        InputOnPinch
+    };
 
     enum MeshStyle {
         Bars = 0,

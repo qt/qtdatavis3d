@@ -22,6 +22,13 @@
 #include "qvalueaxis.h"
 #include "abstract3drenderer_p.h"
 
+#if defined(Q_OS_ANDROID)
+#include "qtouch3dinputhandler.h"
+#else
+#include "q3dinputhandler.h"
+#endif
+
+
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
@@ -45,6 +52,12 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_isDataDirty(true)
 {
     m_theme.useColorTheme(QDataVis::ThemeSystem);
+#if defined(Q_OS_ANDROID)
+    m_inputHandler = new QTouch3DInputHandler();
+#else
+    m_inputHandler = new Q3DInputHandler();
+#endif
+    m_inputHandler->setCamera(m_cameraHelper);
 }
 
 Abstract3DController::~Abstract3DController()
