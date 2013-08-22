@@ -1146,88 +1146,6 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         m_barShader->release();
     }
 
-    // Handle slice activation and label drawing
-    if (!barSelectionFound) {
-        // We have no ownership, don't delete. Just NULL the pointer.
-        m_selectedBar = NULL;
-        if (m_cachedIsSlicingActivated
-                && Bars3dController::MouseOnOverview == m_controller->mouseState())
-            m_controller->setSlicingActive(false);
-    } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow
-               && Bars3dController::MouseOnScene == m_controller->mouseState()) {
-        // Activate slice mode
-        m_controller->setSlicingActive(true);
-
-        // Create label textures
-        for (int col = 0; col < m_sliceSelection->size(); col++) {
-            BarRenderItem *item = m_sliceSelection->at(col);
-            if (item->sliceLabel().isNull())
-                item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(), item->value()));
-            m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
-        }
-    } else {
-        // Print value of selected bar
-        m_labelShader->bind();
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-        // Draw the selection label
-        LabelItem &labelItem = m_selectedBar->selectionLabelItem();
-        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
-            QString labelText = m_selectedBar->selectionLabel();
-            if (labelText.isNull()) {
-                static const QString rowIndexTag(QStringLiteral("@rowIdx"));
-                static const QString rowLabelTag(QStringLiteral("@rowLabel"));
-                static const QString rowTitleTag(QStringLiteral("@rowTitle"));
-                static const QString colIndexTag(QStringLiteral("@colIdx"));
-                static const QString colLabelTag(QStringLiteral("@colLabel"));
-                static const QString colTitleTag(QStringLiteral("@colTitle"));
-                static const QString valueTitleTag(QStringLiteral("@valueTitle"));
-                static const QString valueLabelTag(QStringLiteral("@valueLabel"));
-
-                // Custom format expects printf format specifier. There is no tag for it.
-                labelText = generateValueLabel(itemLabelFormat(), m_selectedBar->value());
-
-                labelText.replace(rowIndexTag, QString::number(m_selectedBar->position().x()));
-                labelText.replace(rowLabelTag, m_axisCacheX.labels().at(m_selectedBar->position().x()));
-                labelText.replace(rowTitleTag, m_axisCacheX.title());
-                labelText.replace(colIndexTag, QString::number(m_selectedBar->position().y()));
-                labelText.replace(colLabelTag, m_axisCacheZ.labels().at(m_selectedBar->position().y()));
-                labelText.replace(colTitleTag, m_axisCacheZ.title());
-                labelText.replace(valueTitleTag, m_axisCacheY.title());
-
-                if (labelText.contains(valueLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(), m_selectedBar->value());
-                    labelText.replace(valueLabelTag, valueLabelText);
-                }
-
-                m_selectedBar->setSelectionLabel(labelText);
-            }
-            m_drawer->generateLabelItem(labelItem, labelText);
-            m_previouslySelectedBar = m_selectedBar;
-        }
-
-        m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, true, false);
-
-        glDisable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-            glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-
-        // Release label shader
-        m_labelShader->release();
-
-        // Reset label update flag; they should have been updated when we get here
-        m_updateLabels = false;
-    }
-
     // TODO: Calculations done temporarily here. When optimizing, move to after data set addition? Keep drawing of the labels here.
     // Bind label shader
     m_labelShader->bind();
@@ -1382,6 +1300,76 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         }
         labelNbr++;
         labelPos += heightStep;
+    }
+
+    // Handle slice activation and selection label drawing
+    if (!barSelectionFound) {
+        // We have no ownership, don't delete. Just NULL the pointer.
+        m_selectedBar = NULL;
+        if (m_cachedIsSlicingActivated
+                && Bars3dController::MouseOnOverview == m_controller->mouseState())
+            m_controller->setSlicingActive(false);
+    } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow
+               && Bars3dController::MouseOnScene == m_controller->mouseState()) {
+        // Activate slice mode
+        m_controller->setSlicingActive(true);
+
+        // Create label textures
+        for (int col = 0; col < m_sliceSelection->size(); col++) {
+            BarRenderItem *item = m_sliceSelection->at(col);
+            if (item->sliceLabel().isNull())
+                item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(), item->value()));
+            m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
+        }
+    } else {
+        // Print value of selected bar
+        glDisable(GL_DEPTH_TEST);
+        // Draw the selection label
+        LabelItem &labelItem = m_selectedBar->selectionLabelItem();
+        if (m_previouslySelectedBar != m_selectedBar || m_updateLabels || !labelItem.textureId()) {
+            QString labelText = m_selectedBar->selectionLabel();
+            if (labelText.isNull()) {
+                static const QString rowIndexTag(QStringLiteral("@rowIdx"));
+                static const QString rowLabelTag(QStringLiteral("@rowLabel"));
+                static const QString rowTitleTag(QStringLiteral("@rowTitle"));
+                static const QString colIndexTag(QStringLiteral("@colIdx"));
+                static const QString colLabelTag(QStringLiteral("@colLabel"));
+                static const QString colTitleTag(QStringLiteral("@colTitle"));
+                static const QString valueTitleTag(QStringLiteral("@valueTitle"));
+                static const QString valueLabelTag(QStringLiteral("@valueLabel"));
+
+                // Custom format expects printf format specifier. There is no tag for it.
+                labelText = generateValueLabel(itemLabelFormat(), m_selectedBar->value());
+
+                labelText.replace(rowIndexTag, QString::number(m_selectedBar->position().x()));
+                labelText.replace(rowLabelTag, m_axisCacheX.labels().at(m_selectedBar->position().x()));
+                labelText.replace(rowTitleTag, m_axisCacheX.title());
+                labelText.replace(colIndexTag, QString::number(m_selectedBar->position().y()));
+                labelText.replace(colLabelTag, m_axisCacheZ.labels().at(m_selectedBar->position().y()));
+                labelText.replace(colTitleTag, m_axisCacheZ.title());
+                labelText.replace(valueTitleTag, m_axisCacheY.title());
+
+                if (labelText.contains(valueLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(), m_selectedBar->value());
+                    labelText.replace(valueLabelTag, valueLabelText);
+                }
+
+                m_selectedBar->setSelectionLabel(labelText);
+            }
+            m_drawer->generateLabelItem(labelItem, labelText);
+            m_previouslySelectedBar = m_selectedBar;
+        }
+
+        m_drawer->drawLabel(*m_selectedBar, labelItem, viewMatrix, projectionMatrix,
+                            QVector3D(0.0f, m_yAdjustment, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedBar->height(),
+                            m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, camera, true, false);
+
+        // Reset label update flag; they should have been updated when we get here
+        m_updateLabels = false;
+
+        glEnable(GL_DEPTH_TEST);
     }
 
     glDisable(GL_TEXTURE_2D);

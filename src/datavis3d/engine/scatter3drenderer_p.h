@@ -150,7 +150,7 @@ private:
 #endif
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
-    Scatter3DController::SelectionType isSelected(GLint bar, const QVector3D &selection);
+    Scatter3DController::SelectionType isSelected(GLint dot, const QVector3D &selection);
 
     Q_DISABLE_COPY(Scatter3DRenderer)
 

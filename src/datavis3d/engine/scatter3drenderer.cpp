@@ -175,7 +175,7 @@ void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
         m_hasHeightAdjustmentChanged = false;
     }
 
-    // Draw bars scene
+    // Draw dots scene
     drawScene(camera, defaultFboHandle);
 }
 
@@ -326,9 +326,9 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
                                     0.0f, 100.0f);
 #endif
-        // Draw bars to depth buffer
-        for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
-            const ScatterRenderItem &item = m_renderItemArray.at(bar);
+        // Draw dots to depth buffer
+        for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
+            const ScatterRenderItem &item = m_renderItemArray.at(dot);
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -403,18 +403,18 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         // Bind selection shader
         m_selectionShader->bind();
 
-        // Draw bars to selection buffer
+        // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
         glClearColor(selectionSkipColor.x() / 255, selectionSkipColor.y() / 255,
                      selectionSkipColor.z() / 255, 1.0f); // Set clear color to white (= skipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-        GLint barIdxRed = 0;
-        GLint barIdxGreen = 0;
-        GLint barIdxBlue = 0;
-        for (int bar = 0; bar < m_renderItemArray.size(); bar++, barIdxRed++) {
-            const ScatterRenderItem &item = m_renderItemArray.at(bar);
+        GLint dotIdxRed = 0;
+        GLint dotIdxGreen = 0;
+        GLint dotIdxBlue = 0;
+        for (int dot = 0; dot < m_renderItemArray.size(); dot++, dotIdxRed++) {
+            const ScatterRenderItem &item = m_renderItemArray.at(dot);
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -431,23 +431,23 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-            if (barIdxRed > 0 && barIdxRed % 256 == 0) {
-                barIdxRed = 0;
-                barIdxGreen++;
+            if (dotIdxRed > 0 && dotIdxRed % 256 == 0) {
+                dotIdxRed = 0;
+                dotIdxGreen++;
             }
-            if (barIdxGreen > 0 && barIdxGreen % 256 == 0) {
-                barIdxGreen = 0;
-                barIdxBlue++;
+            if (dotIdxGreen > 0 && dotIdxGreen % 256 == 0) {
+                dotIdxGreen = 0;
+                dotIdxBlue++;
             }
-            if (barIdxBlue > 255)
+            if (dotIdxBlue > 255)
                 qFatal("Too many objects");
 
-            QVector3D barColor = QVector3D((GLfloat)barIdxRed / 255.0f,
-                                           (GLfloat)barIdxGreen / 255.0f,
-                                           (GLfloat)barIdxBlue / 255.0f);
+            QVector3D dotColor = QVector3D((GLfloat)dotIdxRed / 255.0f,
+                                           (GLfloat)dotIdxGreen / 255.0f,
+                                           (GLfloat)dotIdxBlue / 255.0f);
 
             m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
-            m_selectionShader->setUniformValue(m_selectionShader->color(), barColor);
+            m_selectionShader->setUniformValue(m_selectionShader->color(), dotColor);
 
             // 1st attribute buffer : vertices
             glEnableVertexAttribArray(m_selectionShader->posAtt());
@@ -506,16 +506,16 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
     }
 
-    // Bind bar shader
+    // Bind dot shader
     m_dotShader->bind();
 
     // Enable texture
     glEnable(GL_TEXTURE_2D);
 
-    // Draw bars
-    bool barSelectionFound = false;
-    for (int bar = 0; bar < m_renderItemArray.size(); bar++) {
-        ScatterRenderItem &item = m_renderItemArray[bar];
+    // Draw dots
+    bool dotSelectionFound = false;
+    for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
+        ScatterRenderItem &item = m_renderItemArray[dot];
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
@@ -549,22 +549,22 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         QVector3D heightColor =
                 Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.translation().y();
 
-        QVector3D barColor = baseColor + heightColor;
+        QVector3D dotColor = baseColor + heightColor;
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
         if (m_cachedSelectionMode > QDataVis::ModeNone) {
-            Scatter3DController::SelectionType selectionType = isSelected(bar, m_selection);
+            Scatter3DController::SelectionType selectionType = isSelected(dot, m_selection);
             switch (selectionType) {
             case Scatter3DController::SelectionItem: {
-                barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
+                dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 m_selectedItem = &item;
-                barSelectionFound = true;
+                dotSelectionFound = true;
                 break;
             }
             case Scatter3DController::SelectionNone: {
-                // Current bar is not selected, nor on a row or column
+                // Current dot is not selected, nor on a row or column
                 // do nothing
                 break;
             }
@@ -583,7 +583,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         m_dotShader->setUniformValue(m_dotShader->nModel(),
                                      itModelMatrix.inverted().transposed());
         m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
-        m_dotShader->setUniformValue(m_dotShader->color(), barColor);
+        m_dotShader->setUniformValue(m_dotShader->color(), dotColor);
         m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -606,7 +606,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         }
     }
 
-    // Release bar shader
+    // Release dot shader
     m_dotShader->release();
 
     // Bind background shader
@@ -702,14 +702,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
 
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
-        // Bind bar shader
+        // Bind line shader
         m_dotShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
         m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
         m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
-        m_dotShader->setUniformValue(m_dotShader->color(), barColor);
+        m_dotShader->setUniformValue(m_dotShader->color(), lineColor);
         m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows (= Z)
@@ -1013,80 +1013,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             }
         }
 
-        // Release bar shader
+        // Release line shader
         m_dotShader->release();
-    }
-
-    // Handle selection clearing and selection label drawing
-    if (!barSelectionFound) {
-        // We have no ownership, don't delete. Just NULL the pointer.
-        m_selectedItem = NULL;
-    } else {
-        // Draw the selection label
-        m_labelShader->bind();
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        }
-
-        LabelItem &labelItem = m_selectedItem->selectionLabelItem();
-        if (m_previouslySelectedItem != m_selectedItem || m_updateLabels
-                || !labelItem.textureId()) {
-            QString labelText = m_selectedItem->selectionLabel();
-            if (labelText.isNull()) {
-                static const QString xTitleTag(QStringLiteral("@xTitle"));
-                static const QString yTitleTag(QStringLiteral("@yTitle"));
-                static const QString zTitleTag(QStringLiteral("@zTitle"));
-                static const QString xLabelTag(QStringLiteral("@xLabel"));
-                static const QString yLabelTag(QStringLiteral("@yLabel"));
-                static const QString zLabelTag(QStringLiteral("@zLabel"));
-
-                labelText = itemLabelFormat();
-
-                labelText.replace(xTitleTag, m_axisCacheX.title());
-                labelText.replace(yTitleTag, m_axisCacheY.title());
-                labelText.replace(zTitleTag, m_axisCacheZ.title());
-
-                if (labelText.contains(xLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheX.labelFormat(),
-                                                                m_selectedItem->position().x());
-                    labelText.replace(xLabelTag, valueLabelText);
-                }
-                if (labelText.contains(yLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(),
-                                                                m_selectedItem->position().y());
-                    labelText.replace(yLabelTag, valueLabelText);
-                }
-                if (labelText.contains(zLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheZ.labelFormat(),
-                                                                m_selectedItem->position().z());
-                    labelText.replace(zLabelTag, valueLabelText);
-                }
-
-                m_selectedItem->setSelectionLabel(labelText);
-            }
-            m_drawer->generateLabelItem(labelItem, labelText);
-            m_previouslySelectedItem = m_selectedItem;
-        }
-
-        m_drawer->drawLabel(*m_selectedItem, labelItem, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, 0.0f, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, true, false, Drawer::LabelMid);
-
-        glDisable(GL_TEXTURE_2D);
-        if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-            glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-
-        // Release label shader
-        m_labelShader->release();
-
-        // Reset label update flag; they should have been updated when we get here
-        m_updateLabels = false;
     }
 
     // Draw axis labels
@@ -1291,6 +1219,65 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             labelPos += posStep;
         }
     }
+
+    // Handle selection clearing and selection label drawing
+    if (!dotSelectionFound) {
+        // We have no ownership, don't delete. Just NULL the pointer.
+        m_selectedItem = NULL;
+    } else {
+        glDisable(GL_DEPTH_TEST);
+        // Draw the selection label
+        LabelItem &labelItem = m_selectedItem->selectionLabelItem();
+        if (m_previouslySelectedItem != m_selectedItem || m_updateLabels
+                || !labelItem.textureId()) {
+            QString labelText = m_selectedItem->selectionLabel();
+            if (labelText.isNull()) {
+                static const QString xTitleTag(QStringLiteral("@xTitle"));
+                static const QString yTitleTag(QStringLiteral("@yTitle"));
+                static const QString zTitleTag(QStringLiteral("@zTitle"));
+                static const QString xLabelTag(QStringLiteral("@xLabel"));
+                static const QString yLabelTag(QStringLiteral("@yLabel"));
+                static const QString zLabelTag(QStringLiteral("@zLabel"));
+
+                labelText = itemLabelFormat();
+
+                labelText.replace(xTitleTag, m_axisCacheX.title());
+                labelText.replace(yTitleTag, m_axisCacheY.title());
+                labelText.replace(zTitleTag, m_axisCacheZ.title());
+
+                if (labelText.contains(xLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheX.labelFormat(),
+                                                                m_selectedItem->position().x());
+                    labelText.replace(xLabelTag, valueLabelText);
+                }
+                if (labelText.contains(yLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(),
+                                                                m_selectedItem->position().y());
+                    labelText.replace(yLabelTag, valueLabelText);
+                }
+                if (labelText.contains(zLabelTag)) {
+                    QString valueLabelText = generateValueLabel(m_axisCacheZ.labelFormat(),
+                                                                m_selectedItem->position().z());
+                    labelText.replace(zLabelTag, valueLabelText);
+                }
+
+                m_selectedItem->setSelectionLabel(labelText);
+            }
+            m_drawer->generateLabelItem(labelItem, labelText);
+            m_previouslySelectedItem = m_selectedItem;
+        }
+
+        m_drawer->drawLabel(*m_selectedItem, labelItem, viewMatrix, projectionMatrix,
+                            QVector3D(0.0f, 0.0f, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f), m_selectedItem->height(),
+                            m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, camera, true, false, Drawer::LabelMid);
+
+        // Reset label update flag; they should have been updated when we get here
+        m_updateLabels = false;
+        glEnable(GL_DEPTH_TEST);
+    }
+
     glDisable(GL_TEXTURE_2D);
     if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
         glDisable(GL_BLEND);
@@ -1324,7 +1311,7 @@ void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
 {
     if (enable != m_cachedIsBackgroundEnabled) {
         Abstract3DRenderer::updateBackgroundEnabled(enable);
-        loadMeshFile(); // Load changed bar type
+        loadMeshFile(); // Load changed dot type
     }
 }
 
@@ -1430,31 +1417,31 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_axisCacheY.max() << m_axisCacheX.max() << m_axisCacheZ.max();
 }
 
-Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint bar,
+Scatter3DController::SelectionType Scatter3DRenderer::isSelected(GLint dot,
                                                                  const QVector3D &selection)
 {
     //qDebug() << __FUNCTION__;
-    GLubyte barIdxRed = 0;
-    GLubyte barIdxGreen = 0;
-    GLubyte barIdxBlue = 0;
+    GLubyte dotIdxRed = 0;
+    GLubyte dotIdxGreen = 0;
+    GLubyte dotIdxBlue = 0;
     //static QVector3D prevSel = selection; // TODO: For debugging
     Scatter3DController::SelectionType isSelectedType = Scatter3DController::SelectionNone;
 
     if (selection == selectionSkipColor)
         return isSelectedType; // skip window
 
-    if (bar <= 255) {
-        barIdxRed = bar;
-    } else if (bar <= 65535) {
-        barIdxGreen = bar / 256;
-        barIdxRed = bar % 256;
+    if (dot <= 255) {
+        dotIdxRed = dot;
+    } else if (dot <= 65535) {
+        dotIdxGreen = dot / 256;
+        dotIdxRed = dot % 256;
     } else {
-        barIdxBlue = bar / 65535;
-        barIdxGreen = bar % 65535;
-        barIdxRed = bar % 256;
+        dotIdxBlue = dot / 65535;
+        dotIdxGreen = dot % 65535;
+        dotIdxRed = dot % 256;
     }
 
-    QVector3D current = QVector3D(barIdxRed, barIdxGreen, barIdxBlue);
+    QVector3D current = QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
 
     // TODO: For debugging
     //if (selection != prevSel) {
