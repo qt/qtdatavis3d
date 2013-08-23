@@ -52,7 +52,7 @@ class SurfaceObject;
 class TextureHelper;
 class Theme;
 class Drawer;
-class CameraHelper;
+class Q3DScene;
 class SelectionPointer;
 
 class QT_DATAVIS3D_EXPORT Surface3DRenderer : public Abstract3DRenderer
@@ -117,7 +117,8 @@ public:
     ~Surface3DRenderer();
 
     void updateDataModel(QSurfaceDataProxy *dataProxy);
-    void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
+    void updateScene(Q3DScene *scene);
+    void render(GLuint defaultFboHandle = 0);
 
 protected:
     void initializeOpenGL();
@@ -137,7 +138,7 @@ private:
     void loadGridLineMesh();
     void loadLabelMesh();
     void loadSurfaceObj();
-    void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
+    void drawScene(GLuint defaultFboHandle);
     void handleResize();
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);

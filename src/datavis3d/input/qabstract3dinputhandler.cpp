@@ -19,9 +19,13 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QAbstract3DInputHandler::QAbstract3DInputHandler() :
-    QObject(),
+QAbstract3DInputHandler::QAbstract3DInputHandler(QObject *parent) :
+    QObject(parent),
     d_ptr(new QAbstract3DInputHandlerPrivate(this))
+{
+}
+
+QAbstract3DInputHandler::~QAbstract3DInputHandler()
 {
 }
 
@@ -65,7 +69,7 @@ QDataVis::InputState QAbstract3DInputHandler::inputState()
     return d_ptr->m_inputState;
 }
 
-void QAbstract3DInputHandler::setInputState(const QDataVis::InputState inputState)
+void QAbstract3DInputHandler::setInputState(QDataVis::InputState inputState)
 {
     if (inputState != d_ptr->m_inputState) {
         d_ptr->m_inputState = inputState;
@@ -73,42 +77,16 @@ void QAbstract3DInputHandler::setInputState(const QDataVis::InputState inputStat
     }
 }
 
-QPoint QAbstract3DInputHandler::inputPosition()
+QPoint QAbstract3DInputHandler::inputPosition() const
 {
     return d_ptr->m_inputPosition;
 }
 
-void QAbstract3DInputHandler::setInputPosition(const QPoint position)
+void QAbstract3DInputHandler::setInputPosition(const QPoint &position)
 {
     if (position != d_ptr->m_inputPosition) {
         d_ptr->m_inputPosition = position;
         emit positionChanged(position);
-    }
-}
-
-bool QAbstract3DInputHandler::slicingActivated()
-{
-    return d_ptr->m_isSlicingActivated;
-}
-
-void QAbstract3DInputHandler::setSlicingActivated(const bool isSlicing)
-{
-    if (isSlicing != d_ptr->m_isSlicingActivated) {
-        d_ptr->m_isSlicingActivated = isSlicing;
-        emit slicingActiveChanged(isSlicing);
-    }
-}
-
-int QAbstract3DInputHandler::zoomLevel()
-{
-    return d_ptr->m_zoomLevel;
-}
-
-void QAbstract3DInputHandler::setZoomLevel(const int zoomLevel)
-{
-    if (zoomLevel != d_ptr->m_zoomLevel) {
-        d_ptr->m_zoomLevel = zoomLevel;
-        emit zoomLevelChanged(zoomLevel);
     }
 }
 
@@ -117,41 +95,41 @@ void QAbstract3DInputHandler::setPrevDistance(int distance)
     d_ptr->m_prevDistance = distance;
 }
 
-int QAbstract3DInputHandler::prevDistance()
+int QAbstract3DInputHandler::prevDistance() const
 {
     return d_ptr->m_prevDistance;
 }
 
 
-QRect QAbstract3DInputHandler::mainViewPortRect()
+Q3DScene *QAbstract3DInputHandler::scene() const
 {
-    return d_ptr->m_mainViewPort;
+    return d_ptr->m_scene;
 }
 
-void QAbstract3DInputHandler::setMainViewPortRect(const QRect viewPort)
+void QAbstract3DInputHandler::setScene(Q3DScene *scene)
 {
-    d_ptr->m_mainViewPort = viewPort;
+    d_ptr->m_scene = scene;
 }
 
-CameraHelper *QAbstract3DInputHandler::camera()
+void QAbstract3DInputHandler::setPreviousInputPos(const QPoint &position)
 {
-    return d_ptr->m_camera;
+    d_ptr->m_previousInputPos = position;
 }
 
-void QAbstract3DInputHandler::setCamera(CameraHelper *camera)
+QPoint QAbstract3DInputHandler::previousInputPos() const
 {
-    d_ptr->m_camera = camera;
+    return d_ptr->m_previousInputPos;
 }
+
 
 
 QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputHandler *q) :
     q_ptr(q),
     m_prevDistance(0),
     m_inputState(QDataVis::InputNone),
-    m_isSlicingActivated(false),
     m_inputPosition(QPoint(0,0)),
-    m_zoomLevel(0),
-    m_camera(0)
+    m_previousInputPos(QPoint(0,0)),
+    m_scene(0)
 {
 }
 

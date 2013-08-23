@@ -16,18 +16,23 @@
 **
 ****************************************************************************/
 #include "qtouch3dinputhandler.h"
+#include "q3dcamera.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-QTouch3DInputHandler::QTouch3DInputHandler() :
-    Q3DInputHandler()
+QTouch3DInputHandler::QTouch3DInputHandler(QObject *parent) :
+    Q3DInputHandler(parent)
+{
+}
+
+QTouch3DInputHandler::~QTouch3DInputHandler()
 {
 }
 
 // Input event listeners
 void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!slicingActivated()) {
+    if (!scene()->isSlicingActivated()) {
         setInputState( QDataVis::InputOnScene );
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition( event->pos() );
@@ -39,13 +44,13 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     QList<QTouchEvent::TouchPoint> points;
     points = event->touchPoints();
 
-    if (!slicingActivated() && points.count() == 2) {
+    if (!scene()->isSlicingActivated() && points.count() == 2) {
         setInputState( QDataVis::InputOnPinch );
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();
         int zoomRate = 1;
-        int zoomLevel = QAbstract3DInputHandler::zoomLevel();
+        int zoomLevel = scene()->camera()->zoomLevel();
         if (zoomLevel > 100)
             zoomRate = 5;
         if (newDistance > prevDistance())
@@ -56,7 +61,7 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             zoomLevel = 500;
         else if (zoomLevel < 10)
             zoomLevel = 10;
-        setZoomLevel(zoomLevel);
+        scene()->camera()->setZoomLevel(zoomLevel);
         setPrevDistance(newDistance);
     }
 }
@@ -64,16 +69,16 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
 void QTouch3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     // TODO: This code needs revisiting with new Qt releases and possibly move to using touch events for these as well.
-    QRect mainViewPort = mainViewPortRect();
     if (Qt::LeftButton == event->button()) {
-        if (slicingActivated()) {
-            if (mousePos.x() <= mainViewPort.width()
-                    && mousePos.y() <= mainViewPort.height()) {
+        if (scene()->isSlicingActivated()) {
+            if (scene()->isInputInsideMainView(mousePos)) {
                 setInputState(QDataVis::InputOnOverview);
                 //qDebug() << "Mouse pressed on overview";
-            } else {
+            } else if (scene()->isInputInsideSliceView(mousePos)) {
                 setInputState(QDataVis::InputOnSlice);
                 //qDebug() << "Mouse pressed on zoom";
+            } else {
+                setInputState(QDataVis::InputNone);
             }
         } else {
             setInputState(QDataVis::InputRotating);
@@ -84,14 +89,12 @@ void QTouch3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mou
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
         setInputPosition(QPoint(0, 0));
-    } else if (!slicingActivated() && Qt::RightButton == event->button()) {
+    } else if (Qt::RightButton == event->button()) {
         // disable rotating when in slice view
         setInputState(QDataVis::InputOnScene);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
-    // TODO: Call actual camera class when it's been written.
-    //m_cameraHelper->updateMousePos(m_mousePos);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

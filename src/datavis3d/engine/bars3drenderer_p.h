@@ -44,7 +44,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class ShaderHelper;
 class ObjectHelper;
 class LabelItem;
-class CameraHelper;
+class Q3DScene;
 
 class QT_DATAVIS3D_EXPORT Bars3DRenderer : public Abstract3DRenderer
 {
@@ -111,7 +111,8 @@ public:
     ~Bars3DRenderer();
 
     void updateDataModel(QBarDataProxy *dataProxy);
-    void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
+    void updateScene(Q3DScene *scene);
+    void render(GLuint defaultFboHandle = 0);
 
     QRect mainViewPort();
 
@@ -121,13 +122,13 @@ protected:
 
 public slots:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
-                        QSizeF spacing = QSizeF(1.0, 1.0),
+                        const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
     void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateSampleSpace(int rowCount, int columnCount);
     void updateBackgroundEnabled(bool enable);
-    void updateSelectedBarPos(QPoint position);
+    void updateSelectedBarPos(const QPoint &position);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
@@ -140,9 +141,8 @@ private:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
 
-    void drawSlicedScene(CameraHelper *camera,
-                         const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
-    void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
+    void drawSlicedScene(const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawScene(GLuint defaultFboHandle);
     void handleResize();
 
     void loadBackgroundMesh();

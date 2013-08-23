@@ -54,21 +54,12 @@ private:
     GLfloat m_segmentStep;
     GLfloat m_segmentMinimum;
 
-    // Interaction
-    MouseState m_mouseState;
-    QPoint m_mousePos;
-    QDataVis::SelectionMode m_selectionMode;
-
 public:
     explicit Surface3DController(QRect rect);
     ~Surface3DController();
 
     void initializeOpenGL();
     virtual void synchDataToRenderer();
-
-    QPoint mousePosition();
-
-    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
 
     // Enable or disable the smoothes of the surface
     void setSmoothSurface(bool enable);
@@ -88,18 +79,10 @@ public:
     //TODO: Temp solution
     void setData(QList<qreal> series, int width, int depth);
 
-#if defined(Q_OS_ANDROID)
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-#endif
-    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
-    void wheelEvent(QWheelEvent *event);
-
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    void handleSelectionAtPoint(const QPoint &point);
 
 public slots:
     void handleArrayReset();

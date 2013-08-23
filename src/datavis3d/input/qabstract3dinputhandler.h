@@ -19,29 +19,24 @@
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
-#include <QObject>
-
 #include "qdatavis3denums.h"
 #include "qabstract3dinputhandler_p.h"
+#include "q3dscene.h"
+#include <QObject>
+#include <QMouseEvent>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstract3DInputHandler : public QObject
+class QT_DATAVIS3D_EXPORT QAbstract3DInputHandler : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVis3D::QDataVis::InputState inputState READ inputState WRITE setInputState NOTIFY inputStateChanged)
     Q_PROPERTY(QPoint inputPosition READ inputPosition WRITE setInputPosition NOTIFY positionChanged)
-    Q_PROPERTY(bool slicingActivated READ slicingActivated WRITE setSlicingActivated NOTIFY slicingActiveChanged)
-    Q_PROPERTY(int zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
-    Q_PROPERTY(QRect mainViewPortRect READ mainViewPortRect WRITE setMainViewPortRect)
-
-    Q_PROPERTY(CameraHelper *camera READ camera WRITE setCamera)
-
-private:
-    QScopedPointer<QAbstract3DInputHandlerPrivate> d_ptr;
+    Q_PROPERTY(Q3DScene *scene READ scene WRITE setScene)
 
 public:
-    explicit QAbstract3DInputHandler();
+    explicit QAbstract3DInputHandler(QObject *parent = 0);
+    virtual ~QAbstract3DInputHandler();
 
     // Input event listeners
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -56,29 +51,30 @@ public:
 
     // TODO: Check if the inputState needs to be visible outside of subclasses in the final architecture
     QDataVis::InputState inputState();
-    void setInputState(const QDataVis::InputState inputState);
-    void setInputPosition(const QPoint position);
-    QPoint inputPosition();
-    void setSlicingActivated(const bool isSlicing);
-    bool slicingActivated();
-    void setZoomLevel(const int zoomLevel);
-    int zoomLevel();
-    QRect mainViewPortRect();
-    void setMainViewPortRect(const QRect viewPort);
+    void setInputState(QDataVis::InputState inputState);
+    void setInputPosition(const QPoint &position);
+    QPoint inputPosition() const;
 
-    // TODO: Modify for proper camera once that is available
-    CameraHelper *camera();
-    void setCamera(CameraHelper *camera);
+    Q3DScene *scene() const;
+    void setScene(Q3DScene *scene);
 
 protected:
     void setPrevDistance(int distance);
-    int prevDistance();
+    int prevDistance() const;
+    void setPreviousInputPos(const QPoint &position);
+    QPoint previousInputPos() const;
 
 signals:
-    void positionChanged(QPoint position);
+    void positionChanged(const QPoint &position);
     void inputStateChanged(QDataVis::InputState state);
-    void slicingActiveChanged(bool isSlicing);
-    void zoomLevelChanged(int zoomLevel);
+    void selectionAtPoint(const QPoint &point);
+
+private:
+    Q_DISABLE_COPY(QAbstract3DInputHandler)
+
+    QScopedPointer<QAbstract3DInputHandlerPrivate> d_ptr;
+
+    friend class Abstract3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

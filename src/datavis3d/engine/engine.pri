@@ -17,7 +17,16 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/scatter3drenderer_p.h \
            $$PWD/axisrendercache_p.h \
            $$PWD/abstract3drenderer_p.h \
-           $$PWD/selectionpointer_p.h
+           $$PWD/selectionpointer_p.h \
+           $$PWD/q3dcamera.h \
+           $$PWD/q3dcamera_p.h \
+           $$PWD/q3dscene.h \
+           $$PWD/q3dlight.h \
+           $$PWD/q3dlight_p.h \
+           $$PWD/q3dbox.h \
+           $$PWD/q3dobject.h \
+           $$PWD/q3dobject_p.h \
+           $$PWD/q3dscene_p.h
 
 SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/q3dbars.cpp \
@@ -34,6 +43,11 @@ SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/scatter3drenderer.cpp \
            $$PWD/axisrendercache.cpp \
            $$PWD/abstract3drenderer.cpp \
-           $$PWD/selectionpointer.cpp
+           $$PWD/selectionpointer.cpp \
+           $$PWD/q3dcamera.cpp \
+           $$PWD/q3dlight.cpp \
+           $$PWD/q3dbox.cpp \
+           $$PWD/q3dobject.cpp \
+           $$PWD/q3dscene.cpp
 
 RESOURCES += engine/engine.qrc

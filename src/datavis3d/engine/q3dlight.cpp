@@ -16,30 +16,34 @@
 **
 ****************************************************************************/
 
-#ifndef QTOUCH3DINPUTHANDLER_H
-#define QTOUCH3DINPUTHANDLER_H
-
-#include "q3dinputhandler.h"
+#include "q3dlight.h"
+#include "q3dscene.h"
+#include "q3dlight_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QTouch3DInputHandler : public Q3DInputHandler
+Q3DLight::Q3DLight(QObject *parent) :
+    Q3DObject(parent),
+    d_ptr(new Q3DLightPrivate(this))
 {
-    Q_OBJECT
+}
 
-public:
-    explicit QTouch3DInputHandler(QObject *parent = 0);
-    virtual ~QTouch3DInputHandler();
+void Q3DLight::copyValuesFrom(const Q3DLight &source)
+{
+    Q3DObject::copyValuesFrom(source);
+}
 
-    // Input event listeners
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void touchEvent(QTouchEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+Q3DLight::~Q3DLight()
+{
+}
 
-private:
-    Q_DISABLE_COPY(QTouch3DInputHandler)
-};
+Q3DLightPrivate::Q3DLightPrivate(Q3DLight *q) :
+    q_ptr(q)
+{
+}
+
+Q3DLightPrivate::~Q3DLightPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
-
-#endif // QTOUCH3DINPUTHANDLER_H

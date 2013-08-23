@@ -16,30 +16,45 @@
 **
 ****************************************************************************/
 
-#ifndef QTOUCH3DINPUTHANDLER_H
-#define QTOUCH3DINPUTHANDLER_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include "q3dinputhandler.h"
+#ifndef Q3DSCENE_P_H
+#define Q3DSCENE_P_H
+
+#include <QRect>
+
+#include "datavis3dglobal_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QT_DATAVIS3D_EXPORT QTouch3DInputHandler : public Q3DInputHandler
+class Q3DCamera;
+class Q3DLight;
+class Q3DScene;
+
+class Q3DScenePrivate
 {
-    Q_OBJECT
-
 public:
-    explicit QTouch3DInputHandler(QObject *parent = 0);
-    virtual ~QTouch3DInputHandler();
+    Q3DScenePrivate(Q3DScene *q);
+    ~Q3DScenePrivate();
 
-    // Input event listeners
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void touchEvent(QTouchEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-
-private:
-    Q_DISABLE_COPY(QTouch3DInputHandler)
+    Q3DScene *q_ptr;
+    QRect m_viewport;
+    QRect m_mainViewport;
+    QRect m_sliceViewport;
+    Q3DCamera *m_camera;
+    Q3DLight *m_light;
+    bool m_isUnderSideCameraEnabled;
+    bool m_isSlicingActivated;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QTOUCH3DINPUTHANDLER_H
+#endif // Q3DSCENE_P_H

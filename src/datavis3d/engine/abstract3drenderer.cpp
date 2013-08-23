@@ -20,6 +20,8 @@
 #include "q3dvalueaxis.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
+#include "q3dscene.h"
+#include "q3dcamera.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -34,10 +36,10 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedBoundingRect(QRect(0,0,0,0)),
       m_cachedShadowQuality(QDataVis::ShadowMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedZoomLevel(100),
       m_cachedSelectionMode(QDataVis::ModeNone),
       m_cachedIsGridEnabled(false),
-      m_cachedIsBackgroundEnabled(false)
+      m_cachedIsBackgroundEnabled(false),
+      m_cachedScene(0)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -51,6 +53,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
 {
     delete m_drawer;
     delete m_textureHelper;
+    delete m_cachedScene;
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -75,10 +78,8 @@ void Abstract3DRenderer::initializeOpenGL()
     axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
 }
 
-void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Abstract3DRenderer::render(const GLuint defaultFboHandle)
 {
-    Q_UNUSED(camera)
-
 #ifdef DISPLAY_RENDER_SPEED
     // For speed computation
     if (m_isFirstFrame) {
@@ -127,13 +128,13 @@ QString Abstract3DRenderer::itemLabelFormat() const
     return m_cachedItemLabelFormat;
 }
 
-void Abstract3DRenderer::updateBoundingRect(const QRect boundingRect)
+void Abstract3DRenderer::updateBoundingRect(const QRect &boundingRect)
 {
     m_cachedBoundingRect = boundingRect;
     handleResize();
 }
 
-void Abstract3DRenderer::updatePosition(const QRect boundingRect)
+void Abstract3DRenderer::updatePosition(const QRect &boundingRect)
 {
     m_cachedBoundingRect = boundingRect;
 }
@@ -145,6 +146,14 @@ void Abstract3DRenderer::updateTheme(Theme theme)
     m_drawer->setTheme(m_cachedTheme);
     // Re-initialize shaders
     handleShadowQualityChange();
+}
+
+void Abstract3DRenderer::updateScene(Q3DScene *scene)
+{
+    // Make a copy of the scene to renderer's cache.
+    Q3DScene *newScene = scene->clone();
+    delete m_cachedScene;
+    m_cachedScene = newScene;
 }
 
 void Abstract3DRenderer::handleShadowQualityChange()
@@ -240,11 +249,6 @@ void Abstract3DRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
-}
-
-void Abstract3DRenderer::updateZoomLevel(int newZoomLevel)
-{
-    m_cachedZoomLevel = newZoomLevel;
 }
 
 void Abstract3DRenderer::updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type)

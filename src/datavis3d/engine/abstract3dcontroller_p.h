@@ -37,6 +37,8 @@
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
+#include "q3dscene.h"
+#include "q3dbox.h"
 
 class QFont;
 
@@ -153,10 +155,12 @@ private:
     bool m_isGridEnabled;
     QString m_objFile;
 
+    Q3DScene *m_scene;
+
 protected:
-    QAbstract3DInputHandler *m_inputHandler;
+    QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
+    QAbstract3DInputHandler *m_activeInputHandler;
     CameraHelper *m_cameraHelper;
-    int m_zoomLevel;
     // Active axes
     Q3DAbstractAxis *m_axisX;
     Q3DAbstractAxis *m_axisY;
@@ -204,6 +208,13 @@ public:
     virtual int x();
     virtual void setY(const int y);
     virtual int y();
+
+    virtual QRect mainViewport() const;
+    virtual void setMainViewport(const QRect &mainViewport);
+
+    virtual QRect sliceViewport() const;
+    virtual void setSliceViewport(const QRect &sliceViewport);
+
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual Q3DAbstractAxis *axisX();
     virtual void setAxisY(Q3DAbstractAxis *axis);
@@ -213,6 +224,11 @@ public:
     virtual void addAxis(Q3DAbstractAxis *axis);
     virtual void releaseAxis(Q3DAbstractAxis *axis);
     virtual QList<Q3DAbstractAxis *> axes() const; // Omits default axes
+
+    virtual void addInputHandler(QAbstract3DInputHandler *inputHandler);
+    virtual void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
+    virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
+    virtual QAbstract3DInputHandler *activeInputHandler();
 
     virtual QAbstractDataProxy *activeDataProxy() const;
     virtual void addDataProxy(QAbstractDataProxy *proxy);
@@ -265,9 +281,27 @@ public:
     virtual void setGridEnabled(bool enable);
     virtual bool gridEnabled();
 
+    // Query input state and position
+    QDataVis::InputState inputState();
+    QPoint inputPosition();
+
+    // Enable or disable slicing mode
+    bool isSlicingActive();
+    void setSlicingActive(bool isSlicing);
+
+
     // override bar type with own mesh
     virtual void setMeshFileName(const QString &fileName);
     virtual QString meshFileName();
+
+    Q3DScene *scene();
+
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void touchEvent(QTouchEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+    virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
+    virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
+    virtual void wheelEvent(QWheelEvent *event);
 
     virtual void handleAxisTitleChangedBySender(QObject *sender);
     virtual void handleAxisLabelsChangedBySender(QObject *sender);
@@ -289,7 +323,6 @@ public slots:
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-
     void needRender();
 
 protected:

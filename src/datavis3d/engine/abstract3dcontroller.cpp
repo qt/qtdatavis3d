@@ -22,7 +22,10 @@
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
 #include "abstract3drenderer_p.h"
+#include "q3dcamera.h"
+#include "q3dlight.h"
 #include "qabstractdataproxy_p.h"
+#include "qabstract3dinputhandler.h"
 
 #if defined(Q_OS_ANDROID)
 #include "qtouch3dinputhandler.h"
@@ -46,8 +49,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_labelTransparency(QDataVis::TransparencyNoBackground),
     m_isBackgroundEnabled(true),
     m_isGridEnabled(true),
-    m_cameraHelper(new CameraHelper()),
-    m_zoomLevel(100),
+    m_scene(new Q3DScene()),
+    m_activeInputHandler(0),
     m_axisX(0),
     m_axisY(0),
     m_axisZ(0),
@@ -57,25 +60,31 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_renderPending(false)
 {
     m_theme.useColorTheme(QDataVis::ThemeSystem);
+
+    // Populate the scene
+    m_scene->setCamera(new Q3DCamera());
+    m_scene->setLight(new Q3DLight());
+    m_scene->light()->setPosition(defaultLightPos);
+
+    // Create initial default input handler
+    QAbstract3DInputHandler *inputHandler;
 #if defined(Q_OS_ANDROID)
-    m_inputHandler = new QTouch3DInputHandler();
+        inputHandler = new QTouch3DInputHandler();
 #else
-    m_inputHandler = new Q3DInputHandler();
+        inputHandler = new Q3DInputHandler();
 #endif
-    m_inputHandler->setCamera(m_cameraHelper);
+        inputHandler->d_ptr->m_isDefaultHandler = true;
+        setActiveInputHandler(inputHandler);
 }
 
 Abstract3DController::~Abstract3DController()
 {
-    delete m_cameraHelper;
-    delete m_inputHandler;
-    // Attached axes are children, so no need to explicitly delete them
-
     // Renderer can be in another thread, don't delete it directly in that case
     if (m_renderer && m_renderer->thread() != QThread::currentThread())
         m_renderer->deleteLater();
     else
         delete m_renderer;
+    delete m_scene;
 }
 
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
@@ -89,14 +98,11 @@ void Abstract3DController::synchDataToRenderer()
     if (!m_renderer)
         return;
 
+    m_renderer->updateScene(m_scene);
+
     if (m_changeTracker.positionChanged) {
         m_renderer->updatePosition(m_boundingRect);
         m_changeTracker.positionChanged = false;
-    }
-
-    if (m_changeTracker.zoomLevelChanged) {
-        m_renderer->updateZoomLevel(m_zoomLevel);
-        m_changeTracker.zoomLevelChanged = false;
     }
 
     if (m_changeTracker.themeChanged) {
@@ -306,7 +312,7 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
     if (!m_renderer)
         return;
 
-    m_renderer->render(m_cameraHelper, defaultFboHandle);
+    m_renderer->render(defaultFboHandle);
 
 #ifdef DISPLAY_RENDER_SPEED
     // To get meaningful framerate, don't just do render on demand.
@@ -314,10 +320,47 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
 #endif
 }
 
+void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    m_activeInputHandler->mouseDoubleClickEvent(event);
+    emitNeedRender();
+}
+
+void Abstract3DController::touchEvent(QTouchEvent *event)
+{
+    m_activeInputHandler->touchEvent(event);
+    emitNeedRender();
+}
+
+void Abstract3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    m_activeInputHandler->mousePressEvent(event, mousePos);
+    emitNeedRender();
+}
+
+void Abstract3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    m_activeInputHandler->mouseReleaseEvent(event, mousePos);
+    emitNeedRender();
+}
+
+void Abstract3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
+{
+    m_activeInputHandler->mouseMoveEvent(event, mousePos);
+    emitNeedRender();
+}
+
+void Abstract3DController::wheelEvent(QWheelEvent *event)
+{
+    m_activeInputHandler->wheelEvent(event);
+    emitNeedRender();
+}
+
 void Abstract3DController::setSize(const int width, const int height)
 {
     m_boundingRect.setWidth(width);
     m_boundingRect.setHeight(height);
+    m_scene->setViewportSize(width, height);
 
     m_changeTracker.boundingRectChanged = true;
     emitNeedRender();
@@ -336,6 +379,7 @@ const QRect Abstract3DController::boundingRect()
 void Abstract3DController::setBoundingRect(const QRect boundingRect)
 {
     m_boundingRect = boundingRect;
+    m_scene->setViewport(boundingRect);
 
     m_changeTracker.boundingRectChanged = true;
     emitNeedRender();
@@ -344,6 +388,7 @@ void Abstract3DController::setBoundingRect(const QRect boundingRect)
 void Abstract3DController::setWidth(const int width)
 {
     m_boundingRect.setWidth(width);
+    m_scene->setViewportSize(width, m_scene->viewport().height());
 
     m_changeTracker.sizeChanged = true;
     emitNeedRender();
@@ -357,6 +402,7 @@ int Abstract3DController::width()
 void Abstract3DController::setHeight(const int height)
 {
     m_boundingRect.setHeight(height);
+    m_scene->setViewportSize(m_scene->viewport().width(), height);
 
     m_changeTracker.sizeChanged = true;
     emitNeedRender();
@@ -391,6 +437,26 @@ void Abstract3DController::setY(const int y)
 int Abstract3DController::y()
 {
     return m_boundingRect.y();
+}
+
+QRect Abstract3DController::mainViewport() const
+{
+    return m_scene->mainViewport();
+}
+
+void Abstract3DController::setMainViewport(const QRect &mainViewport)
+{
+    m_scene->setMainViewport(mainViewport);
+}
+
+QRect Abstract3DController::sliceViewport() const
+{
+    return m_scene->sliceViewport();
+}
+
+void Abstract3DController::setSliceViewport(const QRect &sliceViewport)
+{
+    m_scene->setSliceViewport(sliceViewport);
 }
 
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
@@ -525,14 +591,68 @@ void Abstract3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     emitNeedRender();
 }
 
+void Abstract3DController::addInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    Q_ASSERT(inputHandler);
+    Abstract3DController *owner = qobject_cast<Abstract3DController *>(inputHandler->parent());
+    if (owner != this) {
+        Q_ASSERT_X(!owner, "addInputHandler", "Input handler already attached to another component.");
+        inputHandler->setParent(this);
+    }
+
+    if (!m_inputHandlers.contains(inputHandler))
+        m_inputHandlers.append(inputHandler);
+}
+
+void Abstract3DController::releaseInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    if (inputHandler && m_inputHandlers.contains(inputHandler)) {
+        // Clear the default status from released default input handler
+        if (inputHandler->d_ptr->m_isDefaultHandler)
+            inputHandler->d_ptr->m_isDefaultHandler = false;
+
+        // If the input handler is in use, remove it
+        if (m_activeInputHandler == inputHandler)
+            setActiveInputHandler(0);
+
+        m_inputHandlers.removeAll(inputHandler);
+        inputHandler->setParent(0);
+    }
+}
+
+void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    // If existing input handler is the default input handler, delete it
+    if (m_activeInputHandler) {
+        if (m_activeInputHandler->d_ptr->m_isDefaultHandler) {
+            m_inputHandlers.removeAll(m_activeInputHandler);
+            delete m_activeInputHandler;
+        } else {
+            // Disconnect the old input handler from the scene
+            m_activeInputHandler->setScene(0);
+        }
+    }
+
+    // Assume ownership and connect to this controller's scene
+    addInputHandler(inputHandler);
+    m_activeInputHandler = inputHandler;
+    if (m_activeInputHandler)
+        m_activeInputHandler->setScene(m_scene);
+}
+
+QAbstract3DInputHandler* Abstract3DController::activeInputHandler()
+{
+    return m_activeInputHandler;
+}
+
 int Abstract3DController::zoomLevel()
 {
-    return m_zoomLevel;
+    return m_scene->camera()->zoomLevel();
 }
 
 void Abstract3DController::setZoomLevel(int zoomLevel)
 {
-    m_zoomLevel = zoomLevel;
+    m_scene->camera()->setZoomLevel(zoomLevel);
 
     m_changeTracker.zoomLevelChanged = true;
     emitNeedRender();
@@ -540,7 +660,7 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
 
 void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
 {
-    m_cameraHelper->setCameraPreset(preset);
+    m_scene->camera()->setCameraPreset(preset);
     emitNeedRender();
 }
 
@@ -548,10 +668,9 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
 {
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
-    m_zoomLevel = qBound(10, distance, 500);
-    m_changeTracker.zoomLevelChanged = true;
-    m_cameraHelper->setCameraRotation(QPointF(m_horizontalRotation,
-                                              m_verticalRotation));
+    m_scene->camera()->setZoomLevel(qBound(10, distance, 500));
+    m_scene->camera()->setRotations(QPointF(m_horizontalRotation,
+                                            m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
     emitNeedRender();
 }
@@ -657,6 +776,27 @@ bool Abstract3DController::gridEnabled()
     return m_isGridEnabled;
 }
 
+bool Abstract3DController::isSlicingActive()
+{
+    return m_scene->isSlicingActivated();
+}
+
+void Abstract3DController::setSlicingActive(bool isSlicing)
+{
+    m_scene->setSlicingActivated(isSlicing);
+    emitNeedRender();
+}
+
+QDataVis::InputState Abstract3DController::inputState()
+{
+    return m_activeInputHandler->inputState();
+}
+
+QPoint Abstract3DController::inputPosition()
+{
+    return m_activeInputHandler->inputPosition();
+}
+
 void Abstract3DController::setMeshFileName(const QString &fileName)
 {
     m_objFile = fileName;
@@ -667,6 +807,11 @@ void Abstract3DController::setMeshFileName(const QString &fileName)
 QString Abstract3DController::meshFileName()
 {
     return m_objFile;
+}
+
+Q3DScene *Abstract3DController::scene()
+{
+    return m_scene;
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)

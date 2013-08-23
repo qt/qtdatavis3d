@@ -21,9 +21,10 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
-#include "camerahelper_p.h"
+#include "q3dcamera.h"
 #include "drawer_p.h"
 #include "utils_p.h"
+#include "q3dlight.h"
 
 #include <QImage>
 #include <QMatrix4x4>
@@ -41,6 +42,7 @@ SelectionPointer::SelectionPointer(Surface3DController *controller)
       m_pointObj(0),
       m_textureHelper(0),
       m_isInitialized(false),
+      m_cachedScene(0),
       m_font(QFont(QStringLiteral("Arial"))),
       m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_drawer(new Drawer(m_cachedTheme, m_font, m_labelTransparency))
@@ -56,6 +58,7 @@ SelectionPointer::~SelectionPointer()
     delete m_pointObj;
     delete m_textureHelper;
     delete m_drawer;
+    delete m_cachedScene;
 }
 
 void SelectionPointer::initializeOpenGL()
@@ -79,20 +82,26 @@ void SelectionPointer::initializeOpenGL()
     m_isInitialized = true;
 }
 
-void SelectionPointer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void SelectionPointer::updateScene(Q3DScene *scene)
+{
+    // Make a copy of the scene.
+    delete m_cachedScene;
+    m_cachedScene = scene->clone();
+}
+
+void SelectionPointer::render(GLuint defaultFboHandle)
 {
     Q_UNUSED(defaultFboHandle)
 
+    Q3DCamera *camera = m_cachedScene->camera();
     QSize textureSize = m_labelItem.size();
 
     QMatrix4x4 itModelMatrix;
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
-                m_mainViewPort.width(),
-                m_mainViewPort.height(),
-                false/*m_hasNegativeValues*/);
+    //TODO: m_autoScaleAdjustment
+    camera->updateViewMatrix(1.0f);
+    QMatrix4x4 viewMatrix = camera->viewMatrix();
 
     itModelMatrix.scale(m_scale);
 
@@ -119,7 +128,7 @@ void SelectionPointer::render(CameraHelper *camera, const GLuint defaultFboHandl
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
-    QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
+    QVector3D lightPos =  m_cachedScene->light()->position();
 
     //
     // Draw the point
@@ -149,7 +158,7 @@ void SelectionPointer::render(CameraHelper *camera, const GLuint defaultFboHandl
         modelMatrixLabel.translate(m_position * m_scale + labelAlign + QVector3D(0.0f, 0.0f, zComp));
 
         // Position the label towards the camera
-        QPointF camRotations = camera->getCameraRotations();
+        QPointF camRotations = camera->rotations();
         modelMatrixLabel.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrixLabel.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
 

@@ -2,7 +2,8 @@ HEADERS += \
     $$PWD/qabstract3dinputhandler.h \
     $$PWD/q3dinputhandler.h \
     input/qtouch3dinputhandler.h \
-    input/qabstract3dinputhandler_p.h
+    input/qabstract3dinputhandler_p.h \
+    input/q3dinputhandler_p.h
 
 SOURCES += \
     $$PWD/qabstract3dinputhandler.cpp \

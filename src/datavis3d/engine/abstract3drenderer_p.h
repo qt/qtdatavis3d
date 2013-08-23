@@ -62,7 +62,6 @@ protected:
     QRect m_cachedBoundingRect;
     QDataVis::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
-    int m_cachedZoomLevel;
 
     QString m_cachedItemLabelFormat;
     QString m_cachedObjFile;
@@ -70,11 +69,13 @@ protected:
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
 
-
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
+    Q3DBox m_boundingBox;
+
+    Q3DScene *m_cachedScene;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -89,12 +90,11 @@ public:
 
     void updateDataModel(QAbstractDataProxy *dataProxy);
 
-    virtual void render(CameraHelper *camera, const GLuint defaultFboHandle);
+    virtual void render(GLuint defaultFboHandle);
 
-    virtual void updateBoundingRect(const QRect boundingRect);
-    virtual void updatePosition(const QRect boundingRect);
+    virtual void updateBoundingRect(const QRect &boundingRect);
+    virtual void updatePosition(const QRect &boundingRect);
 
-    virtual void updateZoomLevel(int newZoomLevel);
     virtual void updateTheme(Theme theme);
     virtual void updateFont(const QFont &font);
     virtual void updateLabelTransparency(QDataVis::LabelTransparency transparency);
@@ -102,10 +102,11 @@ public:
     virtual void updateGridEnabled(bool enable);
     virtual void updateBackgroundEnabled(bool enable);
     virtual void updateMeshFileName(const QString &objFileName);
-
+    virtual void updateScene(Q3DScene *scene);
     virtual QString itemLabelFormat() const;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
+
 #if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
 #endif

@@ -18,7 +18,7 @@
 
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
-#include "camerahelper_p.h"
+#include "q3dcamera.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "surfaceobject_p.h"
@@ -27,6 +27,7 @@
 #include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
+#include "q3dlight.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -208,24 +209,52 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
 
-void Surface3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
-    // Handle GL state setup for FBO buffers and clearing of the render surface
-    Abstract3DRenderer::render(camera, defaultFboHandle);
+    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
+    scene->setMainViewport(m_mainViewPort);
+    scene->setUnderSideCameraEnabled(m_hasNegativeValues);
 
-    camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                        QVector3D(0.0f, 0.0f, zComp),
-                                        QVector3D(0.0f, 1.0f, 0.0f));
+    // TODO: bars have m_hasHeightAdjustmentChanged, which is always true!
+    // Set initial camera position
+    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
+    scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                  QVector3D(0.0f, 0.0f, zComp),
+                                  QVector3D(0.0f, 1.0f, 0.0f));
 
-    drawScene(camera, defaultFboHandle);
+    // TODO: m_autoScaleAdjustment
+    scene->camera()->updateViewMatrix(1.0f);
+    scene->setLightPositionRelativeToCamera(defaultLightPos);
+
+    Abstract3DRenderer::updateScene(scene);
+}
+
+void Surface3DRenderer::render(GLuint defaultFboHandle)
+{
+    m_cachedScene->setUnderSideCameraEnabled(m_hasNegativeValues);
+    Q3DCamera *camera = m_cachedScene->camera();
+    if (defaultFboHandle) {
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+    }
+
+    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
+    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    drawScene(defaultFboHandle);
 
     // If selection pointer is active, pass the render request for it also
     if (m_selectionPointer && m_selectionActive)
-        m_selectionPointer->render(camera, defaultFboHandle);
+        m_selectionPointer->render(defaultFboHandle);
 }
 
-void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
+void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
+    Q3DCamera *camera = m_cachedScene->camera();
     GLfloat backgroundRotation = 0;
 
     // Specify viewport
@@ -237,12 +266,9 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
-    // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                                100.0f, //TODO: m_zoomLevel * m_autoScaleAdjustment
-                                m_mainViewPort.width(),
-                                m_mainViewPort.height(),
-                                m_hasNegativeValues);
+    // Calculate view matrix TODO: m_autoScaleAdjustment
+    camera->updateViewMatrix(1.0f);
+    QMatrix4x4 viewMatrix = camera->viewMatrix();
 
     // Calculate flipping indicators
     if (viewMatrix.row(0).x() > 0)
@@ -264,7 +290,8 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 0.0f;
 
-    QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
+    // TODO: add 0.0f, 1.0f / m_autoScaleAdjustment
+    QVector3D lightPos = m_cachedScene->light()->position();
 
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
@@ -332,7 +359,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
 
         m_querySelection = false;
 
-        QPoint point = m_controller->mousePosition();
+        QPoint point = m_controller->inputPosition();
         GLubyte pixel[4] = {0};
         glReadPixels(point.x(), m_cachedBoundingRect.height() - point.y(), 1, 1,
                      GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
@@ -1018,9 +1045,6 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_scaleFactor = qMax(m_sampleSpace.width(), m_sampleSpace.height());
     m_scaleX = (coordSpace * m_sampleSpace.width()) / m_scaleFactor;
     m_scaleZ = (coordSpace * m_sampleSpace.height()) / m_scaleFactor;
-
-    //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
-    //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
 }
 
 void Surface3DRenderer::updateSmoothStatus(bool enable)

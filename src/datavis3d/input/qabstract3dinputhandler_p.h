@@ -29,12 +29,13 @@
 #ifndef QABSTRACT3DINPUTHANDLER_P_H
 #define QABSTRACT3DINPUTHANDLER_P_H
 
-#include <QMouseEvent>
+#include "datavis3dglobal_p.h"
+#include <QRect>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QAbstract3DInputHandler;
-class CameraHelper;
+class Q3DScene;
 
 class QAbstract3DInputHandlerPrivate
 {
@@ -45,18 +46,22 @@ public:
 public:
     QAbstract3DInputHandler *q_ptr;
     int m_prevDistance;
+    QPoint m_previousInputPos;
+
+    GLfloat m_defaultXRotation;
+    GLfloat m_defaultYRotation;
 
 private:
     QDataVis::InputState m_inputState;
-    bool m_isSlicingActivated;
     QPoint m_inputPosition;
-    int m_zoomLevel;
     QRect m_mainViewPort;
 
-    // TODO: Replace with proper camera once it's available
-    CameraHelper *m_camera;
+    // TODO: Check if this could be avoided with signals/slots or some other way.
+    Q3DScene *m_scene;
+    bool m_isDefaultHandler;
 
     friend class QAbstract3DInputHandler;
+    friend class Abstract3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

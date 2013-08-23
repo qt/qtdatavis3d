@@ -57,11 +57,6 @@ class QT_DATAVIS3D_EXPORT Scatter3DController : public Abstract3DController
 private:
     Scatter3DChangeBitField m_changeTracker;
 
-    // Interaction
-    MouseState m_mouseState;
-    QPoint m_mousePos;
-    bool m_isSlicingActivated;
-
     // Rendering
     Scatter3DRenderer *m_renderer;
     int m_selectedItemIndex;
@@ -72,15 +67,6 @@ public:
 
     void initializeOpenGL();
 
-    MouseState mouseState();
-    QPoint mousePosition();
-
-    bool isSlicingActive();
-    void setSlicingActive(bool isSlicing);
-
-    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight,
-                                   bool showUnder = false);
-
     // Object type
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
@@ -90,15 +76,6 @@ public:
     void setSelectedItemIndex(int index);
     int selectedItemIndex() const;
     static inline int noSelectionIndex() { return -1; }
-
-#if defined(Q_OS_ANDROID)
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-#endif
-    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
-    void wheelEvent(QWheelEvent *event);
 
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 

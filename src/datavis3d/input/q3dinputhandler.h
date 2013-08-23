@@ -28,20 +28,31 @@ const int nearZoomRangeDivider = 12;
 const int midZoomRangeDivider  = 60;
 const int farZoomRangeDivider  = 120;
 
+const float rotationSpeed    = 100.0f;
+
 #include "qabstract3dinputhandler.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Q3DInputHandler : public QAbstract3DInputHandler
+class QT_DATAVIS3D_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {
+    Q_OBJECT
+
 public:
-    explicit Q3DInputHandler();
+    explicit Q3DInputHandler(QObject *parent = 0);
+    virtual ~Q3DInputHandler();
 
     // Input event listeners
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void wheelEvent(QWheelEvent *event);
+
+signals:
+    void rotationSpeedChanged(int rotationSpeed);
+
+private:
+    Q_DISABLE_COPY(Q3DInputHandler)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

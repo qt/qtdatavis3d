@@ -44,8 +44,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class ShaderHelper;
 class ObjectHelper;
 class LabelItem;
-class CameraHelper;
-class Q3DAbstractAxisPrivate;
+class Q3DScene;
+class QAbstractAxisPrivate;
 
 class QT_DATAVIS3D_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
@@ -99,7 +99,8 @@ public:
     ~Scatter3DRenderer();
 
     void updateDataModel(QScatterDataProxy *dataProxy);
-    void render(CameraHelper *camera, const GLuint defaultFboHandle);
+    void updateScene(Q3DScene *scene);
+    void render(GLuint defaultFboHandle);
 
     QRect mainViewPort();
 
@@ -112,7 +113,7 @@ private:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
 
-    void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
+    void drawScene(GLuint defaultFboHandle);
     void handleResize();
 
     void loadBackgroundMesh();

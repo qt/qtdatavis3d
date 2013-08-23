@@ -18,11 +18,12 @@
 
 #include "scatter3drenderer_p.h"
 #include "scatter3dcontroller_p.h"
-#include "camerahelper_p.h"
+#include "q3dcamera.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
+#include "q3dlight.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -160,25 +161,37 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
 
-void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
-    // Handle GL state setup for FBO buffers and clearing of the render surface
-    Abstract3DRenderer::render(camera, defaultFboHandle);
+    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
+    scene->setMainViewport(m_mainViewPort);
+    scene->setUnderSideCameraEnabled(true);
 
     if (m_hasHeightAdjustmentChanged) {
-        // Set initial camera position. Also update if height adjustment has changed.
-        camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                            QVector3D(0.0f, 0.0f, zComp),
-                                            QVector3D(0.0f, 1.0f, 0.0f));
+        // Set initial m_cachedScene->camera() position. Also update if height adjustment has changed.
+        scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                               QVector3D(0.0f, 0.0f, zComp),
+                                               QVector3D(0.0f, 1.0f, 0.0f));
         m_hasHeightAdjustmentChanged = false;
     }
 
-    // Draw dots scene
-    drawScene(camera, defaultFboHandle);
+    scene->camera()->updateViewMatrix(m_autoScaleAdjustment);
+    // Set light position (rotate light with m_cachedScene->camera(), a bit above it (as set in defaultLightPos))
+    scene->setLightPositionRelativeToCamera(defaultLightPos);
+
+    Abstract3DRenderer::updateScene(scene);
 }
 
-void Scatter3DRenderer::drawScene(CameraHelper *camera,
-                                  const GLuint defaultFboHandle)
+void Scatter3DRenderer::render(GLuint defaultFboHandle)
+{
+    // Handle GL state setup for FBO buffers and clearing of the render surface
+    Abstract3DRenderer::render(defaultFboHandle);
+
+    // Draw dots scene
+    drawScene(defaultFboHandle);
+}
+
+void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
 
@@ -192,11 +205,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                m_cachedZoomLevel * m_autoScaleAdjustment,
-                m_mainViewPort.width(),
-                m_mainViewPort.height(),
-                true);
+    QMatrix4x4 viewMatrix = m_cachedScene->camera()->viewMatrix();
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -224,8 +233,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     else if (m_zFlipped && !m_xFlipped)
         backgroundRotation = 0.0f;
 
-    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    QVector3D lightPos = camera->calculateLightPosition(defaultLightPos);
+    // Get light position from the scene
+    QVector3D lightPos =  m_cachedScene->light()->position();
 
     // Map adjustment direction to model matrix scaling
     // TODO: Let's use these for testing the autoscaling of dots based on their number
@@ -260,12 +269,13 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = camera->calculateLightPosition(
+        QVector3D depthLightPos = m_cachedScene->camera()->calculatePositionRelativeToCamera(
                     defaultLightPos, 0.0f, 1.0f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
-        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above? That causes the scene to be not drawn from above -> must be fixed
-        //qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
+        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
+        // That causes the scene to be not drawn from above -> must be fixed
+        // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
@@ -413,9 +423,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (Scatter3DController::MouseOnScene == m_controller->mouseState())
-            m_selection = Utils::getSelection(m_controller->mousePosition(),
+        if (QDataVis::InputOnScene == m_controller->inputState()) {
+            m_selection = Utils::getSelection(m_controller->inputPosition(),
                                               m_cachedBoundingRect.height());
+        }
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -701,7 +712,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -710,7 +721,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -719,7 +730,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -755,7 +766,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -764,7 +775,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -773,7 +784,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -831,7 +842,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -840,7 +851,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -884,7 +895,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -893,7 +904,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -902,7 +913,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -956,7 +967,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -965,7 +976,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1023,7 +1034,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -1032,7 +1043,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1041,7 +1052,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -1120,7 +1131,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1180,7 +1191,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1233,7 +1244,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
                                     alignment);
 
                 // Side wall
@@ -1255,7 +1266,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1323,7 +1334,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                             QVector3D(0.0f, 0.0f, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, camera, true, false, Drawer::LabelMid);
+                            m_labelObj, m_cachedScene->camera(), true, false, Drawer::LabelMid);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;

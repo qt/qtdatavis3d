@@ -35,9 +35,7 @@ Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
       m_smoothSurface(false),
-      m_surfaceGrid(true),
-      m_mouseState(MouseNone),
-      m_mousePos(QPoint(0, 0))
+      m_surfaceGrid(true)
 {
     setActiveDataProxy(0);
 
@@ -47,6 +45,8 @@ Surface3DController::Surface3DController(QRect rect)
     setAxisX(0);
     setAxisY(0);
     setAxisZ(0);
+    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::selectionAtPoint,
+                     this, &Surface3DController::handleSelectionAtPoint);
 }
 
 Surface3DController::~Surface3DController()
@@ -87,15 +87,6 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
     // TODO: Implement!
 }
 
-QMatrix4x4 Surface3DController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
-{
-    return m_cameraHelper->calculateViewMatrix(m_mousePos,
-                                               zoom,
-                                               viewPortWidth,
-                                               viewPortHeight,
-                                               showUnder);
-}
-
 void Surface3DController::setSmoothSurface(bool enable)
 {
     m_smoothSurface = enable;
@@ -118,67 +109,6 @@ void Surface3DController::setSurfaceGrid(bool enable)
 bool Surface3DController::surfaceGrid()
 {
     return m_surfaceGrid;
-}
-
-
-#if defined(Q_OS_ANDROID)
-void Surface3DController::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    Q_UNUSED(event)
-}
-void touchEvent(QTouchEvent *event)
-{
-    Q_UNUSED(event)
-}
-#endif
-
-void Surface3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    if (Qt::LeftButton == event->button()) {
-        m_mousePos = mousePos;
-        emit leftMousePressed(mousePos);
-    } else if (Qt::RightButton == event->button()) {
-    #if !defined(Q_OS_ANDROID)
-        m_mouseState = Abstract3DController::MouseRotating;
-    #else
-        m_mouseState = Abstract3DController::MouseOnScene;
-    #endif
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos; //event->pos();
-    }
-    m_cameraHelper->updateMousePos(m_mousePos);
-    emitNeedRender();
-}
-
-void Surface3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event)
-    if (Abstract3DController::MouseRotating == m_mouseState) {
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos; //event->pos();
-        m_cameraHelper->updateMousePos(mousePos); //event->pos());
-        emitNeedRender();
-    }
-    m_mouseState = Abstract3DController::MouseNone;
-}
-
-void Surface3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event)
-    if (Abstract3DController::MouseRotating == m_mouseState) {
-        m_mousePos = mousePos; //event->pos();
-        emitNeedRender();
-    }
-}
-
-void Surface3DController::wheelEvent(QWheelEvent *event)
-{
-    Q_UNUSED(event)
-}
-
-QPoint Surface3DController::mousePosition()
-{
-    return m_mousePos;
 }
 
 void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
@@ -221,6 +151,11 @@ void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
     Theme t = theme();
     t.m_surfaceGradient.setColorAt(pos, color);
     emitNeedRender();
+}
+
+void Surface3DController::handleSelectionAtPoint(const QPoint &point)
+{
+    emit leftMousePressed(point);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -66,9 +66,6 @@ private:
     int m_columnCount;
 
     // Interaction
-    MouseState m_mouseState;
-    QPoint m_mousePos;
-    bool m_isSlicingActivated;
     QPoint m_selectedBarPos;     // Points to row & column in data window.
 
     // Look'n'feel
@@ -88,14 +85,6 @@ public:
 
     int columnCount();
     int rowCount();
-
-    MouseState mouseState();
-    QPoint mousePosition();
-
-    bool isSlicingActive();
-    void setSlicingActive(bool isSlicing);
-
-    QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -118,15 +107,6 @@ public:
 
     void setSelectedBarPos(const QPoint &position);
     QPoint selectedBarPos() const;
-
-#if defined(Q_OS_ANDROID)
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-#endif
-    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
-    void wheelEvent(QWheelEvent *event);
 
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 

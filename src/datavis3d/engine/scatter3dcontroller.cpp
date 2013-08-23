@@ -31,9 +31,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_mouseState(MouseNone),
-      m_mousePos(QPoint(0, 0)),
-      m_isSlicingActivated(false),
       m_renderer(0),
       m_selectedItemIndex(noSelectionIndex())
 {
@@ -93,152 +90,6 @@ void Scatter3DController::synchDataToRenderer()
     }
 }
 
-QMatrix4x4 Scatter3DController::calculateViewMatrix(int zoom, int viewPortWidth,
-                                                    int viewPortHeight, bool showUnder)
-{
-    return m_cameraHelper->calculateViewMatrix(m_mousePos,
-                                               zoom,
-                                               viewPortWidth,
-                                               viewPortHeight,
-                                               showUnder);
-}
-
-bool Scatter3DController::isSlicingActive()
-{
-    return m_isSlicingActivated;
-}
-
-void Scatter3DController::setSlicingActive(bool isSlicing)
-{
-    m_isSlicingActivated = isSlicing;
-
-    m_changeTracker.slicingActiveChanged = true;
-    emitNeedRender();
-}
-
-Scatter3DController::MouseState Scatter3DController::mouseState()
-{
-    return m_mouseState;
-}
-
-#if defined(Q_OS_ANDROID)
-void Scatter3DController::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    if (!m_isSlicingActivated) {
-        m_mouseState = Scatter3DController::MouseOnScene;
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = event->pos();
-        emitNeedRender();
-    }
-}
-
-void Scatter3DController::touchEvent(QTouchEvent *event)
-{
-    static int prevDistance = 0;
-
-    QList<QTouchEvent::TouchPoint> points;
-    points = event->touchPoints();
-
-    if (points.count() == 2) {
-        m_mouseState = Scatter3DController::MouseOnPinch;
-
-        QPointF distance = points.at(0).pos() - points.at(1).pos();
-        int newDistance = distance.manhattanLength();
-        int zoomRate = 1;
-        int zoomLevel = m_zoomLevel;
-        if (zoomLevel > 100)
-            zoomRate = 5;
-        if (newDistance > prevDistance)
-            zoomLevel += zoomRate;
-        else
-            zoomLevel -= zoomRate;
-        if (zoomLevel > 500)
-            zoomLevel = 500;
-        else if (zoomLevel < 10)
-            zoomLevel = 10;
-        setZoomLevel(zoomLevel);
-        prevDistance = newDistance;
-        //qDebug() << "distance" << distance.manhattanLength();
-    }
-}
-#endif
-
-void Scatter3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    QRect mainViewPort = m_renderer->mainViewPort();
-    if (Qt::LeftButton == event->button()) {
-        if (m_isSlicingActivated) {
-            if (mousePos.x() <= mainViewPort.width()
-                    && mousePos.y() <= mainViewPort.height()) {
-                m_mouseState = Scatter3DController::MouseOnOverview;
-                //qDebug() << "Mouse pressed on overview";
-            } else {
-                m_mouseState = Scatter3DController::MouseOnZoom;
-                //qDebug() << "Mouse pressed on zoom";
-            }
-        } else {
-#if !defined(Q_OS_ANDROID)
-            m_mouseState = Scatter3DController::MouseOnScene;
-#else
-            m_mouseState = Scatter3DController::MouseRotating;
-#endif
-            // update mouse positions to prevent jumping when releasing or repressing a button
-            m_mousePos = mousePos;
-            //qDebug() << "Mouse pressed on scene";
-        }
-    } else if (Qt::MiddleButton == event->button()) {
-        // reset rotations
-        m_mousePos = QPoint(0, 0);
-    } else if (Qt::RightButton == event->button()) {
-#if !defined(Q_OS_ANDROID)
-        m_mouseState = Scatter3DController::MouseRotating;
-#else
-        m_mouseState = Scatter3DController::MouseOnScene;
-#endif
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos;
-    }
-    m_cameraHelper->updateMousePos(m_mousePos);
-    emitNeedRender();
-}
-
-void Scatter3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event);
-    if (Scatter3DController::MouseRotating == m_mouseState) {
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        m_mousePos = mousePos;
-        m_cameraHelper->updateMousePos(mousePos);
-        emitNeedRender();
-    }
-    m_mouseState = Scatter3DController::MouseNone;
-}
-
-void Scatter3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    Q_UNUSED(event);
-    if (Scatter3DController::MouseRotating == m_mouseState) {
-        m_mousePos = mousePos;
-        emitNeedRender();
-    }
-}
-
-void Scatter3DController::wheelEvent(QWheelEvent *event)
-{
-    int zoomLevel = m_zoomLevel;
-    if (zoomLevel > 100)
-        zoomLevel += event->angleDelta().y() / 12;
-    else if (zoomLevel > 50)
-        zoomLevel += event->angleDelta().y() / 60;
-    else
-        zoomLevel += event->angleDelta().y() / 120;
-    if (zoomLevel > 500)
-        zoomLevel = 500;
-    else if (zoomLevel < 10)
-        zoomLevel = 10;
-
-    setZoomLevel(zoomLevel);
-}
 
 void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
@@ -383,11 +234,6 @@ void Scatter3DController::setSelectedItemIndex(int index)
 int Scatter3DController::selectedItemIndex() const
 {
     return m_selectedItemIndex;
-}
-
-QPoint Scatter3DController::mousePosition()
-{
-    return m_mousePos;
 }
 
 void Scatter3DController::adjustValueAxisRange()

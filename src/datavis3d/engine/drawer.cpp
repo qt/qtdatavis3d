@@ -22,7 +22,7 @@
 #include "objecthelper_p.h"
 #include "abstractobjecthelper_p.h"
 #include "surfaceobject_p.h"
-#include "camerahelper_p.h"
+#include "q3dcamera.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
 #include <QMatrix4x4>
@@ -181,7 +181,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
                        const QVector3D &positionComp, const QVector3D &rotation,
                        GLfloat itemHeight, QDataVis::SelectionMode mode,
                        ShaderHelper *shader, ObjectHelper *object,
-                       CameraHelper *camera,
+                       const Q3DCamera *camera,
                        bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment)
 {
@@ -296,7 +296,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     if (useDepth && !rotateAlong) {
         // Apply negative camera rotations to keep labels facing camera
-        QPointF camRotations = camera->getCameraRotations();
+        QPointF camRotations = camera->rotations();
         modelMatrix.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
     }

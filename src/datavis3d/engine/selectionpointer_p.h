@@ -35,6 +35,7 @@
 #include <QWindow>
 #include <QVector3D>
 
+#include "q3dscene.h"
 #include "datavis3dglobal_p.h"
 #include "surface3dcontroller_p.h"
 
@@ -48,7 +49,7 @@ class SurfaceObject;
 class TextureHelper;
 class Theme;
 class Drawer;
-class CameraHelper;
+class Q3DCamera;
 
 class QT_DATAVIS3D_EXPORT SelectionPointer : public QObject, protected QOpenGLFunctions
 {
@@ -59,12 +60,13 @@ public:
     ~SelectionPointer();
 
     void initializeOpenGL();
-    void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
+    void render(GLuint defaultFboHandle = 0);
     void setPosition(QVector3D position);
     void setScaling(QVector3D scaling);
     void setLabel(QString label);
     void updateTheme(Theme theme);
     void updateBoundingRect(QRect rect);
+    void updateScene(Q3DScene *scene);
 
 private:
     void initShaders();
@@ -87,6 +89,7 @@ private:
     QRect m_mainViewPort;
     QVector3D m_position;
     QVector3D m_scale;
+    Q3DScene *m_cachedScene;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
