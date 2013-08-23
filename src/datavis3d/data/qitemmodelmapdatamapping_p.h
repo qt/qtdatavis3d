@@ -43,7 +43,7 @@ public:
 private:
     QString m_labelRole;
     QString m_xPosRole;
-    QString m_yPosRole;
+    QString m_zPosRole;
     QString m_valueRole;
 
     QItemModelMapDataMapping *q_ptr;

@@ -29,11 +29,11 @@ class QItemModelBarDataMappingPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole)
-    Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole)
-    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
-    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
-    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
+    Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY mappingChanged)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY mappingChanged)
 public:
     explicit QItemModelBarDataMapping();
     QItemModelBarDataMapping(const QItemModelBarDataMapping &other);

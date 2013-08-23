@@ -29,15 +29,15 @@ class QItemModelMapDataMappingPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelMapDataMapping : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString labelRole READ labelRole WRITE setLabelRole)
-    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole)
-    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole)
-    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
+    Q_PROPERTY(QString labelRole READ labelRole WRITE setLabelRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
 public:
     explicit QItemModelMapDataMapping();
     QItemModelMapDataMapping(const QItemModelMapDataMapping &other);
     QItemModelMapDataMapping(const QString &labelRole, const QString &xPosRole,
-                             const QString &yPosRole, const QString &valueRole);
+                             const QString &zPosRole, const QString &valueRole);
     virtual ~QItemModelMapDataMapping();
 
     QItemModelMapDataMapping &operator=(const QItemModelMapDataMapping &other);
@@ -46,13 +46,13 @@ public:
     QString labelRole() const;
     void setXPosRole(const QString &role);
     QString xPosRole() const;
-    void setYPosRole(const QString &role);
-    QString yPosRole() const;
+    void setZPosRole(const QString &role);
+    QString zPosRole() const;
     void setValueRole(const QString &role);
     QString valueRole() const;
 
     void remap(const QString &labelRole, const QString &xPosRole,
-               const QString &yPosRole, const QString &valueRole);
+               const QString &zPosRole, const QString &valueRole);
 signals:
     void mappingChanged();
 

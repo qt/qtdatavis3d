@@ -263,7 +263,7 @@ void QItemModelMapDataProxyPrivate::resolveModel()
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
     const int labelRole = roleHash.key(m_mapping->labelRole().toLatin1(), noRoleIndex);
     const int xPosRole = roleHash.key(m_mapping->xPosRole().toLatin1(), noRoleIndex);
-    const int yPosRole = roleHash.key(m_mapping->yPosRole().toLatin1(), noRoleIndex);
+    const int zPosRole = roleHash.key(m_mapping->zPosRole().toLatin1(), noRoleIndex);
     // Default valueRole to display role if no mapping
     const int valueRole = roleHash.key(m_mapping->valueRole().toLatin1(), Qt::DisplayRole);
     const int columnCount = m_itemModel->columnCount();
@@ -282,8 +282,8 @@ void QItemModelMapDataProxyPrivate::resolveModel()
             qreal yPos(qreal(0.0));
             if (xPosRole != noRoleIndex)
                 xPos = index.data(xPosRole).toReal();
-            if (yPosRole != noRoleIndex)
-                yPos = index.data(yPosRole).toReal();
+            if (zPosRole != noRoleIndex)
+                yPos = index.data(zPosRole).toReal(); // z position is mapped to y of QPoint
             (*newProxyArray)[runningCount].setMapPosition(QPointF(xPos, yPos));
             (*newProxyArray)[runningCount].setValue(index.data(valueRole).toReal());
             runningCount++;

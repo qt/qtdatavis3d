@@ -20,12 +20,32 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QItemModelScatterDataMapping
+ * \inmodule QtDataVis3D
+ * \brief Data model mapping for Q3DScatter.
+ * \since 1.0.0
+ *
+ * QItemModelScatterDataMapping is used to define roles for mapping data in QAbstractItemModel to
+ * Q3DScatter.
+ *
+ * TO BE CHECKED (add more explanations and/or example)
+ *
+ * \sa QItemModelScatterDataProxy
+ */
+
+/*!
+ * Constructs QItemModelScatterDataMapping.
+ */
 QItemModelScatterDataMapping::QItemModelScatterDataMapping()
     : QObject(0),
       d_ptr(new QItemModelScatterDataMappingPrivate(this))
 {
 }
 
+/*!
+ * Constructs a copy of \a other.
+ */
 QItemModelScatterDataMapping::QItemModelScatterDataMapping(
         const QItemModelScatterDataMapping &other)
     : QObject(0),
@@ -34,31 +54,37 @@ QItemModelScatterDataMapping::QItemModelScatterDataMapping(
     operator=(other);
 }
 
-QItemModelScatterDataMapping::QItemModelScatterDataMapping(const QString &labelRole,
-                                                           const QString &xPosRole,
+/*!
+ * Constructs QItemModelScatterDataMapping with \a xPosRole, \a yPosRole, \a zPosRole and
+ * \a valueRole.
+ */
+QItemModelScatterDataMapping::QItemModelScatterDataMapping(const QString &xPosRole,
                                                            const QString &yPosRole,
                                                            const QString &zPosRole,
                                                            const QString &valueRole)
     : QObject(0),
       d_ptr(new QItemModelScatterDataMappingPrivate(this))
 {
-    Q_UNUSED(labelRole);
     Q_UNUSED(valueRole);
-    //d_ptr->m_labelRole = labelRole;
     d_ptr->m_xPosRole = xPosRole;
     d_ptr->m_yPosRole = yPosRole;
     d_ptr->m_zPosRole = zPosRole;
     //d_ptr->m_valueRole = valueRole;
 }
 
+/*!
+ * Destroys QItemModelScatterDataMapping.
+ */
 QItemModelScatterDataMapping::~QItemModelScatterDataMapping()
 {
 }
 
+/*!
+ *  Assigns a copy of \a other to this object.
+ */
 QItemModelScatterDataMapping &QItemModelScatterDataMapping::operator=(
         const QItemModelScatterDataMapping &other)
 {
-    //d_ptr->m_labelRole = other.d_ptr->m_labelRole;
     d_ptr->m_xPosRole = other.d_ptr->m_xPosRole;
     d_ptr->m_yPosRole = other.d_ptr->m_yPosRole;
     d_ptr->m_zPosRole = other.d_ptr->m_zPosRole;
@@ -67,17 +93,11 @@ QItemModelScatterDataMapping &QItemModelScatterDataMapping::operator=(
     return *this;
 }
 
-//void QItemModelScatterDataMapping::setLabelRole(const QString &role)
-//{
-//    d_ptr->m_labelRole = role;
-//    emit mappingChanged();
-//}
-
-//QString QItemModelScatterDataMapping::labelRole() const
-//{
-//    return d_ptr->m_labelRole;
-//}
-
+/*!
+ * \property QItemModelScatterDataMapping::xPosRole
+ *
+ * Defines the x position role for the mapping.
+ */
 void QItemModelScatterDataMapping::setXPosRole(const QString &role)
 {
     d_ptr->m_xPosRole = role;
@@ -89,6 +109,11 @@ QString QItemModelScatterDataMapping::xPosRole() const
     return d_ptr->m_xPosRole;
 }
 
+/*!
+ * \property QItemModelScatterDataMapping::yPosRole
+ *
+ * Defines the y position role for the mapping.
+ */
 void QItemModelScatterDataMapping::setYPosRole(const QString &role)
 {
     d_ptr->m_yPosRole = role;
@@ -100,6 +125,11 @@ QString QItemModelScatterDataMapping::yPosRole() const
     return d_ptr->m_yPosRole;
 }
 
+/*!
+ * \property QItemModelScatterDataMapping::zPosRole
+ *
+ * Defines the z position role for the mapping.
+ */
 void QItemModelScatterDataMapping::setZPosRole(const QString &role)
 {
     d_ptr->m_zPosRole = role;
@@ -122,13 +152,15 @@ QString QItemModelScatterDataMapping::zPosRole() const
 //    return d_ptr->m_valueRole;
 //}
 
-void QItemModelScatterDataMapping::remap(const QString &labelRole, const QString &xPosRole,
-                                         const QString &yPosRole, const QString &zPosRole,
-                                         const QString &valueRole)
+/*!
+ * Changes \a xPosRole, \a yPosRole, \a zPosRole and \a valueRole to the mapping.
+ *
+ * Emits mappingChanged() signal after remapping.
+ */
+void QItemModelScatterDataMapping::remap(const QString &xPosRole, const QString &yPosRole,
+                                         const QString &zPosRole, const QString &valueRole)
 {
-    Q_UNUSED(labelRole);
     Q_UNUSED(valueRole);
-    //d_ptr->m_labelRole = labelRole;
     d_ptr->m_xPosRole = xPosRole;
     d_ptr->m_yPosRole = yPosRole;
     d_ptr->m_zPosRole = zPosRole;

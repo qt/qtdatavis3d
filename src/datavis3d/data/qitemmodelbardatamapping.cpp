@@ -20,12 +20,32 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QItemModelBarDataMapping
+ * \inmodule QtDataVis3D
+ * \brief Data model mapping for Q3DBars.
+ * \since 1.0.0
+ *
+ * QItemModelBarDataMapping is used to define roles for mapping data in QAbstractItemModel to
+ * Q3DBars.
+ *
+ * TO BE CHECKED (add more explanations and/or example)
+ *
+ * \sa QItemModelBarDataProxy
+ */
+
+/*!
+ * Constructs QItemModelBarDataMapping.
+ */
 QItemModelBarDataMapping::QItemModelBarDataMapping()
     : QObject(0),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
 }
 
+/*!
+ * Constructs a copy of \a other.
+ */
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QItemModelBarDataMapping &other)
     : QObject(0),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
@@ -33,6 +53,9 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QItemModelBarDataMappin
     operator=(other);
 }
 
+/*!
+ * Constructs QItemModelBarDataMapping with \a valueRole.
+ */
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole)
     : QObject(0),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
@@ -40,6 +63,10 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole)
     d_ptr->m_valueRole = valueRole;
 }
 
+/*!
+ * Constructs QItemModelBarDataMapping with \a rowRole, \a columnRole, \a valueRole,
+ * \a rowCategories and \a columnCategories.
+ */
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
                                                    const QString &columnRole,
                                                    const QString &valueRole,
@@ -55,10 +82,16 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
     d_ptr->m_columnCategories = columnCategories;
 }
 
+/*!
+ * Destroys QItemModelBarDataMapping.
+ */
 QItemModelBarDataMapping::~QItemModelBarDataMapping()
 {
 }
 
+/*!
+ *  Assigns a copy of \a other to this object.
+ */
 QItemModelBarDataMapping &QItemModelBarDataMapping::operator=(const QItemModelBarDataMapping &other)
 {
     d_ptr->m_rowRole = other.d_ptr->m_rowRole;
@@ -70,6 +103,11 @@ QItemModelBarDataMapping &QItemModelBarDataMapping::operator=(const QItemModelBa
     return *this;
 }
 
+/*!
+ * \property QItemModelBarDataMapping::rowRole
+ *
+ * Defines the row role for the mapping.
+ */
 void QItemModelBarDataMapping::setRowRole(const QString &role)
 {
     d_ptr->m_rowRole = role;
@@ -81,6 +119,11 @@ QString QItemModelBarDataMapping::rowRole() const
     return d_ptr->m_rowRole;
 }
 
+/*!
+ * \property QItemModelBarDataMapping::columnRole
+ *
+ * Defines the column role for the mapping.
+ */
 void QItemModelBarDataMapping::setColumnRole(const QString &role)
 {
     d_ptr->m_columnRole = role;
@@ -92,6 +135,11 @@ QString QItemModelBarDataMapping::columnRole() const
     return d_ptr->m_columnRole;
 }
 
+/*!
+ * \property QItemModelBarDataMapping::valueRole
+ *
+ * Defines the value role for the mapping.
+ */
 void QItemModelBarDataMapping::setValueRole(const QString &role)
 {
     d_ptr->m_valueRole = role;
@@ -103,6 +151,11 @@ QString QItemModelBarDataMapping::valueRole() const
     return d_ptr->m_valueRole;
 }
 
+/*!
+ * \property QItemModelBarDataMapping::rowCategories
+ *
+ * Defines the row categories for the mapping.
+ */
 void QItemModelBarDataMapping::setRowCategories(const QStringList &categories)
 {
     d_ptr->m_rowCategories = categories;
@@ -114,6 +167,11 @@ const QStringList &QItemModelBarDataMapping::rowCategories() const
     return d_ptr->m_rowCategories;
 }
 
+/*!
+ * \property QItemModelBarDataMapping::columnCategories
+ *
+ * Defines the column categories for the mapping.
+ */
 void QItemModelBarDataMapping::setColumnCategories(const QStringList &categories)
 {
     d_ptr->m_columnCategories = categories;
@@ -125,6 +183,12 @@ const QStringList &QItemModelBarDataMapping::columnCategories() const
     return d_ptr->m_columnCategories;
 }
 
+/*!
+ * Changes \a rowRole, \a columnRole, \a valueRole, \a rowCategories and \a columnCategories to the
+ * mapping.
+ *
+ * Emits mappingChanged() signal after remapping.
+ */
 void QItemModelBarDataMapping::remap(const QString &rowRole,
                                      const QString &columnRole,
                                      const QString &valueRole,
