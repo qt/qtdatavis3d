@@ -19,6 +19,9 @@
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
 #include "camerahelper_p.h"
+#include "qabstractaxis_p.h"
+#include "qvalueaxis_p.h"
+#include "qcategoryaxis.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -30,12 +33,15 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 Surface3dController::Surface3dController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
-      m_isInitialized(false),
       m_smoothSurface(false),
       m_surfaceGrid(true),
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0))
 {
+    // Default axes
+    setAxisX(new QValueAxis()); // Or QCategoryAxis
+    setAxisY(new QValueAxis());
+    setAxisZ(new QValueAxis()); // Or QCategoryAxis
 }
 
 Surface3dController::~Surface3dController()
@@ -45,24 +51,22 @@ Surface3dController::~Surface3dController()
 void Surface3dController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
-    if (m_isInitialized)
+    if (isInitialized())
         return;
 
     m_renderer = new Surface3dRenderer(this);
-    m_isInitialized = true;
+    setRenderer(m_renderer);
+    synchDataToRenderer();
 }
 
 void Surface3dController::synchDataToRenderer()
 {
-    // TODO: Implement
-}
+    Abstract3DController::synchDataToRenderer();
 
-void Surface3dController::render(const GLuint defaultFboHandle)
-{
-    if (!m_isInitialized)
+    if (!isInitialized())
         return;
 
-    m_renderer->render(m_cameraHelper, defaultFboHandle);
+    // Notify changes to renderer
 }
 
 void Surface3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
@@ -80,18 +84,6 @@ QMatrix4x4 Surface3dController::calculateViewMatrix(int zoom, int viewPortWidth,
                                                viewPortWidth,
                                                viewPortHeight,
                                                showUnder);
-}
-
-void Surface3dController::setWidth(const int width)
-{
-    qDebug() << "Surface3dController::setWidth";
-    m_renderer->setWidth(width);
-}
-
-void Surface3dController::setHeight(const int height)
-{
-    qDebug() << "Surface3dController::setHeight";
-    m_renderer->setHeight(height);
 }
 
 void Surface3dController::setSmoothSurface(bool enable)
@@ -132,7 +124,7 @@ void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mous
 {
     if (Qt::LeftButton == event->button()) {
         m_mousePos = mousePos;
-        emit leftMousePressed();
+        emit leftMousePressed(mousePos);
     } else if (Qt::RightButton == event->button()) {
     #if !defined(Q_OS_ANDROID)
         m_mouseState = Abstract3DController::MouseRotating;
@@ -171,16 +163,6 @@ void Surface3dController::wheelEvent(QWheelEvent *event)
 QPoint Surface3dController::mousePosition()
 {
     return m_mousePos;
-}
-
-
-// TODO: abstract renderer should have accessor for Drawer instead
-Drawer *Surface3dController::drawer()
-{
-    if (m_renderer)
-        return m_renderer->drawer();
-    else
-        return 0;
 }
 
 void Surface3dController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)

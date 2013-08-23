@@ -50,10 +50,9 @@ public:
     int numOfSeries();
     // TODO
 
+    Q3DSurface *q_ptr;
     Surface3dController *m_shared;
 
-private:
-    Q3DSurface *q_ptr;
     QList<QList<qreal> > m_seriesList; // Temp to be replaced by dataset
 };
 

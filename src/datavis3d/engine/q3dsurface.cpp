@@ -18,6 +18,7 @@
 
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
+#include "qvalueaxis.h"
 
 #include <QMouseEvent>
 
@@ -37,6 +38,7 @@ Q3DSurface::~Q3DSurface()
 
 void Q3DSurface::render()
 {
+    d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
 }
 
@@ -78,6 +80,40 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
     d_ptr->m_shared->setHeight(height());
 }
 
+/*!
+ * \property Q3DSurface::gridVisible
+ *
+ * \a visible Flag to enable or disable grid. \c true by default.
+ *
+ * Sets grid drawing on or off.
+ */
+void Q3DSurface::setGridVisible(bool visible)
+{
+    d_ptr->m_shared->setGridEnabled(visible);
+}
+
+bool Q3DSurface::isGridVisible() const
+{
+    return d_ptr->m_shared->gridEnabled();
+}
+
+/*!
+ * \property Q3DSurface::backgroundVisible
+ *
+ * \a visible Flag to enable or disable background. \c true by default.
+ *
+ * Sets backround rendering on or off.
+ */
+void Q3DSurface::setBackgroundVisible(bool visible)
+{
+    d_ptr->m_shared->setBackgroundEnabled(visible);
+}
+
+bool Q3DSurface::isBackgroundVisible() const
+{
+    return d_ptr->m_shared->backgroundEnabled();
+}
+
 void Q3DSurface::setSmoothSurface(bool enable)
 {
     d_ptr->m_shared->setSmoothSurface(enable);
@@ -111,19 +147,47 @@ void Q3DSurface::setHeight(const int height)
 }
 
 /*!
- * \a segmentCount How many segments will be drawn. \c 5 by default.
- *
- * \a step How large a step each segment is.
- *
- * \a minimum Minimum value a bar in data set can have. Setting this correctly is especially
- * important if values can be negative, or autoscaling won't work correctly.
- *
- * Sets segment count and step. Note; segmentCount * step should be the maximum possible value of data
- * set.
+  TODO: REMOVE
  */
 void Q3DSurface::setSegmentCount(int segmentCount, qreal step, qreal minimum)
 {
     d_ptr->m_shared->setSegmentCount(GLint(segmentCount), GLfloat(step), GLfloat(minimum));
+}
+
+void Q3DSurface::setValueAxisX(QValueAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisX(axis);
+}
+
+QValueAxis *Q3DSurface::valueAxisX()
+{
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisX());
+}
+
+void Q3DSurface::setValueAxisY(QValueAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisY(axis);
+}
+
+QValueAxis *Q3DSurface::valueAxisY()
+{
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
+}
+
+void Q3DSurface::setValueAxisZ(QValueAxis *axis)
+{
+    Q_ASSERT(axis);
+
+    return d_ptr->m_shared->setAxisZ(axis);
+}
+
+QValueAxis *Q3DSurface::valueAxisZ()
+{
+    return static_cast<QValueAxis *>(d_ptr->m_shared->axisZ());
 }
 
 void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
@@ -154,9 +218,8 @@ void Q3DSurface::showData() const
 /////////////////// PRIVATE ///////////////////////////////////
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
-    : m_shared(new Surface3dController(rect)),
-      q_ptr(q)
-
+    : q_ptr(q),
+      m_shared(new Surface3dController(rect))
 {
 }
 

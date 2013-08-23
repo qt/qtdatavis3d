@@ -25,16 +25,27 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
+class QValueAxis;
 
 class QT_DATAVIS3D_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurface READ smoothSurface WRITE setSmoothSurface)
     Q_PROPERTY(bool surfaceGrid READ surfaceGrid WRITE setSurfaceGrid)
 
 public:
     explicit Q3DSurface();
     ~Q3DSurface();
+
+    // Enable or disable background grid
+    void setGridVisible(bool visible);
+    bool isGridVisible() const;
+
+    // Enable or disable background mesh
+    void setBackgroundVisible(bool visible);
+    bool isBackgroundVisible() const;
 
     // Enable or disable the smoothes of the surface
     void setSmoothSurface(bool enable);
@@ -46,9 +57,17 @@ public:
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
-    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
+    // Axes
+    void setValueAxisX(QValueAxis *axis);
+    QValueAxis *valueAxisX();
+
+    void setValueAxisY(QValueAxis *axis);
+    QValueAxis *valueAxisY();
+
+    void setValueAxisZ(QValueAxis *axis);
+    QValueAxis *valueAxisZ();
+
+    // TODO: Remove when axes handling in use
     void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);
 
 //TODO part

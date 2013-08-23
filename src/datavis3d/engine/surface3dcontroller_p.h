@@ -44,7 +44,6 @@ class QT_DATAVIS3D_EXPORT Surface3dController : public Abstract3DController
 
 private:
     Surface3dRenderer *m_renderer;
-    bool m_isInitialized;
     QList<qreal> m_series; // TODO: TEMP
     int m_dataWidth;
     int m_dataDepth;
@@ -65,15 +64,11 @@ public:
     ~Surface3dController();
 
     void initializeOpenGL();
-    void synchDataToRenderer();
-    void render(const GLuint defaultFboHandle = 0);
+    virtual void synchDataToRenderer();
 
     QPoint mousePosition();
 
     QMatrix4x4 calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder = false);
-
-    void setWidth(const int width);
-    void setHeight(const int height);
 
     // Enable or disable the smoothes of the surface
     void setSmoothSurface(bool enable);
@@ -102,15 +97,13 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
-    // TODO: abstract renderer should have accessor for Drawer instead
-    virtual Drawer *drawer();
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
 signals:
     void smoothStatusChanged(bool enable);
     void surfaceGridChanged(bool enable);
     void segmentCountChanged(GLint segmentCount, GLfloat step, GLfloat minimum);
-    void leftMousePressed();
+    void leftMousePressed(const QPoint &point); // My temp solution
 
 private:
     Q_DISABLE_COPY(Surface3dController)

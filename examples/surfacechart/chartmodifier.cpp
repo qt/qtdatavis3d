@@ -17,6 +17,8 @@
 ****************************************************************************/
 
 #include "chartmodifier.h"
+#include <QCategoryAxis>
+#include <QValueAxis>
 
 #include <qmath.h>
 
@@ -70,8 +72,10 @@ void ChartModifier::toggleSqrtSin(bool enable)
             }
         }
 
-        m_chart->setSegmentCount(4, 0.5f);
+        m_chart->setSegmentCount(4, 0.5f); // Going to be obsolete
         m_chart->appendSeries(series, m_xCount, m_zCount);
+
+        m_chart->valueAxisZ()->setSegmentCount(7);
 
         qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
     } else {
@@ -94,6 +98,10 @@ void ChartModifier::togglePlane(bool enable)
 
         m_chart->setSegmentCount(4, 0.5f);
         m_chart->appendSeries(series, m_xCount, m_zCount);
+        m_chart->valueAxisX()->setSegmentCount(m_xCount - 1);
+        m_chart->valueAxisY()->setSegmentCount(4);
+        m_chart->valueAxisY()->setRange(0.0, 2.0);
+        m_chart->valueAxisZ()->setSegmentCount(m_zCount - 1);
     }
 }
 

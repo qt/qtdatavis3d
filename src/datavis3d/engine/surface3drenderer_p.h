@@ -38,6 +38,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "surface3dcontroller_p.h"
+#include "abstract3drenderer_p.h"
 
 class QOpenGLShaderProgram;
 
@@ -52,26 +53,12 @@ class Drawer;
 class CameraHelper;
 class SelectionPointer;
 
-class QT_DATAVIS3D_EXPORT Surface3dRenderer : public QObject, protected QOpenGLFunctions
+class QT_DATAVIS3D_EXPORT Surface3dRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
 public:
-    enum MousePressType {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
     Surface3dController *m_controller;
-
-    // Interaction related parameters // TODO: Moved to controller
-    MousePressType m_mousePressed;
-    QPoint m_mousePos;
-    QDataVis::SelectionMode m_selectionMode;
 
     // Visual parameters
     QRect m_boundingRect;
@@ -79,9 +66,7 @@ public:
     QDataVis::LabelTransparency m_labelTransparency;
     QFont m_font;
     bool m_isGridEnabled;
-    bool m_isBackgroundEnabled;
     QDataVis::ShadowQuality m_shadowQuality;
-    bool m_hasNegativeValues;
 
 private:
     // Data parameters
@@ -93,13 +78,11 @@ private:
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
-    QRect m_sliceViewPort;
+    ShaderHelper *m_shader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceShader;
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_selectionShader;
-    TextureHelper *m_textureHelper;
-    bool m_isInitialized;
     GLfloat m_yRange; // m_heightNormalizer
     GLfloat m_yAdjustment;
     GLfloat m_xLength;
@@ -125,8 +108,12 @@ private:
     bool m_cachedSurfaceGridOn;
     SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
+    bool m_xFlipped;
+    bool m_zFlipped;
+    bool m_yFlipped;
 
-    Drawer *m_drawer;
+protected:
+    virtual void loadMeshFile();
 
 public:
     explicit Surface3dRenderer(Surface3dController *controller);
@@ -135,57 +122,41 @@ public:
     void initializeOpenGL();
     void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
 
-    // TODO: Not thread-safe, needs rethinking how axes create labels
-    Drawer *drawer() { return m_drawer; }
-
-public slots:
-    void updateTheme(Theme theme);
-    void updateSmoothStatus(bool enable);
-    void updateSurfaceGridStatus(bool enable);
-    void updateSurfaceGradient();
-    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
-
-    void getSelection();
-
-public:
-    // Size
-    const QSize size();
-    const QRect boundingRect();
-    void setBoundingRect(const QRect boundingRect);
-    void setWidth(const int width);
-    int width();
-    void setHeight(const int height);
-    int height();
-    void setX(const int x);
-    int x();
-    void setY(const int y);
-    int y();
-
-    void handleResize();
-
-#if !defined(QT_OPENGL_ES_2)
-    void updateDepthBuffer();
-#endif
-    void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadSurfaceObj();
-
     // TODO: temp
     void setXZStuff(GLint segmentXCount, GLint segmentZCount);
     void setSeries(QList<qreal> series);
 
+public slots:
+    void updateSmoothStatus(bool enable);
+    void updateSurfaceGridStatus(bool enable);
+    void updateSurfaceGradient();
+    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
+    virtual void requestSelectionAtPoint(const QPoint &point);
+
+
 private:
+    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
+    virtual void updateTextures();
+    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    void loadBackgroundMesh();
+    void loadGridLineMesh();
+    void loadSurfaceObj();
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
+    void handleResize();
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShaders();
     void initSurfaceShaders();
+    void initSelectionBuffer();
     void updateSelectionTexture();
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(qreal value, int column, int row);
     void surfacePointCleared();
     QVector3D normalize(float x, float y, float z);
+#if !defined(QT_OPENGL_ES_2)
+    void updateDepthBuffer();
+#endif
 
     Q_DISABLE_COPY(Surface3dRenderer)
 };
