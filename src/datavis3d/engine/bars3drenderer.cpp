@@ -41,10 +41,6 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-#ifdef DISPLAY_RENDER_SPEED
-#include <QTime>
-#endif
-
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 const GLfloat gridLineWidth = 0.005f;

@@ -38,10 +38,6 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-#ifdef DISPLAY_RENDER_SPEED
-#include <QTime>
-#endif
-
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
@@ -472,15 +468,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
         if (Scatter3DController::MouseOnScene == m_controller->mouseState())
             m_selection = Utils::getSelection(m_controller->mousePosition(),
                                               m_cachedBoundingRect.height());
-
-        QMutexLocker locker(&m_mutex);
-        if (m_isSelectionPointRequestActive) {
-            m_isSelectionPointRequestActive = false;
-            m_selection = Utils::getSelection(m_selectionPointRequest,
-                                              m_cachedBoundingRect.height());
-            emit selectionUpdated(m_selection);
-        }
-        locker.unlock();
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -1284,15 +1271,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
     // Release label shader
     m_labelShader->release();
-}
-
-void Scatter3DRenderer::requestSelectionAtPoint(const QPoint &point)
-{
-    //qDebug() << __FUNCTION__;
-    QMutexLocker locker(&m_mutex);
-    m_selectionPointRequest.setX(point.x());
-    m_selectionPointRequest.setY(point.y());
-    m_isSelectionPointRequestActive = true;
 }
 
 void Scatter3DRenderer::handleResize()

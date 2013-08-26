@@ -31,11 +31,14 @@
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
+#include <QTime>
 
 #include "datavis3dglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
 #include "qabstractdataproxy.h"
+
+//#define DISPLAY_RENDER_SPEED
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -72,6 +75,12 @@ protected:
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
+
+#ifdef DISPLAY_RENDER_SPEED
+    bool m_isFirstFrame;
+    QTime m_lastFrameTime;
+    GLint m_numFrames;
+#endif
 
     QString generateValueLabel(const QString &format, qreal value);
 

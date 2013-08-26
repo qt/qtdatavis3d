@@ -29,21 +29,11 @@
 #ifndef Q3DBARSRENDERER_p_H
 #define Q3DBARSRENDERER_p_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
-#include <QTime>
-#include <QWindow>
-#include <QMutex>
-
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "qbardataproxy.h"
 #include "barrenderitem_p.h"
-
-//#define DISPLAY_RENDER_SPEED
 
 class QPoint;
 class QSizeF;
@@ -115,12 +105,6 @@ private:
     BarRenderItem m_dummyBarRenderItem;
 
     BarRenderItemArray m_renderItemArray;
-
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
 
 public:
     explicit Bars3dRenderer(Bars3dController *controller);

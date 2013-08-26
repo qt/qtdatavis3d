@@ -29,21 +29,11 @@
 #ifndef Q3DSCATTERRENDERER_P_H
 #define Q3DSCATTERRENDERER_P_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
-#include <QTime>
-#include <QWindow>
-#include <QMutex>
-
 #include "datavis3dglobal_p.h"
 #include "scatter3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "qscatterdataproxy.h"
 #include "scatterrenderitem_p.h"
-
-//#define DISPLAY_RENDER_SPEED
 
 class QPoint;
 class QSizeF;
@@ -67,10 +57,6 @@ private:
     // * All attribs that are modifiable from QML need to e in this set.
 
     Scatter3DController *m_controller;
-
-    // Mutex for sharing resources between render and main threads.
-    // TODO: this mutex needs to go, too
-    QMutex m_mutex;
 
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
@@ -102,19 +88,10 @@ private:
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
 
-    QPoint m_selectionPointRequest;
-    bool m_isSelectionPointRequestActive;
-
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
 
     ScatterRenderItemArray m_renderItemArray;
-
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
@@ -161,14 +138,6 @@ public slots:
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-
-    // Requests that upon next render pass the column and row under the given point is inspected for selection.
-    // Only one request can be queued per render pass at this point. New request will override any pending requests.
-    // After inspection the selectionUpdated signal is emitted.
-    virtual void requestSelectionAtPoint(const QPoint &point);
-
-signals:
-    void selectionUpdated(QVector3D selection);
 };
 
 
