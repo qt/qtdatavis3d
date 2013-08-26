@@ -21,11 +21,28 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QItemModelScatterDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Proxy class for Q3DScatter data model mapping.
+ * \since 1.0.0
+ *
+ * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
+ * for Q3DScatter. It maps roles defined in QItemModelScatterDataMapping to roles in the model.
+ */
+
+/*!
+ * Constructs QItemModelScatterDataProxy.
+ */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy() :
     QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this))
 {
 }
 
+/*!
+ * Constructs QItemModelScatterDataProxy with \a itemModel and \a mapping. Does not take ownership
+ * of the model or the mapping, but does connect to them to listen for changes.
+ */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                                        QItemModelScatterDataMapping *mapping) :
     QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this))
@@ -34,10 +51,19 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemM
     dptr()->setMapping(mapping);
 }
 
+/*!
+ * Destroys QItemModelScatterDataProxy.
+ */
 QItemModelScatterDataProxy::~QItemModelScatterDataProxy()
 {
 }
 
+/*!
+ * \property QItemModelScatterDataProxy::itemModel
+ *
+ * Defines item model. Does not take ownership of the model, but does connect to it to listen for
+ * changes.
+ */
 void QItemModelScatterDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
     dptr()->setItemModel(itemModel);
@@ -48,6 +74,12 @@ QAbstractItemModel *QItemModelScatterDataProxy::itemModel()
     return dptr()->m_itemModel.data();
 }
 
+/*!
+ * \property QItemModelScatterDataProxy::mapping
+ *
+ * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
+ * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
+ */
 void QItemModelScatterDataProxy::setMapping(QItemModelScatterDataMapping *mapping)
 {
     dptr()->setMapping(mapping);
@@ -58,6 +90,9 @@ QItemModelScatterDataMapping *QItemModelScatterDataProxy::mapping()
     return dptr()->m_mapping.data();
 }
 
+/*!
+ * \internal
+ */
 QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptr()
 {
     return static_cast<QItemModelScatterDataProxyPrivate *>(d_ptr.data());

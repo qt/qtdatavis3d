@@ -31,19 +31,17 @@ class QItemModelBarDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelBarDataMapping* mapping READ mapping WRITE setMapping)
 
 public:
     explicit QItemModelBarDataProxy();
     explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, QItemModelBarDataMapping *mapping);
     virtual ~QItemModelBarDataProxy();
 
-    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
     void setItemModel(QAbstractItemModel *itemModel);
     QAbstractItemModel *itemModel();
 
-    // Map bars role (row, column, value) to role in model.
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
     void setMapping(QItemModelBarDataMapping *mapping);
     QItemModelBarDataMapping *mapping();
 

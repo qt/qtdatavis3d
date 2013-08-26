@@ -21,11 +21,28 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+/*!
+ * \class QItemModelMapDataProxy
+ * \inmodule QtDataVis3D
+ * \brief Proxy class for Q3DMaps data model mapping.
+ * \since 1.0.0
+ *
+ * QItemModelMapDataProxy allows you to use QAbstractItemModel derived models as a data source
+ * for Q3DMaps. It maps roles defined in QItemModelMapDataMapping to roles in the model.
+ */
+
+/*!
+ * Constructs QItemModelMapDataProxy.
+ */
 QItemModelMapDataProxy::QItemModelMapDataProxy() :
     QMapDataProxy(new QItemModelMapDataProxyPrivate(this))
 {
 }
 
+/*!
+ * Constructs QItemModelMapDataProxy with \a itemModel and \a mapping. Does not take ownership of
+ * the model or the mapping, but does connect to them to listen for changes.
+ */
 QItemModelMapDataProxy::QItemModelMapDataProxy(QAbstractItemModel *itemModel,
                                                QItemModelMapDataMapping *mapping) :
     QMapDataProxy(new QItemModelMapDataProxyPrivate(this))
@@ -34,10 +51,19 @@ QItemModelMapDataProxy::QItemModelMapDataProxy(QAbstractItemModel *itemModel,
     dptr()->setMapping(mapping);
 }
 
+/*!
+ * Destroys QItemModelMapDataProxy.
+ */
 QItemModelMapDataProxy::~QItemModelMapDataProxy()
 {
 }
 
+/*!
+ * \property QItemModelMapDataProxy::itemModel
+ *
+ * Defines item model. Does not take ownership of the model, but does connect to it to listen for
+ * changes.
+ */
 void QItemModelMapDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
     dptr()->setItemModel(itemModel);
@@ -48,6 +74,12 @@ QAbstractItemModel *QItemModelMapDataProxy::itemModel()
     return dptr()->m_itemModel.data();
 }
 
+/*!
+ * \property QItemModelMapDataProxy::mapping
+ *
+ * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
+ * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
+ */
 void QItemModelMapDataProxy::setMapping(QItemModelMapDataMapping *mapping)
 {
     dptr()->setMapping(mapping);
@@ -58,6 +90,9 @@ QItemModelMapDataMapping *QItemModelMapDataProxy::mapping()
     return dptr()->m_mapping.data();
 }
 
+/*!
+ * \internal
+ */
 QItemModelMapDataProxyPrivate *QItemModelMapDataProxy::dptr()
 {
     return static_cast<QItemModelMapDataProxyPrivate *>(d_ptr.data());

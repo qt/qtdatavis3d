@@ -31,7 +31,7 @@
 
     \snippet doc_src_qtdatavis3d.cpp 0
 
-    To link against the module, add this line to your \l qmake \c
+    To link against the module, add this line to your qmake \c
     .pro file:
 
     \snippet doc_src_qtdatavis3d.pro 0

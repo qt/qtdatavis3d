@@ -31,6 +31,8 @@ class QItemModelScatterDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
 {
     Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelScatterDataMapping* mapping READ mapping WRITE setMapping)
 
 public:
     explicit QItemModelScatterDataProxy();
@@ -38,13 +40,9 @@ public:
                                         QItemModelScatterDataMapping *mapping);
     virtual ~QItemModelScatterDataProxy();
 
-    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
     void setItemModel(QAbstractItemModel *itemModel);
     QAbstractItemModel *itemModel();
 
-    // Map scatter role (xPos, yPos, zPos) to role in model
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
     void setMapping(QItemModelScatterDataMapping *mapping);
     QItemModelScatterDataMapping *mapping();
 

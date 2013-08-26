@@ -31,19 +31,17 @@ class QItemModelMapDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelMapDataProxy : public QMapDataProxy
 {
     Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelMapDataMapping* mapping READ mapping WRITE setMapping)
 
 public:
     explicit QItemModelMapDataProxy();
     explicit QItemModelMapDataProxy(QAbstractItemModel *itemModel, QItemModelMapDataMapping *mapping);
     virtual ~QItemModelMapDataProxy();
 
-    // Doesn't gain ownership of the model, but does connect to it to listen for data changes.
     void setItemModel(QAbstractItemModel *itemModel);
     QAbstractItemModel *itemModel();
 
-    // Map maps role (label, xPos, yPos, value) to role in model
-    // Doesn't gain ownership of mapping, but does connect to it to listen for mapping changes.
-    // Modifying mapping that is set to proxy will trigger dataset re-resolving.
     void setMapping(QItemModelMapDataMapping *mapping);
     QItemModelMapDataMapping *mapping();
 
