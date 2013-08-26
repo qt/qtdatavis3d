@@ -162,7 +162,7 @@ void QItemModelBarDataMapping::setRowCategories(const QStringList &categories)
     emit mappingChanged();
 }
 
-const QStringList &QItemModelBarDataMapping::rowCategories() const
+QStringList QItemModelBarDataMapping::rowCategories() const
 {
     return d_ptr->m_rowCategories;
 }
@@ -178,7 +178,7 @@ void QItemModelBarDataMapping::setColumnCategories(const QStringList &categories
     emit mappingChanged();
 }
 
-const QStringList &QItemModelBarDataMapping::columnCategories() const
+QStringList QItemModelBarDataMapping::columnCategories() const
 {
     return d_ptr->m_columnCategories;
 }

@@ -146,10 +146,6 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality();
 
-public slots:
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
-
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
@@ -157,6 +153,9 @@ signals:
 protected:
     Scatter3DController *m_shared;
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

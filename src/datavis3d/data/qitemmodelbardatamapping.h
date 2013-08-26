@@ -57,9 +57,9 @@ public:
     QString valueRole() const;
 
     void setRowCategories(const QStringList &categories);
-    const QStringList &rowCategories() const;
+    QStringList rowCategories() const;
     void setColumnCategories(const QStringList &categories);
-    const QStringList &columnCategories() const;
+    QStringList columnCategories() const;
 
     void remap(const QString &rowRole, const QString &columnRole,
                const QString &valueRole, const QStringList &rowCategories,

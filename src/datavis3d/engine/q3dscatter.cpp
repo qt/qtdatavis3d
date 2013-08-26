@@ -78,8 +78,6 @@ Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DScatter::handleShadowQualityUpdate);
 }
 
 /*!
@@ -96,14 +94,6 @@ void Q3DScatter::render()
 {
     d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
 }
 
 #if defined(Q_OS_ANDROID)
@@ -369,7 +359,7 @@ void Q3DScatter::setValueAxisX(QValueAxis *axis)
 /*!
  * \return used value axis (X-axis).
  */
-QValueAxis *Q3DScatter::valueAxisX()
+QValueAxis *Q3DScatter::valueAxisX() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisX());
 }
@@ -387,7 +377,7 @@ void Q3DScatter::setValueAxisY(QValueAxis *axis)
 /*!
  * \return used value axis (Y-axis).
  */
-QValueAxis *Q3DScatter::valueAxisY()
+QValueAxis *Q3DScatter::valueAxisY() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
@@ -405,7 +395,7 @@ void Q3DScatter::setValueAxisZ(QValueAxis *axis)
 /*!
  * \return used value axis (Z-axis).
  */
-QValueAxis *Q3DScatter::valueAxisZ()
+QValueAxis *Q3DScatter::valueAxisZ() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisZ());
 }
@@ -436,12 +426,19 @@ Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q, QRect rect)
     : q_ptr(q),
       m_shared(new Scatter3DController(rect))
 {
+    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
     qDebug() << "Destroying Q3DScatterPrivate";
     delete m_shared;
+}
+
+void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
+{
+    emit q_ptr->shadowQualityChanged(quality);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

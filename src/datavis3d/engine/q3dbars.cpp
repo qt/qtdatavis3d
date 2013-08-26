@@ -85,8 +85,6 @@ Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DBars::handleShadowQualityUpdate);
     QObject::connect(d_ptr->m_shared, &Bars3dController::selectedBarPosChanged, this,
                      &Q3DBars::selectedBarPosChanged);
 }
@@ -105,14 +103,6 @@ void Q3DBars::render()
 {
     d_ptr->m_shared->synchDataToRenderer();
     d_ptr->m_shared->render();
-}
-
-/*!
- * \internal
- */
-void Q3DBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
 }
 
 #if defined(Q_OS_ANDROID)
@@ -415,7 +405,7 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 /*!
  * \return category axis for rows.
  */
-QCategoryAxis *Q3DBars::rowAxis()
+QCategoryAxis *Q3DBars::rowAxis() const
 {
     return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
 }
@@ -423,7 +413,7 @@ QCategoryAxis *Q3DBars::rowAxis()
 /*!
  * \return category axis for columns.
  */
-QCategoryAxis *Q3DBars::columnAxis()
+QCategoryAxis *Q3DBars::columnAxis() const
 {
     return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
@@ -441,7 +431,7 @@ void Q3DBars::setValueAxis(QValueAxis *axis)
 /*!
  * \return used value axis (Y-axis).
  */
-QValueAxis *Q3DBars::valueAxis()
+QValueAxis *Q3DBars::valueAxis() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
@@ -466,12 +456,19 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),
       m_shared(new Bars3dController(rect))
 {
+    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
     qDebug() << "Destroying Q3DBarsPrivate";
     delete m_shared;
+}
+
+void Q3DBarsPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
+{
+    emit q_ptr->shadowQualityChanged(quality);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

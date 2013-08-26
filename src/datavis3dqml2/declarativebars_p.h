@@ -180,10 +180,6 @@ public:
     void setSelectedBarPos(const QPoint &position);
     QPoint selectedBarPos() const;
 
-public slots:
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
-
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
@@ -192,6 +188,9 @@ signals:
 
 protected:
     Bars3dController *m_shared;
+
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 

@@ -42,6 +42,9 @@ public:
     Q3DBarsPrivate(Q3DBars *q, QRect rect);
     ~Q3DBarsPrivate();
 
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
+
     Q3DBars *q_ptr;
     Bars3dController *m_shared;
 };

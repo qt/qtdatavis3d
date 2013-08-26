@@ -37,7 +37,7 @@ public:
     QScatterDataItem &operator=(const QScatterDataItem &other);
 
     void setPosition(const QVector3D &position);
-    const QVector3D &position() const;
+    QVector3D position() const;
 
     //void setSize(qreal size);
     //qreal size() const;

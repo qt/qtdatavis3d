@@ -83,20 +83,16 @@ public:
     QDataVis::ShadowQuality shadowQuality() const;
 
     void setValueAxisX(QValueAxis *axis);
-    QValueAxis *valueAxisX();
+    QValueAxis *valueAxisX() const;
 
     void setValueAxisY(QValueAxis *axis);
-    QValueAxis *valueAxisY();
+    QValueAxis *valueAxisY() const;
 
     void setValueAxisZ(QValueAxis *axis);
-    QValueAxis *valueAxisZ();
+    QValueAxis *valueAxisZ() const;
 
     void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy();
-
-public slots:
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);

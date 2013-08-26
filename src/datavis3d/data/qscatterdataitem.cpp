@@ -94,7 +94,7 @@ void QScatterDataItem::setPosition(const QVector3D &position)
 /*!
  * \return position of this data item.
  */
-const QVector3D &QScatterDataItem::position() const
+QVector3D QScatterDataItem::position() const
 {
     return m_position;
 }

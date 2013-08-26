@@ -42,6 +42,9 @@ public:
     Q3DScatterPrivate(Q3DScatter *q, QRect rect);
     ~Q3DScatterPrivate();
 
+    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
+    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
+
     Q3DScatter *q_ptr;
     Scatter3DController *m_shared;
 };
