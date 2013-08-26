@@ -1234,7 +1234,8 @@ void Maps3DController::setTheme(QDataVis::ColorTheme colorTheme)
     m_updateLabels = true;
 }
 
-void Maps3DController::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
+void Maps3DController::setBarColor(const QColor &baseColor, const QColor &heightColor,
+                                   bool uniform)
 {
     m_theme->m_baseColor = baseColor;
     m_theme->m_heightColor = heightColor;

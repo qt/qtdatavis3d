@@ -215,8 +215,8 @@ public:
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    virtual void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                bool uniform = true);
+    virtual void setObjectColor(const QColor &baseColor, const QColor &heightColor,
+                                const QColor &depthColor, bool uniform = true);
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
@@ -260,7 +260,8 @@ public:
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleAxisSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender);
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
 
 public slots:

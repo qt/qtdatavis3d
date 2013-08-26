@@ -120,7 +120,7 @@ void DeclarativeMaps::setTheme(QDataVis::ColorTheme theme)
     m_shared->setTheme(theme);
 }
 
-void DeclarativeMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
+void DeclarativeMaps::setBarColor(const QColor &baseColor, const QColor &heightColor, bool uniform)
 {
     m_shared->setBarColor(baseColor, heightColor, uniform);
 }

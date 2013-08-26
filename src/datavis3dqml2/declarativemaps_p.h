@@ -88,7 +88,8 @@ public:
     Q_INVOKABLE void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
-    Q_INVOKABLE void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
+    Q_INVOKABLE void setBarColor(const QColor &baseColor, const QColor &heightColor,
+                                 bool uniform = true);
 
     // Set area specs
     Q_INVOKABLE void setAreaSpecs(const QRect &areaRect, const QImage &image);

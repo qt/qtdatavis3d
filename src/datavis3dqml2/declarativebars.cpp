@@ -99,8 +99,8 @@ void DeclarativeBars::setDataWindow(int rowCount, int columnCount)
     m_shared->setDataWindow(rowCount, columnCount);
 }
 
-void DeclarativeBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                  bool uniform)
+void DeclarativeBars::setBarColor(const QColor &baseColor, const QColor &heightColor,
+                                  const QColor &depthColor, bool uniform)
 {
     m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }

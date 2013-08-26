@@ -375,7 +375,7 @@ QPoint Bars3dController::noSelectionPoint()
     return noSelectionPos;
 }
 
-void Bars3dController::setBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
+void Bars3dController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)
 {
     m_barThicknessRatio = thicknessRatio;
     m_barSpacing        = spacing;

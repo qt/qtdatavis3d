@@ -37,7 +37,6 @@ class QT_DATAVIS3D_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
@@ -58,16 +57,13 @@ public:
 
     void setTheme(QDataVis::ColorTheme theme);
 
-    void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                        bool uniform = true);
+    void setObjectColor(const QColor &baseColor, const QColor &heightColor,
+                        const QColor &depthColor, bool uniform = true);
 
     void setMeshFileName(const QString &objFileName);
 
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;
-
-    void setWindowTitle(const QString &title);
-    QString windowTitle() const;
 
     void setFontSize(float fontsize);
     float fontSize() const;

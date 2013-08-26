@@ -170,7 +170,7 @@ void Q3DMaps::setTheme(QDataVis::ColorTheme theme)
     d_ptr->m_shared->setTheme(theme);
 }
 
-void Q3DMaps::setBarColor(QColor baseColor, QColor heightColor, bool uniform)
+void Q3DMaps::setBarColor(const QColor &baseColor, const QColor &heightColor, bool uniform)
 {
     d_ptr->m_shared->setBarColor(baseColor, heightColor, uniform);
 }
@@ -193,16 +193,6 @@ void Q3DMaps::setSelectionMode(QDataVis::SelectionMode mode)
 QDataVis::SelectionMode Q3DMaps::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-void Q3DMaps::setWindowTitle(const QString &title)
-{
-    setTitle(title);
-}
-
-QString Q3DMaps::windowTitle() const
-{
-    return title();
 }
 
 void Q3DMaps::setFontSize(float fontsize)

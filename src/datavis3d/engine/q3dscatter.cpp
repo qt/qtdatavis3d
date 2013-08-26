@@ -241,7 +241,8 @@ void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
  *
  * \warning This method is subject to change.
  */
-void Q3DScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+void Q3DScatter::setObjectColor(const QColor &baseColor, const QColor &heightColor,
+                                const QColor &depthColor, bool uniform)
 {
     d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
@@ -260,21 +261,6 @@ void Q3DScatter::setSelectionMode(QDataVis::SelectionMode mode)
 QDataVis::SelectionMode Q3DScatter::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DScatter::windowTitle
- *
- * Sets the window \a title. The default is application executable name.
- */
-void Q3DScatter::setWindowTitle(const QString &title)
-{
-    setTitle(title);
-}
-
-QString Q3DScatter::windowTitle() const
-{
-    return title();
 }
 
 /*!

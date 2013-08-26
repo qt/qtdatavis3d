@@ -200,7 +200,7 @@ void Q3DBars::setHeight(const int height)
  * thickness. If it is true, value of 0.0 means the bars are side-to-side and for example 1.0 means
  * there is one thickness in between the bars. It is \c true by default.
  */
-void Q3DBars::setBarSpecs(qreal thicknessRatio, QSizeF spacing, bool relative)
+void Q3DBars::setBarSpecs(qreal thicknessRatio, const QSizeF &spacing, bool relative)
 {
     d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), spacing, relative);
 }
@@ -281,7 +281,8 @@ void Q3DBars::setTheme(QDataVis::ColorTheme theme)
  *
  * \warning This method is subject to change.
  */
-void Q3DBars::setBarColor(QColor baseColor, QColor heightColor, QColor depthColor, bool uniform)
+void Q3DBars::setBarColor(const QColor &baseColor, const QColor &heightColor,
+                          const QColor &depthColor, bool uniform)
 {
     d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
@@ -300,21 +301,6 @@ void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
 QDataVis::SelectionMode Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DBars::windowTitle
- *
- * Sets the window \a title. The default is application executable name.
- */
-void Q3DBars::setWindowTitle(const QString &title)
-{
-    setTitle(title);
-}
-
-QString Q3DBars::windowTitle() const
-{
-    return title();
 }
 
 /*!

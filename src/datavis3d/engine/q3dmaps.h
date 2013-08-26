@@ -37,7 +37,6 @@ class QMapDataProxy;
 class QT_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
 
@@ -82,7 +81,7 @@ public:
     void setTheme(QDataVis::ColorTheme theme);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height) color to change from bottom to top
-    void setBarColor(QColor baseColor, QColor heightColor, bool uniform = true);
+    void setBarColor(const QColor &baseColor, const QColor &heightColor, bool uniform = true);
 
     // Set area specs
     void setAreaSpecs(const QRect &areaRect, const QImage &image);
@@ -95,10 +94,6 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;
-
-    // Set window title
-    void setWindowTitle(const QString &title);
-    QString windowTitle() const;
 
     // Font size adjustment
     void setFontSize(float fontsize);

@@ -81,7 +81,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setGridVisible(false);
 
     // Set window title
-    m_chart->setWindowTitle(QStringLiteral("Monthly rainfall in various cities"));
+    m_chart->setTitle(QStringLiteral("Monthly rainfall in various cities"));
 }
 
 RainfallChart::~RainfallChart()

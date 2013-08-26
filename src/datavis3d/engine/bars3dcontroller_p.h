@@ -102,7 +102,7 @@ public:
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
     void setBarSpecs(GLfloat thicknessRatio = 1.0f,
-                     QSizeF spacing = QSizeF(1.0, 1.0),
+                     const QSizeF &spacing = QSizeF(1.0, 1.0),
                      bool relative = true);
     GLfloat barThickness();
     QSizeF barSpacing();

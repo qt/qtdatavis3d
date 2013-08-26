@@ -119,7 +119,7 @@ void ChartModifier::addDataSet()
     // Use QDataSet adder
 
     // Set window title
-    m_chart->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    m_chart->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     // Set up row and column names
     QStringList months;

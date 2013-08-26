@@ -82,8 +82,8 @@ public:
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    Q_INVOKABLE void setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                    bool uniform = true);
+    Q_INVOKABLE void setObjectColor(const QColor &baseColor, const QColor &heightColor,
+                                    const QColor &depthColor, bool uniform = true);
 
     // Add whole data set.
     void setData(QAbstractItemModel *data);

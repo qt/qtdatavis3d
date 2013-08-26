@@ -94,8 +94,8 @@ void DeclarativeScatter::setCameraPosition(qreal horizontal, qreal vertical, int
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-void DeclarativeScatter::setObjectColor(QColor baseColor, QColor heightColor, QColor depthColor,
-                                        bool uniform)
+void DeclarativeScatter::setObjectColor(const QColor &baseColor, const QColor &heightColor,
+                                        const QColor &depthColor, bool uniform)
 {
     m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
