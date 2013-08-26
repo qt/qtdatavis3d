@@ -74,7 +74,8 @@ Item {
             id: testscatter
             width: dataView.width
             height: dataView.height
-            fontSize: 30.0
+            font.family: "Times New Roman"
+            font.pointSize: 40
             mapping: scatterMapping
             shadowQuality: Scatter3D.ShadowNone
             selectionMode: Scatter3D.ModeItem

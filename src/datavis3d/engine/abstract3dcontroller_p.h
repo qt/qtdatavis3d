@@ -223,10 +223,6 @@ public:
     virtual void setColorTheme(QDataVis::ColorTheme colorTheme);
     virtual Theme theme();
 
-    // Font size adjustment
-    virtual void setFontSize(float fontsize);
-    virtual float fontSize();
-
     // Set font
     virtual void setFont(const QFont &font);
     virtual QFont font();

@@ -30,7 +30,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
       m_fontSize(30.0f)
 {
-    m_chart->setFontSize(m_fontSize);
+    QFont font = m_chart->font();
+    font.setPointSize(m_fontSize);
+    m_chart->setFont(font);
     m_chart->setObjectType(QDataVis::Spheres, true);
     m_chart->setTheme(QDataVis::ThemeBrownSand);
     m_chart->setShadowQuality(QDataVis::ShadowHigh);
@@ -147,7 +149,9 @@ void ScatterDataModifier::changeFont(const QFont &font)
 void ScatterDataModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    m_chart->setFontSize((GLfloat)m_fontSize);
+    QFont font = m_chart->font();
+    font.setPointSize(m_fontSize);
+    m_chart->setFont(font);
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)

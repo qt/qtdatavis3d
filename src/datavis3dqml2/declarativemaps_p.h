@@ -48,7 +48,6 @@ class DeclarativeMaps : public QQuickItem
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(QItemModelMapDataMapping *mapping READ mapping WRITE setMapping)
     Q_ENUMS(QtDataVis3D::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVis3D::QDataVis::ShadowQuality)
@@ -101,10 +100,6 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
-
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
 
     // Set font
     void setFont(const QFont &font);

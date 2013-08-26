@@ -150,16 +150,6 @@ QDataVis::SelectionMode DeclarativeMaps::selectionMode()
     return m_shared->selectionMode();
 }
 
-void DeclarativeMaps::setFontSize(float fontsize)
-{
-    m_shared->setFontSize(fontsize);
-}
-
-float DeclarativeMaps::fontSize()
-{
-    return m_shared->fontSize();
-}
-
 void DeclarativeMaps::setFont(const QFont &font)
 {
     m_shared->setFont(font);

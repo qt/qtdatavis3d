@@ -38,7 +38,6 @@ class QT_DATAVIS3D_EXPORT Q3DMaps : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
 
 public:
 
@@ -94,10 +93,6 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;
-
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize() const;
 
     // Set font
     void setFont(const QFont &font);

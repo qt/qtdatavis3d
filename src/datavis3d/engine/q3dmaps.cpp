@@ -195,16 +195,6 @@ QDataVis::SelectionMode Q3DMaps::selectionMode() const
     return d_ptr->m_shared->selectionMode();
 }
 
-void Q3DMaps::setFontSize(float fontsize)
-{
-    d_ptr->m_shared->setFontSize(fontsize);
-}
-
-float Q3DMaps::fontSize() const
-{
-    return d_ptr->m_shared->fontSize();
-}
-
 void Q3DMaps::setFont(const QFont &font)
 {
     d_ptr->m_shared->setFont(font);

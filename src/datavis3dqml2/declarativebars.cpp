@@ -265,16 +265,6 @@ QDataVis::ColorTheme DeclarativeBars::theme()
     return m_theme;
 }
 
-void DeclarativeBars::setFontSize(float fontsize)
-{
-    m_shared->setFontSize(fontsize);
-}
-
-float DeclarativeBars::fontSize()
-{
-    return m_shared->fontSize();
-}
-
 void DeclarativeBars::setFont(const QFont &font)
 {
     m_shared->setFont(font);

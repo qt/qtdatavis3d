@@ -316,21 +316,6 @@ void Q3DBars::setMeshFileName(const QString &objFileName)
 }
 
 /*!
- * \property Q3DBars::fontSize
- *
- * Sets font size to \a fontsize.
- */
-void Q3DBars::setFontSize(float fontsize)
-{
-    d_ptr->m_shared->setFontSize(fontsize);
-}
-
-float Q3DBars::fontSize()
-{
-    return d_ptr->m_shared->fontSize();
-}
-
-/*!
  * \property Q3DBars::font
  *
  * Sets the \a font for labels. It is preset to \c Arial by default.

@@ -58,7 +58,6 @@ class DeclarativeScatter : public QQuickItem
     Q_PROPERTY(bool objectSmooth READ objectSmooth WRITE setObjectSmooth)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
@@ -123,10 +122,6 @@ public:
     // Change selection mode
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
-
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
 
     // Set font
     void setFont(const QFont &font);

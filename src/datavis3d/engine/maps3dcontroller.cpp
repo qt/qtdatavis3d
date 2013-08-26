@@ -1300,18 +1300,6 @@ QDataVis::SelectionMode Maps3DController::selectionMode()
     return m_selectionMode;
 }
 
-void Maps3DController::setFontSize(float fontsize)
-{
-    m_font.setPointSizeF(fontsize);
-    m_drawer->setFont(m_font);
-    m_updateLabels = true;
-}
-
-float Maps3DController::fontSize()
-{
-    return m_font.pointSizeF();
-}
-
 void Maps3DController::setFont(const QFont &font)
 {
     m_font = font;

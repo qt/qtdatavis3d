@@ -229,16 +229,6 @@ QDataVis::ColorTheme DeclarativeScatter::theme()
     return m_theme;
 }
 
-void DeclarativeScatter::setFontSize(float fontsize)
-{
-    m_shared->setFontSize(fontsize);
-}
-
-float DeclarativeScatter::fontSize()
-{
-    return m_shared->fontSize();
-}
-
 void DeclarativeScatter::setFont(const QFont &font)
 {
     m_shared->setFont(font);

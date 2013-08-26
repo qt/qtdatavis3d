@@ -63,7 +63,6 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(bool barSmooth READ barSmooth WRITE setBarSmooth)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(float fontSize READ fontSize WRITE setFontSize)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(int rows READ rows WRITE setRows)
@@ -148,10 +147,6 @@ public:
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
-
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
 
     // Set font
     void setFont(const QFont &font);

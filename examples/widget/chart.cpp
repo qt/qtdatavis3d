@@ -348,14 +348,15 @@ void ChartModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
-    //qDebug() << newFont << newFont.style();
     m_chart->setFont(newFont);
 }
 
 void ChartModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    m_chart->setFontSize((GLfloat)m_fontSize);
+    QFont font = m_chart->font();
+    font.setPointSize(m_fontSize);
+    m_chart->setFont(font);
 }
 
 void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)

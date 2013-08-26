@@ -117,10 +117,6 @@ public:
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
 
-    // Font size adjustment
-    void setFontSize(float fontsize);
-    float fontSize();
-
     // Set font
     void setFont(const QFont &font);
     QFont font();

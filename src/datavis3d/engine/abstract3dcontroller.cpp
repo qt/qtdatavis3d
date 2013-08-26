@@ -459,19 +459,6 @@ Theme Abstract3DController::theme()
     return m_theme;
 }
 
-void Abstract3DController::setFontSize(float fontsize)
-{
-    m_font.setPointSizeF(fontsize);
-
-    m_changeTracker.fontChanged = true;
-    emit fontChanged(m_font);
-}
-
-float Abstract3DController::fontSize()
-{
-    return m_font.pointSizeF();
-}
-
 void Abstract3DController::setFont(const QFont &font)
 {
     m_font = font;

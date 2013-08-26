@@ -276,21 +276,6 @@ void Q3DScatter::setMeshFileName(const QString &objFileName)
 }
 
 /*!
- * \property Q3DScatter::fontSize
- *
- * Sets font size to \a fontsize.
- */
-void Q3DScatter::setFontSize(float fontsize)
-{
-    d_ptr->m_shared->setFontSize(fontsize);
-}
-
-float Q3DScatter::fontSize() const
-{
-    return d_ptr->m_shared->fontSize();
-}
-
-/*!
  * \property Q3DScatter::font
  *
  * Sets the \a font for labels. It is preset to \c Arial by default.

@@ -32,7 +32,9 @@ MapsModifier::MapsModifier(Q3DMaps *maps)
     QImage image = QImage(QStringLiteral(":/images/finland"));
     m_imageRect = image.rect();
     m_chart->setAreaSpecs(m_imageRect, image);
-    m_chart->setFontSize(m_fontSize);
+    QFont font = m_chart->font();
+    font.setPointSize(m_fontSize);
+    m_chart->setFont(font);
 
 #if 0
     m_chart->setBarSpecs(m_barSpecs, Q3DMaps::AdjustHeight);
@@ -296,14 +298,15 @@ void MapsModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    //qDebug() << newFont << newFont.style();
     m_chart->setFont(newFont);
 }
 
 void MapsModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    m_chart->setFontSize((GLfloat)m_fontSize);
+    QFont font = m_chart->font();
+    font.setPointSize(m_fontSize);
+    m_chart->setFont(font);
 }
 
 void MapsModifier::changeShadowQuality(int quality)
