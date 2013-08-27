@@ -1438,7 +1438,6 @@ void Scatter3DRenderer::initDepthShader()
 
 void Scatter3DRenderer::updateDepthBuffer()
 {
-    //qDebug() << __FUNCTION__;
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
@@ -1453,14 +1452,17 @@ void Scatter3DRenderer::updateDepthBuffer()
             case QDataVis::ShadowHigh:
                 qWarning("Creating high quality shadows failed. Changing to medium quality.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
+                updateShadowQuality(QDataVis::ShadowMedium);
                 break;
             case QDataVis::ShadowMedium:
                 qWarning("Creating medium quality shadows failed. Changing to low quality.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
+                updateShadowQuality(QDataVis::ShadowLow);
                 break;
             case QDataVis::ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
                 break;
             default:
                 // You'll never get here

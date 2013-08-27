@@ -1507,7 +1507,6 @@ void Bars3dRenderer::updateSelectedBarPos(QPoint position)
 
 void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    qDebug() << __FUNCTION__ << quality;
     m_cachedShadowQuality = quality;
     switch (quality) {
     case QDataVis::ShadowLow:
@@ -1718,14 +1717,17 @@ void Bars3dRenderer::updateDepthBuffer()
             case QDataVis::ShadowHigh:
                 qWarning("Creating high quality shadows failed. Changing to medium quality.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
+                updateShadowQuality(QDataVis::ShadowMedium);
                 break;
             case QDataVis::ShadowMedium:
                 qWarning("Creating medium quality shadows failed. Changing to low quality.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
+                updateShadowQuality(QDataVis::ShadowLow);
                 break;
             case QDataVis::ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
                 break;
             default:
                 // You'll never get here
