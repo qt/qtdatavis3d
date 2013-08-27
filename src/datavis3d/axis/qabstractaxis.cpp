@@ -54,10 +54,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QAbstractAxis with \a d.
+ * \internal
  */
-QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d) :
-    QObject(0),
+QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent) :
+    QObject(parent),
     d_ptr(d)
 {
 }

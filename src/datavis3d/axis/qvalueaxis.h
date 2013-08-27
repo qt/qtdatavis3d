@@ -36,7 +36,7 @@ class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
 
 public:
-    explicit QValueAxis();
+    explicit QValueAxis(QObject *parent = 0);
     ~QValueAxis();
 
     qreal min() const;

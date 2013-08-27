@@ -34,16 +34,14 @@ class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QObject
     Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
     Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY mappingChanged)
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY mappingChanged)
+
 public:
-    explicit QItemModelBarDataMapping();
-    QItemModelBarDataMapping(const QItemModelBarDataMapping &other);
-    QItemModelBarDataMapping(const QString &valueRole);
+    explicit QItemModelBarDataMapping(QObject *parent = 0);
+    QItemModelBarDataMapping(const QString &valueRole, QObject *parent = 0);
     QItemModelBarDataMapping(const QString &rowRole, const QString &columnRole,
                              const QString &valueRole, const QStringList &rowCategories,
-                             const QStringList &columnCategories);
+                             const QStringList &columnCategories, QObject *parent = 0);
     virtual ~QItemModelBarDataMapping();
-
-    QItemModelBarDataMapping &operator=(const QItemModelBarDataMapping &other);
 
     // If row categories or column categories is an empty list, use item models's rows and columns for rows and columns.
     // If the categories are both defined, ignore item model's rows and columns and figure out the rows and columns from
@@ -64,6 +62,7 @@ public:
     void remap(const QString &rowRole, const QString &columnRole,
                const QString &valueRole, const QStringList &rowCategories,
                const QStringList &columnCategories);
+
 signals:
     void mappingChanged();
 

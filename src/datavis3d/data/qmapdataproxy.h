@@ -33,8 +33,7 @@ class QT_DATAVIS3D_EXPORT QMapDataProxy : public QAbstractDataProxy
     Q_OBJECT
 
 public:
-    explicit QMapDataProxy();
-    explicit QMapDataProxy(QMapDataProxyPrivate *d);
+    explicit QMapDataProxy(QObject *parent = 0);
     virtual ~QMapDataProxy();
 
     // TODO: Replace first part of class description in docs with this once all TODOs are done:
@@ -70,6 +69,7 @@ signals:
     void itemsInserted(int startIndex, int count);
 
 protected:
+    explicit QMapDataProxy(QMapDataProxyPrivate *d, QObject *parent = 0);
     QMapDataProxyPrivate *dptr();
     const QMapDataProxyPrivate *dptrc() const;
 

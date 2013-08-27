@@ -55,7 +55,8 @@ public:
     };
 
 protected:
-    explicit QAbstractAxis(QAbstractAxisPrivate *d);
+    explicit QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent = 0);
+
 public:
     virtual ~QAbstractAxis();
 

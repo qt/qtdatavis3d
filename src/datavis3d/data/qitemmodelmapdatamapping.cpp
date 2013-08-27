@@ -35,33 +35,24 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QItemModelMapDataMapping.
+ * Constructs QItemModelMapDataMapping with the given \a parent.
  */
-QItemModelMapDataMapping::QItemModelMapDataMapping()
-    : QObject(0),
+QItemModelMapDataMapping::QItemModelMapDataMapping(QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelMapDataMappingPrivate(this))
 {
 }
 
 /*!
- * Constructs a copy of \a other.
- */
-QItemModelMapDataMapping::QItemModelMapDataMapping(const QItemModelMapDataMapping &other)
-    : QObject(0),
-      d_ptr(new QItemModelMapDataMappingPrivate(this))
-{
-    operator=(other);
-}
-
-/*!
- * Constructs QItemModelMapDataMapping with \a labelRole, \a xPosRole, \a zPosRole and
- * \a valueRole.
+ * Constructs QItemModelMapDataMapping with \a labelRole, \a xPosRole, \a zPosRole,
+ * \a valueRole and the given \a parent.
  */
 QItemModelMapDataMapping::QItemModelMapDataMapping(const QString &labelRole,
                                                    const QString &xPosRole,
                                                    const QString &zPosRole,
-                                                   const QString &valueRole)
-    : QObject(0),
+                                                   const QString &valueRole,
+                                                   QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelMapDataMappingPrivate(this))
 {
     d_ptr->m_labelRole = labelRole;
@@ -75,19 +66,6 @@ QItemModelMapDataMapping::QItemModelMapDataMapping(const QString &labelRole,
  */
 QItemModelMapDataMapping::~QItemModelMapDataMapping()
 {
-}
-
-/*!
- *  Assigns a copy of \a other to this object.
- */
-QItemModelMapDataMapping &QItemModelMapDataMapping::operator=(const QItemModelMapDataMapping &other)
-{
-    d_ptr->m_labelRole = other.d_ptr->m_labelRole;
-    d_ptr->m_xPosRole = other.d_ptr->m_xPosRole;
-    d_ptr->m_zPosRole = other.d_ptr->m_zPosRole;
-    d_ptr->m_valueRole = other.d_ptr->m_valueRole;
-
-    return *this;
 }
 
 /*!

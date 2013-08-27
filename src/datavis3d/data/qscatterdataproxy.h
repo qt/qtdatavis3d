@@ -33,8 +33,7 @@ class QT_DATAVIS3D_EXPORT QScatterDataProxy : public QAbstractDataProxy
     Q_OBJECT
 
 public:
-    explicit QScatterDataProxy();
-    explicit QScatterDataProxy(QScatterDataProxyPrivate *d);
+    explicit QScatterDataProxy(QObject *parent = 0);
     virtual ~QScatterDataProxy();
 
     // TODO: Replace first part of class description in docs with this once all TODOs are done:
@@ -70,6 +69,7 @@ signals:
     void itemsInserted(int startIndex, int count);
 
 protected:
+    explicit QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent = 0);
     QScatterDataProxyPrivate *dptr();
     const QScatterDataProxyPrivate *dptrc() const;
 

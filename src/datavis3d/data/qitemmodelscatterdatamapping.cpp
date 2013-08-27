@@ -35,34 +35,24 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QItemModelScatterDataMapping.
+ * Constructs QItemModelScatterDataMapping with the given \a parent.
  */
-QItemModelScatterDataMapping::QItemModelScatterDataMapping()
-    : QObject(0),
+QItemModelScatterDataMapping::QItemModelScatterDataMapping(QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelScatterDataMappingPrivate(this))
 {
 }
 
 /*!
- * Constructs a copy of \a other.
- */
-QItemModelScatterDataMapping::QItemModelScatterDataMapping(
-        const QItemModelScatterDataMapping &other)
-    : QObject(0),
-      d_ptr(new QItemModelScatterDataMappingPrivate(this))
-{
-    operator=(other);
-}
-
-/*!
- * Constructs QItemModelScatterDataMapping with \a xPosRole, \a yPosRole, \a zPosRole and
- * \a valueRole.
+ * Constructs QItemModelScatterDataMapping with \a xPosRole, \a yPosRole, \a zPosRole,
+ * \a valueRole and the given \a parent.
  */
 QItemModelScatterDataMapping::QItemModelScatterDataMapping(const QString &xPosRole,
                                                            const QString &yPosRole,
                                                            const QString &zPosRole,
-                                                           const QString &valueRole)
-    : QObject(0),
+                                                           const QString &valueRole,
+                                                           QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelScatterDataMappingPrivate(this))
 {
     Q_UNUSED(valueRole);
@@ -77,20 +67,6 @@ QItemModelScatterDataMapping::QItemModelScatterDataMapping(const QString &xPosRo
  */
 QItemModelScatterDataMapping::~QItemModelScatterDataMapping()
 {
-}
-
-/*!
- *  Assigns a copy of \a other to this object.
- */
-QItemModelScatterDataMapping &QItemModelScatterDataMapping::operator=(
-        const QItemModelScatterDataMapping &other)
-{
-    d_ptr->m_xPosRole = other.d_ptr->m_xPosRole;
-    d_ptr->m_yPosRole = other.d_ptr->m_yPosRole;
-    d_ptr->m_zPosRole = other.d_ptr->m_zPosRole;
-    //d_ptr->m_valueRole = other.d_ptr->m_valueRole;
-
-    return *this;
 }
 
 /*!

@@ -55,18 +55,18 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QScatterDataProxy.
+ * Constructs QScatterDataProxy with the given \a parent.
  */
-QScatterDataProxy::QScatterDataProxy() :
-    QAbstractDataProxy(new QScatterDataProxyPrivate(this))
+QScatterDataProxy::QScatterDataProxy(QObject *parent) :
+    QAbstractDataProxy(new QScatterDataProxyPrivate(this), parent)
 {
 }
 
 /*!
- * Constructs QScatterDataProxy with \a d.
+ * \internal
  */
-QScatterDataProxy::QScatterDataProxy(QScatterDataProxyPrivate *d) :
-    QAbstractDataProxy(d)
+QScatterDataProxy::QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent) :
+    QAbstractDataProxy(d, parent)
 {
 }
 

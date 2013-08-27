@@ -35,8 +35,7 @@ class QT_DATAVIS3D_EXPORT QBarDataProxy : public QAbstractDataProxy
     Q_OBJECT
 
 public:
-    explicit QBarDataProxy();
-    explicit QBarDataProxy(QBarDataProxyPrivate *d);
+    explicit QBarDataProxy(QObject *parent = 0);
     virtual ~QBarDataProxy();
 
     // TODO: Replace first part of class description in docs with this once all TODOs are done:
@@ -94,6 +93,7 @@ signals:
     // TODO void itemsChanged(int rowIndex, int columnIndex, int rowCount, int columnCount);
 
 protected:
+    explicit QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent = 0);
     QBarDataProxyPrivate *dptr();
     const QBarDataProxyPrivate *dptrc() const;
 

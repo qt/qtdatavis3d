@@ -35,29 +35,19 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QItemModelBarDataMapping.
+ * Constructs QItemModelBarDataMapping with the given \a parent.
  */
-QItemModelBarDataMapping::QItemModelBarDataMapping()
-    : QObject(0),
+QItemModelBarDataMapping::QItemModelBarDataMapping(QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
 }
 
 /*!
- * Constructs a copy of \a other.
+ * Constructs QItemModelBarDataMapping with \a valueRole and the given \a parent.
  */
-QItemModelBarDataMapping::QItemModelBarDataMapping(const QItemModelBarDataMapping &other)
-    : QObject(0),
-      d_ptr(new QItemModelBarDataMappingPrivate(this))
-{
-    operator=(other);
-}
-
-/*!
- * Constructs QItemModelBarDataMapping with \a valueRole.
- */
-QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole)
-    : QObject(0),
+QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole, QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
     d_ptr->m_valueRole = valueRole;
@@ -65,14 +55,15 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole)
 
 /*!
  * Constructs QItemModelBarDataMapping with \a rowRole, \a columnRole, \a valueRole,
- * \a rowCategories and \a columnCategories.
+ * \a rowCategories, \a columnCategories and the given \a parent.
  */
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
                                                    const QString &columnRole,
                                                    const QString &valueRole,
                                                    const QStringList &rowCategories,
-                                                   const QStringList &columnCategories)
-    : QObject(0),
+                                                   const QStringList &columnCategories,
+                                                   QObject *parent)
+    : QObject(parent),
       d_ptr(new QItemModelBarDataMappingPrivate(this))
 {
     d_ptr->m_rowRole = rowRole;
@@ -87,20 +78,6 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
  */
 QItemModelBarDataMapping::~QItemModelBarDataMapping()
 {
-}
-
-/*!
- *  Assigns a copy of \a other to this object.
- */
-QItemModelBarDataMapping &QItemModelBarDataMapping::operator=(const QItemModelBarDataMapping &other)
-{
-    d_ptr->m_rowRole = other.d_ptr->m_rowRole;
-    d_ptr->m_columnRole = other.d_ptr->m_columnRole;
-    d_ptr->m_valueRole = other.d_ptr->m_valueRole;
-    d_ptr->m_rowCategories = other.d_ptr->m_rowCategories;
-    d_ptr->m_columnCategories = other.d_ptr->m_columnCategories;
-
-    return *this;
 }
 
 /*!

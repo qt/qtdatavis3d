@@ -33,18 +33,18 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QMapDataProxy.
+ * Constructs QMapDataProxy with the given \a parent.
  */
-QMapDataProxy::QMapDataProxy() :
-    QAbstractDataProxy(new QMapDataProxyPrivate(this))
+QMapDataProxy::QMapDataProxy(QObject *parent) :
+    QAbstractDataProxy(new QMapDataProxyPrivate(this), parent)
 {
 }
 
 /*!
- * Constructs QMapDataProxy with \a d.
+ * \internal
  */
-QMapDataProxy::QMapDataProxy(QMapDataProxyPrivate *d) :
-    QAbstractDataProxy(d)
+QMapDataProxy::QMapDataProxy(QMapDataProxyPrivate *d, QObject *parent) :
+    QAbstractDataProxy(d, parent)
 {
 }
 

@@ -32,8 +32,9 @@ class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
     //       which is read only there. Since subclass cannot have property with same name,
     //       this partially duplicate property is necessary.
     Q_PROPERTY(QStringList categoryLabels READ categoryLabels WRITE setCategoryLabels)
+
 public:
-    explicit QCategoryAxis();
+    explicit QCategoryAxis(QObject *parent = 0);
     ~QCategoryAxis();
 
     QStringList categoryLabels() const;

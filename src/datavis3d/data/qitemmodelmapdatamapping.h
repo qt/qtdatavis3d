@@ -33,14 +33,13 @@ class QT_DATAVIS3D_EXPORT QItemModelMapDataMapping : public QObject
     Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY mappingChanged)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY mappingChanged)
     Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
-public:
-    explicit QItemModelMapDataMapping();
-    QItemModelMapDataMapping(const QItemModelMapDataMapping &other);
-    QItemModelMapDataMapping(const QString &labelRole, const QString &xPosRole,
-                             const QString &zPosRole, const QString &valueRole);
-    virtual ~QItemModelMapDataMapping();
 
-    QItemModelMapDataMapping &operator=(const QItemModelMapDataMapping &other);
+public:
+    explicit QItemModelMapDataMapping(QObject *parent = 0);
+    QItemModelMapDataMapping(const QString &labelRole, const QString &xPosRole,
+                             const QString &zPosRole, const QString &valueRole,
+                             QObject *parent = 0);
+    virtual ~QItemModelMapDataMapping();
 
     void setLabelRole(const QString &role);
     QString labelRole() const;
@@ -53,6 +52,7 @@ public:
 
     void remap(const QString &labelRole, const QString &xPosRole,
                const QString &zPosRole, const QString &valueRole);
+
 signals:
     void mappingChanged();
 

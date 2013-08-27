@@ -33,14 +33,13 @@ class QT_DATAVIS3D_EXPORT QItemModelScatterDataMapping : public QObject
     Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY mappingChanged)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY mappingChanged)
     //Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
-public:
-    explicit QItemModelScatterDataMapping();
-    QItemModelScatterDataMapping(const QItemModelScatterDataMapping &other);
-    QItemModelScatterDataMapping(const QString &xPosRole, const QString &yPosRole,
-                                  const QString &zPosRole, const QString &valueRole);
-    virtual ~QItemModelScatterDataMapping();
 
-    QItemModelScatterDataMapping &operator=(const QItemModelScatterDataMapping &other);
+public:
+    explicit QItemModelScatterDataMapping(QObject *parent = 0);
+    QItemModelScatterDataMapping(const QString &xPosRole, const QString &yPosRole,
+                                 const QString &zPosRole, const QString &valueRole,
+                                 QObject *parent = 0);
+    virtual ~QItemModelScatterDataMapping();
 
     void setXPosRole(const QString &role);
     QString xPosRole() const;
@@ -54,6 +53,7 @@ public:
 
     void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole,
                const QString &valueRole);
+
 signals:
     void mappingChanged();
 

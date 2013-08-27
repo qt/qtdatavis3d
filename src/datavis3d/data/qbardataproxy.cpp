@@ -65,18 +65,18 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QBarDataProxy.
+ * Constructs QBarDataProxy with the given \a parent.
  */
-QBarDataProxy::QBarDataProxy() :
-    QAbstractDataProxy(new QBarDataProxyPrivate(this))
+QBarDataProxy::QBarDataProxy(QObject *parent) :
+    QAbstractDataProxy(new QBarDataProxyPrivate(this), parent)
 {
 }
 
 /*!
- * Constructs QBarDataProxy with \a d.
+ * \internal
  */
-QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d) :
-    QAbstractDataProxy(d)
+QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent) :
+    QAbstractDataProxy(d, parent)
 {
 }
 

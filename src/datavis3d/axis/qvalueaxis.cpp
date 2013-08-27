@@ -37,10 +37,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QValueAxis.
+ * Constructs QValueAxis with the given \a parent.
  */
-QValueAxis::QValueAxis() :
-    QAbstractAxis(new QValueAxisPrivate(this))
+QValueAxis::QValueAxis(QObject *parent) :
+    QAbstractAxis(new QValueAxisPrivate(this), parent)
 {
 }
 

@@ -47,10 +47,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QAbstractDataProxy with \a d.
+ * \internal
  */
-QAbstractDataProxy::QAbstractDataProxy(QAbstractDataProxyPrivate *d) :
-    QObject(0),
+QAbstractDataProxy::QAbstractDataProxy(QAbstractDataProxyPrivate *d, QObject *parent) :
+    QObject(parent),
     d_ptr(d)
 {
 }
