@@ -138,16 +138,24 @@ void Scatter3DRenderer::initializeOpenGL()
 
 void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
 {
+    int actualDataSize = 0;
     const QScatterDataArray &dataArray = *dataProxy->array();
     calculateSceneScalingFactors();
     int dataSize = dataArray.size();
     m_renderItemArray.resize(dataSize);
     for (int i = 0; i < dataSize ; i++) {
-        m_renderItemArray[i].setPosition(dataArray.at(i).position());
-        calculateTranslation(m_renderItemArray[i]);
-        m_renderItemArray[i].setRenderer(this);
+        QVector3D dotPos = dataArray.at(i).position();
+        if ((dotPos.x() >= m_axisCacheX.min() && dotPos.x() <= m_axisCacheX.max())
+                && (dotPos.y() >= m_axisCacheY.min() && dotPos.y() <= m_axisCacheY.max())
+                && (dotPos.z() >= m_axisCacheZ.min() && dotPos.z() <= m_axisCacheZ.max())) {
+            m_renderItemArray[actualDataSize].setPosition(dotPos);
+            calculateTranslation(m_renderItemArray[actualDataSize]);
+            m_renderItemArray[actualDataSize].setRenderer(this);
+            actualDataSize++;
+        }
     }
-    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)dataSize)), 0.1);
+    m_renderItemArray.resize(actualDataSize);
+    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)actualDataSize)), 0.1);
     m_selectedItem = 0;
 
     Abstract3DRenderer::updateDataModel(dataProxy);
@@ -1381,7 +1389,7 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
-    m_heightNormalizer = (GLfloat)m_axisCacheY.max();
+    m_heightNormalizer = (GLfloat)qMax(qAbs(m_axisCacheY.max()), qAbs(m_axisCacheY.min()));
     // TODO: Get rid of m_areaSize and use m_axisCaches directly?
     m_areaSize.setHeight(m_axisCacheZ.max());
     m_areaSize.setWidth(m_axisCacheX.max());

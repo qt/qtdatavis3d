@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low"));
     shadowQuality->addItem(QStringLiteral("Medium"));
     shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->setCurrentIndex(1);
+    shadowQuality->setCurrentIndex(3);
 
     QFontComboBox *fontList = new QFontComboBox(widget);
 
