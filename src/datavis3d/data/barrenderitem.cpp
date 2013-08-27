@@ -25,6 +25,7 @@ BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_renderer(0),
       m_value(0),
+      m_height(0.0f),
       m_sliceLabelItem(0)
 {
 }

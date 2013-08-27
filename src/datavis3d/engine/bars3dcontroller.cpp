@@ -435,6 +435,7 @@ void Bars3dController::setDataWindow(int rowCount, int columnCount)
         setSelectedBarPos(noSelectionPoint());
 
     m_changeTracker.sampleSpaceChanged = true;
+    m_isDataDirty = true; // Render item array is recreated in renderer
     emit sampleSpaceChanged(rowCount, columnCount);
 }
 
