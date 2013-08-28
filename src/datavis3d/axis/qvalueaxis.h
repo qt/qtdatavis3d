@@ -37,7 +37,7 @@ class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
 
 public:
     explicit QValueAxis(QObject *parent = 0);
-    ~QValueAxis();
+    virtual ~QValueAxis();
 
     qreal min() const;
     qreal max() const;

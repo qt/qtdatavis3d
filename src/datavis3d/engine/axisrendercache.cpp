@@ -52,11 +52,21 @@ void AxisRenderCache::setType(QAbstractAxis::AxisType type)
 {
     m_type = type;
 
-    // If type is set, it means completely new axis instance, so clear all generated label items.
+    // If type is set, it means completely new axis instance, so clear all old data
+    m_labels.clear();
+    m_title.clear();
+    m_min = 0.0;
+    m_max = 10.0;
+    m_segmentCount = 5;
+    m_subSegmentCount = 1;
+    m_labelFormat.clear();
+
     m_titleItem.clear();
     foreach (LabelItem *label, m_labelItems)
         delete label;
     m_labelItems.clear();
+    m_segmentStep = 10.0f;
+    m_subSegmentStep = 10.0f;
 }
 
 void AxisRenderCache::setTitle(const QString &title)
@@ -80,10 +90,10 @@ void AxisRenderCache::setLabels(const QStringList &labels)
 
         m_labelItems.reserve(newSize);
 
-        if (m_drawer) {
-            for (int i = 0; i < newSize; i++) {
-                if (i >= oldSize)
-                    m_labelItems.append(new LabelItem);
+        for (int i = 0; i < newSize; i++) {
+            if (i >= oldSize)
+                m_labelItems.append(new LabelItem);
+            if (m_drawer) {
                 if (labels.at(i).isEmpty())
                     m_labelItems[i]->clear();
                 else if (i >= oldSize || labels.at(i) != m_labels.at(i))

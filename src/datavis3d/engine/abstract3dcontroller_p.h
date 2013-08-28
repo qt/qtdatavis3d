@@ -156,9 +156,12 @@ protected:
     QAbstract3DInputHandler *m_inputHandler;
     CameraHelper *m_cameraHelper;
     int m_zoomLevel;
+    // Active axes
     QAbstractAxis *m_axisX;
     QAbstractAxis *m_axisY;
     QAbstractAxis *m_axisZ;
+
+    QList<QAbstractAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
 
@@ -201,6 +204,9 @@ public:
     virtual QAbstractAxis *axisY();
     virtual void setAxisZ(QAbstractAxis *axis);
     virtual QAbstractAxis *axisZ();
+    virtual void addAxis(QAbstractAxis *axis);
+    virtual void releaseAxis(QAbstractAxis *axis);
+    virtual QList<QAbstractAxis *> axes() const; // Omits default axes
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
@@ -282,6 +288,11 @@ signals:
     void backgroundEnabledChanged(bool enable);
     void gridEnabledChanged(bool enable); // TODO: Should be handled via axes?
     void meshFileNameChanged(QString fileName);
+
+protected:
+    virtual QAbstractAxis *createDefaultAxis(QAbstractAxis::AxisOrientation orientation);
+    QValueAxis *createDefaultValueAxis();
+    QCategoryAxis *createDefaultCategoryAxis();
 
 private:
     void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis,

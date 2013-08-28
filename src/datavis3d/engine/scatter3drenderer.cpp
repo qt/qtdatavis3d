@@ -1324,17 +1324,26 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 labelText.replace(zTitleTag, m_axisCacheZ.title());
 
                 if (labelText.contains(xLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheX.labelFormat(),
+                    QString labelFormat = m_axisCacheX.labelFormat();
+                    if (labelFormat.isEmpty())
+                        labelFormat = Utils::defaultLabelFormat();
+                    QString valueLabelText = generateValueLabel(labelFormat,
                                                                 selectedItem->position().x());
                     labelText.replace(xLabelTag, valueLabelText);
                 }
                 if (labelText.contains(yLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(),
+                    QString labelFormat = m_axisCacheY.labelFormat();
+                    if (labelFormat.isEmpty())
+                        labelFormat = Utils::defaultLabelFormat();
+                    QString valueLabelText = generateValueLabel(labelFormat,
                                                                 selectedItem->position().y());
                     labelText.replace(yLabelTag, valueLabelText);
                 }
                 if (labelText.contains(zLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheZ.labelFormat(),
+                    QString labelFormat = m_axisCacheZ.labelFormat();
+                    if (labelFormat.isEmpty())
+                        labelFormat = Utils::defaultLabelFormat();
+                    QString valueLabelText = generateValueLabel(labelFormat,
                                                                 selectedItem->position().z());
                     labelText.replace(zLabelTag, valueLabelText);
                 }

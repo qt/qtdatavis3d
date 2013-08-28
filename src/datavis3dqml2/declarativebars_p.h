@@ -48,9 +48,9 @@ class DeclarativeBars : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
-    Q_PROPERTY(QCategoryAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(QValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(QCategoryAxis *axisZ READ axisZ WRITE setAxisZ)
+    Q_PROPERTY(QCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
+    Q_PROPERTY(QValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
+    Q_PROPERTY(QCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -103,18 +103,18 @@ public:
     QItemModelBarDataMapping *mapping() const;
     void setMapping(QItemModelBarDataMapping *mapping);
 
-    QCategoryAxis *axisX() const;
-    void setAxisX(QCategoryAxis *axis);
-    QValueAxis *axisY() const;
-    void setAxisY(QValueAxis *axis);
-    QCategoryAxis *axisZ() const;
-    void setAxisZ(QCategoryAxis *axis);
+    QCategoryAxis *rowAxis() const;
+    void setRowAxis(QCategoryAxis *axis);
+    QValueAxis *valueAxis() const;
+    void setValueAxis(QValueAxis *axis);
+    QCategoryAxis *columnAxis() const;
+    void setColumnAxis(QCategoryAxis *axis);
 
-    // Set bar thickness. Y -component sets the thickness of z -direction.
+    // Set bar thickness.
     void setBarThickness(qreal thicknessRatio);
     qreal barThickness();
 
-    // Set spacing between bars. Y -component sets the spacing of z -direction.
+    // Set spacing between bars. Y-component sets the spacing of Z-direction.
     // If spacing is relative, 0.0f means side-to-side and 1.0f = one thickness in between.
     void setBarSpacing(QSizeF spacing);
     QSizeF barSpacing();

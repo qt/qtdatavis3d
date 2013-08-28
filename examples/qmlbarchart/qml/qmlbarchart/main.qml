@@ -101,12 +101,20 @@ Item {
                 "July", "August", "September", "October", "November", "December"]
         }
         ValueAxis {
-            id: valueAxis
+            id: incomeAxis
             min: 0
             max: 35
-            labelFormat: "%.1f M\u20AC"
-            title: "Annual expenses"
+            labelFormat: "%.2f M\u20AC"
+            title: "Monthly income"
         }
+        ValueAxis {
+            id: expensesAxis
+            min: 0
+            max: 35
+            labelFormat: "-%.2f M\u20AC"
+            title: "Monthly expenses"
+        }
+
         Bars3D {
             id: testchart
             width: dataView.width
@@ -122,14 +130,14 @@ Item {
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
             barType: Bars3D.BevelBars
-            axisX: rowAxis
-            axisY: valueAxis
-            axisZ: columnAxis
+            rowAxis: rowAxis
+            columnAxis: columnAxis
+            valueAxis: expensesAxis
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
 
             onDataResolved: {
                 // Can't select a bar until data has been resolved from model to proxy
-                selectedBarPos = Qt.point(0, 5)
+                //selectedBarPos = Qt.point(0, 5)
             }
         }
 
@@ -204,11 +212,11 @@ Item {
                 if (valueMapping.valueRole == "expenses") {
                     valueMapping.valueRole = "income"
                     mappingButtonText.text = "Show Expenses"
-                    valueAxis.title = "Annual income"
+                    testchart.valueAxis = incomeAxis
                 } else {
                     valueMapping.valueRole = "expenses"
                     mappingButtonText.text = "Show Income"
-                    valueAxis.title = "Annual expenses"
+                    testchart.valueAxis = expensesAxis
                 }
             }
         }

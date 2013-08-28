@@ -20,6 +20,7 @@
 #include "q3dbars_p.h"
 #include "bars3dcontroller_p.h"
 #include "qvalueaxis.h"
+#include "qcategoryaxis.h"
 
 #include <QMouseEvent>
 
@@ -394,7 +395,7 @@ QPoint Q3DBars::selectedBarPos() const
  */
 void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    return d_ptr->m_shared->setShadowQuality(quality);
+    d_ptr->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DBars::shadowQuality() const
@@ -403,37 +404,102 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 }
 
 /*!
- * \return category axis for rows.
+ * Sets a user-defined row \a axis. Implicitly calls addAxis() to transfer ownership of
+ * the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set row axis at all, a temporary
+ * default axis with no labels is used.
+ *
+ * \sa addAxis(), releaseAxis()
+ */
+void Q3DBars::setRowAxis(QCategoryAxis *axis)
+{
+    d_ptr->m_shared->setAxisX(axis);
+}
+
+/*!
+ * \return category axis for rows. Returns null pointer if default axis is in use.
  */
 QCategoryAxis *Q3DBars::rowAxis() const
 {
-    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
 }
 
 /*!
- * \return category axis for columns.
+ * Sets a user-defined column \a axis. Implicitly calls addAxis() to transfer ownership of
+ * the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set column axis at all, a temporary
+ * default axis with no labels is used.
+ *
+ * \sa addAxis(), releaseAxis()
+ */
+void Q3DBars::setColumnAxis(QCategoryAxis *axis)
+{
+    d_ptr->m_shared->setAxisZ(axis);
+}
+
+/*!
+ * \return category axis for columns. Returns null pointer if default axis is in use.
  */
 QCategoryAxis *Q3DBars::columnAxis() const
 {
-    return reinterpret_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
 /*!
- * Sets a user-defined value \a axis (Y-axis). Ownership of the axis is transferred to Q3DBars.
+ * Sets a user-defined value \a axis (the Y-axis). Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
  */
 void Q3DBars::setValueAxis(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisY(axis);
+    d_ptr->m_shared->setAxisY(axis);
 }
 
 /*!
- * \return used value axis (Y-axis).
+ * \return used value axis (Y-axis). Returns null pointer if default axis is in use.
  */
 QValueAxis *Q3DBars::valueAxis() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
+}
+
+/*!
+ * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
+ * addAxis is simply used to give the ownership of the \a axis to the graph.
+ * The \a axis must not be null or added to another graph.
+ *
+ * \sa releaseAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
+ */
+void Q3DBars::addAxis(QAbstractAxis *axis)
+{
+    d_ptr->m_shared->addAxis(axis);
+}
+
+/*!
+ * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
+ * If the released \a axis is in use, a temporary default axis will be set active.
+ *
+ * \sa addAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
+ */
+void Q3DBars::releaseAxis(QAbstractAxis *axis)
+{
+    d_ptr->m_shared->releaseAxis(axis);
+}
+
+/*!
+ * \return list of all added axes.
+ *
+ * \sa addAxis()
+ */
+QList<QAbstractAxis *> Q3DBars::axes() const
+{
+    return d_ptr->m_shared->axes();
 }
 
 /*!

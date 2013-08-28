@@ -38,10 +38,12 @@ Surface3dController::Surface3dController(QRect rect)
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0))
 {
-    // Default axes
-    setAxisX(new QValueAxis()); // Or QCategoryAxis
-    setAxisY(new QValueAxis());
-    setAxisZ(new QValueAxis()); // Or QCategoryAxis
+    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
+    //       functions implemented by subclasses.
+    setAxisX(0);
+    setAxisY(0);
+    setAxisZ(0);
 }
 
 Surface3dController::~Surface3dController()

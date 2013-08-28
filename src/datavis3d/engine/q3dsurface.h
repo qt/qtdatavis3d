@@ -58,14 +58,15 @@ public:
     void setGradientColorAt(qreal pos, const QColor &color);
 
     // Axes
-    void setValueAxisX(QValueAxis *axis);
-    QValueAxis *valueAxisX();
-
-    void setValueAxisY(QValueAxis *axis);
-    QValueAxis *valueAxisY();
-
-    void setValueAxisZ(QValueAxis *axis);
-    QValueAxis *valueAxisZ();
+    void setAxisX(QValueAxis *axis);
+    QValueAxis *axisX() const;
+    void setAxisY(QValueAxis *axis);
+    QValueAxis *axisY() const;
+    void setAxisZ(QValueAxis *axis);
+    QValueAxis *axisZ() const;
+    void addAxis(QValueAxis *axis);
+    void releaseAxis(QValueAxis *axis);
+    QList<QValueAxis *> axes() const;
 
     // TODO: Remove when axes handling in use
     void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);

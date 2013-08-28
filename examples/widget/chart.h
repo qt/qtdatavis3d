@@ -24,6 +24,7 @@
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
+#include <QPointer>
 
 using namespace QtDataVis3D;
 
@@ -34,7 +35,7 @@ public:
     explicit ChartModifier(Q3DBars *barchart);
     ~ChartModifier();
 
-    void addDataSet();
+    void resetData();
     void addRow();
     void addRows();
     void changeItem();
@@ -62,6 +63,7 @@ public:
     void start();
     void restart(bool dynamicData);
     void selectBar();
+    void swapAxis();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -86,9 +88,16 @@ private:
     int m_subSegments;
     qreal m_minval;
     qreal m_maxval;
-    QStringList m_genericRowLabels;
-    QStringList m_genericColumnLabels;
+    QStringList m_months;
+    QStringList m_years;
     QPoint m_selectedBarPos;
+    QValueAxis *m_autoAdjustingAxis;
+    QValueAxis *m_fixedRangeAxis;
+    QValueAxis *m_temperatureAxis;
+    QCategoryAxis *m_yearAxis;
+    QCategoryAxis *m_monthAxis;
+    QCategoryAxis *m_genericRowAxis;
+    QCategoryAxis *m_genericColumnAxis;
 };
 
 #endif

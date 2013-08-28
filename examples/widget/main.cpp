@@ -98,6 +98,10 @@ int main(int argc, char **argv)
     QPushButton *setSelectedBarButton = new QPushButton(widget);
     setSelectedBarButton->setText(QStringLiteral("Select/deselect bar at (5,5)"));
 
+    QPushButton *swapAxisButton = new QPushButton(widget);
+    swapAxisButton->setText(QStringLiteral("Swap value axis"));
+    swapAxisButton->setEnabled(false);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -196,6 +200,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
+    vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -254,6 +259,8 @@ int main(int argc, char **argv)
                      &ChartModifier::changeSelectionMode);
     QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
                      &ChartModifier::selectBar);
+    QObject::connect(swapAxisButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::swapAxis);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);
@@ -289,6 +296,8 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderZ,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &ChartModifier::restart);
 

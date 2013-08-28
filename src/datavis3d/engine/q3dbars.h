@@ -26,6 +26,7 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
+class QAbstractAxis;
 class QCategoryAxis;
 class QValueAxis;
 class QBarDataProxy;
@@ -93,10 +94,15 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
+    void setRowAxis(QCategoryAxis *axis);
     QCategoryAxis *rowAxis() const;
+    void setColumnAxis(QCategoryAxis *axis);
     QCategoryAxis *columnAxis() const;
     void setValueAxis(QValueAxis *axis);
     QValueAxis *valueAxis() const;
+    void addAxis(QAbstractAxis *axis);
+    void releaseAxis(QAbstractAxis *axis);
+    QList<QAbstractAxis *> axes() const;
 
     void setDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *dataProxy();

@@ -365,57 +365,106 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
 }
 
 /*!
- * Sets a user-defined value \a axis (X-axis). Ownership of the axis is transferred to Q3DScatter.
+ * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setValueAxisX(QValueAxis *axis)
+void Q3DScatter::setAxisX(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisX(axis);
+    d_ptr->m_shared->setAxisX(axis);
 }
 
 /*!
- * \return used value axis (X-axis).
+ * \return used X-axis. Returns null pointer if default axis is in use.
  */
-QValueAxis *Q3DScatter::valueAxisX() const
+QValueAxis *Q3DScatter::axisX() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisX());
 }
 
 /*!
- * Sets a user-defined value \a axis (Y-axis). Ownership of the axis is transferred to Q3DScatter.
+ * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setValueAxisY(QValueAxis *axis)
+void Q3DScatter::setAxisY(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisY(axis);
+    d_ptr->m_shared->setAxisY(axis);
 }
 
 /*!
- * \return used value axis (Y-axis).
+ * \return used Y-axis. Returns null pointer if default axis is in use.
  */
-QValueAxis *Q3DScatter::valueAxisY() const
+QValueAxis *Q3DScatter::axisY() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
 
 /*!
- * Sets a user-defined value \a axis (Z-axis). Ownership of the axis is transferred to Q3DScatter.
+ * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setValueAxisZ(QValueAxis *axis)
+void Q3DScatter::setAxisZ(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisZ(axis);
+    d_ptr->m_shared->setAxisZ(axis);
 }
 
 /*!
- * \return used value axis (Z-axis).
+ * \return used Z-axis. Returns null pointer if default axis is in use.
  */
-QValueAxis *Q3DScatter::valueAxisZ() const
+QValueAxis *Q3DScatter::axisZ() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisZ());
+}
+
+/*!
+ * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
+ * addAxis is simply used to give the ownership of the \a axis to the graph.
+ * The \a axis must not be null or added to another graph.
+ *
+ * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
+ */
+void Q3DScatter::addAxis(QValueAxis *axis)
+{
+    d_ptr->m_shared->addAxis(axis);
+}
+
+/*!
+ * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
+ *
+ * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
+ */
+void Q3DScatter::releaseAxis(QValueAxis *axis)
+{
+    d_ptr->m_shared->releaseAxis(axis);
+}
+
+/*!
+ * \return list of all added axes.
+ *
+ * \sa addAxis()
+ */
+QList<QValueAxis *> Q3DScatter::axes() const
+{
+    QList<QAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<QValueAxis *> retList;
+    foreach (QAbstractAxis *axis, abstractAxes)
+        retList.append(static_cast<QValueAxis *>(axis));
+
+    return retList;
 }
 
 /*!

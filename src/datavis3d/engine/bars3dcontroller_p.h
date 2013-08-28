@@ -152,6 +152,9 @@ signals:
     void barSpecsChanged(GLfloat thicknessRatio, QSizeF spacing, bool relative);
     void selectedBarPosChanged(QPoint position);
 
+protected:
+    virtual QAbstractAxis *createDefaultAxis(QAbstractAxis::AxisOrientation orientation);
+
 private:
     void adjustValueAxisRange();
 

@@ -154,40 +154,107 @@ void Q3DSurface::setSegmentCount(int segmentCount, qreal step, qreal minimum)
     d_ptr->m_shared->setSegmentCount(GLint(segmentCount), GLfloat(step), GLfloat(minimum));
 }
 
-void Q3DSurface::setValueAxisX(QValueAxis *axis)
+/*!
+ * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
+ */
+void Q3DSurface::setAxisX(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisX(axis);
+    d_ptr->m_shared->setAxisX(axis);
 }
 
-QValueAxis *Q3DSurface::valueAxisX()
+/*!
+ * \return used X-axis. Returns null pointer if default axis is in use.
+ */
+QValueAxis *Q3DSurface::axisX() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisX());
 }
 
-void Q3DSurface::setValueAxisY(QValueAxis *axis)
+/*!
+ * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
+ */
+void Q3DSurface::setAxisY(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisY(axis);
+    d_ptr->m_shared->setAxisY(axis);
 }
 
-QValueAxis *Q3DSurface::valueAxisY()
+/*!
+ * \return used Y-axis. Returns null pointer if default axis is in use.
+ */
+QValueAxis *Q3DSurface::axisY() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
 }
 
-void Q3DSurface::setValueAxisZ(QValueAxis *axis)
+/*!
+ * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
+ * of the \a axis to this graph.
+ *
+ * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
+ * default axis with no labels and automatic range adjusting is used.
+ *
+ * \sa addAxis(), releaseAxis()
+ */
+void Q3DSurface::setAxisZ(QValueAxis *axis)
 {
-    Q_ASSERT(axis);
-
-    return d_ptr->m_shared->setAxisZ(axis);
+    d_ptr->m_shared->setAxisZ(axis);
 }
 
-QValueAxis *Q3DSurface::valueAxisZ()
+/*!
+ * \return used Z-axis. Returns null pointer if default axis is in use.
+ */
+QValueAxis *Q3DSurface::axisZ() const
 {
     return static_cast<QValueAxis *>(d_ptr->m_shared->axisZ());
+}
+
+/*!
+ * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
+ * addAxis is simply used to give the ownership of the \a axis to the graph.
+ * The \a axis must not be null or added to another graph.
+ *
+ * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
+ */
+void Q3DSurface::addAxis(QValueAxis *axis)
+{
+    d_ptr->m_shared->addAxis(axis);
+}
+
+/*!
+ * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
+ *
+ * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
+ */
+void Q3DSurface::releaseAxis(QValueAxis *axis)
+{
+    d_ptr->m_shared->releaseAxis(axis);
+}
+
+/*!
+ * \return list of all added axes.
+ *
+ * \sa addAxis()
+ */
+QList<QValueAxis *> Q3DSurface::axes() const
+{
+    QList<QAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<QValueAxis *> retList;
+    foreach (QAbstractAxis *axis, abstractAxes)
+        retList.append(static_cast<QValueAxis *>(axis));
+
+    return retList;
 }
 
 void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)

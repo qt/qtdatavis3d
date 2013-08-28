@@ -219,7 +219,9 @@ QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
       m_max(10.0),
       m_segmentCount(5),
       m_subSegmentCount(1),
-      m_autoAdjust(true)
+      m_autoAdjust(true),
+      m_labelFormat(Utils::defaultLabelFormat()),
+      m_labelsDirty(true)
 {
 }
 
@@ -307,9 +309,6 @@ void QValueAxisPrivate::updateLabels()
     qreal segmentStep = (m_max - m_min) / m_segmentCount;
 
     QString formatString(m_labelFormat);
-    if (formatString.isEmpty())
-        formatString = Utils::defaultLabelFormat();
-
     Utils::ParamType paramType = Utils::findFormatParamType(formatString);
     QByteArray formatArray = formatString.toUtf8();
 

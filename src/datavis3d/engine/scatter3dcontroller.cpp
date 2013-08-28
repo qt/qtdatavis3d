@@ -38,15 +38,17 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_data(0),
       m_selectedItemIndex(noSelectionIndex())
 {
-    // Default axes
-    setAxisX(new QValueAxis());
-    setAxisY(new QValueAxis());
-    setAxisZ(new QValueAxis());
-
     // Default object type; specific to scatter
     setObjectType(QDataVis::Spheres, false);
 
     setDataProxy(new QScatterDataProxy);
+
+    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
+    //       functions implemented by subclasses.
+    setAxisX(0);
+    setAxisY(0);
+    setAxisZ(0);
 }
 
 Scatter3DController::~Scatter3DController()

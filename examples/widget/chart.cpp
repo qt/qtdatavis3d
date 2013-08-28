@@ -41,22 +41,75 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_subSegments(3),
       m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
       m_maxval(20.0),
-      m_selectedBarPos(-1, -1)
+      m_selectedBarPos(-1, -1),
+      m_autoAdjustingAxis(new QValueAxis),
+      m_fixedRangeAxis(new QValueAxis),
+      m_temperatureAxis(new QValueAxis),
+      m_yearAxis(new QCategoryAxis),
+      m_monthAxis(new QCategoryAxis),
+      m_genericRowAxis(new QCategoryAxis),
+      m_genericColumnAxis(new QCategoryAxis)
 {
     // Don't set any styles or specifications, start from defaults
     // Generate generic labels
+    QStringList genericRowLabels;
+    QStringList genericColumnLabels;
     for (int i = 0; i < 200; i++) {
         if (i % 5)
-            m_genericRowLabels << QString();
+            genericRowLabels << QString();
         else
-            m_genericRowLabels << QStringLiteral("Row %1").arg(i);
+            genericRowLabels << QStringLiteral("Row %1").arg(i);
     }
     for (int i = 0; i < 200; i++) {
         if (i % 5)
-            m_genericColumnLabels << QString();
+            genericColumnLabels << QString();
         else
-            m_genericColumnLabels << QStringLiteral("Column %1").arg(i);
+            genericColumnLabels << QStringLiteral("Column %1").arg(i);
     }
+
+    m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
+    m_years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
+
+    QString labelFormat(QStringLiteral("%.3f"));
+    QString axisTitle("Generic Value");
+
+    m_autoAdjustingAxis->setLabelFormat(labelFormat);
+    m_autoAdjustingAxis->setTitle(axisTitle);
+    m_autoAdjustingAxis->setSegmentCount(m_segments * 2);
+    m_autoAdjustingAxis->setSubSegmentCount(1);
+    m_autoAdjustingAxis->setAutoAdjustRange(true);
+
+    m_fixedRangeAxis->setLabelFormat(labelFormat);
+    m_fixedRangeAxis->setTitle(axisTitle);
+    m_fixedRangeAxis->setSegmentCount(m_segments);
+    m_fixedRangeAxis->setSubSegmentCount(m_subSegments);
+    m_fixedRangeAxis->setRange(0.0, 100.0);
+
+    m_genericRowAxis->setTitle("Generic Row");
+    m_genericRowAxis->setCategoryLabels(genericRowLabels);
+
+    m_genericColumnAxis->setTitle("Generic Column");
+    m_genericColumnAxis->setCategoryLabels(genericColumnLabels);
+
+    m_temperatureAxis->setTitle("Average temperature");
+    m_temperatureAxis->setSegmentCount(m_segments);
+    m_temperatureAxis->setSubSegmentCount(m_subSegments);
+    m_temperatureAxis->setRange(m_minval, m_maxval);
+    m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
+
+    m_yearAxis->setTitle("Year");
+    m_yearAxis->setCategoryLabels(m_years);
+
+    m_monthAxis->setTitle("Month");
+    m_monthAxis->setCategoryLabels(m_months);
+
+    m_chart->addAxis(m_autoAdjustingAxis);
+    m_chart->addAxis(m_fixedRangeAxis);
+    m_chart->addAxis(m_temperatureAxis);
+    m_chart->addAxis(m_yearAxis);
+    m_chart->addAxis(m_monthAxis);
+    m_chart->addAxis(m_genericRowAxis);
+    m_chart->addAxis(m_genericColumnAxis);
 }
 
 ChartModifier::~ChartModifier()
@@ -66,8 +119,9 @@ ChartModifier::~ChartModifier()
 
 void ChartModifier::start()
 {
-    if (m_static)
-        addDataSet();
+    m_chart->setFont(QFont("Times Roman", 20));
+
+    restart(false);
 }
 
 void ChartModifier::restart(bool dynamicData)
@@ -75,31 +129,32 @@ void ChartModifier::restart(bool dynamicData)
     m_static = !dynamicData;
 
     if (m_static) {
-        start();
-        // Set selection mode to zoom row
-        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
-        m_chart->setFont(QFont("Times Roman", 20));
+        resetData();
+
+        m_chart->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+
+        m_chart->setValueAxis(m_temperatureAxis);
+        m_chart->setRowAxis(m_yearAxis);
+        m_chart->setColumnAxis(m_monthAxis);
+
+        m_chart->setDataWindow(m_years.size(), m_months.size());
+        m_chart->setSelectionMode(QDataVis::ModeItem);
+        m_chart->dataProxy()->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+
     } else {
+
         m_chart->dataProxy()->resetArray(0);
-        m_chart->dataProxy()->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
-        // Set up sample space
+
+        m_chart->setTitle(QStringLiteral("Generic data"));
+
+        m_chart->setValueAxis(m_fixedRangeAxis);
+        m_chart->setRowAxis(m_genericRowAxis);
+        m_chart->setColumnAxis(m_genericColumnAxis);
+
         m_chart->setDataWindow(m_rowCount, m_columnCount);
-        // Set selection mode to full
-        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
-        m_chart->valueAxis()->setSegmentCount(m_segments * 2);
-        m_chart->valueAxis()->setSubSegmentCount(1);
-        m_chart->valueAxis()->setAutoAdjustRange(true);
-        m_chart->valueAxis()->setLabelFormat(QString(QStringLiteral("%.3f")));
+        m_chart->setSelectionMode(QDataVis::ModeItem);
+        m_chart->dataProxy()->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
 
-        m_chart->rowAxis()->setTitle("Generic Row");
-        m_chart->columnAxis()->setTitle("Generic Column");
-        m_chart->valueAxis()->setTitle("Generic Value");
-
-        if (m_chart->rowAxis()->labels().size() < m_rowCount)
-            m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
-
-        if (m_chart->columnAxis()->labels().size() < m_rowCount)
-            m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
     }
 }
 
@@ -113,53 +168,49 @@ void ChartModifier::selectBar()
         m_chart->setSelectedBarPos(noSelection);
 }
 
-void ChartModifier::addDataSet()
+void ChartModifier::swapAxis()
 {
-    // Prepare data to be visualized
-    // Use QDataSet adder
+    static int counter = 0;
+    int state = ++counter % 3;
 
-    // Set window title
-    m_chart->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    if (state == 0) {
+        m_chart->setValueAxis(m_fixedRangeAxis);
+        qDebug() << "Fixed range axis";
+    } else if (state == 1) {
+        m_chart->setValueAxis(m_autoAdjustingAxis);
+        qDebug() << "Automatic range axis";
+    } else {
+        m_chart->setValueAxis(0);
+        qDebug() << "default axis";
+    }
+}
 
-    // Set up row and column names
-    QStringList months;
-    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    QStringList years;
-    years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
+void ChartModifier::resetData()
+{
 
     // Set up data
-    float temp[7][12] = {{-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
-                         {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
-                         {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
-                         {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
-                         {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
-                         {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
-                         {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}};    // 2012
+    static const float temp[7][12] = {
+        {-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
+        {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
+        {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
+        {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
+        {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
+        {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
+        {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}      // 2012
+    };
 
     // Use default data proxy to feed data directly in expected format
     QBarDataProxy *proxy = m_chart->dataProxy();
-
-    // Add labels
-    m_chart->rowAxis()->setTitle("Year");
-    m_chart->columnAxis()->setTitle("Month");
-    m_chart->valueAxis()->setTitle("Average temperature");
-    m_chart->rowAxis()->setCategoryLabels(years);
-    m_chart->columnAxis()->setCategoryLabels(months);
-    m_chart->valueAxis()->setSegmentCount(m_segments);
-    m_chart->valueAxis()->setSubSegmentCount(m_subSegments);
-    m_chart->valueAxis()->setRange(m_minval, m_maxval);
-    m_chart->valueAxis()->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
-    m_chart->setSelectionMode(QDataVis::ModeSliceRow);
 
     // Create data rows
     QBarDataArray *dataSet = new QBarDataArray;
     QBarDataRow *dataRow;
 
-    dataSet->reserve(years.size());
-    for (int year = 0; year < years.size(); year++) {
-        dataRow = new QBarDataRow(months.size());
+    dataSet->reserve(m_years.size());
+    for (int year = 0; year < m_years.size(); year++) {
+        dataRow = new QBarDataRow(m_months.size());
         // Create data items
-        for (int month = 0; month < months.size(); month++) {
+        for (int month = 0; month < m_months.size(); month++) {
             // Add data to rows
             (*dataRow)[month].setValue(temp[year][month]);
         }
@@ -167,12 +218,9 @@ void ChartModifier::addDataSet()
         dataSet->append(dataRow);
     }
 
-    // Set up sample space based on prepared data
-    m_chart->setDataWindow(years.size(), months.size());
 
     // Add data to chart (chart assumes ownership)
     proxy->resetArray(dataSet);
-    proxy->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
 }
 
 void ChartModifier::addRow()
@@ -446,14 +494,10 @@ void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
     m_chart->setDataWindow(m_rowCount, m_columnCount);
-    if (m_chart->columnAxis()->labels().size() < m_columnCount)
-        m_chart->columnAxis()->setCategoryLabels(m_genericColumnLabels.mid(0, m_columnCount));
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
     m_chart->setDataWindow(m_rowCount, m_columnCount);
-    if (m_chart->rowAxis()->labels().size() < m_rowCount)
-        m_chart->rowAxis()->setCategoryLabels(m_genericRowLabels.mid(0, m_rowCount));
 }

@@ -80,6 +80,7 @@ private:
     Q_DISABLE_COPY(QAbstractAxis)
 
     friend class Abstract3DController;
+    friend class Bars3dController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

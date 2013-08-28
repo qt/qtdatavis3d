@@ -70,6 +70,9 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
       m_rowCount(50),
       m_tableWidget(tableWidget)
 {
+    m_chart->setRowAxis(new QCategoryAxis);
+    m_chart->setColumnAxis(new QCategoryAxis);
+    m_chart->setValueAxis(new QValueAxis);
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
     m_chart->setBarSpecs(1.0, QSizeF(0.2, 0.2));

@@ -111,8 +111,6 @@ void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHan
 QString Abstract3DRenderer::generateValueLabel(const QString &format, qreal value)
 {
     QString valueLabelFormat = format;
-    if (valueLabelFormat.isEmpty())
-        valueLabelFormat = Utils::defaultLabelFormat();
     Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
     QByteArray valueFormatArray = valueLabelFormat.toUtf8();
     return Utils::formatLabel(valueFormatArray, valueParamType, value);

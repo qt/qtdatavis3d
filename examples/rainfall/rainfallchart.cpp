@@ -51,6 +51,9 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     // Set axis labels and titles
     QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
+    m_chart->setRowAxis(new QCategoryAxis);
+    m_chart->setColumnAxis(new QCategoryAxis);
+    m_chart->setValueAxis(new QValueAxis);
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
     m_chart->valueAxis()->setTitle(QString("rainfall in city %1").arg(m_city - 1));

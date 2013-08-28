@@ -20,6 +20,7 @@
 #include "camerahelper_p.h"
 #include "qabstractaxis_p.h"
 #include "qvalueaxis.h"
+#include "qcategoryaxis.h"
 #include "abstract3drenderer_p.h"
 
 #if defined(Q_OS_ANDROID)
@@ -63,9 +64,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
 Abstract3DController::~Abstract3DController()
 {
     delete m_cameraHelper;
-    delete m_axisX;
-    delete m_axisY;
-    delete m_axisZ;
+
+    // Attached axes are children, so no need to explicitly delete them
 }
 
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
@@ -383,6 +383,8 @@ void Abstract3DController::setAxisX(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisX()
 {
+    if (m_axisX->d_ptr->isDefaultAxis())
+        return 0;
     return m_axisX;
 }
 
@@ -393,6 +395,8 @@ void Abstract3DController::setAxisY(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisY()
 {
+    if (m_axisY->d_ptr->isDefaultAxis())
+        return 0;
     return m_axisY;
 }
 
@@ -403,7 +407,55 @@ void Abstract3DController::setAxisZ(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisZ()
 {
+    if (m_axisZ->d_ptr->isDefaultAxis())
+        return 0;
     return m_axisZ;
+}
+
+void Abstract3DController::addAxis(QAbstractAxis *axis)
+{
+    Q_ASSERT(axis);
+    Abstract3DController *owner = qobject_cast<Abstract3DController *>(axis->parent());
+    if (owner != this) {
+        Q_ASSERT_X(!owner, "addAxis", "Axis already attached to a graph.");
+        axis->setParent(this);
+    }
+    if (!m_axes.contains(axis))
+        m_axes.append(axis);
+}
+
+void Abstract3DController::releaseAxis(QAbstractAxis *axis)
+{
+    if (axis && m_axes.contains(axis)) {
+        // If the axis is in use, replace it with a temporary one
+        switch (axis->orientation()) {
+        case QAbstractAxis::AxisOrientationX:
+            setAxisX(0);
+            break;
+        case QAbstractAxis::AxisOrientationY:
+            setAxisY(0);
+            break;
+        case QAbstractAxis::AxisOrientationZ:
+            setAxisZ(0);
+            break;
+        default:
+            break;
+        }
+
+        m_axes.removeAll(axis);
+        axis->setParent(0);
+    }
+}
+
+QList<QAbstractAxis *> Abstract3DController::axes() const
+{
+    QList<QAbstractAxis *> retList;
+    foreach (QAbstractAxis *axis, m_axes) {
+        if (!axis->d_ptr->isDefaultAxis())
+            retList.append(axis);
+    }
+
+    return retList;
 }
 
 int Abstract3DController::zoomLevel()
@@ -658,25 +710,48 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
 
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
 {
-    if (sender == m_axisX)
+    // Label format changing needs to dirty the data so that labels are reset.
+    if (sender == m_axisX) {
+        m_isDataDirty = true;
         m_changeTracker.axisXLabelFormatChanged = true;
-    else if (sender == m_axisY)
+    } else if (sender == m_axisY) {
+        m_isDataDirty = true;
         m_changeTracker.axisYLabelFormatChanged = true;
-    else if (sender == m_axisZ)
+    } else if (sender == m_axisZ) {
+        m_isDataDirty = true;
         m_changeTracker.axisZLabelFormatChanged = true;
-    else
+    } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    }
 }
 
 void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientation,
                                          QAbstractAxis *axis, QAbstractAxis **axisPtr)
 {
-    Q_ASSERT(axis);
+    // Setting null axis indicates using default axis
+    if (axis == 0)
+        axis = createDefaultAxis(orientation);
 
-    delete *axisPtr;
+    // If old axis is default axis, delete it
+    QAbstractAxis *oldAxis = *axisPtr;
+    if (oldAxis) {
+        if (oldAxis->d_ptr->isDefaultAxis()) {
+            m_axes.removeAll(oldAxis);
+            delete oldAxis;
+            oldAxis = 0;
+        } else {
+            // Disconnect the old axis from use
+            QObject::disconnect(oldAxis, 0, this, 0);
+            oldAxis->d_ptr->setOrientation(QAbstractAxis::AxisOrientationNone);
+        }
+    }
+
+    // Assume ownership
+    addAxis(axis);
+
+    // Connect the new axis
     *axisPtr = axis;
 
-    axis->setParent(0); // Assume ownership
     axis->d_ptr->setOrientation(orientation);
 
     QObject::connect(axis, &QAbstractAxis::titleChanged,
@@ -714,6 +789,39 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
                                                       valueAxis->isAutoAdjustRange());
         handleAxisLabelFormatChangedBySender(valueAxis);
     }
+}
+
+QAbstractAxis *Abstract3DController::createDefaultAxis(QAbstractAxis::AxisOrientation orientation)
+{
+    Q_UNUSED(orientation)
+
+    // The default default axis is a value axis. If the chart type has a different default axis
+    // for some orientation, this function needs to be overridden.
+    QAbstractAxis *defaultAxis = createDefaultValueAxis();
+    return defaultAxis;
+}
+
+QValueAxis *Abstract3DController::createDefaultValueAxis()
+{
+    // Default value axis has single segment, empty label format, and auto scaling
+    // TODO: Grid should be also hidden, but that is not currently controlled by axis
+    QValueAxis *defaultAxis = new QValueAxis;
+    defaultAxis->setSegmentCount(1);
+    defaultAxis->setSubSegmentCount(1);
+    defaultAxis->setAutoAdjustRange(true);
+    defaultAxis->setLabelFormat(QString());
+    defaultAxis->d_ptr->setDefaultAxis(true);
+
+    return defaultAxis;
+}
+
+QCategoryAxis *Abstract3DController::createDefaultCategoryAxis()
+{
+    // Default category axis has no labels
+    // TODO: Grid should be also hidden, but that is not currently controlled by axis.
+    QCategoryAxis *defaultAxis = new QCategoryAxis;
+    defaultAxis->d_ptr->setDefaultAxis(true);
+    return defaultAxis;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

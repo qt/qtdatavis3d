@@ -28,6 +28,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "qabstractaxis.h"
+#include "abstract3dcontroller_p.h"
 
 #ifndef QABSTRACTAXIS_P_H
 #define QABSTRACTAXIS_P_H
@@ -43,6 +44,9 @@ public:
 
     void setOrientation(QAbstractAxis::AxisOrientation orientation);
 
+    inline bool isDefaultAxis() { return m_isDefaultAxis; }
+    inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
+
 protected:
     virtual void updateLabels();
 
@@ -52,6 +56,7 @@ protected:
     QStringList m_labels;
     QAbstractAxis::AxisOrientation m_orientation;
     QAbstractAxis::AxisType m_type;
+    bool m_isDefaultAxis;
 
     friend class QAbstractAxis;
     friend class QValueAxis;

@@ -77,14 +77,12 @@ protected:
 
 void BarRenderItem::setValue(qreal value)
 {
-    if (m_value != value) {
-        m_value = value;
-         // Force reformatting on next access by setting label string to null string
-        if (!m_sliceLabel.isNull())
-            setSliceLabel(QString());
-        if (!m_selectionLabel.isNull())
-            setSelectionLabel(QString());
-    }
+    m_value = value;
+     // Force reformatting on next access by setting label string to null string
+    if (!m_sliceLabel.isNull())
+        setSliceLabel(QString());
+    if (!m_selectionLabel.isNull())
+        setSelectionLabel(QString());
 }
 
 typedef QVector<BarRenderItem> BarRenderItemRow;

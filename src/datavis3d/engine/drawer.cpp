@@ -321,18 +321,20 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text)
 
     item.clear();
 
-    // Create labels
-    // Print label into a QImage using QPainter
-    QImage label = Utils::printTextToImage(m_font,
-                                           text,
-                                           m_theme.m_textBackgroundColor,
-                                           m_theme.m_textColor,
-                                           m_transparency);
+    if (!text.isEmpty()) {
+        // Create labels
+        // Print label into a QImage using QPainter
+        QImage label = Utils::printTextToImage(m_font,
+                                               text,
+                                               m_theme.m_textBackgroundColor,
+                                               m_theme.m_textColor,
+                                               m_transparency);
 
-    // Set label size
-    item.setSize(label.size());
-    // Insert text texture into label (also deletes the old texture)
-    item.setTextureId(m_textureHelper->create2DTexture(label, true, true));
+        // Set label size
+        item.setSize(label.size());
+        // Insert text texture into label (also deletes the old texture)
+        item.setTextureId(m_textureHelper->create2DTexture(label, true, true));
+    }
 }
 
 QT_DATAVIS3D_END_NAMESPACE

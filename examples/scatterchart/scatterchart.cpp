@@ -38,6 +38,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setTheme(QDataVis::ThemeBrownSand);
     m_chart->setShadowQuality(QDataVis::ShadowHigh);
     m_chart->setCameraPreset(QDataVis::PresetFront);
+    m_chart->setAxisX(new QValueAxis);
+    m_chart->setAxisY(new QValueAxis);
+    m_chart->setAxisZ(new QValueAxis);
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
@@ -59,12 +62,12 @@ void ScatterDataModifier::start()
 void ScatterDataModifier::addData()
 {
     // Add labels
-    m_chart->valueAxisX()->setTitle("X");
-    m_chart->valueAxisY()->setTitle("Y");
-    m_chart->valueAxisZ()->setTitle("Z");
-    m_chart->valueAxisX()->setRange(-50.0, 50.0);
-    m_chart->valueAxisY()->setRange(-1.0, 1.0);
-    m_chart->valueAxisZ()->setRange(-50.0, 50.0);
+    m_chart->axisX()->setTitle("X");
+    m_chart->axisY()->setTitle("Y");
+    m_chart->axisZ()->setTitle("Z");
+    m_chart->axisX()->setRange(-50.0, 50.0);
+    m_chart->axisY()->setRange(-1.0, 1.0);
+    m_chart->axisZ()->setRange(-50.0, 50.0);
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);

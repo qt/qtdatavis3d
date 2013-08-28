@@ -1360,7 +1360,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 labelText.replace(valueTitleTag, m_axisCacheY.title());
 
                 if (labelText.contains(valueLabelTag)) {
-                    QString valueLabelText = generateValueLabel(m_axisCacheY.labelFormat(), selectedBar->value());
+                    QString labelFormat = m_axisCacheY.labelFormat();
+                    if (labelFormat.isEmpty())
+                        labelFormat = Utils::defaultLabelFormat();
+                    QString valueLabelText = generateValueLabel(labelFormat, selectedBar->value());
                     labelText.replace(valueLabelTag, valueLabelText);
                 }
 

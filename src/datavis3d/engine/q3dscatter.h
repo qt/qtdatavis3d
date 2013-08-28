@@ -86,14 +86,15 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    void setValueAxisX(QValueAxis *axis);
-    QValueAxis *valueAxisX() const;
-
-    void setValueAxisY(QValueAxis *axis);
-    QValueAxis *valueAxisY() const;
-
-    void setValueAxisZ(QValueAxis *axis);
-    QValueAxis *valueAxisZ() const;
+    void setAxisX(QValueAxis *axis);
+    QValueAxis *axisX() const;
+    void setAxisY(QValueAxis *axis);
+    QValueAxis *axisY() const;
+    void setAxisZ(QValueAxis *axis);
+    QValueAxis *axisZ() const;
+    void addAxis(QValueAxis *axis);
+    void releaseAxis(QValueAxis *axis);
+    QList<QValueAxis *> axes() const;
 
     void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy();

@@ -125,32 +125,32 @@ void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
     static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
 }
 
-QCategoryAxis *DeclarativeBars::axisX() const
+QCategoryAxis *DeclarativeBars::rowAxis() const
 {
     return static_cast<QCategoryAxis *>(m_shared->axisX());
 }
 
-void DeclarativeBars::setAxisX(QCategoryAxis *axis)
+void DeclarativeBars::setRowAxis(QCategoryAxis *axis)
 {
     m_shared->setAxisX(axis);
 }
 
-QValueAxis *DeclarativeBars::axisY() const
+QValueAxis *DeclarativeBars::valueAxis() const
 {
     return static_cast<QValueAxis *>(m_shared->axisY());
 }
 
-void DeclarativeBars::setAxisY(QValueAxis *axis)
+void DeclarativeBars::setValueAxis(QValueAxis *axis)
 {
     m_shared->setAxisY(axis);
 }
 
-QCategoryAxis *DeclarativeBars::axisZ() const
+QCategoryAxis *DeclarativeBars::columnAxis() const
 {
     return static_cast<QCategoryAxis *>(m_shared->axisZ());
 }
 
-void DeclarativeBars::setAxisZ(QCategoryAxis *axis)
+void DeclarativeBars::setColumnAxis(QCategoryAxis *axis)
 {
     m_shared->setAxisZ(axis);
 }

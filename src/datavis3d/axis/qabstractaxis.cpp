@@ -124,7 +124,8 @@ QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::Axis
     : QObject(0),
       q_ptr(q),
       m_orientation(QAbstractAxis::AxisOrientationNone),
-      m_type(type)
+      m_type(type),
+      m_isDefaultAxis(false)
 {
 }
 

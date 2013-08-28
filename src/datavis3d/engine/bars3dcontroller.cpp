@@ -44,15 +44,17 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_renderer(0),
       m_data(0)
 {
-    // Default axes
-    setAxisX(new QCategoryAxis());
-    setAxisY(new QValueAxis());
-    setAxisZ(new QCategoryAxis());
-
     // Default bar type; specific to bars
     setBarType(QDataVis::Bars, false);
 
     setDataProxy(new QBarDataProxy);
+
+    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
+    //       functions implemented by subclasses.
+    setAxisX(0);
+    setAxisY(0);
+    setAxisZ(0);
 }
 
 Bars3dController::~Bars3dController()
@@ -500,6 +502,18 @@ void Bars3dController::adjustValueAxisRange()
             valueAxis->dptr()->setRange(0.0, limits.second);
         }
     }
+}
+
+QAbstractAxis *Bars3dController::createDefaultAxis(QAbstractAxis::AxisOrientation orientation)
+{
+    QAbstractAxis *defaultAxis = 0;
+
+    if (orientation == QAbstractAxis::AxisOrientationY)
+        defaultAxis = createDefaultValueAxis();
+    else
+        defaultAxis = createDefaultCategoryAxis();
+
+    return defaultAxis;
 }
 
 QT_DATAVIS3D_END_NAMESPACE

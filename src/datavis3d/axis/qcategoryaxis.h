@@ -35,7 +35,7 @@ class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
 
 public:
     explicit QCategoryAxis(QObject *parent = 0);
-    ~QCategoryAxis();
+    virtual ~QCategoryAxis();
 
     QStringList categoryLabels() const;
 
