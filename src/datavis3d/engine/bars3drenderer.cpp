@@ -1649,7 +1649,9 @@ void Bars3dRenderer::updateSlicingActive(bool isSlicing)
         m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
                                this->m_cachedBoundingRect.height());
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+#if !defined(QT_OPENGL_ES_2)
         updateDepthBuffer(); // Re-init depth buffer as well
+#endif
     }
 }
 
