@@ -13,6 +13,8 @@ win32 {
 
 LIBS += -L$$OUT_PWD/../../lib
 
+TEMPLATE = app
+
 QT += datavis3d
 
 contains(TARGET, qml.*) {
@@ -62,7 +64,7 @@ contains(TARGET, qml.*) {
 
     android {
         android_qmldir.files = $$copy_qmldir_examples.target
-        android_qmldir.path = /assets/imports/$$make_qmldir_target
+        android_qmldir.path = /assets/qml/$$uri_replaced
         android_qmlplugin.files = $$copy_lib.target
         android_qmlplugin.path = $$target.path
         INSTALLS += android_qmldir android_qmlplugin
