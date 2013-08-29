@@ -61,16 +61,6 @@ android-no-sdk {
         export($$itempath)
         INSTALLS += $$item
     }
-
-    x86 {
-        target.path = /libs/x86
-    } else: armeabi-v7a {
-        target.path = /libs/armeabi-v7a
-    } else {
-        target.path = /libs/armeabi
-    }
-
-    export(target.path)
     INSTALLS += target
 } else:win32 {
     copyCommand =
