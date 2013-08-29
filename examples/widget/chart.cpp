@@ -185,6 +185,20 @@ void ChartModifier::swapAxis()
     }
 }
 
+void ChartModifier::releaseAxes()
+{
+    // Releases all axes - results in default axes for all dimensions.
+    // Axes reset when the graph is switched as set*Axis calls are made, which
+    // implicitly add axes.
+    m_chart->releaseAxis(m_autoAdjustingAxis);
+    m_chart->releaseAxis(m_fixedRangeAxis);
+    m_chart->releaseAxis(m_temperatureAxis);
+    m_chart->releaseAxis(m_yearAxis);
+    m_chart->releaseAxis(m_monthAxis);
+    m_chart->releaseAxis(m_genericRowAxis);
+    m_chart->releaseAxis(m_genericColumnAxis);
+}
+
 void ChartModifier::resetData()
 {
 

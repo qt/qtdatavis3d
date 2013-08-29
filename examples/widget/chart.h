@@ -64,6 +64,7 @@ public:
     void restart(bool dynamicData);
     void selectBar();
     void swapAxis();
+    void releaseAxes();
 
 public slots:
     void changeShadowQuality(int quality);

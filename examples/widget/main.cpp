@@ -102,6 +102,10 @@ int main(int argc, char **argv)
     swapAxisButton->setText(QStringLiteral("Swap value axis"));
     swapAxisButton->setEnabled(false);
 
+    QPushButton *releaseAxesButton = new QPushButton(widget);
+    releaseAxesButton->setText(QStringLiteral("Release all axes"));
+    releaseAxesButton->setEnabled(true);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -201,6 +205,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
+    vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -261,6 +266,8 @@ int main(int argc, char **argv)
                      &ChartModifier::selectBar);
     QObject::connect(swapAxisButton, &QPushButton::clicked, modifier,
                      &ChartModifier::swapAxis);
+    QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::releaseAxes);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);

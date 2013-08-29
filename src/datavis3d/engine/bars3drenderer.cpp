@@ -1351,11 +1351,19 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                 // Custom format expects printf format specifier. There is no tag for it.
                 labelText = generateValueLabel(itemLabelFormat(), selectedBar->value());
 
-                labelText.replace(rowIndexTag, QString::number(selectedBar->position().x()));
-                labelText.replace(rowLabelTag, m_axisCacheX.labels().at(selectedBar->position().x()));
+                int selBarPosX = selectedBar->position().x();
+                int selBarPosY = selectedBar->position().y();
+                labelText.replace(rowIndexTag, QString::number(selBarPosX));
+                if (m_axisCacheX.labels().size() > selBarPosX)
+                    labelText.replace(rowLabelTag, m_axisCacheX.labels().at(selBarPosX));
+                else
+                    labelText.replace(rowLabelTag, QString());
                 labelText.replace(rowTitleTag, m_axisCacheX.title());
-                labelText.replace(colIndexTag, QString::number(selectedBar->position().y()));
-                labelText.replace(colLabelTag, m_axisCacheZ.labels().at(selectedBar->position().y()));
+                labelText.replace(colIndexTag, QString::number(selBarPosY));
+                if (m_axisCacheZ.labels().size() > selBarPosY)
+                    labelText.replace(colLabelTag, m_axisCacheZ.labels().at(selBarPosY));
+                else
+                    labelText.replace(colLabelTag, QString());
                 labelText.replace(colTitleTag, m_axisCacheZ.title());
                 labelText.replace(valueTitleTag, m_axisCacheY.title());
 
