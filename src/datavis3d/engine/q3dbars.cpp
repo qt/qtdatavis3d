@@ -21,6 +21,7 @@
 #include "bars3dcontroller_p.h"
 #include "qvalueaxis.h"
 #include "qcategoryaxis.h"
+#include "qbardataproxy.h"
 
 #include <QMouseEvent>
 
@@ -75,6 +76,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * but no other interaction is included in this minimal code example. You can learn more by
  * familiarizing yourself with the examples provided, like the \l{Rainfall Example} or
  * the \l{Widget Example}.
+ *
+ * If no axes are explicitly set to Q3DBars, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is explicitly
+ * set for the orientation, the default axis for that orientation is destroyed.
+ *
+ * Data proxies work similarly: If no data proxy is explicitly set, Q3DBars creates a default
+ * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
+ * added to it is destroyed.
  *
  * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization 3D C++ Classes}
  */
@@ -407,8 +416,8 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  * Sets a user-defined row \a axis. Implicitly calls addAxis() to transfer ownership of
  * the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set row axis at all, a temporary
- * default axis with no labels is used.
+ * If the \a axis is null, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -418,7 +427,7 @@ void Q3DBars::setRowAxis(QCategoryAxis *axis)
 }
 
 /*!
- * \return category axis for rows. Returns null pointer if default axis is in use.
+ * \return category axis for rows.
  */
 QCategoryAxis *Q3DBars::rowAxis() const
 {
@@ -429,8 +438,8 @@ QCategoryAxis *Q3DBars::rowAxis() const
  * Sets a user-defined column \a axis. Implicitly calls addAxis() to transfer ownership of
  * the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set column axis at all, a temporary
- * default axis with no labels is used.
+ * If the \a axis is null, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -440,7 +449,7 @@ void Q3DBars::setColumnAxis(QCategoryAxis *axis)
 }
 
 /*!
- * \return category axis for columns. Returns null pointer if default axis is in use.
+ * \return category axis for columns.
  */
 QCategoryAxis *Q3DBars::columnAxis() const
 {
@@ -451,8 +460,9 @@ QCategoryAxis *Q3DBars::columnAxis() const
  * Sets a user-defined value \a axis (the Y-axis). Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -462,7 +472,7 @@ void Q3DBars::setValueAxis(QValueAxis *axis)
 }
 
 /*!
- * \return used value axis (Y-axis). Returns null pointer if default axis is in use.
+ * \return used value axis (Y-axis).
  */
 QValueAxis *Q3DBars::valueAxis() const
 {
@@ -483,7 +493,9 @@ void Q3DBars::addAxis(QAbstractAxis *axis)
 
 /*!
  * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
- * If the released \a axis is in use, a temporary default axis will be set active.
+ * If the released \a axis is in use, a new default axis will be created and set active.
+ *
+ * If the default axis is released and added back later, it behaves as any other axis would.
  *
  * \sa addAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
  */
@@ -503,19 +515,65 @@ QList<QAbstractAxis *> Q3DBars::axes() const
 }
 
 /*!
- * Sets a user-defined data \a proxy. Ownership of the proxy is transferred to Q3DBars.
+ * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
+ * the \a proxy to this graph.
+ *
+ * If the \a proxy is null, a temporary default proxy is created and activated.
+ * This temporary proxy is destroyed if another \a proxy is explicitly set active via this method.
+ *
+ * \sa addDataProxy(), releaseDataProxy()
  */
-void Q3DBars::setDataProxy(QBarDataProxy *proxy)
+void Q3DBars::setActiveDataProxy(QBarDataProxy *proxy)
 {
-    d_ptr->m_shared->setDataProxy(proxy);
+    d_ptr->m_shared->setActiveDataProxy(proxy);
 }
 
 /*!
- * \return used data proxy.
+ * \return active data proxy.
  */
-QBarDataProxy *Q3DBars::dataProxy()
+QBarDataProxy *Q3DBars::activeDataProxy() const
 {
-    return d_ptr->m_shared->dataProxy();
+    return static_cast<QBarDataProxy *>(d_ptr->m_shared->activeDataProxy());
+}
+
+/*!
+ * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
+ * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
+ * The \a proxy must not be null or added to another graph.
+ *
+ * \sa releaseDataProxy(), setActiveDataProxy()
+ */
+void Q3DBars::addDataProxy(QBarDataProxy *proxy)
+{
+    d_ptr->m_shared->addDataProxy(proxy);
+}
+
+/*!
+ * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
+ * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
+ *
+ * If the default \a proxy is released and added back later, it behaves as any other proxy would.
+ *
+ * \sa addDataProxy(), setActiveDataProxy()
+ */
+void Q3DBars::releaseDataProxy(QBarDataProxy *proxy)
+{
+    d_ptr->m_shared->releaseDataProxy(proxy);
+}
+
+/*!
+ * \return list of all added data proxies.
+ *
+ * \sa addDataProxy()
+ */
+QList<QBarDataProxy *> Q3DBars::dataProxies() const
+{
+    QList<QBarDataProxy *> retList;
+    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
+    foreach (QAbstractDataProxy *proxy, abstractList)
+        retList.append(static_cast<QBarDataProxy *>(proxy));
+
+    return retList;
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

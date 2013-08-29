@@ -78,7 +78,6 @@ private:
 
     // Rendering
     Bars3dRenderer *m_renderer;
-    QBarDataProxy *m_data;
 
 public:
     explicit Bars3dController(QRect rect);
@@ -129,9 +128,8 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
-    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
-    void setDataProxy(QBarDataProxy *proxy);
-    QBarDataProxy *dataProxy();
+    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
     static QPoint noSelectionPoint();

@@ -45,7 +45,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
                      &DeclarativeBars::handleShadowQualityUpdate);
 
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
-    m_shared->setDataProxy(proxy);
+    m_shared->setActiveDataProxy(proxy);
 
     QObject::connect(proxy, &QBarDataProxy::arrayReset, this,
                      &DeclarativeBars::dataResolved);
@@ -112,17 +112,17 @@ void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int di
 
 void DeclarativeBars::setData(QAbstractItemModel *data)
 {
-    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setItemModel(data);
+    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
 }
 
 QAbstractItemModel *DeclarativeBars::data()
 {
-    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->itemModel();
+    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->itemModel();
 }
 
 void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
 {
-    static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setMapping(mapping);
 }
 
 QCategoryAxis *DeclarativeBars::rowAxis() const
@@ -157,7 +157,7 @@ void DeclarativeBars::setColumnAxis(QCategoryAxis *axis)
 
 QItemModelBarDataMapping *DeclarativeBars::mapping() const
 {
-    return static_cast<QItemModelBarDataProxy *>(m_shared->dataProxy())->mapping();
+    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->mapping();
 }
 
 void DeclarativeBars::setBarThickness(qreal thicknessRatio)
@@ -347,12 +347,12 @@ void DeclarativeBars::setColumns(int columns)
 
 void DeclarativeBars::setItemLabelFormat(const QString &format)
 {
-    m_shared->dataProxy()->setItemLabelFormat(format);
+    m_shared->activeDataProxy()->setItemLabelFormat(format);
 }
 
 QString DeclarativeBars::itemLabelFormat()
 {
-    return m_shared->dataProxy()->itemLabelFormat();
+    return m_shared->activeDataProxy()->itemLabelFormat();
 }
 
 void DeclarativeBars::setSelectedBarPos(const QPoint &position)

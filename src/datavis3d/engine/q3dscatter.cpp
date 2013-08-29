@@ -20,6 +20,7 @@
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
 #include "qvalueaxis.h"
+#include "qscatterdataproxy.h"
 
 #include <QMouseEvent>
 
@@ -67,6 +68,14 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
  * code example. You can learn more by familiarizing yourself with the examples provided, like
  * the \l{Scatter Chart Example}.
+ *
+ * If no axes are explicitly set to Q3DScatter, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is explicitly
+ * set for the orientation, the default axis for that orientation is destroyed.
+ *
+ * Data proxies work similarly: If no data proxy is explicitly set, Q3DScatter creates a default
+ * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
+ * added to it is destroyed.
  *
  * \sa Q3DBars, Q3DSurface, {Qt Data Visualization 3D C++ Classes}
  */
@@ -368,8 +377,9 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -379,7 +389,7 @@ void Q3DScatter::setAxisX(QValueAxis *axis)
 }
 
 /*!
- * \return used X-axis. Returns null pointer if default axis is in use.
+ * \return used X-axis.
  */
 QValueAxis *Q3DScatter::axisX() const
 {
@@ -390,8 +400,9 @@ QValueAxis *Q3DScatter::axisX() const
  * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -401,7 +412,7 @@ void Q3DScatter::setAxisY(QValueAxis *axis)
 }
 
 /*!
- * \return used Y-axis. Returns null pointer if default axis is in use.
+ * \return used Y-axis.
  */
 QValueAxis *Q3DScatter::axisY() const
 {
@@ -412,8 +423,9 @@ QValueAxis *Q3DScatter::axisY() const
  * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -423,7 +435,7 @@ void Q3DScatter::setAxisZ(QValueAxis *axis)
 }
 
 /*!
- * \return used Z-axis. Returns null pointer if default axis is in use.
+ * \return used Z-axis.
  */
 QValueAxis *Q3DScatter::axisZ() const
 {
@@ -444,6 +456,9 @@ void Q3DScatter::addAxis(QValueAxis *axis)
 
 /*!
  * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
+ * If the released \a axis is in use, a new default axis will be created and set active.
+ *
+ * If the default axis is released and added back later, it behaves as any other axis would.
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
@@ -468,19 +483,65 @@ QList<QValueAxis *> Q3DScatter::axes() const
 }
 
 /*!
- * Sets a user-defined data \a proxy. Ownership of the proxy is transferred to Q3DScatter.
+ * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
+ * the \a proxy to this graph.
+ *
+ * If the \a proxy is null, a temporary default proxy is created and activated.
+ * This temporary proxy is destroyed if another \a proxy is explicitly set active via this method.
+ *
+ * \sa addDataProxy(), releaseDataProxy()
  */
-void Q3DScatter::setDataProxy(QScatterDataProxy *proxy)
+void Q3DScatter::setActiveDataProxy(QScatterDataProxy *proxy)
 {
-    d_ptr->m_shared->setDataProxy(proxy);
+    d_ptr->m_shared->setActiveDataProxy(proxy);
 }
 
 /*!
- * \return used data proxy.
+ * \return active data proxy.
  */
-QScatterDataProxy *Q3DScatter::dataProxy()
+QScatterDataProxy *Q3DScatter::activeDataProxy() const
 {
-    return d_ptr->m_shared->dataProxy();
+    return static_cast<QScatterDataProxy *>(d_ptr->m_shared->activeDataProxy());
+}
+
+/*!
+ * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
+ * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
+ * The \a proxy must not be null or added to another graph.
+ *
+ * \sa releaseDataProxy(), setActiveDataProxy()
+ */
+void Q3DScatter::addDataProxy(QScatterDataProxy *proxy)
+{
+    d_ptr->m_shared->addDataProxy(proxy);
+}
+
+/*!
+ * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
+ * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
+ *
+ * If the default \a proxy is released and added back later, it behaves as any other proxy would.
+ *
+ * \sa addDataProxy(), setActiveDataProxy()
+ */
+void Q3DScatter::releaseDataProxy(QScatterDataProxy *proxy)
+{
+    d_ptr->m_shared->releaseDataProxy(proxy);
+}
+
+/*!
+ * \return list of all added data proxies.
+ *
+ * \sa addDataProxy()
+ */
+QList<QScatterDataProxy *> Q3DScatter::dataProxies() const
+{
+    QList<QScatterDataProxy *> retList;
+    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
+    foreach (QAbstractDataProxy *proxy, abstractList)
+        retList.append(static_cast<QScatterDataProxy *>(proxy));
+
+    return retList;
 }
 
 /*!
@@ -509,3 +570,4 @@ void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality qualit
 }
 
 QT_DATAVIS3D_END_NAMESPACE
+

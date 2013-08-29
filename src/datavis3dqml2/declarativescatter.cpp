@@ -43,7 +43,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeScatter::handleShadowQualityUpdate);
 
-    m_shared->setDataProxy(new QItemModelScatterDataProxy);
+    m_shared->setActiveDataProxy(new QItemModelScatterDataProxy);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -102,22 +102,22 @@ void DeclarativeScatter::setObjectColor(const QColor &baseColor, const QColor &h
 
 void DeclarativeScatter::setData(QAbstractItemModel *data)
 {
-    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setItemModel(data);
+    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
 }
 
 QAbstractItemModel *DeclarativeScatter::data()
 {
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->itemModel();
+    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->itemModel();
 }
 
 void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
 {
-    static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setMapping(mapping);
 }
 
 QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
 {
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->dataProxy())->mapping();
+    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->mapping();
 }
 
 QValueAxis *DeclarativeScatter::axisX() const
@@ -291,12 +291,12 @@ QDataVis::ShadowQuality DeclarativeScatter::shadowQuality()
 
 void DeclarativeScatter::setItemLabelFormat(const QString &format)
 {
-    m_shared->dataProxy()->setItemLabelFormat(format);
+    m_shared->activeDataProxy()->setItemLabelFormat(format);
 }
 
 QString DeclarativeScatter::itemLabelFormat()
 {
-    return m_shared->dataProxy()->itemLabelFormat();
+    return m_shared->activeDataProxy()->itemLabelFormat();
 }
 
 void DeclarativeScatter::mousePressEvent(QMouseEvent *event)

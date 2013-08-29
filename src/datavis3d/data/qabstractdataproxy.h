@@ -61,6 +61,10 @@ protected:
 
 private:
     Q_DISABLE_COPY(QAbstractDataProxy)
+
+    friend class Abstract3DController;
+    friend class Bars3dController;
+    friend class Scatter3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

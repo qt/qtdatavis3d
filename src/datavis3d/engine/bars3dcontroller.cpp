@@ -41,13 +41,12 @@ Bars3dController::Bars3dController(QRect boundRect)
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
-      m_renderer(0),
-      m_data(0)
+      m_renderer(0)
 {
     // Default bar type; specific to bars
     setBarType(QDataVis::Bars, false);
 
-    setDataProxy(new QBarDataProxy);
+    setActiveDataProxy(0);
 
     // Setting a null axis creates a new default axis according to orientation and chart type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
@@ -59,7 +58,6 @@ Bars3dController::Bars3dController(QRect boundRect)
 
 Bars3dController::~Bars3dController()
 {
-    delete m_data;
 }
 
 void Bars3dController::initializeOpenGL()
@@ -105,7 +103,7 @@ void Bars3dController::synchDataToRenderer()
     }
 
     if (m_isDataDirty) {
-        m_renderer->updateDataModel(m_data);
+        m_renderer->updateDataModel(static_cast<QBarDataProxy *>(m_data));
         m_isDataDirty = false;
     }
 }
@@ -258,32 +256,36 @@ void Bars3dController::wheelEvent(QWheelEvent *event)
     setZoomLevel(zoomLevel);
 }
 
-void Bars3dController::setDataProxy(QBarDataProxy *proxy)
+void Bars3dController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
-    delete m_data;
-    m_data = proxy;
+    // Setting null proxy indicates default proxy
+    if (!proxy) {
+        proxy = new QBarDataProxy;
+        proxy->d_ptr->setDefaultProxy(true);
+    }
 
-    QObject::connect(m_data, &QBarDataProxy::arrayReset, this,
+    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeBar);
+
+    Abstract3DController::setActiveDataProxy(proxy);
+
+    QBarDataProxy *barDataProxy = static_cast<QBarDataProxy *>(m_data);
+
+    QObject::connect(barDataProxy, &QBarDataProxy::arrayReset, this,
                      &Bars3dController::handleArrayReset);
-    QObject::connect(m_data, &QBarDataProxy::rowsAdded, this,
+    QObject::connect(barDataProxy, &QBarDataProxy::rowsAdded, this,
                      &Bars3dController::handleRowsAdded);
-    QObject::connect(m_data, &QBarDataProxy::rowsChanged, this,
+    QObject::connect(barDataProxy, &QBarDataProxy::rowsChanged, this,
                      &Bars3dController::handleRowsChanged);
-    QObject::connect(m_data, &QBarDataProxy::rowsRemoved, this,
+    QObject::connect(barDataProxy, &QBarDataProxy::rowsRemoved, this,
                      &Bars3dController::handleRowsRemoved);
-    QObject::connect(m_data, &QBarDataProxy::rowsInserted, this,
+    QObject::connect(barDataProxy, &QBarDataProxy::rowsInserted, this,
                      &Bars3dController::handleRowsInserted);
-    QObject::connect(m_data, &QBarDataProxy::itemChanged, this,
+    QObject::connect(barDataProxy, &QBarDataProxy::itemChanged, this,
                      &Bars3dController::handleItemChanged);
 
     adjustValueAxisRange();
     m_isDataDirty = true;
     setSelectedBarPos(noSelectionPoint());
-}
-
-QBarDataProxy *Bars3dController::dataProxy()
-{
-    return m_data;
 }
 
 void Bars3dController::handleArrayReset()
@@ -326,7 +328,7 @@ void Bars3dController::handleRowsRemoved(int startIndex, int count)
     adjustValueAxisRange();
     m_isDataDirty = true;
     // TODO this will break once data window offset is implemented
-    if (startIndex >= m_data->rowCount())
+    if (startIndex >= static_cast<QBarDataProxy *>(m_data)->rowCount())
         setSelectedBarPos(noSelectionPoint());
 }
 
@@ -453,8 +455,8 @@ void Bars3dController::setSelectedBarPos(const QPoint &position)
     // TODO this will break once data window offset is implemented
     QPoint pos = position;
     if (pos.x() < 0 || pos.y() < 0
-            || pos.x() >= m_data->rowCount()
-            || pos.y() >= m_data->rowAt(pos.x())->size()) {
+            || pos.x() >= static_cast<QBarDataProxy *>(m_data)->rowCount()
+            || pos.y() >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()) {
         pos = noSelectionPoint();
     }
 
@@ -489,8 +491,9 @@ void Bars3dController::adjustValueAxisRange()
 {
     QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisY);
     if (valueAxis && valueAxis->isAutoAdjustRange() && m_data) {
-        QPair<GLfloat, GLfloat> limits = m_data->dptr()->limitValues(0, m_rowCount,
-                                                                     0, m_columnCount);
+        QPair<GLfloat, GLfloat> limits =
+                static_cast<QBarDataProxy *>(m_data)->dptr()->limitValues(0, m_rowCount,
+                                                                          0, m_columnCount);
         if (limits.first < 0) {
             // TODO: Currently we only support symmetric y-axis for bar chart if there are negative values
             qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));

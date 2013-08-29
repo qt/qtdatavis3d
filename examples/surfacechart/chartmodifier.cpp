@@ -30,9 +30,6 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
       m_xCount(10),
       m_zCount(10)
 {
-    m_chart->setAxisX(new QValueAxis);
-    m_chart->setAxisY(new QValueAxis);
-    m_chart->setAxisZ(new QValueAxis);
 }
 
 ChartModifier::~ChartModifier()

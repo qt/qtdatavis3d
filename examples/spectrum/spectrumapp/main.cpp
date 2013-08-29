@@ -70,9 +70,6 @@ MainApp::MainApp(Q3DBars *window)
     // Disable grid
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining explicit range
-    // By setting count to 0 we avoid getting any grid
-    m_chart->setValueAxis(new QValueAxis);
-    m_chart->valueAxis()->setSegmentCount(0);
     m_chart->valueAxis()->setRange(0.0, 1.0);
     // Disable shadows
     m_chart->setShadowQuality(QDataVis::ShadowNone);
@@ -103,7 +100,7 @@ MainApp::MainApp(Q3DBars *window)
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
     QBarDataProxy *proxy = new QBarDataProxy;
-    m_chart->setDataProxy(proxy);
+    m_chart->setActiveDataProxy(proxy);
 }
 
 MainApp::~MainApp()
@@ -140,7 +137,7 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
             (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), qreal(e.amplitude)));
         }
     }
-    static_cast<QBarDataProxy *>(m_chart->dataProxy())->insertRow(0, data);
+    static_cast<QBarDataProxy *>(m_chart->activeDataProxy())->insertRow(0, data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)

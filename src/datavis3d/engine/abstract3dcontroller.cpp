@@ -22,6 +22,7 @@
 #include "qvalueaxis.h"
 #include "qcategoryaxis.h"
 #include "abstract3drenderer_p.h"
+#include "qabstractdataproxy_p.h"
 
 #if defined(Q_OS_ANDROID)
 #include "qtouch3dinputhandler.h"
@@ -50,7 +51,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisY(0),
     m_axisZ(0),
     m_renderer(0),
-    m_isDataDirty(true)
+    m_isDataDirty(true),
+    m_data(0)
 {
     m_theme.useColorTheme(QDataVis::ThemeSystem);
 #if defined(Q_OS_ANDROID)
@@ -383,8 +385,6 @@ void Abstract3DController::setAxisX(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisX()
 {
-    if (m_axisX->d_ptr->isDefaultAxis())
-        return 0;
     return m_axisX;
 }
 
@@ -395,8 +395,6 @@ void Abstract3DController::setAxisY(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisY()
 {
-    if (m_axisY->d_ptr->isDefaultAxis())
-        return 0;
     return m_axisY;
 }
 
@@ -407,8 +405,6 @@ void Abstract3DController::setAxisZ(QAbstractAxis *axis)
 
 QAbstractAxis *Abstract3DController::axisZ()
 {
-    if (m_axisZ->d_ptr->isDefaultAxis())
-        return 0;
     return m_axisZ;
 }
 
@@ -427,6 +423,10 @@ void Abstract3DController::addAxis(QAbstractAxis *axis)
 void Abstract3DController::releaseAxis(QAbstractAxis *axis)
 {
     if (axis && m_axes.contains(axis)) {
+        // Clear the default status from released default axes
+        if (axis->d_ptr->isDefaultAxis())
+            axis->d_ptr->setDefaultAxis(false);
+
         // If the axis is in use, replace it with a temporary one
         switch (axis->orientation()) {
         case QAbstractAxis::AxisOrientationX:
@@ -449,13 +449,63 @@ void Abstract3DController::releaseAxis(QAbstractAxis *axis)
 
 QList<QAbstractAxis *> Abstract3DController::axes() const
 {
-    QList<QAbstractAxis *> retList;
-    foreach (QAbstractAxis *axis, m_axes) {
-        if (!axis->d_ptr->isDefaultAxis())
-            retList.append(axis);
+    return m_axes;
+}
+
+QAbstractDataProxy *Abstract3DController::activeDataProxy() const
+{
+    return m_data;
+}
+
+void Abstract3DController::addDataProxy(QAbstractDataProxy *proxy)
+{
+    Q_ASSERT(proxy);
+    Abstract3DController *owner = qobject_cast<Abstract3DController *>(proxy->parent());
+    if (owner != this) {
+        Q_ASSERT_X(!owner, "addDataProxy", "Proxy already attached to a graph.");
+        proxy->setParent(this);
+    }
+    if (!m_dataProxies.contains(proxy))
+        m_dataProxies.append(proxy);
+}
+
+void Abstract3DController::releaseDataProxy(QAbstractDataProxy *proxy)
+{
+    if (proxy && m_dataProxies.contains(proxy)) {
+        // Clear the default status from released default proxies
+        if (proxy->d_ptr->isDefaultProxy())
+            proxy->d_ptr->setDefaultProxy(false);
+
+        // If the proxy is in use, replace it with a temporary one
+        if (m_data == proxy)
+            setActiveDataProxy(0);
+
+        m_dataProxies.removeAll(proxy);
+        proxy->setParent(0);
+    }
+}
+
+QList<QAbstractDataProxy *> Abstract3DController::dataProxies() const
+{
+    return m_dataProxies;
+}
+
+void Abstract3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
+{
+    // If existing proxy is the default proxy, delete it
+    if (m_data) {
+        if (m_data->d_ptr->isDefaultProxy()) {
+            m_dataProxies.removeAll(m_data);
+            delete m_data;
+        } else {
+            // Disconnect the old proxy from use
+            QObject::disconnect(m_data, 0, this, 0);
+        }
     }
 
-    return retList;
+    // Assume ownership and activate
+    addDataProxy(proxy);
+    m_data = proxy;
 }
 
 int Abstract3DController::zoomLevel()
@@ -729,7 +779,7 @@ void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientat
                                          QAbstractAxis *axis, QAbstractAxis **axisPtr)
 {
     // Setting null axis indicates using default axis
-    if (axis == 0)
+    if (!axis)
         axis = createDefaultAxis(orientation);
 
     // If old axis is default axis, delete it

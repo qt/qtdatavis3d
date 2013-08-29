@@ -102,7 +102,8 @@ QString QAbstractDataProxy::itemLabelFormat() const
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
     : QObject(0),
       q_ptr(q),
-      m_type(type)
+      m_type(type),
+      m_isDefaultProxy(false)
 {
 }
 

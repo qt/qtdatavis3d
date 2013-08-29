@@ -106,6 +106,10 @@ int main(int argc, char **argv)
     releaseAxesButton->setText(QStringLiteral("Release all axes"));
     releaseAxesButton->setEnabled(true);
 
+    QPushButton *releaseProxiesButton = new QPushButton(widget);
+    releaseProxiesButton->setText(QStringLiteral("Release all proxies"));
+    releaseProxiesButton->setEnabled(true);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -206,6 +210,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(releaseProxiesButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -268,6 +273,8 @@ int main(int argc, char **argv)
                      &ChartModifier::swapAxis);
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
                      &ChartModifier::releaseAxes);
+    QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
+                     &ChartModifier::releaseProxies);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ChartModifier::changeFont);

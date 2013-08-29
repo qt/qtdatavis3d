@@ -44,10 +44,14 @@ public:
 
     void setItemLabelFormat(const QString &format);
 
+    inline bool isDefaultProxy() { return m_isDefaultProxy; }
+    inline void setDefaultProxy(bool isDefault) { m_isDefaultProxy = isDefault; }
+
 protected:
     QAbstractDataProxy *q_ptr;
     QAbstractDataProxy::DataType m_type;
     QString m_itemLabelFormat;
+    bool m_isDefaultProxy;
 
 private:
     friend class QAbstractDataProxy;

@@ -36,6 +36,7 @@
 #include "qabstractaxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
+#include "qabstractdataproxy.h"
 
 class QFont;
 
@@ -165,6 +166,9 @@ protected:
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
 
+    QAbstractDataProxy *m_data;
+    QList<QAbstractDataProxy *> m_dataProxies;
+
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
     ~Abstract3DController();
 
@@ -207,6 +211,12 @@ public:
     virtual void addAxis(QAbstractAxis *axis);
     virtual void releaseAxis(QAbstractAxis *axis);
     virtual QList<QAbstractAxis *> axes() const; // Omits default axes
+
+    virtual QAbstractDataProxy *activeDataProxy() const;
+    virtual void addDataProxy(QAbstractDataProxy *proxy);
+    virtual void releaseDataProxy(QAbstractDataProxy *proxy);
+    virtual QList<QAbstractDataProxy *> dataProxies() const;
+    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);

@@ -44,7 +44,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
-    m_chart->setDataProxy(proxy);
+    m_chart->setActiveDataProxy(proxy);
 
     connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
 }
@@ -88,7 +88,7 @@ void ScatterDataModifier::addData()
     }
 #endif
 
-    static_cast<QScatterDataProxy *>(m_chart->dataProxy())->resetArray(dataArray);
+    static_cast<QScatterDataProxy *>(m_chart->activeDataProxy())->resetArray(dataArray);
 }
 
 void ScatterDataModifier::changeStyle()
@@ -179,15 +179,15 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality s
 
 void ScatterDataModifier::clear()
 {
-    m_chart->dataProxy()->resetArray(0);
+    m_chart->activeDataProxy()->resetArray(0);
     qDebug() << m_loopCounter << "Cleared array";
 }
 
 void ScatterDataModifier::addOne()
 {
     QScatterDataItem item(randVector());
-    int addIndex = m_chart->dataProxy()->addItem(item);
-    qDebug() << m_loopCounter << "added one to index:" << addIndex << "array size:" << m_chart->dataProxy()->array()->size();
+    int addIndex = m_chart->activeDataProxy()->addItem(item);
+    qDebug() << m_loopCounter << "added one to index:" << addIndex << "array size:" << m_chart->activeDataProxy()->array()->size();
 }
 
 void ScatterDataModifier::addBunch()
@@ -195,15 +195,15 @@ void ScatterDataModifier::addBunch()
     QScatterDataArray items(100);
     for (int i = 0; i < items.size(); i++)
         items[i].setPosition(randVector());
-    int addIndex = m_chart->dataProxy()->addItems(items);
-    qDebug() << m_loopCounter << "added bunch to index:" << addIndex << "array size:" << m_chart->dataProxy()->array()->size();
+    int addIndex = m_chart->activeDataProxy()->addItems(items);
+    qDebug() << m_loopCounter << "added bunch to index:" << addIndex << "array size:" << m_chart->activeDataProxy()->array()->size();
 }
 
 void ScatterDataModifier::insertOne()
 {
     QScatterDataItem item(randVector());
-    m_chart->dataProxy()->insertItem(0, item);
-    qDebug() << m_loopCounter << "Inserted one, array size:" << m_chart->dataProxy()->array()->size();
+    m_chart->activeDataProxy()->insertItem(0, item);
+    qDebug() << m_loopCounter << "Inserted one, array size:" << m_chart->activeDataProxy()->array()->size();
 }
 
 void ScatterDataModifier::insertBunch()
@@ -211,43 +211,43 @@ void ScatterDataModifier::insertBunch()
     QScatterDataArray items(100);
     for (int i = 0; i < items.size(); i++)
         items[i].setPosition(randVector());
-    m_chart->dataProxy()->insertItems(0, items);
-    qDebug() << m_loopCounter << "Inserted bunch, array size:" << m_chart->dataProxy()->array()->size();
+    m_chart->activeDataProxy()->insertItems(0, items);
+    qDebug() << m_loopCounter << "Inserted bunch, array size:" << m_chart->activeDataProxy()->array()->size();
 }
 
 void ScatterDataModifier::changeOne()
 {
-    if (m_selectedItem >= 0 && m_chart->dataProxy()->array()->size()) {
+    if (m_selectedItem >= 0 && m_chart->activeDataProxy()->array()->size()) {
         QScatterDataItem item(randVector());
-        m_chart->dataProxy()->setItem(m_selectedItem, item);
-        qDebug() << m_loopCounter << "Changed one, array size:" << m_chart->dataProxy()->array()->size();
+        m_chart->activeDataProxy()->setItem(m_selectedItem, item);
+        qDebug() << m_loopCounter << "Changed one, array size:" << m_chart->activeDataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::changeBunch()
 {
-    if (m_chart->dataProxy()->array()->size()) {
-        int amount = qMin(m_chart->dataProxy()->array()->size(), 100);
+    if (m_chart->activeDataProxy()->array()->size()) {
+        int amount = qMin(m_chart->activeDataProxy()->array()->size(), 100);
         QScatterDataArray items(amount);
         for (int i = 0; i < items.size(); i++)
             items[i].setPosition(randVector());
-        m_chart->dataProxy()->setItems(0, items);
-        qDebug() << m_loopCounter << "Changed bunch, array size:" << m_chart->dataProxy()->array()->size();
+        m_chart->activeDataProxy()->setItems(0, items);
+        qDebug() << m_loopCounter << "Changed bunch, array size:" << m_chart->activeDataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::removeOne()
 {
     if (m_selectedItem >= 0) {
-        m_chart->dataProxy()->removeItems(m_selectedItem, 1);
-        qDebug() << m_loopCounter << "Removed one, array size:" << m_chart->dataProxy()->array()->size();
+        m_chart->activeDataProxy()->removeItems(m_selectedItem, 1);
+        qDebug() << m_loopCounter << "Removed one, array size:" << m_chart->activeDataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::removeBunch()
 {
-    m_chart->dataProxy()->removeItems(0, 100);
-    qDebug() << m_loopCounter << "Removed bunch, array size:" << m_chart->dataProxy()->array()->size();
+    m_chart->activeDataProxy()->removeItems(0, 100);
+    qDebug() << m_loopCounter << "Removed bunch, array size:" << m_chart->activeDataProxy()->array()->size();
 }
 
 void ScatterDataModifier::timeout()

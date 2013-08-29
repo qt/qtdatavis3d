@@ -35,7 +35,7 @@ public:
     explicit ChartModifier(Q3DBars *barchart);
     ~ChartModifier();
 
-    void resetData();
+    void resetTemperatureData();
     void addRow();
     void addRows();
     void changeItem();
@@ -65,6 +65,7 @@ public:
     void selectBar();
     void swapAxis();
     void releaseAxes();
+    void releaseProxies();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -99,6 +100,9 @@ private:
     QCategoryAxis *m_monthAxis;
     QCategoryAxis *m_genericRowAxis;
     QCategoryAxis *m_genericColumnAxis;
+    QBarDataProxy *m_temperatureData;
+    QBarDataProxy *m_genericData;
+    QValueAxis *m_currentAxis;
 };
 
 #endif

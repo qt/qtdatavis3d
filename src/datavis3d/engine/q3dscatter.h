@@ -96,8 +96,11 @@ public:
     void releaseAxis(QValueAxis *axis);
     QList<QValueAxis *> axes() const;
 
-    void setDataProxy(QScatterDataProxy *proxy);
-    QScatterDataProxy *dataProxy();
+    void setActiveDataProxy(QScatterDataProxy *proxy);
+    QScatterDataProxy *activeDataProxy() const;
+    void addDataProxy(QScatterDataProxy *proxy);
+    void releaseDataProxy(QScatterDataProxy *proxy);
+    QList<QScatterDataProxy *> dataProxies() const;
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);

@@ -104,8 +104,11 @@ public:
     void releaseAxis(QAbstractAxis *axis);
     QList<QAbstractAxis *> axes() const;
 
-    void setDataProxy(QBarDataProxy *proxy);
-    QBarDataProxy *dataProxy();
+    void setActiveDataProxy(QBarDataProxy *proxy);
+    QBarDataProxy *activeDataProxy() const;
+    void addDataProxy(QBarDataProxy *proxy);
+    void releaseDataProxy(QBarDataProxy *proxy);
+    QList<QBarDataProxy *> dataProxies() const;
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);

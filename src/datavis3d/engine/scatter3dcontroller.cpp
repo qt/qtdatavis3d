@@ -35,13 +35,12 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_mousePos(QPoint(0, 0)),
       m_isSlicingActivated(false),
       m_renderer(0),
-      m_data(0),
       m_selectedItemIndex(noSelectionIndex())
 {
     // Default object type; specific to scatter
     setObjectType(QDataVis::Spheres, false);
 
-    setDataProxy(new QScatterDataProxy);
+    setActiveDataProxy(new QScatterDataProxy);
 
     // Setting a null axis creates a new default axis according to orientation and chart type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
@@ -53,7 +52,6 @@ Scatter3DController::Scatter3DController(QRect boundRect)
 
 Scatter3DController::~Scatter3DController()
 {
-    delete m_data;
 }
 
 void Scatter3DController::initializeOpenGL()
@@ -89,7 +87,7 @@ void Scatter3DController::synchDataToRenderer()
     }
 
     if (m_isDataDirty) {
-        m_renderer->updateDataModel(m_data);
+        m_renderer->updateDataModel(static_cast<QScatterDataProxy *>(m_data));
         m_isDataDirty = false;
     }
 }
@@ -236,30 +234,34 @@ void Scatter3DController::wheelEvent(QWheelEvent *event)
     setZoomLevel(zoomLevel);
 }
 
-void Scatter3DController::setDataProxy(QScatterDataProxy *proxy)
+void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
-    delete m_data;
-    m_data = proxy;
+    // Setting null proxy indicates default proxy
+    if (!proxy) {
+        proxy = new QScatterDataProxy;
+        proxy->d_ptr->setDefaultProxy(true);
+    }
 
-    QObject::connect(m_data, &QScatterDataProxy::arrayReset,
+    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeScatter);
+
+    Abstract3DController::setActiveDataProxy(proxy);
+
+    QScatterDataProxy *scatterDataProxy = static_cast<QScatterDataProxy *>(m_data);
+
+    QObject::connect(scatterDataProxy, &QScatterDataProxy::arrayReset,
                      this, &Scatter3DController::handleArrayReset);
-    QObject::connect(m_data, &QScatterDataProxy::itemsAdded,
+    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsAdded,
                      this, &Scatter3DController::handleItemsAdded);
-    QObject::connect(m_data, &QScatterDataProxy::itemsChanged,
+    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsChanged,
                      this, &Scatter3DController::handleItemsChanged);
-    QObject::connect(m_data, &QScatterDataProxy::itemsRemoved,
+    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsRemoved,
                      this, &Scatter3DController::handleItemsRemoved);
-    QObject::connect(m_data, &QScatterDataProxy::itemsInserted,
+    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsInserted,
                      this, &Scatter3DController::handleItemsInserted);
 
     adjustValueAxisRange();
     m_isDataDirty = true;
     setSelectedItemIndex(noSelectionIndex());
-}
-
-QScatterDataProxy *Scatter3DController::dataProxy()
-{
-    return m_data;
 }
 
 void Scatter3DController::handleArrayReset()
@@ -295,7 +297,7 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
-    if (startIndex >= m_data->itemCount())
+    if (startIndex >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
         setSelectedItemIndex(noSelectionIndex());
 }
 
@@ -356,7 +358,7 @@ void Scatter3DController::setSelectedItemIndex(int index)
 {
     // TODO If items not within axis ranges are culled from drawing, should they be
     // TODO unselectable as well?
-    if (index < 0 || index >= m_data->itemCount())
+    if (index < 0 || index >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
         index = noSelectionIndex();
 
     if (index != m_selectedItemIndex) {
@@ -379,7 +381,7 @@ QPoint Scatter3DController::mousePosition()
 void Scatter3DController::adjustValueAxisRange()
 {
     if (m_data) {
-        QVector3D limits = m_data->dptr()->limitValues();
+        QVector3D limits = static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues();
         QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (limits.x() > 0)

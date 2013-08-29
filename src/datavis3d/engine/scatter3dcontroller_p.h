@@ -64,7 +64,6 @@ private:
 
     // Rendering
     Scatter3DRenderer *m_renderer;
-    QScatterDataProxy *m_data;
     int m_selectedItemIndex;
 
 public:
@@ -101,9 +100,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
-    // Sets the data proxy. Assumes ownership of the data proxy. Deletes old proxy.
-    void setDataProxy(QScatterDataProxy *proxy);
-    QScatterDataProxy *dataProxy();
+    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     void synchDataToRenderer();
 

@@ -158,8 +158,9 @@ void Q3DSurface::setSegmentCount(int segmentCount, qreal step, qreal minimum)
  * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -169,7 +170,7 @@ void Q3DSurface::setAxisX(QValueAxis *axis)
 }
 
 /*!
- * \return used X-axis. Returns null pointer if default axis is in use.
+ * \return used X-axis.
  */
 QValueAxis *Q3DSurface::axisX() const
 {
@@ -180,8 +181,9 @@ QValueAxis *Q3DSurface::axisX() const
  * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -191,7 +193,7 @@ void Q3DSurface::setAxisY(QValueAxis *axis)
 }
 
 /*!
- * \return used Y-axis. Returns null pointer if default axis is in use.
+ * \return used Y-axis.
  */
 QValueAxis *Q3DSurface::axisY() const
 {
@@ -202,8 +204,9 @@ QValueAxis *Q3DSurface::axisY() const
  * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
- * If the \a axis is null, or if user doesn't explicitly set value axis at all, a temporary
- * default axis with no labels and automatic range adjusting is used.
+ * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -213,7 +216,7 @@ void Q3DSurface::setAxisZ(QValueAxis *axis)
 }
 
 /*!
- * \return used Z-axis. Returns null pointer if default axis is in use.
+ * \return used Z-axis.
  */
 QValueAxis *Q3DSurface::axisZ() const
 {
@@ -234,6 +237,9 @@ void Q3DSurface::addAxis(QValueAxis *axis)
 
 /*!
  * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
+ * If the released \a axis is in use, a new default axis will be created and set active.
+ *
+ * If the default axis is released and added back later, it behaves as any other axis would.
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
