@@ -2,6 +2,8 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
+QT += widgets
+
 # Add more folders to ship with the application, here
 folder_01.source = qml/qmlbarchart
 folder_01.target = qml
@@ -17,5 +19,4 @@ SOURCES += main.cpp
 include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
-RESOURCES += \
-    qmlbarchart.qrc
+RESOURCES += qmlbarchart.qrc

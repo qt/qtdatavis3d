@@ -17,9 +17,9 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Window 2.1
 import QtQuick.Controls 1.0
 import com.digia.QtDataVis3D 1.0
+import "."
 
 Item {
     id: mainview
@@ -123,6 +123,7 @@ Item {
             shadowQuality: Bars3D.ShadowNone
             selectionMode: Bars3D.ModeItem
             labelTransparency: Bars3D.TransparencyNone
+            theme: Bars3D.ThemeBrownSand
             rows: 5
             columns: 12
             mapping: valueMapping
@@ -152,72 +153,43 @@ Item {
         id: tableView
         x: 0
         y: 0
-        width: 270
-        height: 500
-        TableViewColumn{ role: "year"  ; title: "Year" ; width: 40 }
+        width: 300
+        height: parent.height - mappingToggle.height - shadowToggle.height
+        TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
         TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
         TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 70 }
-        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
+        TableViewColumn{ role: "income" ; title: "Income" ; width: 70 }
         model: dataModel
     }
 
-    Rectangle {
-        id: shadowToggle
-        color: "#FFFFFF"
-        x: 0
-        y: tableView.height
+    Button {
+        id: mappingToggle
+        anchors.bottom: parent.bottom
         width: tableView.width
-        height: 50
-
-        TextArea {
-            id: shadowButtonText
-            text: "Toggle Shadows"
-            anchors.fill: parent
-            textColor: "#000000"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testchart.shadowQuality == Bars3D.ShadowNone) {
-                    testchart.shadowQuality = Bars3D.ShadowLow;
-                    shadowButtonText.textColor = "#FFFFFF";
-                    shadowToggle.color = "#000000";
-                } else {
-                    testchart.shadowQuality = Bars3D.ShadowNone;
-                    shadowButtonText.textColor = "#000000";
-                    shadowToggle.color = "#FFFFFF";
-                }
+        text: "Show Income"
+        onClicked: {
+            if (valueMapping.valueRole == "expenses") {
+                valueMapping.valueRole = "income"
+                text = "Show Expenses"
+                testchart.valueAxis = incomeAxis
+            } else {
+                valueMapping.valueRole = "expenses"
+                text = "Show Income"
+                testchart.valueAxis = expensesAxis
             }
         }
     }
-    Rectangle {
-        id: mappingToggle
-        color: "#FFFFFF"
-        x: 0
-        y: shadowToggle.height + shadowToggle.y
-        width: shadowToggle.width
-        height: 50
 
-        TextArea {
-            id: mappingButtonText
-            text: "Show Income"
-            anchors.fill: parent
-            textColor: "#000000"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (valueMapping.valueRole == "expenses") {
-                    valueMapping.valueRole = "income"
-                    mappingButtonText.text = "Show Expenses"
-                    testchart.valueAxis = incomeAxis
-                } else {
-                    valueMapping.valueRole = "expenses"
-                    mappingButtonText.text = "Show Income"
-                    testchart.valueAxis = expensesAxis
-                }
+    Button {
+        id: shadowToggle
+        anchors.bottom: mappingToggle.top
+        width: tableView.width
+        text: "Toggle Shadows"
+        onClicked: {
+            if (testchart.shadowQuality == Bars3D.ShadowNone) {
+                testchart.shadowQuality = Bars3D.ShadowLow;
+            } else {
+                testchart.shadowQuality = Bars3D.ShadowNone;
             }
         }
     }

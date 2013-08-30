@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="main.qml">qml/qmlbarchart/main.qml</file>
+        <file alias="Button.qml">qml/qmlbarchart/button.qml</file>
     </qresource>
 </RCC>
