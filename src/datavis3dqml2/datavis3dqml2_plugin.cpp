@@ -22,7 +22,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-void Datavis3dqml2Plugin::registerTypes(const char *uri)
+void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 {
     // @uri com.digia.QtDataVis3D
     qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",

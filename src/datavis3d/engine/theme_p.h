@@ -50,10 +50,10 @@ public:
 private:
     friend class Abstract3DController;
     friend class Abstract3DRenderer;
-    friend class Bars3dRenderer;
+    friend class Bars3DRenderer;
     friend class Maps3DController;
-    friend class Surface3dRenderer;
-    friend class Surface3dController;
+    friend class Surface3DRenderer;
+    friend class Surface3DController;
     friend class Scatter3DRenderer;
     friend class SelectionPointer;
     friend class Drawer;

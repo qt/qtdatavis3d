@@ -187,7 +187,7 @@ signals:
     void dataResolved();
 
 protected:
-    Bars3dController *m_shared;
+    Bars3DController *m_shared;
 
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
     void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);

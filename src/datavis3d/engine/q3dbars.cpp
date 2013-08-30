@@ -95,12 +95,12 @@ Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Bars3dController::selectedBarPosChanged, this,
+    QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarPosChanged, this,
                      &Q3DBars::selectedBarPosChanged);
 }
 
 /*!
- *  Destroys the 3d bar window.
+ *  Destroys the 3D bar window.
  */
 Q3DBars::~Q3DBars()
 {
@@ -578,7 +578,7 @@ QList<QBarDataProxy *> Q3DBars::dataProxies() const
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
     : q_ptr(q),
-      m_shared(new Bars3dController(rect))
+      m_shared(new Bars3DController(rect))
 {
     QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBarsPrivate::handleShadowQualityUpdate);

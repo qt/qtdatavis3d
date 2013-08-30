@@ -49,7 +49,7 @@ Q_DECLARE_METATYPE(QValueAxis *)
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Datavis3dqml2Plugin : public QQmlExtensionPlugin
+class Datavis3Dqml2Plugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")

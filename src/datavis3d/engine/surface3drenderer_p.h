@@ -53,12 +53,12 @@ class Drawer;
 class CameraHelper;
 class SelectionPointer;
 
-class QT_DATAVIS3D_EXPORT Surface3dRenderer : public Abstract3DRenderer
+class QT_DATAVIS3D_EXPORT Surface3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
 public:
-    Surface3dController *m_controller;
+    Surface3DController *m_controller;
 
     // Visual parameters
     QRect m_boundingRect;
@@ -116,8 +116,8 @@ protected:
     virtual void loadMeshFile();
 
 public:
-    explicit Surface3dRenderer(Surface3dController *controller);
-    ~Surface3dRenderer();
+    explicit Surface3DRenderer(Surface3DController *controller);
+    ~Surface3DRenderer();
 
     void initializeOpenGL();
     void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
@@ -158,7 +158,7 @@ private:
     void updateDepthBuffer();
 #endif
 
-    Q_DISABLE_COPY(Surface3dRenderer)
+    Q_DISABLE_COPY(Surface3DRenderer)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

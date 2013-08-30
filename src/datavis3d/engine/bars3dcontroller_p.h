@@ -36,7 +36,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Bars3dRenderer;
+class Bars3DRenderer;
 class QBarDataProxy;
 
 struct Bars3DChangeBitField {
@@ -54,7 +54,7 @@ struct Bars3DChangeBitField {
     }
 };
 
-class QT_DATAVIS3D_EXPORT Bars3dController : public Abstract3DController
+class QT_DATAVIS3D_EXPORT Bars3DController : public Abstract3DController
 {
     Q_OBJECT
 
@@ -77,11 +77,11 @@ private:
     QSizeF m_barSpacing;
 
     // Rendering
-    Bars3dRenderer *m_renderer;
+    Bars3DRenderer *m_renderer;
 
 public:
-    explicit Bars3dController(QRect rect);
-    ~Bars3dController();
+    explicit Bars3DController(QRect rect);
+    ~Bars3DController();
 
     void initializeOpenGL();
     virtual void synchDataToRenderer();
@@ -156,7 +156,7 @@ protected:
 private:
     void adjustValueAxisRange();
 
-    Q_DISABLE_COPY(Bars3dController)
+    Q_DISABLE_COPY(Bars3DController)
 
 };
 

@@ -46,7 +46,7 @@ public:
     void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
     Q3DBars *q_ptr;
-    Bars3dController *m_shared;
+    Bars3DController *m_shared;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

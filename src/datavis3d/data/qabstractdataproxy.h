@@ -63,7 +63,7 @@ private:
     Q_DISABLE_COPY(QAbstractDataProxy)
 
     friend class Abstract3DController;
-    friend class Bars3dController;
+    friend class Bars3DController;
     friend class Scatter3DController;
 };
 

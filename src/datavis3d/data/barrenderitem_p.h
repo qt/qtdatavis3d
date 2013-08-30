@@ -33,7 +33,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Bars3dRenderer;
+class Bars3DRenderer;
 
 class BarRenderItem : public AbstractRenderItem
 {
@@ -62,10 +62,10 @@ public:
     QString &sliceLabel(); // Formats label if not previously formatted
 
     // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Bars3dRenderer *renderer) { m_renderer = renderer; }
+    inline void setRenderer(Bars3DRenderer *renderer) { m_renderer = renderer; }
 
 protected:
-    Bars3dRenderer *m_renderer;
+    Bars3DRenderer *m_renderer;
     qreal m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;

@@ -61,9 +61,9 @@ class TextureHelper : protected QOpenGLFunctions
     void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
-    friend class Bars3dRenderer;
+    friend class Bars3DRenderer;
     friend class Maps3DController;
-    friend class Surface3dRenderer;
+    friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
 };
 

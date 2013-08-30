@@ -292,7 +292,7 @@ void Q3DSurface::showData() const
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
     : q_ptr(q),
-      m_shared(new Surface3dController(rect))
+      m_shared(new Surface3DController(rect))
 {
 }
 

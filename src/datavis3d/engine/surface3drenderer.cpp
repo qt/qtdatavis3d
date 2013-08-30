@@ -46,7 +46,7 @@ const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat coordRatio = 2.0f;
 
-Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
+Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
       m_isGridEnabled(true),
@@ -90,14 +90,14 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
       m_yFlipped(false)
 {
     // Listen to changes in the controller
-    QObject::connect(m_controller, &Surface3dController::smoothStatusChanged, this,
-                     &Surface3dRenderer::updateSmoothStatus);
-    QObject::connect(m_controller, &Surface3dController::surfaceGridChanged, this,
-                     &Surface3dRenderer::updateSurfaceGridStatus);
-    QObject::connect(m_controller, &Surface3dController::segmentCountChanged, this,
-                     &Surface3dRenderer::updateSegmentCount);
-    QObject::connect(m_controller, &Surface3dController::leftMousePressed, this,
-                     &Surface3dRenderer::requestSelectionAtPoint); // TODO: Possible temp
+    QObject::connect(m_controller, &Surface3DController::smoothStatusChanged, this,
+                     &Surface3DRenderer::updateSmoothStatus);
+    QObject::connect(m_controller, &Surface3DController::surfaceGridChanged, this,
+                     &Surface3DRenderer::updateSurfaceGridStatus);
+    QObject::connect(m_controller, &Surface3DController::segmentCountChanged, this,
+                     &Surface3DRenderer::updateSegmentCount);
+    QObject::connect(m_controller, &Surface3DController::leftMousePressed, this,
+                     &Surface3DRenderer::requestSelectionAtPoint); // TODO: Possible temp
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
@@ -106,9 +106,9 @@ Surface3dRenderer::Surface3dRenderer(Surface3dController *controller)
     initializeOpenGL();
 }
 
-Surface3dRenderer::~Surface3dRenderer()
+Surface3DRenderer::~Surface3DRenderer()
 {
-    qDebug() << "Surface3dRenderer::~Surface3dRenderer()";
+    qDebug() << __FUNCTION__;
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
@@ -132,7 +132,7 @@ Surface3dRenderer::~Surface3dRenderer()
         delete m_selectionPointer;
 }
 
-void Surface3dRenderer::initializeOpenGL()
+void Surface3DRenderer::initializeOpenGL()
 {
     Abstract3DRenderer::initializeOpenGL();
 
@@ -176,7 +176,7 @@ void Surface3dRenderer::initializeOpenGL()
     updateSurfaceGradient();
 }
 
-void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Surface3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
     if (defaultFboHandle) {
         glDepthMask(true);
@@ -204,10 +204,8 @@ void Surface3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
         m_selectionPointer->render(camera, defaultFboHandle);
 }
 
-void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
+void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboHandle)
 {
-    //qDebug() << "Surface3dRenderer::drawScene";
-
     GLfloat backgroundRotation = 0;
 
     // Specify viewport
@@ -702,7 +700,7 @@ void Surface3dRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     }
 }
 
-void Surface3dRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
+void Surface3DRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
     m_segmentYCount = segmentCount;
     m_segmentYStep = step;
@@ -712,7 +710,7 @@ void Surface3dRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLf
     }
 }
 
-void Surface3dRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
+void Surface3DRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
 {
     m_segmentXCount = segmentXCount;
     m_segmentZCount = segmentZCount;
@@ -724,7 +722,7 @@ void Surface3dRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
     calculateSceneScalingFactors();
 }
 
-void Surface3dRenderer::updateSurfaceGradient()
+void Surface3DRenderer::updateSurfaceGradient()
 {
     QImage image(QSize(4, 100), QImage::Format_RGB32);
     QPainter pmp(&image);
@@ -740,7 +738,7 @@ void Surface3dRenderer::updateSurfaceGradient()
     m_gradientTexture = m_textureHelper->create2DTexture(image, false, true);
 }
 
-void Surface3dRenderer::requestSelectionAtPoint(const QPoint &point)
+void Surface3DRenderer::requestSelectionAtPoint(const QPoint &point)
 {
     Q_UNUSED(point)
 
@@ -753,7 +751,7 @@ void Surface3dRenderer::requestSelectionAtPoint(const QPoint &point)
 }
 
 // This one needs to be called when the data size changes
-void Surface3dRenderer::updateSelectionTexture()
+void Surface3DRenderer::updateSelectionTexture()
 {
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
@@ -802,7 +800,7 @@ void Surface3dRenderer::updateSelectionTexture()
     delete bits;
 }
 
-void Surface3dRenderer::initSelectionBuffer()
+void Surface3DRenderer::initSelectionBuffer()
 {
     // Create the result selection texture and buffers
     if (m_selectionResultTexture) {
@@ -815,7 +813,7 @@ void Surface3dRenderer::initSelectionBuffer()
                                                                        m_selectionDepthBuffer);
 }
 
-void Surface3dRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride)
+void Surface3DRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride)
 {
     p[0] = r;
     p[1] = g;
@@ -835,7 +833,7 @@ void Surface3dRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar 
     p[stride + 7] = a;
 }
 
-void Surface3dRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a)
+void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a)
 {
     *r = id & ID_TO_RGBA_MASK;
     *g = (id >> 8) & ID_TO_RGBA_MASK;
@@ -843,7 +841,7 @@ void Surface3dRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
     *a = (id >> 24) & ID_TO_RGBA_MASK;
 }
 
-void Surface3dRenderer::setSeries(QList<qreal> series)
+void Surface3DRenderer::setSeries(QList<qreal> series)
 {
     m_series = series;
 
@@ -859,14 +857,14 @@ void Surface3dRenderer::setSeries(QList<qreal> series)
     updateSelectionTexture();
 }
 
-void Surface3dRenderer::updateTextures()
+void Surface3DRenderer::updateTextures()
 {
-    qDebug() << "Surface3dRenderer::updateTextures() NEED TO DO SOMETHING";
+    qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     //m_updateLabels = true;
 }
 
-void Surface3dRenderer::calculateSceneScalingFactors()
+void Surface3DRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
     m_xLength = m_segmentXCount;
@@ -886,7 +884,7 @@ void Surface3dRenderer::calculateSceneScalingFactors()
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
 }
 
-void Surface3dRenderer::updateSmoothStatus(bool enable)
+void Surface3DRenderer::updateSmoothStatus(bool enable)
 {
     m_cachedSmoothSurface = enable;
 
@@ -901,12 +899,12 @@ void Surface3dRenderer::updateSmoothStatus(bool enable)
     initSurfaceShaders();
 }
 
-void Surface3dRenderer::updateSurfaceGridStatus(bool enable)
+void Surface3DRenderer::updateSurfaceGridStatus(bool enable)
 {
     m_cachedSurfaceGridOn = enable;
 }
 
-void Surface3dRenderer::loadBackgroundMesh()
+void Surface3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
@@ -917,7 +915,7 @@ void Surface3dRenderer::loadBackgroundMesh()
     m_backgroundObj->load();
 }
 
-void Surface3dRenderer::loadSurfaceObj()
+void Surface3DRenderer::loadSurfaceObj()
 {
     if (m_surfaceObj)
         delete m_surfaceObj;
@@ -925,7 +923,7 @@ void Surface3dRenderer::loadSurfaceObj()
     //m_surfaceObj->setUpData();
 }
 
-void Surface3dRenderer::loadGridLineMesh()
+void Surface3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
@@ -933,7 +931,7 @@ void Surface3dRenderer::loadGridLineMesh()
     m_gridLineObj->load();
 }
 
-void Surface3dRenderer::handleResize()
+void Surface3DRenderer::handleResize()
 {
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
@@ -947,7 +945,7 @@ void Surface3dRenderer::handleResize()
 }
 
 #if !defined(QT_OPENGL_ES_2)
-void Surface3dRenderer::updateDepthBuffer()
+void Surface3DRenderer::updateDepthBuffer()
 {
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
@@ -983,7 +981,7 @@ void Surface3dRenderer::updateDepthBuffer()
 }
 #endif
 
-void Surface3dRenderer::surfacePointSelected(qreal value, int column, int row)
+void Surface3DRenderer::surfacePointSelected(qreal value, int column, int row)
 {
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_controller);
@@ -997,7 +995,7 @@ void Surface3dRenderer::surfacePointSelected(qreal value, int column, int row)
     m_selectionActive = true;
 }
 
-QVector3D Surface3dRenderer::normalize(float x, float y, float z)
+QVector3D Surface3DRenderer::normalize(float x, float y, float z)
 {
     float resX = x / ((float(m_segmentXCount) - 1.0f) / 2.0f) - 1.0f;
     float resY = y / (m_yRange / 2.0f) - 1.0f;
@@ -1006,7 +1004,7 @@ QVector3D Surface3dRenderer::normalize(float x, float y, float z)
     return QVector3D(resX, resY, resZ);
 }
 
-void Surface3dRenderer::surfacePointCleared()
+void Surface3DRenderer::surfacePointCleared()
 {
     if (m_selectionPointer) {
         delete m_selectionPointer;
@@ -1015,18 +1013,18 @@ void Surface3dRenderer::surfacePointCleared()
     }
 }
 
-void Surface3dRenderer::loadMeshFile()
+void Surface3DRenderer::loadMeshFile()
 {
-    qDebug() << "Surface3dRenderer::loadMeshFile() should we do something";
+    qDebug() << __FUNCTION__ << "should we do something";
 }
 
-void Surface3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
+void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     Q_UNUSED(quality)
-    qDebug() << "Surface3dRenderer::updateShadowQuality NEED TO DO SOMETHING";
+    qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
 }
 
-void Surface3dRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
+void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_shader)
         delete m_shader;
@@ -1034,7 +1032,7 @@ void Surface3dRenderer::initShaders(const QString &vertexShader, const QString &
     m_shader->initialize();
 }
 
-void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
+void Surface3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                               const QString &fragmentShader)
 {
     if (m_backgroundShader)
@@ -1043,7 +1041,7 @@ void Surface3dRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
-void Surface3dRenderer::initSelectionShaders()
+void Surface3DRenderer::initSelectionShaders()
 {
     if (m_selectionShader)
         delete m_selectionShader;
@@ -1052,7 +1050,7 @@ void Surface3dRenderer::initSelectionShaders()
     m_selectionShader->initialize();
 }
 
-void Surface3dRenderer::initSurfaceShaders()
+void Surface3DRenderer::initSurfaceShaders()
 {
     if (m_surfaceShader)
         delete m_surfaceShader;

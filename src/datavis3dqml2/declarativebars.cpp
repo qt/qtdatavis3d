@@ -40,7 +40,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_shared = new Bars3dController(boundingRect().toRect());
+    m_shared = new Bars3DController(boundingRect().toRect());
     QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
 

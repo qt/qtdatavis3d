@@ -46,13 +46,13 @@ class ObjectHelper;
 class LabelItem;
 class CameraHelper;
 
-class QT_DATAVIS3D_EXPORT Bars3dRenderer : public Abstract3DRenderer
+class QT_DATAVIS3D_EXPORT Bars3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
 private:
     // TODO: Filter to the set of attributes to be moved to the model object.
-    Bars3dController *m_controller;
+    Bars3DController *m_controller;
 
     // Cached state based on emitted signals from the controller
     QSizeF m_cachedBarThickness;
@@ -106,8 +106,8 @@ private:
     BarRenderItemArray m_renderItemArray;
 
 public:
-    explicit Bars3dRenderer(Bars3dController *controller);
-    ~Bars3dRenderer();
+    explicit Bars3DRenderer(Bars3DController *controller);
+    ~Bars3DRenderer();
 
     void updateDataModel(QBarDataProxy *dataProxy);
     void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
@@ -159,7 +159,7 @@ private:
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(GLint row, GLint bar);
 
-    Q_DISABLE_COPY(Bars3dRenderer)
+    Q_DISABLE_COPY(Bars3DRenderer)
 
     friend class BarRenderItem;
 };

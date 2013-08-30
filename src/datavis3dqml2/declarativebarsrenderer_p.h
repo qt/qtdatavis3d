@@ -44,7 +44,7 @@ class DeclarativeBarsRenderer : public QObject, public QSGSimpleTextureNode
     Q_OBJECT
 
 public:
-    DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *shared);
+    DeclarativeBarsRenderer(QQuickWindow *window, Bars3DController *shared);
     ~DeclarativeBarsRenderer();
 
 public slots:
@@ -57,7 +57,7 @@ private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    Bars3dController *m_barsRenderer;
+    Bars3DController *m_barsRenderer;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

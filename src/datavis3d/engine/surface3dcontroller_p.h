@@ -36,14 +36,14 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Surface3dRenderer;
+class Surface3DRenderer;
 
-class QT_DATAVIS3D_EXPORT Surface3dController : public Abstract3DController
+class QT_DATAVIS3D_EXPORT Surface3DController : public Abstract3DController
 {
     Q_OBJECT
 
 private:
-    Surface3dRenderer *m_renderer;
+    Surface3DRenderer *m_renderer;
     QList<qreal> m_series; // TODO: TEMP
     int m_dataWidth;
     int m_dataDepth;
@@ -60,8 +60,8 @@ private:
     QDataVis::SelectionMode m_selectionMode;
 
 public:
-    explicit Surface3dController(QRect rect);
-    ~Surface3dController();
+    explicit Surface3DController(QRect rect);
+    ~Surface3DController();
 
     void initializeOpenGL();
     virtual void synchDataToRenderer();
@@ -106,7 +106,7 @@ signals:
     void leftMousePressed(const QPoint &point); // My temp solution
 
 private:
-    Q_DISABLE_COPY(Surface3dController)
+    Q_DISABLE_COPY(Surface3DController)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -55,7 +55,7 @@ class QT_DATAVIS3D_EXPORT SelectionPointer : public QObject, protected QOpenGLFu
     Q_OBJECT
 
 public:
-    explicit SelectionPointer(Surface3dController *controller);
+    explicit SelectionPointer(Surface3DController *controller);
     ~SelectionPointer();
 
     void initializeOpenGL();
@@ -72,7 +72,7 @@ private:
     void loadPointMesh();
 
 private:
-    Surface3dController *m_controller;
+    Surface3DController *m_controller;
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
     ObjectHelper *m_labelObj;

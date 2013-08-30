@@ -23,7 +23,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3dController *renderer)
+DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3DController *renderer)
     : m_fbo(0),
       m_texture(0),
       m_window(window),

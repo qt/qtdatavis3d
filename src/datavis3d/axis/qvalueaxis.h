@@ -68,7 +68,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(QValueAxis)
-    friend class Bars3dController;
+    friend class Bars3DController;
     friend class Scatter3DController;
 };
 

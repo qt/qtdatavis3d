@@ -30,7 +30,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-Surface3dController::Surface3dController(QRect rect)
+Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
       m_smoothSurface(false),
@@ -46,22 +46,22 @@ Surface3dController::Surface3dController(QRect rect)
     setAxisZ(0);
 }
 
-Surface3dController::~Surface3dController()
+Surface3DController::~Surface3DController()
 {
 }
 
-void Surface3dController::initializeOpenGL()
+void Surface3DController::initializeOpenGL()
 {
     // Initialization is called multiple times when Qt Quick components are used
     if (isInitialized())
         return;
 
-    m_renderer = new Surface3dRenderer(this);
+    m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
 }
 
-void Surface3dController::synchDataToRenderer()
+void Surface3DController::synchDataToRenderer()
 {
     Abstract3DController::synchDataToRenderer();
 
@@ -71,7 +71,7 @@ void Surface3dController::synchDataToRenderer()
     // Notify changes to renderer
 }
 
-void Surface3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -79,7 +79,7 @@ void Surface3dController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstrac
     // TODO: Implement!
 }
 
-QMatrix4x4 Surface3dController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
+QMatrix4x4 Surface3DController::calculateViewMatrix(int zoom, int viewPortWidth, int viewPortHeight, bool showUnder)
 {
     return m_cameraHelper->calculateViewMatrix(m_mousePos,
                                                zoom,
@@ -88,31 +88,31 @@ QMatrix4x4 Surface3dController::calculateViewMatrix(int zoom, int viewPortWidth,
                                                showUnder);
 }
 
-void Surface3dController::setSmoothSurface(bool enable)
+void Surface3DController::setSmoothSurface(bool enable)
 {
     m_smoothSurface = enable;
     emit smoothStatusChanged(m_smoothSurface);
 }
 
-bool Surface3dController::smoothSurface()
+bool Surface3DController::smoothSurface()
 {
     return m_smoothSurface;
 }
 
-void Surface3dController::setSurfaceGrid(bool enable)
+void Surface3DController::setSurfaceGrid(bool enable)
 {
     m_surfaceGrid = enable;
     emit surfaceGridChanged(m_surfaceGrid);
 }
 
-bool Surface3dController::surfaceGrid()
+bool Surface3DController::surfaceGrid()
 {
     return m_surfaceGrid;
 }
 
 
 #if defined(Q_OS_ANDROID)
-void Surface3dController::mouseDoubleClickEvent(QMouseEvent *event)
+void Surface3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
 }
@@ -122,7 +122,7 @@ void touchEvent(QTouchEvent *event)
 }
 #endif
 
-void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
+void Surface3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (Qt::LeftButton == event->button()) {
         m_mousePos = mousePos;
@@ -139,7 +139,7 @@ void Surface3dController::mousePressEvent(QMouseEvent *event, const QPoint &mous
     m_cameraHelper->updateMousePos(m_mousePos);
 }
 
-void Surface3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
+void Surface3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event)
     if (Abstract3DController::MouseRotating == m_mouseState) {
@@ -150,24 +150,24 @@ void Surface3dController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
     m_mouseState = Abstract3DController::MouseNone;
 }
 
-void Surface3dController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
+void Surface3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event)
     if (Abstract3DController::MouseRotating == m_mouseState)
         m_mousePos = mousePos; //event->pos();
 }
 
-void Surface3dController::wheelEvent(QWheelEvent *event)
+void Surface3DController::wheelEvent(QWheelEvent *event)
 {
     Q_UNUSED(event)
 }
 
-QPoint Surface3dController::mousePosition()
+QPoint Surface3DController::mousePosition()
 {
     return m_mousePos;
 }
 
-void Surface3dController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
+void Surface3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
     m_segmentCount   = segmentCount;
     m_segmentStep    = step;
@@ -176,7 +176,7 @@ void Surface3dController::setSegmentCount(GLint segmentCount, GLfloat step, GLfl
     emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
 }
 
-void Surface3dController::setGradientColorAt(qreal pos, const QColor &color)
+void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 {
     Theme t = theme();
     t.m_surfaceGradient.setColorAt(pos, color);
@@ -184,7 +184,7 @@ void Surface3dController::setGradientColorAt(qreal pos, const QColor &color)
 }
 
 // TODO: Temp
-void Surface3dController::setData(QList<qreal> series, int width, int depth)
+void Surface3DController::setData(QList<qreal> series, int width, int depth)
 {
     m_series = series;
     m_dataWidth = width;

@@ -46,7 +46,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
-Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
+Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
       m_selectedBar(0),
@@ -92,7 +92,7 @@ Bars3dRenderer::Bars3dRenderer(Bars3dController *controller)
     initializeOpenGL();
 }
 
-Bars3dRenderer::~Bars3dRenderer()
+Bars3DRenderer::~Bars3DRenderer()
 {
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
@@ -112,7 +112,7 @@ Bars3dRenderer::~Bars3dRenderer()
     delete m_gridLineObj;
 }
 
-void Bars3dRenderer::initializeOpenGL()
+void Bars3DRenderer::initializeOpenGL()
 {
     Abstract3DRenderer::initializeOpenGL();
 
@@ -144,7 +144,7 @@ void Bars3dRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3dRenderer::updateDataModel(QBarDataProxy *dataProxy)
+void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
 {
     // Update cached data window
     int dataRowCount = dataProxy->rowCount();
@@ -170,7 +170,7 @@ void Bars3dRenderer::updateDataModel(QBarDataProxy *dataProxy)
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
 
-void Bars3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Bars3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(camera, defaultFboHandle);
@@ -191,7 +191,7 @@ void Bars3dRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
     drawScene(camera, defaultFboHandle);
 }
 
-void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
+void Bars3DRenderer::drawSlicedScene(CameraHelper *camera,
                                      const LabelItem &xLabel,
                                      const LabelItem &yLabel,
                                      const LabelItem &zLabel)
@@ -379,7 +379,7 @@ void Bars3dRenderer::drawSlicedScene(CameraHelper *camera,
     m_labelShader->release();
 }
 
-void Bars3dRenderer::drawScene(CameraHelper *camera,
+void Bars3DRenderer::drawScene(CameraHelper *camera,
                                const GLuint defaultFboHandle)
 {
     GLint startBar = 0;
@@ -655,7 +655,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (Bars3dController::MouseOnScene == m_controller->mouseState())
+        if (Bars3DController::MouseOnScene == m_controller->mouseState())
             m_selection = Utils::getSelection(m_controller->mousePosition(), m_cachedBoundingRect.height());
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -690,7 +690,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
 
     bool selectionDirty = (m_selection != m_previousSelection
             || (m_selection != selectionSkipColor
-                && Bars3dController::MouseOnScene == m_controller->mouseState()
+                && Bars3DController::MouseOnScene == m_controller->mouseState()
                 && !m_cachedIsSlicingActivated));
     if (selectionDirty) {
         m_previousSelection = m_selection;
@@ -748,10 +748,10 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
             GLfloat lightStrength = m_cachedTheme.m_lightStrength;
 
             if (m_cachedSelectionMode > QDataVis::ModeNone) {
-                Bars3dController::SelectionType selectionType = isSelected(row, bar);
+                Bars3DController::SelectionType selectionType = isSelected(row, bar);
 
                 switch (selectionType) {
-                case Bars3dController::SelectionItem: {
+                case Bars3DController::SelectionItem: {
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert position data into render item. We have no ownership, don't delete the previous one
@@ -783,7 +783,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     }
                     break;
                 }
-                case Bars3dController::SelectionRow: {
+                case Bars3DController::SelectionRow: {
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
@@ -794,7 +794,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     }
                     break;
                 }
-                case Bars3dController::SelectionColumn: {
+                case Bars3DController::SelectionColumn: {
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
@@ -805,7 +805,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
                     }
                     break;
                 }
-                case Bars3dController::SelectionNone: {
+                case Bars3DController::SelectionNone: {
                     // Current bar is not selected, nor on a row or column
                     // do nothing
                     break;
@@ -1318,7 +1318,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
         m_selectedBar = NULL;
         if (m_cachedIsSlicingActivated
                 && (m_selection == selectionSkipColor
-                    || Bars3dController::MouseOnOverview == m_controller->mouseState()))
+                    || Bars3DController::MouseOnOverview == m_controller->mouseState()))
             m_controller->setSlicingActive(false);
     } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow && selectionDirty) {
         // Activate slice mode
@@ -1401,7 +1401,7 @@ void Bars3dRenderer::drawScene(CameraHelper *camera,
     m_labelShader->release();
 }
 
-void Bars3dRenderer::handleResize()
+void Bars3DRenderer::handleResize()
 {
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
@@ -1420,7 +1420,7 @@ void Bars3dRenderer::handleResize()
     Abstract3DRenderer::handleResize();
 }
 
-void Bars3dRenderer::updateBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
+void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool relative)
 {
     // Convert ratio to QSizeF, as we need it in that format for autoscaling calculations
     m_cachedBarThickness.setWidth(1.0f);
@@ -1437,7 +1437,7 @@ void Bars3dRenderer::updateBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool
     calculateSceneScalingFactors();
 }
 
-void Bars3dRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
+void Bars3DRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
     calculateHeightAdjustment();
@@ -1458,7 +1458,7 @@ void Bars3dRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation,
         qWarning() << __FUNCTION__ << "Bar chart currently properly supports only zero-centered and zero minimum ranges for Y-axis.";
 }
 
-void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
+void Bars3DRenderer::updateSampleSpace(int rowCount, int columnCount)
 {
     // Destroy old render items and reallocate new array
     // TODO is there a way to allocate the whole array with one allocation?
@@ -1486,7 +1486,7 @@ void Bars3dRenderer::updateSampleSpace(int rowCount, int columnCount)
     calculateSceneScalingFactors();
 }
 
-void Bars3dRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
+void Bars3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
 {
     Abstract3DRenderer::updateSelectionMode(mode);
 
@@ -1500,7 +1500,7 @@ void Bars3dRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
     }
 }
 
-void Bars3dRenderer::updateBackgroundEnabled(bool enable)
+void Bars3DRenderer::updateBackgroundEnabled(bool enable)
 {
     if (enable != m_cachedIsBackgroundEnabled) {
         Abstract3DRenderer::updateBackgroundEnabled(enable);
@@ -1508,15 +1508,15 @@ void Bars3dRenderer::updateBackgroundEnabled(bool enable)
     }
 }
 
-void Bars3dRenderer::updateSelectedBarPos(QPoint position)
+void Bars3DRenderer::updateSelectedBarPos(QPoint position)
 {
-    if (position == Bars3dController::noSelectionPoint())
+    if (position == Bars3DController::noSelectionPoint())
         m_selection = selectionSkipColor;
     else
         m_selection = QVector3D(position.x(), position.y(), 0);
 }
 
-void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
+void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
     switch (quality) {
@@ -1542,7 +1542,7 @@ void Bars3dRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
-void Bars3dRenderer::loadMeshFile()
+void Bars3DRenderer::loadMeshFile()
 {
     QString objectFileName = m_cachedObjFile;
     if (m_barObj)
@@ -1554,7 +1554,7 @@ void Bars3dRenderer::loadMeshFile()
     m_barObj->load();
 }
 
-void Bars3dRenderer::loadBackgroundMesh()
+void Bars3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
@@ -1565,7 +1565,7 @@ void Bars3dRenderer::loadBackgroundMesh()
     m_backgroundObj->load();
 }
 
-void Bars3dRenderer::loadGridLineMesh()
+void Bars3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
@@ -1573,7 +1573,7 @@ void Bars3dRenderer::loadGridLineMesh()
     m_gridLineObj->load();
 }
 
-void Bars3dRenderer::loadLabelMesh()
+void Bars3DRenderer::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
@@ -1581,13 +1581,13 @@ void Bars3dRenderer::loadLabelMesh()
     m_labelObj->load();
 }
 
-void Bars3dRenderer::updateTextures()
+void Bars3DRenderer::updateTextures()
 {
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }
 
-void Bars3dRenderer::calculateSceneScalingFactors()
+void Bars3DRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
     m_rowWidth = ((m_cachedColumnCount + 1) * m_cachedBarSpacing.width()) / 2.0f;
@@ -1602,7 +1602,7 @@ void Bars3dRenderer::calculateSceneScalingFactors()
     //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
 }
 
-void Bars3dRenderer::calculateHeightAdjustment()
+void Bars3DRenderer::calculateHeightAdjustment()
 {
     m_heightNormalizer = (GLfloat)qMax(qFabs(m_axisCacheY.min()), qFabs(m_axisCacheY.max()));
 
@@ -1615,10 +1615,10 @@ void Bars3dRenderer::calculateHeightAdjustment()
     //qDebug() << m_yAdjustment;
 }
 
-Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
+Bars3DController::SelectionType Bars3DRenderer::isSelected(GLint row, GLint bar)
 {
     //static QVector3D prevSel = m_selection; // TODO: For debugging
-    Bars3dController::SelectionType isSelectedType = Bars3dController::SelectionNone;
+    Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
     if (m_selection == selectionSkipColor)
         return isSelectedType; // skip window
 
@@ -1635,22 +1635,22 @@ Bars3dController::SelectionType Bars3dRenderer::isSelected(GLint row, GLint bar)
     //    prevSel = selection;
     //}
     if (current == m_selection) {
-        isSelectedType = Bars3dController::SelectionItem;
+        isSelectedType = Bars3DController::SelectionItem;
     }
     else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::ModeItemAndColumn
                                                 || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
                                                 || m_cachedSelectionMode == QDataVis::ModeSliceColumn)) {
-        isSelectedType = Bars3dController::SelectionColumn;
+        isSelectedType = Bars3DController::SelectionColumn;
     }
     else if (current.x() == m_selection.x() && (m_cachedSelectionMode == QDataVis::ModeItemAndRow
                                                 || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
                                                 || m_cachedSelectionMode == QDataVis::ModeSliceRow)) {
-        isSelectedType = Bars3dController::SelectionRow;
+        isSelectedType = Bars3DController::SelectionRow;
     }
     return isSelectedType;
 }
 
-void Bars3dRenderer::updateSlicingActive(bool isSlicing)
+void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 {
     m_cachedIsSlicingActivated = isSlicing;
     if (isSlicing) {
@@ -1666,12 +1666,12 @@ void Bars3dRenderer::updateSlicingActive(bool isSlicing)
     }
 }
 
-QRect Bars3dRenderer::mainViewPort()
+QRect Bars3DRenderer::mainViewPort()
 {
     return m_mainViewPort;
 }
 
-void Bars3dRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
+void Bars3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_barShader)
         delete m_barShader;
@@ -1679,7 +1679,7 @@ void Bars3dRenderer::initShaders(const QString &vertexShader, const QString &fra
     m_barShader->initialize();
 }
 
-void Bars3dRenderer::initSelectionShader()
+void Bars3DRenderer::initSelectionShader()
 {
     if (m_selectionShader)
         delete m_selectionShader;
@@ -1688,7 +1688,7 @@ void Bars3dRenderer::initSelectionShader()
     m_selectionShader->initialize();
 }
 
-void Bars3dRenderer::initSelectionBuffer()
+void Bars3DRenderer::initSelectionBuffer()
 {
     if (m_cachedIsSlicingActivated)
         return;
@@ -1702,7 +1702,7 @@ void Bars3dRenderer::initSelectionBuffer()
 }
 
 #if !defined(QT_OPENGL_ES_2)
-void Bars3dRenderer::initDepthShader()
+void Bars3DRenderer::initDepthShader()
 {
     if (m_depthShader)
         delete m_depthShader;
@@ -1711,7 +1711,7 @@ void Bars3dRenderer::initDepthShader()
     m_depthShader->initialize();
 }
 
-void Bars3dRenderer::updateDepthBuffer()
+void Bars3DRenderer::updateDepthBuffer()
 {
     if (m_cachedIsSlicingActivated)
         return;
@@ -1751,7 +1751,7 @@ void Bars3dRenderer::updateDepthBuffer()
 }
 #endif
 
-void Bars3dRenderer::initBackgroundShaders(const QString &vertexShader,
+void Bars3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                            const QString &fragmentShader)
 {
     if (m_backgroundShader)
@@ -1760,7 +1760,7 @@ void Bars3dRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
-void Bars3dRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
+void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_labelShader)
         delete m_labelShader;

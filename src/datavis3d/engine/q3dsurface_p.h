@@ -51,7 +51,7 @@ public:
     // TODO
 
     Q3DSurface *q_ptr;
-    Surface3dController *m_shared;
+    Surface3DController *m_shared;
 
     QList<QList<qreal> > m_seriesList; // Temp to be replaced by dataset
 };

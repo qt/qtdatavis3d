@@ -32,7 +32,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-SelectionPointer::SelectionPointer(Surface3dController *controller)
+SelectionPointer::SelectionPointer(Surface3DController *controller)
     : QObject(controller),
       m_controller(controller),
       m_labelShader(0),
