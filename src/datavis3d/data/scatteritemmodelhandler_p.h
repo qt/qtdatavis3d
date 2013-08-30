@@ -26,31 +26,25 @@
 //
 // We mean it.
 
-#ifndef QITEMMODELBARDATAPROXY_P_H
-#define QITEMMODELBARDATAPROXY_P_H
+#ifndef SCATTERITEMMODELHANDLER_P_H
+#define SCATTERITEMMODELHANDLER_P_H
 
-#include "qitemmodelbardataproxy.h"
-#include "qbardataproxy_p.h"
-#include <QPointer>
-#include <QTimer>
+#include "abstractitemmodelhandler_p.h"
+#include "qitemmodelscatterdataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class BarItemModelHandler;
-
-class QItemModelBarDataProxyPrivate : public QBarDataProxyPrivate
+class ScatterItemModelHandler : public AbstractItemModelHandler
 {
     Q_OBJECT
 public:
-    QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q);
-    virtual ~QItemModelBarDataProxyPrivate();
+    ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent = 0);
+    virtual ~ScatterItemModelHandler();
 
-private:
-    QItemModelBarDataProxy *qptr();
+protected:
+    void virtual resolveModel();
 
-    BarItemModelHandler *m_itemModelHandler;
-
-    friend class QItemModelBarDataProxy;
+    QItemModelScatterDataProxy *m_proxy; // Not owned
 };
 
 QT_DATAVIS3D_END_NAMESPACE

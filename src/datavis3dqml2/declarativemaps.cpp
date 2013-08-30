@@ -79,14 +79,14 @@ QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     return node;
 }
 
-void DeclarativeMaps::setData(QAbstractItemModel *data)
+void DeclarativeMaps::setData(const QAbstractItemModel *data)
 {
     static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setItemModel(data);
 }
 
-QAbstractItemModel *DeclarativeMaps::data()
+const QAbstractItemModel *DeclarativeMaps::data() const
 {
-    return static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->itemModel();
+    return static_cast<const QItemModelMapDataProxy *>(m_shared->dataProxy())->itemModel();
 }
 
 void DeclarativeMaps::setBarSpecs(const QVector3D &thickness,
@@ -182,12 +182,12 @@ QDataVis::ShadowQuality DeclarativeMaps::shadowQuality()
 
 QItemModelMapDataMapping *DeclarativeMaps::mapping() const
 {
-    return static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->mapping();
+    return static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->activeMapping();
 }
 
 void DeclarativeMaps::setMapping(QItemModelMapDataMapping *mapping)
 {
-    static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+    static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setActiveMapping(mapping);
 }
 
 void DeclarativeMaps::mouseDoubleClickEvent(QMouseEvent *event)

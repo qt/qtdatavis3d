@@ -31,22 +31,27 @@ class QItemModelBarDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
-    Q_PROPERTY(QItemModelBarDataMapping* mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelBarDataMapping* activeMapping READ activeMapping WRITE setActiveMapping)
 
 public:
     explicit QItemModelBarDataProxy();
-    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, QItemModelBarDataMapping *mapping);
+    explicit QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+                                    QItemModelBarDataMapping *mapping);
     virtual ~QItemModelBarDataProxy();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    QAbstractItemModel *itemModel();
+    void setItemModel(const QAbstractItemModel *itemModel);
+    const QAbstractItemModel *itemModel() const;
 
-    void setMapping(QItemModelBarDataMapping *mapping);
-    QItemModelBarDataMapping *mapping();
+    void setActiveMapping(QItemModelBarDataMapping *mapping);
+    QItemModelBarDataMapping *activeMapping() const;
+    void addMapping(QItemModelBarDataMapping *mapping);
+    void releaseMapping(QItemModelBarDataMapping *mapping);
+    QList<QItemModelBarDataMapping *> mappings() const;
 
 protected:
     QItemModelBarDataProxyPrivate *dptr();
+    const QItemModelBarDataProxyPrivate *dptrc() const;
 
 private:
     Q_DISABLE_COPY(QItemModelBarDataProxy)

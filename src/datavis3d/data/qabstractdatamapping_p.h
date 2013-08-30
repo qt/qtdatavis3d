@@ -26,31 +26,23 @@
 //
 // We mean it.
 
-#ifndef QITEMMODELBARDATAPROXY_P_H
-#define QITEMMODELBARDATAPROXY_P_H
+#include "qabstractdatamapping.h"
 
-#include "qitemmodelbardataproxy.h"
-#include "qbardataproxy_p.h"
-#include <QPointer>
-#include <QTimer>
+#ifndef QABSTRACTDATAMAPPING_P_H
+#define QABSTRACTDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class BarItemModelHandler;
-
-class QItemModelBarDataProxyPrivate : public QBarDataProxyPrivate
+class QAbstractDataMappingPrivate : public QObject
 {
     Q_OBJECT
 public:
-    QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q);
-    virtual ~QItemModelBarDataProxyPrivate();
+    QAbstractDataMappingPrivate(QAbstractDataMapping *q, QAbstractDataProxy::DataType type);
+    virtual ~QAbstractDataMappingPrivate();
 
 private:
-    QItemModelBarDataProxy *qptr();
-
-    BarItemModelHandler *m_itemModelHandler;
-
-    friend class QItemModelBarDataProxy;
+    QAbstractDataMapping *q_ptr;
+    QAbstractDataProxy::DataType m_type;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

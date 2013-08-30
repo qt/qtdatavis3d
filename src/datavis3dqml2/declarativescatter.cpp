@@ -100,24 +100,24 @@ void DeclarativeScatter::setObjectColor(const QColor &baseColor, const QColor &h
     m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
-void DeclarativeScatter::setData(QAbstractItemModel *data)
+void DeclarativeScatter::setData(const QAbstractItemModel *data)
 {
     static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
 }
 
-QAbstractItemModel *DeclarativeScatter::data()
+const QAbstractItemModel *DeclarativeScatter::data() const
 {
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->itemModel();
+    return static_cast<const QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->itemModel();
 }
 
 void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
 {
-    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setMapping(mapping);
+    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setActiveMapping(mapping);
 }
 
 QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
 {
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->mapping();
+    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->activeMapping();
 }
 
 QValueAxis *DeclarativeScatter::axisX() const

@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "qitemmodelscatterdataproxy_p.h"
+#include "scatteritemmodelhandler_p.h"
 #include <QTimer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -43,12 +44,12 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy() :
  * Constructs QItemModelScatterDataProxy with \a itemModel and \a mapping. Does not take ownership
  * of the model or the mapping, but does connect to them to listen for changes.
  */
-QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
                                                        QItemModelScatterDataMapping *mapping) :
     QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this))
 {
-    dptr()->setItemModel(itemModel);
-    dptr()->setMapping(mapping);
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
+    dptr()->m_itemModelHandler->setActiveMapping(mapping);
 }
 
 /*!
@@ -64,30 +65,50 @@ QItemModelScatterDataProxy::~QItemModelScatterDataProxy()
  * Defines item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
-void QItemModelScatterDataProxy::setItemModel(QAbstractItemModel *itemModel)
+void QItemModelScatterDataProxy::setItemModel(const QAbstractItemModel *itemModel)
 {
-    dptr()->setItemModel(itemModel);
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
 }
 
-QAbstractItemModel *QItemModelScatterDataProxy::itemModel()
+const QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 {
-    return dptr()->m_itemModel.data();
+    return dptrc()->m_itemModelHandler->itemModel();
 }
 
 /*!
- * \property QItemModelScatterDataProxy::mapping
+ * \property QItemModelScatterDataProxy::activeMapping
  *
  * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
  * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
  */
-void QItemModelScatterDataProxy::setMapping(QItemModelScatterDataMapping *mapping)
+void QItemModelScatterDataProxy::setActiveMapping(QItemModelScatterDataMapping *mapping)
 {
-    dptr()->setMapping(mapping);
+    dptr()->m_itemModelHandler->setActiveMapping(mapping);
 }
 
-QItemModelScatterDataMapping *QItemModelScatterDataProxy::mapping()
+QItemModelScatterDataMapping *QItemModelScatterDataProxy::activeMapping() const
 {
-    return dptr()->m_mapping.data();
+    return static_cast<QItemModelScatterDataMapping *>(dptrc()->m_itemModelHandler->activeMapping());
+}
+
+void QItemModelScatterDataProxy::addMapping(QItemModelScatterDataMapping *mapping)
+{
+    dptr()->m_itemModelHandler->addMapping(mapping);
+}
+
+void QItemModelScatterDataProxy::releaseMapping(QItemModelScatterDataMapping *mapping)
+{
+    dptr()->m_itemModelHandler->releaseMapping(mapping);
+}
+
+QList<QItemModelScatterDataMapping *> QItemModelScatterDataProxy::mappings() const
+{
+    QList<QItemModelScatterDataMapping *> retList;
+    QList<QAbstractDataMapping *> abstractList = dptrc()->m_itemModelHandler->mappings();
+    foreach (QAbstractDataMapping *mapping, abstractList)
+        retList.append(static_cast<QItemModelScatterDataMapping *>(mapping));
+
+    return retList;
 }
 
 /*!
@@ -98,238 +119,21 @@ QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptr()
     return static_cast<QItemModelScatterDataProxyPrivate *>(d_ptr.data());
 }
 
+const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() const
+{
+    return static_cast<const QItemModelScatterDataProxyPrivate *>(d_ptr.data());
+}
+
 // QItemModelScatterDataProxyPrivate
 
 QItemModelScatterDataProxyPrivate::QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q)
     : QScatterDataProxyPrivate(q),
-      resolvePending(0)
+      m_itemModelHandler(new ScatterItemModelHandler(q))
 {
-    m_resolveTimer.setSingleShot(true);
-    QObject::connect(&m_resolveTimer, &QTimer::timeout, this,
-                     &QItemModelScatterDataProxyPrivate::handlePendingResolve);
 }
 
 QItemModelScatterDataProxyPrivate::~QItemModelScatterDataProxyPrivate()
 {
-}
-
-void QItemModelScatterDataProxyPrivate::setItemModel(QAbstractItemModel *itemModel)
-{
-    if (!m_itemModel.isNull())
-        QObject::disconnect(m_itemModel, 0, this, 0);
-
-    m_itemModel = itemModel;
-
-    if (!m_itemModel.isNull()) {
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsInserted, this,
-                         &QItemModelScatterDataProxyPrivate::handleColumnsInserted);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsMoved, this,
-                         &QItemModelScatterDataProxyPrivate::handleColumnsMoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsRemoved, this,
-                         &QItemModelScatterDataProxyPrivate::handleColumnsRemoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::dataChanged, this,
-                         &QItemModelScatterDataProxyPrivate::handleDataChanged);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::layoutChanged, this,
-                         &QItemModelScatterDataProxyPrivate::handleLayoutChanged);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::modelReset, this,
-                         &QItemModelScatterDataProxyPrivate::handleModelReset);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsInserted, this,
-                         &QItemModelScatterDataProxyPrivate::handleRowsInserted);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsMoved, this,
-                         &QItemModelScatterDataProxyPrivate::handleRowsMoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsRemoved, this,
-                         &QItemModelScatterDataProxyPrivate::handleRowsRemoved);
-    }
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0);
-}
-
-void QItemModelScatterDataProxyPrivate::setMapping(QItemModelScatterDataMapping *mapping)
-{
-    if (!m_mapping.isNull())
-        QObject::disconnect(m_mapping.data(), &QItemModelScatterDataMapping::mappingChanged, this,
-                            &QItemModelScatterDataProxyPrivate::handleMappingChanged);
-
-    m_mapping = mapping;
-
-    if (!m_mapping.isNull())
-        QObject::connect(m_mapping.data(), &QItemModelScatterDataMapping::mappingChanged, this,
-                         &QItemModelScatterDataProxyPrivate::handleMappingChanged);
-
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0);
-}
-
-void QItemModelScatterDataProxyPrivate::handleColumnsInserted(const QModelIndex &parent,
-                                                              int start, int end)
-{
-    Q_UNUSED(parent)
-    Q_UNUSED(start)
-    Q_UNUSED(end)
-
-    // Resolve new items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleColumnsMoved(const QModelIndex &sourceParent,
-                                                           int sourceStart, int sourceEnd,
-                                                           const QModelIndex &destinationParent,
-                                                           int destinationColumn)
-{
-    Q_UNUSED(sourceParent)
-    Q_UNUSED(sourceStart)
-    Q_UNUSED(sourceEnd)
-    Q_UNUSED(destinationParent)
-    Q_UNUSED(destinationColumn)
-
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleColumnsRemoved(const QModelIndex &parent,
-                                                             int start, int end)
-{
-    Q_UNUSED(parent)
-    Q_UNUSED(start)
-    Q_UNUSED(end)
-
-    // Remove old items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleDataChanged(const QModelIndex &topLeft,
-                                                          const QModelIndex &bottomRight,
-                                                          const QVector<int> &roles)
-{
-    Q_UNUSED(topLeft)
-    Q_UNUSED(bottomRight)
-    Q_UNUSED(roles)
-
-    // Resolve changed items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleLayoutChanged(
-        const QList<QPersistentModelIndex> &parents,
-        QAbstractItemModel::LayoutChangeHint hint)
-{
-    Q_UNUSED(parents)
-    Q_UNUSED(hint)
-
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleModelReset()
-{
-    // Data cleared, reset array
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleRowsInserted(const QModelIndex &parent,
-                                                           int start, int end)
-{
-    Q_UNUSED(parent)
-    Q_UNUSED(start)
-    Q_UNUSED(end)
-
-    // Resolve new items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleRowsMoved(const QModelIndex &sourceParent,
-                                                        int sourceStart, int sourceEnd,
-                                                        const QModelIndex &destinationParent,
-                                                        int destinationRow)
-{
-    Q_UNUSED(sourceParent)
-    Q_UNUSED(sourceStart)
-    Q_UNUSED(sourceEnd)
-    Q_UNUSED(destinationParent)
-    Q_UNUSED(destinationRow)
-
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleRowsRemoved(const QModelIndex &parent,
-                                                          int start, int end)
-{
-    Q_UNUSED(parent)
-    Q_UNUSED(start)
-    Q_UNUSED(end)
-
-    // Resolve removed items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
-}
-
-void QItemModelScatterDataProxyPrivate::handleMappingChanged()
-{
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0);
-}
-
-void QItemModelScatterDataProxyPrivate::handlePendingResolve()
-{
-    resolveModel();
-}
-
-// Resolve entire item model into QScatterDataArray.
-void QItemModelScatterDataProxyPrivate::resolveModel()
-{
-    if (m_itemModel.isNull() || m_mapping.isNull()) {
-        qptr()->resetArray(0);
-        return;
-    }
-
-    static const int noRoleIndex = -1;
-
-    QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
-    //const int labelRole = roleHash.key(m_mapping->labelRole().toLatin1(), noRoleIndex);
-    const int xPosRole = roleHash.key(m_mapping->xPosRole().toLatin1(), noRoleIndex);
-    const int yPosRole = roleHash.key(m_mapping->yPosRole().toLatin1(), noRoleIndex);
-    const int zPosRole = roleHash.key(m_mapping->zPosRole().toLatin1(), noRoleIndex);
-    // Default valueRole to display role if no mapping
-    //const int valueRole = roleHash.key(m_mapping->valueRole().toLatin1(), Qt::DisplayRole);
-    const int columnCount = m_itemModel->columnCount();
-    const int rowCount = m_itemModel->rowCount();
-    const int totalCount = rowCount * columnCount;
-    int runningCount = 0;
-
-    // Parse data into newProxyArray
-    QScatterDataArray *newProxyArray = new QScatterDataArray(totalCount);
-    for (int i = 0; i < rowCount; i++) {
-        for (int j = 0; j < columnCount; j++) {
-            QModelIndex index = m_itemModel->index(i, j);
-            //if (labelRole != noRoleIndex)
-            //    (*newProxyArray)[runningCount].setLabel(index.data(labelRole).toString());
-            float xPos(0.0f);
-            float yPos(0.0f);
-            float zPos(0.0f);
-            if (xPosRole != noRoleIndex)
-                xPos = index.data(xPosRole).toFloat();
-            if (yPosRole != noRoleIndex)
-                yPos = index.data(yPosRole).toFloat();
-            if (zPosRole != noRoleIndex)
-                zPos = index.data(zPosRole).toFloat();
-            (*newProxyArray)[runningCount].setPosition(QVector3D(xPos, yPos, zPos));
-            //(*newProxyArray)[runningCount].setValue(index.data(valueRole).toReal());
-            runningCount++;
-        }
-    }
-
-    qDebug() << __FUNCTION__ << "Total count:" << newProxyArray->size();
-
-    qptr()->resetArray(newProxyArray);
 }
 
 QItemModelScatterDataProxy *QItemModelScatterDataProxyPrivate::qptr()

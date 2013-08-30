@@ -16,41 +16,48 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVis3D API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#include "qitemmodelscatterdatamapping.h"
 #include "qabstractdatamapping_p.h"
-
-#ifndef QITEMMODELSCATTERDATAMAPPING_P_H
-#define QITEMMODELSCATTERDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelScatterDataMappingPrivate : public QAbstractDataMappingPrivate
+/*!
+ * \class QAbstractDataMapping
+ * \inmodule QtDataVis3D
+ * \brief Abstract base class for data mappings
+ * \since 1.0.0
+ *
+ * Data mapping classes provide a way to map data from one data source to another.
+ */
+
+/*!
+ * \internal
+ */
+QAbstractDataMapping::QAbstractDataMapping(QAbstractDataMappingPrivate *d, QObject *parent)
+    : QObject(parent),
+      d_ptr(d)
 {
-    Q_OBJECT
-public:
-    QItemModelScatterDataMappingPrivate(QItemModelScatterDataMapping *q);
-    virtual ~QItemModelScatterDataMappingPrivate();
+}
 
-private:
-    //QString m_labelRole;
-    QString m_xPosRole;
-    QString m_yPosRole;
-    QString m_zPosRole;
-    //QString m_valueRole;
+/*!
+ * Destroys QAbstractDataMapping.
+ */
+QAbstractDataMapping::~QAbstractDataMapping()
+{
+}
 
-    friend class QItemModelScatterDataMapping;
-};
+// QItemModelBarDataMappingPrivate
+
+QAbstractDataMappingPrivate::QAbstractDataMappingPrivate(QAbstractDataMapping *q,
+                                                         QAbstractDataProxy::DataType type)
+    : QObject(0),
+      q_ptr(q),
+      m_type(type)
+{
+}
+
+QAbstractDataMappingPrivate::~QAbstractDataMappingPrivate()
+{
+}
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif

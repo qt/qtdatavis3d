@@ -36,6 +36,8 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+class ScatterItemModelHandler;
+
 class QItemModelScatterDataProxyPrivate : public QScatterDataProxyPrivate
 {
     Q_OBJECT
@@ -43,35 +45,10 @@ public:
     QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q);
     virtual ~QItemModelScatterDataProxyPrivate();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelScatterDataMapping *mapping);
-
-public slots:
-    void handleColumnsInserted(const QModelIndex &parent, int start, int end);
-    void handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                            const QModelIndex &destinationParent, int destinationColumn);
-    void handleColumnsRemoved(const QModelIndex &parent, int start, int end);
-    void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                           const QVector<int> &roles = QVector<int> ());
-    void handleLayoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex> (),
-                             QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
-    void handleModelReset();
-    void handleRowsInserted(const QModelIndex &parent, int start, int end);
-    void handleRowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd,
-                         const QModelIndex &destinationParent, int destinationRow);
-    void handleRowsRemoved(const QModelIndex &parent, int start, int end);
-
-    void handleMappingChanged();
-    void handlePendingResolve();
-
 private:
-    void resolveModel();
     QItemModelScatterDataProxy *qptr();
 
-    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelScatterDataMapping> m_mapping; // Not owned
-    bool resolvePending;
-    QTimer m_resolveTimer;
+    ScatterItemModelHandler *m_itemModelHandler;
 
     friend class QItemModelScatterDataProxy;
 };

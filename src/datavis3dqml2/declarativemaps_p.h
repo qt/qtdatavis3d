@@ -43,7 +43,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeMaps : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
+    Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -60,8 +60,8 @@ public:
     void classBegin();
     void componentComplete();
 
-    void setData(QAbstractItemModel *data);
-    QAbstractItemModel *data();
+    void setData(const QAbstractItemModel *data);
+    const QAbstractItemModel *data() const;
 
     // bar specifications; base thickness in x, y and z, enum to indicate which direction is increased with value
     // TODO: Start using thickness also in adjustment direction; use it as a relative value.

@@ -25,7 +25,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 {
     // @uri com.digia.QtDataVis3D
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
+    qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
                                                    QLatin1String("Trying to create uncreatable: AbstractItemModel."));
     qmlRegisterUncreatableType<QDataVis>(uri, 1, 0, "DataVis",
                                          QLatin1String("Trying to create uncreatable: DataVis."));

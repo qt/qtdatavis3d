@@ -27,13 +27,14 @@
 // We mean it.
 
 #include "qitemmodelbardatamapping.h"
+#include "qabstractdatamapping_p.h"
 
 #ifndef QITEMMODELBARDATAMAPPING_P_H
 #define QITEMMODELBARDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QItemModelBarDataMappingPrivate : public QObject
+class QItemModelBarDataMappingPrivate : public QAbstractDataMappingPrivate
 {
     Q_OBJECT
 public:
@@ -48,8 +49,6 @@ private:
     // For row/column items, sort items into these categories. Other categories are ignored.
     QStringList m_rowCategories;
     QStringList m_columnCategories;
-
-    QItemModelBarDataMapping *q_ptr;
 
     friend class QItemModelBarDataMapping;
 };

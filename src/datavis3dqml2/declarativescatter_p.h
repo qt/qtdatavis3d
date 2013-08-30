@@ -44,7 +44,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeScatter : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
+    Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelScatterDataMapping *mapping READ mapping WRITE setMapping)
     Q_PROPERTY(QValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(QValueAxis *axisY READ axisY WRITE setAxisY)
@@ -85,8 +85,8 @@ public:
                                     const QColor &depthColor, bool uniform = true);
 
     // Add whole data set.
-    void setData(QAbstractItemModel *data);
-    QAbstractItemModel *data();
+    void setData(const QAbstractItemModel *data);
+    const QAbstractItemModel *data() const;
 
     QItemModelScatterDataMapping *mapping() const;
     void setMapping(QItemModelScatterDataMapping *mapping);

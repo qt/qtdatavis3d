@@ -110,19 +110,19 @@ void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int di
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-void DeclarativeBars::setData(QAbstractItemModel *data)
+void DeclarativeBars::setData(const QAbstractItemModel *data)
 {
     static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
 }
 
-QAbstractItemModel *DeclarativeBars::data()
+const QAbstractItemModel *DeclarativeBars::data() const
 {
-    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->itemModel();
+    return static_cast<const QItemModelBarDataProxy *>(m_shared->activeDataProxy())->itemModel();
 }
 
 void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
 {
-    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setMapping(mapping);
+    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setActiveMapping(mapping);
 }
 
 QCategoryAxis *DeclarativeBars::rowAxis() const
@@ -157,7 +157,7 @@ void DeclarativeBars::setColumnAxis(QCategoryAxis *axis)
 
 QItemModelBarDataMapping *DeclarativeBars::mapping() const
 {
-    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->mapping();
+    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->activeMapping();
 }
 
 void DeclarativeBars::setBarThickness(qreal thicknessRatio)

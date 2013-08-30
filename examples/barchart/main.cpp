@@ -296,8 +296,7 @@ int main(int argc, char **argv)
 
     // We don't need to initialize the mapping object in any way, as it defaults
     // to row/column support and uses the Qt::DisplayRole role for value role by default.
-    QItemModelBarDataMapping mapping;
-    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), &mapping);
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), new QItemModelBarDataMapping);
     chart->setActiveDataProxy(proxy);
 
     ChartDataGenerator *generator = new ChartDataGenerator(chart, tableWidget);

@@ -38,8 +38,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QItemModelBarDataMapping with the given \a parent.
  */
 QItemModelBarDataMapping::QItemModelBarDataMapping(QObject *parent)
-    : QObject(parent),
-      d_ptr(new QItemModelBarDataMappingPrivate(this))
+    : QAbstractDataMapping(new QItemModelBarDataMappingPrivate(this), parent)
 {
 }
 
@@ -47,10 +46,9 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(QObject *parent)
  * Constructs QItemModelBarDataMapping with \a valueRole and the given \a parent.
  */
 QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &valueRole, QObject *parent)
-    : QObject(parent),
-      d_ptr(new QItemModelBarDataMappingPrivate(this))
+    : QAbstractDataMapping(new QItemModelBarDataMappingPrivate(this), parent)
 {
-    d_ptr->m_valueRole = valueRole;
+    dptr()->m_valueRole = valueRole;
 }
 
 /*!
@@ -63,14 +61,13 @@ QItemModelBarDataMapping::QItemModelBarDataMapping(const QString &rowRole,
                                                    const QStringList &rowCategories,
                                                    const QStringList &columnCategories,
                                                    QObject *parent)
-    : QObject(parent),
-      d_ptr(new QItemModelBarDataMappingPrivate(this))
+    : QAbstractDataMapping(new QItemModelBarDataMappingPrivate(this), parent)
 {
-    d_ptr->m_rowRole = rowRole;
-    d_ptr->m_columnRole = columnRole;
-    d_ptr->m_valueRole = valueRole;
-    d_ptr->m_rowCategories = rowCategories;
-    d_ptr->m_columnCategories = columnCategories;
+    dptr()->m_rowRole = rowRole;
+    dptr()->m_columnRole = columnRole;
+    dptr()->m_valueRole = valueRole;
+    dptr()->m_rowCategories = rowCategories;
+    dptr()->m_columnCategories = columnCategories;
 }
 
 /*!
@@ -87,13 +84,13 @@ QItemModelBarDataMapping::~QItemModelBarDataMapping()
  */
 void QItemModelBarDataMapping::setRowRole(const QString &role)
 {
-    d_ptr->m_rowRole = role;
+    dptr()->m_rowRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelBarDataMapping::rowRole() const
 {
-    return d_ptr->m_rowRole;
+    return dptrc()->m_rowRole;
 }
 
 /*!
@@ -103,13 +100,13 @@ QString QItemModelBarDataMapping::rowRole() const
  */
 void QItemModelBarDataMapping::setColumnRole(const QString &role)
 {
-    d_ptr->m_columnRole = role;
+    dptr()->m_columnRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelBarDataMapping::columnRole() const
 {
-    return d_ptr->m_columnRole;
+    return dptrc()->m_columnRole;
 }
 
 /*!
@@ -119,13 +116,13 @@ QString QItemModelBarDataMapping::columnRole() const
  */
 void QItemModelBarDataMapping::setValueRole(const QString &role)
 {
-    d_ptr->m_valueRole = role;
+    dptr()->m_valueRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelBarDataMapping::valueRole() const
 {
-    return d_ptr->m_valueRole;
+    return dptrc()->m_valueRole;
 }
 
 /*!
@@ -135,13 +132,13 @@ QString QItemModelBarDataMapping::valueRole() const
  */
 void QItemModelBarDataMapping::setRowCategories(const QStringList &categories)
 {
-    d_ptr->m_rowCategories = categories;
+    dptr()->m_rowCategories = categories;
     emit mappingChanged();
 }
 
 QStringList QItemModelBarDataMapping::rowCategories() const
 {
-    return d_ptr->m_rowCategories;
+    return dptrc()->m_rowCategories;
 }
 
 /*!
@@ -151,13 +148,13 @@ QStringList QItemModelBarDataMapping::rowCategories() const
  */
 void QItemModelBarDataMapping::setColumnCategories(const QStringList &categories)
 {
-    d_ptr->m_columnCategories = categories;
+    dptr()->m_columnCategories = categories;
     emit mappingChanged();
 }
 
 QStringList QItemModelBarDataMapping::columnCategories() const
 {
-    return d_ptr->m_columnCategories;
+    return dptrc()->m_columnCategories;
 }
 
 /*!
@@ -172,26 +169,36 @@ void QItemModelBarDataMapping::remap(const QString &rowRole,
                                      const QStringList &rowCategories,
                                      const QStringList &columnCategories)
 {
-    d_ptr->m_rowRole = rowRole;
-    d_ptr->m_columnRole = columnRole;
-    d_ptr->m_valueRole = valueRole;
-    d_ptr->m_rowCategories = rowCategories;
-    d_ptr->m_columnCategories = columnCategories;
+    dptr()->m_rowRole = rowRole;
+    dptr()->m_columnRole = columnRole;
+    dptr()->m_valueRole = valueRole;
+    dptr()->m_rowCategories = rowCategories;
+    dptr()->m_columnCategories = columnCategories;
 
     emit mappingChanged();
+}
+
+QItemModelBarDataMappingPrivate *QItemModelBarDataMapping::dptr()
+{
+    return static_cast<QItemModelBarDataMappingPrivate *>(d_ptr.data());
+}
+
+const QItemModelBarDataMappingPrivate *QItemModelBarDataMapping::dptrc() const
+{
+    return static_cast<const QItemModelBarDataMappingPrivate *>(d_ptr.data());
 }
 
 // QItemModelBarDataMappingPrivate
 
 QItemModelBarDataMappingPrivate::QItemModelBarDataMappingPrivate(QItemModelBarDataMapping *q)
-    : QObject(0),
-      q_ptr(q)
+    : QAbstractDataMappingPrivate(q, QAbstractDataProxy::DataTypeBar)
 {
 }
 
 QItemModelBarDataMappingPrivate::~QItemModelBarDataMappingPrivate()
 {
 }
+
 
 QT_DATAVIS3D_END_NAMESPACE
 

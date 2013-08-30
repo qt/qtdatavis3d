@@ -20,19 +20,20 @@
 #define QITEMMODELSCATTERDATAMAPPING_H
 
 #include <QtDataVis3D/qdatavis3denums.h>
+#include <QtDataVis3D/qabstractdatamapping.h>
 #include <QObject>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QItemModelScatterDataMappingPrivate;
 
-class QT_DATAVIS3D_EXPORT QItemModelScatterDataMapping : public QObject
+class QT_DATAVIS3D_EXPORT QItemModelScatterDataMapping : public QAbstractDataMapping
 {
     Q_OBJECT
-    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY mappingChanged)
-    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY mappingChanged)
-    Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY mappingChanged)
-    //Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
+    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole)
+    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole)
+    Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole)
+    //Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
 
 public:
     explicit QItemModelScatterDataMapping(QObject *parent = 0);
@@ -54,11 +55,12 @@ public:
     void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole,
                const QString &valueRole);
 
-signals:
-    void mappingChanged();
+protected:
+    QItemModelScatterDataMappingPrivate *dptr();
+    const QItemModelScatterDataMappingPrivate *dptrc() const;
 
 private:
-    QScopedPointer<QItemModelScatterDataMappingPrivate> d_ptr;
+    Q_DISABLE_COPY(QItemModelScatterDataMapping)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

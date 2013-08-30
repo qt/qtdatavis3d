@@ -38,8 +38,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * Constructs QItemModelScatterDataMapping with the given \a parent.
  */
 QItemModelScatterDataMapping::QItemModelScatterDataMapping(QObject *parent)
-    : QObject(parent),
-      d_ptr(new QItemModelScatterDataMappingPrivate(this))
+    : QAbstractDataMapping(new QItemModelScatterDataMappingPrivate(this), parent)
 {
 }
 
@@ -52,13 +51,12 @@ QItemModelScatterDataMapping::QItemModelScatterDataMapping(const QString &xPosRo
                                                            const QString &zPosRole,
                                                            const QString &valueRole,
                                                            QObject *parent)
-    : QObject(parent),
-      d_ptr(new QItemModelScatterDataMappingPrivate(this))
+    : QAbstractDataMapping(new QItemModelScatterDataMappingPrivate(this), parent)
 {
     Q_UNUSED(valueRole);
-    d_ptr->m_xPosRole = xPosRole;
-    d_ptr->m_yPosRole = yPosRole;
-    d_ptr->m_zPosRole = zPosRole;
+    dptr()->m_xPosRole = xPosRole;
+    dptr()->m_yPosRole = yPosRole;
+    dptr()->m_zPosRole = zPosRole;
     //d_ptr->m_valueRole = valueRole;
 }
 
@@ -76,13 +74,13 @@ QItemModelScatterDataMapping::~QItemModelScatterDataMapping()
  */
 void QItemModelScatterDataMapping::setXPosRole(const QString &role)
 {
-    d_ptr->m_xPosRole = role;
+    dptr()->m_xPosRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelScatterDataMapping::xPosRole() const
 {
-    return d_ptr->m_xPosRole;
+    return dptrc()->m_xPosRole;
 }
 
 /*!
@@ -92,13 +90,13 @@ QString QItemModelScatterDataMapping::xPosRole() const
  */
 void QItemModelScatterDataMapping::setYPosRole(const QString &role)
 {
-    d_ptr->m_yPosRole = role;
+    dptr()->m_yPosRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelScatterDataMapping::yPosRole() const
 {
-    return d_ptr->m_yPosRole;
+    return dptrc()->m_yPosRole;
 }
 
 /*!
@@ -108,13 +106,13 @@ QString QItemModelScatterDataMapping::yPosRole() const
  */
 void QItemModelScatterDataMapping::setZPosRole(const QString &role)
 {
-    d_ptr->m_zPosRole = role;
+    dptr()->m_zPosRole = role;
     emit mappingChanged();
 }
 
 QString QItemModelScatterDataMapping::zPosRole() const
 {
-    return d_ptr->m_zPosRole;
+    return dptrc()->m_zPosRole;
 }
 
 //void QItemModelScatterDataMapping::setValueRole(const QString &role)
@@ -137,20 +135,29 @@ void QItemModelScatterDataMapping::remap(const QString &xPosRole, const QString 
                                          const QString &zPosRole, const QString &valueRole)
 {
     Q_UNUSED(valueRole);
-    d_ptr->m_xPosRole = xPosRole;
-    d_ptr->m_yPosRole = yPosRole;
-    d_ptr->m_zPosRole = zPosRole;
+    dptr()->m_xPosRole = xPosRole;
+    dptr()->m_yPosRole = yPosRole;
+    dptr()->m_zPosRole = zPosRole;
     //d_ptr->m_valueRole = valueRole;
 
     emit mappingChanged();
+}
+
+QItemModelScatterDataMappingPrivate *QItemModelScatterDataMapping::dptr()
+{
+    return static_cast<QItemModelScatterDataMappingPrivate *>(d_ptr.data());
+}
+
+const QItemModelScatterDataMappingPrivate *QItemModelScatterDataMapping::dptrc() const
+{
+    return static_cast<const QItemModelScatterDataMappingPrivate *>(d_ptr.data());
 }
 
 // QItemModelScatterDataMappingPrivate
 
 QItemModelScatterDataMappingPrivate::QItemModelScatterDataMappingPrivate(
         QItemModelScatterDataMapping *q)
-    : QObject(0),
-      q_ptr(q)
+    : QAbstractDataMappingPrivate(q, QAbstractDataProxy::DataTypeScatter)
 {
 }
 

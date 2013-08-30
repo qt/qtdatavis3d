@@ -48,7 +48,7 @@ QItemModelMapDataProxy::QItemModelMapDataProxy(QAbstractItemModel *itemModel,
     QMapDataProxy(new QItemModelMapDataProxyPrivate(this))
 {
     dptr()->setItemModel(itemModel);
-    dptr()->setMapping(mapping);
+    dptr()->setActiveMapping(mapping);
 }
 
 /*!
@@ -64,30 +64,30 @@ QItemModelMapDataProxy::~QItemModelMapDataProxy()
  * Defines item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
-void QItemModelMapDataProxy::setItemModel(QAbstractItemModel *itemModel)
+void QItemModelMapDataProxy::setItemModel(const QAbstractItemModel *itemModel)
 {
     dptr()->setItemModel(itemModel);
 }
 
-QAbstractItemModel *QItemModelMapDataProxy::itemModel()
+const QAbstractItemModel *QItemModelMapDataProxy::itemModel() const
 {
-    return dptr()->m_itemModel.data();
+    return dptrc()->m_itemModel.data();
 }
 
 /*!
- * \property QItemModelMapDataProxy::mapping
+ * \property QItemModelMapDataProxy::activeMapping
  *
  * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
  * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
  */
-void QItemModelMapDataProxy::setMapping(QItemModelMapDataMapping *mapping)
+void QItemModelMapDataProxy::setActiveMapping(QItemModelMapDataMapping *mapping)
 {
-    dptr()->setMapping(mapping);
+    dptr()->setActiveMapping(mapping);
 }
 
-QItemModelMapDataMapping *QItemModelMapDataProxy::mapping()
+QItemModelMapDataMapping *QItemModelMapDataProxy::activeMapping() const
 {
-    return dptr()->m_mapping.data();
+    return dptrc()->m_mapping;
 }
 
 /*!
@@ -98,10 +98,16 @@ QItemModelMapDataProxyPrivate *QItemModelMapDataProxy::dptr()
     return static_cast<QItemModelMapDataProxyPrivate *>(d_ptr.data());
 }
 
+const QItemModelMapDataProxyPrivate *QItemModelMapDataProxy::dptrc() const
+{
+    return static_cast<const QItemModelMapDataProxyPrivate *>(d_ptr.data());
+}
+
 // QItemModelMapDataProxyPrivate
 
 QItemModelMapDataProxyPrivate::QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q)
     : QMapDataProxyPrivate(q),
+      m_mapping(0),
       resolvePending(0)
 {
     m_resolveTimer.setSingleShot(true);
@@ -113,7 +119,7 @@ QItemModelMapDataProxyPrivate::~QItemModelMapDataProxyPrivate()
 {
 }
 
-void QItemModelMapDataProxyPrivate::setItemModel(QAbstractItemModel *itemModel)
+void QItemModelMapDataProxyPrivate::setItemModel(const QAbstractItemModel *itemModel)
 {
     if (!m_itemModel.isNull())
         QObject::disconnect(m_itemModel, 0, this, 0);
@@ -144,17 +150,17 @@ void QItemModelMapDataProxyPrivate::setItemModel(QAbstractItemModel *itemModel)
         m_resolveTimer.start(0);
 }
 
-void QItemModelMapDataProxyPrivate::setMapping(QItemModelMapDataMapping *mapping)
+void QItemModelMapDataProxyPrivate::setActiveMapping(QItemModelMapDataMapping *mapping)
 {
-    if (!m_mapping.isNull()) {
-        QObject::disconnect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged,
+    if (m_mapping) {
+        QObject::disconnect(m_mapping, &QItemModelMapDataMapping::mappingChanged,
                             this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
     }
 
     m_mapping = mapping;
 
-    if (!m_mapping.isNull()) {
-        QObject::connect(m_mapping.data(), &QItemModelMapDataMapping::mappingChanged,
+    if (m_mapping) {
+        QObject::connect(m_mapping, &QItemModelMapDataMapping::mappingChanged,
                          this, &QItemModelMapDataProxyPrivate::handleMappingChanged);
     }
 
@@ -288,7 +294,7 @@ void QItemModelMapDataProxyPrivate::handlePendingResolve()
 // Resolve entire item model into QMapDataArray.
 void QItemModelMapDataProxyPrivate::resolveModel()
 {
-    if (m_itemModel.isNull() || m_mapping.isNull()) {
+    if (m_itemModel.isNull() || !m_mapping) {
         qptr()->resetArray(0);
         return;
     }

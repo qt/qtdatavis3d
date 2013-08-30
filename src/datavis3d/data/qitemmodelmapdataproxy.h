@@ -31,22 +31,23 @@ class QItemModelMapDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelMapDataProxy : public QMapDataProxy
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
-    Q_PROPERTY(QItemModelMapDataMapping* mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelMapDataMapping* activeMapping READ activeMapping WRITE setActiveMapping)
 
 public:
     explicit QItemModelMapDataProxy();
     explicit QItemModelMapDataProxy(QAbstractItemModel *itemModel, QItemModelMapDataMapping *mapping);
     virtual ~QItemModelMapDataProxy();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    QAbstractItemModel *itemModel();
+    void setItemModel(const QAbstractItemModel *itemModel);
+    const QAbstractItemModel *itemModel() const;
 
-    void setMapping(QItemModelMapDataMapping *mapping);
-    QItemModelMapDataMapping *mapping();
+    void setActiveMapping(QItemModelMapDataMapping *mapping);
+    QItemModelMapDataMapping *activeMapping() const;
 
 protected:
     QItemModelMapDataProxyPrivate *dptr();
+    const QItemModelMapDataProxyPrivate *dptrc() const;
 
 private:
     Q_DISABLE_COPY(QItemModelMapDataProxy)

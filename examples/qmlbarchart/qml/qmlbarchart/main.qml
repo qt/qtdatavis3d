@@ -27,11 +27,14 @@ Item {
     height: 600
     visible: true
 
+
     Item {
         id: dataView
         width: parent.width - tableView.width
         height: parent.height
         anchors.right: parent.right;
+
+        property point storedSelection: Qt.point(-1, -1)
 
         BarDataMapping {
             id: valueMapping
@@ -138,7 +141,7 @@ Item {
 
             onDataResolved: {
                 // Can't select a bar until data has been resolved from model to proxy
-                //selectedBarPos = Qt.point(0, 5)
+                selectedBarPos = dataView.storedSelection
             }
         }
 
@@ -177,6 +180,7 @@ Item {
                 text = "Show Income"
                 testchart.valueAxis = expensesAxis
             }
+            dataView.storedSelection = testchart.selectedBarPos
         }
     }
 

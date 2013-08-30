@@ -40,7 +40,7 @@ Q_DECLARE_METATYPE(DeclarativeScatter *)
 Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
 Q_DECLARE_METATYPE(QItemModelMapDataMapping *)
 Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
-Q_DECLARE_METATYPE(QAbstractItemModel *)
+Q_DECLARE_METATYPE(const QAbstractItemModel *)
 Q_DECLARE_METATYPE(QDataVis *)
 
 Q_DECLARE_METATYPE(QAbstractAxis *)

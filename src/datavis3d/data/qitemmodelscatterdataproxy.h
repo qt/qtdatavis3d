@@ -31,23 +31,27 @@ class QItemModelScatterDataProxyPrivate;
 class QT_DATAVIS3D_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
-    Q_PROPERTY(QItemModelScatterDataMapping* mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel)
+    Q_PROPERTY(QItemModelScatterDataMapping* activeMapping READ activeMapping WRITE setActiveMapping)
 
 public:
     explicit QItemModelScatterDataProxy();
-    explicit QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
+    explicit QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
                                         QItemModelScatterDataMapping *mapping);
     virtual ~QItemModelScatterDataProxy();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    QAbstractItemModel *itemModel();
+    void setItemModel(const QAbstractItemModel *itemModel);
+    const QAbstractItemModel *itemModel() const;
 
-    void setMapping(QItemModelScatterDataMapping *mapping);
-    QItemModelScatterDataMapping *mapping();
+    void setActiveMapping(QItemModelScatterDataMapping *mapping);
+    QItemModelScatterDataMapping *activeMapping() const;
+    void addMapping(QItemModelScatterDataMapping *mapping);
+    void releaseMapping(QItemModelScatterDataMapping *mapping);
+    QList<QItemModelScatterDataMapping *> mappings() const;
 
 protected:
     QItemModelScatterDataProxyPrivate *dptr();
+    const QItemModelScatterDataProxyPrivate *dptrc() const;
 
 private:
     Q_DISABLE_COPY(QItemModelScatterDataProxy)

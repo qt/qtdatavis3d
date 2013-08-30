@@ -57,6 +57,7 @@ signals:
     void mappingChanged();
 
 private:
+    Q_DISABLE_COPY(QItemModelMapDataMapping)
     QScopedPointer<QItemModelMapDataMappingPrivate> d_ptr;
 };
 

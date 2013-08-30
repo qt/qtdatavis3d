@@ -20,20 +20,21 @@
 #define QITEMMODELBARDATAMAPPING_H
 
 #include <QtDataVis3D/qdatavis3denums.h>
+#include <QtDataVis3D/qabstractdatamapping.h>
 #include <QStringList>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class QItemModelBarDataMappingPrivate;
 
-class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QObject
+class QT_DATAVIS3D_EXPORT QItemModelBarDataMapping : public QAbstractDataMapping
 {
     Q_OBJECT
-    Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY mappingChanged)
-    Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY mappingChanged)
-    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY mappingChanged)
-    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY mappingChanged)
-    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY mappingChanged)
+    Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole)
+    Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole)
+    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
 
 public:
     explicit QItemModelBarDataMapping(QObject *parent = 0);
@@ -63,13 +64,13 @@ public:
                const QString &valueRole, const QStringList &rowCategories,
                const QStringList &columnCategories);
 
-signals:
-    void mappingChanged();
+protected:
+    QItemModelBarDataMappingPrivate *dptr();
+    const QItemModelBarDataMappingPrivate *dptrc() const;
 
 private:
-    QScopedPointer<QItemModelBarDataMappingPrivate> d_ptr;
+    Q_DISABLE_COPY(QItemModelBarDataMapping)
 };
-
 
 QT_DATAVIS3D_END_NAMESPACE
 

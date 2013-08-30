@@ -43,8 +43,8 @@ public:
     QItemModelMapDataProxyPrivate(QItemModelMapDataProxy *q);
     virtual ~QItemModelMapDataProxyPrivate();
 
-    void setItemModel(QAbstractItemModel *itemModel);
-    void setMapping(QItemModelMapDataMapping *mapping);
+    void setItemModel(const QAbstractItemModel *itemModel);
+    void setActiveMapping(QItemModelMapDataMapping *mapping);
 
 public slots:
     void handleColumnsInserted(const QModelIndex &parent, int start, int end);
@@ -68,8 +68,8 @@ private:
     void resolveModel();
     QItemModelMapDataProxy *qptr();
 
-    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
-    QPointer<QItemModelMapDataMapping> m_mapping; // Not owned
+    QPointer<const QAbstractItemModel> m_itemModel;  // Not owned
+    QItemModelMapDataMapping *m_mapping;
     bool resolvePending;
     QTimer m_resolveTimer;
 

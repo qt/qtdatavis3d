@@ -46,7 +46,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeBars : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractItemModel *data READ data WRITE setData)
+    Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
     Q_PROPERTY(QCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
     Q_PROPERTY(QValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
@@ -97,8 +97,8 @@ public:
     Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
 
     // Add whole data set.
-    void setData(QAbstractItemModel *data);
-    QAbstractItemModel *data();
+    void setData(const QAbstractItemModel *data);
+    const QAbstractItemModel *data() const;
 
     QItemModelBarDataMapping *mapping() const;
     void setMapping(QItemModelBarDataMapping *mapping);
