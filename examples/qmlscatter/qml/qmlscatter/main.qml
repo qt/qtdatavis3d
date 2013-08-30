@@ -17,13 +17,11 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
 import com.digia.QtDataVis3D 1.0
+import "."
 
 Item {
     id: mainview
-    width: 800
-    height: 700
     visible: true
 
     Item {
@@ -89,123 +87,80 @@ Item {
         }
     }
 
-    Rectangle {
+    Button {
         id: shadowToggle
-        width: 120
-        height: 30
-
-        TextArea {
-            id: shadowText
-            text: "Toggle Shadows On"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.shadowQuality === Scatter3D.ShadowNone) {
-                    testscatter.shadowQuality = Scatter3D.ShadowMedium;
-                    shadowText.text = "Toggle Shadows Off";
-                } else {
-                    testscatter.shadowQuality = Scatter3D.ShadowNone;
-                    shadowText.text = "Toggle Shadows On";
-                }
+        width: parent.width / 5
+        text: "Toggle Shadows On"
+        onClicked: {
+            if (testscatter.shadowQuality === Scatter3D.ShadowNone) {
+                testscatter.shadowQuality = Scatter3D.ShadowMedium;
+                text = "Toggle Shadows Off";
+            } else {
+                testscatter.shadowQuality = Scatter3D.ShadowNone;
+                text = "Toggle Shadows On";
             }
         }
     }
-    Rectangle {
+
+    Button {
         id: smoothToggle
-        width: 140
-        height: 30
+        width: parent.width / 5
+        defaultColor: "gainsboro"
+        text: "Toggle Smooth Objects On"
         anchors.left: shadowToggle.right
-
-        TextArea {
-            id: smoothText
-            text: "Toggle Smooth Objects On"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.objectSmooth === false) {
-                    smoothText.text = "Toggle Smooth Objects Off"
-                    testscatter.objectSmooth = true;
-                } else {
-                    smoothText.text = "Toggle Smooth Objects On"
-                    testscatter.objectSmooth = false;
-                }
+        onClicked: {
+            if (testscatter.objectSmooth === false) {
+                text = "Toggle Smooth Objects Off"
+                testscatter.objectSmooth = true;
+            } else {
+                text = "Toggle Smooth Objects On"
+                testscatter.objectSmooth = false;
             }
         }
     }
-    Rectangle {
+
+    Button {
         id: cameraToggle
-        width: 130
-        height: 30
+        width: parent.width / 5
+        text: "Toggle Camera Preset"
         anchors.left: smoothToggle.right
-
-        TextArea {
-            text: "Toggle Camera Preset"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.cameraPreset === Scatter3D.PresetFront) {
-                    testscatter.cameraPreset = Scatter3D.PresetIsometricRightHigh;
-                } else {
-                    testscatter.cameraPreset = Scatter3D.PresetFront;
-                }
+        onClicked: {
+            if (testscatter.cameraPreset === Scatter3D.PresetFront) {
+                testscatter.cameraPreset = Scatter3D.PresetIsometricRightHigh;
+            } else {
+                testscatter.cameraPreset = Scatter3D.PresetFront;
             }
         }
     }
-    Rectangle {
+
+    Button {
         id: themeToggle
-        width: 120
-        height: 30
+        width: parent.width / 5
+        defaultColor: "gainsboro"
+        text: "Toggle Theme"
         anchors.left: cameraToggle.right
-
-        TextArea {
-            text: "Toggle Theme"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.theme === Scatter3D.ThemeBlueCerulean) {
-                    testscatter.theme = Scatter3D.ThemeSystem;
-                } else {
-                    testscatter.theme = Scatter3D.ThemeBlueCerulean;
-                }
+        onClicked: {
+            if (testscatter.theme === Scatter3D.ThemeBlueCerulean) {
+                testscatter.theme = Scatter3D.ThemeSystem;
+            } else {
+                testscatter.theme = Scatter3D.ThemeBlueCerulean;
             }
         }
     }
-    Rectangle {
+
+    Button {
         id: backgroundToggle
-        width: 130
-        height: 30
+        width: parent.width / 5
+        text: "Toggle Background Off"
         anchors.left: themeToggle.right
-
-        TextArea {
-            id: backgroundText
-            text: "Toggle Background Off"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.backgroundVisible === true) {
-                    testscatter.backgroundVisible = false;
-                    backgroundText.text = "Toggle Background On";
-                } else {
-                    testscatter.backgroundVisible = true;
-                    backgroundText.text = "Toggle Background Off";
-                }
+        onClicked: {
+            if (testscatter.backgroundVisible === true) {
+                testscatter.backgroundVisible = false;
+                text = "Toggle Background On";
+            } else {
+                testscatter.backgroundVisible = true;
+                text = "Toggle Background Off";
             }
         }
     }
-
 }
