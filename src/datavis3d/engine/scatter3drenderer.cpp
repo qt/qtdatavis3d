@@ -43,6 +43,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
+const GLfloat labelMargin = 0.05f;
 // TODO: Make margin modifiable?
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat gridLineWidth = 0.005f;
@@ -543,11 +544,15 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
         depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
+#if 0
         QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
         QVector3D heightColor =
                 Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.translation().y();
 
         QVector3D dotColor = baseColor + heightColor;
+#else
+        QVector3D dotColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+#endif
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
         if (m_cachedSelectionMode > QDataVis::ModeNone && (selectedIndex == dot)) {
@@ -1124,10 +1129,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
                 GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                        / m_scaleFactor;
+                        / m_scaleFactor + labelMargin;
 #else // ..and this if we want uniform scaling based on largest dimension
             if (axisCacheMax->labelItems().size() > labelNbr) {
-                GLfloat labelXTrans = aspectRatio * backgroundMargin;
+                GLfloat labelXTrans = aspectRatio * backgroundMargin + labelMargin;
 #endif
                 GLfloat labelYTrans = -backgroundMargin;
                 GLfloat rotLabelX = -90.0f;
@@ -1185,10 +1190,10 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             if (m_axisCacheX.labelItems().size() > labelNbr) {
                 GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                        / m_scaleFactor;
+                        / m_scaleFactor + labelMargin;
 #else // ..and this if we want uniform scaling based on largest dimension
             if (axisCacheMax->labelItems().size() > labelNbr) {
-                GLfloat labelZTrans = aspectRatio * backgroundMargin;
+                GLfloat labelZTrans = aspectRatio * backgroundMargin + labelMargin;
 #endif
                 GLfloat labelYTrans = -backgroundMargin;
                 GLfloat rotLabelX = -90.0f;
@@ -1245,6 +1250,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 GLfloat labelXTrans = aspectRatio * backgroundMargin;
                 GLfloat labelZTrans = labelXTrans;
 #endif
+                GLfloat labelMarginXTrans = labelMargin;
+                GLfloat labelMarginZTrans = labelMargin;
                 GLfloat labelYTrans = labelPos / m_heightNormalizer;
                 GLfloat rotLabelX = 0.0f;
                 GLfloat rotLabelY = -90.0f;
@@ -1252,17 +1259,20 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 Qt::AlignmentFlag alignment = Qt::AlignLeft;
                 if (!m_xFlipped) {
                     labelXTrans = -labelXTrans;
+                    labelMarginXTrans = -labelMargin;
                     rotLabelY = 90.0f;
                 }
                 if (m_zFlipped) {
                     labelZTrans = -labelZTrans;
+                    labelMarginZTrans = -labelMargin;
                     alignment = Qt::AlignRight;
                 }
 
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
                 // Back wall
-                QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, labelZTrans + zComp);
+                QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans,
+                                                 labelZTrans + labelMarginZTrans + zComp);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1283,7 +1293,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 else
                     rotLabelY = 0.0f;
 
-                labelTrans = QVector3D(-labelXTrans, labelYTrans, -labelZTrans + zComp);
+                labelTrans = QVector3D(-labelXTrans - labelMarginXTrans, labelYTrans,
+                                       -labelZTrans + zComp);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);

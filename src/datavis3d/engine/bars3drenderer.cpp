@@ -43,6 +43,7 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
+const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
@@ -271,10 +272,14 @@ void Bars3DRenderer::drawSlicedScene(CameraHelper *camera,
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
+#if 0
         QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
         QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item->height();
 
         QVector3D barColor = baseColor + heightColor;
+#else
+        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+#endif
 
         if (item->height() != 0) {
             // Set shader bindings
@@ -739,12 +744,16 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
 #endif
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
+#if 0
             QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
             QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
             QVector3D depthColor = Utils::vectorFromColor(m_cachedTheme.m_depthColor)
                                    * (float(row) / GLfloat(m_cachedRowCount));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
+#else
+            QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+#endif
 
             GLfloat lightStrength = m_cachedTheme.m_lightStrength;
 
@@ -1173,7 +1182,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
-            colPos = m_rowWidth;
+            colPos = (m_rowWidth / m_scaleFactor) + labelMargin;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1181,7 +1190,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             if (m_zFlipped)
                 rotLabelY = 180.0f;
             if (m_xFlipped) {
-                colPos = -m_rowWidth;
+                colPos = -(m_rowWidth / m_scaleFactor) - labelMargin;
                 alignment = Qt::AlignLeft;
             }
             if (m_yFlipped) {
@@ -1191,7 +1200,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
                     rotLabelY = 180.0f;
                 rotLabelZ = 180.0f;
             }
-            QVector3D labelPos = QVector3D(colPos / m_scaleFactor,
+            QVector3D labelPos = QVector3D(colPos,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
                                            (m_columnDepth - rowPos) / m_scaleFactor + zComp);
 
@@ -1213,7 +1222,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             colPos = (column + 0.5f) * m_cachedBarSpacing.width();
-            rowPos = m_columnDepth;
+            rowPos = (m_columnDepth / m_scaleFactor) + labelMargin;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
             GLfloat rotLabelZ = 0.0f;
@@ -1221,7 +1230,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             if (m_xFlipped)
                 rotLabelY = -90.0f;
             if (m_zFlipped) {
-                rowPos = -m_columnDepth;
+                rowPos = -(m_columnDepth / m_scaleFactor) - labelMargin;
                 alignment = Qt::AlignRight;
             }
             if (m_yFlipped) {
@@ -1233,7 +1242,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             }
             QVector3D labelPos = QVector3D((colPos - m_rowWidth) / m_scaleFactor,
                                            -m_yAdjustment + 0.005f, // raise a bit over background to avoid depth "glimmering"
-                                           rowPos / m_scaleFactor + zComp);
+                                           rowPos + zComp);
 
             m_dummyBarRenderItem.setTranslation(labelPos);
             const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(column);
@@ -1258,6 +1267,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
 
     for (int i = 0; i < labelCount; i++) {
         if (m_axisCacheY.labelItems().size() > labelNbr) {
+            GLfloat labelMarginXTrans = labelMargin;
+            GLfloat labelMarginZTrans = labelMargin;
             GLfloat labelXTrans = m_rowWidth / m_scaleFactor;
             GLfloat labelZTrans = m_columnDepth / m_scaleFactor;
             GLfloat labelYTrans = 2.0f * labelPos / m_heightNormalizer - m_yAdjustment;
@@ -1267,17 +1278,20 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             Qt::AlignmentFlag alignment = Qt::AlignLeft;
             if (!m_xFlipped) {
                 labelXTrans = -labelXTrans;
+                labelMarginXTrans = -labelMargin;
                 rotLabelY = 90.0f;
             }
             if (m_zFlipped) {
                 labelZTrans = -labelZTrans;
+                labelMarginZTrans = -labelMargin;
                 alignment = Qt::AlignRight;
             }
 
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
             // Back wall
-            QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, labelZTrans + zComp);
+            QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans,
+                                             labelZTrans + labelMarginZTrans + zComp);
 
             //qDebug() << "labelPos, value:" << labelTrans;
 
@@ -1299,7 +1313,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             else
                 rotLabelY = 0.0f;
 
-            labelTrans = QVector3D(-labelXTrans, labelYTrans, -labelZTrans + zComp);
+            labelTrans = QVector3D(-labelXTrans - labelMarginXTrans, labelYTrans,
+                                   -labelZTrans + zComp);
 
             m_dummyBarRenderItem.setTranslation(labelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,

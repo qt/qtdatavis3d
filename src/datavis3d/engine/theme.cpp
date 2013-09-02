@@ -241,8 +241,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         break;
     }
     case QDataVis::ThemeHighContrast: {
-        m_baseColor = QColor(QRgb(0x202020));
-        m_heightColor = QColor(QRgb(0xff4a41));
+        m_baseColor = QColor(QRgb(0xff4a41));
+        m_heightColor = QColor(QRgb(0x202020));
         m_depthColor = QColor(QRgb(0x596a74));
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0x000000));
