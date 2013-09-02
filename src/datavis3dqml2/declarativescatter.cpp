@@ -58,12 +58,12 @@ void DeclarativeScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quali
 
 void DeclarativeScatter::classBegin()
 {
-    qDebug() << "classBegin";
+    //qDebug() << "classBegin";
 }
 
 void DeclarativeScatter::componentComplete()
 {
-    qDebug() << "componentComplete";
+    //qDebug() << "componentComplete";
 }
 
 QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -297,6 +297,21 @@ void DeclarativeScatter::setItemLabelFormat(const QString &format)
 QString DeclarativeScatter::itemLabelFormat()
 {
     return m_shared->activeDataProxy()->itemLabelFormat();
+}
+
+void DeclarativeScatter::mouseDoubleClickEvent(QMouseEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->mouseDoubleClickEvent(event);
+#endif
+}
+
+void DeclarativeScatter::touchEvent(QTouchEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->touchEvent(event);
+    update();
+#endif
 }
 
 void DeclarativeScatter::mousePressEvent(QMouseEvent *event)

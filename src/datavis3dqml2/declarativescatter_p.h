@@ -157,6 +157,8 @@ protected:
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
     void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void touchEvent(QTouchEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

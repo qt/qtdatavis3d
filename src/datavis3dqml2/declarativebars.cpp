@@ -63,12 +63,12 @@ void DeclarativeBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 
 void DeclarativeBars::classBegin()
 {
-    qDebug() << "classBegin";
+    //qDebug() << "classBegin";
 }
 
 void DeclarativeBars::componentComplete()
 {
-    qDebug() << "componentComplete";
+    //qDebug() << "componentComplete";
 }
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -363,6 +363,21 @@ void DeclarativeBars::setSelectedBarPos(const QPoint &position)
 QPoint DeclarativeBars::selectedBarPos() const
 {
     return m_shared->selectedBarPos();
+}
+
+void DeclarativeBars::mouseDoubleClickEvent(QMouseEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->mouseDoubleClickEvent(event);
+#endif
+}
+
+void DeclarativeBars::touchEvent(QTouchEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->touchEvent(event);
+    update();
+#endif
 }
 
 void DeclarativeBars::mousePressEvent(QMouseEvent *event)

@@ -42,12 +42,12 @@ DeclarativeMaps::~DeclarativeMaps()
 
 void DeclarativeMaps::classBegin()
 {
-    qDebug() << "classBegin";
+    //qDebug() << "classBegin";
 }
 
 void DeclarativeMaps::componentComplete()
 {
-    qDebug() << "componentComplete";
+    //qDebug() << "componentComplete";
 }
 
 QSGNode *DeclarativeMaps::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -188,6 +188,21 @@ QItemModelMapDataMapping *DeclarativeMaps::mapping() const
 void DeclarativeMaps::setMapping(QItemModelMapDataMapping *mapping)
 {
     static_cast<QItemModelMapDataProxy *>(m_shared->dataProxy())->setMapping(mapping);
+}
+
+void DeclarativeMaps::mouseDoubleClickEvent(QMouseEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->mouseDoubleClickEvent(event);
+#endif
+}
+
+void DeclarativeMaps::touchEvent(QTouchEvent *event)
+{
+#if defined(Q_OS_ANDROID)
+    m_shared->touchEvent(event);
+    update();
+#endif
 }
 
 void DeclarativeMaps::mousePressEvent(QMouseEvent *event)

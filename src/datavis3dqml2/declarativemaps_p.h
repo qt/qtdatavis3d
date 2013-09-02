@@ -121,6 +121,8 @@ protected:
 
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void touchEvent(QTouchEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
