@@ -29,7 +29,10 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * \since 1.0.0
  *
  * QItemModelBarDataProxy allows you to use QAbstractItemModel derived models as a data source
- * for Q3DBars. It maps roles defined in QItemModelBarDataMapping to roles in the model.
+ * for Q3DBars. It uses QItemModelBarDataMapping instance to map data from the model to Q3DBars
+ * graph.
+ *
+ * \sa QItemModelBarDataMapping
  */
 
 /*!
@@ -77,10 +80,10 @@ const QAbstractItemModel *QItemModelBarDataProxy::itemModel() const
 }
 
 /*!
- * \property QItemModelBarDataProxy::mapping
+ * \property QItemModelBarDataProxy::activeMapping
  *
- * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
- * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
+ * Defines data mapping. Proxy takes ownership of the \a mapping.
+ * Modifying a mapping that is set to the proxy will trigger data set re-resolving.
  */
 void QItemModelBarDataProxy::setActiveMapping(QItemModelBarDataMapping *mapping)
 {
@@ -92,16 +95,27 @@ QItemModelBarDataMapping *QItemModelBarDataProxy::activeMapping() const
     return static_cast<QItemModelBarDataMapping *>(dptrc()->m_itemModelHandler->activeMapping());
 }
 
+/*!
+ * Transfers the ownership of the \a mapping to this proxy. The mapping is not taken to use yet.
+ * \sa setActiveMapping(), releaseMapping()
+ */
 void QItemModelBarDataProxy::addMapping(QItemModelBarDataMapping *mapping)
 {
     dptr()->m_itemModelHandler->addMapping(mapping);
 }
 
+/*!
+ * Releases the ownership of the \a mapping back to the caller. If the mapping was the currently
+ * active one, no mapping remains active after this call.
+ */
 void QItemModelBarDataProxy::releaseMapping(QItemModelBarDataMapping *mapping)
 {
     dptr()->m_itemModelHandler->releaseMapping(mapping);
 }
 
+/*!
+ * \return list of mappings owned by the proxy.
+ */
 QList<QItemModelBarDataMapping *> QItemModelBarDataProxy::mappings() const
 {
     QList<QItemModelBarDataMapping *> retList;
@@ -120,6 +134,9 @@ QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptr()
     return static_cast<QItemModelBarDataProxyPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptrc() const
 {
     return static_cast<const QItemModelBarDataProxyPrivate *>(d_ptr.data());

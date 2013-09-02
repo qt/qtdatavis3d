@@ -33,13 +33,11 @@ class QT_DATAVIS3D_EXPORT QItemModelScatterDataMapping : public QAbstractDataMap
     Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole)
     Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole)
-    //Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
 
 public:
     explicit QItemModelScatterDataMapping(QObject *parent = 0);
     QItemModelScatterDataMapping(const QString &xPosRole, const QString &yPosRole,
-                                 const QString &zPosRole, const QString &valueRole,
-                                 QObject *parent = 0);
+                                 const QString &zPosRole, QObject *parent = 0);
     virtual ~QItemModelScatterDataMapping();
 
     void setXPosRole(const QString &role);
@@ -48,12 +46,8 @@ public:
     QString yPosRole() const;
     void setZPosRole(const QString &role);
     QString zPosRole() const;
-    // TODO: This is a placeholder for scatter item size
-    //void setValueRole(const QString &role);
-    //QString valueRole() const;
 
-    void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole,
-               const QString &valueRole);
+    void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole);
 
 protected:
     QItemModelScatterDataMappingPrivate *dptr();

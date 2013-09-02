@@ -23,10 +23,12 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 /*!
  * \class QAbstractDataMapping
  * \inmodule QtDataVis3D
- * \brief Abstract base class for data mappings
+ * \brief Abstract base class for QtDataVis3D data mapping classes.
  * \since 1.0.0
  *
- * Data mapping classes provide a way to map data from one data source to another.
+ * Data mapping classes provide a way to map data from an external data source to one of
+ * QtDataVis3D data proxies.
+ * \sa QItemModelBarDataMapping, QItemModelScatterDataMapping
  */
 
 /*!
@@ -44,6 +46,12 @@ QAbstractDataMapping::QAbstractDataMapping(QAbstractDataMappingPrivate *d, QObje
 QAbstractDataMapping::~QAbstractDataMapping()
 {
 }
+
+/*!
+ * \fn void QAbstractDataMapping::mappingChanged()
+ *
+ * Emitted when any mapping has changed.
+ */
 
 // QItemModelBarDataMappingPrivate
 

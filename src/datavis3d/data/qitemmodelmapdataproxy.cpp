@@ -77,8 +77,8 @@ const QAbstractItemModel *QItemModelMapDataProxy::itemModel() const
 /*!
  * \property QItemModelMapDataProxy::activeMapping
  *
- * Defines data mapping. Does not take ownership of the mapping, but does connect to it to listen
- * for changes. Modifying a mapping that is set to the proxy will trigger data set re-resolving.
+ * Defines data mapping. Proxy takes ownership of the \a mapping.
+ * Modifying a mapping that is set to the proxy will trigger data set re-resolving.
  */
 void QItemModelMapDataProxy::setActiveMapping(QItemModelMapDataMapping *mapping)
 {
@@ -98,6 +98,9 @@ QItemModelMapDataProxyPrivate *QItemModelMapDataProxy::dptr()
     return static_cast<QItemModelMapDataProxyPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QItemModelMapDataProxyPrivate *QItemModelMapDataProxy::dptrc() const
 {
     return static_cast<const QItemModelMapDataProxyPrivate *>(d_ptr.data());

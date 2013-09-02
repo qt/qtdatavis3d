@@ -34,8 +34,6 @@ public:
     explicit QAbstractDataMapping(QAbstractDataMappingPrivate *d, QObject *parent = 0);
     virtual ~QAbstractDataMapping();
 
-    QAbstractDataProxy::DataType type() const;
-
 signals:
     void mappingChanged();
 

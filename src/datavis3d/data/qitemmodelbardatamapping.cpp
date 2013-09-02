@@ -26,10 +26,22 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  * \brief Data model mapping for Q3DBars.
  * \since 1.0.0
  *
- * QItemModelBarDataMapping is used to define roles for mapping data in QAbstractItemModel to
- * Q3DBars.
+ * QItemModelBarDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
+ * of Q3DBars. There are two ways to use QItemModelBarDataMapping:
  *
- * TO BE CHECKED (add more explanations and/or example)
+ * 1) By default, the QItemModelBarDataMapping will map the rows and columns of QAbstractItemModel
+ *    to rows and columns of Q3DBars, and uses the value returned for Qt::DisplayRole as bar value.
+ *    The value role to be used can be redefined if Qt::DisplayRole is not suitable.
+ *
+ * 2) For models that do not have data already neatly sorted into rows and columns, such as
+ *    QAbstractListModel based models, you can define a list of categories for both rows and columns,
+ *    and define a role to map for each of row, column and value.
+ *    For example, assume that you have a custom QAbstractItemModel for storing various monthly values
+ *    related to a business.
+ *    Each item in the model has roles "year", "month", "income", and "expenses".
+ *    You could do the following to display the data in a bar chart:
+ *
+ *    \snippet doc_src_qtdatavis3d.cpp 3
  *
  * \sa QItemModelBarDataProxy
  */
@@ -160,8 +172,6 @@ QStringList QItemModelBarDataMapping::columnCategories() const
 /*!
  * Changes \a rowRole, \a columnRole, \a valueRole, \a rowCategories and \a columnCategories to the
  * mapping.
- *
- * Emits mappingChanged() signal after remapping.
  */
 void QItemModelBarDataMapping::remap(const QString &rowRole,
                                      const QString &columnRole,
@@ -178,11 +188,17 @@ void QItemModelBarDataMapping::remap(const QString &rowRole,
     emit mappingChanged();
 }
 
+/*!
+ * \internal
+ */
 QItemModelBarDataMappingPrivate *QItemModelBarDataMapping::dptr()
 {
     return static_cast<QItemModelBarDataMappingPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \internal
+ */
 const QItemModelBarDataMappingPrivate *QItemModelBarDataMapping::dptrc() const
 {
     return static_cast<const QItemModelBarDataMappingPrivate *>(d_ptr.data());
