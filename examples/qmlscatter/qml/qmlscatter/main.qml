@@ -24,49 +24,15 @@ Item {
     id: mainview
     visible: true
 
+    Data {
+        id: chartData
+    }
+
     Item {
         id: dataView
         width: parent.width
         height: parent.height - shadowToggle.height
         anchors.bottom: parent.bottom
-
-        ScatterDataMapping {
-            id: scatterMapping
-            xPosRole: "xPos"
-            yPosRole: "yPos"
-            zPosRole: "zPos"
-        }
-
-        ListModel {
-            id: dataModel
-            ListElement{ xPos: -10.0; yPos: 4.9; zPos: -5.0 }
-            ListElement{ xPos: 10.0; yPos: 4.9; zPos: -5.0 }
-            ListElement{ xPos: -10.0; yPos: 4.9; zPos: 5.0 }
-            ListElement{ xPos: 10.0; yPos: 4.9; zPos: 5.0 }
-            ListElement{ xPos: -10.0; yPos: -4.9; zPos: -5.0 }
-            ListElement{ xPos: 10.0; yPos: -4.9; zPos: -5.0 }
-            ListElement{ xPos: -10.0; yPos: -4.9; zPos: 5.0 }
-            ListElement{ xPos: 10.0; yPos: -4.9; zPos: 5.0 }
-
-            ListElement{ xPos: -1.0; yPos: 0.3; zPos: -0.5 }
-            ListElement{ xPos: 1.0; yPos: 2.105; zPos: 0.5 }
-            ListElement{ xPos: 0.5; yPos: -0.65; zPos: -0.5 }
-            ListElement{ xPos: -0.5; yPos: 1.225; zPos: 0.5 }
-            ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0 }
-            ListElement{ xPos: 0.0; yPos: 2.0; zPos: 0.0 }
-            ListElement{ xPos: 0.0; yPos: -0.5; zPos: 0.0 }
-
-            ListElement{ xPos: 6.0; yPos: 0.0; zPos: 4.0 }
-            ListElement{ xPos: 5.8; yPos: 0.2; zPos: 5.0 }
-            ListElement{ xPos: 5.6; yPos: 0.4; zPos: 4.5 }
-            ListElement{ xPos: 5.4; yPos: 0.6; zPos: 3.8 }
-            ListElement{ xPos: 5.2; yPos: 0.8; zPos: 4.8 }
-            ListElement{ xPos: 5.0; yPos: 0.3; zPos: 4.1 }
-            ListElement{ xPos: 4.9; yPos: -0.3; zPos: 4.9 }
-            ListElement{ xPos: 4.7; yPos: -0.5; zPos: 3.5 }
-            ListElement{ xPos: 4.5; yPos: -0.7; zPos: 3.3 }
-            ListElement{ xPos: 4.3; yPos: -0.4; zPos: 3.7 }
-        }
 
         Scatter3D {
             id: testscatter
@@ -74,15 +40,14 @@ Item {
             height: dataView.height
             font.family: "Times New Roman"
             font.pointSize: 40
-            mapping: scatterMapping
+            mapping: chartData.mapping
             shadowQuality: Scatter3D.ShadowNone
             selectionMode: Scatter3D.ModeItem
             labelTransparency: Scatter3D.TransparencyNoBackground
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
 
             Component.onCompleted: {
-                console.log("testscatter complete");
-                data = dataModel
+                data = chartData.model
             }
         }
     }

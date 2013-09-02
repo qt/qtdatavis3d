@@ -2,5 +2,7 @@
     <qresource prefix="/qml">
         <file alias="main.qml">qml/qmlbarchart/main.qml</file>
         <file alias="Button.qml">qml/qmlbarchart/button.qml</file>
+        <file alias="Data.qml">qml/qmlbarchart/data.qml</file>
+        <file alias="Axes.qml">qml/qmlbarchart/axes.qml</file>
     </qresource>
 </RCC>
