@@ -88,6 +88,7 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
+    GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_yAdjustment;
     GLfloat m_rowWidth;

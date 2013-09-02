@@ -107,9 +107,12 @@ public:
 
     enum ShadowQuality {
         ShadowNone = 0,
-        ShadowLow = 1,
-        ShadowMedium = 3,
-        ShadowHigh = 5
+        ShadowLow,
+        ShadowMedium,
+        ShadowHigh,
+        ShadowSoftLow,
+        ShadowSoftMedium,
+        ShadowSoftHigh
     };
 
     enum LabelTransparency {

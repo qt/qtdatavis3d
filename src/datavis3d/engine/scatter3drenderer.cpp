@@ -71,7 +71,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
-      m_shadowQualityToShader(33.3f),
+      m_shadowQualityToShader(100.0f),
+      m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
       m_selection(selectionSkipColor),
@@ -294,8 +295,8 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
         glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-                   m_mainViewPort.width() * m_cachedShadowQuality,
-                   m_mainViewPort.height() * m_cachedShadowQuality);
+                   m_mainViewPort.width() * m_shadowQualityMultiplier,
+                   m_mainViewPort.height() * m_shadowQualityMultiplier);
 
         // Enable drawing to framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -1403,20 +1404,35 @@ void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
 
 void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    qDebug() << __FUNCTION__ << quality;
     m_cachedShadowQuality = quality;
     switch (quality) {
     case QDataVis::ShadowLow:
         m_shadowQualityToShader = 33.3f;
+        m_shadowQualityMultiplier = 1;
         break;
     case QDataVis::ShadowMedium:
         m_shadowQualityToShader = 100.0f;
+        m_shadowQualityMultiplier = 3;
         break;
     case QDataVis::ShadowHigh:
         m_shadowQualityToShader = 200.0f;
+        m_shadowQualityMultiplier = 5;
+        break;
+    case QDataVis::ShadowSoftLow:
+        m_shadowQualityToShader = 5.0f;
+        m_shadowQualityMultiplier = 1;
+        break;
+    case QDataVis::ShadowSoftMedium:
+        m_shadowQualityToShader = 10.0f;
+        m_shadowQualityMultiplier = 3;
+        break;
+    case QDataVis::ShadowSoftHigh:
+        m_shadowQualityToShader = 15.0f;
+        m_shadowQualityMultiplier = 4;
         break;
     default:
         m_shadowQualityToShader = 0.0f;
+        m_shadowQualityMultiplier = 1;
         break;
     }
 
@@ -1560,7 +1576,7 @@ void Scatter3DRenderer::updateDepthBuffer()
     if (m_cachedShadowQuality > QDataVis::ShadowNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
-                                                             m_cachedShadowQuality);
+                                                             m_shadowQualityMultiplier);
         if (!m_depthTexture) {
             switch (m_cachedShadowQuality) {
             case QDataVis::ShadowHigh:
@@ -1575,6 +1591,21 @@ void Scatter3DRenderer::updateDepthBuffer()
                 break;
             case QDataVis::ShadowLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
+                break;
+            case QDataVis::ShadowSoftHigh:
+                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftMedium);
+                updateShadowQuality(QDataVis::ShadowSoftMedium);
+                break;
+            case QDataVis::ShadowSoftMedium:
+                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftLow);
+                updateShadowQuality(QDataVis::ShadowSoftLow);
+                break;
+            case QDataVis::ShadowSoftLow:
+                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
                 (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
                 updateShadowQuality(QDataVis::ShadowNone);
                 break;

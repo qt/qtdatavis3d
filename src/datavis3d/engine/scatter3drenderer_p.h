@@ -81,6 +81,7 @@ private:
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
+    GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     QVector3D m_selection;

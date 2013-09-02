@@ -154,6 +154,12 @@
            Shadows are rendered in medium quality.
     \value ShadowHigh
            Shadows are rendered in high quality.
+    \value ShadowSoftLow
+           Shadows are rendered in low quality with softened edges.
+    \value ShadowSoftMedium
+           Shadows are rendered in medium quality with softened edges.
+    \value ShadowSoftHigh
+           Shadows are rendered in high quality with softened edges.
 */
 
 /*!

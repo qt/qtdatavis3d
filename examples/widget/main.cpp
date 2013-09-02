@@ -181,7 +181,10 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low"));
     shadowQuality->addItem(QStringLiteral("Medium"));
     shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->setCurrentIndex(2);
+    shadowQuality->addItem(QStringLiteral("Low Soft"));
+    shadowQuality->addItem(QStringLiteral("Medium Soft"));
+    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->setCurrentIndex(5);
 
     vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);

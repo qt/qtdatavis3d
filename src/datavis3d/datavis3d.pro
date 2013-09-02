@@ -27,5 +27,6 @@ wince* {
 OTHER_FILES += doc/qtdatavis3d.qdocconf \
                doc/src/* \
                doc/images/* \
-               doc/snippets/*
+               doc/snippets/* \
+               global/*.qdoc
 

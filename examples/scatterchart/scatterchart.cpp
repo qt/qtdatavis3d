@@ -160,20 +160,8 @@ void ScatterDataModifier::changeFontSize(int fontsize)
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
-    int quality = 0;
-    switch (sq) {
-    case QDataVis::ShadowLow:
-        quality = 1;
-        break;
-    case QDataVis::ShadowMedium:
-        quality = 2;
-        break;
-    case QDataVis::ShadowHigh:
-        quality = 3;
-        break;
-    }
-
-    // Updates the UI component to show correct shadow quality
+    int quality = int(sq);
+     // Updates the UI component to show correct shadow quality
     emit shadowQualityChanged(quality);
 }
 
@@ -318,18 +306,7 @@ void ScatterDataModifier::handleSelectionChange(int index)
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
-    switch (quality) {
-    case 1:
-        sq = QDataVis::ShadowLow;
-        break;
-    case 2:
-        sq = QDataVis::ShadowMedium;
-        break;
-    case 3:
-        sq = QDataVis::ShadowHigh;
-        break;
-    }
+    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
     m_chart->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }

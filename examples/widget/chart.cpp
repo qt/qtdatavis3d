@@ -114,6 +114,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_chart->addAxis(m_genericRowAxis);
     m_chart->addAxis(m_genericColumnAxis);
 
+    m_chart->setShadowQuality(QDataVis::ShadowSoftMedium);
+
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
 
@@ -436,19 +438,7 @@ void ChartModifier::changeFontSize(int fontsize)
 
 void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
-    int quality = 0;
-    switch (sq) {
-    case QDataVis::ShadowLow:
-        quality = 1;
-        break;
-    case QDataVis::ShadowMedium:
-        quality = 2;
-        break;
-    case QDataVis::ShadowHigh:
-        quality = 3;
-        break;
-    }
-
+    int quality = int(sq);
     // Updates the UI component to show correct shadow quality
     emit shadowQualityChanged(quality);
 }
@@ -461,18 +451,7 @@ void ChartModifier::handleSelectionChange(const QPoint &position)
 
 void ChartModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowNone;
-    switch (quality) {
-    case 1:
-        sq = QDataVis::ShadowLow;
-        break;
-    case 2:
-        sq = QDataVis::ShadowMedium;
-        break;
-    case 3:
-        sq = QDataVis::ShadowHigh;
-        break;
-    }
+    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
     m_chart->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }

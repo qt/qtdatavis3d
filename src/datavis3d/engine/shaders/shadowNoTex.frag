@@ -30,22 +30,22 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.19984126, 0.78641367),
                                       vec2(0.14383161, -0.14100790));
 
-/*const highp vec2 poissonDisk[16] = vec2[](vec2(-0.25, -0.25),
-                                          vec2(0.25, -0.25),
-                                          vec2(-0.25, 0.25),
-                                          vec2(0.25, 0.25),
-                                          vec2(-0.5, -0.5),
-                                          vec2(0.5, -0.5),
-                                          vec2(-0.5, 0.5),
-                                          vec2(0.5, 0.5),
-                                          vec2(-0.75, -0.75),
-                                          vec2(0.75, -0.75),
-                                          vec2(-0.75, 0.75),
-                                          vec2(0.75, 0.75),
-                                          vec2(-1.0, -1.0),
-                                          vec2(1.0, -1.0),
-                                          vec2(-1.0, 1.0),
-                                          vec2(1.0, 1.0));*/
+/*highp vec2 poissonDisk[16] = vec2[16](vec2(-0.25, -0.25),
+                                      vec2(0.25, -0.25),
+                                      vec2(-0.25, 0.25),
+                                      vec2(0.25, 0.25),
+                                      vec2(-0.5, -0.5),
+                                      vec2(0.5, -0.5),
+                                      vec2(-0.5, 0.5),
+                                      vec2(0.5, 0.5),
+                                      vec2(-0.75, -0.75),
+                                      vec2(0.75, -0.75),
+                                      vec2(-0.75, 0.75),
+                                      vec2(0.75, 0.75),
+                                      vec2(-1.0, -1.0),
+                                      vec2(1.0, -1.0),
+                                      vec2(-1.0, 1.0),
+                                      vec2(1.0, 1.0));*/
 
 /*float random(vec3 seed, int i) {
     vec4 seed4 = vec4(seed, i);
@@ -75,7 +75,7 @@ void main() {
     // direct method; needs large shadow texture to look good
     //highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoords).r + 0.25;
     // poisson disk sampling; smoothes edges
-    highp float visibility = 0.4;
+    highp float visibility = 0.6;
     for (int i = 0; i < 15; i++) {
         vec4 shadCoordsPD = shadCoords;
         shadCoordsPD.x += cos(poissonDisk[i].x) / shadowQuality;

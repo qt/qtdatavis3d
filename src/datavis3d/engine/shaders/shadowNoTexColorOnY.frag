@@ -58,7 +58,7 @@ void main() {
     // direct method; needs large shadow texture to look good
     //highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoords).r + 0.25;
     // poisson disk sampling; smoothes edges
-    highp float visibility = 0.4;
+    highp float visibility = 0.6;
     for (int i = 0; i < 15; i++) {
         vec4 shadCoordsPD = shadCoords;
         shadCoordsPD.x += cos(poissonDisk[i].x) / shadowQuality;
