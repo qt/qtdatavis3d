@@ -517,8 +517,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                colPos = (bar + 1) * (m_cachedBarSpacing.width());
-                rowPos = (row + 1) * (m_cachedBarSpacing.height());
+                colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
+                rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
                 modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                       item.height() - m_yAdjustment,
@@ -609,8 +609,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                colPos = (bar + 1) * (m_cachedBarSpacing.width());
-                rowPos = (row + 1) * (m_cachedBarSpacing.height());
+                colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
+                rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
                 modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                       item.height() - m_yAdjustment,
@@ -724,8 +724,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 depthMVPMatrix;
 
-            colPos = (bar + 1) * (m_cachedBarSpacing.width());
-            rowPos = (row + 1) * (m_cachedBarSpacing.height());
+            colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
+            rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
             modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                   item.height() - m_yAdjustment,
@@ -952,7 +952,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
+            rowPos = row * m_cachedBarSpacing.height();
             modelMatrix.translate(0.0f, -m_yAdjustment,
                                   (m_columnDepth - rowPos) / m_scaleFactor + zComp);
             modelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
@@ -1000,7 +1000,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             QMatrix4x4 depthMVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
+            colPos = bar * m_cachedBarSpacing.width();
             modelMatrix.translate((m_rowWidth - colPos) / m_scaleFactor,
                                   -m_yAdjustment, zComp);
             modelMatrix.scale(QVector3D(gridLineWidth, gridLineWidth,
@@ -1172,7 +1172,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
         if (m_axisCacheX.labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            rowPos = (row + 1) * (m_cachedBarSpacing.height());
+            rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
             colPos = m_rowWidth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 0.0f;
@@ -1212,7 +1212,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
         if (m_axisCacheZ.labelItems().size() > column) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
-            colPos = (column + 1) * (m_cachedBarSpacing.width());
+            colPos = (column + 0.5f) * m_cachedBarSpacing.width();
             rowPos = m_columnDepth;
             GLfloat rotLabelX = -90.0f;
             GLfloat rotLabelY = 90.0f;
@@ -1607,8 +1607,8 @@ void Bars3DRenderer::updateTextures()
 void Bars3DRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
-    m_rowWidth = ((m_cachedColumnCount + 1) * m_cachedBarSpacing.width()) / 2.0f;
-    m_columnDepth = ((m_cachedRowCount + 1) * m_cachedBarSpacing.height()) / 2.0f;
+    m_rowWidth = (m_cachedColumnCount * m_cachedBarSpacing.width()) / 2.0f;
+    m_columnDepth = (m_cachedRowCount * m_cachedBarSpacing.height()) / 2.0f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleFactor = qMin((m_cachedColumnCount * (m_maxDimension / m_maxSceneSize)),
                          (m_cachedRowCount * (m_maxDimension / m_maxSceneSize)));
