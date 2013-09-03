@@ -28,7 +28,7 @@ Item {
         rowRole: "year"
         columnRole: "month"
         valueRole: "expenses"
-        rowCategories: ["2000", "2001", "2002", "2003", "2004"]
+        rowCategories: ["2000", "2001", "2002", "2003"]
         columnCategories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     }
@@ -78,6 +78,13 @@ Item {
         ListElement{ year: "2003"; month: "Feb"; expenses: "4";  income: "8"  }
         ListElement{ year: "2003"; month: "Mar"; expenses: "7";  income: "12"  }
         ListElement{ year: "2003"; month: "Apr"; expenses: "9";  income: "15"  }
-        // rest of 2003 missing on purpose, as well as whole of 2004
+        ListElement{ year: "2003"; month: "May"; expenses: "7";  income: "19"  }
+        ListElement{ year: "2003"; month: "Jun"; expenses: "9";  income: "18"  }
+        ListElement{ year: "2003"; month: "Jul"; expenses: "13"; income: "17"  }
+        ListElement{ year: "2003"; month: "Aug"; expenses: "5";  income: "9"  }
+        ListElement{ year: "2003"; month: "Sep"; expenses: "3";  income: "8"  }
+        ListElement{ year: "2003"; month: "Oct"; expenses: "13"; income: "15"  }
+        ListElement{ year: "2003"; month: "Nov"; expenses: "8";  income: "17"  }
+        ListElement{ year: "2003"; month: "Dec"; expenses: "7";  income: "10"  }
     }
 }

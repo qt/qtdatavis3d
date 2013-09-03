@@ -23,8 +23,8 @@ import "."
 
 Item {
     id: mainview
-    width: 800
-    height: 600
+    width: 1280
+    height: 1024
     visible: true
 
     Data {
@@ -52,7 +52,7 @@ Item {
             selectionMode: Bars3D.ModeItem
             labelTransparency: Bars3D.TransparencyNone
             theme: Bars3D.ThemeBrownSand
-            rows: 5
+            rows: 4
             columns: 12
             mapping: chartData.mapping
             barThickness: 0.5
@@ -63,6 +63,7 @@ Item {
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+            backgroundVisible: true
 
             onDataResolved: {
                 // Can't select a bar until data has been resolved from model to proxy
@@ -79,13 +80,19 @@ Item {
         id: tableView
         x: 0
         y: 0
-        width: 300
+        width: 298
         height: parent.height - mappingToggle.height - shadowToggle.height
         TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
         TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
-        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 70 }
-        TableViewColumn{ role: "income" ; title: "Income" ; width: 70 }
+        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
+        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
         model: chartData.model
+
+        onClicked: {
+            var rowIndex = testchart.mapping.rowCategoryIndex(chartData.model.get(row).year)
+            var colIndex = testchart.mapping.columnCategoryIndex(chartData.model.get(row).month)
+            testchart.selectedBarPos = Qt.point(rowIndex, colIndex)
+        }
     }
 
     Button {

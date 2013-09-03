@@ -44,10 +44,6 @@ public:
                              const QStringList &columnCategories, QObject *parent = 0);
     virtual ~QItemModelBarDataMapping();
 
-    // If row categories or column categories is an empty list, use item models's rows and columns for rows and columns.
-    // If the categories are both defined, ignore item model's rows and columns and figure out the rows and columns from
-    // the values of the set roles for each item.
-
     void setRowRole(const QString &role);
     QString rowRole() const;
     void setColumnRole(const QString &role);
@@ -63,6 +59,9 @@ public:
     void remap(const QString &rowRole, const QString &columnRole,
                const QString &valueRole, const QStringList &rowCategories,
                const QStringList &columnCategories);
+
+    Q_INVOKABLE int rowCategoryIndex(const QString& category);
+    Q_INVOKABLE int columnCategoryIndex(const QString& category);
 
 protected:
     QItemModelBarDataMappingPrivate *dptr();

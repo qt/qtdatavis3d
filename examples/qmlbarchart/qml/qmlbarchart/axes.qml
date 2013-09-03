@@ -27,7 +27,7 @@ Item {
 
     CategoryAxis {
         id: rowAxis
-        categoryLabels: ["2000", "2001", "2002", "2003", "2004"]
+        categoryLabels: ["2000", "2001", "2002", "2003"]
     }
     CategoryAxis {
         id: columnAxis

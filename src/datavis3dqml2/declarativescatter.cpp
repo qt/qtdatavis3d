@@ -303,6 +303,8 @@ void DeclarativeScatter::mouseDoubleClickEvent(QMouseEvent *event)
 {
 #if defined(Q_OS_ANDROID)
     m_shared->mouseDoubleClickEvent(event);
+#else
+    Q_UNUSED(event)
 #endif
 }
 
@@ -311,6 +313,8 @@ void DeclarativeScatter::touchEvent(QTouchEvent *event)
 #if defined(Q_OS_ANDROID)
     m_shared->touchEvent(event);
     update();
+#else
+    Q_UNUSED(event)
 #endif
 }
 

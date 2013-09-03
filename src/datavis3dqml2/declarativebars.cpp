@@ -355,20 +355,22 @@ QString DeclarativeBars::itemLabelFormat()
     return m_shared->activeDataProxy()->itemLabelFormat();
 }
 
-void DeclarativeBars::setSelectedBarPos(const QPoint &position)
+void DeclarativeBars::setSelectedBarPos(const QPointF &position)
 {
-    m_shared->setSelectedBarPos(position);
+    m_shared->setSelectedBarPos(position.toPoint());
 }
 
-QPoint DeclarativeBars::selectedBarPos() const
+QPointF DeclarativeBars::selectedBarPos() const
 {
-    return m_shared->selectedBarPos();
+    return QPointF(m_shared->selectedBarPos());
 }
 
 void DeclarativeBars::mouseDoubleClickEvent(QMouseEvent *event)
 {
 #if defined(Q_OS_ANDROID)
     m_shared->mouseDoubleClickEvent(event);
+#else
+    Q_UNUSED(event)
 #endif
 }
 
@@ -377,6 +379,8 @@ void DeclarativeBars::touchEvent(QTouchEvent *event)
 #if defined(Q_OS_ANDROID)
     m_shared->touchEvent(event);
     update();
+#else
+    Q_UNUSED(event)
 #endif
 }
 

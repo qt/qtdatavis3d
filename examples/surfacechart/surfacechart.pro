@@ -11,3 +11,5 @@ INSTALLS += target
 
 HEADERS += \
     chartmodifier.h
+
+QT += widgets

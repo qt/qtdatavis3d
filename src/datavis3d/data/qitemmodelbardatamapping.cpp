@@ -188,6 +188,16 @@ void QItemModelBarDataMapping::remap(const QString &rowRole,
     emit mappingChanged();
 }
 
+int QItemModelBarDataMapping::rowCategoryIndex(const QString &category)
+{
+    return dptr()->m_rowCategories.indexOf(category);
+}
+
+int QItemModelBarDataMapping::columnCategoryIndex(const QString &category)
+{
+    return dptr()->m_columnCategories.indexOf(category);
+}
+
 /*!
  * \internal
  */
