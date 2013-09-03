@@ -1,5 +1,5 @@
-!include( ../../examples.pri ) {
-    error( "Couldn't find the examples.pri file!" )
+!include( ../../tests.pri ) {
+    error( "Couldn't find the tests.pri file!" )
 }
 
 !include( ../spectrum.pri ) {

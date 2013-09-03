@@ -2,11 +2,11 @@ TEMPLATE = subdirs
 SUBDIRS += barchart \
            rainfall \
            widget \
-           mapdata \
+           #mapdata \
            qmlbarchart \
            #qmlmaps \
            qmlscatter \
            surfacechart \
            scatterchart
 
-qtHaveModule(multimedia):!android: SUBDIRS += spectrum
+qtHaveModule(multimedia):!android: SUBDIRS += audiolevels

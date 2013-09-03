@@ -1,4 +1,7 @@
 qtHaveModule(multimedia) {
+!include( ../tests.pri ) {
+    error( "Couldn't find the tests.pri file!" )
+}
 include(spectrum.pri)
 
 TEMPLATE = subdirs

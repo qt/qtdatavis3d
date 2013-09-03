@@ -9,3 +9,5 @@ TEMPLATE = subdirs
 
 SUBDIRS += barstest \
            scattertest
+
+qtHaveModule(multimedia):!android: SUBDIRS += spectrum

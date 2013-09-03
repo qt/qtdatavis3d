@@ -81,6 +81,12 @@ Engine::Engine(QObject *parent)
                     SLOT(spectrumChanged(FrequencySpectrum)));
 
     initialize();
+    qDebug() << "output devices:";
+    foreach (QAudioDeviceInfo device, m_availableAudioOutputDevices)
+        qDebug() << device.deviceName();
+    qDebug() << "input devices:";
+    foreach (QAudioDeviceInfo device, m_availableAudioInputDevices)
+        qDebug() << device.deviceName();
 }
 
 Engine::~Engine()
