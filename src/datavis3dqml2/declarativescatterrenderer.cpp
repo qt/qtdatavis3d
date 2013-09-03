@@ -30,8 +30,12 @@ DeclarativeScatterRenderer::DeclarativeScatterRenderer(QQuickWindow *window,
       m_window(window),
       m_scatterRenderer(renderer)
 {
-    connect(m_window, SIGNAL(beforeSynchronizing()), this, SLOT(synchDataToRenderer()), Qt::DirectConnection);
-    connect(m_window, SIGNAL(beforeRendering()), this, SLOT(renderFBO()), Qt::DirectConnection);
+    connect(m_window, &QQuickWindow::beforeSynchronizing, this,
+            &DeclarativeScatterRenderer::synchDataToRenderer, Qt::DirectConnection);
+    connect(m_window, &QQuickWindow::beforeRendering, this,
+            &DeclarativeScatterRenderer::renderFBO, Qt::DirectConnection);
+    connect(m_scatterRenderer, &Abstract3DController::needRender, m_window,
+            &QQuickWindow::update);
 }
 
 DeclarativeScatterRenderer::~DeclarativeScatterRenderer()
@@ -79,9 +83,6 @@ void DeclarativeScatterRenderer::renderFBO()
     m_scatterRenderer->render(m_fbo->handle());
 
     m_fbo->release();
-
-    // New view is in the FBO, request repaint of scene graph
-    m_window->update();
 }
 
 QT_DATAVIS3D_END_NAMESPACE

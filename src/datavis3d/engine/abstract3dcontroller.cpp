@@ -52,7 +52,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_data(0)
+    m_data(0),
+    m_renderPending(false)
 {
     m_theme.useColorTheme(QDataVis::ThemeSystem);
 #if defined(Q_OS_ANDROID)
@@ -292,11 +293,18 @@ void Abstract3DController::synchDataToRenderer()
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
 {
+    m_renderPending = false;
+
     // If not initialized, do nothing.
     if (!m_renderer)
         return;
 
     m_renderer->render(m_cameraHelper, defaultFboHandle);
+
+#ifdef DISPLAY_RENDER_SPEED
+    // To get meaningful framerate, don't just do render on demand.
+    emitNeedRender();
+#endif
 }
 
 void Abstract3DController::setSize(const int width, const int height)
@@ -305,7 +313,7 @@ void Abstract3DController::setSize(const int width, const int height)
     m_boundingRect.setHeight(height);
 
     m_changeTracker.boundingRectChanged = true;
-    emit boundingRectChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 const QSize Abstract3DController::size()
@@ -323,7 +331,7 @@ void Abstract3DController::setBoundingRect(const QRect boundingRect)
     m_boundingRect = boundingRect;
 
     m_changeTracker.boundingRectChanged = true;
-    emit boundingRectChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 void Abstract3DController::setWidth(const int width)
@@ -331,7 +339,7 @@ void Abstract3DController::setWidth(const int width)
     m_boundingRect.setWidth(width);
 
     m_changeTracker.sizeChanged = true;
-    emit sizeChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 int Abstract3DController::width()
@@ -344,7 +352,7 @@ void Abstract3DController::setHeight(const int height)
     m_boundingRect.setHeight(height);
 
     m_changeTracker.sizeChanged = true;
-    emit sizeChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 int Abstract3DController::height()
@@ -357,7 +365,7 @@ void Abstract3DController::setX(const int x)
     m_boundingRect.setX(x);
 
     m_changeTracker.positionChanged = true;
-    emit positionChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 int Abstract3DController::x()
@@ -370,7 +378,7 @@ void Abstract3DController::setY(const int y)
     m_boundingRect.setY(y);
 
     m_changeTracker.positionChanged = true;
-    emit positionChanged(m_boundingRect);
+    emitNeedRender();
 }
 
 int Abstract3DController::y()
@@ -506,6 +514,8 @@ void Abstract3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     // Assume ownership and activate
     addDataProxy(proxy);
     m_data = proxy;
+    m_isDataDirty = true;
+    emitNeedRender();
 }
 
 int Abstract3DController::zoomLevel()
@@ -518,12 +528,13 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     m_zoomLevel = zoomLevel;
 
     m_changeTracker.zoomLevelChanged = true;
-    emit zoomLevelChanged(zoomLevel);
+    emitNeedRender();
 }
 
 void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
 {
     m_cameraHelper->setCameraPreset(preset);
+    emitNeedRender();
 }
 
 void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
@@ -534,6 +545,7 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
     m_cameraHelper->setCameraRotation(QPointF(m_horizontalRotation,
                                               m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
+    emitNeedRender();
 }
 
 void Abstract3DController::setObjectColor(const QColor &baseColor, const QColor &heightColor,
@@ -545,7 +557,7 @@ void Abstract3DController::setObjectColor(const QColor &baseColor, const QColor 
     m_theme.m_uniformColor = uniform;
 
     m_changeTracker.themeChanged = true;
-    emit themeChanged(m_theme);
+    emitNeedRender();
 }
 
 void Abstract3DController::setColorTheme(QDataVis::ColorTheme colorTheme)
@@ -553,7 +565,7 @@ void Abstract3DController::setColorTheme(QDataVis::ColorTheme colorTheme)
     m_theme.useColorTheme(colorTheme);
 
     m_changeTracker.themeChanged = true;
-    emit themeChanged(m_theme);
+    emitNeedRender();
 }
 
 Theme Abstract3DController::theme()
@@ -566,7 +578,7 @@ void Abstract3DController::setFont(const QFont &font)
     m_font = font;
 
     m_changeTracker.fontChanged = true;
-    emit fontChanged(m_font);
+    emitNeedRender();
 }
 
 QFont Abstract3DController::font()
@@ -578,7 +590,7 @@ void Abstract3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
     m_selectionMode = mode;
     m_changeTracker.selectionModeChanged = true;
-    emit selectionModeChanged(m_selectionMode);
+    emitNeedRender();
 }
 
 QDataVis::SelectionMode Abstract3DController::selectionMode()
@@ -592,6 +604,7 @@ void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 
     m_changeTracker.shadowQualityChanged = true;
     emit shadowQualityChanged(m_shadowQuality);
+    emitNeedRender();
 }
 
 QDataVis::ShadowQuality Abstract3DController::shadowQuality()
@@ -604,7 +617,7 @@ void Abstract3DController::setLabelTransparency(QDataVis::LabelTransparency tran
     m_labelTransparency = transparency;
 
     m_changeTracker.labelTransparencyChanged = true;
-    emit labelTransparencyChanged(m_labelTransparency);
+    emitNeedRender();
 }
 
 QDataVis::LabelTransparency Abstract3DController::labelTransparency()
@@ -616,7 +629,7 @@ void Abstract3DController::setBackgroundEnabled(bool enable)
 {
     m_isBackgroundEnabled = enable;
     m_changeTracker.backgroundEnabledChanged = true;
-    emit backgroundEnabledChanged(m_isBackgroundEnabled);
+    emitNeedRender();
 }
 
 bool Abstract3DController::backgroundEnabled()
@@ -628,7 +641,7 @@ void Abstract3DController::setGridEnabled(bool enable)
 {
     m_isGridEnabled = enable;
     m_changeTracker.gridEnabledChanged = true;
-    emit gridEnabledChanged(m_isGridEnabled);
+    emitNeedRender();
 }
 
 bool Abstract3DController::gridEnabled()
@@ -640,7 +653,7 @@ void Abstract3DController::setMeshFileName(const QString &fileName)
 {
     m_objFile = fileName;
     m_changeTracker.objFileChanged = true;
-    emit meshFileNameChanged(m_objFile);
+    emitNeedRender();
 }
 
 QString Abstract3DController::meshFileName()
@@ -664,6 +677,7 @@ void Abstract3DController::handleAxisTitleChangedBySender(QObject *sender)
         m_changeTracker.axisZTitleChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisLabelsChanged()
@@ -681,6 +695,7 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
         m_changeTracker.axisZLabelsChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
@@ -704,6 +719,7 @@ void Abstract3DController::handleAxisRangeChangedBySender(QObject *sender)
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisSegmentCountChanged(int count)
@@ -722,6 +738,7 @@ void Abstract3DController::handleAxisSegmentCountChangedBySender(QObject *sender
         m_changeTracker.axisZSegmentCountChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisSubSegmentCountChanged(int count)
@@ -740,6 +757,7 @@ void Abstract3DController::handleAxisSubSegmentCountChangedBySender(QObject *sen
         m_changeTracker.axisZSubSegmentCountChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
@@ -773,6 +791,7 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
+    emitNeedRender();
 }
 
 void Abstract3DController::setAxisHelper(QAbstractAxis::AxisOrientation orientation,
@@ -872,6 +891,14 @@ QCategoryAxis *Abstract3DController::createDefaultCategoryAxis()
     QCategoryAxis *defaultAxis = new QCategoryAxis;
     defaultAxis->d_ptr->setDefaultAxis(true);
     return defaultAxis;
+}
+
+void Abstract3DController::emitNeedRender()
+{
+    if (!m_renderPending) {
+        emit needRender();
+        m_renderPending = true;
+    }
 }
 
 QT_DATAVIS3D_END_NAMESPACE

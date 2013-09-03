@@ -115,7 +115,6 @@ public slots:
     void handleSelectedItemIndexChanged(int index);
 
 signals:
-    void slicingActiveChanged(bool isSlicing);
     void selectedItemIndexChanged(int index);
 
 private:

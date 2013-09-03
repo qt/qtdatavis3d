@@ -80,7 +80,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
-    setAnimating(true);
+    renderLater();
 }
 
 /*!
@@ -148,26 +148,11 @@ void Q3DWindow::renderNow()
     render();
 
     d_ptr->m_context->swapBuffers(this);
-
-    if (d_ptr->m_animating)
-        renderLater();
-}
-
-/*!
- * \internal
- */
-void Q3DWindow::setAnimating(bool animating)
-{
-    d_ptr->m_animating = animating;
-
-    if (animating)
-        renderLater();
 }
 
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
     : q_ptr(q),
       m_updatePending(false),
-      m_animating(false),
       m_context(new QOpenGLContext(q))
 {
 }

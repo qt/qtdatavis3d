@@ -59,6 +59,7 @@ void Surface3DController::initializeOpenGL()
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
+    emitNeedRender();
 }
 
 void Surface3DController::synchDataToRenderer()
@@ -92,6 +93,7 @@ void Surface3DController::setSmoothSurface(bool enable)
 {
     m_smoothSurface = enable;
     emit smoothStatusChanged(m_smoothSurface);
+    emitNeedRender();
 }
 
 bool Surface3DController::smoothSurface()
@@ -103,6 +105,7 @@ void Surface3DController::setSurfaceGrid(bool enable)
 {
     m_surfaceGrid = enable;
     emit surfaceGridChanged(m_surfaceGrid);
+    emitNeedRender();
 }
 
 bool Surface3DController::surfaceGrid()
@@ -137,6 +140,7 @@ void Surface3DController::mousePressEvent(QMouseEvent *event, const QPoint &mous
         m_mousePos = mousePos; //event->pos();
     }
     m_cameraHelper->updateMousePos(m_mousePos);
+    emitNeedRender();
 }
 
 void Surface3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
@@ -146,6 +150,7 @@ void Surface3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = mousePos; //event->pos();
         m_cameraHelper->updateMousePos(mousePos); //event->pos());
+        emitNeedRender();
     }
     m_mouseState = Abstract3DController::MouseNone;
 }
@@ -153,8 +158,10 @@ void Surface3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
 void Surface3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event)
-    if (Abstract3DController::MouseRotating == m_mouseState)
+    if (Abstract3DController::MouseRotating == m_mouseState) {
         m_mousePos = mousePos; //event->pos();
+        emitNeedRender();
+    }
 }
 
 void Surface3DController::wheelEvent(QWheelEvent *event)
@@ -174,13 +181,14 @@ void Surface3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfl
     m_segmentMinimum = minimum;
 
     emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
+    emitNeedRender();
 }
 
 void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 {
     Theme t = theme();
     t.m_surfaceGradient.setColorAt(pos, color);
-    emit themeChanged(t);
+    emitNeedRender();
 }
 
 // TODO: Temp
@@ -192,6 +200,7 @@ void Surface3DController::setData(QList<qreal> series, int width, int depth)
 
     m_renderer->setXZStuff(width, depth);
     m_renderer->setSeries(series);
+    emitNeedRender();
 }
 
 QT_DATAVIS3D_END_NAMESPACE

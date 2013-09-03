@@ -97,6 +97,8 @@ Q3DBars::Q3DBars()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarPosChanged, this,
                      &Q3DBars::selectedBarPosChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
+                     &Q3DWindow::renderLater);
 }
 
 /*!

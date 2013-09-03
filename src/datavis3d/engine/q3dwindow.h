@@ -38,22 +38,22 @@ public:
     explicit Q3DWindow(QWindow *parent = 0);
     ~Q3DWindow();
 
-private slots:
+protected slots:
     void renderLater();
     void renderNow();
 
 protected:
     virtual void render();
 
-    void setAnimating(bool animating);
     bool event(QEvent *event);
     void exposeEvent(QExposeEvent *event);
 
 private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;
 
-    friend class Q3DBarsPrivate;
     friend class Q3DBars;
+    friend class Q3DScatter;
+    friend class Q3DSurface;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

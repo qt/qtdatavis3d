@@ -169,6 +169,8 @@ protected:
     QAbstractDataProxy *m_data;
     QList<QAbstractDataProxy *> m_dataProxies;
 
+    bool m_renderPending;
+
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
     ~Abstract3DController();
 
@@ -286,23 +288,15 @@ public slots:
     void handleAxisLabelFormatChanged(const QString &format);
 
 signals:
-    void boundingRectChanged(QRect boundingRect);
-    void sizeChanged(QRect boundingRect);
-    void positionChanged(QRect boundingRect);
-    void zoomLevelChanged(int zoomLevel);
-    void themeChanged(Theme theme);
-    void fontChanged(QFont font); // TODO should be handled via axis?? What about font for selection label?
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void labelTransparencyChanged(QDataVis::LabelTransparency transparency);
-    void selectionModeChanged(QDataVis::SelectionMode mode);
-    void backgroundEnabledChanged(bool enable);
-    void gridEnabledChanged(bool enable); // TODO: Should be handled via axes?
-    void meshFileNameChanged(QString fileName);
+
+    void needRender();
 
 protected:
     virtual QAbstractAxis *createDefaultAxis(QAbstractAxis::AxisOrientation orientation);
     QValueAxis *createDefaultValueAxis();
     QCategoryAxis *createDefaultCategoryAxis();
+    void emitNeedRender();
 
 private:
     void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis,

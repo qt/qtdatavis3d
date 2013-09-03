@@ -145,9 +145,6 @@ public slots:
     void handleSelectedBarPosChanged(const QPoint &position);
 
 signals:
-    void slicingActiveChanged(bool isSlicing);
-    void sampleSpaceChanged(int samplesRow, int samplesColumn);
-    void barSpecsChanged(GLfloat thicknessRatio, QSizeF spacing, bool relative);
     void selectedBarPosChanged(QPoint position);
 
 protected:

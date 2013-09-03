@@ -72,6 +72,7 @@ void Bars3DController::initializeOpenGL()
 
     QObject::connect(m_renderer, &Bars3DRenderer::selectedBarPosChanged, this,
                      &Bars3DController::handleSelectedBarPosChanged, Qt::QueuedConnection);
+    emitNeedRender();
 }
 
 void Bars3DController::synchDataToRenderer()
@@ -128,7 +129,7 @@ void Bars3DController::setSlicingActive(bool isSlicing)
     m_isSlicingActivated = isSlicing;
 
     m_changeTracker.slicingActiveChanged = true;
-    emit slicingActiveChanged(m_isSlicingActivated);
+    emitNeedRender();
 }
 
 Bars3DController::MouseState Bars3DController::mouseState()
@@ -144,6 +145,7 @@ void Bars3DController::mouseDoubleClickEvent(QMouseEvent *event)
         m_mouseState = Bars3DController::MouseOnScene;
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
+        emitNeedRender();
     }
 }
 
@@ -215,6 +217,7 @@ void Bars3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePo
         m_mousePos = mousePos;
     }
     m_cameraHelper->updateMousePos(m_mousePos);
+    emitNeedRender();
 }
 
 void Bars3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
@@ -224,6 +227,7 @@ void Bars3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouse
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = mousePos;
         m_cameraHelper->updateMousePos(mousePos);
+        emitNeedRender();
     }
     m_mouseState = Bars3DController::MouseNone;
 }
@@ -231,8 +235,10 @@ void Bars3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouse
 void Bars3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-    if (Bars3DController::MouseRotating == m_mouseState)
+    if (Bars3DController::MouseRotating == m_mouseState) {
         m_mousePos = mousePos;
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::wheelEvent(QWheelEvent *event)
@@ -284,7 +290,6 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
                      &Bars3DController::handleItemChanged);
 
     adjustValueAxisRange();
-    m_isDataDirty = true;
     setSelectedBarPos(noSelectionPoint());
 }
 
@@ -294,6 +299,7 @@ void Bars3DController::handleArrayReset()
     adjustValueAxisRange();
     m_isDataDirty = true;
     setSelectedBarPos(noSelectionPoint());
+    emitNeedRender();
 }
 
 void Bars3DController::handleRowsAdded(int startIndex, int count)
@@ -305,6 +311,7 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Bars3DController::handleRowsChanged(int startIndex, int count)
@@ -316,6 +323,7 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Bars3DController::handleRowsRemoved(int startIndex, int count)
@@ -330,6 +338,7 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
     // TODO this will break once data window offset is implemented
     if (startIndex >= static_cast<QBarDataProxy *>(m_data)->rowCount())
         setSelectedBarPos(noSelectionPoint());
+    emitNeedRender();
 }
 
 void Bars3DController::handleRowsInserted(int startIndex, int count)
@@ -341,6 +350,7 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
@@ -352,6 +362,7 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Bars3DController::handleSelectedBarPosChanged(const QPoint &position)
@@ -362,6 +373,7 @@ void Bars3DController::handleSelectedBarPosChanged(const QPoint &position)
     if (pos != m_selectedBarPos) {
         m_selectedBarPos = pos;
         emit selectedBarPosChanged(pos);
+        emitNeedRender();
     }
 }
 
@@ -386,7 +398,7 @@ void Bars3DController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing
     m_isBarSpecRelative = relative;
 
     m_changeTracker.barSpecsChanged = true;
-    emit barSpecsChanged(thicknessRatio, spacing, relative);
+    emitNeedRender();
 }
 
 GLfloat Bars3DController::barThickness()
@@ -440,7 +452,7 @@ void Bars3DController::setDataWindow(int rowCount, int columnCount)
 
     m_changeTracker.sampleSpaceChanged = true;
     m_isDataDirty = true; // Render item array is recreated in renderer
-    emit sampleSpaceChanged(rowCount, columnCount);
+    emitNeedRender();
 }
 
 void Bars3DController::setSelectionMode(QDataVis::SelectionMode mode)
@@ -464,6 +476,7 @@ void Bars3DController::setSelectedBarPos(const QPoint &position)
         m_selectedBarPos = pos;
         m_changeTracker.selectedBarPosChanged = true;
         emit selectedBarPosChanged(pos);
+        emitNeedRender();
     }
 }
 

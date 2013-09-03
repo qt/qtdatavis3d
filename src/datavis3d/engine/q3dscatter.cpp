@@ -89,6 +89,8 @@ Q3DScatter::Q3DScatter()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
                      &Q3DScatter::selectedItemIndexChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
+                     &Q3DWindow::renderLater);
 }
 
 /*!

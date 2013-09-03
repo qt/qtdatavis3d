@@ -66,6 +66,7 @@ void Scatter3DController::initializeOpenGL()
 
     QObject::connect(m_renderer, &Scatter3DRenderer::selectedItemIndexChanged, this,
                      &Scatter3DController::handleSelectedItemIndexChanged, Qt::QueuedConnection);
+    emitNeedRender();
 }
 
 void Scatter3DController::synchDataToRenderer()
@@ -112,7 +113,7 @@ void Scatter3DController::setSlicingActive(bool isSlicing)
     m_isSlicingActivated = isSlicing;
 
     m_changeTracker.slicingActiveChanged = true;
-    emit slicingActiveChanged(m_isSlicingActivated);
+    emitNeedRender();
 }
 
 Scatter3DController::MouseState Scatter3DController::mouseState()
@@ -127,6 +128,7 @@ void Scatter3DController::mouseDoubleClickEvent(QMouseEvent *event)
         m_mouseState = Scatter3DController::MouseOnScene;
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = event->pos();
+        emitNeedRender();
     }
 }
 
@@ -197,6 +199,7 @@ void Scatter3DController::mousePressEvent(QMouseEvent *event, const QPoint &mous
         m_mousePos = mousePos;
     }
     m_cameraHelper->updateMousePos(m_mousePos);
+    emitNeedRender();
 }
 
 void Scatter3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
@@ -206,6 +209,7 @@ void Scatter3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
         // update mouse positions to prevent jumping when releasing or repressing a button
         m_mousePos = mousePos;
         m_cameraHelper->updateMousePos(mousePos);
+        emitNeedRender();
     }
     m_mouseState = Scatter3DController::MouseNone;
 }
@@ -213,8 +217,10 @@ void Scatter3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mo
 void Scatter3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-    if (Scatter3DController::MouseRotating == m_mouseState)
+    if (Scatter3DController::MouseRotating == m_mouseState) {
         m_mousePos = mousePos;
+        emitNeedRender();
+    }
 }
 
 void Scatter3DController::wheelEvent(QWheelEvent *event)
@@ -260,7 +266,6 @@ void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
                      this, &Scatter3DController::handleItemsInserted);
 
     adjustValueAxisRange();
-    m_isDataDirty = true;
     setSelectedItemIndex(noSelectionIndex());
 }
 
@@ -270,6 +275,7 @@ void Scatter3DController::handleArrayReset()
     adjustValueAxisRange();
     m_isDataDirty = true;
     setSelectedItemIndex(noSelectionIndex());
+    emitNeedRender();
 }
 
 void Scatter3DController::handleItemsAdded(int startIndex, int count)
@@ -279,6 +285,7 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Scatter3DController::handleItemsChanged(int startIndex, int count)
@@ -288,6 +295,7 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Scatter3DController::handleItemsRemoved(int startIndex, int count)
@@ -299,6 +307,7 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     m_isDataDirty = true;
     if (startIndex >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
         setSelectedItemIndex(noSelectionIndex());
+    emitNeedRender();
 }
 
 void Scatter3DController::handleItemsInserted(int startIndex, int count)
@@ -308,6 +317,7 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Scatter3DController::handleSelectedItemIndexChanged(int index)
@@ -315,6 +325,7 @@ void Scatter3DController::handleSelectedItemIndexChanged(int index)
     if (index != m_selectedItemIndex) {
         m_selectedItemIndex = index;
         emit selectedItemIndexChanged(index);
+        emitNeedRender();
     }
 }
 
@@ -365,6 +376,7 @@ void Scatter3DController::setSelectedItemIndex(int index)
         m_selectedItemIndex = index;
         m_changeTracker.selectedItemIndexChanged = true;
         emit selectedItemIndexChanged(index);
+        emitNeedRender();
     }
 }
 
