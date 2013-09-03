@@ -44,7 +44,7 @@ Bars3DController::Bars3DController(QRect boundRect)
       m_renderer(0)
 {
     // Default bar type; specific to bars
-    setBarType(QDataVis::Bars, false);
+    setBarType(QDataVis::BevelBars, false);
 
     setActiveDataProxy(0);
 

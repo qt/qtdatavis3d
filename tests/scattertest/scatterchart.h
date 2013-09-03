@@ -16,35 +16,31 @@
 **
 ****************************************************************************/
 
-#ifndef CHARTMODIFIER_H
-#define CHARTMODIFIER_H
+#ifndef SCATTERDATAMODIFIER_H
+#define SCATTERDATAMODIFIER_H
 
-#include <QtDataVis3D/q3dbars.h>
+#include <QtDataVis3D/q3dscatter.h>
 
 #include <QFont>
 #include <QDebug>
-#include <QStringList>
-#include <QPointer>
+#include <QTimer>
 
 using namespace QtDataVis3D;
 
-class ChartModifier : public QObject
+class ScatterDataModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit ChartModifier(Q3DBars *barchart);
-    ~ChartModifier();
+    explicit ScatterDataModifier(Q3DScatter *scatter);
+    ~ScatterDataModifier();
 
-    void resetTemperatureData();
+    void addData();
     void changeStyle();
     void changePresetCamera();
     void changeTheme();
     void changeTransparency();
-    void changeSelectionMode();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
-    void rotateX(int rotation);
-    void rotateY(int rotation);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void start();
@@ -52,25 +48,30 @@ public:
 public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void clear();
+    void addOne();
+    void addBunch();
+    void insertOne();
+    void insertBunch();
+    void changeOne();
+    void changeBunch();
+    void removeOne();
+    void removeBunch();
+    void timeout();
+    void startStopTimer();
+    void selectItem();
+    void handleSelectionChange(int index);
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
-    Q3DBars *m_chart;
-    float m_xRotation;
-    float m_yRotation;
+    QVector3D randVector();
+    Q3DScatter *m_chart;
     int m_fontSize;
-    int m_segments;
-    int m_subSegments;
-    qreal m_minval;
-    qreal m_maxval;
-    QStringList m_months;
-    QStringList m_years;
-    QValueAxis *m_temperatureAxis;
-    QCategoryAxis *m_yearAxis;
-    QCategoryAxis *m_monthAxis;
-    QBarDataProxy *m_temperatureData;
+    QTimer m_timer;
+    int m_loopCounter;
+    int m_selectedItem;
 };
 
 #endif

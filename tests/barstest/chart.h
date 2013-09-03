@@ -36,6 +36,13 @@ public:
     ~ChartModifier();
 
     void resetTemperatureData();
+    void addRow();
+    void addRows();
+    void changeItem();
+    void changeRow();
+    void changeRows();
+    void removeRow();
+    void removeRows();
     void changeStyle();
     void changePresetCamera();
     void changeTheme();
@@ -47,19 +54,37 @@ public:
     void rotateY(int rotation);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void setSpecsRatio(int barwidth);
+    void setSpecsZ(int bardepth);
+    void setSpacingSpecsX(int spacing);
+    void setSpacingSpecsZ(int spacing);
+    void setSampleCountX(int samples);
+    void setSampleCountZ(int samples);
     void start();
+    void restart(bool dynamicData);
+    void selectBar();
+    void swapAxis();
+    void releaseAxes();
+    void releaseProxies();
 
 public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void handleSelectionChange(const QPoint &position);
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
     Q3DBars *m_chart;
+    int m_columnCount;
+    int m_rowCount;
     float m_xRotation;
     float m_yRotation;
+    bool m_static;
+    qreal m_barThicknessRatio;
+    float m_barSpacingX;
+    float m_barSpacingZ;
     int m_fontSize;
     int m_segments;
     int m_subSegments;
@@ -67,10 +92,17 @@ private:
     qreal m_maxval;
     QStringList m_months;
     QStringList m_years;
+    QPoint m_selectedBarPos;
+    QValueAxis *m_autoAdjustingAxis;
+    QValueAxis *m_fixedRangeAxis;
     QValueAxis *m_temperatureAxis;
     QCategoryAxis *m_yearAxis;
     QCategoryAxis *m_monthAxis;
+    QCategoryAxis *m_genericRowAxis;
+    QCategoryAxis *m_genericColumnAxis;
     QBarDataProxy *m_temperatureData;
+    QBarDataProxy *m_genericData;
+    QValueAxis *m_currentAxis;
 };
 
 #endif

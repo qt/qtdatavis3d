@@ -20,10 +20,7 @@
 #define SCATTERDATAMODIFIER_H
 
 #include <QtDataVis3D/q3dscatter.h>
-
-#include <QFont>
-#include <QDebug>
-#include <QTimer>
+#include <QtGui/QFont>
 
 using namespace QtDataVis3D;
 
@@ -48,19 +45,6 @@ public:
 public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
-    void clear();
-    void addOne();
-    void addBunch();
-    void insertOne();
-    void insertBunch();
-    void changeOne();
-    void changeBunch();
-    void removeOne();
-    void removeBunch();
-    void timeout();
-    void startStopTimer();
-    void selectItem();
-    void handleSelectionChange(int index);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -69,9 +53,6 @@ private:
     QVector3D randVector();
     Q3DScatter *m_chart;
     int m_fontSize;
-    QTimer m_timer;
-    int m_loopCounter;
-    int m_selectedItem;
 };
 
 #endif

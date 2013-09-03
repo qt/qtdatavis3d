@@ -42,7 +42,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::ModeItem),
     m_shadowQuality(QDataVis::ShadowMedium),
-    m_labelTransparency(QDataVis::TransparencyFromTheme),
+    m_labelTransparency(QDataVis::TransparencyNoBackground),
     m_isBackgroundEnabled(true),
     m_isGridEnabled(true),
     m_cameraHelper(new CameraHelper()),
