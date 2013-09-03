@@ -42,9 +42,10 @@ static const int ID_TO_RGBA_MASK = 0xff;
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
+const GLfloat labelMargin = 0.05f;
 const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
-const GLfloat coordRatio = 2.0f;
+const GLfloat coordSpace = 2.0f; // From -1.0 to 1.0
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
@@ -62,6 +63,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_surfaceShader(0),
       m_surfaceGridShader(0),
       m_selectionShader(0),
+      m_labelShader(0),
       m_yRange(0.0f), // m_heightNormalizer
       m_yAdjustment(0.0f),
       m_xLength(0.0f),
@@ -74,6 +76,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_surfaceObj(0),
+      m_labelObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -141,6 +144,9 @@ void Surface3DRenderer::initializeOpenGL()
 
     initSurfaceShaders();
 
+    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
+                     QStringLiteral(":/shaders/fragmentLabel"));
+
     // Init selection shader
     initSelectionShaders();
 
@@ -148,19 +154,7 @@ void Surface3DRenderer::initializeOpenGL()
     loadGridLineMesh();
 
     // Load label mesh
-    //loadLabelMesh();
-
-    // Set OpenGL features
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-#if !defined(QT_OPENGL_ES_2)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-#endif
+    loadLabelMesh();
 
     // Set view port
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
@@ -698,6 +692,173 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
             }
         }
     }
+
+    // Draw axis labels
+    m_labelShader->bind();
+    glEnable(GL_TEXTURE_2D);
+
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    // Z Labels
+    if (m_axisCacheZ.segmentCount() > 0 && m_surfaceObj) {
+        GLfloat posStep = coordSpace / (m_axisCacheZ.segmentCount());
+        GLfloat labelPos = 1.0;
+
+        for (int segment = 0; segment <= m_axisCacheZ.segmentCount(); segment++) {
+            GLfloat labelXTrans = backgroundMargin * m_scaleX + labelMargin;
+            GLfloat labelYTrans = -backgroundBottom;
+            GLfloat rotLabelX = -90.0f;
+            GLfloat rotLabelY = 0.0f;
+            GLfloat rotLabelZ = 0.0f;
+            Qt::AlignmentFlag alignment = Qt::AlignRight;
+
+            if (m_xFlipped) {
+                labelXTrans = -labelXTrans;
+                alignment = Qt::AlignLeft;
+            }
+            if (m_yFlipped) {
+                rotLabelZ += 180.0f;
+                rotLabelY += 180.0f;
+                labelYTrans = -labelYTrans;
+            }
+            QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans,  labelPos * m_scaleZ + zComp);
+
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(segment);
+
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, 0.0f, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                alignment);
+
+            labelPos -= posStep;
+        }
+    }
+
+    // X Labels
+    if (m_axisCacheX.segmentCount() > 0 && m_surfaceObj) {
+        GLfloat posStep = coordSpace / (m_axisCacheX.segmentCount());
+        GLfloat labelPos = -1.0;
+
+        for (int segment = 0; segment <= m_axisCacheX.segmentCount(); segment++) {
+            GLfloat labelYTrans = -backgroundBottom;
+            GLfloat labelZTrans = backgroundMargin * m_scaleZ + labelMargin;
+            GLfloat rotLabelX = -90.0f;
+            GLfloat rotLabelY = 90.0f;
+            GLfloat rotLabelZ = 0.0f;
+            Qt::AlignmentFlag alignment = Qt::AlignLeft;
+
+            if (m_xFlipped)
+                rotLabelY = -90.0f;
+            if (m_zFlipped) {
+                labelZTrans = -labelZTrans;
+                alignment = Qt::AlignRight;
+            }
+            if (m_yFlipped) {
+                rotLabelZ += 180.0f;
+                rotLabelY += 180.0f;
+                labelYTrans = -labelYTrans;
+            }
+            QVector3D labelTrans = QVector3D(labelPos * m_scaleX,
+                                             labelYTrans,
+                                             labelZTrans + zComp);
+
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(segment);
+
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, 0.0f, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                alignment);
+
+            labelPos += posStep;
+        }
+    }
+
+    // Y Labels
+    if (m_axisCacheY.segmentCount() > 0 && m_surfaceObj) {
+        GLfloat posStep = coordSpace / (m_axisCacheY.segmentCount());
+        GLfloat labelPos = -1.0;
+
+        for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
+            GLfloat labelXTrans = backgroundMargin * m_scaleX;
+            GLfloat labelZTrans = backgroundMargin * m_scaleZ;
+            GLfloat labelMarginXTrans = labelMargin;
+            GLfloat labelMarginZTrans = labelMargin;
+            GLfloat rotLabelX = 0.0f;
+            GLfloat rotLabelY = -90.0f;
+            GLfloat rotLabelZ = 0.0f;
+            Qt::AlignmentFlag alignment = Qt::AlignLeft;
+
+            if (!m_xFlipped) {
+                labelXTrans = -labelXTrans;
+                labelMarginXTrans = -labelMargin;
+                rotLabelY = 90.0f;
+            }
+            if (m_zFlipped) {
+                labelZTrans = -labelZTrans;
+                labelMarginZTrans = -labelMargin;
+                alignment = Qt::AlignRight;
+            }
+
+            QVector3D labelTrans = QVector3D(labelXTrans,
+                                             labelPos,
+                                             labelZTrans + labelMarginZTrans + zComp);
+
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(segment);
+
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, 0.0f, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                alignment);
+
+            // Side wall
+            if (m_xFlipped)
+                alignment = Qt::AlignLeft;
+            else
+                alignment = Qt::AlignRight;
+            if (m_zFlipped)
+                rotLabelY = 180.0f;
+            else
+                rotLabelY = 0.0f;
+
+            labelTrans = QVector3D(-labelXTrans  - labelMarginXTrans,
+                                   labelPos,
+                                   -labelZTrans + zComp);
+
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, 0.0f, zComp),
+                                QVector3D(rotLabelX, rotLabelY, rotLabelZ),
+                                0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, camera, true, true, Drawer::LabelMid,
+                                alignment);
+
+            labelPos += posStep;
+        }
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
+        glDisable(GL_BLEND);
+
+    // Release label shader
+    m_labelShader->release();
+
 }
 
 void Surface3DRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
@@ -876,8 +1037,8 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 //    m_scaleZ = 1.0f / m_scaleFactor;
 
     m_scaleFactor = qMax(m_xLength, m_zLength);
-    m_scaleX = (coordRatio * m_xLength) / m_scaleFactor;
-    m_scaleZ = (coordRatio * m_zLength) / m_scaleFactor;
+    m_scaleX = (coordSpace * m_xLength) / m_scaleFactor;
+    m_scaleZ = (coordSpace * m_zLength) / m_scaleFactor;
 
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
@@ -1024,6 +1185,15 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
     qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
 }
 
+void Surface3DRenderer::loadLabelMesh()
+{
+    //qDebug() << __FUNCTION__;
+    if (m_labelObj)
+        delete m_labelObj;
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj->load();
+}
+
 void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
     if (m_shader)
@@ -1070,23 +1240,13 @@ void Surface3DRenderer::initSurfaceShaders()
     m_surfaceGridShader->initialize();
 }
 
+void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
+{
+    //qDebug() << __FUNCTION__;
+    if (m_labelShader)
+        delete m_labelShader;
+    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_labelShader->initialize();
+}
+
 QT_DATAVIS3D_END_NAMESPACE
-
-
-//p = 90;
-//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
-//            bits[p + 2] << ", " << bits[p + 3];
-//p += 4;
-//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
-//            bits[p + 2] << ", " << bits[p + 3];
-//p += 4;
-//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
-//            bits[p + 2] << ", " << bits[p + 3];
-//p += 4;
-//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
-//            bits[p + 2] << ", " << bits[p + 3];
-//p += 4;
-//qDebug() << "rgba = " << bits[p + 0] << ", " << bits[p + 1] << ", " <<
-//            bits[p + 2] << ", " << bits[p + 3];
-//p += 4;
-

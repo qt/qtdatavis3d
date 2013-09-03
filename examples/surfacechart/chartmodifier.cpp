@@ -30,6 +30,9 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
       m_xCount(10),
       m_zCount(10)
 {
+    m_chart->setAxisX(new QValueAxis);
+    m_chart->setAxisY(new QValueAxis);
+    m_chart->setAxisZ(new QValueAxis);
 }
 
 ChartModifier::~ChartModifier()
@@ -98,9 +101,11 @@ void ChartModifier::togglePlane(bool enable)
         m_chart->setSegmentCount(4, 0.5f);
         m_chart->appendSeries(series, m_xCount, m_zCount);
         m_chart->axisX()->setSegmentCount(m_xCount - 1);
+        m_chart->axisX()->setRange(1.0, qreal(m_xCount));
         m_chart->axisY()->setSegmentCount(4);
         m_chart->axisY()->setRange(0.0, 2.0);
         m_chart->axisZ()->setSegmentCount(m_zCount - 1);
+        m_chart->axisZ()->setRange(1.0, qreal(m_zCount));
     }
 }
 

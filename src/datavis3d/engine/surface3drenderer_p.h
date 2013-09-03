@@ -39,6 +39,7 @@
 #include "datavis3dglobal_p.h"
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
+#include "scatterrenderitem_p.h"
 
 class QOpenGLShaderProgram;
 
@@ -83,6 +84,7 @@ private:
     ShaderHelper *m_surfaceShader;
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_selectionShader;
+    ShaderHelper *m_labelShader;
     GLfloat m_yRange; // m_heightNormalizer
     GLfloat m_yAdjustment;
     GLfloat m_xLength;
@@ -94,6 +96,7 @@ private:
     GLfloat m_maxSceneSize;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
+    ObjectHelper *m_labelObj;
     SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
@@ -111,6 +114,7 @@ private:
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
+    ScatterRenderItem m_dummyRenderItem; // Let's use scatter for dummy for now
 
 protected:
     virtual void loadMeshFile();
@@ -133,18 +137,19 @@ public slots:
     void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
     virtual void requestSelectionAtPoint(const QPoint &point);
 
-
 private:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     void loadBackgroundMesh();
     void loadGridLineMesh();
+    void loadLabelMesh();
     void loadSurfaceObj();
     void drawScene(CameraHelper *camera, const GLuint defaultFboHandle);
     void handleResize();
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShaders();
     void initSurfaceShaders();
     void initSelectionBuffer();

@@ -5,6 +5,8 @@
 SOURCES += main.cpp \
     chartmodifier.cpp
 
+QT += widgets
+
 INSTALLS += target
 
 HEADERS += \
