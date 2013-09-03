@@ -25,13 +25,10 @@
 #include <QTextStream>
 #include <QFile>
 
-#define CHANGE_CITY_WITH_TIMER
-
 using namespace QtDataVis3D;
 
 RainfallChart::RainfallChart(Q3DBars *rainfall)
-    : m_chart(rainfall),
-      m_city(2)
+    : m_chart(rainfall)
 {
     // In data file the months are in numeric format, so create custom list
     for (int i = 1; i <= 12; i++)
@@ -53,7 +50,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     m_chart->rowAxis()->setTitle("Year");
     m_chart->columnAxis()->setTitle("Month");
-    m_chart->valueAxis()->setTitle(QString("rainfall in city %1").arg(m_city - 1));
+    m_chart->valueAxis()->setTitle("rainfall");
     m_chart->valueAxis()->setLabelFormat("%d mm");
     m_chart->rowAxis()->setCategoryLabels(m_years);
     m_chart->columnAxis()->setCategoryLabels(months);
@@ -65,10 +62,9 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setShadowQuality(QDataVis::ShadowMedium);
 
     // Set font
-    m_chart->setFont(QFont("Century Gothic", 40));
+    m_chart->setFont(QFont("Century Gothic", 30));
 
     // Set selection mode to bar and column
-    //m_chart->setSelectionMode(ModeItemAndColumn);
     m_chart->setSelectionMode(QDataVis::ModeSliceColumn);
 
     // Set theme
@@ -81,7 +77,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setGridVisible(false);
 
     // Set window title
-    m_chart->setTitle(QStringLiteral("Monthly rainfall in various cities"));
+    m_chart->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));
 }
 
 RainfallChart::~RainfallChart()
@@ -94,20 +90,6 @@ RainfallChart::~RainfallChart()
 void RainfallChart::start()
 {
     addDataSet();
-
-#ifdef CHANGE_CITY_WITH_TIMER
-    connect(&m_timer, &QTimer::timeout, this, &RainfallChart::timeout);
-    m_timer.start(3000);
-#endif
-}
-
-void RainfallChart::timeout()
-{
-    if (++m_city > 4)
-        m_city = 2;
-
-    m_proxy->mapping()->setValueIndex(m_city);
-    m_chart->valueAxis()->setTitle(QString("rainfall in city %1").arg(m_city - 1));
 }
 
 void RainfallChart::updateYearsList(int start, int end)
@@ -135,15 +117,14 @@ void RainfallChart::addDataSet()
             if (line.startsWith("#"))
                 continue;
             QStringList strList = line.split(",", QString::SkipEmptyParts);
-            if (strList.size() < 5) {
+            if (strList.size() < 3) {
                 qWarning() << "Invalid row read from data:" << line;
                 continue;
             }
             VariantDataItem *newItem = new VariantDataItem;
             for (int i = 0; i < 2; i++)
                 newItem->append(strList.at(i).trimmed());
-            for (int i = 2; i < 5; i++)
-                newItem->append(strList.at(i).trimmed().toDouble());
+            newItem->append(strList.at(2).trimmed().toDouble());
             itemList->append(newItem);
         }
     } else {
@@ -154,6 +135,6 @@ void RainfallChart::addDataSet()
 
     m_proxy->setDataSet(m_dataSet);
 
-    m_mapping =  new VariantBarDataMapping(0, 1, m_city, m_years, m_numericMonths);
+    m_mapping =  new VariantBarDataMapping(0, 1, 2, m_years, m_numericMonths);
     m_proxy->setMapping(m_mapping);
 }

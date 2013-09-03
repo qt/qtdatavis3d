@@ -21,7 +21,6 @@
 
 #include "variantbardataproxy.h"
 #include <QtDataVis3D/q3dbars.h>
-#include <QTimer>
 
 using namespace QtDataVis3D;
 
@@ -35,8 +34,6 @@ public:
     void addDataSet();
     void start();
 
-public slots:
-    void timeout();
 private:
 
     void updateYearsList(int start, int end);
@@ -45,9 +42,7 @@ private:
     int m_rowCount;
     QStringList m_years;
     QStringList m_numericMonths;
-    QTimer m_timer;
     VariantBarDataProxy *m_proxy;
-    int m_city;
     VariantBarDataMapping *m_mapping;
     VariantDataSet *m_dataSet;
 };

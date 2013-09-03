@@ -45,8 +45,10 @@ void VariantBarDataProxy::setDataSet(VariantDataSet *newSet)
     m_dataSet = newSet;
 
     if (!m_dataSet.isNull()) {
-        QObject::connect(m_dataSet.data(), &VariantDataSet::itemsAdded, this, &VariantBarDataProxy::handleItemsAdded);
-        QObject::connect(m_dataSet.data(), &VariantDataSet::dataCleared, this, &VariantBarDataProxy::handleDataCleared);
+        QObject::connect(m_dataSet.data(), &VariantDataSet::itemsAdded, this,
+                         &VariantBarDataProxy::handleItemsAdded);
+        QObject::connect(m_dataSet.data(), &VariantDataSet::dataCleared, this,
+                         &VariantBarDataProxy::handleDataCleared);
     }
     resolveDataSet();
 }
@@ -59,12 +61,14 @@ VariantDataSet *VariantBarDataProxy::dataSet()
 void VariantBarDataProxy::setMapping(VariantBarDataMapping *mapping)
 {
     if (!m_mapping.isNull())
-        QObject::disconnect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this, &VariantBarDataProxy::handleMappingChanged);
+        QObject::disconnect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this,
+                            &VariantBarDataProxy::handleMappingChanged);
 
     m_mapping = mapping;
 
     if (!m_mapping.isNull())
-        QObject::connect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this, &VariantBarDataProxy::handleMappingChanged);
+        QObject::connect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this,
+                         &VariantBarDataProxy::handleMappingChanged);
 
     resolveDataSet();
 }
@@ -97,7 +101,8 @@ void VariantBarDataProxy::handleMappingChanged()
 // Resolve entire dataset into QBarDataArray.
 void VariantBarDataProxy::resolveDataSet()
 {
-    if (m_dataSet.isNull() || m_mapping.isNull() || !m_mapping->rowCategories().size() || !m_mapping->columnCategories().size()) {
+    if (m_dataSet.isNull() || m_mapping.isNull() || !m_mapping->rowCategories().size()
+            || !m_mapping->columnCategories().size()) {
         resetArray(0);
         return;
     }
@@ -112,8 +117,10 @@ void VariantBarDataProxy::resolveDataSet()
     // Sort values into rows and columns
     typedef QHash<QString, qreal> ColumnValueMap;
     QHash <QString, ColumnValueMap> itemValueMap;
-    foreach (const VariantDataItem *item, itemList)
-        itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()] = item->at(valueIndex).toReal();
+    foreach (const VariantDataItem *item, itemList) {
+        itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()]
+                = item->at(valueIndex).toReal();
+    }
 
     // Create new data array from itemValueMap
     QBarDataArray *newProxyArray = new QBarDataArray;

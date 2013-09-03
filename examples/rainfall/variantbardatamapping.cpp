@@ -20,9 +20,9 @@
 
 VariantBarDataMapping::VariantBarDataMapping()
     : QObject(0),
-    m_rowIndex(0),
-    m_columnIndex(1),
-    m_valueIndex(2)
+      m_rowIndex(0),
+      m_columnIndex(1),
+      m_valueIndex(2)
 {
 }
 
@@ -36,8 +36,8 @@ VariantBarDataMapping::VariantBarDataMapping(const VariantBarDataMapping &other)
 }
 
 VariantBarDataMapping::VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                                               const QStringList &rowCategories,
-                                               const QStringList &columnCategories)
+                                             const QStringList &rowCategories,
+                                             const QStringList &columnCategories)
     : QObject(0),
       m_rowIndex(0),
       m_columnIndex(1),
@@ -121,8 +121,8 @@ const QStringList &VariantBarDataMapping::columnCategories() const
 }
 
 void VariantBarDataMapping::remap(int rowIndex, int columnIndex, int valueIndex,
-                                   const QStringList &rowCategories,
-                                   const QStringList &columnCategories)
+                                  const QStringList &rowCategories,
+                                  const QStringList &columnCategories)
 {
     m_rowIndex = rowIndex;
     m_columnIndex = columnIndex;
