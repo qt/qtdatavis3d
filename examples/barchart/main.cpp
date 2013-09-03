@@ -29,9 +29,6 @@
 #include <QFont>
 #include <QDebug>
 
-//#define CYCLE_THROUGH_STYLES
-//#define CYCLE_THROUGH_PRESET_CAMERAS
-//#define CYCLE_THROUGH_THEMES
 #define USE_STATIC_DATA
 
 using namespace QtDataVis3D;
@@ -48,6 +45,8 @@ public:
     void changePresetCamera();
     void changeTheme();
     void start();
+    void selectFromTable(const QPoint &selection);
+    void selectedFromTable(int row, int column);
 
 private:
     Q3DBars *m_chart;
@@ -80,10 +79,8 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 #endif
 
-    // Set bar type to smooth bar
-#ifndef CYCLE_THROUGH_STYLES
+    // Set bar type to flat pyramids
     m_chart->setBarType(QDataVis::Pyramids, false);
-#endif
 
 #ifndef USE_STATIC_DATA
     // Set selection mode to full
@@ -91,15 +88,11 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
 #else
     // Set selection mode to zoom row
     m_chart->setSelectionMode(QDataVis::ModeSliceRow);
-    m_chart->setFont(QFont("Courier", 25));
+    m_chart->setFont(QFont("Impact", 25));
 #endif
 
-#ifndef CYCLE_THROUGH_THEMES
-    // Set bar colors
-    m_chart->setBarColor(QColor(Qt::gray), QColor(Qt::red), QColor(Qt::darkBlue));
-#else
-    m_chart->setLabelTransparency(QDataVis::TransparencyNone);
-#endif
+    // Set theme
+    m_chart->setTheme(QDataVis::ThemeLight);
 
     // Set preset camera position
     m_chart->setCameraPreset(QDataVis::PresetFront);
@@ -111,18 +104,6 @@ ChartDataGenerator::~ChartDataGenerator()
         m_dataTimer->stop();
         delete m_dataTimer;
     }
-    if (m_styleTimer) {
-        m_styleTimer->stop();
-        delete m_styleTimer;
-    }
-    if (m_presetTimer) {
-        m_presetTimer->stop();
-        delete m_presetTimer;
-    }
-    if (m_themeTimer) {
-        m_themeTimer->stop();
-        delete m_themeTimer;
-    }
     delete m_chart;
 }
 
@@ -131,39 +112,12 @@ void ChartDataGenerator::start()
 #ifndef USE_STATIC_DATA
     m_dataTimer = new QTimer();
     m_dataTimer->setTimerType(Qt::CoarseTimer);
-    m_dataTimer->setInterval(20);
+    m_dataTimer->setInterval(500);
     QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addRow);
-    m_dataTimer->start(20);
+    m_dataTimer->start(500);
+    m_tableWidget->setFixedWidth(m_chart->width());
 #else
     setupModel();
-#endif
-
-#ifdef CYCLE_THROUGH_STYLES
-    // Change bar style every 10 seconds
-    m_styleTimer = new QTimer();
-    m_styleTimer->setTimerType(Qt::CoarseTimer);
-    m_styleTimer->setInterval(10000);
-    QObject::connect(m_styleTimer, &QTimer::timeout, this, &ChartDataGenerator::changeStyle);
-    m_styleTimer->start(10000);
-#endif
-
-#ifdef CYCLE_THROUGH_PRESET_CAMERAS
-    // Change preset camera every 5 seconds
-    m_presetTimer = new QTimer();
-    m_presetTimer->setTimerType(Qt::CoarseTimer);
-    m_presetTimer->setInterval(5000);
-    QObject::connect(m_presetTimer, &QTimer::timeout, this,
-                     &ChartDataGenerator::changePresetCamera);
-    m_presetTimer->start(5000);
-#endif
-
-#ifdef CYCLE_THROUGH_THEMES
-    // Change theme every 2 seconds
-    m_themeTimer = new QTimer();
-    m_themeTimer->setTimerType(Qt::CoarseTimer);
-    m_themeTimer->setInterval(3000);//2000);
-    QObject::connect(m_themeTimer, &QTimer::timeout, this, &ChartDataGenerator::changeTheme);
-    m_themeTimer->start(3000);//2000);
 #endif
 }
 
@@ -202,6 +156,7 @@ void ChartDataGenerator::setupModel()
             m_tableWidget->model()->setData(index, hours[week][day]);
         }
     }
+    m_tableWidget->setFixedWidth(600);
 
     // Set up sample space based on prepared data
     m_chart->setDataWindow(weeks.size(), days.size());
@@ -215,60 +170,18 @@ void ChartDataGenerator::addRow()
         m_tableWidget->model()->setData(index,
             ((qreal)i / (qreal)m_columnCount) / 2.0 + (qreal)(rand() % 30) / 100.0);
     }
+    m_tableWidget->resizeColumnsToContents();
 }
 
-void ChartDataGenerator::changeStyle()
+void ChartDataGenerator::selectFromTable(const QPoint &selection)
 {
-    static int model = 0;
-    switch (model) {
-    case 0:
-        m_chart->setBarType(QDataVis::Cylinders, false);
-        break;
-    case 1:
-        m_chart->setBarType(QDataVis::Cylinders, true);
-        break;
-    case 2:
-        m_chart->setBarType(QDataVis::Cones, false);
-        break;
-    case 3:
-        m_chart->setBarType(QDataVis::Cones, true);
-        break;
-    case 4:
-        m_chart->setBarType(QDataVis::Bars, false);
-        break;
-    case 5:
-        m_chart->setBarType(QDataVis::Bars, true);
-        break;
-    case 6:
-        m_chart->setBarType(QDataVis::Pyramids, false);
-        break;
-    case 7:
-        m_chart->setBarType(QDataVis::Pyramids, true);
-        break;
-    }
-    model++;
-    if (model > 7)
-        model = 0;
+    m_tableWidget->setFocus();
+    m_tableWidget->setCurrentCell(selection.x(), selection.y());
 }
 
-void ChartDataGenerator::changePresetCamera()
+void ChartDataGenerator::selectedFromTable(int row, int column)
 {
-    static int preset = 0;
-
-    m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
-
-    if (++preset > (int)QDataVis::PresetDirectlyAboveCCW45)
-        preset = 0;
-}
-
-void ChartDataGenerator::changeTheme()
-{
-    static int theme = 0;
-
-    m_chart->setTheme((QDataVis::ColorTheme)theme);
-
-    if (++theme > (int)QDataVis::ThemeLight)
-        theme = 0;
+    m_chart->setSelectedBarPos(QPoint(row, column));
 }
 
 int main(int argc, char **argv)
@@ -289,20 +202,28 @@ int main(int argc, char **argv)
 
     widget->setWindowTitle(QStringLiteral("Hours playing banjo"));
 
-    QTableWidget *tableWidget = new QTableWidget(0, 0, widget);
+    QTableWidget *tableWidget = new QTableWidget(widget);
+    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    tableWidget->setAlternatingRowColors(true);
 
-    layout->addWidget(tableWidget);
     layout->addWidget(container, 1);
+    layout->addWidget(tableWidget, 1, Qt::AlignHCenter);
 
     // We don't need to initialize the mapping object in any way, as it defaults
     // to row/column support and uses the Qt::DisplayRole role for value role by default.
-    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), new QItemModelBarDataMapping);
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(),
+                                                               new QItemModelBarDataMapping);
     chart->setActiveDataProxy(proxy);
 
     ChartDataGenerator *generator = new ChartDataGenerator(chart, tableWidget);
-    generator->start();
+
+    QObject::connect(chart, &Q3DBars::selectedBarPosChanged, generator,
+                     &ChartDataGenerator::selectFromTable);
+    QObject::connect(tableWidget, &QTableWidget::cellClicked, generator,
+                     &ChartDataGenerator::selectedFromTable);
 
     widget->show();
+    generator->start();
 
     return app.exec();
 }

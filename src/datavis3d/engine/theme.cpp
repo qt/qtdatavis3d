@@ -168,7 +168,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_baseColor = QRgb(0x3daeda);
         m_heightColor = QRgb(0x2fa3b4);
         m_depthColor = QColor(QRgb(0x2685bf));
-        m_backgroundColor = QColor(QRgb(0xffffff));
+        m_backgroundColor = QColor(QRgb(0x2fa3b4));
+        //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
         m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
@@ -187,7 +188,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_baseColor = QColor(QRgb(0x1db0da));
         m_heightColor = QColor(QRgb(0x398ca3));
         m_depthColor = QColor(QRgb(0x1341a6));
-        m_backgroundColor = QColor(QRgb(0xffffff));
+        m_backgroundColor = QColor(QRgb(0x398ca3));
+        //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
         m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
@@ -206,7 +208,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_baseColor = QColor(QRgb(0xb39b72));
         m_heightColor = QColor(QRgb(0x494345));
         m_depthColor = QColor(QRgb(0xb3b376));
-        m_backgroundColor = QColor(QRgb(0xf3ece0));
+        m_backgroundColor = QColor(QRgb(0x494345));
+        //m_backgroundColor = QColor(QRgb(0xf3ece0));
         m_windowColor = QColor(QRgb(0xf3ece0));
         m_textColor = QColor(QRgb(0x404044));
         m_textBackgroundColor = QColor(0xb5, 0xb0, 0xa7, 0xC0);
@@ -244,7 +247,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_baseColor = QColor(QRgb(0xff4a41));
         m_heightColor = QColor(QRgb(0x202020));
         m_depthColor = QColor(QRgb(0x596a74));
-        m_backgroundColor = QColor(QRgb(0xffffff));
+        m_backgroundColor = QColor(QRgb(0x596a74));
+        //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0x000000));
         m_textColor = QColor(QRgb(0x181818));
         m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
@@ -263,7 +267,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_baseColor = QColor(QRgb(0x209fdf));
         m_heightColor = QColor(QRgb(0xbf593e));
         m_depthColor = QColor(QRgb(0x99ca53));
-        m_backgroundColor = QColor(QRgb(0xffffff));
+        m_backgroundColor = QColor(QRgb(0x99ca53));
+        //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
         m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
