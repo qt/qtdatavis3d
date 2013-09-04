@@ -21,10 +21,8 @@
 
 #include "datavis3dglobal_p.h"
 #include "declarativebars_p.h"
-#include "declarativemaps_p.h"
 #include "declarativescatter_p.h"
 #include "qitemmodelbardatamapping.h"
-#include "qitemmodelmapdatamapping.h"
 #include "qitemmodelscatterdatamapping.h"
 #include "qvalueaxis.h"
 #include "qcategoryaxis.h"
@@ -34,11 +32,9 @@
 QT_DATAVIS3D_USE_NAMESPACE
 
 Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeMaps *)
 Q_DECLARE_METATYPE(DeclarativeScatter *)
 
 Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
-Q_DECLARE_METATYPE(QItemModelMapDataMapping *)
 Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
 Q_DECLARE_METATYPE(const QAbstractItemModel *)
 Q_DECLARE_METATYPE(QDataVis *)

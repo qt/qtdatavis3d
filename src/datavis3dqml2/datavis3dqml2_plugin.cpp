@@ -33,11 +33,9 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                               QLatin1String("Trying to create uncreatable: AbstractAxis."));
 
     qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelMapDataMapping>(uri, 1, 0, "MapDataMapping");
     qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
-    qmlRegisterType<DeclarativeMaps>(uri, 1, 0, "Maps3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
 
     qmlRegisterType<QValueAxis>(uri, 1, 0, "ValueAxis");

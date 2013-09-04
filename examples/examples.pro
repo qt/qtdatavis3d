@@ -2,9 +2,7 @@ TEMPLATE = subdirs
 SUBDIRS += barchart \
            rainfall \
            widget \
-           #mapdata \
            qmlbarchart \
-           #qmlmaps \
            qmlscatter \
            surfacechart \
            scatterchart

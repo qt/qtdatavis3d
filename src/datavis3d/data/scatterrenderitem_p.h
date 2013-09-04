@@ -49,7 +49,6 @@ public:
     //inline qreal size() const { return m_size; }
 
     // TODO should be in abstract, but currently there is no abstract renderer
-    // TODO change when maps refactored
     inline void setRenderer(Scatter3DRenderer *renderer) { m_renderer = renderer; }
 
 protected:

@@ -241,48 +241,6 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     GLfloat heightScaler = 0.0f;
     GLfloat widthScaler = 0.0f;
     GLfloat depthScaler = 0.0f;
-    //    switch (m_adjustDirection) {
-    //    case Q3DMaps::AdjustHeight:
-    //        widthMultiplier = 0.0f;
-    //        heightMultiplier = 1.0f;
-    //        depthMultiplier = 0.0f;
-    //        widthScaler = m_barThickness.x() / m_scaleFactor;
-    //        heightScaler = 0.0f;
-    //        depthScaler = m_barThickness.z() / m_scaleFactor;
-    //        break;
-    //    case Q3DMaps::AdjustWidth:
-    //        widthMultiplier = 1.0f;
-    //        heightMultiplier = 0.0f;
-    //        depthMultiplier = 0.0f;
-    //        widthScaler = 0.0f;
-    //        heightScaler = m_barThickness.y() / m_scaleFactor;
-    //        depthScaler = m_barThickness.z() / m_scaleFactor;
-    //        break;
-    //    case Q3DMaps::AdjustDepth:
-    //        widthMultiplier = 0.0f;
-    //        heightMultiplier = 0.0f;
-    //        depthMultiplier = 1.0f;
-    //        widthScaler = m_barThickness.x() / m_scaleFactor;
-    //        heightScaler = m_barThickness.y() / m_scaleFactor;
-    //        depthScaler = 0.0f;
-    //        break;
-    //    case Q3DMaps::AdjustRadius:
-    //        widthMultiplier = 1.0f;
-    //        heightMultiplier = 0.0f;
-    //        depthMultiplier = 1.0f;
-    //        widthScaler = 0.0f;
-    //        heightScaler = m_barThickness.y() / m_scaleFactor;
-    //        depthScaler = 0.0f;
-    //        break;
-    //    case Q3DMaps::AdjustAll:
-    //        widthMultiplier = 1.0f;
-    //        heightMultiplier = 1.0f;
-    //        depthMultiplier = 1.0f;
-    //        widthScaler = 0.0f;
-    //        heightScaler = 0.0f;
-    //        depthScaler = 0.0f;
-    //        break;
-    //    }
 
     // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;

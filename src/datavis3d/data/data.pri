@@ -12,20 +12,11 @@ HEADERS += \
     $$PWD/qitemmodelbardatamapping_p.h \
     $$PWD/qitemmodelbardataproxy_p.h \
     $$PWD/qitemmodelbardataproxy.h \
-    $$PWD/maprenderitem_p.h \
-    $$PWD/qmapdataitem.h \
-    $$PWD/qmapdataitem_p.h \
-    $$PWD/qmapdataproxy.h \
-    $$PWD/qmapdataproxy_p.h \
     $$PWD/scatterrenderitem_p.h \
     $$PWD/qscatterdataitem.h \
     $$PWD/qscatterdataitem_p.h \
     $$PWD/qscatterdataproxy.h \
     $$PWD/qscatterdataproxy_p.h \
-    $$PWD/qitemmodelmapdatamapping.h \
-    $$PWD/qitemmodelmapdatamapping_p.h \
-    $$PWD/qitemmodelmapdataproxy.h \
-    $$PWD/qitemmodelmapdataproxy_p.h \
     $$PWD/qitemmodelscatterdatamapping.h \
     $$PWD/qitemmodelscatterdatamapping_p.h \
     $$PWD/qitemmodelscatterdataproxy.h \
@@ -45,14 +36,9 @@ SOURCES += \
     $$PWD/qbardataitem.cpp \
     $$PWD/qitemmodelbardatamapping.cpp \
     $$PWD/qitemmodelbardataproxy.cpp \
-    $$PWD/maprenderitem.cpp \
-    $$PWD/qmapdataitem.cpp \
-    $$PWD/qmapdataproxy.cpp \
     $$PWD/scatterrenderitem.cpp \
     $$PWD/qscatterdataitem.cpp \
     $$PWD/qscatterdataproxy.cpp \
-    $$PWD/qitemmodelmapdatamapping.cpp \
-    $$PWD/qitemmodelmapdataproxy.cpp \
     $$PWD/qitemmodelscatterdatamapping.cpp \
     $$PWD/qitemmodelscatterdataproxy.cpp \
     $$PWD/abstractitemmodelhandler.cpp \

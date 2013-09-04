@@ -37,9 +37,8 @@ public:
     enum DataType {
         DataTypeNone = 0,
         DataTypeBar = 1,
-        DataTypeMap = 2,
-        DataTypeScatter = 4,
-        DataTypeSurface = 8
+        DataTypeScatter = 2,
+        DataTypeSurface = 4
     };
 
 protected:

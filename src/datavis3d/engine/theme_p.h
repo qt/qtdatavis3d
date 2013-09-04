@@ -51,7 +51,6 @@ private:
     friend class Abstract3DController;
     friend class Abstract3DRenderer;
     friend class Bars3DRenderer;
-    friend class Maps3DController;
     friend class Surface3DRenderer;
     friend class Surface3DController;
     friend class Scatter3DRenderer;
