@@ -61,11 +61,7 @@ public:
     void setSliceLabel(const QString &label);
     QString &sliceLabel(); // Formats label if not previously formatted
 
-    // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Bars3DRenderer *renderer) { m_renderer = renderer; }
-
 protected:
-    Bars3DRenderer *m_renderer;
     qreal m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;

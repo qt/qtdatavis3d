@@ -23,7 +23,6 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
-      m_renderer(0),
       m_value(0),
       m_height(0.0f),
       m_sliceLabelItem(0)
@@ -33,7 +32,6 @@ BarRenderItem::BarRenderItem()
 BarRenderItem::BarRenderItem(const BarRenderItem &other)
     : AbstractRenderItem(other)
 {
-    m_renderer = other.m_renderer;
     m_value = other.m_value;
     m_position = other.m_position;
     m_height = other.m_height;

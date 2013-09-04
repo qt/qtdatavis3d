@@ -82,9 +82,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true)
 {
-    //qDebug() << __FUNCTION__;
-    m_dummyRenderItem.setRenderer(this);
-
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -152,7 +149,6 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
                 && (dotPos.z() >= m_axisCacheZ.min() && dotPos.z() <= m_axisCacheZ.max())) {
             m_renderItemArray[actualDataSize].setPosition(dotPos);
             calculateTranslation(m_renderItemArray[actualDataSize]);
-            m_renderItemArray[actualDataSize].setRenderer(this);
             actualDataSize++;
         }
     }

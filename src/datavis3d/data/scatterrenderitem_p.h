@@ -48,11 +48,7 @@ public:
     //inline void setSize(qreal size);
     //inline qreal size() const { return m_size; }
 
-    // TODO should be in abstract, but currently there is no abstract renderer
-    inline void setRenderer(Scatter3DRenderer *renderer) { m_renderer = renderer; }
-
 protected:
-    Scatter3DRenderer *m_renderer;
     QVector3D m_position;
     //qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 

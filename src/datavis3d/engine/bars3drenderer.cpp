@@ -88,8 +88,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_previousSelection(selectionSkipColor),
       m_hasHeightAdjustmentChanged(true)
 {
-    m_dummyBarRenderItem.setRenderer(this);
-
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -1480,11 +1478,8 @@ void Bars3DRenderer::updateSampleSpace(int rowCount, int columnCount)
     // TODO is there a way to allocate the whole array with one allocation?
     m_renderItemArray.clear();
     m_renderItemArray.resize(rowCount);
-    for (int i = 0; i < rowCount; i++) {
+    for (int i = 0; i < rowCount; i++)
         m_renderItemArray[i].resize(columnCount);
-        for (int j = 0; j < columnCount; j++)
-            m_renderItemArray[i][j].setRenderer(this);
-    }
 
     // Force update for selection related items
     m_sliceCache = 0;
