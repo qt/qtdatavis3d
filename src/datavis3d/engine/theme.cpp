@@ -32,7 +32,7 @@ Theme::Theme()
       m_backgroundColor(QColor(Qt::gray)),
       m_windowColor(QColor(Qt::gray)),
       m_textColor(QColor(Qt::white)),
-      m_textBackgroundColor(QColor(0x00, 0x00, 0x00, 0x80)),
+      m_textBackgroundColor(QColor(0x00, 0x00, 0x00, 0xa0)),
       m_gridLine(QColor(Qt::black)),
       m_highlightBarColor(QColor(Qt::red)),
       m_highlightRowColor(QColor(Qt::darkRed)),
@@ -84,7 +84,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
                                GetGValue(colorWindow),
                                GetBValue(colorWindow));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0xa0);
         m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0xe2e2e2));
         m_highlightRowColor = QColor(QRgb(0xf2f2f2));
@@ -100,7 +100,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0xa0);
         m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0xeba85f));
         m_highlightRowColor = QColor(QRgb(0xfc5751));
@@ -116,7 +116,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0xa0);
         m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0xeba85f));
         m_highlightRowColor = QColor(QRgb(0xfc5751));
@@ -132,7 +132,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
+        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0xa0);
         m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0xeba85f));
         m_highlightRowColor = QColor(QRgb(0xfc5751));
@@ -142,7 +142,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_highlightLightStrength = 6.0f;
         m_uniformColor = true;
 #endif
-        qDebug("ThemeSystem");
+        //qDebug("ThemeSystem");
         break;
     }
     case QDataVis::ThemeBlueCerulean: {
@@ -152,8 +152,9 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0x056189));
         m_windowColor = QColor(QRgb(0x101a31));
         m_textColor = QColor(QRgb(0xffffff));
-        m_textBackgroundColor = QColor(0x05, 0x61, 0x89, 0x80);
-        m_gridLine = QColor(QRgb(0x84a2b0));
+        m_textBackgroundColor = QColor(0x05, 0x61, 0x89, 0xa0);
+        m_gridLine = QColor(QRgb(0xee7392));
+        //m_gridLine = QColor(QRgb(0x84a2b0));
         m_highlightBarColor = QColor(QRgb(0x5cbf9b));
         m_highlightRowColor = QColor(QRgb(0x009fbf));
         m_highlightColumnColor = QColor(QRgb(0x009fbf));
@@ -161,7 +162,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 10.0f;
         m_uniformColor = true;
-        qDebug("ThemeBlueCerulean");
+        //qDebug("ThemeBlueCerulean");
         break;
     }
     case QDataVis::ThemeBlueIcy: {
@@ -172,8 +173,10 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
-        m_gridLine = QColor(QRgb(0xe2e2e2));
+        m_textBackgroundColor = QColor(0x26, 0x85, 0xbf, 0xa0);
+        //m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
+        m_gridLine = QColor(QRgb(0x2685bf));
+        //m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0x0c2673));
         m_highlightRowColor = QColor(QRgb(0x5f3dba));
         m_highlightColumnColor = QColor(QRgb(0x5f3dba));
@@ -181,7 +184,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = true;
-        qDebug("ThemeBlueIcy");
+        //qDebug("ThemeBlueIcy");
         break;
     }
     case QDataVis::ThemeBlueNcs: {
@@ -192,8 +195,10 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
-        m_gridLine = QColor(QRgb(0xe2e2e2));
+        m_textBackgroundColor = QColor(0x1d, 0xb0, 0xda, 0xa0);
+        //m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
+        m_gridLine = QColor(QRgb(0x1341a6));
+        //m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0x88d41e));
         m_highlightRowColor = QColor(QRgb(0xff8e1a));
         m_highlightColumnColor = QColor(QRgb(0xff8e1a));
@@ -201,7 +206,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 6.0f;
         m_uniformColor = true;
-        qDebug("ThemeBlueNcs");
+        //qDebug("ThemeBlueNcs");
         break;
     }
     case QDataVis::ThemeBrownSand: {
@@ -212,8 +217,9 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         //m_backgroundColor = QColor(QRgb(0xf3ece0));
         m_windowColor = QColor(QRgb(0xf3ece0));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xb5, 0xb0, 0xa7, 0xC0);
-        m_gridLine = QColor(QRgb(0xd4cec3));
+        m_textBackgroundColor = QColor(0xb5, 0xb0, 0xa7, 0xa0);
+        m_gridLine = QColor(QRgb(0xb3b376));
+        //m_gridLine = QColor(QRgb(0xd4cec3));
         m_highlightBarColor = QColor(QRgb(0xc35660));
         m_highlightRowColor = QColor(QRgb(0x536780));
         m_highlightColumnColor = QColor(QRgb(0x536780));
@@ -221,7 +227,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = false;
-        qDebug("ThemeBrownSand");
+        //qDebug("ThemeBrownSand");
         break;
     }
     case QDataVis::ThemeDark: {
@@ -231,8 +237,9 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0x2e303a));         // charts: background color 1
         m_windowColor = QColor(QRgb(0x121218));             // charts: background color 2
         m_textColor = QColor(QRgb(0xffffff));               // charts: label color
-        m_textBackgroundColor = QColor(0x86, 0x87, 0x8c, 0x80); // charts: axis line pen OR background color 2
-        m_gridLine = QColor(QRgb(0x86878c));                // charts: grid line color
+        m_textBackgroundColor = QColor(0x86, 0x87, 0x8c, 0xa0); // charts: axis line pen OR background color 2
+        m_gridLine = QColor(QRgb(0xbf593e));                // charts: grid line color
+        //m_gridLine = QColor(QRgb(0x86878c));                // charts: grid line color
         m_highlightBarColor = QColor(QRgb(0xeb8817));       // charts: series color 3
         m_highlightRowColor = QColor(QRgb(0x7b7f8c));       // charts: series color 4
         m_highlightColumnColor = QColor(QRgb(0x7b7f8c));    // charts: series color 4
@@ -240,7 +247,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = false;
-        qDebug("ThemeDark");
+        //qDebug("ThemeDark");
         break;
     }
     case QDataVis::ThemeHighContrast: {
@@ -251,10 +258,11 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0x000000));
         m_textColor = QColor(QRgb(0xffffff));
-        m_textBackgroundColor = QColor(0x18, 0x18, 0x18, 0x80);
+        m_textBackgroundColor = QColor(0x20, 0x20, 0x20, 0xa0);
         //m_textColor = QColor(QRgb(0x181818));
-        //m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
-        m_gridLine = QColor(QRgb(0x8c8c8c));
+        //m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0xa0);
+        m_gridLine = QColor(QRgb(0xffab03));
+        //m_gridLine = QColor(QRgb(0x8c8c8c));
         m_highlightBarColor = QColor(QRgb(0xffab03));
         m_highlightRowColor = QColor(QRgb(0x038e9b));
         m_highlightColumnColor = QColor(QRgb(0x038e9b));
@@ -262,7 +270,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 10.0f;
         m_uniformColor = false;
-        qDebug("ThemeHighContrast");
+        //qDebug("ThemeHighContrast");
         break;
     }
     case QDataVis::ThemeLight: {
@@ -273,8 +281,10 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x404044));
-        m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0x80);
-        m_gridLine = QColor(QRgb(0xe2e2e2));
+        m_textBackgroundColor = QColor(0xf6, 0xa6, 0x25, 0xa0);
+        //m_textBackgroundColor = QColor(0xd6, 0xd6, 0xd6, 0xa0);
+        m_gridLine = QColor(QRgb(0x99ca53));
+        //m_gridLine = QColor(QRgb(0xe2e2e2));
         m_highlightBarColor = QColor(QRgb(0xf6a625));
         m_highlightRowColor = QColor(QRgb(0x6d5fd5));
         m_highlightColumnColor = QColor(QRgb(0x6d5fd5));
@@ -282,7 +292,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 7.0f;
         m_uniformColor = true;
-        qDebug("ThemeLight");
+        //qDebug("ThemeLight");
         break;
     }
     default:
