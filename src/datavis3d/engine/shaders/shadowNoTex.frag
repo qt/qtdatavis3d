@@ -7,7 +7,6 @@ uniform highp vec3 color_mdl;
 uniform highp sampler2DShadow shadowMap;
 
 varying highp vec4 shadowCoord;
-varying highp vec2 UV;
 varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;

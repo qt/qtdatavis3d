@@ -37,7 +37,8 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
 }*/
 
 void main() {
-    highp vec3 materialDiffuseColor = vec3(coords_mdl.y * color_mdl.x, coords_mdl.y * color_mdl.y, coords_mdl.y * color_mdl.z);
+    highp float heightMod = coords_mdl.y + (1.0 - ambientStrength);
+    highp vec3 materialDiffuseColor = heightMod * color_mdl;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
 
@@ -76,5 +77,6 @@ void main() {
         visibility * (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
+    gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0.0, 1.0);
     gl_FragColor.a = 1.0;
 }
