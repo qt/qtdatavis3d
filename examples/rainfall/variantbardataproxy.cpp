@@ -35,6 +35,7 @@ VariantBarDataProxy::VariantBarDataProxy(VariantDataSet *newSet,
 
 VariantBarDataProxy::~VariantBarDataProxy()
 {
+    delete m_dataSet;
 }
 
 void VariantBarDataProxy::setDataSet(VariantDataSet *newSet)

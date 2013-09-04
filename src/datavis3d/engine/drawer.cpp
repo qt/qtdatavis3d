@@ -51,6 +51,7 @@ Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelTransparenc
 
 Drawer::~Drawer()
 {
+    delete m_textureHelper;
 }
 
 void Drawer::initializeOpenGL()

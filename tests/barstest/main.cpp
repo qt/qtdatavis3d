@@ -37,6 +37,7 @@ int main(int argc, char **argv)
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
 
     Q3DBars *widgetchart = new Q3DBars();
     QSize screenSize = widgetchart->screen()->size();
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     QPushButton *dataButton = new QPushButton(widget);
     dataButton->setText(QStringLiteral("Insert a row of data"));
@@ -186,18 +188,6 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
-    vLayout->addWidget(staticCheckBox, 0, Qt::AlignTop);
-    vLayout->addWidget(rotationCheckBox, 0, Qt::AlignTop);
-    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")));
-    vLayout->addWidget(ratioSlider, 0, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")));
-    vLayout->addWidget(spacingSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(spacingSliderZ, 0, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
-    vLayout->addWidget(sampleSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(sampleSliderZ, 1, Qt::AlignTop);
     vLayout->addWidget(dataButton, 0, Qt::AlignTop);
     vLayout->addWidget(multiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeSingleDataButton, 0, Qt::AlignTop);
@@ -213,15 +203,28 @@ int main(int argc, char **argv)
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
-    vLayout->addWidget(releaseProxiesButton, 0, Qt::AlignTop);
-    vLayout->addWidget(backgroundCheckBox);
-    vLayout->addWidget(gridCheckBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-    vLayout->addWidget(fontList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
+
+    vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(rotationSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(rotationSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust relative bar size")), 0, Qt::AlignTop);
+    vLayout2->addWidget(ratioSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")), 0, Qt::AlignTop);
+    vLayout2->addWidget(spacingSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(spacingSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust sample count")), 0, Qt::AlignTop);
+    vLayout2->addWidget(sampleSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(sampleSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
+    vLayout2->addWidget(shadowQuality, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
+    vLayout2->addWidget(fontList, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
+    vLayout2->addWidget(fontSizeSlider, 1, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();

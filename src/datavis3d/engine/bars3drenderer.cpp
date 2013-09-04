@@ -50,6 +50,7 @@ static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection tex
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
+      m_cachedIsSlicingActivated(false),
       m_selectedBar(0),
       m_sliceSelection(0),
       m_sliceCache(0),
@@ -110,6 +111,8 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_barObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
+    delete m_labelObj;
+    delete m_labelShader;
 }
 
 void Bars3DRenderer::initializeOpenGL()

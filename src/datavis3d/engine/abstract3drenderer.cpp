@@ -294,7 +294,7 @@ AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::Ax
     case Q3DAbstractAxis::AxisOrientationZ:
         return m_axisCacheZ;
     default:
-        qFatal(__FUNCTION__);
+        qFatal("Abstract3DRenderer::axisCacheForOrientation");
         return m_axisCacheX;
     }
 }

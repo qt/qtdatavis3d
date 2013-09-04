@@ -25,13 +25,13 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    Q3DBars rainfall;
-    rainfall.resize(1280, 800);
-    rainfall.setPosition(QPoint(10, 30));
-    rainfall.show();
+    Q3DBars *rainfall = new Q3DBars;
+    rainfall->resize(1280, 800);
+    rainfall->setPosition(QPoint(10, 30));
+    rainfall->show();
 
-    RainfallChart *rainfallchart = new RainfallChart(&rainfall);
-    rainfallchart->start();
+    RainfallChart rainfallchart(rainfall);
+    rainfallchart.start();
 
     return app.exec();
 }

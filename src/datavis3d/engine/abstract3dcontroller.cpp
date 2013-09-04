@@ -67,7 +67,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
 Abstract3DController::~Abstract3DController()
 {
     delete m_cameraHelper;
-
+    delete m_inputHandler;
     // Attached axes are children, so no need to explicitly delete them
 }
 

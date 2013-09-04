@@ -59,8 +59,6 @@ private:
     QPointer<VariantBarDataMapping> m_mapping;
 
     Q_DISABLE_COPY(VariantBarDataProxy)
-
-    friend class VariantBarDataProxy;
 };
 
 #endif
