@@ -130,7 +130,7 @@ public:
 
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
     static QPoint noSelectionPoint();
 
@@ -148,7 +148,7 @@ signals:
     void selectedBarPosChanged(QPoint position);
 
 protected:
-    virtual QAbstractAxis *createDefaultAxis(QAbstractAxis::AxisOrientation orientation);
+    virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
 
 private:
     void adjustValueAxisRange();

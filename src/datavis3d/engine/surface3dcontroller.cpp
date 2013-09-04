@@ -19,9 +19,9 @@
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "qabstractaxis_p.h"
-#include "qvalueaxis_p.h"
-#include "qcategoryaxis.h"
+#include "q3dabstractaxis_p.h"
+#include "q3dvalueaxis_p.h"
+#include "q3dcategoryaxis.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -72,7 +72,7 @@ void Surface3DController::synchDataToRenderer()
     // Notify changes to renderer
 }
 
-void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)

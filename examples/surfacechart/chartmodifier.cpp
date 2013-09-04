@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "chartmodifier.h"
-#include <QValueAxis>
+#include <Q3DValueAxis>
 
 #include <qmath.h>
 
@@ -30,9 +30,9 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
       m_xCount(10),
       m_zCount(10)
 {
-    m_chart->setAxisX(new QValueAxis);
-    m_chart->setAxisY(new QValueAxis);
-    m_chart->setAxisZ(new QValueAxis);
+    m_chart->setAxisX(new Q3DValueAxis);
+    m_chart->setAxisY(new Q3DValueAxis);
+    m_chart->setAxisZ(new Q3DValueAxis);
 }
 
 ChartModifier::~ChartModifier()

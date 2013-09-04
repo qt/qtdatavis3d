@@ -26,9 +26,9 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
-class QAbstractAxis;
-class QCategoryAxis;
-class QValueAxis;
+class Q3DAbstractAxis;
+class Q3DCategoryAxis;
+class Q3DValueAxis;
 class QBarDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DBars : public Q3DWindow
@@ -94,15 +94,15 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    void setRowAxis(QCategoryAxis *axis);
-    QCategoryAxis *rowAxis() const;
-    void setColumnAxis(QCategoryAxis *axis);
-    QCategoryAxis *columnAxis() const;
-    void setValueAxis(QValueAxis *axis);
-    QValueAxis *valueAxis() const;
-    void addAxis(QAbstractAxis *axis);
-    void releaseAxis(QAbstractAxis *axis);
-    QList<QAbstractAxis *> axes() const;
+    void setRowAxis(Q3DCategoryAxis *axis);
+    Q3DCategoryAxis *rowAxis() const;
+    void setColumnAxis(Q3DCategoryAxis *axis);
+    Q3DCategoryAxis *columnAxis() const;
+    void setValueAxis(Q3DValueAxis *axis);
+    Q3DValueAxis *valueAxis() const;
+    void addAxis(Q3DAbstractAxis *axis);
+    void releaseAxis(Q3DAbstractAxis *axis);
+    QList<Q3DAbstractAxis *> axes() const;
 
     void setActiveDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *activeDataProxy() const;

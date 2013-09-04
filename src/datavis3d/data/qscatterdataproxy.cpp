@@ -41,13 +41,13 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  *     \li @zTitle    \li Title from Z axis
  *   \row
  *     \li @xLabel    \li Item value formatted using the same format the X axis attached to the graph uses,
- *                            see \l{QValueAxis::setLabelFormat()} for more information.
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
  *   \row
  *     \li @yLabel    \li Item value formatted using the same format the Y axis attached to the graph uses,
- *                            see \l{QValueAxis::setLabelFormat()} for more information.
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
  *   \row
  *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
- *                            see \l{QValueAxis::setLabelFormat()} for more information.
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
  * \endtable
  *
  * For example:

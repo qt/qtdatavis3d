@@ -20,7 +20,7 @@
 #include "audiolevels.h"
 
 #include <QtDataVis3D/qbardataproxy.h>
-#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/q3dvalueaxis.h>
 
 #include <QAudioDeviceInfo>
 #include <QAudioInput>

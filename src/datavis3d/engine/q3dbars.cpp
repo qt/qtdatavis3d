@@ -19,8 +19,8 @@
 #include "q3dbars.h"
 #include "q3dbars_p.h"
 #include "bars3dcontroller_p.h"
-#include "qvalueaxis.h"
-#include "qcategoryaxis.h"
+#include "q3dvalueaxis.h"
+#include "q3dcategoryaxis.h"
 #include "qbardataproxy.h"
 
 #include <QMouseEvent>
@@ -423,7 +423,7 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setRowAxis(QCategoryAxis *axis)
+void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
 {
     d_ptr->m_shared->setAxisX(axis);
 }
@@ -431,9 +431,9 @@ void Q3DBars::setRowAxis(QCategoryAxis *axis)
 /*!
  * \return category axis for rows.
  */
-QCategoryAxis *Q3DBars::rowAxis() const
+Q3DCategoryAxis *Q3DBars::rowAxis() const
 {
-    return static_cast<QCategoryAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisX());
 }
 
 /*!
@@ -445,7 +445,7 @@ QCategoryAxis *Q3DBars::rowAxis() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setColumnAxis(QCategoryAxis *axis)
+void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
     d_ptr->m_shared->setAxisZ(axis);
 }
@@ -453,9 +453,9 @@ void Q3DBars::setColumnAxis(QCategoryAxis *axis)
 /*!
  * \return category axis for columns.
  */
-QCategoryAxis *Q3DBars::columnAxis() const
+Q3DCategoryAxis *Q3DBars::columnAxis() const
 {
-    return static_cast<QCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
 /*!
@@ -468,7 +468,7 @@ QCategoryAxis *Q3DBars::columnAxis() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setValueAxis(QValueAxis *axis)
+void Q3DBars::setValueAxis(Q3DValueAxis *axis)
 {
     d_ptr->m_shared->setAxisY(axis);
 }
@@ -476,9 +476,9 @@ void Q3DBars::setValueAxis(QValueAxis *axis)
 /*!
  * \return used value axis (Y-axis).
  */
-QValueAxis *Q3DBars::valueAxis() const
+Q3DValueAxis *Q3DBars::valueAxis() const
 {
-    return static_cast<QValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
 }
 
 /*!
@@ -488,7 +488,7 @@ QValueAxis *Q3DBars::valueAxis() const
  *
  * \sa releaseAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
  */
-void Q3DBars::addAxis(QAbstractAxis *axis)
+void Q3DBars::addAxis(Q3DAbstractAxis *axis)
 {
     d_ptr->m_shared->addAxis(axis);
 }
@@ -501,7 +501,7 @@ void Q3DBars::addAxis(QAbstractAxis *axis)
  *
  * \sa addAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
  */
-void Q3DBars::releaseAxis(QAbstractAxis *axis)
+void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
 {
     d_ptr->m_shared->releaseAxis(axis);
 }
@@ -511,7 +511,7 @@ void Q3DBars::releaseAxis(QAbstractAxis *axis)
  *
  * \sa addAxis()
  */
-QList<QAbstractAxis *> Q3DBars::axes() const
+QList<Q3DAbstractAxis *> Q3DBars::axes() const
 {
     return d_ptr->m_shared->axes();
 }

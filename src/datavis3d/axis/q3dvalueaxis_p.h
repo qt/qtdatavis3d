@@ -26,43 +26,44 @@
 //
 // We mean it.
 
-#include "datavis3dglobal_p.h"
-#include "qabstractaxis.h"
-#include "abstract3dcontroller_p.h"
+#include "q3dvalueaxis.h"
+#include "q3dabstractaxis_p.h"
 
-#ifndef QABSTRACTAXIS_P_H
-#define QABSTRACTAXIS_P_H
+#ifndef QVALUEAXIS_P_H
+#define QVALUEAXIS_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractAxisPrivate : public QObject
+class Q3DValueAxisPrivate : public Q3DAbstractAxisPrivate
 {
     Q_OBJECT
+
 public:
-    QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type);
-    virtual ~QAbstractAxisPrivate();
+    Q3DValueAxisPrivate(Q3DValueAxis *q);
+    virtual ~Q3DValueAxisPrivate();
 
-    void setOrientation(QAbstractAxis::AxisOrientation orientation);
-
-    inline bool isDefaultAxis() { return m_isDefaultAxis; }
-    inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
+    void setRange(qreal min, qreal max);
+    void setMin(qreal min);
+    void setMax (qreal max);
 
 protected:
+    void emitLabelsChanged();
     virtual void updateLabels();
 
-    QAbstractAxis *q_ptr;
+    qreal m_min;
+    qreal m_max;
+    int m_segmentCount;
+    int m_subSegmentCount;
+    bool m_autoAdjust;
+    QString m_labelFormat;
+    bool m_labelsDirty;
 
-    QString m_title;
-    QStringList m_labels;
-    QAbstractAxis::AxisOrientation m_orientation;
-    QAbstractAxis::AxisType m_type;
-    bool m_isDefaultAxis;
+private:
+    Q3DValueAxis *qptr();
 
-    friend class QAbstractAxis;
-    friend class QValueAxis;
-    friend class QCategoryAxis;
+    friend class Q3DValueAxis;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QABSTRACTAXIS_P_H
+#endif // QVALUEAXIS_P_H

@@ -27,8 +27,8 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DScatterPrivate;
 class LabelItem;
-class QValueAxis;
-class QCategoryAxis;
+class Q3DValueAxis;
+class Q3DCategoryAxis;
 class QScatterDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DScatter : public Q3DWindow
@@ -86,15 +86,15 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    void setAxisX(QValueAxis *axis);
-    QValueAxis *axisX() const;
-    void setAxisY(QValueAxis *axis);
-    QValueAxis *axisY() const;
-    void setAxisZ(QValueAxis *axis);
-    QValueAxis *axisZ() const;
-    void addAxis(QValueAxis *axis);
-    void releaseAxis(QValueAxis *axis);
-    QList<QValueAxis *> axes() const;
+    void setAxisX(Q3DValueAxis *axis);
+    Q3DValueAxis *axisX() const;
+    void setAxisY(Q3DValueAxis *axis);
+    Q3DValueAxis *axisY() const;
+    void setAxisZ(Q3DValueAxis *axis);
+    Q3DValueAxis *axisZ() const;
+    void addAxis(Q3DValueAxis *axis);
+    void releaseAxis(Q3DValueAxis *axis);
+    QList<Q3DValueAxis *> axes() const;
 
     void setActiveDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *activeDataProxy() const;

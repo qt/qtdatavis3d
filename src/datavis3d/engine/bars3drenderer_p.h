@@ -130,7 +130,7 @@ public slots:
     void updateSelectedBarPos(QPoint position);
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
 signals:
     void selectedBarPosChanged(QPoint position);

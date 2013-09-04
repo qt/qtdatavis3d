@@ -16,18 +16,18 @@
 **
 ****************************************************************************/
 
-#include "qcategoryaxis.h"
-#include "qcategoryaxis_p.h"
+#include "q3dcategoryaxis.h"
+#include "q3dcategoryaxis_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 /*!
- * \class QCategoryAxis
+ * \class Q3DCategoryAxis
  * \inmodule QtDataVis3D
- * \brief The QCategoryAxis class is used for manipulating an axis of a graph.
+ * \brief The Q3DCategoryAxis class is used for manipulating an axis of a graph.
  * \since 1.0.0
  *
- * QCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
+ * Q3DCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
  * categories based on \l {Q3DBars::setDataWindow()}{data window} size.
  *
  * Grid lines are drawn between categories, if visible. Labels are drawn to positions of categories
@@ -35,32 +35,32 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QCategoryAxis with \a parent.
+ * Constructs Q3DCategoryAxis with \a parent.
  */
-QCategoryAxis::QCategoryAxis(QObject *parent) :
-    QAbstractAxis(new QCategoryAxisPrivate(this), parent)
+Q3DCategoryAxis::Q3DCategoryAxis(QObject *parent) :
+    Q3DAbstractAxis(new Q3DCategoryAxisPrivate(this), parent)
 {
 }
 
 /*!
- * Destroys QCategoryAxis.
+ * Destroys Q3DCategoryAxis.
  */
-QCategoryAxis::~QCategoryAxis()
+Q3DCategoryAxis::~Q3DCategoryAxis()
 {
 }
 
 /*!
- * \property QCategoryAxis::categoryLabels
+ * \property Q3DCategoryAxis::categoryLabels
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
  * remaining ones do not have a label.
  */
-QStringList QCategoryAxis::categoryLabels() const
+QStringList Q3DCategoryAxis::categoryLabels() const
 {
     return labels();
 }
 
-void QCategoryAxis::setCategoryLabels(const QStringList &labels)
+void Q3DCategoryAxis::setCategoryLabels(const QStringList &labels)
 {
     if (d_ptr->m_labels != labels) {
         d_ptr->m_labels = labels;
@@ -71,17 +71,17 @@ void QCategoryAxis::setCategoryLabels(const QStringList &labels)
 /*!
  * \internal
  */
-QCategoryAxisPrivate *QCategoryAxis::dptr()
+Q3DCategoryAxisPrivate *Q3DCategoryAxis::dptr()
 {
-    return static_cast<QCategoryAxisPrivate *>(d_ptr.data());
+    return static_cast<Q3DCategoryAxisPrivate *>(d_ptr.data());
 }
 
-QCategoryAxisPrivate::QCategoryAxisPrivate(QCategoryAxis *q)
-    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeCategory)
+Q3DCategoryAxisPrivate::Q3DCategoryAxisPrivate(Q3DCategoryAxis *q)
+    : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeCategory)
 {
 }
 
-QCategoryAxisPrivate::~QCategoryAxisPrivate()
+Q3DCategoryAxisPrivate::~Q3DCategoryAxisPrivate()
 {
 }
 

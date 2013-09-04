@@ -93,16 +93,16 @@ private:
     QStringList m_months;
     QStringList m_years;
     QPoint m_selectedBarPos;
-    QValueAxis *m_autoAdjustingAxis;
-    QValueAxis *m_fixedRangeAxis;
-    QValueAxis *m_temperatureAxis;
-    QCategoryAxis *m_yearAxis;
-    QCategoryAxis *m_monthAxis;
-    QCategoryAxis *m_genericRowAxis;
-    QCategoryAxis *m_genericColumnAxis;
+    Q3DValueAxis *m_autoAdjustingAxis;
+    Q3DValueAxis *m_fixedRangeAxis;
+    Q3DValueAxis *m_temperatureAxis;
+    Q3DCategoryAxis *m_yearAxis;
+    Q3DCategoryAxis *m_monthAxis;
+    Q3DCategoryAxis *m_genericRowAxis;
+    Q3DCategoryAxis *m_genericColumnAxis;
     QBarDataProxy *m_temperatureData;
     QBarDataProxy *m_genericData;
-    QValueAxis *m_currentAxis;
+    Q3DValueAxis *m_currentAxis;
 };
 
 #endif

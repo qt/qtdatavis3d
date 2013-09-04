@@ -25,23 +25,23 @@ Item {
     property alias expenses: expensesAxis
     property alias income: incomeAxis
 
-    CategoryAxis {
+    CategoryAxis3D {
         id: rowAxis
         categoryLabels: ["2000", "2001", "2002", "2003"]
     }
-    CategoryAxis {
+    CategoryAxis3D {
         id: columnAxis
         categoryLabels: ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"]
     }
-    ValueAxis {
+    ValueAxis3D {
         id: incomeAxis
         min: 0
         max: 35
         labelFormat: "%.2f M\u20AC"
         title: "Monthly income"
     }
-    ValueAxis {
+    ValueAxis3D {
         id: expensesAxis
         min: 0
         max: 35

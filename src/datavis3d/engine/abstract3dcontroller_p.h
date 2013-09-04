@@ -33,7 +33,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "theme_p.h"
-#include "qabstractaxis.h"
+#include "q3dabstractaxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
@@ -158,11 +158,11 @@ protected:
     CameraHelper *m_cameraHelper;
     int m_zoomLevel;
     // Active axes
-    QAbstractAxis *m_axisX;
-    QAbstractAxis *m_axisY;
-    QAbstractAxis *m_axisZ;
+    Q3DAbstractAxis *m_axisX;
+    Q3DAbstractAxis *m_axisY;
+    Q3DAbstractAxis *m_axisZ;
 
-    QList<QAbstractAxis *> m_axes; // List of all added axes
+    QList<Q3DAbstractAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
 
@@ -204,15 +204,15 @@ public:
     virtual int x();
     virtual void setY(const int y);
     virtual int y();
-    virtual void setAxisX(QAbstractAxis *axis);
-    virtual QAbstractAxis *axisX();
-    virtual void setAxisY(QAbstractAxis *axis);
-    virtual QAbstractAxis *axisY();
-    virtual void setAxisZ(QAbstractAxis *axis);
-    virtual QAbstractAxis *axisZ();
-    virtual void addAxis(QAbstractAxis *axis);
-    virtual void releaseAxis(QAbstractAxis *axis);
-    virtual QList<QAbstractAxis *> axes() const; // Omits default axes
+    virtual void setAxisX(Q3DAbstractAxis *axis);
+    virtual Q3DAbstractAxis *axisX();
+    virtual void setAxisY(Q3DAbstractAxis *axis);
+    virtual Q3DAbstractAxis *axisY();
+    virtual void setAxisZ(Q3DAbstractAxis *axis);
+    virtual Q3DAbstractAxis *axisZ();
+    virtual void addAxis(Q3DAbstractAxis *axis);
+    virtual void releaseAxis(Q3DAbstractAxis *axis);
+    virtual QList<Q3DAbstractAxis *> axes() const; // Omits default axes
 
     virtual QAbstractDataProxy *activeDataProxy() const;
     virtual void addDataProxy(QAbstractDataProxy *proxy);
@@ -275,7 +275,7 @@ public:
     virtual void handleAxisSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
-            QAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
+            Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
 
 public slots:
@@ -293,14 +293,14 @@ signals:
     void needRender();
 
 protected:
-    virtual QAbstractAxis *createDefaultAxis(QAbstractAxis::AxisOrientation orientation);
-    QValueAxis *createDefaultValueAxis();
-    QCategoryAxis *createDefaultCategoryAxis();
+    virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
+    Q3DValueAxis *createDefaultValueAxis();
+    Q3DCategoryAxis *createDefaultCategoryAxis();
     void emitNeedRender();
 
 private:
-    void setAxisHelper(QAbstractAxis::AxisOrientation orientation, QAbstractAxis *axis,
-                       QAbstractAxis **axisPtr);
+    void setAxisHelper(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis *axis,
+                       Q3DAbstractAxis **axisPtr);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -31,7 +31,7 @@
 
 #include "datavis3dglobal_p.h"
 #include "labelitem_p.h"
-#include "qabstractaxis_p.h"
+#include "q3dabstractaxis_p.h"
 #include "drawer_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
@@ -45,8 +45,8 @@ public:
 
     void setDrawer(Drawer *drawer);
 
-    void setType(QAbstractAxis::AxisType type);
-    inline QAbstractAxis::AxisType type() const { return m_type; }
+    void setType(Q3DAbstractAxis::AxisType type);
+    inline Q3DAbstractAxis::AxisType type() const { return m_type; }
     void setTitle(const QString &title);
     inline const QString &title() { return m_title; }
     void setLabels(const QStringList &labels);
@@ -75,7 +75,7 @@ private:
     void updateSubSegmentStep();
 
     // Cached axis values
-    QAbstractAxis::AxisType m_type;
+    Q3DAbstractAxis::AxisType m_type;
     QString m_title;
     QStringList m_labels;
     qreal m_min;

@@ -120,32 +120,32 @@ QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
     return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->activeMapping();
 }
 
-QValueAxis *DeclarativeScatter::axisX() const
+Q3DValueAxis *DeclarativeScatter::axisX() const
 {
-    return static_cast<QValueAxis *>(m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(m_shared->axisX());
 }
 
-void DeclarativeScatter::setAxisX(QValueAxis *axis)
+void DeclarativeScatter::setAxisX(Q3DValueAxis *axis)
 {
     m_shared->setAxisX(axis);
 }
 
-QValueAxis *DeclarativeScatter::axisY() const
+Q3DValueAxis *DeclarativeScatter::axisY() const
 {
-    return static_cast<QValueAxis *>(m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(m_shared->axisY());
 }
 
-void DeclarativeScatter::setAxisY(QValueAxis *axis)
+void DeclarativeScatter::setAxisY(Q3DValueAxis *axis)
 {
     m_shared->setAxisY(axis);
 }
 
-QValueAxis *DeclarativeScatter::axisZ() const
+Q3DValueAxis *DeclarativeScatter::axisZ() const
 {
-    return static_cast<QValueAxis *>(m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(m_shared->axisZ());
 }
 
-void DeclarativeScatter::setAxisZ(QValueAxis *axis)
+void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
 {
     m_shared->setAxisZ(axis);
 }

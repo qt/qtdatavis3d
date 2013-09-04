@@ -67,9 +67,9 @@ private:
     qreal m_maxval;
     QStringList m_months;
     QStringList m_years;
-    QValueAxis *m_temperatureAxis;
-    QCategoryAxis *m_yearAxis;
-    QCategoryAxis *m_monthAxis;
+    Q3DValueAxis *m_temperatureAxis;
+    Q3DCategoryAxis *m_yearAxis;
+    Q3DCategoryAxis *m_monthAxis;
     QBarDataProxy *m_temperatureData;
 };
 

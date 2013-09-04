@@ -16,19 +16,19 @@
 **
 ****************************************************************************/
 
-#include "qvalueaxis.h"
-#include "qvalueaxis_p.h"
+#include "q3dvalueaxis.h"
+#include "q3dvalueaxis_p.h"
 #include "utils_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 /*!
- * \class QValueAxis
+ * \class Q3DValueAxis
  * \inmodule QtDataVis3D
- * \brief The QValueAxis class is used for manipulating an axis of a graph.
+ * \brief The Q3DValueAxis class is used for manipulating an axis of a graph.
  * \since 1.0.0
  *
- * QValueAxis provides an axis that can be given a range of values and segment and subsegment
+ * Q3DValueAxis provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
  *
  * Labels are drawn between each segment. Grid lines are drawn between each segment and each
@@ -37,17 +37,17 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs QValueAxis with the given \a parent.
+ * Constructs Q3DValueAxis with the given \a parent.
  */
-QValueAxis::QValueAxis(QObject *parent) :
-    QAbstractAxis(new QValueAxisPrivate(this), parent)
+Q3DValueAxis::Q3DValueAxis(QObject *parent) :
+    Q3DAbstractAxis(new Q3DValueAxisPrivate(this), parent)
 {
 }
 
 /*!
- * Destroys QValueAxis.
+ * Destroys Q3DValueAxis.
  */
-QValueAxis::~QValueAxis()
+Q3DValueAxis::~Q3DValueAxis()
 {
 }
 
@@ -55,50 +55,50 @@ QValueAxis::~QValueAxis()
  * Sets value range of the axis from \a min to \a max.
  * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
  */
-void QValueAxis::setRange(qreal min, qreal max)
+void Q3DValueAxis::setRange(qreal min, qreal max)
 {
     dptr()->setRange(min, max);
     setAutoAdjustRange(false);
 }
 
 /*!
- * \property QValueAxis::min
+ * \property Q3DValueAxis::min
  *
  * Defines the minimum value on the axis.
  * When setting this property the max is adjusted if necessary, to ensure that the range remains
  * valid.
  */
-void QValueAxis::setMin(qreal min)
+void Q3DValueAxis::setMin(qreal min)
 {
     dptr()->setMin(min);
     setAutoAdjustRange(false);
 }
 
 /*!
- * \property QValueAxis::max
+ * \property Q3DValueAxis::max
  *
  * Defines the maximum value on the axis.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  */
-void QValueAxis::setMax(qreal max)
+void Q3DValueAxis::setMax(qreal max)
 {
     dptr()->setMax(max);
     setAutoAdjustRange(false);
 }
 
-qreal QValueAxis::min() const
+qreal Q3DValueAxis::min() const
 {
     return dptrc()->m_min;
 }
 
-qreal QValueAxis::max() const
+qreal Q3DValueAxis::max() const
 {
     return dptrc()->m_max;
 }
 
 /*!
- * \property QValueAxis::segmentCount
+ * \property Q3DValueAxis::segmentCount
  *
  * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
  * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
@@ -106,7 +106,7 @@ qreal QValueAxis::max() const
  *
  * \sa setSubSegmentCount()
  */
-void QValueAxis::setSegmentCount(int count)
+void Q3DValueAxis::setSegmentCount(int count)
 {
     if (count <= 0) {
         qWarning() << "Warning: Illegal segment count automatically adjusted to a legal one:"
@@ -120,13 +120,13 @@ void QValueAxis::setSegmentCount(int count)
     }
 }
 
-int QValueAxis::segmentCount() const
+int Q3DValueAxis::segmentCount() const
 {
     return dptrc()->m_segmentCount;
 }
 
 /*!
- * \property QValueAxis::subSegmentCount
+ * \property Q3DValueAxis::subSegmentCount
  *
  * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
  * each subsegment, in addition to each segment.
@@ -134,7 +134,7 @@ int QValueAxis::segmentCount() const
  *
  * \sa setSegmentCount()
  **/
-void QValueAxis::setSubSegmentCount(int count)
+void Q3DValueAxis::setSubSegmentCount(int count)
 {
     if (count <= 0) {
         qWarning() << "Warning: Illegal subsegment count automatically adjusted to a legal one:"
@@ -147,20 +147,20 @@ void QValueAxis::setSubSegmentCount(int count)
     }
 }
 
-int QValueAxis::subSegmentCount() const
+int Q3DValueAxis::subSegmentCount() const
 {
     return dptrc()->m_subSegmentCount;
 }
 
 /*!
- * \property QValueAxis::autoAdjustRange
+ * \property Q3DValueAxis::autoAdjustRange
  *
  * Tells the axis to automatically calculate the range instead of setting range or adjusting min or
  * max property.
  *
  * \sa setRange(), setMin(), setMax()
  */
-void QValueAxis::setAutoAdjustRange(bool autoAdjust)
+void Q3DValueAxis::setAutoAdjustRange(bool autoAdjust)
 {
     if (dptr()->m_autoAdjust != autoAdjust) {
         dptr()->m_autoAdjust = autoAdjust;
@@ -168,13 +168,13 @@ void QValueAxis::setAutoAdjustRange(bool autoAdjust)
     }
 }
 
-bool QValueAxis::isAutoAdjustRange() const
+bool Q3DValueAxis::isAutoAdjustRange() const
 {
     return dptrc()->m_autoAdjust;
 }
 
 /*!
- * \property QValueAxis::labelFormat
+ * \property Q3DValueAxis::labelFormat
  *
  * Defines the label format to be used for the labels on this axis. Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
@@ -183,7 +183,7 @@ bool QValueAxis::isAutoAdjustRange() const
  *
  * \c {axis->setLabelFormat("%.2f mm");}
  */
-void QValueAxis::setLabelFormat(const QString &format)
+void Q3DValueAxis::setLabelFormat(const QString &format)
 {
     if (dptr()->m_labelFormat != format) {
         dptr()->m_labelFormat = format;
@@ -192,7 +192,7 @@ void QValueAxis::setLabelFormat(const QString &format)
     }
 }
 
-QString QValueAxis::labelFormat() const
+QString Q3DValueAxis::labelFormat() const
 {
     return dptrc()->m_labelFormat;
 }
@@ -200,21 +200,21 @@ QString QValueAxis::labelFormat() const
 /*!
  * \internal
  */
-QValueAxisPrivate *QValueAxis::dptr()
+Q3DValueAxisPrivate *Q3DValueAxis::dptr()
 {
-    return static_cast<QValueAxisPrivate *>(d_ptr.data());
+    return static_cast<Q3DValueAxisPrivate *>(d_ptr.data());
 }
 
 /*!
  * \internal
  */
-const QValueAxisPrivate *QValueAxis::dptrc() const
+const Q3DValueAxisPrivate *Q3DValueAxis::dptrc() const
 {
-    return static_cast<const QValueAxisPrivate *>(d_ptr.data());
+    return static_cast<const Q3DValueAxisPrivate *>(d_ptr.data());
 }
 
-QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
-    : QAbstractAxisPrivate(q, QAbstractAxis::AxisTypeValue),
+Q3DValueAxisPrivate::Q3DValueAxisPrivate(Q3DValueAxis *q)
+    : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeValue),
       m_min(0.0),
       m_max(10.0),
       m_segmentCount(5),
@@ -225,11 +225,11 @@ QValueAxisPrivate::QValueAxisPrivate(QValueAxis *q)
 {
 }
 
-QValueAxisPrivate::~QValueAxisPrivate()
+Q3DValueAxisPrivate::~Q3DValueAxisPrivate()
 {
 }
 
-void QValueAxisPrivate::setRange(qreal min, qreal max)
+void Q3DValueAxisPrivate::setRange(qreal min, qreal max)
 {
     // If min >= max, we adjust ranges so that
     // m_max becomes (min + 1.0)
@@ -257,7 +257,7 @@ void QValueAxisPrivate::setRange(qreal min, qreal max)
     }
 }
 
-void QValueAxisPrivate::setMin(qreal min)
+void Q3DValueAxisPrivate::setMin(qreal min)
 {
     if (m_min != min) {
         if (min >= m_max) {
@@ -273,7 +273,7 @@ void QValueAxisPrivate::setMin(qreal min)
     }
 }
 
-void QValueAxisPrivate::setMax(qreal max)
+void Q3DValueAxisPrivate::setMax(qreal max)
 {
     if (m_max != max) {
         if (max <= m_min) {
@@ -289,13 +289,13 @@ void QValueAxisPrivate::setMax(qreal max)
     }
 }
 
-void QValueAxisPrivate::emitLabelsChanged()
+void Q3DValueAxisPrivate::emitLabelsChanged()
 {
     m_labelsDirty = true;
     emit q_ptr->labelsChanged();
 }
 
-void QValueAxisPrivate::updateLabels()
+void Q3DValueAxisPrivate::updateLabels()
 {
     if (!m_labelsDirty)
         return;
@@ -324,9 +324,9 @@ void QValueAxisPrivate::updateLabels()
         m_labels = newLabels;
 }
 
-QValueAxis *QValueAxisPrivate::qptr()
+Q3DValueAxis *Q3DValueAxisPrivate::qptr()
 {
-    return static_cast<QValueAxis *>(q_ptr);
+    return static_cast<Q3DValueAxis *>(q_ptr);
 }
 
 QT_DATAVIS3D_END_NAMESPACE

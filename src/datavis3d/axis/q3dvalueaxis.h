@@ -19,13 +19,13 @@
 #ifndef QVALUEAXIS_H
 #define QVALUEAXIS_H
 
-#include <QtDataVis3D/qabstractaxis.h>
+#include <QtDataVis3D/q3dabstractaxis.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QValueAxisPrivate;
+class Q3DValueAxisPrivate;
 
-class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
+class QT_DATAVIS3D_EXPORT Q3DValueAxis : public Q3DAbstractAxis
 {
     Q_OBJECT
     Q_PROPERTY(qreal min READ min WRITE setMin NOTIFY rangeChanged)
@@ -36,8 +36,8 @@ class QT_DATAVIS3D_EXPORT QValueAxis : public QAbstractAxis
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
 
 public:
-    explicit QValueAxis(QObject *parent = 0);
-    virtual ~QValueAxis();
+    explicit Q3DValueAxis(QObject *parent = 0);
+    virtual ~Q3DValueAxis();
 
     qreal min() const;
     qreal max() const;
@@ -63,11 +63,11 @@ signals:
     void labelFormatChanged(QString format);
 
 protected:
-    QValueAxisPrivate *dptr();
-    const QValueAxisPrivate *dptrc() const;
+    Q3DValueAxisPrivate *dptr();
+    const Q3DValueAxisPrivate *dptrc() const;
 
 private:
-    Q_DISABLE_COPY(QValueAxis)
+    Q_DISABLE_COPY(Q3DValueAxis)
     friend class Bars3DController;
     friend class Scatter3DController;
 };

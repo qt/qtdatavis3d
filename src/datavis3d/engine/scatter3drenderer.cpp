@@ -1453,7 +1453,7 @@ void Scatter3DRenderer::updateTextures()
     m_updateLabels = true;
 }
 
-void Scatter3DRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation,
+void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation,
                                         qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);

@@ -1451,7 +1451,7 @@ void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, QSizeF spacing, bool
     calculateSceneScalingFactors();
 }
 
-void Bars3DRenderer::updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
+void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
     calculateHeightAdjustment();

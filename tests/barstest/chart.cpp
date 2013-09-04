@@ -17,8 +17,8 @@
 ****************************************************************************/
 
 #include "chart.h"
-#include <QtDataVis3D/qcategoryaxis.h>
-#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/q3dcategoryaxis.h>
+#include <QtDataVis3D/q3dvalueaxis.h>
 #include <QtDataVis3D/qbardataproxy.h>
 #include <QTime>
 
@@ -42,13 +42,13 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
       m_maxval(20.0),
       m_selectedBarPos(-1, -1),
-      m_autoAdjustingAxis(new QValueAxis),
-      m_fixedRangeAxis(new QValueAxis),
-      m_temperatureAxis(new QValueAxis),
-      m_yearAxis(new QCategoryAxis),
-      m_monthAxis(new QCategoryAxis),
-      m_genericRowAxis(new QCategoryAxis),
-      m_genericColumnAxis(new QCategoryAxis),
+      m_autoAdjustingAxis(new Q3DValueAxis),
+      m_fixedRangeAxis(new Q3DValueAxis),
+      m_temperatureAxis(new Q3DValueAxis),
+      m_yearAxis(new Q3DCategoryAxis),
+      m_monthAxis(new Q3DCategoryAxis),
+      m_genericRowAxis(new Q3DCategoryAxis),
+      m_genericColumnAxis(new Q3DCategoryAxis),
       m_temperatureData(new QBarDataProxy),
       m_genericData(new QBarDataProxy),
       m_currentAxis(m_fixedRangeAxis)

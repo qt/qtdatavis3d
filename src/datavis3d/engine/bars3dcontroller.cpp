@@ -19,9 +19,9 @@
 #include "bars3dcontroller_p.h"
 #include "bars3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "qabstractaxis_p.h"
-#include "qvalueaxis_p.h"
-#include "qcategoryaxis.h"
+#include "q3dabstractaxis_p.h"
+#include "q3dvalueaxis_p.h"
+#include "q3dcategoryaxis.h"
 #include "qbardataproxy_p.h"
 
 #include <QMatrix4x4>
@@ -378,7 +378,7 @@ void Bars3DController::handleSelectedBarPosChanged(const QPoint &position)
 }
 
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
-        QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+        Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -502,7 +502,7 @@ int Bars3DController::rowCount()
 
 void Bars3DController::adjustValueAxisRange()
 {
-    QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisY);
+    Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
     if (valueAxis && valueAxis->isAutoAdjustRange() && m_data) {
         QPair<GLfloat, GLfloat> limits =
                 static_cast<QBarDataProxy *>(m_data)->dptr()->limitValues(0, m_rowCount,
@@ -520,11 +520,11 @@ void Bars3DController::adjustValueAxisRange()
     }
 }
 
-QAbstractAxis *Bars3DController::createDefaultAxis(QAbstractAxis::AxisOrientation orientation)
+Q3DAbstractAxis *Bars3DController::createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation)
 {
-    QAbstractAxis *defaultAxis = 0;
+    Q3DAbstractAxis *defaultAxis = 0;
 
-    if (orientation == QAbstractAxis::AxisOrientationY)
+    if (orientation == Q3DAbstractAxis::AxisOrientationY)
         defaultAxis = createDefaultValueAxis();
     else
         defaultAxis = createDefaultCategoryAxis();

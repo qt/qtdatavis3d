@@ -112,13 +112,13 @@ public:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
-    virtual void updateAxisType(QAbstractAxis::AxisOrientation orientation, QAbstractAxis::AxisType type);
-    virtual void updateAxisTitle(QAbstractAxis::AxisOrientation orientation, const QString &title);
-    virtual void updateAxisLabels(QAbstractAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
-    virtual void updateAxisSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubSegmentCount(QAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisLabelFormat(QAbstractAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type);
+    virtual void updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title);
+    virtual void updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
 
 protected:
     Abstract3DRenderer(Abstract3DController *controller);
@@ -129,7 +129,7 @@ protected:
     virtual void handleResize();
     virtual void loadMeshFile() = 0;
 
-    AxisRenderCache &axisCacheForOrientation(QAbstractAxis::AxisOrientation orientation);
+    AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
 };
 
 QT_DATAVIS3D_END_NAMESPACE

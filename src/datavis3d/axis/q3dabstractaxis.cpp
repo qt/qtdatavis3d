@@ -16,24 +16,24 @@
 **
 ****************************************************************************/
 
-#include "qabstractaxis.h"
-#include "qabstractaxis_p.h"
+#include "q3dabstractaxis.h"
+#include "q3dabstractaxis_p.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 /*!
- * \class QAbstractAxis
+ * \class Q3DAbstractAxis
  * \inmodule QtDataVis3D
- * \brief QAbstractAxis is base class for axes of a graph.
+ * \brief Q3DAbstractAxis is base class for axes of a graph.
  * \since 1.0.0
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
- * \sa QCategoryAxis, QValueAxis
+ * \sa Q3DCategoryAxis, Q3DValueAxis
  */
 
 /*!
- * \enum QAbstractAxis::AxisOrientation
+ * \enum Q3DAbstractAxis::AxisOrientation
  *
  * The orientation of the axis object.
  *
@@ -44,7 +44,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  */
 
 /*!
- * \enum QAbstractAxis::AxisType
+ * \enum Q3DAbstractAxis::AxisType
  *
  * The type of the axis object.
  *
@@ -56,61 +56,61 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 /*!
  * \internal
  */
-QAbstractAxis::QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent) :
+Q3DAbstractAxis::Q3DAbstractAxis(Q3DAbstractAxisPrivate *d, QObject *parent) :
     QObject(parent),
     d_ptr(d)
 {
 }
 
 /*!
- * Destroys QAbstractAxis.
+ * Destroys Q3DAbstractAxis.
  */
-QAbstractAxis::~QAbstractAxis()
+Q3DAbstractAxis::~Q3DAbstractAxis()
 {
 }
 
 /*!
- * \property QAbstractAxis::title
+ * \property Q3DAbstractAxis::title
  *
  * Defines the title for the axis.
  */
-QString QAbstractAxis::title() const
+QString Q3DAbstractAxis::title() const
 {
     return d_ptr->m_title;
 }
 
 /*!
- * \property QAbstractAxis::labels
+ * \property Q3DAbstractAxis::labels
  *
  * Defines the labels for the axis.
  */
-QStringList QAbstractAxis::labels() const
+QStringList Q3DAbstractAxis::labels() const
 {
     d_ptr->updateLabels();
     return d_ptr->m_labels;
 }
 
 /*!
- * \property QAbstractAxis::orientation
+ * \property Q3DAbstractAxis::orientation
  *
- * Defines the orientation of the axis, one of \c QAbstractAxis::AxisOrientation.
+ * Defines the orientation of the axis, one of \c Q3DAbstractAxis::AxisOrientation.
  */
-QAbstractAxis::AxisOrientation QAbstractAxis::orientation() const
+Q3DAbstractAxis::AxisOrientation Q3DAbstractAxis::orientation() const
 {
     return d_ptr->m_orientation;
 }
 
 /*!
- * \property QAbstractAxis::type
+ * \property Q3DAbstractAxis::type
  *
- * Defines the type of the axis, one of \c QAbstractAxis::AxisType.
+ * Defines the type of the axis, one of \c Q3DAbstractAxis::AxisType.
  */
-QAbstractAxis::AxisType QAbstractAxis::type() const
+Q3DAbstractAxis::AxisType Q3DAbstractAxis::type() const
 {
     return d_ptr->m_type;
 }
 
-void QAbstractAxis::setTitle(QString title)
+void Q3DAbstractAxis::setTitle(QString title)
 {
     if (d_ptr->m_title != title) {
         d_ptr->m_title = title;
@@ -118,30 +118,30 @@ void QAbstractAxis::setTitle(QString title)
     }
 }
 
-// QAbstractAxisPrivate
+// Q3DAbstractAxisPrivate
 
-QAbstractAxisPrivate::QAbstractAxisPrivate(QAbstractAxis *q, QAbstractAxis::AxisType type)
+Q3DAbstractAxisPrivate::Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAxis::AxisType type)
     : QObject(0),
       q_ptr(q),
-      m_orientation(QAbstractAxis::AxisOrientationNone),
+      m_orientation(Q3DAbstractAxis::AxisOrientationNone),
       m_type(type),
       m_isDefaultAxis(false)
 {
 }
 
-QAbstractAxisPrivate::~QAbstractAxisPrivate()
+Q3DAbstractAxisPrivate::~Q3DAbstractAxisPrivate()
 {
 }
 
-void QAbstractAxisPrivate::setOrientation(QAbstractAxis::AxisOrientation orientation)
+void Q3DAbstractAxisPrivate::setOrientation(Q3DAbstractAxis::AxisOrientation orientation)
 {
-    if (m_orientation == QAbstractAxis::AxisOrientationNone)
+    if (m_orientation == Q3DAbstractAxis::AxisOrientationNone)
         m_orientation = orientation;
     else
         Q_ASSERT("Attempted to reset axis orientation.");
 }
 
-void QAbstractAxisPrivate::updateLabels()
+void Q3DAbstractAxisPrivate::updateLabels()
 {
     // Default implementation does nothing
 }

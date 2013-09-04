@@ -17,12 +17,12 @@
 ****************************************************************************/
 
 /*!
-    \example spectrum
-    \title Spectrum Example
+    \example audiolevels
+    \title Audiolevels Example
 
-    The spectrum example shows how feed dynamic data to a graph using Q3DBars.
+    The audiolevels example shows how feed dynamic data to a graph using Q3DBars.
 
-    \image spectrum-example.png
+    \image audiolevels-example.png
 
     TODO
 */

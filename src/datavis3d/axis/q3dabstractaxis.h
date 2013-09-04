@@ -16,8 +16,8 @@
 **
 ****************************************************************************/
 
-#ifndef QABSTRACTAXIS_H
-#define QABSTRACTAXIS_H
+#ifndef Q3DABSTRACTAXIS_H
+#define Q3DABSTRACTAXIS_H
 
 #include <QtDataVis3D/qdatavis3denums.h>
 #include <QObject>
@@ -27,9 +27,9 @@
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractAxisPrivate;
+class Q3DAbstractAxisPrivate;
 
-class QT_DATAVIS3D_EXPORT QAbstractAxis : public QObject
+class QT_DATAVIS3D_EXPORT Q3DAbstractAxis : public QObject
 {
     Q_OBJECT
     Q_ENUMS(AxisOrientation)
@@ -55,10 +55,10 @@ public:
     };
 
 protected:
-    explicit QAbstractAxis(QAbstractAxisPrivate *d, QObject *parent = 0);
+    explicit Q3DAbstractAxis(Q3DAbstractAxisPrivate *d, QObject *parent = 0);
 
 public:
-    virtual ~QAbstractAxis();
+    virtual ~Q3DAbstractAxis();
 
     QString title() const;
     QStringList labels() const;
@@ -74,10 +74,10 @@ signals:
     void labelsChanged();
 
 protected:
-    QScopedPointer<QAbstractAxisPrivate> d_ptr;
+    QScopedPointer<Q3DAbstractAxisPrivate> d_ptr;
 
 private:
-    Q_DISABLE_COPY(QAbstractAxis)
+    Q_DISABLE_COPY(Q3DAbstractAxis)
 
     friend class Abstract3DController;
     friend class Bars3DController;

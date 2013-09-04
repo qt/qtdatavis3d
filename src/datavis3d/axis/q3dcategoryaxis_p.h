@@ -26,44 +26,24 @@
 //
 // We mean it.
 
-#include "qvalueaxis.h"
-#include "qabstractaxis_p.h"
+#include "q3dcategoryaxis.h"
+#include "q3dabstractaxis_p.h"
+#include "qbardataitem.h"
 
-#ifndef QVALUEAXIS_P_H
-#define QVALUEAXIS_P_H
+#ifndef QCATEGORYAXIS_P_H
+#define QCATEGORYAXIS_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QValueAxisPrivate : public QAbstractAxisPrivate
+class Q3DCategoryAxisPrivate : public Q3DAbstractAxisPrivate
 {
     Q_OBJECT
 
 public:
-    QValueAxisPrivate(QValueAxis *q);
-    virtual ~QValueAxisPrivate();
-
-    void setRange(qreal min, qreal max);
-    void setMin(qreal min);
-    void setMax (qreal max);
-
-protected:
-    void emitLabelsChanged();
-    virtual void updateLabels();
-
-    qreal m_min;
-    qreal m_max;
-    int m_segmentCount;
-    int m_subSegmentCount;
-    bool m_autoAdjust;
-    QString m_labelFormat;
-    bool m_labelsDirty;
-
-private:
-    QValueAxis *qptr();
-
-    friend class QValueAxis;
+    Q3DCategoryAxisPrivate(Q3DCategoryAxis *q);
+    virtual ~Q3DCategoryAxisPrivate();
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QVALUEAXIS_P_H
+#endif // QCATEGORYAXIS_P_H

@@ -45,7 +45,7 @@ class ShaderHelper;
 class ObjectHelper;
 class LabelItem;
 class CameraHelper;
-class QAbstractAxisPrivate;
+class Q3DAbstractAxisPrivate;
 
 class QT_DATAVIS3D_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
@@ -137,7 +137,7 @@ public slots:
     void updateBackgroundEnabled(bool enable);
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
     void updateSelectedItemIndex(int index);
 

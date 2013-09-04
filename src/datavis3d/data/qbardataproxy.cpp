@@ -55,7 +55,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
  *     \li @colLabel      \li Label from column axis
  *   \row
  *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
- *                            see \l{QValueAxis::setLabelFormat()} for more information.
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
  *   \row
  *     \li %<format spec> \li Item value in specified format.
  * \endtable

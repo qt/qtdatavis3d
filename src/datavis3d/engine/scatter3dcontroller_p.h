@@ -104,7 +104,7 @@ public:
 
     void synchDataToRenderer();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
 public slots:
     void handleArrayReset();

@@ -18,7 +18,7 @@
 
 #include "scatterchart.h"
 #include <QtDataVis3D/qscatterdataproxy.h>
-#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/q3dvalueaxis.h>
 #include <qmath.h>
 using namespace QtDataVis3D;
 
@@ -37,9 +37,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setTheme(QDataVis::ThemeBrownSand);
     m_chart->setShadowQuality(QDataVis::ShadowHigh);
     m_chart->setCameraPreset(QDataVis::PresetFront);
-    m_chart->setAxisX(new QValueAxis);
-    m_chart->setAxisY(new QValueAxis);
-    m_chart->setAxisZ(new QValueAxis);
+    m_chart->setAxisX(new Q3DValueAxis);
+    m_chart->setAxisY(new Q3DValueAxis);
+    m_chart->setAxisZ(new Q3DValueAxis);
 
     QScatterDataProxy *proxy = new QScatterDataProxy;
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");

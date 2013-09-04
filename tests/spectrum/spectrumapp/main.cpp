@@ -21,7 +21,7 @@
 
 #include <QtDataVis3D/q3dbars.h>
 #include <QtDataVis3D/qbardataproxy.h>
-#include <QtDataVis3D/qvalueaxis.h>
+#include <QtDataVis3D/q3dvalueaxis.h>
 
 #include <QGuiApplication>
 #include <QAudio>

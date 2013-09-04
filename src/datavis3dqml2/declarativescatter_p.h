@@ -33,7 +33,7 @@
 #include "scatter3dcontroller_p.h"
 #include "declarativescatter_p.h"
 #include "qitemmodelscatterdatamapping.h"
-#include "qvalueaxis.h"
+#include "q3dvalueaxis.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -46,9 +46,9 @@ class DeclarativeScatter : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelScatterDataMapping *mapping READ mapping WRITE setMapping)
-    Q_PROPERTY(QValueAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(QValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(QValueAxis *axisZ READ axisZ WRITE setAxisZ)
+    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
+    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
+    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -91,12 +91,12 @@ public:
     QItemModelScatterDataMapping *mapping() const;
     void setMapping(QItemModelScatterDataMapping *mapping);
 
-    QValueAxis *axisX() const;
-    void setAxisX(QValueAxis *axis);
-    QValueAxis *axisY() const;
-    void setAxisY(QValueAxis *axis);
-    QValueAxis *axisZ() const;
-    void setAxisZ(QValueAxis *axis);
+    Q3DValueAxis *axisX() const;
+    void setAxisX(Q3DValueAxis *axis);
+    Q3DValueAxis *axisY() const;
+    void setAxisY(Q3DValueAxis *axis);
+    Q3DValueAxis *axisZ() const;
+    void setAxisZ(Q3DValueAxis *axis);
 
     // Object type
     void setObjectType(QDataVis::MeshStyle style);

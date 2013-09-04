@@ -16,16 +16,16 @@
 **
 ****************************************************************************/
 
-#ifndef QCATEGORYAXIS_H
-#define QCATEGORYAXIS_H
+#ifndef Q3DCATEGORYAXIS_H
+#define Q3DCATEGORYAXIS_H
 
-#include <QtDataVis3D/qabstractaxis.h>
+#include <QtDataVis3D/q3dabstractaxis.h>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate;
+class Q3DCategoryAxisPrivate;
 
-class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
+class QT_DATAVIS3D_EXPORT Q3DCategoryAxis : public Q3DAbstractAxis
 {
     Q_OBJECT
     // Note: categoryLabels actually reads/writes the labels property in abstract axis,
@@ -34,8 +34,8 @@ class QT_DATAVIS3D_EXPORT QCategoryAxis : public QAbstractAxis
     Q_PROPERTY(QStringList categoryLabels READ categoryLabels WRITE setCategoryLabels)
 
 public:
-    explicit QCategoryAxis(QObject *parent = 0);
-    virtual ~QCategoryAxis();
+    explicit Q3DCategoryAxis(QObject *parent = 0);
+    virtual ~Q3DCategoryAxis();
 
     QStringList categoryLabels() const;
 
@@ -43,11 +43,10 @@ public slots:
     void setCategoryLabels(const QStringList &labels);
 
 protected:
-    QCategoryAxisPrivate *dptr();
+    Q3DCategoryAxisPrivate *dptr();
 
 private:
-
-    Q_DISABLE_COPY(QCategoryAxis)
+    Q_DISABLE_COPY(Q3DCategoryAxis)
 };
 
 QT_DATAVIS3D_END_NAMESPACE

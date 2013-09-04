@@ -19,8 +19,8 @@
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "qabstractaxis_p.h"
-#include "qvalueaxis_p.h"
+#include "q3dabstractaxis_p.h"
+#include "q3dvalueaxis_p.h"
 #include "qscatterdataproxy_p.h"
 
 #include <QMatrix4x4>
@@ -330,7 +330,7 @@ void Scatter3DController::handleSelectedItemIndexChanged(int index)
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
-        QAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+        Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -394,7 +394,7 @@ void Scatter3DController::adjustValueAxisRange()
 {
     if (m_data) {
         QVector3D limits = static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues();
-        QValueAxis *valueAxis = static_cast<QValueAxis *>(m_axisX);
+        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (limits.x() > 0)
                 valueAxis->dptr()->setRange(-limits.x(), limits.x());
@@ -402,7 +402,7 @@ void Scatter3DController::adjustValueAxisRange()
                 valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
         }
 
-        valueAxis = static_cast<QValueAxis *>(m_axisY);
+        valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (limits.y() > 0)
                 valueAxis->dptr()->setRange(-limits.y(), limits.y());
@@ -410,7 +410,7 @@ void Scatter3DController::adjustValueAxisRange()
                 valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
         }
 
-        valueAxis = static_cast<QValueAxis *>(m_axisZ);
+        valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (limits.z() > 0)
                 valueAxis->dptr()->setRange(-limits.z(), limits.z());

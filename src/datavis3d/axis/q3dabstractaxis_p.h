@@ -26,24 +26,43 @@
 //
 // We mean it.
 
-#include "qcategoryaxis.h"
-#include "qabstractaxis_p.h"
-#include "qbardataitem.h"
+#include "datavis3dglobal_p.h"
+#include "q3dabstractaxis.h"
+#include "abstract3dcontroller_p.h"
 
-#ifndef QCATEGORYAXIS_P_H
-#define QCATEGORYAXIS_P_H
+#ifndef Q3DABSTRACTAXIS_P_H
+#define Q3DABSTRACTAXIS_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QCategoryAxisPrivate : public QAbstractAxisPrivate
+class Q3DAbstractAxisPrivate : public QObject
 {
     Q_OBJECT
-
 public:
-    QCategoryAxisPrivate(QCategoryAxis *q);
-    virtual ~QCategoryAxisPrivate();
+    Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAxis::AxisType type);
+    virtual ~Q3DAbstractAxisPrivate();
+
+    void setOrientation(Q3DAbstractAxis::AxisOrientation orientation);
+
+    inline bool isDefaultAxis() { return m_isDefaultAxis; }
+    inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
+
+protected:
+    virtual void updateLabels();
+
+    Q3DAbstractAxis *q_ptr;
+
+    QString m_title;
+    QStringList m_labels;
+    Q3DAbstractAxis::AxisOrientation m_orientation;
+    Q3DAbstractAxis::AxisType m_type;
+    bool m_isDefaultAxis;
+
+    friend class Q3DAbstractAxis;
+    friend class Q3DValueAxis;
+    friend class Q3DCategoryAxis;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // QCATEGORYAXIS_P_H
+#endif // QABSTRACTAXIS_P_H

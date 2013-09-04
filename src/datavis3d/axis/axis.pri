@@ -1,12 +1,12 @@
 HEADERS += \
-    $$PWD/qabstractaxis.h \
-    $$PWD/qabstractaxis_p.h \
-    $$PWD/qvalueaxis.h \
-    $$PWD/qvalueaxis_p.h \
-    $$PWD/qcategoryaxis.h \
-    $$PWD/qcategoryaxis_p.h
+    $$PWD/q3dabstractaxis.h \
+    $$PWD/q3dabstractaxis_p.h \
+    $$PWD/q3dvalueaxis.h \
+    $$PWD/q3dvalueaxis_p.h \
+    $$PWD/q3dcategoryaxis.h \
+    $$PWD/q3dcategoryaxis_p.h
 
 SOURCES += \
-    $$PWD/qabstractaxis.cpp \
-    $$PWD/qvalueaxis.cpp \
-    $$PWD/qcategoryaxis.cpp
+    $$PWD/q3dabstractaxis.cpp \
+    $$PWD/q3dvalueaxis.cpp \
+    $$PWD/q3dcategoryaxis.cpp

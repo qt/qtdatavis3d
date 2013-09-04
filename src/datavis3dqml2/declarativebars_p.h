@@ -33,8 +33,8 @@
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
 #include "qitemmodelbardatamapping.h"
-#include "qvalueaxis.h"
-#include "qcategoryaxis.h"
+#include "q3dvalueaxis.h"
+#include "q3dcategoryaxis.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -48,9 +48,9 @@ class DeclarativeBars : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
     Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
-    Q_PROPERTY(QCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
-    Q_PROPERTY(QValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
-    Q_PROPERTY(QCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
+    Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
+    Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
+    Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
     Q_PROPERTY(QtDataVis3D::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVis3D::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVis3D::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -103,12 +103,12 @@ public:
     QItemModelBarDataMapping *mapping() const;
     void setMapping(QItemModelBarDataMapping *mapping);
 
-    QCategoryAxis *rowAxis() const;
-    void setRowAxis(QCategoryAxis *axis);
-    QValueAxis *valueAxis() const;
-    void setValueAxis(QValueAxis *axis);
-    QCategoryAxis *columnAxis() const;
-    void setColumnAxis(QCategoryAxis *axis);
+    Q3DCategoryAxis *rowAxis() const;
+    void setRowAxis(Q3DCategoryAxis *axis);
+    Q3DValueAxis *valueAxis() const;
+    void setValueAxis(Q3DValueAxis *axis);
+    Q3DCategoryAxis *columnAxis() const;
+    void setColumnAxis(Q3DCategoryAxis *axis);
 
     // Set bar thickness.
     void setBarThickness(qreal thicknessRatio);

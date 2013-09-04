@@ -188,11 +188,19 @@ void QItemModelBarDataMapping::remap(const QString &rowRole,
     emit mappingChanged();
 }
 
+/*!
+ * /return index of the specified \a category in row categories list.
+ * If the category is not found, -1 is returned.
+ */
 int QItemModelBarDataMapping::rowCategoryIndex(const QString &category)
 {
     return dptr()->m_rowCategories.indexOf(category);
 }
 
+/*!
+ * /return index of the specified \a category in column categories list.
+ * If the category is not found, -1 is returned.
+ */
 int QItemModelBarDataMapping::columnCategoryIndex(const QString &category)
 {
     return dptr()->m_columnCategories.indexOf(category);

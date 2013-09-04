@@ -24,8 +24,8 @@
 #include "declarativescatter_p.h"
 #include "qitemmodelbardatamapping.h"
 #include "qitemmodelscatterdatamapping.h"
-#include "qvalueaxis.h"
-#include "qcategoryaxis.h"
+#include "q3dvalueaxis.h"
+#include "q3dcategoryaxis.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -39,9 +39,9 @@ Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
 Q_DECLARE_METATYPE(const QAbstractItemModel *)
 Q_DECLARE_METATYPE(QDataVis *)
 
-Q_DECLARE_METATYPE(QAbstractAxis *)
-Q_DECLARE_METATYPE(QCategoryAxis *)
-Q_DECLARE_METATYPE(QValueAxis *)
+Q_DECLARE_METATYPE(Q3DAbstractAxis *)
+Q_DECLARE_METATYPE(Q3DCategoryAxis *)
+Q_DECLARE_METATYPE(Q3DValueAxis *)
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
