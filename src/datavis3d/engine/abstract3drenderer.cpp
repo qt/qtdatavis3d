@@ -101,6 +101,7 @@ void Abstract3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHan
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
+        glDisable(GL_BLEND); // For QtQuick2 blending is enabled by default, but we don't want it to be
     }
 
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
