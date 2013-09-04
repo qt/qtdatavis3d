@@ -362,7 +362,7 @@ void Bars3DRenderer::drawSlicedScene(CameraHelper *camera,
             // If draw order of bars is flipped, label draw order should be too
             if (m_xFlipped) {
                 labelItem = m_sliceCache->labelItems().at(
-                                m_sliceCache->labelItems().size() - col - 1);
+                            m_sliceCache->labelItems().size() - col - 1);
             } else {
                 labelItem = m_sliceCache->labelItems().at(col);
             }
@@ -412,10 +412,10 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_controller->calculateViewMatrix(
-                                m_cachedZoomLevel * m_autoScaleAdjustment,
-                                m_mainViewPort.width(),
-                                m_mainViewPort.height(),
-                                m_hasNegativeValues);
+                m_cachedZoomLevel * m_autoScaleAdjustment,
+                m_mainViewPort.width(),
+                m_mainViewPort.height(),
+                m_hasNegativeValues);
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
@@ -694,8 +694,8 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
 
     bool selectionDirty = (m_selection != m_previousSelection
             || (m_selection != selectionSkipColor
-                && Bars3DController::MouseOnScene == m_controller->mouseState()
-                && !m_cachedIsSlicingActivated));
+            && Bars3DController::MouseOnScene == m_controller->mouseState()
+            && !m_cachedIsSlicingActivated));
     if (selectionDirty) {
         m_previousSelection = m_selection;
         if (m_sliceSelection) {
@@ -746,7 +746,7 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
             QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
             QVector3D depthColor = Utils::vectorFromColor(m_cachedTheme.m_depthColor)
-                                   * (float(row) / GLfloat(m_cachedRowCount));
+                    * (float(row) / GLfloat(m_cachedRowCount));
 
             QVector3D barColor = baseColor + heightColor + depthColor;
 #else
@@ -942,15 +942,16 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
 
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
+        ShaderHelper *lineShader = m_backgroundShader;
         // Bind bar shader
-        m_barShader->bind();
+        lineShader->bind();
 
         // Set unchanging shader bindings
         QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
-        m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-        m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-        m_barShader->setUniformValue(m_barShader->color(), barColor);
-        m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->lightP(), lightPos);
+        lineShader->setUniformValue(lineShader->view(), viewMatrix);
+        lineShader->setUniformValue(lineShader->color(), barColor);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Floor lines: rows
         for (GLfloat row = 0.0f; row <= m_cachedRowCount; row++) {
@@ -974,29 +975,29 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            lineShader->setUniformValue(lineShader->model(), modelMatrix);
+            lineShader->setUniformValue(lineShader->nModel(),
+                                        itModelMatrix.inverted().transposed());
+            lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
-                                             m_cachedTheme.m_lightStrength / 10.0f);
+                lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                lineShader->setUniformValue(lineShader->lightS(),
+                                            m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(lineShader, m_gridLineObj);
             }
         }
 
@@ -1023,29 +1024,29 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
             // Set the rest of the shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+            lineShader->setUniformValue(lineShader->model(), modelMatrix);
+            lineShader->setUniformValue(lineShader->nModel(),
+                                        itModelMatrix.inverted().transposed());
+            lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                 // Set shadow shader bindings
-                m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                m_barShader->setUniformValue(m_barShader->lightS(),
-                                             m_cachedTheme.m_lightStrength / 10.0f);
+                lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                lineShader->setUniformValue(lineShader->lightS(),
+                                            m_cachedTheme.m_lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
                 // Set shadowless shader bindings
-                m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_barShader, m_gridLineObj);
+                m_drawer->drawObject(lineShader, m_gridLineObj);
             }
         }
 
@@ -1082,29 +1083,29 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-                m_barShader->setUniformValue(m_barShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
-                m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
+                                            itModelMatrix.inverted().transposed());
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                    m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                    m_barShader->setUniformValue(m_barShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_barShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
             }
 
@@ -1134,34 +1135,34 @@ void Bars3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-                m_barShader->setUniformValue(m_barShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
-                m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
+                                            itModelMatrix.inverted().transposed());
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                    m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                    m_barShader->setUniformValue(m_barShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength / 10.0f);
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_barShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_barShader->setUniformValue(m_barShader->lightS(), m_cachedTheme.m_lightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_barShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
             }
         }
         // Release bar shader
-        m_barShader->release();
+        lineShader->release();
     }
 
     // TODO: Calculations done temporarily here. When optimizing, move to after data set addition? Keep drawing of the labels here.

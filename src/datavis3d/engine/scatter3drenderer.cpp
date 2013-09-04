@@ -643,15 +643,16 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
 #endif
 
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
+        ShaderHelper *lineShader = m_backgroundShader;
         // Bind line shader
-        m_dotShader->bind();
+        lineShader->bind();
 
         // Set unchanging shader bindings
         QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
-        m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
-        m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
-        m_dotShader->setUniformValue(m_dotShader->color(), lineColor);
-        m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->lightP(), lightPos);
+        lineShader->setUniformValue(lineShader->view(), viewMatrix);
+        lineShader->setUniformValue(lineShader->color(), lineColor);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
@@ -700,30 +701,30 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
@@ -754,30 +755,30 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
@@ -830,29 +831,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
@@ -883,30 +884,30 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
@@ -955,29 +956,29 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(), m_cachedTheme.m_lightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
@@ -1022,37 +1023,37 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
-                m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-                m_dotShader->setUniformValue(m_dotShader->nModel(),
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
                                              itModelMatrix.inverted().transposed());
-                m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-                    m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj, 0, m_depthTexture);
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
                     // Set shadowless shader bindings
-                    m_dotShader->setUniformValue(m_dotShader->lightS(),
+                    lineShader->setUniformValue(lineShader->lightS(),
                                                  m_cachedTheme.m_lightStrength);
 
                     // Draw the object
-                    m_drawer->drawObject(m_dotShader, m_gridLineObj);
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
                 linePos += lineStep;
             }
         }
 
         // Release line shader
-        m_dotShader->release();
+        lineShader->release();
     }
 
     // Draw axis labels
