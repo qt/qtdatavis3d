@@ -16,23 +16,28 @@
 **
 ****************************************************************************/
 
-#include "audiolevels.h"
+#ifndef AUDIOLEVELS_H
+#define AUDIOLEVELS_H
 
-#include <QGuiApplication>
-#include <QAudio>
+#include <QtDataVis3D/q3dbars.h>
 
-using namespace QtDataVis3D;
+QT_DATAVIS3D_USE_NAMESPACE
 
-int main(int argc, char *argv[])
+class AudioLevelsIODevice;
+class QAudioInput;
+
+class AudioLevels : public QObject
 {
-    QGuiApplication app(argc, argv);
+    Q_OBJECT
 
-    Q3DBars window;
-    window.resize(1024, 768);
-    window.setTitle("QtDataVis3D microphone audio levels visualizer");
-    window.show();
+public:
+    AudioLevels(Q3DBars *chart, QObject *parent = 0);
+    ~AudioLevels();
 
-    AudioLevels audioLevels(&window);
+private:
+    AudioLevelsIODevice *m_device;
+    Q3DBars *m_graph;
+    QAudioInput *m_audioInput;
+};
 
-    return app.exec();
-}
+#endif

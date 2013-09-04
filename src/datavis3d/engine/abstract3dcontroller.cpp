@@ -542,6 +542,7 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_zoomLevel = qBound(10, distance, 500);
+    m_changeTracker.zoomLevelChanged = true;
     m_cameraHelper->setCameraRotation(QPointF(m_horizontalRotation,
                                               m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;

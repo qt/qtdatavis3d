@@ -6,6 +6,11 @@ TARGET = audiolevels
 
 QT += multimedia
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+           audiolevels.cpp \
+           audiolevelsiodevice.cpp
+
+HEADERS += audiolevels.h \
+           audiolevelsiodevice.h
 
 INSTALLS += target
