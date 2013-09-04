@@ -250,8 +250,10 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0x596a74));
         //m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0x000000));
-        m_textColor = QColor(QRgb(0x181818));
-        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
+        m_textColor = QColor(QRgb(0xffffff));
+        m_textBackgroundColor = QColor(0x18, 0x18, 0x18, 0x80);
+        //m_textColor = QColor(QRgb(0x181818));
+        //m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x80);
         m_gridLine = QColor(QRgb(0x8c8c8c));
         m_highlightBarColor = QColor(QRgb(0xffab03));
         m_highlightRowColor = QColor(QRgb(0x038e9b));

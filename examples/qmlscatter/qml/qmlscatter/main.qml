@@ -31,20 +31,29 @@ Item {
     Item {
         id: dataView
         width: parent.width
-        height: parent.height - shadowToggle.height
+        height: parent.height - shadowToggle.height - 3
         anchors.bottom: parent.bottom
 
         Scatter3D {
             id: testscatter
             width: dataView.width
             height: dataView.height
-            font.family: "Times New Roman"
+            font.family: "Lucida Handwriting"
             font.pointSize: 40
             mapping: chartData.mapping
-            shadowQuality: Scatter3D.ShadowNone
+            theme: Scatter3D.ThemeHighContrast
+            shadowQuality: Scatter3D.ShadowSoftLow
             selectionMode: Scatter3D.ModeItem
-            labelTransparency: Scatter3D.TransparencyNoBackground
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+            axisX.segmentCount: 3
+            axisX.subSegmentCount: 2
+            axisX.labelFormat: "%.2f"
+            axisZ.segmentCount: 2
+            axisZ.subSegmentCount: 2
+            axisZ.labelFormat: "%.2f"
+            axisY.segmentCount: 2
+            axisY.subSegmentCount: 2
+            axisY.labelFormat: "%.2f"
 
             Component.onCompleted: {
                 data = chartData.model
@@ -54,31 +63,31 @@ Item {
 
     Button {
         id: shadowToggle
-        width: parent.width / 5
-        text: "Toggle Shadows On"
+        width: parent.width / 6
+        text: "Hide Shadows"
         onClicked: {
             if (testscatter.shadowQuality === Scatter3D.ShadowNone) {
-                testscatter.shadowQuality = Scatter3D.ShadowMedium;
-                text = "Toggle Shadows Off";
+                testscatter.shadowQuality = Scatter3D.ShadowSoftLow;
+                text = "Hide Shadows";
             } else {
                 testscatter.shadowQuality = Scatter3D.ShadowNone;
-                text = "Toggle Shadows On";
+                text = "Show Shadows";
             }
         }
     }
 
     Button {
         id: smoothToggle
-        width: parent.width / 5
+        width: parent.width / 6
         defaultColor: "gainsboro"
-        text: "Toggle Smooth Objects On"
+        text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
         onClicked: {
             if (testscatter.objectSmooth === false) {
-                text = "Toggle Smooth Objects Off"
+                text = "Use Flat Dots";
                 testscatter.objectSmooth = true;
             } else {
-                text = "Toggle Smooth Objects On"
+                text = "Use Smooth Dots"
                 testscatter.objectSmooth = false;
             }
         }
@@ -86,8 +95,8 @@ Item {
 
     Button {
         id: cameraToggle
-        width: parent.width / 5
-        text: "Toggle Camera Preset"
+        width: parent.width / 6
+        text: "Change Camera Placement"
         anchors.left: smoothToggle.right
         onClicked: {
             if (testscatter.cameraPreset === Scatter3D.PresetFront) {
@@ -100,13 +109,13 @@ Item {
 
     Button {
         id: themeToggle
-        width: parent.width / 5
+        width: parent.width / 6
         defaultColor: "gainsboro"
-        text: "Toggle Theme"
+        text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
             if (testscatter.theme === Scatter3D.ThemeBlueCerulean) {
-                testscatter.theme = Scatter3D.ThemeSystem;
+                testscatter.theme = Scatter3D.ThemeHighContrast;
             } else {
                 testscatter.theme = Scatter3D.ThemeBlueCerulean;
             }
@@ -115,17 +124,32 @@ Item {
 
     Button {
         id: backgroundToggle
-        width: parent.width / 5
-        text: "Toggle Background Off"
+        width: parent.width / 6
+        text: "Hide Background"
         anchors.left: themeToggle.right
         onClicked: {
             if (testscatter.backgroundVisible === true) {
                 testscatter.backgroundVisible = false;
-                text = "Toggle Background On";
+                text = "Show Background";
             } else {
                 testscatter.backgroundVisible = true;
-                text = "Toggle Background Off";
+                text = "Hide Background";
             }
         }
+    }
+    Button {
+        id: exitButton
+        width: parent.width / 6
+        defaultColor: "lightsteelblue"
+        text: "Quit"
+        anchors.left: backgroundToggle.right
+        onClicked: Qt.quit(0);
+    }
+
+    Rectangle {
+        width: parent.width
+        height: 3
+        anchors.top: shadowToggle.bottom
+        anchors.bottom: dataView.top
     }
 }

@@ -47,7 +47,6 @@ Item {
             id: testchart
             width: dataView.width
             height: dataView.height
-            gridVisible: true
             shadowQuality: Bars3D.ShadowNone
             selectionMode: Bars3D.ModeItem
             labelTransparency: Bars3D.TransparencyNone
@@ -58,12 +57,10 @@ Item {
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
-            barType: Bars3D.BevelBars
             rowAxis: chartAxes.row
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
-            backgroundVisible: true
 
             onDataResolved: {
                 // Can't select a bar until data has been resolved from model to proxy
@@ -118,12 +115,14 @@ Item {
         id: shadowToggle
         anchors.bottom: mappingToggle.top
         width: tableView.width
-        text: "Toggle Shadows"
+        text: "Show Shadows"
         onClicked: {
             if (testchart.shadowQuality == Bars3D.ShadowNone) {
-                testchart.shadowQuality = Bars3D.ShadowLow;
+                testchart.shadowQuality = Bars3D.ShadowMedium;
+                text = "Hide Shadows"
             } else {
                 testchart.shadowQuality = Bars3D.ShadowNone;
+                text = "Show Shadows"
             }
         }
     }
