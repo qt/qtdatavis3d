@@ -47,9 +47,9 @@ Item {
             id: testchart
             width: dataView.width
             height: dataView.height
-            shadowQuality: Bars3D.ShadowNone
+            shadowQuality: Bars3D.ShadowMedium
             selectionMode: Bars3D.ModeItem
-            labelTransparency: Bars3D.TransparencyNone
+            font.pointSize: 35
             theme: Bars3D.ThemeBrownSand
             rows: 4
             columns: 12
@@ -57,6 +57,7 @@ Item {
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
+            cameraPreset: Bars3D.PresetRight
             rowAxis: chartAxes.row
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
@@ -115,7 +116,7 @@ Item {
         id: shadowToggle
         anchors.bottom: mappingToggle.top
         width: tableView.width
-        text: "Show Shadows"
+        text: "Hide Shadows"
         onClicked: {
             if (testchart.shadowQuality == Bars3D.ShadowNone) {
                 testchart.shadowQuality = Bars3D.ShadowMedium;
