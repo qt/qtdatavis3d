@@ -152,6 +152,7 @@ QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataPr
 
 QItemModelBarDataProxyPrivate::~QItemModelBarDataProxyPrivate()
 {
+    delete m_itemModelHandler;
 }
 
 QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()

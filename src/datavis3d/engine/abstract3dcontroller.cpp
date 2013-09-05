@@ -30,6 +30,7 @@
 #include "q3dinputhandler.h"
 #endif
 
+#include <QThread>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -69,6 +70,12 @@ Abstract3DController::~Abstract3DController()
     delete m_cameraHelper;
     delete m_inputHandler;
     // Attached axes are children, so no need to explicitly delete them
+
+    // Renderer can be in another thread, don't delete it directly in that case
+    if (m_renderer && m_renderer->thread() != QThread::currentThread())
+        m_renderer->deleteLater();
+    else
+        delete m_renderer;
 }
 
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)

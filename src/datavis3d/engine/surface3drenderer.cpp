@@ -111,7 +111,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
 
 Surface3DRenderer::~Surface3DRenderer()
 {
-    qDebug() << __FUNCTION__;
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
@@ -126,10 +125,12 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_selectionShader;
     delete m_surfaceShader;
     delete m_surfaceGridShader;
+    delete m_labelShader;
 
     delete m_backgroundObj;
     delete m_surfaceObj;
     delete m_gridLineObj;
+    delete m_labelObj;
 
     if (m_selectionPointer)
         delete m_selectionPointer;
@@ -958,7 +959,7 @@ void Surface3DRenderer::updateSelectionTexture()
     m_selectionTexture = m_textureHelper->create2DTexture(bits, idImageWidth, idImageHeight);
 
     // Release the temp bits allocation
-    delete bits;
+    delete[] bits;
 }
 
 void Surface3DRenderer::initSelectionBuffer()
@@ -1187,7 +1188,6 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 
 void Surface3DRenderer::loadLabelMesh()
 {
-    //qDebug() << __FUNCTION__;
     if (m_labelObj)
         delete m_labelObj;
     m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
@@ -1242,7 +1242,6 @@ void Surface3DRenderer::initSurfaceShaders()
 
 void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
 {
-    //qDebug() << __FUNCTION__;
     if (m_labelShader)
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);

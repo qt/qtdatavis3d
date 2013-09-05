@@ -148,6 +148,7 @@ QItemModelScatterDataProxyPrivate::QItemModelScatterDataProxyPrivate(QItemModelS
 
 QItemModelScatterDataProxyPrivate::~QItemModelScatterDataProxyPrivate()
 {
+    delete m_itemModelHandler;
 }
 
 QItemModelScatterDataProxy *QItemModelScatterDataProxyPrivate::qptr()

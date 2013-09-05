@@ -88,7 +88,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 
 Scatter3DRenderer::~Scatter3DRenderer()
 {
-    //qDebug() << __FUNCTION__;
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
     m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
     m_textureHelper->deleteTexture(&m_selectionTexture);
@@ -98,9 +97,11 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
+    delete m_labelShader;
     delete m_dotObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
+    delete m_labelObj;
 }
 
 void Scatter3DRenderer::initializeOpenGL()
@@ -161,8 +162,6 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
 
 void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
 {
-    //qDebug() << __FUNCTION__;
-
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(camera, defaultFboHandle);
 
@@ -181,7 +180,6 @@ void Scatter3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHand
 void Scatter3DRenderer::drawScene(CameraHelper *camera,
                                   const GLuint defaultFboHandle)
 {
-    //qDebug() << __FUNCTION__;
     GLfloat backgroundRotation = 0;
 
     // Specify viewport
@@ -1350,7 +1348,6 @@ void Scatter3DRenderer::updateSelectedItemIndex(int index)
 
 void Scatter3DRenderer::handleResize()
 {
-    //qDebug() << __FUNCTION__;
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
 
@@ -1412,7 +1409,6 @@ void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 
 void Scatter3DRenderer::loadMeshFile()
 {
-    //qDebug() << __FUNCTION__;
     QString objectFileName = m_cachedObjFile;
     if (m_dotObj)
         delete m_dotObj;
@@ -1422,7 +1418,6 @@ void Scatter3DRenderer::loadMeshFile()
 
 void Scatter3DRenderer::loadBackgroundMesh()
 {
-    //qDebug() << __FUNCTION__;
     if (m_backgroundObj)
         delete m_backgroundObj;
     m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
@@ -1431,7 +1426,6 @@ void Scatter3DRenderer::loadBackgroundMesh()
 
 void Scatter3DRenderer::loadGridLineMesh()
 {
-    //qDebug() << __FUNCTION__;
     if (m_gridLineObj)
         delete m_gridLineObj;
     m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
@@ -1440,7 +1434,6 @@ void Scatter3DRenderer::loadGridLineMesh()
 
 void Scatter3DRenderer::loadLabelMesh()
 {
-    //qDebug() << __FUNCTION__;
     if (m_labelObj)
         delete m_labelObj;
     m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
@@ -1449,7 +1442,6 @@ void Scatter3DRenderer::loadLabelMesh()
 
 void Scatter3DRenderer::updateTextures()
 {
-    //qDebug() << __FUNCTION__;
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }
@@ -1462,8 +1454,6 @@ void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orienta
 
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
-    //qDebug() << __FUNCTION__;
-
     // Origin should be in the center of scene, ie. both positive and negative values are drawn
     // above background
 
@@ -1487,13 +1477,11 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
 
 QRect Scatter3DRenderer::mainViewPort()
 {
-    //qDebug() << __FUNCTION__;
     return m_mainViewPort;
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
-    //qDebug() << __FUNCTION__;
     if (m_dotShader)
         delete m_dotShader;
     m_dotShader = new ShaderHelper(this, vertexShader, fragmentShader);
@@ -1502,7 +1490,6 @@ void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &
 
 void Scatter3DRenderer::initSelectionShader()
 {
-    //qDebug() << __FUNCTION__;
     if (m_selectionShader)
         delete m_selectionShader;
     m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSelection"),
@@ -1512,7 +1499,6 @@ void Scatter3DRenderer::initSelectionShader()
 
 void Scatter3DRenderer::initSelectionBuffer()
 {
-    //qDebug() << __FUNCTION__;
     if (m_selectionTexture)
         m_textureHelper->deleteTexture(&m_selectionTexture);
 
@@ -1524,7 +1510,6 @@ void Scatter3DRenderer::initSelectionBuffer()
 #if !defined(QT_OPENGL_ES_2)
 void Scatter3DRenderer::initDepthShader()
 {
-    //qDebug() << __FUNCTION__;
     if (m_depthShader)
         delete m_depthShader;
     m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
@@ -1587,7 +1572,6 @@ void Scatter3DRenderer::updateDepthBuffer()
 void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                               const QString &fragmentShader)
 {
-    //qDebug() << __FUNCTION__;
     if (m_backgroundShader)
         delete m_backgroundShader;
     m_backgroundShader = new ShaderHelper(this, vertexShader, fragmentShader);
@@ -1596,7 +1580,6 @@ void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
 
 void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
 {
-    //qDebug() << __FUNCTION__;
     if (m_labelShader)
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);

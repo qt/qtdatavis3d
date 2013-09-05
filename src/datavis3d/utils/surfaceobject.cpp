@@ -122,10 +122,8 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
 
     createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
 
-    if (indices)
-        delete indices;
-    if (gridIndices)
-        delete gridIndices;
+    delete[] indices;
+    delete[] gridIndices;
 }
 
 
@@ -216,12 +214,9 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
 
     createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
 
-    if (indices)
-        delete indices;
-    if (gridIndices)
-        delete gridIndices;
+    delete[] indices;
+    delete[] gridIndices;
 }
-
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                    const QVector<QVector3D> &normals, const GLint *indices,

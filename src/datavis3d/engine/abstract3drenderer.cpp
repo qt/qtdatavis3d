@@ -24,7 +24,7 @@
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
-    : QObject(controller),
+    : QObject(0),
       m_controller(controller),
       m_hasNegativeValues(false),
       m_cachedTheme(),
