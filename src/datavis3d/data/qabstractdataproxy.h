@@ -65,6 +65,7 @@ private:
     friend class Abstract3DController;
     friend class Bars3DController;
     friend class Scatter3DController;
+    friend class Surface3DController;
 };
 
 QT_DATAVIS3D_END_NAMESPACE

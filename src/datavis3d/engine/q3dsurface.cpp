@@ -19,6 +19,7 @@
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
 #include "q3dvalueaxis.h"
+#include "qsurfacedataproxy.h"
 
 #include <QMouseEvent>
 
@@ -265,30 +266,44 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
     return retList;
 }
 
+void Q3DSurface::setActiveDataProxy(QSurfaceDataProxy *proxy)
+{
+    d_ptr->m_shared->setActiveDataProxy(proxy);
+}
+
+/*!
+ * \return active data proxy.
+ */
+QSurfaceDataProxy *Q3DSurface::activeDataProxy() const
+{
+    return static_cast<QSurfaceDataProxy *>(d_ptr->m_shared->activeDataProxy());
+}
+
+void Q3DSurface::addDataProxy(QSurfaceDataProxy *proxy)
+{
+    d_ptr->m_shared->addDataProxy(proxy);
+}
+
+void Q3DSurface::releaseDataProxy(QSurfaceDataProxy *proxy)
+{
+    d_ptr->m_shared->releaseDataProxy(proxy);
+}
+
+QList<QSurfaceDataProxy *> Q3DSurface::dataProxies() const
+{
+    QList<QSurfaceDataProxy *> retList;
+    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
+    foreach (QAbstractDataProxy *proxy, abstractList)
+        retList.append(static_cast<QSurfaceDataProxy *>(proxy));
+
+    return retList;
+}
+
+
 void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
 {
     d_ptr->m_shared->setGradientColorAt(pos, color);
 }
-
-// TODO /////////////////////////////////////////
-void Q3DSurface::appendSeries(QList<qreal> series, int width, int depth )
-{
-    d_ptr->appendSeries(series);
-    d_ptr->m_shared->setData(series, width, depth);
-}
-
-void Q3DSurface::showData() const
-{
-    for (int i = 0; i < d_ptr->numOfSeries(); i++) {
-        QList<qreal> s = d_ptr->seriesAt(i);
-        qDebug() << "Series = ";
-        foreach (qreal val, s) {
-            qDebug() << val;
-        }
-    }
-}
-
-// TODO END //////////////////////////////////////////
 
 /////////////////// PRIVATE ///////////////////////////////////
 
@@ -301,21 +316,6 @@ Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
     delete m_shared;
-}
-
-void Q3DSurfacePrivate::appendSeries(QList<qreal> series)
-{
-    m_seriesList.append(series);
-}
-
-QList<qreal> Q3DSurfacePrivate::seriesAt(int i)
-{
-    return m_seriesList.at(i);
-}
-
-int Q3DSurfacePrivate::numOfSeries()
-{
-    return m_seriesList.count();
 }
 
 QT_DATAVIS3D_END_NAMESPACE

@@ -40,6 +40,7 @@
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "scatterrenderitem_p.h"
+#include "qsurfacedataproxy.h"
 
 class QOpenGLShaderProgram;
 
@@ -74,8 +75,6 @@ private:
     QList<qreal> m_series; // TODO: TEMP
     GLint m_segmentYCount;
     GLfloat m_segmentYStep;
-    GLint m_segmentXCount;
-    GLint m_segmentZCount;
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
@@ -85,15 +84,10 @@ private:
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_labelShader;
-    GLfloat m_yRange; // m_heightNormalizer
-    GLfloat m_yAdjustment;
-    GLfloat m_xLength;
-    GLfloat m_zLength;
-    GLfloat m_maxDimension;
+    GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     GLfloat m_scaleX;
     GLfloat m_scaleZ;
-    GLfloat m_maxSceneSize;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -115,26 +109,24 @@ private:
     bool m_zFlipped;
     bool m_yFlipped;
     ScatterRenderItem m_dummyRenderItem; // Let's use scatter for dummy for now
-
-protected:
-    virtual void loadMeshFile();
+    QSurfaceDataArray m_dataArray;
+    QRect m_sampleSpace;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
     ~Surface3DRenderer();
 
-    void initializeOpenGL();
+    void updateDataModel(QSurfaceDataProxy *dataProxy);
     void render(CameraHelper *camera, const GLuint defaultFboHandle = 0);
 
-    // TODO: temp
-    void setXZStuff(GLint segmentXCount, GLint segmentZCount);
-    void setSeries(QList<qreal> series);
+protected:
+    void initializeOpenGL();
+    virtual void loadMeshFile();
 
 public slots:
     void updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient();
-    void updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
     virtual void requestSelectionAtPoint(const QPoint &point);
 
 private:
@@ -156,7 +148,7 @@ private:
     void updateSelectionTexture();
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
-    void surfacePointSelected(qreal value, int column, int row);
+    void surfacePointSelected(int id);
     void surfacePointCleared();
     QVector3D normalize(float x, float y, float z);
 #if !defined(QT_OPENGL_ES_2)

@@ -31,7 +31,10 @@
 
 #include "datavis3dglobal_p.h"
 #include "abstractobjecthelper_p.h"
+#include "qsurfacedataproxy.h"
+
 #include <QOpenGLFunctions>
+#include <QRect>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -41,8 +44,8 @@ public:
     SurfaceObject();
     ~SurfaceObject();
 
-    void setUpData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry);
-    void setUpSmoothData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry);
+    void setUpData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry);
+    void setUpSmoothData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry);
     GLuint gridElementBuf();
     GLuint gridIndexCount();
 
@@ -53,7 +56,6 @@ private:
                        const GLint *gridIndices, bool changeGeometry);
 
 private:
-    QList<qreal> m_series;
     int m_dataWidth;
     int m_dataDepth;
     GLfloat m_yRange;

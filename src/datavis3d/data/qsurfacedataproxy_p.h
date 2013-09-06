@@ -26,28 +26,31 @@
 //
 // We mean it.
 
-#ifndef Q3DSURFACE_P_H
-#define Q3DSURFACE_P_H
+#ifndef QSURFACEDATAPROXY_P_H
+#define QSURFACEDATAPROXY_P_H
 
-#include "surface3dcontroller_p.h"
-#include "qdatavis3denums.h"
+#include "qsurfacedataproxy.h"
+#include "qabstractdataproxy_p.h"
 
-#include <QList>
+#include <QSize>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class Q3DSurface;
-
-class Q3DSurfacePrivate : public QObject
+class QSurfaceDataProxyPrivate : public QAbstractDataProxyPrivate
 {
+    Q_OBJECT
 public:
-    Q3DSurfacePrivate(Q3DSurface *q, QRect rect);
-    ~Q3DSurfacePrivate();
+    QSurfaceDataProxyPrivate(QSurfaceDataProxy *q);
+    virtual ~QSurfaceDataProxyPrivate();
 
-    Q3DSurface *q_ptr;
-    Surface3DController *m_shared;
+    bool resetArray(QSurfaceDataArray *newArray);
+
+private:
+    QSurfaceDataArray *m_dataArray;
+
+    friend class QSurfaceDataProxy;
 };
 
 QT_DATAVIS3D_END_NAMESPACE
 
-#endif // Q3DSURFACE_P_H
+#endif // QSURFACEDATAPROXY_P_H

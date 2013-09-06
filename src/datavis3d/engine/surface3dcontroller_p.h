@@ -97,7 +97,12 @@ public:
     void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     void wheelEvent(QWheelEvent *event);
 
+    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+
+public slots:
+    void handleArrayReset();
 
 signals:
     void smoothStatusChanged(bool enable);

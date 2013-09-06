@@ -72,6 +72,10 @@ int main(int argc, char *argv[])
     planeCB->setText(QStringLiteral("Plane"));
     planeCB->setChecked(false);
 
+    QCheckBox *heightMapCB = new QCheckBox(widget);
+    heightMapCB->setText(QStringLiteral("Height map"));
+    heightMapCB->setChecked(false);
+
     QCheckBox *gridSlidersLockCB = new QCheckBox(widget);
     gridSlidersLockCB->setText(QStringLiteral("Lock"));
     gridSlidersLockCB->setChecked(false);
@@ -110,6 +114,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
     vLayout->addWidget(planeCB);
+    vLayout->addWidget(heightMapCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
@@ -129,6 +134,8 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::toggleSqrtSin);
     QObject::connect(planeCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::togglePlane);
+    QObject::connect(heightMapCB, &QCheckBox::stateChanged,
+                     modifier, &ChartModifier::setHeightMapData);
     QObject::connect(gridSlidersLockCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleGridSliderLock);
     QObject::connect(gridSliderX, &QSlider::valueChanged,

@@ -12,4 +12,5 @@ INSTALLS += target
 HEADERS += \
     chartmodifier.h
 
-QT += widgets
+RESOURCES += \
+    surface.qrc

@@ -22,6 +22,7 @@
 #include "q3dabstractaxis_p.h"
 #include "q3dvalueaxis_p.h"
 #include "q3dcategoryaxis.h"
+#include "qsurfacedataproxy_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -38,6 +39,8 @@ Surface3DController::Surface3DController(QRect rect)
       m_mouseState(MouseNone),
       m_mousePos(QPoint(0, 0))
 {
+    setActiveDataProxy(0);
+
     // Setting a null axis creates a new default axis according to orientation and chart type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
@@ -70,6 +73,10 @@ void Surface3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
+    if (m_isDataDirty) {
+        m_renderer->updateDataModel(static_cast<QSurfaceDataProxy *>(m_data));
+        m_isDataDirty = false;
+    }
 }
 
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
@@ -174,6 +181,31 @@ QPoint Surface3DController::mousePosition()
     return m_mousePos;
 }
 
+void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
+{
+    // Setting null proxy indicates default proxy
+    if (!proxy) {
+        proxy = new QSurfaceDataProxy;
+        proxy->d_ptr->setDefaultProxy(true);
+    }
+
+    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeSurface);
+
+    Abstract3DController::setActiveDataProxy(proxy);
+
+    QSurfaceDataProxy *surfaceDataProxy = static_cast<QSurfaceDataProxy *>(m_data);
+
+    // TODO connections and handler for proxy changes
+    QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
+                     this, &Surface3DController::handleArrayReset);
+}
+
+void Surface3DController::handleArrayReset()
+{
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
 void Surface3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
 {
     m_segmentCount   = segmentCount;
@@ -188,18 +220,6 @@ void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 {
     Theme t = theme();
     t.m_surfaceGradient.setColorAt(pos, color);
-    emitNeedRender();
-}
-
-// TODO: Temp
-void Surface3DController::setData(QList<qreal> series, int width, int depth)
-{
-    m_series = series;
-    m_dataWidth = width;
-    m_dataDepth = depth;
-
-    m_renderer->setXZStuff(width, depth);
-    m_renderer->setSeries(series);
     emitNeedRender();
 }
 

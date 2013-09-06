@@ -26,6 +26,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
 class Q3DValueAxis;
+class QSurfaceDataProxy;
 
 class QT_DATAVIS3D_EXPORT Q3DSurface : public Q3DWindow
 {
@@ -68,13 +69,14 @@ public:
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
 
+    void setActiveDataProxy(QSurfaceDataProxy *proxy);
+    QSurfaceDataProxy *activeDataProxy() const;
+    void addDataProxy(QSurfaceDataProxy *proxy);
+    void releaseDataProxy(QSurfaceDataProxy *proxy);
+    QList<QSurfaceDataProxy *> dataProxies() const;
+
     // TODO: Remove when axes handling in use
     void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);
-
-//TODO part
-    void appendSeries(QList<qreal> series, int width, int depth);
-    void showData() const;
-//END TODO
 
     // TODO: Do these need to be public? Where are they called from?
     // Size

@@ -56,23 +56,16 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQuality(QDataVis::ShadowLow),
       m_segmentYCount(0),
       m_segmentYStep(0.0f),
-      m_segmentXCount(0),
-      m_segmentZCount(0),
       m_shader(0),
       m_backgroundShader(0),
       m_surfaceShader(0),
       m_surfaceGridShader(0),
       m_selectionShader(0),
       m_labelShader(0),
-      m_yRange(0.0f), // m_heightNormalizer
-      m_yAdjustment(0.0f),
-      m_xLength(0.0f),
-      m_zLength(0.0f),
-      m_maxDimension(0.0f),
+      m_heightNormalizer(0.0f),
       m_scaleFactor(0.0f),
       m_scaleX(0.0f),
       m_scaleZ(0.0f),
-      m_maxSceneSize(40.0),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -90,15 +83,14 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionActive(false),
       m_xFlipped(false),
       m_zFlipped(false),
-      m_yFlipped(false)
+      m_yFlipped(false),
+      m_sampleSpace(QRect(0, 0, 0, 0))
 {
     // Listen to changes in the controller
     QObject::connect(m_controller, &Surface3DController::smoothStatusChanged, this,
                      &Surface3DRenderer::updateSmoothStatus);
     QObject::connect(m_controller, &Surface3DController::surfaceGridChanged, this,
                      &Surface3DRenderer::updateSurfaceGridStatus);
-    QObject::connect(m_controller, &Surface3DController::segmentCountChanged, this,
-                     &Surface3DRenderer::updateSegmentCount);
     QObject::connect(m_controller, &Surface3DController::leftMousePressed, this,
                      &Surface3DRenderer::requestSelectionAtPoint); // TODO: Possible temp
 
@@ -171,23 +163,56 @@ void Surface3DRenderer::initializeOpenGL()
     updateSurfaceGradient();
 }
 
-void Surface3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 {
-    if (defaultFboHandle) {
-        glDepthMask(true);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+    // Make a copy of data array.
+    for (int i = 0; i < m_dataArray.size(); i++)
+        delete m_dataArray.at(i);
+    m_dataArray.clear();
+
+    const QSurfaceDataArray *array = dataProxy->array();
+
+    m_dataArray.reserve(array->size());
+    for (int i = 0; i < array->size(); i++) {
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(*array->at(i));
+        m_dataArray << newRow;
     }
 
-    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (m_dataArray.size() > 0) {
+        if (!m_surfaceObj)
+            loadSurfaceObj();
 
-    // TODO: bars have m_hasHeightAdjustmentChanged, which is always true!
-    // Set initial camera position
-    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
+        QRect sampleSpace(0, 0, m_dataArray.at(0)->size(), m_dataArray.size());
+
+        bool dimensionChanged = false;
+        if (m_sampleSpace != sampleSpace) {
+            dimensionChanged = true;
+            m_sampleSpace = sampleSpace;
+        }
+
+        // TODO: Setting height bigger than biggest value on data works nicely, but smaller
+        // creates odd scaling. That's not going to be trivial to clip 'peaks' off
+        m_heightNormalizer = (GLfloat)qMax(qAbs(m_axisCacheY.max()), qAbs(m_axisCacheY.min()));
+
+        if (m_cachedSmoothSurface)
+            m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+        else
+            m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+
+        if (dimensionChanged)
+            updateSelectionTexture();
+    }
+
+    calculateSceneScalingFactors();
+
+    Abstract3DRenderer::updateDataModel(dataProxy);
+}
+
+void Surface3DRenderer::render(CameraHelper *camera, const GLuint defaultFboHandle)
+{
+    // Handle GL state setup for FBO buffers and clearing of the render surface
+    Abstract3DRenderer::render(camera, defaultFboHandle);
+
     camera->setDefaultCameraOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
                                         QVector3D(0.0f, 0.0f, zComp),
                                         QVector3D(0.0f, 1.0f, 0.0f));
@@ -229,7 +254,6 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     else
         m_xFlipped = true;
 
-
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 270.0f;
@@ -245,7 +269,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
     depthProjectionMatrix = projectionMatrix; // TODO
-    depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, -m_yAdjustment, zComp),
+    depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 0.0f, zComp),
                            QVector3D(0.0f, 1.0f, 0.0f)); // TODO: Move
 
     // Enable texturing
@@ -268,7 +292,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
+        modelMatrix.translate(0.0f, 0.0f, zComp);
         modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
 
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -321,7 +345,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         // Put the RGBA value back to uint
         uint id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
         if (id) {
-            surfacePointSelected(m_series.at(id - 1), (id - 1) % m_segmentXCount, (id - 1) / m_segmentXCount);
+            surfacePointSelected(id);
         } else {
             //surfacePointCleared();
             m_selectionActive = false;
@@ -340,7 +364,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
+        modelMatrix.translate(0.0f, 0.0f, zComp);
         modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
         itModelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
 
@@ -413,7 +437,7 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, zComp);
+        modelMatrix.translate(0.0f, 0.0f, zComp);
         modelMatrix.scale(QVector3D(m_scaleX * backgroundMargin, 1.0f, m_scaleZ * backgroundMargin));
         modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
         itModelMatrix.scale(QVector3D(m_scaleX * backgroundMargin, 1.0f, m_scaleZ * backgroundMargin));
@@ -862,28 +886,6 @@ void Surface3DRenderer::drawScene(CameraHelper *camera, const GLuint defaultFboH
 
 }
 
-void Surface3DRenderer::updateSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
-{
-    m_segmentYCount = segmentCount;
-    m_segmentYStep = step;
-    if (segmentCount > 0 && step > 0.0) {
-        m_yRange = m_segmentYCount * m_segmentYStep;
-        m_yAdjustment = 2.0f - ((m_yRange - minimum) / m_yRange); // TODO: to function
-    }
-}
-
-void Surface3DRenderer::setXZStuff(GLint segmentXCount, GLint segmentZCount)
-{
-    m_segmentXCount = segmentXCount;
-    m_segmentZCount = segmentZCount;
-
-    // TODO: Invent "idiotproof" max scene size formula..
-    // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
-    m_maxSceneSize = 2 * qSqrt(segmentXCount * segmentZCount);
-
-    calculateSceneScalingFactors();
-}
-
 void Surface3DRenderer::updateSurfaceGradient()
 {
     QImage image(QSize(4, 100), QImage::Format_RGB32);
@@ -918,8 +920,8 @@ void Surface3DRenderer::updateSelectionTexture()
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
     // TODO: power of two thing for ES
-    int idImageWidth = (m_segmentXCount - 1) * 4;
-    int idImageHeight = (m_segmentZCount - 1) * 4;
+    int idImageWidth = (m_sampleSpace.width() - 1) * 4;
+    int idImageHeight = (m_sampleSpace.height() - 1) * 4;
     int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
 
     uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
@@ -934,10 +936,10 @@ void Surface3DRenderer::updateSelectionTexture()
             idToRGBA(id + 1, &r, &g, &b, &a);
             fillIdCorner(&bits[p + 8], r, g, b, a, stride);
 
-            idToRGBA(id + m_segmentXCount, &r, &g, &b, &a);
+            idToRGBA(id + m_sampleSpace.width(), &r, &g, &b, &a);
             fillIdCorner(&bits[p + 2 * stride], r, g, b, a, stride);
 
-            idToRGBA(id + m_segmentXCount + 1, &r, &g, &b, &a);
+            idToRGBA(id + m_sampleSpace.width() + 1, &r, &g, &b, &a);
             fillIdCorner(&bits[p + 2 * stride + 8], r, g, b, a, stride);
 
             id++;
@@ -1003,22 +1005,6 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
     *a = (id >> 24) & ID_TO_RGBA_MASK;
 }
 
-void Surface3DRenderer::setSeries(QList<qreal> series)
-{
-    m_series = series;
-
-    // TODO temp solution
-    if (!m_surfaceObj)
-        loadSurfaceObj();
-
-    if (m_cachedSmoothSurface)
-        m_surfaceObj->setUpSmoothData(series, m_segmentXCount, m_segmentZCount, m_yRange, true);
-    else
-        m_surfaceObj->setUpData(series, m_segmentXCount, m_segmentZCount, m_yRange, true);
-
-    updateSelectionTexture();
-}
-
 void Surface3DRenderer::updateTextures()
 {
     qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
@@ -1029,21 +1015,12 @@ void Surface3DRenderer::updateTextures()
 void Surface3DRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
-    m_xLength = m_segmentXCount;
-    m_zLength = m_segmentZCount;
-    m_maxDimension = qMax(m_xLength, m_zLength);
-//    m_scaleFactor = qMin((m_segmentXCount * (m_maxDimension / m_maxSceneSize)),
-//                         (m_segmentZCount * (m_maxDimension / m_maxSceneSize)));
-//    m_scaleX = 1.0f / m_scaleFactor;
-//    m_scaleZ = 1.0f / m_scaleFactor;
-
-    m_scaleFactor = qMax(m_xLength, m_zLength);
-    m_scaleX = (coordSpace * m_xLength) / m_scaleFactor;
-    m_scaleZ = (coordSpace * m_zLength) / m_scaleFactor;
+    m_scaleFactor = qMax(m_sampleSpace.width(), m_sampleSpace.height());
+    m_scaleX = (coordSpace * m_sampleSpace.width()) / m_scaleFactor;
+    m_scaleZ = (coordSpace * m_sampleSpace.height()) / m_scaleFactor;
 
     //qDebug() << "m_scaleX" << m_scaleX << "m_scaleFactor" << m_scaleFactor;
     //qDebug() << "m_scaleZ" << m_scaleZ << "m_scaleFactor" << m_scaleFactor;
-    //qDebug() << "m_rowWidth:" << m_rowWidth << "m_columnDepth:" << m_columnDepth << "m_maxDimension:" << m_maxDimension;
 }
 
 void Surface3DRenderer::updateSmoothStatus(bool enable)
@@ -1054,9 +1031,9 @@ void Surface3DRenderer::updateSmoothStatus(bool enable)
         return;
 
     if (m_cachedSmoothSurface)
-        m_surfaceObj->setUpSmoothData(m_series, m_segmentXCount, m_segmentZCount, m_yRange, true);
+        m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
     else
-        m_surfaceObj->setUpData(m_series, m_segmentXCount, m_segmentZCount, m_yRange, true);
+        m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
 
     initSurfaceShaders();
 }
@@ -1143,8 +1120,12 @@ void Surface3DRenderer::updateDepthBuffer()
 }
 #endif
 
-void Surface3DRenderer::surfacePointSelected(qreal value, int column, int row)
+void Surface3DRenderer::surfacePointSelected(int id)
 {
+    int column = (id - 1) % m_sampleSpace.width();
+    int row = (id - 1) / m_sampleSpace.width();
+    qreal value = m_dataArray.at(row)->at(column);
+
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_controller);
 
@@ -1159,9 +1140,9 @@ void Surface3DRenderer::surfacePointSelected(qreal value, int column, int row)
 
 QVector3D Surface3DRenderer::normalize(float x, float y, float z)
 {
-    float resX = x / ((float(m_segmentXCount) - 1.0f) / 2.0f) - 1.0f;
-    float resY = y / (m_yRange / 2.0f) - 1.0f;
-    float resZ = z / ((float(m_segmentZCount) - 1.0f) / -2.0f) + 1.0f;
+    float resX = x / ((float(m_sampleSpace.width()) - 1.0f) / 2.0f) - 1.0f;
+    float resY = y / (m_heightNormalizer / 2.0f) - 1.0f;
+    float resZ = z / ((float(m_sampleSpace.height()) - 1.0f) / -2.0f) + 1.0f;
 
     return QVector3D(resX, resY, resZ);
 }

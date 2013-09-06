@@ -35,8 +35,10 @@ SurfaceObject::~SurfaceObject()
 {
 }
 
-void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry)
 {
+    int columns = space.width();
+    int rows = space.height();
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
     GLfloat height = yRange / 2.0f;
@@ -50,7 +52,7 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
     for (float i = 0.0f; i < float(rows); i += 1.0, row += columns) {
         for (float j = 0; j < columns; j++) {
             vertices.append(QVector3D(j / width - 1.0f,
-                                      series.at(row + int(j)) / height - 1.0f,
+                                      dataArray.at(int(i))->at(int(j)) / height - 1.0f,
                                       i / depth + 1.0f));
             uvs.append(QVector2D(j * uvX, i * uvY));
         }
@@ -127,8 +129,10 @@ void SurfaceObject::setUpSmoothData(QList<qreal> series, int columns, int rows, 
 }
 
 
-void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry)
 {
+    int columns = space.width();
+    int rows = space.height();
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
     GLfloat height = yRange / 2.0f;
@@ -142,7 +146,7 @@ void SurfaceObject::setUpData(QList<qreal> series, int columns, int rows, GLfloa
     for (float i = 0.0f; i < float(rows); i += 1.0f, row += columns) {
         for (float j = 0.0f; j < float(columns); j += 1.0f) {
             vertices.append(QVector3D(j / width - 1.0f,
-                                      series.at(row + int(j)) / height - 1.0f,
+                                      dataArray.at(int(i))->at(int(j)) / height - 1.0f,
                                       i / depth + 1.0f));
             uvs.append(QVector2D(j * uvX, i * uvY));
             if (j > 0 && j < columns - 1) {
