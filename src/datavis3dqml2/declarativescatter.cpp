@@ -56,16 +56,6 @@ void DeclarativeScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quali
     emit shadowQualityChanged(quality);
 }
 
-void DeclarativeScatter::classBegin()
-{
-    //qDebug() << "classBegin";
-}
-
-void DeclarativeScatter::componentComplete()
-{
-    //qDebug() << "componentComplete";
-}
-
 QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     // If old node exists and has right size, reuse it.
@@ -100,24 +90,14 @@ void DeclarativeScatter::setObjectColor(const QColor &baseColor, const QColor &h
     m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
 }
 
-void DeclarativeScatter::setData(const QAbstractItemModel *data)
+QScatterDataProxy *DeclarativeScatter::dataProxy() const
 {
-    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
+    return static_cast<QScatterDataProxy *>(m_shared->activeDataProxy());
 }
 
-const QAbstractItemModel *DeclarativeScatter::data() const
+void DeclarativeScatter::setDataProxy(QScatterDataProxy *dataProxy)
 {
-    return static_cast<const QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->itemModel();
-}
-
-void DeclarativeScatter::setMapping(QItemModelScatterDataMapping *mapping)
-{
-    static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->setActiveMapping(mapping);
-}
-
-QItemModelScatterDataMapping *DeclarativeScatter::mapping() const
-{
-    return static_cast<QItemModelScatterDataProxy *>(m_shared->activeDataProxy())->activeMapping();
+    m_shared->setActiveDataProxy(dataProxy);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisX() const

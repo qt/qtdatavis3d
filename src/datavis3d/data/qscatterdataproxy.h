@@ -32,6 +32,7 @@ class QT_DATAVIS3D_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
+    Q_PROPERTY(int itemCount READ itemCount)
 public:
     explicit QScatterDataProxy(QObject *parent = 0);
     virtual ~QScatterDataProxy();

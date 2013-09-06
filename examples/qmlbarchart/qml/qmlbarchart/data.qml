@@ -22,6 +22,7 @@ import com.digia.QtDataVis3D 1.0
 Item {
     property alias mapping: valueMapping
     property alias model: dataModel
+    property alias proxy: modelProxy
 
     BarDataMapping {
         id: valueMapping
@@ -31,6 +32,12 @@ Item {
         rowCategories: ["2000", "2001", "2002", "2003"]
         columnCategories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    }
+
+    ItemModelBarDataProxy {
+        id: modelProxy
+        activeMapping: valueMapping
+        itemModel: dataModel
     }
 
     ListModel {

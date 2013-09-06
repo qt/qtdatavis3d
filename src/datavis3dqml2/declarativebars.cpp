@@ -18,8 +18,8 @@
 
 #include "declarativebars_p.h"
 #include "declarativebarsrenderer_p.h"
-#include "qitemmodelbardataproxy.h"
 #include "q3dvalueaxis.h"
+#include "qitemmodelbardataproxy.h"
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -46,9 +46,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
     m_shared->setActiveDataProxy(proxy);
-
-    QObject::connect(proxy, &QBarDataProxy::arrayReset, this,
-                     &DeclarativeBars::dataResolved);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -59,16 +56,6 @@ DeclarativeBars::~DeclarativeBars()
 void DeclarativeBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
     emit shadowQualityChanged(quality);
-}
-
-void DeclarativeBars::classBegin()
-{
-    //qDebug() << "classBegin";
-}
-
-void DeclarativeBars::componentComplete()
-{
-    //qDebug() << "componentComplete";
 }
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -110,19 +97,14 @@ void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int di
     m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
-void DeclarativeBars::setData(const QAbstractItemModel *data)
+void DeclarativeBars::setDataProxy(QBarDataProxy *dataProxy)
 {
-    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setItemModel(data);
+    m_shared->setActiveDataProxy(dataProxy);
 }
 
-const QAbstractItemModel *DeclarativeBars::data() const
+QBarDataProxy *DeclarativeBars::dataProxy() const
 {
-    return static_cast<const QItemModelBarDataProxy *>(m_shared->activeDataProxy())->itemModel();
-}
-
-void DeclarativeBars::setMapping(QItemModelBarDataMapping *mapping)
-{
-    static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->setActiveMapping(mapping);
+    return static_cast<QBarDataProxy *>(m_shared->activeDataProxy());
 }
 
 Q3DCategoryAxis *DeclarativeBars::rowAxis() const
@@ -153,11 +135,6 @@ Q3DCategoryAxis *DeclarativeBars::columnAxis() const
 void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
     m_shared->setAxisZ(axis);
-}
-
-QItemModelBarDataMapping *DeclarativeBars::mapping() const
-{
-    return static_cast<QItemModelBarDataProxy *>(m_shared->activeDataProxy())->activeMapping();
 }
 
 void DeclarativeBars::setBarThickness(qreal thicknessRatio)

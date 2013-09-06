@@ -40,7 +40,7 @@ Item {
             height: dataView.height
             font.family: "Lucida Handwriting"
             font.pointSize: 40
-            mapping: chartData.mapping
+            dataProxy: chartData.proxy
             theme: Scatter3D.ThemeHighContrast
             shadowQuality: Scatter3D.ShadowSoftLow
             selectionMode: Scatter3D.ModeItem
@@ -54,10 +54,6 @@ Item {
             axisY.segmentCount: 2
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
-
-            Component.onCompleted: {
-                data = chartData.model
-            }
         }
     }
 

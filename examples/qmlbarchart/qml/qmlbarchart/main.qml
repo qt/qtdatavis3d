@@ -41,8 +41,6 @@ Item {
         height: parent.height
         anchors.right: parent.right;
 
-        property point storedSelection: Qt.point(-1, -1)
-
         Bars3D {
             id: testchart
             width: dataView.width
@@ -53,7 +51,7 @@ Item {
             theme: Bars3D.ThemeBrownSand
             rows: 4
             columns: 12
-            mapping: chartData.mapping
+            dataProxy: chartData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
@@ -62,16 +60,7 @@ Item {
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
-
-            onDataResolved: {
-                // Can't select a bar until data has been resolved from model to proxy
-                selectedBarPos = dataView.storedSelection
-            }
         }
-    }
-
-    Component.onCompleted: {
-        testchart.data = chartData.model
     }
 
     TableView {
@@ -87,8 +76,8 @@ Item {
         model: chartData.model
 
         onCurrentRowChanged: {
-            var rowIndex = testchart.mapping.rowCategoryIndex(chartData.model.get(currentRow).year)
-            var colIndex = testchart.mapping.columnCategoryIndex(chartData.model.get(currentRow).month)
+            var rowIndex = chartData.proxy.activeMapping.rowCategoryIndex(chartData.model.get(currentRow).year)
+            var colIndex = chartData.proxy.activeMapping.columnCategoryIndex(chartData.model.get(currentRow).month)
             testchart.selectedBarPos = Qt.point(rowIndex, colIndex)
         }
     }
@@ -108,7 +97,6 @@ Item {
                 text = "Show Income"
                 testchart.valueAxis = chartAxes.expenses
             }
-            dataView.storedSelection = testchart.selectedBarPos
         }
     }
 

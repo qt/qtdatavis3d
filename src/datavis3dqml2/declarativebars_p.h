@@ -32,9 +32,9 @@
 #include "datavis3dglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
-#include "qitemmodelbardatamapping.h"
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
+#include "qbardataproxy.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -46,8 +46,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeBars : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
-    Q_PROPERTY(QItemModelBarDataMapping *mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
     Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
     Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
@@ -80,9 +79,6 @@ public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
-    void classBegin();
-    void componentComplete();
-
     // how many samples per row and column
     Q_INVOKABLE void setDataWindow(int rowCount, int columnCount);
 
@@ -96,12 +92,8 @@ public:
     // percentage (10...500))
     Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
 
-    // Add whole data set.
-    void setData(const QAbstractItemModel *data);
-    const QAbstractItemModel *data() const;
-
-    QItemModelBarDataMapping *mapping() const;
-    void setMapping(QItemModelBarDataMapping *mapping);
+    QBarDataProxy *dataProxy() const;
+    void setDataProxy(QBarDataProxy *dataProxy);
 
     Q3DCategoryAxis *rowAxis() const;
     void setRowAxis(Q3DCategoryAxis *axis);
@@ -183,8 +175,6 @@ public:
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    // Signals data has been resolved
-    void dataResolved();
 
 protected:
     Bars3DController *m_shared;

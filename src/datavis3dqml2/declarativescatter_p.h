@@ -32,8 +32,8 @@
 #include "datavis3dglobal_p.h"
 #include "scatter3dcontroller_p.h"
 #include "declarativescatter_p.h"
-#include "qitemmodelscatterdatamapping.h"
 #include "q3dvalueaxis.h"
+#include "qscatterdataproxy.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -44,8 +44,7 @@ QT_DATAVIS3D_BEGIN_NAMESPACE
 class DeclarativeScatter : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(const QAbstractItemModel *data READ data WRITE setData)
-    Q_PROPERTY(QItemModelScatterDataMapping *mapping READ mapping WRITE setMapping)
+    Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
@@ -72,9 +71,6 @@ public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
     ~DeclarativeScatter();
 
-    void classBegin();
-    void componentComplete();
-
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (-90...90) angles and distance in percentage (10...500))
     Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
@@ -84,12 +80,8 @@ public:
     Q_INVOKABLE void setObjectColor(const QColor &baseColor, const QColor &heightColor,
                                     const QColor &depthColor, bool uniform = true);
 
-    // Add whole data set.
-    void setData(const QAbstractItemModel *data);
-    const QAbstractItemModel *data() const;
-
-    QItemModelScatterDataMapping *mapping() const;
-    void setMapping(QItemModelScatterDataMapping *mapping);
+    QScatterDataProxy *dataProxy() const;
+    void setDataProxy(QScatterDataProxy *dataProxy);
 
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);

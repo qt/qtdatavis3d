@@ -31,6 +31,12 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                          QLatin1String("Trying to create uncreatable: DataVis."));
     qmlRegisterUncreatableType<Q3DAbstractAxis>(uri, 1, 0, "AbstractAxis3D",
                                               QLatin1String("Trying to create uncreatable: AbstractAxis."));
+    qmlRegisterUncreatableType<QAbstractDataProxy>(uri, 1, 0, "AbstractDataProxy",
+                                              QLatin1String("Trying to create uncreatable: AbstractDataProxy."));
+    qmlRegisterUncreatableType<QBarDataProxy>(uri, 1, 0, "BarDataProxy",
+                                              QLatin1String("Trying to create uncreatable: BarDataProxy."));
+    qmlRegisterUncreatableType<QScatterDataProxy>(uri, 1, 0, "ScatterDataProxy",
+                                              QLatin1String("Trying to create uncreatable: ScatterDataProxy."));
 
     qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
     qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
@@ -40,6 +46,9 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 
     qmlRegisterType<Q3DValueAxis>(uri, 1, 0, "ValueAxis3D");
     qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
+
+    qmlRegisterType<QItemModelBarDataProxy>(uri, 1, 0, "ItemModelBarDataProxy");
+    qmlRegisterType<QItemModelScatterDataProxy>(uri, 1, 0, "ItemModelScatterDataProxy");
 }
 
 QT_DATAVIS3D_END_NAMESPACE

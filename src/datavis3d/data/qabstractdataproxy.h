@@ -32,6 +32,7 @@ class QT_DATAVIS3D_EXPORT QAbstractDataProxy : public QObject
     Q_OBJECT
     Q_ENUMS(DataType)
     Q_PROPERTY(DataType type READ type)
+    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
 
 public:
     enum DataType {

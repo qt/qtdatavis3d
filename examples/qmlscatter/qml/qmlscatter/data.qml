@@ -22,12 +22,19 @@ import com.digia.QtDataVis3D 1.0
 Item {
     property alias mapping: scatterMapping
     property alias model: dataModel
+    property alias proxy: modelProxy
 
     ScatterDataMapping {
         id: scatterMapping
         xPosRole: "xPos"
         yPosRole: "yPos"
         zPosRole: "zPos"
+    }
+
+    ItemModelScatterDataProxy {
+        id: modelProxy
+        activeMapping: scatterMapping
+        itemModel: dataModel
     }
 
     ListModel {

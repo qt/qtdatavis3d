@@ -290,6 +290,8 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
                      &Bars3DController::handleItemChanged);
 
     adjustValueAxisRange();
+
+    // Always clear selection on proxy change
     setSelectedBarPos(noSelectionPoint());
 }
 
@@ -298,7 +300,8 @@ void Bars3DController::handleArrayReset()
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
-    setSelectedBarPos(noSelectionPoint());
+    // Clear selection unless still valid
+    setSelectedBarPos(m_selectedBarPos);
     emitNeedRender();
 }
 
@@ -335,9 +338,10 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
     setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
-    // TODO this will break once data window offset is implemented
-    if (startIndex >= static_cast<QBarDataProxy *>(m_data)->rowCount())
-        setSelectedBarPos(noSelectionPoint());
+
+    // Clear selection unless still valid
+    setSelectedBarPos(m_selectedBarPos);
+
     emitNeedRender();
 }
 
@@ -447,8 +451,8 @@ void Bars3DController::setDataWindow(int rowCount, int columnCount)
 
     adjustValueAxisRange();
 
-    if (m_selectedBarPos.x() >= rowCount || m_selectedBarPos.y() >= columnCount)
-        setSelectedBarPos(noSelectionPoint());
+    // Clear selection unless still valid
+    setSelectedBarPos(m_selectedBarPos);
 
     m_changeTracker.sampleSpaceChanged = true;
     m_isDataDirty = true; // Render item array is recreated in renderer
@@ -464,11 +468,14 @@ void Bars3DController::setSelectionMode(QDataVis::SelectionMode mode)
 
 void Bars3DController::setSelectedBarPos(const QPoint &position)
 {
+    // If the selection is outside data window or targets non-existent
+    // bar, clear selection instead.
     // TODO this will break once data window offset is implemented
     QPoint pos = position;
     if (pos.x() < 0 || pos.y() < 0
             || pos.x() >= static_cast<QBarDataProxy *>(m_data)->rowCount()
-            || pos.y() >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()) {
+            || pos.y() >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()
+            || pos.x() >= m_rowCount || pos.y() >= m_columnCount) {
         pos = noSelectionPoint();
     }
 
