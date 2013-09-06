@@ -25,6 +25,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QRadioButton>
 #include <QSlider>
 #include <QLabel>
 #include <QScreen>
@@ -64,15 +65,16 @@ int main(int argc, char *argv[])
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));
     surfaceGridCB->setChecked(true);
 
-    QCheckBox *sqrtSinCB = new QCheckBox(widget);
+    //QCheckBox *sqrtSinCB = new QCheckBox(widget);
+    QRadioButton *sqrtSinCB = new QRadioButton(widget);
     sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
     sqrtSinCB->setChecked(false);
 
-    QCheckBox *planeCB = new QCheckBox(widget);
+    QRadioButton *planeCB = new QRadioButton(widget);
     planeCB->setText(QStringLiteral("Plane"));
     planeCB->setChecked(false);
 
-    QCheckBox *heightMapCB = new QCheckBox(widget);
+    QRadioButton *heightMapCB = new QRadioButton(widget);
     heightMapCB->setText(QStringLiteral("Height map"));
     heightMapCB->setChecked(false);
 
@@ -130,11 +132,11 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::toggleSmooth);
     QObject::connect(surfaceGridCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleSurfaceGrid);
-    QObject::connect(sqrtSinCB, &QCheckBox::stateChanged,
+    QObject::connect(sqrtSinCB, &QRadioButton::toggled,
                      modifier, &ChartModifier::toggleSqrtSin);
-    QObject::connect(planeCB, &QCheckBox::stateChanged,
+    QObject::connect(planeCB, &QCheckBox::toggled,
                      modifier, &ChartModifier::togglePlane);
-    QObject::connect(heightMapCB, &QCheckBox::stateChanged,
+    QObject::connect(heightMapCB, &QCheckBox::toggled,
                      modifier, &ChartModifier::setHeightMapData);
     QObject::connect(gridSlidersLockCB, &QCheckBox::stateChanged,
                      modifier, &ChartModifier::toggleGridSliderLock);

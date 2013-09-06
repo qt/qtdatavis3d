@@ -29,7 +29,8 @@ QT_DATAVIS3D_USE_NAMESPACE
 ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
       m_xCount(10),
-      m_zCount(10)
+      m_zCount(10),
+      m_activeSample(0)
 {
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
@@ -87,6 +88,8 @@ void ChartModifier::toggleSqrtSin(bool enable)
         m_chart->axisZ()->setRange(0.0, qreal(m_zCount - 1));
         m_chart->activeDataProxy()->resetArray(dataArray);
 
+        m_activeSample = ChartModifier::SqrtSin;
+
         //qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
     } else {
         qDebug() << "Remove surface";
@@ -116,6 +119,8 @@ void ChartModifier::togglePlane(bool enable)
         m_chart->axisZ()->setRange(0.0, qreal(m_zCount - 1));
 
         m_chart->activeDataProxy()->resetArray(dataArray);
+
+        m_activeSample = ChartModifier::Plane;
     }
 }
 
@@ -142,6 +147,8 @@ void ChartModifier::setHeightMapData(bool enable)
         m_chart->axisZ()->setRange(0.0, qreal(image.height() - 1));
 
         m_chart->activeDataProxy()->resetArray(dataArray);
+
+        m_activeSample = ChartModifier::Map;
     }
 }
 
@@ -162,6 +169,8 @@ void ChartModifier::adjustXCount(int count)
     if (m_gridSlidersLocked)
         m_gridSliderZ->setValue(count);
 
+    updateSamples();
+
     qDebug() << "X count = " << count;
 }
 
@@ -169,6 +178,24 @@ void ChartModifier::adjustZCount(int count)
 {
     m_zCount = count;
 
+    updateSamples();
+
     qDebug() << "Z count = " << count;
+}
+
+void ChartModifier::updateSamples()
+{
+    switch (m_activeSample) {
+    case SqrtSin:
+        toggleSqrtSin(true);
+        break;
+
+    case Plane:
+        togglePlane(true);
+        break;
+
+    default:
+        break;
+    }
 }
 

@@ -28,6 +28,12 @@ class ChartModifier : public QObject
 {
     Q_OBJECT
 public:
+    enum Samples {
+        SqrtSin = 1,
+        Plane,
+        Map
+    };
+
     explicit ChartModifier(Q3DSurface *chart);
     ~ChartModifier();
 
@@ -41,6 +47,7 @@ public:
     void setGridSliderZ(QSlider *slider) { m_gridSliderZ = slider; }
     void adjustXCount(int count);
     void adjustZCount(int count);
+    void updateSamples();
 
 private:
     Q3DSurface *m_chart;
@@ -49,6 +56,7 @@ private:
     bool m_gridSlidersLocked;
     int m_xCount;
     int m_zCount;
+    int m_activeSample;
 };
 
 #endif // CHARTMODIFIER_H
