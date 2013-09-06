@@ -47,10 +47,12 @@ qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
     int rowSize = qMin((newDataSize + oldRow->size()), maxRowSize);
 
     QBarDataRow *row = new QBarDataRow(rowSize);
+    int bottom = qMax(0, (newDataSize - rowSize));
 
     // Insert data in reverse order, so that newest data is always at the front of the row
-    for (int i = newDataSize - 1; i >= 0; i--)
-        (*row)[i].setValue(((quint8)data[resolution * i] - 128) / 2.0);
+    int index = 0;
+    for (int i = newDataSize - 1; i >= bottom; i--)
+        (*row)[index++].setValue(((quint8)data[resolution * i] - 128) / 2.0);
 
     // Append old data to new row
     for (int i = newDataSize; i < rowSize; i++)
