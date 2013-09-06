@@ -31,7 +31,7 @@ void main() {
     gl_FragColor.rgb =
         materialAmbientColor +
         materialDiffuseColor * lightStrength * (cosTheta * cosTheta) / distance +
-        materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / distance;
+        materialSpecularColor * lightStrength * (cosAlpha * cosAlpha * cosAlpha * cosAlpha * cosAlpha) / distance;
     gl_FragColor.a = texture2D(textureSampler, UV).a;
 }
 

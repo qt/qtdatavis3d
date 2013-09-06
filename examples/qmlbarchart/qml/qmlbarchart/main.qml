@@ -86,9 +86,9 @@ Item {
         TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
         model: chartData.model
 
-        onClicked: {
-            var rowIndex = testchart.mapping.rowCategoryIndex(chartData.model.get(row).year)
-            var colIndex = testchart.mapping.columnCategoryIndex(chartData.model.get(row).month)
+        onCurrentRowChanged: {
+            var rowIndex = testchart.mapping.rowCategoryIndex(chartData.model.get(currentRow).year)
+            var colIndex = testchart.mapping.columnCategoryIndex(chartData.model.get(currentRow).month)
             testchart.selectedBarPos = Qt.point(rowIndex, colIndex)
         }
     }
