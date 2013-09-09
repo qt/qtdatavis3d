@@ -17,13 +17,13 @@
 ****************************************************************************/
 
 /*!
-    \example qmlbarchart
-    \title Qt Quick 2 Barchart Example
+    \example qmlsurface
+    \title Qt Quick 2 Surface Example
 
-    The Qt Quick 2 barchart example shows how to make a simple 3D bar chart using Q3DBars and Qt
-    Quick 2.
+    The Qt Quick 2 surface example shows how to make a simple 3D surface plot using Q3DSurface with
+    Qt Quick 2.
 
-    \image qmlbarchart-example.png
+    \image qmlsurface-example.png
 
     TODO
 */

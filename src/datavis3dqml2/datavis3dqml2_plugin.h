@@ -22,12 +22,15 @@
 #include "datavis3dglobal_p.h"
 #include "declarativebars_p.h"
 #include "declarativescatter_p.h"
+#include "declarativesurface_p.h"
 #include "qitemmodelbardatamapping.h"
 #include "qitemmodelscatterdatamapping.h"
-#include "q3dvalueaxis.h"
-#include "q3dcategoryaxis.h"
+#include "qitemmodelsurfacedatamapping.h"
 #include "qitemmodelbardataproxy.h"
 #include "qitemmodelscatterdataproxy.h"
+#include "qitemmodelsurfacedataproxy.h"
+#include "q3dvalueaxis.h"
+#include "q3dcategoryaxis.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -35,10 +38,14 @@ QT_DATAVIS3D_USE_NAMESPACE
 
 Q_DECLARE_METATYPE(DeclarativeBars *)
 Q_DECLARE_METATYPE(DeclarativeScatter *)
+Q_DECLARE_METATYPE(DeclarativeSurface *)
 
 Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
 Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
+Q_DECLARE_METATYPE(QItemModelSurfaceDataMapping *)
+
 Q_DECLARE_METATYPE(const QAbstractItemModel *)
+
 Q_DECLARE_METATYPE(QDataVis *)
 
 Q_DECLARE_METATYPE(Q3DAbstractAxis *)
@@ -50,6 +57,8 @@ Q_DECLARE_METATYPE(QBarDataProxy *)
 Q_DECLARE_METATYPE(QItemModelBarDataProxy *)
 Q_DECLARE_METATYPE(QScatterDataProxy *)
 Q_DECLARE_METATYPE(QItemModelScatterDataProxy *)
+Q_DECLARE_METATYPE(QSurfaceDataProxy *)
+Q_DECLARE_METATYPE(QItemModelSurfaceDataProxy *)
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 

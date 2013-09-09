@@ -4,6 +4,7 @@ SUBDIRS += barchart \
            widget \
            qmlbarchart \
            qmlscatter \
+           qmlsurface \
            surfacechart \
            scatterchart
 

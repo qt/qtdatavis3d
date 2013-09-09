@@ -21,7 +21,7 @@
     \title Qt Quick 2 Scatter Example
 
     The Qt Quick 2 scatter example shows how to make a simple scatter chart visualization using
-    Q3DScatter using Qt Quick 2.
+    Q3DScatter and Qt Quick 2.
 
     \image qmlscatter-example.png
 

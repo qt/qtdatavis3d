@@ -16,37 +16,42 @@
 **
 ****************************************************************************/
 
-#ifndef QABSTRACTDATAMAPPING_H
-#define QABSTRACTDATAMAPPING_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include <QtDataVis3D/qdatavis3denums.h>
-#include <QtDataVis3D/qabstractdataproxy.h>
+#ifndef QITEMMODELSURFACEDATAPROXY_P_H
+#define QITEMMODELSURFACEDATAPROXY_P_H
+
+#include "qitemmodelsurfacedataproxy.h"
+#include "qsurfacedataproxy_p.h"
+#include <QPointer>
+#include <QTimer>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractDataMappingPrivate;
+class SurfaceItemModelHandler;
 
-class QT_DATAVIS3D_EXPORT QAbstractDataMapping : public QObject
+class QItemModelSurfaceDataProxyPrivate : public QSurfaceDataProxyPrivate
 {
     Q_OBJECT
-
 public:
-    explicit QAbstractDataMapping(QAbstractDataMappingPrivate *d, QObject *parent = 0);
-    virtual ~QAbstractDataMapping();
-
-signals:
-    void mappingChanged();
+    QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q);
+    virtual ~QItemModelSurfaceDataProxyPrivate();
 
 private:
-    QScopedPointer<QAbstractDataMappingPrivate> d_ptr;
+    QItemModelSurfaceDataProxy *qptr();
 
-    Q_DISABLE_COPY(QAbstractDataMapping)
+    SurfaceItemModelHandler *m_itemModelHandler;
 
-    friend class QItemModelBarDataMapping;
-    friend class QItemModelScatterDataMapping;
-    friend class QItemModelSurfaceDataMapping;
+    friend class QItemModelSurfaceDataProxy;
 };
-
 
 QT_DATAVIS3D_END_NAMESPACE
 

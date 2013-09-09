@@ -27,7 +27,12 @@ HEADERS += \
     $$PWD/qabstractdatamapping_p.h \
     $$PWD/scatteritemmodelhandler_p.h \
     $$PWD/qsurfacedataproxy.h \
-    $$PWD/qsurfacedataproxy_p.h
+    $$PWD/qsurfacedataproxy_p.h \
+    $$PWD/qitemmodelsurfacedatamapping.h \
+    $$PWD/qitemmodelsurfacedatamapping_p.h \
+    $$PWD/qitemmodelsurfacedataproxy.h \
+    $$PWD/qitemmodelsurfacedataproxy_p.h \
+    $$PWD/surfaceitemmodelhandler_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -47,4 +52,7 @@ SOURCES += \
     $$PWD/baritemmodelhandler.cpp \
     $$PWD/qabstractdatamapping.cpp \
     $$PWD/scatteritemmodelhandler.cpp \
-    $$PWD/qsurfacedataproxy.cpp
+    $$PWD/qsurfacedataproxy.cpp \
+    $$PWD/qitemmodelsurfacedatamapping.cpp \
+    $$PWD/qitemmodelsurfacedataproxy.cpp \
+    $$PWD/surfaceitemmodelhandler.cpp

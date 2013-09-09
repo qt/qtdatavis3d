@@ -16,37 +16,42 @@
 **
 ****************************************************************************/
 
-#ifndef QABSTRACTDATAMAPPING_H
-#define QABSTRACTDATAMAPPING_H
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the QtDataVis3D API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
 
-#include <QtDataVis3D/qdatavis3denums.h>
-#include <QtDataVis3D/qabstractdataproxy.h>
+#include "qitemmodelsurfacedatamapping.h"
+#include "qabstractdatamapping_p.h"
+
+#ifndef QITEMMODELSURFACEDATAMAPPING_P_H
+#define QITEMMODELSURFACEDATAMAPPING_P_H
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
-class QAbstractDataMappingPrivate;
-
-class QT_DATAVIS3D_EXPORT QAbstractDataMapping : public QObject
+class QItemModelSurfaceDataMappingPrivate : public QAbstractDataMappingPrivate
 {
     Q_OBJECT
-
 public:
-    explicit QAbstractDataMapping(QAbstractDataMappingPrivate *d, QObject *parent = 0);
-    virtual ~QAbstractDataMapping();
-
-signals:
-    void mappingChanged();
+    QItemModelSurfaceDataMappingPrivate(QItemModelSurfaceDataMapping *q);
+    virtual ~QItemModelSurfaceDataMappingPrivate();
 
 private:
-    QScopedPointer<QAbstractDataMappingPrivate> d_ptr;
+    QString m_rowRole;
+    QString m_columnRole;
+    QString m_valueRole;
 
-    Q_DISABLE_COPY(QAbstractDataMapping)
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    QStringList m_rowCategories;
+    QStringList m_columnCategories;
 
-    friend class QItemModelBarDataMapping;
-    friend class QItemModelScatterDataMapping;
     friend class QItemModelSurfaceDataMapping;
 };
-
 
 QT_DATAVIS3D_END_NAMESPACE
 

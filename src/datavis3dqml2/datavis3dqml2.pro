@@ -21,14 +21,18 @@ SOURCES += \
     declarativebars.cpp \
     declarativebarsrenderer.cpp \
     declarativescatter.cpp \
-    declarativescatterrenderer.cpp
+    declarativescatterrenderer.cpp \
+    declarativesurface.cpp \
+    declarativesurfacerenderer.cpp
 
 HEADERS += \
     datavis3dqml2_plugin.h \
     declarativebars_p.h \
     declarativebarsrenderer_p.h \
     declarativescatter_p.h \
-    declarativescatterrenderer_p.h
+    declarativescatterrenderer_p.h \
+    declarativesurface_p.h \
+    declarativesurfacerenderer_p.h
 
 OTHER_FILES = qmldir
 
