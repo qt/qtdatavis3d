@@ -657,7 +657,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheZ.subSegmentStep();
-            GLfloat linePos = aspectRatio * m_axisCacheZ.min(); // Start line
+            GLfloat linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
             int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
 #else
             GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
@@ -724,14 +724,14 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
-                linePos += lineStep;
+                linePos -= lineStep;
             }
 
             // Side wall lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor;
-            linePos = aspectRatio * m_axisCacheZ.min(); // Start line
+            linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
 #else
             GLfloat lineXTrans = aspectRatio * backgroundMargin;
             linePos = -aspectRatio * m_scaleFactor; // Start line
@@ -778,7 +778,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
-                linePos += lineStep;
+                linePos -= lineStep;
             }
         }
 
@@ -1070,7 +1070,7 @@ void Scatter3DRenderer::drawScene(CameraHelper *camera,
     if (m_axisCacheZ.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
-        GLfloat labelPos = aspectRatio * m_axisCacheZ.max();
+        GLfloat labelPos = -aspectRatio * m_axisCacheZ.min();
         int lastSegment = m_axisCacheZ.segmentCount();
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
@@ -1468,9 +1468,8 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
     m_heightNormalizer = (GLfloat)qMax(qAbs(m_axisCacheY.max()), qAbs(m_axisCacheY.min()));
-    // TODO: Get rid of m_areaSize and use m_axisCaches directly?
-    m_areaSize.setHeight(m_axisCacheZ.max());
-    m_areaSize.setWidth(m_axisCacheX.max());
+    m_areaSize.setHeight(qMax(qAbs(m_axisCacheZ.max()), qAbs(m_axisCacheZ.min())));
+    m_areaSize.setWidth(qMax(qAbs(m_axisCacheX.max()), qAbs(m_axisCacheX.min())));
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
     //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_axisCacheY.max() << m_axisCacheX.max() << m_axisCacheZ.max();
 }
