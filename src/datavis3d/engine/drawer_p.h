@@ -70,6 +70,7 @@ public:
 
     void setTheme(const Theme &theme);
     void setFont(const QFont &font);
+    QFont font() const;
     void setTransparency(QDataVis::LabelTransparency transparency);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
@@ -85,7 +86,7 @@ public:
                    Qt::AlignmentFlag alignment = Qt::AlignCenter);
 
     void generateSelectionLabelTexture(AbstractRenderItem *item);
-    void generateLabelItem(LabelItem &item, const QString &text);
+    void generateLabelItem(LabelItem &item, const QString &text, int widestLabel = 0);
 
 Q_SIGNALS:
     void drawerChanged();

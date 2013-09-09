@@ -74,6 +74,11 @@ void Drawer::setFont(const QFont &font)
     emit drawerChanged();
 }
 
+QFont Drawer::font() const
+{
+    return m_font;
+}
+
 void Drawer::setTransparency(QDataVis::LabelTransparency transparency)
 {
     m_transparency = transparency;
@@ -316,7 +321,7 @@ void Drawer::generateSelectionLabelTexture(AbstractRenderItem *item)
     generateLabelItem(labelItem, item->selectionLabel());
 }
 
-void Drawer::generateLabelItem(LabelItem &item, const QString &text)
+void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestLabel)
 {
     initializeOpenGL();
 
@@ -329,7 +334,8 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text)
                                                text,
                                                m_theme.m_textBackgroundColor,
                                                m_theme.m_textColor,
-                                               m_transparency);
+                                               m_transparency,
+                                               widestLabel);
 
         // Set label size
         item.setSize(label.size());

@@ -73,6 +73,7 @@ public slots:
 private:
     void updateSegmentStep();
     void updateSubSegmentStep();
+    int maxLabelWidth(const QStringList &labels) const;
 
     // Cached axis values
     Q3DAbstractAxis::AxisType m_type;
@@ -83,6 +84,7 @@ private:
     int m_segmentCount;
     int m_subSegmentCount;
     QString m_labelFormat;
+    QFont m_font;
 
     // Renderer items
     Drawer *m_drawer; // Not owned

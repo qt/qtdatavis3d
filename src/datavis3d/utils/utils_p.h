@@ -59,7 +59,8 @@ public:
                                    const QString &text,
                                    const QColor &bgrColor,
                                    const QColor &txtColor,
-                                   QDataVis::LabelTransparency transparency);
+                                   QDataVis::LabelTransparency transparency,
+                                   int maxLabelWidth = 0);
     static QVector3D getSelection(QPoint mousepos, int height);
 
     static ParamType findFormatParamType(const QString &format);

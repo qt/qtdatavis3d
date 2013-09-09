@@ -119,30 +119,31 @@ void Utils::printText(QPainter *painter, const QString &text, const QSize &posit
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor, QDataVis::LabelTransparency transparency)
+                               const QColor &txtColor, QDataVis::LabelTransparency transparency,
+                               int maxLabelWidth)
 {
     GLuint paddingWidth = 15;
     GLuint paddingHeight = 15;
     // Calculate text dimensions
     QFont valueFont = font;
-    valueFont.setPointSize(30);
+    valueFont.setPointSize(50);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
+    if (maxLabelWidth && QDataVis::TransparencyNoBackground != transparency)
+        valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     QSize labelSize;
 
 #if defined(Q_OS_ANDROID)
     // Android can't handle textures with dimensions not in power of 2. Resize labels accordingly.
     // Add some padding before converting to power of two to avoid too tight fit
-    GLuint prePadding = 10;
+    GLuint prePadding = 5;
+    // Android needs to use this always because of the power of 2 -issue.
+    valueStrWidth = maxLabelWidth;
     labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
     //qDebug() << "label size before padding" << labelSize;
     labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
     labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
-    paddingWidth += prePadding;
-    paddingHeight += prePadding;
-    paddingWidth /= 2;
-    paddingHeight /= 2;
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
     if (QDataVis::TransparencyNoBackground == transparency)
@@ -161,14 +162,21 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     switch (transparency) {
-    // TODO: Texture size padding fix for Android f**ks this up for axis labels. Fix or disable for android.
     case QDataVis::TransparencyNoBackground: {
         painter.setFont(valueFont);
         painter.setPen(txtColor);
+#if defined(Q_OS_ANDROID)
+        painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
+                         (labelSize.height() - valueStrHeight) / 2.0f,
+                         valueStrWidth, valueStrHeight,
+                         Qt::AlignCenter | Qt::AlignVCenter,
+                         text);
+#else
         painter.drawText(0, 0,
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
+#endif
         break;
     }
     case QDataVis::TransparencyFromTheme: {
@@ -177,7 +185,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
         painter.setFont(valueFont);
         painter.setPen(txtColor);
-        painter.drawText(paddingWidth, paddingHeight,
+        painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
+                         (labelSize.height() - valueStrHeight) / 2.0f,
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
@@ -189,7 +198,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());
         painter.setFont(valueFont);
         painter.setPen(txtColor);
-        painter.drawText(paddingWidth, paddingHeight,
+        painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
+                         (labelSize.height() - valueStrHeight) / 2.0f,
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
@@ -207,14 +217,14 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     // This is the only one that works with ANGLE (ES 2.0)
     // Item count will be limited to 256*256*256
     GLubyte pixel[4];
-    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
-                 GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
+                 (void *)pixel);
 
     //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2] << pixel[3] << "mousepos:" << mousepos << "height:" << height;
 
     //#else
-    //// These work with desktop OpenGL
-    //// They offer a lot higher possible object count and a possibility to use object ids
+    // These work with desktop OpenGL
+    // They offer a lot higher possible object count and a possibility to use object ids
     //GLuint pixel[3];
     //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
     //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel);
@@ -235,13 +245,13 @@ Utils::ParamType Utils::mapFormatCharToParamType(const QChar &formatChar)
 {
     ParamType retVal = ParamTypeUnknown;
     if (formatChar == QLatin1Char('d')
-        || formatChar == QLatin1Char('i')
-        || formatChar == QLatin1Char('c')) {
+            || formatChar == QLatin1Char('i')
+            || formatChar == QLatin1Char('c')) {
         retVal = ParamTypeInt;
     } else if (formatChar == QLatin1Char('u')
-             || formatChar == QLatin1Char('o')
-             || formatChar == QLatin1Char('x')
-             || formatChar == QLatin1Char('X')) {
+               || formatChar == QLatin1Char('o')
+               || formatChar == QLatin1Char('x')
+               || formatChar == QLatin1Char('X')) {
         retVal = ParamTypeUInt;
     } else if (formatChar == QLatin1Char('f')
                || formatChar == QLatin1Char('F')

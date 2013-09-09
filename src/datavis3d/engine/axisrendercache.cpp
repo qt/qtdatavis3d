@@ -18,6 +18,7 @@
 
 #include "axisrendercache_p.h"
 #include "qmath.h"
+#include <QFontMetrics>
 
 QT_DATAVIS3D_BEGIN_NAMESPACE
 
@@ -27,6 +28,7 @@ AxisRenderCache::AxisRenderCache()
       m_max(10.0),
       m_segmentCount(5),
       m_subSegmentCount(1),
+      m_font(QFont(QStringLiteral("Arial"))),
       m_drawer(0),
       m_segmentStep(10.0f),
       m_subSegmentStep(10.0f)
@@ -42,6 +44,7 @@ AxisRenderCache::~AxisRenderCache()
 void AxisRenderCache::setDrawer(Drawer *drawer)
 {
     m_drawer = drawer;
+    m_font = m_drawer->font();
     if (m_drawer) {
         QObject::connect(m_drawer, &Drawer::drawerChanged, this, &AxisRenderCache::updateTextures);
         updateTextures();
@@ -90,6 +93,8 @@ void AxisRenderCache::setLabels(const QStringList &labels)
 
         m_labelItems.reserve(newSize);
 
+        int widest = maxLabelWidth(labels);
+
         for (int i = 0; i < newSize; i++) {
             if (i >= oldSize)
                 m_labelItems.append(new LabelItem);
@@ -97,7 +102,7 @@ void AxisRenderCache::setLabels(const QStringList &labels)
                 if (labels.at(i).isEmpty())
                     m_labelItems[i]->clear();
                 else if (i >= oldSize || labels.at(i) != m_labels.at(i))
-                    m_drawer->generateLabelItem(*m_labelItems[i], labels.at(i));
+                    m_drawer->generateLabelItem(*m_labelItems[i], labels.at(i), widest);
             }
         }
         m_labels = labels;
@@ -130,16 +135,20 @@ void AxisRenderCache::setSubSegmentCount(int count)
 
 void AxisRenderCache::updateTextures()
 {
+    m_font = m_drawer->font();
+
     if (m_title.isEmpty())
         m_titleItem.clear();
     else
         m_drawer->generateLabelItem(m_titleItem, m_title);
 
+    int widest = maxLabelWidth(m_labels);
+
     for (int i = 0; i < m_labels.size(); i++) {
         if (m_labels.at(i).isEmpty())
             m_labelItems[i]->clear();
         else
-            m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i));
+            m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i), widest);
     }
 }
 
@@ -158,6 +167,20 @@ void AxisRenderCache::updateSubSegmentStep()
         m_subSegmentStep = m_segmentStep / m_subSegmentCount;
     else
         m_subSegmentStep = m_segmentStep;
+}
+
+int AxisRenderCache::maxLabelWidth(const QStringList &labels) const
+{
+    int labelWidth = 0;
+    QFont labelFont = m_font;
+    labelFont.setPointSize(50);
+    QFontMetrics labelFM(labelFont);
+    for (int i = 0; i < labels.size(); i++) {
+        int newWidth = labelFM.width(labels.at(i));
+        if (labelWidth < newWidth)
+            labelWidth = newWidth;
+    }
+    return labelWidth;
 }
 
 QT_DATAVIS3D_END_NAMESPACE
