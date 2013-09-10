@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -32,7 +32,7 @@
 #include <QPainter>
 #include <QDebug>
 
-using namespace QtDataVis3D;
+using namespace QtDataVisualization;
 
 int main(int argc, char *argv[])
 {

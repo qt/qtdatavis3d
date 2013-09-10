@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -19,10 +19,10 @@
 #ifndef SCATTERDATAMODIFIER_H
 #define SCATTERDATAMODIFIER_H
 
-#include <QtDataVis3D/q3dscatter.h>
+#include <QtDataVisualization/q3dscatter.h>
 #include <QtGui/QFont>
 
-using namespace QtDataVis3D;
+using namespace QtDataVisualization;
 
 class ScatterDataModifier : public QObject
 {

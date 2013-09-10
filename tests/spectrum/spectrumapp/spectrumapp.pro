@@ -50,7 +50,7 @@ RESOURCES = spectrum.qrc
 android {
     target.path = /libs/$$ANDROID_TARGET_ARCH
 } else {
-    target.path = $$[QT_INSTALL_EXAMPLES]/datavis3d/spectrum
+    target.path = $$[QT_INSTALL_EXAMPLES]/datavisualization/spectrum
 }
 INSTALLS += target
 

@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -19,13 +19,13 @@
 #include "audiolevelsiodevice.h"
 #include "audiolevels.h"
 
-#include <QtDataVis3D/qbardataproxy.h>
-#include <QtDataVis3D/q3dvalueaxis.h>
+#include <QtDataVisualization/qbardataproxy.h>
+#include <QtDataVisualization/q3dvalueaxis.h>
 
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
 
-QT_DATAVIS3D_USE_NAMESPACE
+QT_DATAVISUALIZATION_USE_NAMESPACE
 
 AudioLevels::AudioLevels(Q3DBars *chart, QObject *parent)
     : QObject(parent),

@@ -1,0 +1,37 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \page qtdatavisualizationlicense.html
+    \title Qt Data Visualization License Information
+    \ingroup licensing
+    \brief License information for Qt Data Visualization
+
+    \legalese
+    Copyright 2013 Digia.
+
+    Qt and Qt logos are trademarks of of Digia Corporation in Finland and/or other countries
+    worldwide.
+
+    All other trademarks are property of their respective owners.
+
+    Licensees holding valid Qt Enterprise licenses may use this document in accordance with the
+    Qt Enterprise License Agreement provided with the Software or, alternatively, in accordance
+    with the terms contained in a written agreement between you and Digia.
+    \endlegalese
+*/

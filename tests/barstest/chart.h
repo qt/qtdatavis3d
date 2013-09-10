@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -19,14 +19,14 @@
 #ifndef CHARTMODIFIER_H
 #define CHARTMODIFIER_H
 
-#include <QtDataVis3D/q3dbars.h>
+#include <QtDataVisualization/q3dbars.h>
 
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
 #include <QPointer>
 
-using namespace QtDataVis3D;
+using namespace QtDataVisualization;
 
 class ChartModifier : public QObject
 {

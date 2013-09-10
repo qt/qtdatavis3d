@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -21,7 +21,7 @@
 #include <QGuiApplication>
 #include <QAudio>
 
-using namespace QtDataVis3D;
+using namespace QtDataVisualization;
 
 int main(int argc, char *argv[])
 {
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     Q3DBars window;
     window.resize(1024, 768);
-    window.setTitle("QtDataVis3D microphone audio levels visualizer");
+    window.setTitle("QtDataVisualization microphone audio levels visualizer");
     window.show();
 
     AudioLevels audioLevels(&window);

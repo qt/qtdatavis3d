@@ -1,0 +1,60 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \title Qt Data Visualization
+    \page qtdatavisualization-index.html
+    \brief QtDataVisualization module provides functionality for 3D visualization.
+
+    Qt Data Visualization module provides a way to visualize data in 3D.
+    It uses OpneGL for the data rendering.
+
+    \section1 Getting Started
+
+    Qt Data Visualization provides classes for rendering 3D data. To include
+    the definitions of the module's classes, use the following directive:
+
+    \snippet doc_src_qtdatavisualization.cpp 0
+
+    To link against the module, add this line to your qmake \c
+    .pro file:
+
+    \snippet doc_src_qtdatavisualization.pro 0
+
+    \section1 Articles
+    \list
+    \li \l{Qt Data Visualization License Information}{License Information}
+    \endlist
+
+    \section1 References
+    \list
+        \li \l{Qt Data Visualization C++ Classes}
+    \endlist
+
+    Qt Data Visualization comes with the following examples:
+
+    \list
+        \li \l{Barchart Example}
+        \li \l{Qt Quick 2 Barchart Example}
+        \li \l{Qt Quick 2 Scatter Example}
+        \li \l{Rainfall Example}
+        \li \l{Scatter Chart Example}
+        \li \l{Audiolevels Example}
+        \li \l{Widget Example}
+    \endlist
+*/

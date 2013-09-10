@@ -1,7 +1,7 @@
 android {
     target.path = /libs/$$ANDROID_TARGET_ARCH
 } else {
-    target.path = $$[QT_INSTALL_TESTS]/datavis3d/$$TARGET
+    target.path = $$[QT_INSTALL_TESTS]/datavisualization/$$TARGET
 }
 
 win32 {
@@ -15,11 +15,11 @@ LIBS += -L$$OUT_PWD/../../lib
 
 TEMPLATE = app
 
-QT += datavis3d
+QT += datavisualization
 
 contains(TARGET, qml.*) {
-    uri = com.digia.QtDataVis3D
-    lib_name = datavis3dqml2
+    uri = com.digia.QtDataVisualization
+    lib_name = datavisualizationqml2
 
     uri_replaced = $$replace(uri, \\., $$QMAKE_DIR_SEP)
     make_qmldir_path = $$DESTDIR/$$uri_replaced

@@ -1,0 +1,33 @@
+include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
+
+project             = QtDataVisualization
+description         = Qt Data Visualization Reference Documentation
+version             = 1.0.0
+
+exampledirs += ../../../examples \
+               snippets
+
+headerdirs += ..
+imagedirs  += ../images \
+              images
+sourcedirs += ..
+
+depends += qtcore \
+           qtgui
+
+qhp.projects                    = qtdatavisualization
+
+qhp.qtdatavisualization.file            = qtdatavisualization.qhp
+qhp.qtdatavisualization.namespace       = org.qt-project.qtdatavisualization.1.0.0
+qhp.qtdatavisualization.virtualFolder   = qtdatavisualization
+qhp.qtdatavisualization.indexTitle      = Qt Data Visualization
+qhp.qtdatavisualization.indexRoot       =
+
+qhp.qtdatavisualization.filterAttributes                    = qtdatavisualization 1.0.0 qtrefdoc
+qhp.qtdatavisualization.customFilters.Qt.name               = QtDataVisualization 1.0.0
+qhp.qtdatavisualization.customFilters.Qt.filterAttributes   = qtdatavisualization 1.0.0
+qhp.qtdatavisualization.subprojects                         = classes
+qhp.qtdatavisualization.subprojects.classes.title           = C++ Classes
+qhp.qtdatavisualization.subprojects.classes.indexTitle      = Qt Data Visualization C++ Classes
+qhp.qtdatavisualization.subprojects.classes.selectors       = class fake:headerfile
+qhp.qtdatavisualization.subprojects.classes.sortPages       = true
