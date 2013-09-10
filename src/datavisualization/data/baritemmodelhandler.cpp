@@ -88,7 +88,17 @@ void BarItemModelHandler::resolveModel()
         }
     }
 
-    m_proxy->resetArray(newProxyArray);
+    // Generate labels from headers if using model rows/columns
+    QStringList rowLabels;
+    QStringList columnLabels;
+    if (useModelRows) {
+        for (int i = 0; i < rowCount; i++)
+            rowLabels << m_itemModel->headerData(i, Qt::Vertical).toString();
+        for (int i = 0; i < columnCount; i++)
+            columnLabels << m_itemModel->headerData(i, Qt::Horizontal).toString();
+    }
+
+    m_proxy->resetArray(newProxyArray, rowLabels, columnLabels);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

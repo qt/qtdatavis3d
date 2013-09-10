@@ -28,9 +28,6 @@ class Q3DCategoryAxisPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DCategoryAxis : public Q3DAbstractAxis
 {
     Q_OBJECT
-    // Note: categoryLabels actually reads/writes the labels property in abstract axis,
-    //       which is read only there. Since subclass cannot have property with same name,
-    //       this partially duplicate property is necessary.
     Q_PROPERTY(QStringList categoryLabels READ categoryLabels WRITE setCategoryLabels)
 
 public:
@@ -47,6 +44,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(Q3DCategoryAxis)
+    friend class Bars3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

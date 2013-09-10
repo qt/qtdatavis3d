@@ -38,6 +38,8 @@ public:
     void resetTemperatureData();
     void addRow();
     void addRows();
+    void insertRow();
+    void insertRows();
     void changeItem();
     void changeRow();
     void changeRows();

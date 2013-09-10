@@ -54,10 +54,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
 
     m_yearAxis->setTitle("Year");
-    m_yearAxis->setCategoryLabels(m_years);
 
     m_monthAxis->setTitle("Month");
-    m_monthAxis->setCategoryLabels(m_months);
 
     m_chart->addAxis(m_temperatureAxis);
     m_chart->addAxis(m_yearAxis);
@@ -124,7 +122,7 @@ void ChartModifier::resetTemperatureData()
     }
 
     // Add data to chart (chart assumes ownership)
-    m_temperatureData->resetArray(dataSet);
+    m_temperatureData->resetArray(dataSet, m_years, m_months);
 }
 
 void ChartModifier::changeStyle(int style)

@@ -42,23 +42,29 @@ public:
     QBarDataProxyPrivate(QBarDataProxy *q);
     virtual ~QBarDataProxyPrivate();
 
-    bool resetArray(QBarDataArray *newArray);
-    void setRow(int rowIndex, QBarDataRow *row);
-    void setRows(int rowIndex, const QBarDataArray &rows);
+    bool resetArray(QBarDataArray *newArray, const QStringList *rowLabels,
+                    const QStringList *columnLabels);
+    void setRow(int rowIndex, QBarDataRow *row, const QString *label);
+    void setRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels);
     void setItem(int rowIndex, int columnIndex, const QBarDataItem &item);
-    int addRow(QBarDataRow *row);
-    int addRows(const QBarDataArray &rows);
-    void insertRow(int rowIndex, QBarDataRow *row);
-    void insertRows(int rowIndex, const QBarDataArray &rows);
-    void removeRows(int rowIndex, int removeCount);
+    int addRow(QBarDataRow *row, const QString *label);
+    int addRows(const QBarDataArray &rows, const QStringList *labels);
+    void insertRow(int rowIndex, QBarDataRow *row, const QString *label);
+    void insertRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels);
+    void removeRows(int rowIndex, int removeCount, bool removeLabels);
 
-    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount, int columnCount);
+    QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount,
+                                        int columnCount);
 
 private:
+    QBarDataProxy *qptr();
     void clearRow(int rowIndex);
     void clearArray();
+    void fixRowLabels(int startIndex, int count, const QStringList &newLabels, bool isInsert);
 
     QBarDataArray *m_dataArray;
+    QStringList m_rowLabels;
+    QStringList m_columnLabels;
 
 private:
     friend class QBarDataProxy;

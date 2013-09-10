@@ -114,6 +114,9 @@ public:
 
     static QPoint noSelectionPoint();
 
+    virtual void setAxisX(Q3DAbstractAxis *axis);
+    virtual void setAxisZ(Q3DAbstractAxis *axis);
+
 public slots:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
@@ -121,6 +124,8 @@ public slots:
     void handleRowsRemoved(int startIndex, int count);
     void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
+    void handleDataRowLabelsChanged();
+    void handleDataColumnLabelsChanged();
 
     void handleSelectedBarPosChanged(const QPoint &position);
 

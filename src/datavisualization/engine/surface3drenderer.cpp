@@ -232,7 +232,6 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     m_cachedScene->setUnderSideCameraEnabled(m_hasNegativeValues);
-    Q3DCamera *camera = m_cachedScene->camera();
     if (defaultFboHandle) {
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);

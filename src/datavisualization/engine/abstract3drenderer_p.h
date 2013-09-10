@@ -86,7 +86,7 @@ protected:
     QString generateValueLabel(const QString &format, qreal value);
 
 public:
-    ~Abstract3DRenderer();
+    virtual ~Abstract3DRenderer();
 
     void updateDataModel(QAbstractDataProxy *dataProxy);
 

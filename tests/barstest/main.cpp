@@ -54,13 +54,21 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
 
-    QPushButton *dataButton = new QPushButton(widget);
-    dataButton->setText(QStringLiteral("Insert a row of data"));
-    dataButton->setEnabled(false);
+    QPushButton *addDataButton = new QPushButton(widget);
+    addDataButton->setText(QStringLiteral("Add a row of data"));
+    addDataButton->setEnabled(false);
 
-    QPushButton *multiDataButton = new QPushButton(widget);
-    multiDataButton->setText(QStringLiteral("Insert many rows of data"));
-    multiDataButton->setEnabled(false);
+    QPushButton *addMultiDataButton = new QPushButton(widget);
+    addMultiDataButton->setText(QStringLiteral("Add many rows of data"));
+    addMultiDataButton->setEnabled(false);
+
+    QPushButton *insertDataButton = new QPushButton(widget);
+    insertDataButton->setText(QStringLiteral("Insert a row of data"));
+    insertDataButton->setEnabled(false);
+
+    QPushButton *insertMultiDataButton = new QPushButton(widget);
+    insertMultiDataButton->setText(QStringLiteral("Insert many rows of data"));
+    insertMultiDataButton->setEnabled(false);
 
     QPushButton *changeSingleDataButton = new QPushButton(widget);
     changeSingleDataButton->setText(QStringLiteral("Change selected bar value"));
@@ -188,8 +196,10 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
-    vLayout->addWidget(dataButton, 0, Qt::AlignTop);
-    vLayout->addWidget(multiDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertDataButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertMultiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeSingleDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeRowButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeRowsButton, 0, Qt::AlignTop);
@@ -264,8 +274,10 @@ int main(int argc, char **argv)
     QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeTransparency);
-    QObject::connect(dataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
-    QObject::connect(multiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
+    QObject::connect(addDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
+    QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
+    QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &ChartModifier::insertRow);
+    QObject::connect(insertMultiDataButton, &QPushButton::clicked, modifier, &ChartModifier::insertRows);
     QObject::connect(changeSingleDataButton, &QPushButton::clicked, modifier, &ChartModifier::changeItem);
     QObject::connect(changeRowButton, &QPushButton::clicked, modifier, &ChartModifier::changeRow);
     QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::changeRows);
@@ -299,9 +311,13 @@ int main(int argc, char **argv)
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
                      &QSlider::setValue);
 
-    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, dataButton,
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, addDataButton,
                      &QPushButton::setEnabled);
-    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, multiDataButton,
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, addMultiDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, insertDataButton,
+                     &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, insertMultiDataButton,
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, changeSingleDataButton,
                      &QPushButton::setEnabled);

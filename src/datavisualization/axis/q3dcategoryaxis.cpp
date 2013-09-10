@@ -18,6 +18,8 @@
 
 #include "q3dcategoryaxis.h"
 #include "q3dcategoryaxis_p.h"
+#include "bars3dcontroller_p.h"
+#include "qbardataproxy.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -53,7 +55,12 @@ Q3DCategoryAxis::~Q3DCategoryAxis()
  * \property Q3DCategoryAxis::categoryLabels
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label.
+ * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * generated from the data row and column labels.
+ *
+ * \note CategoryLabels actually reads/writes the Q3DAbstractAxis::labels property,
+ * which is read only there. Since subclass cannot have property with same name,
+ * this partially duplicate property is necessary.
  */
 QStringList Q3DCategoryAxis::categoryLabels() const
 {
@@ -62,7 +69,24 @@ QStringList Q3DCategoryAxis::categoryLabels() const
 
 void Q3DCategoryAxis::setCategoryLabels(const QStringList &labels)
 {
-    if (d_ptr->m_labels != labels) {
+    dptr()->m_labelsExplicitlySet = !labels.isEmpty();
+    bool labelsFromData = false;
+
+    // Get labels from data proxy if axis is attached to a bar controller and an active axis there
+    if (labels.isEmpty()) {
+        Bars3DController *controller = qobject_cast<Bars3DController *>(parent());
+        if (controller) {
+            if (controller->axisX() == this) {
+                controller->handleDataRowLabelsChanged();
+                labelsFromData = true;
+            } else if (controller->axisZ() == this) {
+                controller->handleDataColumnLabelsChanged();
+                labelsFromData = true;
+            }
+        }
+    }
+
+    if (!labelsFromData && d_ptr->m_labels != labels) {
         d_ptr->m_labels = labels;
         emit labelsChanged();
     }
@@ -77,12 +101,31 @@ Q3DCategoryAxisPrivate *Q3DCategoryAxis::dptr()
 }
 
 Q3DCategoryAxisPrivate::Q3DCategoryAxisPrivate(Q3DCategoryAxis *q)
-    : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeCategory)
+    : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeCategory),
+      m_labelsExplicitlySet(false)
 {
 }
 
 Q3DCategoryAxisPrivate::~Q3DCategoryAxisPrivate()
 {
+}
+
+/*!
+ * \internal
+ * Controller uses this function to set labels from data proxy as category labels.
+ * If the labels have been explicitly set by user, data proxy labels are not used.
+ */
+void Q3DCategoryAxisPrivate::setDataLabels(const QStringList &labels)
+{
+    if (!m_labelsExplicitlySet && m_labels != labels) {
+        m_labels = labels;
+        emit qptr()->labelsChanged();
+    }
+}
+
+Q3DCategoryAxis *Q3DCategoryAxisPrivate::qptr()
+{
+    return static_cast<Q3DCategoryAxis *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

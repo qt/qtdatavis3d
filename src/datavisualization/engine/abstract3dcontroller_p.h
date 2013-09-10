@@ -176,7 +176,7 @@ protected:
     bool m_renderPending;
 
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
-    ~Abstract3DController();
+    virtual ~Abstract3DController();
 
 public:
 

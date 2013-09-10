@@ -21,7 +21,7 @@
 #include "camerahelper_p.h"
 #include "q3dabstractaxis_p.h"
 #include "q3dvalueaxis_p.h"
-#include "q3dcategoryaxis.h"
+#include "q3dcategoryaxis_p.h"
 #include "qbardataproxy_p.h"
 
 #include <QMatrix4x4>
@@ -128,11 +128,18 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
                      &Bars3DController::handleRowsInserted);
     QObject::connect(barDataProxy, &QBarDataProxy::itemChanged, this,
                      &Bars3DController::handleItemChanged);
+    QObject::connect(barDataProxy, &QBarDataProxy::rowLabelsChanged, this,
+                     &Bars3DController::handleDataRowLabelsChanged);
+    QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, this,
+                     &Bars3DController::handleDataColumnLabelsChanged);
 
     adjustValueAxisRange();
 
     // Always clear selection on proxy change
     setSelectedBarPos(noSelectionPoint());
+
+    handleDataRowLabelsChanged();
+    handleDataColumnLabelsChanged();
 }
 
 void Bars3DController::handleArrayReset()
@@ -209,6 +216,26 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
     emitNeedRender();
 }
 
+void Bars3DController::handleDataRowLabelsChanged()
+{
+    if (m_axisX && m_data) {
+        // Grab a sublist equal to data window (no need to have more labels in axis)
+        // TODO once axis controls data window, this needs to change
+        QStringList subList = static_cast<QBarDataProxy *>(m_data)->rowLabels().mid(0, m_rowCount);
+        static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
+    }
+}
+
+void Bars3DController::handleDataColumnLabelsChanged()
+{
+    if (m_axisZ && m_data) {
+        // Grab a sublist equal to data window (no need to have more labels in axis)
+        // TODO once axis controls data window, this needs to change
+        QStringList subList = static_cast<QBarDataProxy *>(m_data)->columnLabels().mid(0, m_columnCount);
+        static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
+    }
+}
+
 void Bars3DController::handleSelectedBarPosChanged(const QPoint &position)
 {
     QPoint pos = position;
@@ -233,6 +260,18 @@ QPoint Bars3DController::noSelectionPoint()
 {
     static QPoint noSelectionPos(-1, -1);
     return noSelectionPos;
+}
+
+void Bars3DController::setAxisX(Q3DAbstractAxis *axis)
+{
+    Abstract3DController::setAxisX(axis);
+    handleDataRowLabelsChanged();
+}
+
+void Bars3DController::setAxisZ(Q3DAbstractAxis *axis)
+{
+    Abstract3DController::setAxisZ(axis);
+    handleDataColumnLabelsChanged();
 }
 
 void Bars3DController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)
@@ -296,6 +335,10 @@ void Bars3DController::setDataWindow(int rowCount, int columnCount)
 
     m_changeTracker.sampleSpaceChanged = true;
     m_isDataDirty = true; // Render item array is recreated in renderer
+
+    handleDataRowLabelsChanged();
+    handleDataColumnLabelsChanged();
+
     emitNeedRender();
 }
 

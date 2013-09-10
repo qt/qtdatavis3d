@@ -42,6 +42,14 @@ class Q3DCategoryAxisPrivate : public Q3DAbstractAxisPrivate
 public:
     Q3DCategoryAxisPrivate(Q3DCategoryAxis *q);
     virtual ~Q3DCategoryAxisPrivate();
+
+    void setDataLabels(const QStringList &labels);
+
+private:
+    Q3DCategoryAxis *qptr();
+
+    bool m_labelsExplicitlySet;
+    friend class Q3DCategoryAxis;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

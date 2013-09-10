@@ -28,6 +28,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Q3DScene::Q3DScene(QObject *parent) :
+    QObject(parent),
     d_ptr(new Q3DScenePrivate(this))
 {
 }

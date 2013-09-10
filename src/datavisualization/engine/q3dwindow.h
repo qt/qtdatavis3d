@@ -36,7 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLF
 
 public:
     explicit Q3DWindow(QWindow *parent = 0);
-    ~Q3DWindow();
+    virtual ~Q3DWindow();
 
 protected slots:
     void renderLater();

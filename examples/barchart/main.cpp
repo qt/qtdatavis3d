@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <QFont>
 #include <QDebug>
+#include <QHeaderView>
 
 #define USE_STATIC_DATA
 
@@ -46,7 +47,8 @@ public:
     void changeTheme();
     void start();
     void selectFromTable(const QPoint &selection);
-    void selectedFromTable(int row, int column);
+    void selectedFromTable(int currentRow, int currentColumn, int previousRow, int previousColumn);
+    void fixTableSize();
 
 private:
     Q3DBars *m_chart;
@@ -73,18 +75,22 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     // and add a small space between the bars
     m_chart->setBarSpecs(1.0, QSizeF(0.2, 0.2));
 
-#ifndef USE_STATIC_DATA
-    // Set up sample space; make it as deep as it's wide
-    m_chart->setDataWindow(m_rowCount, m_columnCount);
-    m_tableWidget->setColumnCount(m_columnCount);
-#endif
-
     // Set bar type to flat pyramids
     m_chart->setBarType(QDataVis::Pyramids, false);
 
 #ifndef USE_STATIC_DATA
+    // Set up sample space; make it as deep as it's wide
+    m_chart->setDataWindow(m_rowCount, m_columnCount);
+    m_tableWidget->setColumnCount(m_columnCount);
+
     // Set selection mode to full
     m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
+
+    // Hide axis labels by explicitly setting one empty string as label list
+    m_chart->rowAxis()->setCategoryLabels(QStringList(QString()));
+    m_chart->columnAxis()->setCategoryLabels(QStringList(QString()));
+
+    m_chart->activeDataProxy()->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
     // Set selection mode to zoom row
     m_chart->setSelectionMode(QDataVis::ModeSliceRow);
@@ -112,12 +118,17 @@ void ChartDataGenerator::start()
 #ifndef USE_STATIC_DATA
     m_dataTimer = new QTimer();
     m_dataTimer->setTimerType(Qt::CoarseTimer);
-    m_dataTimer->setInterval(500);
     QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::addRow);
-    m_dataTimer->start(500);
+    m_dataTimer->start(0);
     m_tableWidget->setFixedWidth(m_chart->width());
 #else
     setupModel();
+    // Table needs to be shown before the size of its headers can be accurately obtained,
+    // so we postpone it a bit
+    m_dataTimer = new QTimer();
+    m_dataTimer->setSingleShot(true);
+    QObject::connect(m_dataTimer, &QTimer::timeout, this, &ChartDataGenerator::fixTableSize);
+    m_dataTimer->start(0);
 #endif
 }
 
@@ -142,13 +153,14 @@ void ChartDataGenerator::setupModel()
     m_chart->valueAxis()->setTitle("Hours playing banjo");
     m_chart->valueAxis()->setSegmentCount(5);
     m_chart->valueAxis()->setLabelFormat("%.1f h");
-    m_chart->rowAxis()->setCategoryLabels(weeks);
-    m_chart->columnAxis()->setCategoryLabels(days);
 
     m_tableWidget->setRowCount(5);
     m_tableWidget->setColumnCount(7);
     m_tableWidget->setHorizontalHeaderLabels(days);
     m_tableWidget->setVerticalHeaderLabels(weeks);
+    m_tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_tableWidget->setCurrentCell(-1, -1);
 
     for (int week = 0; week < weeks.size(); week++) {
         for (int day = 0; day < days.size(); day++) {
@@ -156,7 +168,6 @@ void ChartDataGenerator::setupModel()
             m_tableWidget->model()->setData(index, hours[week][day]);
         }
     }
-    m_tableWidget->setFixedWidth(600);
 
     // Set up sample space based on prepared data
     m_chart->setDataWindow(weeks.size(), days.size());
@@ -165,6 +176,8 @@ void ChartDataGenerator::setupModel()
 void ChartDataGenerator::addRow()
 {
     m_tableWidget->model()->insertRow(0);
+    if (m_tableWidget->model()->rowCount() > m_rowCount)
+        m_tableWidget->model()->removeRow(m_rowCount);
     for (int i = 0; i < m_columnCount; i++) {
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
@@ -179,9 +192,22 @@ void ChartDataGenerator::selectFromTable(const QPoint &selection)
     m_tableWidget->setCurrentCell(selection.x(), selection.y());
 }
 
-void ChartDataGenerator::selectedFromTable(int row, int column)
+void ChartDataGenerator::selectedFromTable(int currentRow, int currentColumn,
+                                           int previousRow, int previousColumn)
 {
-    m_chart->setSelectedBarPos(QPoint(row, column));
+    Q_UNUSED(previousRow)
+    Q_UNUSED(previousColumn)
+    m_chart->setSelectedBarPos(QPoint(currentRow, currentColumn));
+}
+
+void ChartDataGenerator::fixTableSize()
+{
+    int width = m_tableWidget->horizontalHeader()->length();
+    width += m_tableWidget->verticalHeader()->width();
+    m_tableWidget->setFixedWidth(width + 2);
+    int height = m_tableWidget->verticalHeader()->length();
+    height += m_tableWidget->horizontalHeader()->height();
+    m_tableWidget->setFixedHeight(height + 2);
 }
 
 int main(int argc, char **argv)
@@ -219,7 +245,7 @@ int main(int argc, char **argv)
 
     QObject::connect(chart, &Q3DBars::selectedBarPosChanged, generator,
                      &ChartDataGenerator::selectFromTable);
-    QObject::connect(tableWidget, &QTableWidget::cellClicked, generator,
+    QObject::connect(tableWidget, &QTableWidget::currentCellChanged, generator,
                      &ChartDataGenerator::selectedFromTable);
 
     widget->show();

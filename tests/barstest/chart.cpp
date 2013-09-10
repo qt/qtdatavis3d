@@ -53,16 +53,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_genericData(new QBarDataProxy),
       m_currentAxis(m_fixedRangeAxis)
 {
-    // Don't set any styles or specifications, start from defaults
     // Generate generic labels
-    QStringList genericRowLabels;
     QStringList genericColumnLabels;
-    for (int i = 0; i < 200; i++) {
-        if (i % 5)
-            genericRowLabels << QString();
-        else
-            genericRowLabels << QStringLiteral("Row %1").arg(i);
-    }
     for (int i = 0; i < 200; i++) {
         if (i % 5)
             genericColumnLabels << QString();
@@ -89,7 +81,6 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_fixedRangeAxis->setRange(0.0, 100.0);
 
     m_genericRowAxis->setTitle("Generic Row");
-    m_genericRowAxis->setCategoryLabels(genericRowLabels);
 
     m_genericColumnAxis->setTitle("Generic Column");
     m_genericColumnAxis->setCategoryLabels(genericColumnLabels);
@@ -101,10 +92,8 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
 
     m_yearAxis->setTitle("Year");
-    m_yearAxis->setCategoryLabels(m_years);
 
     m_monthAxis->setTitle("Month");
-    m_monthAxis->setCategoryLabels(m_months);
 
     m_chart->addAxis(m_autoAdjustingAxis);
     m_chart->addAxis(m_fixedRangeAxis);
@@ -249,38 +238,71 @@ void ChartModifier::resetTemperatureData()
 
 
     // Add data to chart (chart assumes ownership)
-    m_temperatureData->resetArray(dataSet);
+    m_temperatureData->resetArray(dataSet, m_years, m_months);
 }
+
+
+static int addCounter = 0;
+static int insertCounter = 0;
+static int changeCounter = 0;
 
 void ChartModifier::addRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (float i = 0; i < m_columnCount; i++) {
+    for (float i = 0; i < m_columnCount; i++)
         (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
-        //(*dataRow)[i].setValue(i + m_chart->dataProxy()->rowCount());
-    }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = qMax(m_selectedBarPos.x(), 0);
-    m_chart->activeDataProxy()->insertRow(row, dataRow);
+    QString label = QStringLiteral("Add %1").arg(addCounter++);
+    m_chart->activeDataProxy()->addRow(dataRow, label);
 }
 
 void ChartModifier::addRows()
 {
-    QTime timer;
-    timer.start();
     QBarDataArray dataArray;
+    QStringList labels;
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
             (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()));
         dataArray.append(dataRow);
+        labels.append(QStringLiteral("Add %1").arg(addCounter++));
+    }
+
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    m_chart->activeDataProxy()->addRows(dataArray, labels);
+}
+
+void ChartModifier::insertRow()
+{
+    QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+    for (float i = 0; i < m_columnCount; i++)
+        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+
+    // TODO Needs to be changed to account for data window offset once it is implemented.
+    int row = qMax(m_selectedBarPos.x(), 0);
+    QString label = QStringLiteral("Insert %1").arg(insertCounter++);
+    m_chart->activeDataProxy()->insertRow(row, dataRow, label);
+}
+
+void ChartModifier::insertRows()
+{
+    QTime timer;
+    timer.start();
+    QBarDataArray dataArray;
+    QStringList labels;
+    for (int i = 0; i < m_rowCount; i++) {
+        QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
+        for (int j = 0; j < m_columnCount; j++)
+            (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()));
+        dataArray.append(dataRow);
+        labels.append(QStringLiteral("Insert %1").arg(insertCounter++));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBarPos.x(), 0);
-    m_chart->activeDataProxy()->insertRows(row, dataArray);
-    qDebug() << "Added" << m_rowCount << "rows, time:" << timer.elapsed();
+    m_chart->activeDataProxy()->insertRows(row, dataArray, labels);
+    qDebug() << "Inserted" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
 void ChartModifier::changeItem()
@@ -302,7 +324,8 @@ void ChartModifier::changeRow()
         QBarDataRow *newRow = new QBarDataRow(m_chart->activeDataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
             (*newRow)[i].setValue(qreal(rand() % 100));
-        m_chart->activeDataProxy()->setRow(row, newRow);
+        QString label = QStringLiteral("Change %1").arg(changeCounter++);
+        m_chart->activeDataProxy()->setRow(row, newRow, label);
     }
 }
 
@@ -313,13 +336,15 @@ void ChartModifier::changeRows()
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
         QBarDataArray newArray;
+        QStringList labels;
         for (int i = startRow; i <= row; i++ ) {
             QBarDataRow *newRow = new QBarDataRow(m_chart->activeDataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
                 (*newRow)[j].setValue(qreal(rand() % 100));
             newArray.append(newRow);
+            labels.append(QStringLiteral("Change %1").arg(changeCounter++));
         }
-        m_chart->activeDataProxy()->setRows(startRow, newArray);
+        m_chart->activeDataProxy()->setRows(startRow, newArray, labels);
     }
 }
 
