@@ -34,6 +34,8 @@ class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
+    Q_PROPERTY(int itemCount READ itemCount)
+
 public:
     explicit QSurfaceDataProxy(QObject *parent = 0);
     virtual ~QSurfaceDataProxy();

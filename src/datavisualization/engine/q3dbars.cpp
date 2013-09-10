@@ -85,7 +85,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
  * added to it is destroyed.
  *
- * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization 3D C++ Classes}
+ * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
 
 /*!

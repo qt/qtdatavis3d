@@ -35,6 +35,7 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
     Q_OBJECT
 
     Q_PROPERTY(int rowCount READ rowCount)
+
 public:
     explicit QBarDataProxy(QObject *parent = 0);
     virtual ~QBarDataProxy();

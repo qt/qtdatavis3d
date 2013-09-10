@@ -183,6 +183,8 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount)
 }
 
 /*!
+ * \property QBarDataProxy::rowCount
+ *
  * \return row count in the array.
  */
 int QBarDataProxy::rowCount() const

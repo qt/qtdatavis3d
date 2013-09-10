@@ -161,6 +161,8 @@ void QScatterDataProxy::removeItems(int index, int removeCount)
 }
 
 /*!
+ * \property QScatterDataProxy::itemCount
+ *
  * \return item count in the array.
  */
 int QScatterDataProxy::itemCount() const

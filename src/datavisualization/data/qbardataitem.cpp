@@ -29,7 +29,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * A QBarDataItem holds data for a single rendered bar in a graph.
  * Bar data proxies parse data into QBarDataItem instances for visualizing.
  *
- * \sa QBarDataProxy, {Qt Data Visualization 3D C++ Classes}
+ * \sa QBarDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!

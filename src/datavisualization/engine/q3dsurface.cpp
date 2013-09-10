@@ -23,9 +23,18 @@
 
 #include <QMouseEvent>
 
-#include <QDebug>
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+
+/*!
+ * \class Q3DSurface
+ * \inmodule QtDataVisualization
+ * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
+ * \since 1.0.0
+ *
+ * DOCUMENTATION GOES HERE
+ *
+ * \sa Q3DBars, Q3DScatter, {Qt Data Visualization C++ Classes}
+ */
 
 Q3DSurface::Q3DSurface()
     : d_ptr(new Q3DSurfacePrivate(this, geometry()))

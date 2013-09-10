@@ -30,7 +30,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * A QScatterDataItem holds data for a single rendered item in a scatter graph.
  * Scatter data proxies parse data into QScatterDataItem instances for visualizing.
  *
- * \sa QScatterDataProxy, {Qt Data Visualization 3D C++ Classes}
+ * \sa QScatterDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!
