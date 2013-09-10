@@ -24,7 +24,7 @@ import "."
 Item {
     id: mainview
     width: 1280
-    height: 1024
+    height: 720
     visible: true
 
     Data {
@@ -42,19 +42,29 @@ Item {
             width: surfaceView.width
             height: surfaceView.height
             //shadowQuality: Surface3D.ShadowMedium
+            theme: Surface3D.ThemeDark
+            smooth: true
+            surfaceGrid: false
+            font.family: "STCaiyun"
             font.pointSize: 35
             cameraPreset: Surface3D.PresetIsometricLeft
-            itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+            //itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             dataProxy: surfaceData.proxy
-//            axisX.segmentCount: 4
-//            axisX.subSegmentCount: 1
-//            axisX.labelFormat: "%.2f"
-//            axisZ.segmentCount: 1
-//            axisZ.subSegmentCount: 1
-//            axisZ.labelFormat: "%.2f"
-//            axisY.segmentCount: 1
-//            axisY.subSegmentCount: 1
-//            axisY.labelFormat: "%.2f"
+            axisX.min: 0.0
+            axisX.max: 49.0
+            axisZ.min: 0.0
+            axisZ.max: 49.0
+            axisY.min: 0.0
+            axisY.max: 50.0
+            axisX.segmentCount: 10
+            axisX.subSegmentCount: 5
+            axisX.labelFormat: "%i"
+            axisZ.segmentCount: 10
+            axisZ.subSegmentCount: 5
+            axisZ.labelFormat: "%i"
+            axisY.segmentCount: 5
+            axisY.subSegmentCount: 5
+            axisY.labelFormat: "%i"
         }
     }
 
@@ -62,7 +72,7 @@ Item {
         id: surfaceGridToggle
         anchors.left: parent.left
         width: 200
-        text: "Hide Surface Grid"
+        text: "Show Surface Grid"
         onClicked: {
             if (surfaceplot.surfaceGrid == false) {
                 surfaceplot.surfaceGrid = true;
@@ -78,7 +88,7 @@ Item {
         id: smoothSurfaceToggle
         anchors.top: surfaceGridToggle.bottom
         width: surfaceGridToggle.width
-        text: "Show Smooth"
+        text: "Show Flat"
         onClicked: {
             if (surfaceplot.smoothSurface == true) {
                 surfaceplot.smoothSurface = false;
@@ -86,6 +96,38 @@ Item {
             } else {
                 surfaceplot.smoothSurface = true;
                 text = "Show Flat"
+            }
+        }
+    }
+
+    Button {
+        id: backgroundToggle
+        anchors.top: smoothSurfaceToggle.bottom
+        width: smoothSurfaceToggle.width
+        text: "Hide Background"
+        onClicked: {
+            if (surfaceplot.backgroundVisible == true) {
+                surfaceplot.backgroundVisible = false;
+                text = "Show Background"
+            } else {
+                surfaceplot.backgroundVisible = true;
+                text = "Hide Background"
+            }
+        }
+    }
+
+    Button {
+        id: gridToggle
+        anchors.top: backgroundToggle.bottom
+        width: backgroundToggle.width
+        text: "Hide Grid"
+        onClicked: {
+            if (surfaceplot.gridVisible == true) {
+                surfaceplot.gridVisible = false;
+                text = "Show Grid"
+            } else {
+                surfaceplot.gridVisible = true;
+                text = "Hide Grid"
             }
         }
     }
