@@ -52,8 +52,16 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-    QPushButton *themeButton = new QPushButton(widget);
-    themeButton->setText(QStringLiteral("Change theme"));
+    QComboBox *themeList = new QComboBox(widget);
+    themeList->addItem(QStringLiteral("System"));
+    themeList->addItem(QStringLiteral("Blue Cerulean"));
+    themeList->addItem(QStringLiteral("Blue Icy"));
+    themeList->addItem(QStringLiteral("Blue Ncs"));
+    themeList->addItem(QStringLiteral("Brown Sand"));
+    themeList->addItem(QStringLiteral("Dark"));
+    themeList->addItem(QStringLiteral("High Contrast"));
+    themeList->addItem(QStringLiteral("Light"));
+    themeList->setCurrentIndex(0);
 
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
@@ -109,13 +117,14 @@ int main(int argc, char **argv)
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate vertically")));
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
-    vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout->addWidget(themeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
@@ -130,7 +139,6 @@ int main(int argc, char **argv)
     QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &ChartModifier::rotateX);
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &ChartModifier::rotateY);
 
-    QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeTransparency);
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
@@ -143,6 +151,9 @@ int main(int argc, char **argv)
                      &ChartModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ChartModifier::setGridEnabled);
+
+    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeTheme(int)));
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));

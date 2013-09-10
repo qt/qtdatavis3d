@@ -175,14 +175,9 @@ void ChartModifier::changePresetCamera()
         preset = QDataVis::PresetFrontLow;
 }
 
-void ChartModifier::changeTheme()
+void ChartModifier::changeTheme(int theme)
 {
-    static int theme = QDataVis::ThemeBlueCerulean;
-
     m_chart->setTheme((QDataVis::ColorTheme)theme);
-
-    if (++theme > QDataVis::ThemeLight)
-        theme = QDataVis::ThemeSystem;
 }
 
 void ChartModifier::changeTransparency()

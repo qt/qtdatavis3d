@@ -38,7 +38,6 @@ public:
     void resetTemperatureData();
     void changeStyle();
     void changePresetCamera();
-    void changeTheme();
     void changeTransparency();
     void changeSelectionMode();
     void changeFont(const QFont &font);
@@ -51,6 +50,7 @@ public:
 
 public slots:
     void changeShadowQuality(int quality);
+    void changeTheme(int theme);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
 signals:
