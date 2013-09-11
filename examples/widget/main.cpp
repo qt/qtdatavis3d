@@ -66,14 +66,30 @@ int main(int argc, char **argv)
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
-    QPushButton *styleButton = new QPushButton(widget);
-    styleButton->setText(QStringLiteral("Change bar style"));
+    QCheckBox *smoothCheckBox = new QCheckBox(widget);
+    smoothCheckBox->setText(QStringLiteral("Smooth bars"));
+    smoothCheckBox->setChecked(false);
+
+    QComboBox *barStyleList = new QComboBox(widget);
+    barStyleList->addItem(QStringLiteral("Bars"));
+    barStyleList->addItem(QStringLiteral("Pyramids"));
+    barStyleList->addItem(QStringLiteral("Cones"));
+    barStyleList->addItem(QStringLiteral("Cylinders"));
+    barStyleList->addItem(QStringLiteral("Beveled Bars"));
+    barStyleList->setCurrentIndex(4);
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
-    QPushButton *selectionButton = new QPushButton(widget);
-    selectionButton->setText(QStringLiteral("Change selection mode"));
+    QComboBox *selectionModeList = new QComboBox(widget);
+    selectionModeList->addItem(QStringLiteral("None"));
+    selectionModeList->addItem(QStringLiteral("Bar"));
+    selectionModeList->addItem(QStringLiteral("Bar and Row"));
+    selectionModeList->addItem(QStringLiteral("Bar and Column"));
+    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"));
+    selectionModeList->addItem(QStringLiteral("Slice into Row"));
+    selectionModeList->addItem(QStringLiteral("Slice into Column"));
+    selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -118,11 +134,14 @@ int main(int argc, char **argv)
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate vertically")));
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
-    vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
-    vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
+    vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
+    vLayout->addWidget(barStyleList);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
+    vLayout->addWidget(selectionModeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -141,22 +160,28 @@ int main(int argc, char **argv)
 
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeTransparency);
-    QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changePresetCamera);
-    QObject::connect(selectionButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::changeSelectionMode);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &ChartModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ChartModifier::setGridEnabled);
+    QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ChartModifier::setSmoothBars);
+
+    QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeStyle(int)));
+
+    QObject::connect(selectionModeList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeSelectionMode(int)));
 
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeTheme(int)));
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
+
     QObject::connect(modifier, &ChartModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
     QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,

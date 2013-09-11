@@ -38,7 +38,9 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_temperatureAxis(new Q3DValueAxis),
       m_yearAxis(new Q3DCategoryAxis),
       m_monthAxis(new Q3DCategoryAxis),
-      m_temperatureData(new QBarDataProxy)
+      m_temperatureData(new QBarDataProxy),
+      m_style(QDataVis::BevelBars),
+      m_smooth(false)
 {
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     m_years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
@@ -125,44 +127,10 @@ void ChartModifier::resetTemperatureData()
     m_temperatureData->resetArray(dataSet);
 }
 
-void ChartModifier::changeStyle()
+void ChartModifier::changeStyle(int style)
 {
-    static int model = 9;
-    switch (model) {
-    case 0:
-        m_chart->setBarType(QDataVis::Cylinders, false);
-        break;
-    case 1:
-        m_chart->setBarType(QDataVis::Cylinders, true);
-        break;
-    case 2:
-        m_chart->setBarType(QDataVis::Cones, false);
-        break;
-    case 3:
-        m_chart->setBarType(QDataVis::Cones, true);
-        break;
-    case 4:
-        m_chart->setBarType(QDataVis::Bars, false);
-        break;
-    case 5:
-        m_chart->setBarType(QDataVis::Bars, true);
-        break;
-    case 6:
-        m_chart->setBarType(QDataVis::Pyramids, false);
-        break;
-    case 7:
-        m_chart->setBarType(QDataVis::Pyramids, true);
-        break;
-    case 8:
-        m_chart->setBarType(QDataVis::BevelBars, false);
-        break;
-    case 9:
-        m_chart->setBarType(QDataVis::BevelBars, true);
-        break;
-    }
-    model++;
-    if (model > 9)
-        model = 0;
+    m_style = QDataVis::MeshStyle(style);
+    m_chart->setBarType(m_style, m_smooth);
 }
 
 void ChartModifier::changePresetCamera()
@@ -190,13 +158,8 @@ void ChartModifier::changeTransparency()
         transparency = QDataVis::TransparencyNone;
 }
 
-void ChartModifier::changeSelectionMode()
+void ChartModifier::changeSelectionMode(int selectionMode)
 {
-    static int selectionMode = m_chart->selectionMode();
-
-    if (++selectionMode > QDataVis::ModeSliceColumn)
-        selectionMode = QDataVis::ModeNone;
-
     m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 }
 
@@ -249,4 +212,10 @@ void ChartModifier::setBackgroundEnabled(int enabled)
 void ChartModifier::setGridEnabled(int enabled)
 {
     m_chart->setGridVisible((bool)enabled);
+}
+
+void ChartModifier::setSmoothBars(int smooth)
+{
+    m_smooth = bool(smooth);
+    m_chart->setBarType(m_style, m_smooth);
 }

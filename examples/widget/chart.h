@@ -36,21 +36,22 @@ public:
     ~ChartModifier();
 
     void resetTemperatureData();
-    void changeStyle();
     void changePresetCamera();
     void changeTransparency();
-    void changeSelectionMode();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
     void rotateX(int rotation);
     void rotateY(int rotation);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void setSmoothBars(int smooth);
     void start();
 
 public slots:
-    void changeShadowQuality(int quality);
+    void changeStyle(int style);
+    void changeSelectionMode(int selectionMode);
     void changeTheme(int theme);
+    void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
 signals:
@@ -71,6 +72,8 @@ private:
     Q3DCategoryAxis *m_yearAxis;
     Q3DCategoryAxis *m_monthAxis;
     QBarDataProxy *m_temperatureData;
+    QDataVis::MeshStyle m_style;
+    bool m_smooth;
 };
 
 #endif
