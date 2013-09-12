@@ -43,8 +43,8 @@ Item {
             height: surfaceView.height
             //shadowQuality: Surface3D.ShadowMedium
             theme: Surface3D.ThemeDark
-            smooth: true
-            surfaceGrid: false
+            smoothSurfaceEnabled: true
+            surfaceGridEnabled: false
             font.family: "STCaiyun"
             font.pointSize: 35
             cameraPreset: Surface3D.PresetIsometricLeft
@@ -74,11 +74,11 @@ Item {
         width: 200
         text: "Show Surface Grid"
         onClicked: {
-            if (surfaceplot.surfaceGrid == false) {
-                surfaceplot.surfaceGrid = true;
+            if (surfaceplot.surfaceGridEnabled == false) {
+                surfaceplot.surfaceGridEnabled = true;
                 text = "Hide Surface Grid"
             } else {
-                surfaceplot.surfaceGrid = false;
+                surfaceplot.surfaceGridEnabled = false;
                 text = "Show Surface Grid"
             }
         }
@@ -90,11 +90,11 @@ Item {
         width: surfaceGridToggle.width
         text: "Show Flat"
         onClicked: {
-            if (surfaceplot.smoothSurface == true) {
-                surfaceplot.smoothSurface = false;
+            if (surfaceplot.smoothSurfaceEnabled == true) {
+                surfaceplot.smoothSurfaceEnabled = false;
                 text = "Show Smooth"
             } else {
-                surfaceplot.smoothSurface = true;
+                surfaceplot.smoothSurfaceEnabled = true;
                 text = "Show Flat"
             }
         }

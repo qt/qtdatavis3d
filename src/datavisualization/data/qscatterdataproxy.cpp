@@ -55,6 +55,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ScatterDataProxy
+ * \instantiates QScatterDataProxy
+ * \inherits AbstractDataProxy
+ *
+ * This type handles adding, inserting, changing and removing data items.
+ */
+
+/*!
+ * \qmlproperty int ScatterDataProxy::itemCount
+ * Item count in the array.
+ */
+
+/*!
  * Constructs QScatterDataProxy with the given \a parent.
  */
 QScatterDataProxy::QScatterDataProxy(QObject *parent) :

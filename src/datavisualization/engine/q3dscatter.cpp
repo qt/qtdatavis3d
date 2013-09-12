@@ -81,6 +81,123 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype Scatter3D
+ * \instantiates Q3DScatter
+ *
+ * This type enables developers to render scatter graphs in 3D with Qt Quick 2.
+ *
+ * You will need to import data visualization module to use this type:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 0
+ *
+ * After that you can use Scatter3D in your qml files:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 2
+ *
+ * See \l{Qt Quick 2 Scatter Example} for more thorough usage example.
+ *
+ * \sa ItemModelScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+ * \qmlproperty ScatterDataProxy Scatter3D::dataProxy
+ * The active data proxy.
+ *
+ * If a proxy is not given, a temporary default proxy is created and activated.
+ * This temporary proxy is destroyed if another proxy is explicitly set active via this property.
+ */
+
+/*!
+ * \qmlproperty ValueAxis3D Scatter3D::axisX
+ * A user-defined X axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty ValueAxis3D Scatter3D::axisY
+ * A user-defined Y axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty ValueAxis3D Scatter3D::axisZ
+ * A user-defined Z axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.SelectionMode Scatter3D::selectionMode
+ * Dot selection mode.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.LabelTransparency Scatter3D::labelTransparency
+ * Label transparency.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.ShadowQuality Scatter3D::shadowQuality
+ * Shadow quality.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.MeshStyle Scatter3D::objectType
+ * Dot object type.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.CameraPreset Scatter3D::cameraPreset
+ * Camera preset.
+ */
+
+/*!
+ * \qmlproperty Scatter3D.ColorTheme Scatter3D::theme
+ * Theme of the graph. Theme affects bar colors, label colors, text color, background color, window
+ * color and grid color. Lighting is also adjusted by themes.
+ */
+
+/*!
+ * \qmlproperty bool Scatter3D::objectSmoothingEnabled
+ * Dot smoothing. If false, dot shading is flat.
+ */
+
+/*!
+ * \qmlproperty string Scatter3D::meshFileName
+ * Override object type with a mesh object.
+ * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
+ * It also needs to be in triangles.
+ */
+
+/*!
+ * \qmlproperty font Scatter3D::font
+ * Font used for labels.
+ */
+
+/*!
+ * \qmlproperty bool Scatter3D::gridVisible
+ * Grid visibility. If false, grid lines are not drawn.
+ */
+
+/*!
+ * \qmlproperty bool Scatter3D::backgroundVisible
+ * Background visibility. If false, background is not drawn.
+ */
+
+/*!
+ * \qmlproperty string Scatter3D::itemLabelFormat
+ * Label format of single item labels, e.g. a selected bar.
+ */
+
+/*!
  * Constructs a new 3D scatter window.
  */
 Q3DScatter::Q3DScatter()

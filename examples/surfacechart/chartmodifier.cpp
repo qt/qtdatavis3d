@@ -48,13 +48,13 @@ ChartModifier::~ChartModifier()
 void ChartModifier::toggleSmooth(bool enabled)
 {
     qDebug() << "ChartModifier::toggleSmooth " << enabled;
-    m_chart->setSmoothSurface(enabled);
+    m_chart->setSmoothSurfaceEnabled(enabled);
 }
 
 void ChartModifier::toggleSurfaceGrid(bool enable)
 {
     qDebug() << "ChartModifier::toggleSurfaceGrid" << enable;
-    m_chart->setSurfaceGrid(enable);
+    m_chart->setSurfaceGridEnabled(enable);
 }
 
 void ChartModifier::toggleSqrtSin(bool enable)

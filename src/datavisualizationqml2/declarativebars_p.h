@@ -59,7 +59,7 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
-    Q_PROPERTY(bool barSmooth READ barSmooth WRITE setBarSmooth)
+    Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
@@ -120,8 +120,8 @@ public:
     QDataVis::MeshStyle barType();
 
     // Bar smoothing
-    void setBarSmooth(bool smooth);
-    bool barSmooth();
+    void setBarSmoothingEnabled(bool enabled);
+    bool isBarSmoothingEnabled();
 
     // override object type with own mesh
     void setMeshFileName(const QString &objFileName);

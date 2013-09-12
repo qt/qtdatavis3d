@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
     QCheckBox *smoothCB = new QCheckBox(widget);
     smoothCB->setText(QStringLiteral("Smooth "));
-    smoothCB->setChecked(surfaceChart->smoothSurface());
+    smoothCB->setChecked(surfaceChart->isSmoothSurfaceEnabled());
 
     QCheckBox *surfaceGridCB = new QCheckBox(widget);
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));

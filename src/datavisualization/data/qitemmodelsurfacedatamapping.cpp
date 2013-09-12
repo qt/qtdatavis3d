@@ -32,6 +32,45 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype SurfaceDataMapping
+ * \instantiates QItemModelSurfaceDataMapping
+ *
+ * This type is used to map roles of AbstractItemModel to rows, columns, and values of Surface3D.
+ * For more complete description, see QItemModelSurfaceDataMapping.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 6
+ *
+ * \sa ItemModelSurfaceDataProxy
+ */
+
+/*!
+ * \qmlproperty string SurfaceDataMapping::rowRole
+ * The row role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string SurfaceDataMapping::columnRole
+ * The column role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string SurfaceDataMapping::valueRole
+ * The value role of the mapping.
+ */
+
+/*!
+ * \qmlproperty list SurfaceDataMapping::rowCategories
+ * The row categories of the mapping.
+ */
+
+/*!
+ * \qmlproperty list SurfaceDataMapping::columnCategories
+ * The column categories of the mapping.
+ */
+
+/*!
  * Constructs QItemModelSurfaceDataMapping with the given \a parent.
  */
 QItemModelSurfaceDataMapping::QItemModelSurfaceDataMapping(QObject *parent)

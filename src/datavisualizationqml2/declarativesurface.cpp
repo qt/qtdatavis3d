@@ -190,22 +190,22 @@ bool DeclarativeSurface::isBackgroundVisible()
     return m_shared->backgroundEnabled();
 }
 
-void DeclarativeSurface::setSmoothSurface(bool enable)
+void DeclarativeSurface::setSmoothSurfaceEnabled(bool enabled)
 {
-    m_shared->setSmoothSurface(enable);
+    m_shared->setSmoothSurface(enabled);
 }
 
-bool DeclarativeSurface::smoothSurface() const
+bool DeclarativeSurface::isSmoothSurfaceEnabled() const
 {
     return m_shared->smoothSurface();
 }
 
-void DeclarativeSurface::setSurfaceGrid(bool enable)
+void DeclarativeSurface::setSurfaceGridEnabled(bool enabled)
 {
-    m_shared->setSurfaceGrid(enable);
+    m_shared->setSurfaceGrid(enabled);
 }
 
-bool DeclarativeSurface::surfaceGrid() const
+bool DeclarativeSurface::isSurfaceGridEnabled() const
 {
     return m_shared->surfaceGrid();
 }

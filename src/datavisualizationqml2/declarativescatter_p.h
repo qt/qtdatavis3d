@@ -54,7 +54,7 @@ class DeclarativeScatter : public QQuickItem
     Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
-    Q_PROPERTY(bool objectSmooth READ objectSmooth WRITE setObjectSmooth)
+    Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
@@ -95,8 +95,8 @@ public:
     QDataVis::MeshStyle objectType();
 
     // Object smoothing
-    void setObjectSmooth(bool smooth);
-    bool objectSmooth();
+    void setObjectSmoothingEnabled(bool enabled);
+    bool isObjectSmoothingEnabled();
 
     // override object type with own mesh
     void setMeshFileName(const QString &objFileName);

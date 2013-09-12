@@ -33,6 +33,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ItemModelScatterDataProxy
+ * \instantiates QItemModelScatterDataProxy
+ * \inherits ScatterDataProxy
+ *
+ * This type allows you to use AbstractItemModel derived models as a data source for Scatter3D.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 8
+ *
+ * \sa ScatterDataProxy, ScatterDataMapping
+ */
+
+/*!
+ * \qmlproperty list ItemModelScatterDataProxy::itemModel
+ * The item model.
+ */
+
+/*!
+ * \qmlproperty list ItemModelScatterDataProxy::activeMapping
+ * The active mapping. Modifying a mapping that is set to the proxy will trigger data set
+ * re-resolving.
+ */
+
+/*!
  * Constructs QItemModelScatterDataProxy.
  */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy() :

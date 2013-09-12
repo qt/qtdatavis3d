@@ -36,6 +36,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ItemModelBarDataProxy
+ * \instantiates QItemModelBarDataProxy
+ * \inherits BarDataProxy
+ *
+ * This type allows you to use AbstractItemModel derived models as a data source for Bars3D.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 7
+ *
+ * \sa BarDataProxy, BarDataMapping
+ */
+
+/*!
+ * \qmlproperty list ItemModelBarDataProxy::itemModel
+ * The item model.
+ */
+
+/*!
+ * \qmlproperty list ItemModelBarDataProxy::activeMapping
+ * The active mapping. Modifying a mapping that is set to the proxy will trigger data set
+ * re-resolving.
+ */
+
+/*!
  * Constructs QItemModelBarDataProxy.
  */
 QItemModelBarDataProxy::QItemModelBarDataProxy() :

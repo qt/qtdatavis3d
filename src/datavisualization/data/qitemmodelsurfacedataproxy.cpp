@@ -35,6 +35,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ItemModelSurfaceDataProxy
+ * \instantiates QItemModelSurfaceDataProxy
+ * \inherits SurfaceDataProxy
+ *
+ * This type allows you to use AbstractItemModel derived models as a data source for Surface3D.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 9
+ *
+ * \sa SurfaceDataProxy, SurfaceDataMapping
+ */
+
+/*!
+ * \qmlproperty list ItemModelSurfaceDataProxy::itemModel
+ * The item model.
+ */
+
+/*!
+ * \qmlproperty list ItemModelSurfaceDataProxy::activeMapping
+ * The active mapping. Modifying a mapping that is set to the proxy will trigger data set
+ * re-resolving.
+ */
+
+/*!
  * Constructs QItemModelSurfaceDataProxy.
  */
 QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy() :

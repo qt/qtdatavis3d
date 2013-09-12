@@ -33,6 +33,33 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype AbstractAxis3D
+ * \instantiates Q3DAbstractAxis
+ *
+ * You should not need to use this type directly.
+ */
+
+/*!
+ * \qmlproperty string AbstractAxis3D::title
+ * Defines the title for the axis.
+ */
+
+/*!
+ * \qmlproperty list AbstractAxis3D::labels
+ * Defines the labels for the axis.
+ */
+
+/*!
+ * \qmlproperty AbstractAxis3D.AxisOrientation AbstractAxis3D::orientation
+ * Defines the orientation of the axis.
+ */
+
+/*!
+ * \qmlproperty AbstractAxis3D.AxisType AbstractAxis3D::type
+ * Defines the type of the axis.
+ */
+
+/*!
  * \enum Q3DAbstractAxis::AxisOrientation
  *
  * The orientation of the axis object.

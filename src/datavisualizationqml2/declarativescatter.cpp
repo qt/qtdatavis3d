@@ -146,16 +146,16 @@ QDataVis::MeshStyle DeclarativeScatter::objectType()
         return QDataVis::Dots;
 }
 
-void DeclarativeScatter::setObjectSmooth(bool smooth)
+void DeclarativeScatter::setObjectSmoothingEnabled(bool enabled)
 {
     QString objFile = m_shared->meshFileName();
     if (objFile.endsWith(smoothString)) {
-        if (smooth)
+        if (enabled)
             return; // Already smooth; do nothing
         else // Rip Smooth off the end
             objFile.resize(objFile.indexOf(smoothString));
     } else {
-        if (!smooth) // Already flat; do nothing
+        if (!enabled) // Already flat; do nothing
             return;
         else // Append Smooth to the end
             objFile.append(smoothString);
@@ -163,7 +163,7 @@ void DeclarativeScatter::setObjectSmooth(bool smooth)
     m_shared->setMeshFileName(objFile);
 }
 
-bool DeclarativeScatter::objectSmooth()
+bool DeclarativeScatter::isObjectSmoothingEnabled()
 {
     QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);

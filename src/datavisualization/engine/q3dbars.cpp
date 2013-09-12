@@ -89,6 +89,153 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype Bars3D
+ * \instantiates Q3DBars
+ *
+ * This type enables developers to render bar graphs in 3D with Qt Quick 2.
+ *
+ * You will need to import data visualization module to use this type:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 0
+ *
+ * After that you can use Bars3D in your qml files:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 1
+ *
+ * See \l{Qt Quick 2 Barchart Example} for more thorough usage example.
+ *
+ * \sa ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+ * \qmlproperty BarDataProxy Bars3D::dataProxy
+ * The active data proxy.
+ *
+ * If a proxy is not given, a temporary default proxy is created and activated.
+ * This temporary proxy is destroyed if another proxy is explicitly set active via this property.
+ */
+
+/*!
+ * \qmlproperty CategoryAxis3D Bars3D::rowAxis
+ * A user-defined row axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty ValueAxis3D Bars3D::valueAxis
+ * A user-defined value axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels and automatically adjusting
+ * range is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty CategoryAxis3D Bars3D::columnAxis
+ * A user-defined column axis.
+ *
+ * If an axis is not given, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+ * \qmlproperty Bars3D.SelectionMode Bars3D::selectionMode
+ * Bar selection mode.
+ */
+
+/*!
+ * \qmlproperty Bars3D.LabelTransparency Bars3D::labelTransparency
+ * Label transparency.
+ */
+
+/*!
+ * \qmlproperty Bars3D.ShadowQuality Bars3D::shadowQuality
+ * Shadow quality.
+ */
+
+/*!
+ * \qmlproperty Bars3D.MeshStyle Bars3D::barType
+ * Bar object type.
+ */
+
+/*!
+ * \qmlproperty Bars3D.CameraPreset Bars3D::cameraPreset
+ * Camera preset.
+ */
+
+/*!
+ * \qmlproperty Bars3D.ColorTheme Bars3D::theme
+ * Theme of the graph. Theme affects bar colors, label colors, text color, background color, window
+ * color and grid color. Lighting is also adjusted by themes.
+ */
+
+/*!
+ * \qmlproperty real Bars3D::barThickness
+ * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
+ * makes them twice as deep as they are wide.
+ */
+
+/*!
+ * \qmlproperty size Bars3D::barSpacing
+ * Bar spacing in X and Z dimensions.
+ */
+
+/*!
+ * \qmlproperty bool Bars3D::barSpacingRelative
+ * Relative or absolute bar spacing.
+ */
+
+/*!
+ * \qmlproperty bool Bars3D::barSmoothingEnabled
+ * Bar smoothing. If false, bar shading is flat.
+ */
+
+/*!
+ * \qmlproperty string Bars3D::meshFileName
+ * Override bar type with a mesh object.
+ * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
+ * It also needs to be in triangles.
+ */
+
+/*!
+ * \qmlproperty font Bars3D::font
+ * Font used for labels.
+ */
+
+/*!
+ * \qmlproperty bool Bars3D::gridVisible
+ * Grid visibility. If false, grid lines are not drawn.
+ */
+
+/*!
+ * \qmlproperty bool Bars3D::backgroundVisible
+ * Background visibility. If false, background is not drawn.
+ */
+
+/*!
+ * \qmlproperty int Bars3D::rows
+ * Row count of data window.
+ */
+
+/*!
+ * \qmlproperty int Bars3D::columns
+ * Column count of data window.
+ */
+
+/*!
+ * \qmlproperty string Bars3D::itemLabelFormat
+ * Label format of single item labels, e.g. a selected bar.
+ */
+
+/*!
+ * \qmlproperty point Bars3D::selectedBarPos
+ * Position of the selected bar, if any. Only one bar can be selected at a time.
+ * To clear selection, specify an illegal position, e.g. Qt.point(-1.0, -1.0).
+ */
+
+/*!
  * Constructs a new 3D bar window.
  */
 Q3DBars::Q3DBars()

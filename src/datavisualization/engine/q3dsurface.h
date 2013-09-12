@@ -33,8 +33,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_OBJECT
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(bool smoothSurface READ smoothSurface WRITE setSmoothSurface)
-    Q_PROPERTY(bool surfaceGrid READ surfaceGrid WRITE setSurfaceGrid)
+    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
+    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
 
 public:
     explicit Q3DSurface();
@@ -49,12 +49,12 @@ public:
     bool isBackgroundVisible() const;
 
     // Enable or disable the smoothes of the surface
-    void setSmoothSurface(bool enable);
-    bool smoothSurface() const;
+    void setSmoothSurfaceEnabled(bool enabled);
+    bool isSmoothSurfaceEnabled() const;
 
     // Enable or disable the grid on the surface
-    void setSurfaceGrid(bool enable);
-    bool surfaceGrid() const;
+    void setSurfaceGridEnabled(bool enabled);
+    bool isSurfaceGridEnabled() const;
 
     void setGradientColorAt(qreal pos, const QColor &color);
 

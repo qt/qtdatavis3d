@@ -183,16 +183,16 @@ QDataVis::MeshStyle DeclarativeBars::barType()
         return QDataVis::Dots;
 }
 
-void DeclarativeBars::setBarSmooth(bool smooth)
+void DeclarativeBars::setBarSmoothingEnabled(bool enabled)
 {
     QString objFile = m_shared->meshFileName();
     if (objFile.endsWith(smoothString)) {
-        if (smooth)
+        if (enabled)
             return; // Already smooth; do nothing
         else // Rip Smooth off the end
             objFile.resize(objFile.indexOf(smoothString));
     } else {
-        if (!smooth) // Already flat; do nothing
+        if (!enabled) // Already flat; do nothing
             return;
         else // Append Smooth to the end
             objFile.append(smoothString);
@@ -200,7 +200,7 @@ void DeclarativeBars::setBarSmooth(bool smooth)
     m_shared->setMeshFileName(objFile);
 }
 
-bool DeclarativeBars::barSmooth()
+bool DeclarativeBars::isBarSmoothingEnabled()
 {
     QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);

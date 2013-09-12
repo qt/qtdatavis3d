@@ -37,6 +37,61 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ValueAxis3D
+ * \instantiates Q3DValueAxis
+ * \inherits AbstractAxis3D
+ *
+ * This type provides an axis that can be given a range of values and segment and subsegment
+ * counts to divide the range into.
+ */
+
+/*!
+ * \qmlproperty real ValueAxis3D::min
+ *
+ * Defines the minimum value on the axis.
+ * When setting this property the max is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+
+/*!
+ * \qmlproperty real ValueAxis3D::max
+ *
+ * Defines the maximum value on the axis.
+ * When setting this property the min is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+
+/*!
+ * \qmlproperty int ValueAxis3D::segmentCount
+ *
+ * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
+ * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
+ * The preset default is \c 5, and it can not be below \c 1.
+ */
+
+/*!
+ * \qmlproperty int ValueAxis3D::subSegmentCount
+ *
+ * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
+ * each subsegment, in addition to each segment.
+ * The preset default is \c 1, and it can not be below \c 1.
+ */
+
+/*!
+ * \qmlproperty bool ValueAxis3D::autoAdjustRange
+ *
+ * Determines if the axis is to automatically calculate the range instead of setting range or
+ * adjusting min or max property.
+ */
+
+/*!
+ * \qmlproperty string ValueAxis3D::labelFormat
+ *
+ * Defines the label format to be used for the labels on this axis. Supported specifiers are:
+ * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
+ */
+
+/*!
  * Constructs Q3DValueAxis with the given \a parent.
  */
 Q3DValueAxis::Q3DValueAxis(QObject *parent) :
@@ -133,7 +188,7 @@ int Q3DValueAxis::segmentCount() const
  * The preset default is \c 1, and it can not be below \c 1.
  *
  * \sa setSegmentCount()
- **/
+ */
 void Q3DValueAxis::setSubSegmentCount(int count)
 {
     if (count <= 0) {

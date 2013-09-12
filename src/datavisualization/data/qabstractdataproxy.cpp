@@ -32,6 +32,24 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype AbstractDataProxy
+ * \instantiates QAbstractDataProxy
+ */
+
+/*!
+ * \qmlproperty AbstractDataProxy.DataType AbstractDataProxy::type
+ * The type of the proxy.
+ */
+
+/*!
+ * \qmlproperty string AbstractDataProxy::itemLabelFormat
+ *
+ * Label format for data items in this proxy. This format is used for single item labels,
+ * e.g. when an item is selected. How the format is interpreted depends on proxy type. See
+ * each proxy class documentation for more information.
+ */
+
+/*!
  * \enum QAbstractDataProxy::DataType
  *
  * Data type of the proxy.
@@ -64,6 +82,8 @@ QAbstractDataProxy::~QAbstractDataProxy()
 
 /*!
  * \property QAbstractDataProxy::type
+ *
+ * The type of the proxy.
  */
 QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 {

@@ -37,6 +37,21 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype CategoryAxis3D
+ * \instantiates Q3DCategoryAxis
+ * \inherits AbstractAxis3D
+ *
+ * This type provides an axis that can be given labels.
+ */
+
+/*!
+ * \qmlproperty list CategoryAxis3D::categoryLabels
+ * Defines labels for axis applied to categories. If there are fewer labels than categories, the
+ * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * generated from the data row and column labels.
+ */
+
+/*!
  * Constructs Q3DCategoryAxis with \a parent.
  */
 Q3DCategoryAxis::Q3DCategoryAxis(QObject *parent) :

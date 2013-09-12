@@ -43,6 +43,35 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype ScatterDataMapping
+ * \instantiates QItemModelScatterDataMapping
+ *
+ * This type is used to map roles of AbstractItemModel to the XYZ-values of Scatter3D points. For
+ * more complete description, see QItemModelScatterDataMapping.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 5
+ *
+ * \sa ItemModelScatterDataProxy
+ */
+
+/*!
+ * \qmlproperty string ScatterDataMapping::xPosRole
+ * The X position role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string ScatterDataMapping::yPosRole
+ * The Y position role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string ScatterDataMapping::zPosRole
+ * The Z position role of the mapping.
+ */
+
+/*!
  * Constructs QItemModelScatterDataMapping with the given \a parent.
  */
 QItemModelScatterDataMapping::QItemModelScatterDataMapping(QObject *parent)

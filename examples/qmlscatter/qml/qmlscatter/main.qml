@@ -79,12 +79,12 @@ Item {
         text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
         onClicked: {
-            if (testscatter.objectSmooth === false) {
+            if (testscatter.objectSmoothingEnabled === false) {
                 text = "Use Flat Dots";
-                testscatter.objectSmooth = true;
+                testscatter.objectSmoothingEnabled = true;
             } else {
                 text = "Use Smooth Dots"
-                testscatter.objectSmooth = false;
+                testscatter.objectSmoothingEnabled = false;
             }
         }
     }

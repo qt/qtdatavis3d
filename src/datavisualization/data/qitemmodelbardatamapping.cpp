@@ -47,6 +47,45 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype BarDataMapping
+ * \instantiates QItemModelBarDataMapping
+ *
+ * This type is used to map roles of AbstractItemModel to rows, columns, and values of Bars3D. For
+ * more complete description, see QItemModelBarDataMapping.
+ *
+ * Usage example:
+ *
+ * \snippet doc_src_qmldatavisualization.cpp 4
+ *
+ * \sa ItemModelBarDataProxy
+ */
+
+/*!
+ * \qmlproperty string BarDataMapping::rowRole
+ * The row role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string BarDataMapping::columnRole
+ * The column role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string BarDataMapping::valueRole
+ * The value role of the mapping.
+ */
+
+/*!
+ * \qmlproperty list BarDataMapping::rowCategories
+ * The row categories of the mapping.
+ */
+
+/*!
+ * \qmlproperty list BarDataMapping::columnCategories
+ * The column categories of the mapping.
+ */
+
+/*!
  * Constructs QItemModelBarDataMapping with the given \a parent.
  */
 QItemModelBarDataMapping::QItemModelBarDataMapping(QObject *parent)

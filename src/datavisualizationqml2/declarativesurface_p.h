@@ -57,8 +57,8 @@ class DeclarativeSurface : public QQuickItem
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(bool smoothSurface READ smoothSurface WRITE setSmoothSurface)
-    Q_PROPERTY(bool surfaceGrid READ surfaceGrid WRITE setSurfaceGrid)
+    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
+    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
@@ -112,12 +112,12 @@ public:
     bool isBackgroundVisible();
 
     // Enable or disable the smoothes of the surface
-    void setSmoothSurface(bool enable);
-    bool smoothSurface() const;
+    void setSmoothSurfaceEnabled(bool enabled);
+    bool isSmoothSurfaceEnabled() const;
 
     // Enable or disable the grid on the surface
-    void setSurfaceGrid(bool enable);
-    bool surfaceGrid() const;
+    void setSurfaceGridEnabled(bool enabled);
+    bool isSurfaceGridEnabled() const;
 
     // Adjust shadow quality
     void setShadowQuality(QDataVis::ShadowQuality quality);

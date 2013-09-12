@@ -32,6 +32,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype SurfaceDataProxy
+ * \instantiates QSurfaceDataProxy
+ * \inherits AbstractDataProxy
+ *
+ * DOCUMENTATION GOES HERE TOO
+ */
+
+/*!
+ * \qmlproperty int SurfaceDataProxy::itemCount
+ * Item count in the array.
+ */
+
+/*!
  * Constructs QSurfaceDataProxy with the given \a parent.
  */
 QSurfaceDataProxy::QSurfaceDataProxy(QObject *parent) :

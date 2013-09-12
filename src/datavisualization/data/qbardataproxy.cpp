@@ -71,6 +71,33 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype BarDataProxy
+ * \instantiates QBarDataProxy
+ * \inherits AbstractDataProxy
+ *
+ * This type handles adding, inserting, changing and removing rows of data with Qt Quick 2.
+ */
+
+/*!
+ * \qmlproperty int BarDataProxy::rowCount
+ * Row count in the array.
+ */
+
+/*!
+ * \qmlproperty list BarDataProxy::rowLabels
+ *
+ * Optional row labels for the array. Indexes in this array match row indexes in data array.
+ * If the list is shorter than row count, all rows will not get labels.
+ */
+
+/*!
+ * \qmlproperty list BarDataProxy::columnLabels
+ *
+ * Optional column labels for the array. Indexes in this array match column indexes in rows.
+ * If the list is shorter than the longest row, all columns will not get labels.
+ */
+
+/*!
  * Constructs QBarDataProxy with the given \a parent.
  */
 QBarDataProxy::QBarDataProxy(QObject *parent) :
@@ -304,7 +331,6 @@ int QBarDataProxy::rowCount() const
  * Optional row labels for the array. Indexes in this array match row indexes in data array.
  * If the list is shorter than row count, all rows will not get labels.
  */
-
 QStringList QBarDataProxy::rowLabels() const
 {
     return dptrc()->m_rowLabels;
