@@ -29,9 +29,8 @@
 #ifndef Q3DSCENE_P_H
 #define Q3DSCENE_P_H
 
-#include <QRect>
-
 #include "datavisualizationglobal_p.h"
+#include <QRect>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -39,13 +38,38 @@ class Q3DCamera;
 class Q3DLight;
 class Q3DScene;
 
+struct Q3DSceneChangeBitField {
+    bool viewportChanged               : 1;
+    bool mainViewportChanged           : 1;
+    bool sliceViewportChanged          : 1;
+    bool cameraChanged                 : 1;
+    bool lightChanged                  : 1;
+    bool underSideCameraEnabledChanged : 1;
+    bool slicingActivatedChanged       : 1;
+
+    Q3DSceneChangeBitField()
+        : viewportChanged(true),
+          mainViewportChanged(true),
+          sliceViewportChanged(true),
+          cameraChanged(true),
+          lightChanged(true),
+          underSideCameraEnabledChanged(true),
+          slicingActivatedChanged(true)
+    {
+    }
+};
+
 class Q3DScenePrivate
 {
 public:
     Q3DScenePrivate(Q3DScene *q);
     ~Q3DScenePrivate();
 
+    void sync(Q3DScenePrivate &other);
+
     Q3DScene *q_ptr;
+    Q3DSceneChangeBitField m_changeTracker;
+
     QRect m_viewport;
     QRect m_mainViewport;
     QRect m_sliceViewport;

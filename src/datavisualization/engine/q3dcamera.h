@@ -19,12 +19,8 @@
 #ifndef Q3DCAMERA_H
 #define Q3DCAMERA_H
 
-#include <QObject>
+#include <QtDataVisualization/q3dobject.h>
 #include <QMatrix4x4>
-
-#include "datavisualizationglobal_p.h"
-#include "q3dbars.h"
-#include "q3dobject.h"
 
 class QVector3D;
 class QPoint;
@@ -63,7 +59,7 @@ public:
                                        const QVector3D &defaultUp);
 
     // Calculate view matrix based on zoomadjustment, current rotation and current zoom level
-    virtual void updateViewMatrix(GLfloat zoomAdjustment);
+    virtual void updateViewMatrix(qreal zoomAdjustment);
 
     virtual void setCameraPreset(QDataVis::CameraPreset preset);
     virtual QDataVis::CameraPreset cameraPreset();
@@ -72,14 +68,16 @@ public:
     virtual int zoomLevel();
 
     virtual QVector3D calculatePositionRelativeToCamera(const QVector3D &relativePosition,
-                                                        GLfloat fixedRotation,
-                                                        GLfloat distanceModifier) const;
+                                                        qreal fixedRotation,
+                                                        qreal distanceModifier) const;
 
 private:
-    void setRotationsPrivate(const QPointF &rotation);
     QScopedPointer<Q3DCameraPrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DCamera)
+
+    friend class Q3DCameraPrivate;
+    friend class Q3DScenePrivate;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

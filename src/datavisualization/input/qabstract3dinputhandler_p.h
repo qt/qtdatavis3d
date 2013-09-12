@@ -30,6 +30,7 @@
 #define QABSTRACT3DINPUTHANDLER_P_H
 
 #include "datavisualizationglobal_p.h"
+#include "qabstract3dinputhandler.h"
 #include <QRect>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE

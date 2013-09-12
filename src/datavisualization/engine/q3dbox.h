@@ -19,9 +19,9 @@
 #ifndef Q3DBOX_H
 #define Q3DBOX_H
 
-#include "datavisualizationglobal_p.h"
-
-class QMatrix4x4;
+#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QMatrix4x4>
+#include <QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

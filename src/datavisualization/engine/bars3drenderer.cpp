@@ -197,7 +197,8 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
 
 void Bars3DRenderer::render(GLuint defaultFboHandle)
 {
-    updateSlicingActive(m_cachedScene->isSlicingActivated());
+    bool slicingActivated = m_cachedScene->isSlicingActivated();
+    updateSlicingActive(slicingActivated);
 
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
@@ -208,6 +209,11 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
 
     // Draw bars scene
     drawScene(defaultFboHandle);
+
+    // If slicing has been activated by this render pass, we need another render
+    if (slicingActivated !=  m_cachedScene->isSlicingActivated())
+        emit needRender();
+
 }
 
 void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
@@ -1344,8 +1350,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectedBar = NULL;
         if (m_cachedIsSlicingActivated
                 && (m_selection == selectionSkipColor
-                    || QDataVis::InputOnOverview == m_controller->inputState()))
+                    || QDataVis::InputOnOverview == m_controller->inputState())) {
             m_cachedScene->setSlicingActivated(false);
+        }
     } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow && selectionDirty) {
         // Activate slice mode
         m_cachedScene->setSlicingActivated(true);

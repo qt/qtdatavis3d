@@ -19,13 +19,13 @@
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
-#include "qdatavisualizationenums.h"
-#include "qabstract3dinputhandler_p.h"
-#include "q3dscene.h"
-#include <QObject>
+#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/q3dscene.h>
 #include <QMouseEvent>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+
+class QAbstract3DInputHandlerPrivate;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
 {

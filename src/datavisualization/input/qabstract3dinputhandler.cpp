@@ -15,7 +15,7 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
-#include "qabstract3dinputhandler.h"
+#include "qabstract3dinputhandler_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

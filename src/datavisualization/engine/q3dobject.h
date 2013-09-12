@@ -19,8 +19,9 @@
 #ifndef Q3DOBJECT_H
 #define Q3DOBJECT_H
 
+#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QObject>
-#include "datavisualizationglobal_p.h"
+#include <QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -43,10 +44,16 @@ public:
     virtual void setPosition(const QVector3D &position);
     virtual QVector3D position() const;
 
+protected:
+    void setDirty(bool dirty);
+    bool isDirty() const;
+
 private:
     QScopedPointer<Q3DObjectPrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DObject)
+
+    friend class Q3DScenePrivate;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

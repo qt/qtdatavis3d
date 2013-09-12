@@ -19,18 +19,15 @@
 #ifndef Q3DSCENE_H
 #define Q3DSCENE_H
 
+#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QObject>
-
-#include "datavisualizationglobal_p.h"
-#include "q3dscene_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DCamera;
 class Q3DBox;
 class Q3DLight;
-
-// Note: Scene doesn't take ownership of any of the objects given as parameter. Upon destruction of the scene it will call setParentScene(0) on it's child objects.
+class Q3DScenePrivate;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 {
@@ -39,8 +36,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 public:
     Q3DScene(QObject *parent = 0);
     ~Q3DScene();
-
-    Q3DScene *clone(QObject *parent = 0);
 
     QRect viewport() const;
     void setViewport(const QRect &viewport);
@@ -69,13 +64,15 @@ public:
     // Calcluate light position based on rotation.
     // Call after calling calculateViewMatrix to get up-to-date position
     void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                          GLfloat fixedRotation = 0.0f,
-                                          GLfloat distanceModifier = 0.0f);
+                                          qreal fixedRotation = 0.0,
+                                          qreal distanceModifier = 0.0);
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DScene)
+
+    friend class Abstract3DRenderer;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

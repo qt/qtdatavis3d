@@ -121,6 +121,9 @@ public:
     virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
 
+signals:
+    void needRender(); // Emit this if something in renderer causes need for another render pass.
+
 protected:
     Abstract3DRenderer(Abstract3DController *controller);
 

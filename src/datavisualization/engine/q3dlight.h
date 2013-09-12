@@ -19,10 +19,7 @@
 #ifndef Q3DLIGHT_H
 #define Q3DLIGHT_H
 
-#include <QObject>
-
-#include "datavisualizationglobal_p.h"
-#include "q3dobject.h"
+#include <QtDataVisualization/q3dobject.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -43,6 +40,9 @@ private:
     QScopedPointer<Q3DLightPrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DLight)
+
+    friend class Q3DLightPrivate;
+    friend class Q3DScenePrivate;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

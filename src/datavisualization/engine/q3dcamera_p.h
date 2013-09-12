@@ -30,8 +30,7 @@
 #define Q3DCAMERA_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "q3dbars.h"
-#include <QObject>
+#include "q3dcamera.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -43,8 +42,13 @@ public:
     Q3DCameraPrivate(Q3DCamera *q);
     ~Q3DCameraPrivate();
 
+    void sync(Q3DCamera &other);
+
+    void setRotations(const QPointF &rotation);
+
 public:
     Q3DCamera *q_ptr;
+
     QVector3D m_target;
     QVector3D m_up;
 

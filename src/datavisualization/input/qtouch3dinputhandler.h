@@ -19,7 +19,7 @@
 #ifndef QTOUCH3DINPUTHANDLER_H
 #define QTOUCH3DINPUTHANDLER_H
 
-#include "q3dinputhandler.h"
+#include <QtDataVisualization/q3dinputhandler.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

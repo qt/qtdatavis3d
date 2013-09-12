@@ -20,8 +20,9 @@
 #include "q3dvalueaxis.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
-#include "q3dscene.h"
-#include "q3dcamera.h"
+#include "q3dscene_p.h"
+#include "q3dcamera_p.h"
+#include "q3dlight_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -39,7 +40,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedSelectionMode(QDataVis::ModeNone),
       m_cachedIsGridEnabled(false),
       m_cachedIsBackgroundEnabled(false),
-      m_cachedScene(0)
+      m_cachedScene(new Q3DScene())
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -47,6 +48,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
+    QObject::connect(this, &Abstract3DRenderer::needRender, m_controller,
+                     &Abstract3DController::needRender, Qt::QueuedConnection);
 }
 
 Abstract3DRenderer::~Abstract3DRenderer()
@@ -150,10 +153,10 @@ void Abstract3DRenderer::updateTheme(Theme theme)
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
 {
-    // Make a copy of the scene to renderer's cache.
-    Q3DScene *newScene = scene->clone();
-    delete m_cachedScene;
-    m_cachedScene = newScene;
+    // Synchronize the controller scene to that of the renderer, and vice versa.
+    // Controller scene had priority if both have changed same values.
+    scene->d_ptr->sync(*m_cachedScene->d_ptr);
+    m_cachedScene->d_ptr->sync(*scene->d_ptr);
 }
 
 void Abstract3DRenderer::handleShadowQualityChange()

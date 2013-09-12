@@ -19,6 +19,10 @@
 #ifndef QDEFAULT3DINPUTHANDLER_H
 #define QDEFAULT3DINPUTHANDLER_H
 
+#include <QtDataVisualization/qabstract3dinputhandler.h>
+
+QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+
 const int minZoomLevel         = 10;
 const int halfSizeZoomLevel    = 50;
 const int oneToOneZoomLevel    = 100;
@@ -29,10 +33,6 @@ const int midZoomRangeDivider  = 60;
 const int farZoomRangeDivider  = 120;
 
 const float rotationSpeed    = 100.0f;
-
-#include "qabstract3dinputhandler.h"
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class QT_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {

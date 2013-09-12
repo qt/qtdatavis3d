@@ -25,7 +25,7 @@
 #include "q3dcamera.h"
 #include "q3dlight.h"
 #include "qabstractdataproxy_p.h"
-#include "qabstract3dinputhandler.h"
+#include "qabstract3dinputhandler_p.h"
 
 #if defined(Q_OS_ANDROID)
 #include "qtouch3dinputhandler.h"
@@ -62,8 +62,6 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_theme.useColorTheme(QDataVis::ThemeSystem);
 
     // Populate the scene
-    m_scene->setCamera(new Q3DCamera());
-    m_scene->setLight(new Q3DLight());
     m_scene->light()->setPosition(defaultLightPos);
 
     // Create initial default input handler

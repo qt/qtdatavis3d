@@ -46,6 +46,7 @@ public:
     Q3DObject *q_ptr;
     Q3DScene *m_parentScene;
     QVector3D m_position;
+    bool m_isDirty;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -30,6 +30,7 @@
 #define Q3DLIGHT_P_H
 
 #include "datavisualizationglobal_p.h"
+#include "q3dlight.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -42,9 +43,10 @@ public:
     Q3DLightPrivate(Q3DLight *q);
     ~Q3DLightPrivate();
 
+    void sync(Q3DLight &other);
+
 public:
     Q3DLight *q_ptr;
-
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

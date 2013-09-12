@@ -15,6 +15,8 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
+
+#include "datavisualizationglobal_p.h"
 #include "q3dinputhandler.h"
 #include "q3dcamera.h"
 #include "q3dlight.h"

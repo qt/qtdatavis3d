@@ -84,9 +84,9 @@ void SelectionPointer::initializeOpenGL()
 
 void SelectionPointer::updateScene(Q3DScene *scene)
 {
-    // Make a copy of the scene.
-    delete m_cachedScene;
-    m_cachedScene = scene->clone();
+    Q_UNUSED(scene)
+    // Synchronize the scenes
+    // TODO
 }
 
 void SelectionPointer::render(GLuint defaultFboHandle)
