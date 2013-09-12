@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     viewer.addImportPath(QString::fromLatin1("%1/%2").arg(QCoreApplication::applicationDirPath(),
                                                           QString::fromLatin1("qml")));
 #endif
+    viewer.setTitle(QStringLiteral("Tycho crater on the Moon (height exaggerated)"));
     viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();

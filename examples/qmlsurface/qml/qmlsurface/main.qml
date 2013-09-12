@@ -41,8 +41,7 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
-            //shadowQuality: Surface3D.ShadowMedium
-            theme: Surface3D.ThemeDark
+            shadowQuality: Surface3D.ShadowMedium
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"
@@ -51,9 +50,9 @@ Item {
             //itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             dataProxy: surfaceData.proxy
             axisX.min: 0.0
-            axisX.max: 49.0
+            axisX.max: 99.0
             axisZ.min: 0.0
-            axisZ.max: 49.0
+            axisZ.max: 99.0
             axisY.min: 0.0
             axisY.max: 50.0
             axisX.segmentCount: 10
@@ -65,6 +64,10 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 5
             axisY.labelFormat: "%i"
+            Component.onCompleted: {
+                setGradientColorAt(0, "black");
+                setGradientColorAt(1, "white");
+            }
         }
     }
 
