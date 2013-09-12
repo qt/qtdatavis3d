@@ -241,16 +241,16 @@ public:
 
     // Select preset camera placement
     virtual void setCameraPreset(QDataVis::CameraPreset preset);
+    virtual QDataVis::CameraPreset cameraPreset() const;
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
     // percentage (10...500))
     virtual void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
 
-    // Set color if you don't want to use themes. Set uniform to false if you want the (height)
-    // color to change from bottom to top
-    virtual void setObjectColor(const QColor &baseColor, const QColor &heightColor,
-                                const QColor &depthColor, bool uniform = true);
+    // Set color if you don't want to use themes.
+    virtual void setObjectColor(const QColor &baseColor, bool uniform = true);
+    virtual QColor objectColor() const;
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)

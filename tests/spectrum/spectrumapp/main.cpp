@@ -76,22 +76,24 @@ MainApp::MainApp(Q3DBars *window)
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
-    m_chart->setBarSpecs(1.25), QSizeF(0.2, -0.75));
+    m_chart->setBarThickness(1.25);
+    m_chart->setBarSpacing(QSizeF(0.2, -0.75));
     // Set bar type, smooth cones
     m_chart->setBarType(QDataVis::Cones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
-    // spacings (in setBarSpecs)
+    // spacings (in setBarSpacing)
     m_chart->setCameraPosition(10.0f, 5.0f, 70);
 #else
     // Set bar specifications; make them twice as wide as they're deep
-    m_chart->setBarSpecs(2.0, QSizeF(0.0, 0.0));
+    m_chart->setBarThickness(2.0);
+    m_chart->setBarSpacing(QSizeF(0.0, 0.0));
     // Set bar type, flat bars
     m_chart->setBarType(QDataVis::Bars, false);
     // Adjust camera position
     m_chart->setCameraPosition(10.0f, 7.5f, 75);
 #endif
     // Set color scheme
-    m_chart->setBarColor(QColor(Qt::black), QColor(Qt::red), QColor(Qt::darkYellow));
+    m_chart->setBarColor(QColor(Qt::red), false);
     // Disable selection
     m_chart->setSelectionMode(QDataVis::ModeNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);

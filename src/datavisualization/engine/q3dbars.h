@@ -37,6 +37,11 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
+    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
+    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
+    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
+    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
@@ -44,14 +49,11 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
     explicit Q3DBars();
     ~Q3DBars();
-
-    void setBarSpecs(qreal thicknessRatio = 1.0,
-                     const QSizeF &spacing = QSizeF(1.0, 1.0),
-                     bool relative = true);
 
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
@@ -60,15 +62,26 @@ public:
     QSize dataWindow() const; // TODO: Return QRect once data window properly implemented?
 
     void setCameraPreset(QDataVis::CameraPreset preset);
+    QDataVis::CameraPreset cameraPreset() const;
 
     void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
     void setTheme(QDataVis::ColorTheme theme);
 
-    void setBarColor(const QColor &baseColor, const QColor &heightColor, const QColor &depthColor,
-                     bool uniform = true);
+    void setBarThickness(qreal thicknessRatio);
+    qreal barThickness();
+
+    void setBarSpacing(QSizeF spacing);
+    QSizeF barSpacing();
+
+    void setBarSpacingRelative(bool relative);
+    bool isBarSpacingRelative();
+
+    void setBarColor(const QColor &baseColor, bool uniform = true);
+    QColor barColor() const;
 
     void setMeshFileName(const QString &objFileName);
+    QString meshFileName() const;
 
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;

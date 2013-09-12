@@ -147,7 +147,6 @@ protected:
 
 private:
     QSize m_initialisedSize;
-    QDataVis::CameraPreset m_cameraPreset;
     QDataVis::ColorTheme m_theme;
 };
 

@@ -316,11 +316,18 @@ void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * Moves camera to a \a preset position. The position can be one of \c QDataVis::CameraPreset.
+ * \property Q3DScatter::cameraPreset
+ *
+ * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
  */
 void Q3DScatter::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
+}
+
+QDataVis::CameraPreset Q3DScatter::cameraPreset() const
+{
+    return d_ptr->m_shared->cameraPreset();
 }
 
 /*!
@@ -339,6 +346,8 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
  * grid color. Lighting is also adjusted by themes.
  *
  * \sa setObjectColor()
+ *
+ * \warning This method is subject to change.
  */
 void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
 {
@@ -346,14 +355,9 @@ void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
 }
 
 /*!
- * Set item color using your own colors. \a baseColor sets the base color of a item. If all other
- * colors are black, this sets the final color of the item if uniform is set to false.
- * \a heightColor is added to the item based on its height. The higher the item, the more prominent
- * this color becomes. Setting this black keeps the color unchanged regardless of height.
- * \a depthColor becomes more prominent the further away from the first row the item is.
- * Setting this black keeps items the same color regardless of "depth" in the set. \a uniform -flag
- * is used to define if color needs to be uniform throughout item's length, or will the colors be
- * applied by height. It is \c true by default.
+ * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
+ * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
+ * be applied by height. It is \c true by default.
  *
  * Calling this method overrides colors from theme.
  *
@@ -361,10 +365,17 @@ void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
  *
  * \warning This method is subject to change.
  */
-void Q3DScatter::setObjectColor(const QColor &baseColor, const QColor &heightColor,
-                                const QColor &depthColor, bool uniform)
+void Q3DScatter::setObjectColor(const QColor &baseColor, bool uniform)
 {
-    d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+    d_ptr->m_shared->setObjectColor(baseColor, uniform);
+}
+
+/*!
+ * \return item color in use.
+ */
+QColor Q3DScatter::objectColor() const
+{
+    return d_ptr->m_shared->objectColor();
 }
 
 /*!
@@ -384,6 +395,8 @@ QDataVis::SelectionMode Q3DScatter::selectionMode() const
 }
 
 /*!
+ * \property Q3DScatter::meshFileName
+ *
  * Override item type with a mesh object located in \a objFileName.
  * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
  * It also needs to be in triangles.
@@ -393,6 +406,11 @@ QDataVis::SelectionMode Q3DScatter::selectionMode() const
 void Q3DScatter::setMeshFileName(const QString &objFileName)
 {
     d_ptr->m_shared->setMeshFileName(objFileName);
+}
+
+QString Q3DScatter::meshFileName() const
+{
+    return d_ptr->m_shared->meshFileName();
 }
 
 /*!

@@ -84,8 +84,7 @@ public:
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    Q_INVOKABLE void setBarColor(const QColor &baseColor, const QColor &heightColor,
-                                 const QColor &depthColor, bool uniform = true);
+    Q_INVOKABLE void setBarColor(const QColor &baseColor, bool uniform = true);
 
     // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
     // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
@@ -193,7 +192,6 @@ protected:
 
 private:
     QSize m_initialisedSize;
-    QDataVis::CameraPreset m_cameraPreset;
     QDataVis::ColorTheme m_theme;
 };
 

@@ -84,7 +84,6 @@ private:
     float m_xRotation;
     float m_yRotation;
     bool m_static;
-    qreal m_barThicknessRatio;
     float m_barSpacingX;
     float m_barSpacingZ;
     int m_fontSize;

@@ -342,16 +342,54 @@ void Q3DBars::setHeight(const int height)
 }
 
 /*!
- * Sets bar specifications. Bar \a thicknessRatio specifies the ratio of a bar thickness between x
- * and z axes. For example, setting the ratio to 2.0 means bars are twice as wide in x dimension
- * as they are in z dimension. Bar \a spacing sets the spacing between bars in x and z axes.
- * \a relative -flag is used to indicate if spacing is meant to be absolute or relative to bar
- * thickness. If it is true, value of 0.0 means the bars are side-to-side and for example 1.0 means
- * there is one thickness in between the bars. It is \c true by default.
+ * \property Q3DBars::barThickness
+ *
+ * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
+ * makes them twice as deep as they are wide. It is preset to \c 1.0 by default.
  */
-void Q3DBars::setBarSpecs(qreal thicknessRatio, const QSizeF &spacing, bool relative)
+void Q3DBars::setBarThickness(qreal thicknessRatio)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), spacing, relative);
+    d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+}
+
+qreal Q3DBars::barThickness()
+{
+    return d_ptr->m_shared->barThickness();
+}
+
+/*!
+ * \property Q3DBars::barSpacing
+ *
+ * Bar spacing, ie. the empty space between bars, in X and Z dimensions. It is preset to
+ * \c {(1.0, 1.0)} by default. Spacing is affected by barSpacingRelative -property.
+ *
+ * \sa barSpacingRelative
+ */
+void Q3DBars::setBarSpacing(QSizeF spacing)
+{
+    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+}
+
+QSizeF Q3DBars::barSpacing()
+{
+    return d_ptr->m_shared->barSpacing();
+}
+
+/*!
+ * \property Q3DBars::barSpacingRelative
+ *
+ * This is used to indicate if spacing is meant to be absolute or relative to bar thickness.
+ * If it is true, value of 0.0 means the bars are side-to-side and for example 1.0 means
+ * there is one thickness in between the bars. It is preset to \c true.
+ */
+void Q3DBars::setBarSpacingRelative(bool relative)
+{
+    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+}
+
+bool Q3DBars::isBarSpacingRelative()
+{
+    return d_ptr->m_shared->isBarSpecRelative();
 }
 
 /*!
@@ -384,11 +422,18 @@ QSize Q3DBars::dataWindow() const
 }
 
 /*!
- * Moves camera to a \a preset position. The position can be one of \c QDataVis::CameraPreset.
+ * \property Q3DBars::cameraPreset
+ *
+ * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
  */
 void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
     d_ptr->m_shared->setCameraPreset(preset);
+}
+
+QDataVis::CameraPreset Q3DBars::cameraPreset() const
+{
+    return d_ptr->m_shared->cameraPreset();
 }
 
 /*!
@@ -408,6 +453,8 @@ void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
  * grid color. Lighting is also adjusted by themes.
  *
  * \sa setBarColor()
+ *
+ * \warning This method is subject to change.
  */
 void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 {
@@ -415,14 +462,9 @@ void Q3DBars::setTheme(QDataVis::ColorTheme theme)
 }
 
 /*!
- * Set bar color using your own colors. \a baseColor sets the base color of a bar. If all other
- * colors are black, this sets the final color of the bar if uniform is set to false.
- * \a heightColor is added to the bar based on its height. The higher the bar, the more prominent
- * this color becomes. Setting this black keeps the color unchanged regardless of height.
- * \a depthColor becomes more prominent the further away from the first row the bar is.
- * Setting this black keeps bars the same color regardless of "depth" in the set. \a uniform -flag
- * is used to define if color needs to be uniform throughout bar's length, or will the colors be
- * applied by height. It is \c true by default.
+ * Set bar color using your own color. \a baseColor sets the base color of a bar. The \a uniform
+ * -flag is used to define if color needs to be uniform throughout bar's length, or will the colors
+ * be applied by height, starting with dark at the bottom. It is \c true by default.
  *
  * Calling this method overrides colors from theme.
  *
@@ -430,10 +472,17 @@ void Q3DBars::setTheme(QDataVis::ColorTheme theme)
  *
  * \warning This method is subject to change.
  */
-void Q3DBars::setBarColor(const QColor &baseColor, const QColor &heightColor,
-                          const QColor &depthColor, bool uniform)
+void Q3DBars::setBarColor(const QColor &baseColor, bool uniform)
 {
-    d_ptr->m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+    d_ptr->m_shared->setObjectColor(baseColor, uniform);
+}
+
+/*!
+ * \return bar color in use.
+ */
+QColor Q3DBars::barColor() const
+{
+    return d_ptr->m_shared->objectColor();
 }
 
 /*!
@@ -453,6 +502,8 @@ QDataVis::SelectionMode Q3DBars::selectionMode() const
 }
 
 /*!
+ * \property Q3DBars::meshFileName
+ *
  * Override bar type with a mesh object located in \a objFileName.
  * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
  * It also needs to be in triangles.
@@ -462,6 +513,11 @@ QDataVis::SelectionMode Q3DBars::selectionMode() const
 void Q3DBars::setMeshFileName(const QString &objFileName)
 {
     d_ptr->m_shared->setMeshFileName(objFileName);
+}
+
+QString Q3DBars::meshFileName() const
+{
+    return d_ptr->m_shared->meshFileName();
 }
 
 /*!

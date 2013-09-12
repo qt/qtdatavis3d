@@ -27,7 +27,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
       m_initialisedSize(0, 0),
-      m_cameraPreset(QDataVis::NoPreset),
       m_theme(QDataVis::ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
@@ -96,10 +95,13 @@ QSurfaceDataProxy *DeclarativeSurface::dataProxy() const
 
 void DeclarativeSurface::setCameraPreset(QDataVis::CameraPreset preset)
 {
-    // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
-    // We need to save this locally, as there are no getters for it in controller
-    m_cameraPreset = preset;
     m_shared->setCameraPreset(preset);
+}
+
+QDataVis::CameraPreset DeclarativeSurface::cameraPreset()
+{
+    return m_shared->cameraPreset();
+
 }
 
 Q3DValueAxis *DeclarativeSurface::axisX() const
@@ -130,11 +132,6 @@ Q3DValueAxis *DeclarativeSurface::axisZ() const
 void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
 {
     m_shared->setAxisZ(axis);
-}
-
-QDataVis::CameraPreset DeclarativeSurface::cameraPreset()
-{
-    return m_cameraPreset;
 }
 
 void DeclarativeSurface::setTheme(QDataVis::ColorTheme theme)

@@ -37,6 +37,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
+    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
@@ -44,6 +46,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
     explicit Q3DScatter();
@@ -52,15 +55,17 @@ public:
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
     void setCameraPreset(QDataVis::CameraPreset preset);
+    QDataVis::CameraPreset cameraPreset() const;
 
     void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
     void setTheme(QDataVis::ColorTheme theme);
 
-    void setObjectColor(const QColor &baseColor, const QColor &heightColor,
-                        const QColor &depthColor, bool uniform = true);
+    void setObjectColor(const QColor &baseColor, bool uniform = true);
+    QColor objectColor() const;
 
     void setMeshFileName(const QString &objFileName);
+    QString meshFileName() const;
 
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode() const;

@@ -77,8 +77,7 @@ public:
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
-    Q_INVOKABLE void setObjectColor(const QColor &baseColor, const QColor &heightColor,
-                                    const QColor &depthColor, bool uniform = true);
+    Q_INVOKABLE void setObjectColor(const QColor &baseColor, bool uniform = true);
 
     QScatterDataProxy *dataProxy() const;
     void setDataProxy(QScatterDataProxy *dataProxy);
@@ -158,7 +157,6 @@ protected:
 
 private:
     QSize m_initialisedSize;
-    QDataVis::CameraPreset m_cameraPreset;
     QDataVis::ColorTheme m_theme;
 };
 

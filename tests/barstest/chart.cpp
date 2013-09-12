@@ -33,7 +33,6 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_xRotation(0.0f),
       m_yRotation(0.0f),
       m_static(true),
-      m_barThicknessRatio(1.0),
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
@@ -505,20 +504,19 @@ void ChartModifier::rotateY(int rotation)
 
 void ChartModifier::setSpecsRatio(int barwidth)
 {
-    m_barThicknessRatio = (float)barwidth / 30.0f;
-    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarThickness((qreal)barwidth / 30.0);
 }
 
 void ChartModifier::setSpacingSpecsX(int spacing)
 {
     m_barSpacingX = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (float)spacing / 100.0f;
-    m_chart->setBarSpecs(m_barThicknessRatio, QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSampleCountX(int samples)

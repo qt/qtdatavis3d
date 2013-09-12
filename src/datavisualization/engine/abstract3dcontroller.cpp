@@ -662,6 +662,11 @@ void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
     emitNeedRender();
 }
 
+QDataVis::CameraPreset Abstract3DController::cameraPreset() const
+{
+    return m_scene->camera()->cameraPreset();
+}
+
 void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
@@ -673,16 +678,18 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
     emitNeedRender();
 }
 
-void Abstract3DController::setObjectColor(const QColor &baseColor, const QColor &heightColor,
-                                          const QColor &depthColor, bool uniform)
+void Abstract3DController::setObjectColor(const QColor &baseColor, bool uniform)
 {
     m_theme.m_baseColor = baseColor;
-    m_theme.m_heightColor = heightColor;
-    m_theme.m_depthColor = depthColor;
     m_theme.m_uniformColor = uniform;
 
     m_changeTracker.themeChanged = true;
     emitNeedRender();
+}
+
+QColor Abstract3DController::objectColor() const
+{
+    return m_theme.m_baseColor;
 }
 
 void Abstract3DController::setColorTheme(QDataVis::ColorTheme colorTheme)

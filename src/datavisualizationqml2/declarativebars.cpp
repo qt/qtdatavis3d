@@ -29,7 +29,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
       m_initialisedSize(0, 0),
-      m_cameraPreset(QDataVis::NoPreset),
       m_theme(QDataVis::ThemeDefault)
 {
     setFlags(QQuickItem::ItemHasContents);
@@ -86,10 +85,9 @@ void DeclarativeBars::setDataWindow(int rowCount, int columnCount)
     m_shared->setDataWindow(rowCount, columnCount);
 }
 
-void DeclarativeBars::setBarColor(const QColor &baseColor, const QColor &heightColor,
-                                  const QColor &depthColor, bool uniform)
+void DeclarativeBars::setBarColor(const QColor &baseColor, bool uniform)
 {
-    m_shared->setObjectColor(baseColor, heightColor, depthColor, uniform);
+    m_shared->setObjectColor(baseColor, uniform);
 }
 
 void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
@@ -218,15 +216,12 @@ QString DeclarativeBars::meshFileName()
 
 void DeclarativeBars::setCameraPreset(QDataVis::CameraPreset preset)
 {
-    // TODO: Implement correctly once "improved camera api" (QTRD-2122) is implemented
-    // We need to save this locally, as there are no getters for it in controller
-    m_cameraPreset = preset;
     m_shared->setCameraPreset(preset);
 }
 
 QDataVis::CameraPreset DeclarativeBars::cameraPreset()
 {
-    return m_cameraPreset;
+    return m_shared->cameraPreset();
 }
 
 void DeclarativeBars::setTheme(QDataVis::ColorTheme theme)
