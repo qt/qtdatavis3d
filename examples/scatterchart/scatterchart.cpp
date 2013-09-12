@@ -28,7 +28,9 @@ const int numberOfItems = 10000;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
-      m_fontSize(40.0f)
+      m_fontSize(40.0f),
+      m_style(QDataVis::Spheres),
+      m_smooth(true)
 {
     QFont font = m_chart->font();
     font.setPointSize(m_fontSize);
@@ -88,26 +90,21 @@ void ScatterDataModifier::addData()
     static_cast<QScatterDataProxy *>(m_chart->activeDataProxy())->resetArray(dataArray);
 }
 
-void ScatterDataModifier::changeStyle()
+void ScatterDataModifier::changeStyle(int style)
 {
-    static int model = 0;
-    switch (model) {
-    case 0:
-        m_chart->setObjectType(QDataVis::Dots, false);
-        break;
-    case 1:
-        m_chart->setObjectType(QDataVis::Dots, true);
-        break;
-    case 2:
-        m_chart->setObjectType(QDataVis::Spheres, false);
-        break;
-    case 3:
-        m_chart->setObjectType(QDataVis::Spheres, true);
-        break;
-    }
-    model++;
-    if (model > 3)
-        model = 0;
+    m_style = QDataVis::MeshStyle(style + 5); // skip unsupported mesh types
+    m_chart->setObjectType(m_style, m_smooth);
+}
+
+void ScatterDataModifier::setSmoothDots(int smooth)
+{
+    m_smooth = bool(smooth);
+    m_chart->setObjectType(m_style, m_smooth);
+}
+
+void ScatterDataModifier::changeTheme(int theme)
+{
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
 }
 
 void ScatterDataModifier::changePresetCamera()
@@ -150,7 +147,7 @@ void ScatterDataModifier::changeFont(const QFont &font)
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
     int quality = int(sq);
-     // Updates the UI component to show correct shadow quality
+    // Updates the UI component to show correct shadow quality
     emit shadowQualityChanged(quality);
 }
 
@@ -174,7 +171,7 @@ void ScatterDataModifier::setGridEnabled(int enabled)
 QVector3D ScatterDataModifier::randVector()
 {
     return QVector3D(
-        (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
-        (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
-        (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
+                (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
+                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
 }

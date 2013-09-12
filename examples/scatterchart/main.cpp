@@ -52,14 +52,28 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
 
-    QPushButton *themeButton = new QPushButton(widget);
-    themeButton->setText(QStringLiteral("Change theme"));
+    QComboBox *themeList = new QComboBox(widget);
+    themeList->addItem(QStringLiteral("System"));
+    themeList->addItem(QStringLiteral("Blue Cerulean"));
+    themeList->addItem(QStringLiteral("Blue Icy"));
+    themeList->addItem(QStringLiteral("Blue Ncs"));
+    themeList->addItem(QStringLiteral("Brown Sand"));
+    themeList->addItem(QStringLiteral("Dark"));
+    themeList->addItem(QStringLiteral("High Contrast"));
+    themeList->addItem(QStringLiteral("Light"));
+    themeList->setCurrentIndex(4);
 
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
-    QPushButton *styleButton = new QPushButton(widget);
-    styleButton->setText(QStringLiteral("Change item style"));
+    QCheckBox *smoothCheckBox = new QCheckBox(widget);
+    smoothCheckBox->setText(QStringLiteral("Smooth dots"));
+    smoothCheckBox->setChecked(true);
+
+    QComboBox *barStyleList = new QComboBox(widget);
+    barStyleList->addItem(QStringLiteral("Sphere"));
+    barStyleList->addItem(QStringLiteral("Tetrahedron"));
+    barStyleList->setCurrentIndex(0);
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
@@ -85,12 +99,15 @@ int main(int argc, char **argv)
     QFontComboBox *fontList = new QFontComboBox(widget);
     fontList->setCurrentFont(QFont("Arial"));
 
-    vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
-    vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
+    vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change dot style")));
+    vLayout->addWidget(barStyleList);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout->addWidget(themeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
@@ -100,17 +117,27 @@ int main(int argc, char **argv)
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
-    QObject::connect(styleButton, &QPushButton::clicked, modifier,
-                     &ScatterDataModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
-    QObject::connect(themeButton, &QPushButton::clicked, modifier,
-                     &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTransparency);
 
+    QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setBackgroundEnabled);
+    QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setGridEnabled);
+    QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setSmoothDots);
+
+    QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeStyle(int)));
+
+    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeTheme(int)));
+
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
+
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
     QObject::connect(chart, &Q3DScatter::shadowQualityChanged, modifier,
@@ -118,11 +145,6 @@ int main(int argc, char **argv)
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
-
-    QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
-                     &ScatterDataModifier::setBackgroundEnabled);
-    QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
-                     &ScatterDataModifier::setGridEnabled);
 
     modifier->start();
 

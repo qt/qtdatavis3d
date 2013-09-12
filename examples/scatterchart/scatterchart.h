@@ -40,9 +40,12 @@ public:
     void changeFontSize(int fontsize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void setSmoothDots(int smooth);
     void start();
 
 public slots:
+    void changeStyle(int style);
+    void changeTheme(int theme);
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
@@ -53,6 +56,8 @@ private:
     QVector3D randVector();
     Q3DScatter *m_chart;
     int m_fontSize;
+    QDataVis::MeshStyle m_style;
+    bool m_smooth;
 };
 
 #endif
