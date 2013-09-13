@@ -62,7 +62,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_theme.useColorTheme(QDataVis::ThemeSystem);
 
     // Populate the scene
-    m_scene->light()->setPosition(defaultLightPos);
+    m_scene->activeLight()->setPosition(defaultLightPos);
 
     // Create initial default input handler
     QAbstract3DInputHandler *inputHandler;
@@ -428,24 +428,24 @@ int Abstract3DController::y()
     return m_boundingRect.y();
 }
 
-QRect Abstract3DController::mainViewport() const
+QRect Abstract3DController::primarySubViewport() const
 {
-    return m_scene->mainViewport();
+    return m_scene->primarySubViewport();
 }
 
-void Abstract3DController::setMainViewport(const QRect &mainViewport)
+void Abstract3DController::setPrimarySubViewport(const QRect &primarySubViewport)
 {
-    m_scene->setMainViewport(mainViewport);
+    m_scene->setPrimarySubViewport(primarySubViewport);
 }
 
-QRect Abstract3DController::sliceViewport() const
+QRect Abstract3DController::secondarySubViewport() const
 {
-    return m_scene->sliceViewport();
+    return m_scene->secondarySubViewport();
 }
 
-void Abstract3DController::setSliceViewport(const QRect &sliceViewport)
+void Abstract3DController::setSecondarySubViewport(const QRect &secondarySubViewport)
 {
-    m_scene->setSliceViewport(sliceViewport);
+    m_scene->setSecondarySubViewport(secondarySubViewport);
 }
 
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
@@ -636,12 +636,12 @@ QAbstract3DInputHandler* Abstract3DController::activeInputHandler()
 
 int Abstract3DController::zoomLevel()
 {
-    return m_scene->camera()->zoomLevel();
+    return m_scene->activeCamera()->zoomLevel();
 }
 
 void Abstract3DController::setZoomLevel(int zoomLevel)
 {
-    m_scene->camera()->setZoomLevel(zoomLevel);
+    m_scene->activeCamera()->setZoomLevel(zoomLevel);
 
     m_changeTracker.zoomLevelChanged = true;
     emitNeedRender();
@@ -649,25 +649,25 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
 
 void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
 {
-    m_scene->camera()->setCameraPreset(preset);
+    m_scene->activeCamera()->setCameraPreset(preset);
     emitNeedRender();
 }
 
 QDataVis::CameraPreset Abstract3DController::cameraPreset() const
 {
-    return m_scene->camera()->cameraPreset();
+    return m_scene->activeCamera()->cameraPreset();
 }
 
 void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
     // disable camera movement if in slice view
-    if (scene()->isSlicingActivated())
+    if (scene()->isSlicingActive())
         return;
 
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
-    m_scene->camera()->setZoomLevel(qBound(10, distance, 500));
-    m_scene->camera()->setRotations(QPointF(m_horizontalRotation,
+    m_scene->activeCamera()->setZoomLevel(qBound(10, distance, 500));
+    m_scene->activeCamera()->setRotations(QPointF(m_horizontalRotation,
                                             m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
     emitNeedRender();
@@ -778,12 +778,12 @@ bool Abstract3DController::gridEnabled()
 
 bool Abstract3DController::isSlicingActive()
 {
-    return m_scene->isSlicingActivated();
+    return m_scene->isSlicingActive();
 }
 
 void Abstract3DController::setSlicingActive(bool isSlicing)
 {
-    m_scene->setSlicingActivated(isSlicing);
+    m_scene->setSlicingActive(isSlicing);
     emitNeedRender();
 }
 

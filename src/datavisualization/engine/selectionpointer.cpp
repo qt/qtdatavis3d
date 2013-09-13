@@ -22,6 +22,7 @@
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "drawer_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
@@ -91,7 +92,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 {
     Q_UNUSED(defaultFboHandle)
 
-    Q3DCamera *camera = m_cachedScene->camera();
+    Q3DCamera *camera = m_cachedScene->activeCamera();
     QSize textureSize = m_labelItem.size();
 
     QMatrix4x4 itModelMatrix;
@@ -124,7 +125,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
-    QVector3D lightPos =  m_cachedScene->light()->position();
+    QVector3D lightPos =  m_cachedScene->activeLight()->position();
 
     //
     // Draw the point

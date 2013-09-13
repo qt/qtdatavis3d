@@ -22,17 +22,36 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+/*!
+   \class Q3DLight
+   \inmodule QtDataVisualization
+   \brief Representation of a light source in 3D space.
+   \since 1.0.0
+
+    Q3DLight represents a monochrome non variable light source in 3D space.
+*/
+
+/*!
+ * Constructs a new 3D light located at origo. An optional \a parent parameter can be given
+ * and is then passed to QObject constructor.
+ */
 Q3DLight::Q3DLight(QObject *parent) :
     Q3DObject(parent),
     d_ptr(new Q3DLightPrivate(this))
 {
 }
 
+/*!
+ * Copies the properties of the 3D light from the given source \a source light to this light instance.
+ */
 void Q3DLight::copyValuesFrom(const Q3DLight &source)
 {
     Q3DObject::copyValuesFrom(source);
 }
 
+/*!
+ * Destroys the light object.
+ */
 Q3DLight::~Q3DLight()
 {
 }
@@ -46,10 +65,10 @@ Q3DLightPrivate::~Q3DLightPrivate()
 {
 }
 
-// Copies changed values from this light to the other light. If the other light had same changes,
-// those changes are discarded.
 void Q3DLightPrivate::sync(Q3DLight &other)
 {
+    // Copies changed values from this light to the other light. If the other light had same changes,
+    // those changes are discarded.
     if (q_ptr->isDirty()) {
         other.copyValuesFrom(*q_ptr);
         q_ptr->setDirty(false);

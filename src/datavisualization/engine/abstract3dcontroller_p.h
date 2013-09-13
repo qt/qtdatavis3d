@@ -209,11 +209,11 @@ public:
     virtual void setY(const int y);
     virtual int y();
 
-    virtual QRect mainViewport() const;
-    virtual void setMainViewport(const QRect &mainViewport);
+    virtual QRect primarySubViewport() const;
+    virtual void setPrimarySubViewport(const QRect &primarySubViewport);
 
-    virtual QRect sliceViewport() const;
-    virtual void setSliceViewport(const QRect &sliceViewport);
+    virtual QRect secondarySubViewport() const;
+    virtual void setSecondarySubViewport(const QRect &secondarySubViewport);
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual Q3DAbstractAxis *axisX();

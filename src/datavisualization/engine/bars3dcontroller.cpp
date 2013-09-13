@@ -137,7 +137,7 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
 void Bars3DController::handleArrayReset()
 {
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     // Clear selection unless still valid
@@ -150,7 +150,7 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should update slice instead of deactivating?
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -161,7 +161,7 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should update slice instead of deactivating?
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -172,7 +172,7 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should update slice instead of deactivating?
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
 
@@ -187,7 +187,7 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should update slice instead of deactivating?
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -198,7 +198,7 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
     Q_UNUSED(rowIndex)
     Q_UNUSED(columnIndex)
     // TODO should update slice instead of deactivating?
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -269,7 +269,7 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
     // Data window changed
     if (sender == m_axisX || sender == m_axisZ) {
         // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-        scene()->setSlicingActivated(false);
+        scene()->setSlicingActive(false);
 
         // Clear selection unless still valid
         setSelectedBarPos(m_selectedBarPos);
@@ -331,7 +331,7 @@ void Bars3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
 void Bars3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
     // Disable zoom if selection mode changes
-    scene()->setSlicingActivated(false);
+    scene()->setSlicingActive(false);
     Abstract3DController::setSelectionMode(mode);
 }
 

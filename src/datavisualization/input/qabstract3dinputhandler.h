@@ -32,7 +32,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::InputState inputState READ inputState WRITE setInputState NOTIFY inputStateChanged)
     Q_PROPERTY(QPoint inputPosition READ inputPosition WRITE setInputPosition NOTIFY positionChanged)
-    Q_PROPERTY(Q3DScene *scene READ scene WRITE setScene)
+    Q_PROPERTY(Q3DScene *scene READ scene WRITE setScene NOTIFY sceneChanged)
 
 public:
     explicit QAbstract3DInputHandler(QObject *parent = 0);
@@ -47,27 +47,27 @@ public:
     virtual void wheelEvent(QWheelEvent *event);
 
 public:
-    // Property get/set functions
-
     // TODO: Check if the inputState needs to be visible outside of subclasses in the final architecture
     QDataVis::InputState inputState();
     void setInputState(QDataVis::InputState inputState);
-    void setInputPosition(const QPoint &position);
+
     QPoint inputPosition() const;
+    void setInputPosition(const QPoint &position);
 
     Q3DScene *scene() const;
     void setScene(Q3DScene *scene);
+
+signals:
+    void positionChanged(const QPoint &position);
+    void inputStateChanged(QDataVis::InputState state);
+    void selectionAtPoint(const QPoint &point);
+    void sceneChanged(const Q3DScene *scene);
 
 protected:
     void setPrevDistance(int distance);
     int prevDistance() const;
     void setPreviousInputPos(const QPoint &position);
     QPoint previousInputPos() const;
-
-signals:
-    void positionChanged(const QPoint &position);
-    void inputStateChanged(QDataVis::InputState state);
-    void selectionAtPoint(const QPoint &point);
 
 private:
     Q_DISABLE_COPY(QAbstract3DInputHandler)

@@ -19,6 +19,7 @@
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
 #include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "surfaceobject_p.h"
@@ -254,20 +255,20 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
 void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setMainViewport(m_mainViewPort);
+    scene->setPrimarySubViewport(m_mainViewPort);
     scene->setUnderSideCameraEnabled(m_hasNegativeValues);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                      QVector3D(0.0f, 0.0f, zComp),
-                                      QVector3D(0.0f, 1.0f, 0.0f));
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                                  QVector3D(0.0f, 0.0f, zComp),
+                                                  QVector3D(0.0f, 1.0f, 0.0f));
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
     }
 
-    scene->camera()->updateViewMatrix(m_autoScaleAdjustment);
+    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
     scene->setLightPositionRelativeToCamera(defaultLightPos);
 
     if (m_selectionPointer)
@@ -292,7 +293,7 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
 
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
-    Q3DCamera *camera = m_cachedScene->camera();
+    Q3DCamera *camera = m_cachedScene->activeCamera();
     GLfloat backgroundRotation = 0;
 
     // Specify viewport
@@ -305,7 +306,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_cachedScene->camera()->viewMatrix();
+    QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->viewMatrix();
 
     // Calculate flipping indicators
     if (viewMatrix.row(0).x() > 0)
@@ -328,7 +329,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         backgroundRotation = 0.0f;
 
     // TODO: add 0.0f, 1.0f / m_autoScaleAdjustment
-    QVector3D lightPos = m_cachedScene->light()->position();
+    QVector3D lightPos = m_cachedScene->activeLight()->position();
 
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
@@ -598,25 +599,25 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-    #if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj, 0, m_depthTexture);
                 } else
-    #endif
+#endif
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj);
@@ -648,25 +649,25 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-    #if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj, 0, m_depthTexture);
                 } else
-    #endif
+#endif
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj);
@@ -702,25 +703,25 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-    #if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj, 0, m_depthTexture);
                 } else
-    #endif
+#endif
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj);
@@ -753,25 +754,25 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
                 lineShader->setUniformValue(lineShader->nModel(),
-                                             itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-    #if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj, 0, m_depthTexture);
                 } else
-    #endif
+#endif
                 {
                     // Set shadowless shader bindings
                     lineShader->setUniformValue(lineShader->lightS(),
-                                              m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme.m_lightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(m_shader, m_gridLineObj);
@@ -970,10 +971,10 @@ void Surface3DRenderer::requestSelectionAtPoint(const QPoint &point)
 {
     Q_UNUSED(point)
 
-//    QMutexLocker locker(&m_mutex);
-//    m_selectionPointRequest.setX(point.x());
-//    m_selectionPointRequest.setY(point.y());
-//    m_isSelectionPointRequestActive = true;
+    //    QMutexLocker locker(&m_mutex);
+    //    m_selectionPointRequest.setX(point.x());
+    //    m_selectionPointRequest.setY(point.y());
+    //    m_isSelectionPointRequestActive = true;
 
     m_querySelection = true;
 }

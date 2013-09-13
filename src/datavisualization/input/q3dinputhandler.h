@@ -37,9 +37,6 @@ public:
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void wheelEvent(QWheelEvent *event);
 
-signals:
-    void rotationSpeedChanged(int rotationSpeed);
-
 private:
     Q_DISABLE_COPY(Q3DInputHandler)
 };

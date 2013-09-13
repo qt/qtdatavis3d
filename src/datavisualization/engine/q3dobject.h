@@ -31,6 +31,8 @@ class Q3DObjectPrivate;
 class Q3DObject : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(Q3DScene* parentScene READ parentScene)
+    Q_PROPERTY(QVector3D position READ position WRITE setPosition)
 
 public:
     Q3DObject(QObject *parent = 0);
@@ -38,11 +40,10 @@ public:
 
     void copyValuesFrom(const Q3DObject &source);
 
-    virtual void setParentScene(Q3DScene *parentScene);
     virtual Q3DScene *parentScene();
 
-    virtual void setPosition(const QVector3D &position);
     virtual QVector3D position() const;
+    virtual void setPosition(const QVector3D &position);
 
 protected:
     void setDirty(bool dirty);

@@ -20,6 +20,7 @@
 #define QTOUCH3DINPUTHANDLER_H
 
 #include <QtDataVisualization/q3dinputhandler.h>
+#include "q3dcamera.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

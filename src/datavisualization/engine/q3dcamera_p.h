@@ -46,6 +46,8 @@ public:
 
     void setRotations(const QPointF &rotation);
 
+    void updateViewMatrix(qreal zoomAdjustment);
+
 public:
     Q3DCamera *q_ptr;
 
@@ -53,11 +55,19 @@ public:
     QVector3D m_up;
 
     QMatrix4x4 m_viewMatrix;
+    bool m_isViewMatrixUpdateActive;
 
     GLfloat m_xRotation;
     GLfloat m_yRotation;
     int m_zoomLevel;
     QDataVis::CameraPreset m_activePreset;
+
+    friend class Bars3DRenderer;
+    friend class Surface3DRenderer;
+    friend class Scatter3DRenderer;
+    friend class SelectionPointer;
+    friend class Q3DInputHandler;
+    friend class QMac3DInputHandler;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -19,6 +19,7 @@
 #include "scatter3drenderer_p.h"
 #include "scatter3dcontroller_p.h"
 #include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
@@ -164,19 +165,19 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setMainViewport(m_mainViewPort);
+    scene->setPrimarySubViewport(m_mainViewPort);
     scene->setUnderSideCameraEnabled(true);
 
     if (m_hasHeightAdjustmentChanged) {
-        // Set initial m_cachedScene->camera() position. Also update if height adjustment has changed.
-        scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                               QVector3D(0.0f, 0.0f, zComp),
-                                               QVector3D(0.0f, 1.0f, 0.0f));
+        // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                                  QVector3D(0.0f, 0.0f, zComp),
+                                                  QVector3D(0.0f, 1.0f, 0.0f));
         m_hasHeightAdjustmentChanged = false;
     }
 
-    scene->camera()->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with m_cachedScene->camera(), a bit above it (as set in defaultLightPos))
+    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
+    // Set light position (rotate light with m_cachedScene->activeCamera(), a bit above it (as set in defaultLightPos))
     scene->setLightPositionRelativeToCamera(defaultLightPos);
 
     Abstract3DRenderer::updateScene(scene);
@@ -205,7 +206,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_cachedScene->camera()->viewMatrix();
+    QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->viewMatrix();
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -234,7 +235,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         backgroundRotation = 0.0f;
 
     // Get light position from the scene
-    QVector3D lightPos =  m_cachedScene->light()->position();
+    QVector3D lightPos =  m_cachedScene->activeLight()->position();
 
     // Map adjustment direction to model matrix scaling
     // TODO: Let's use these for testing the autoscaling of dots based on their number
@@ -269,7 +270,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = m_cachedScene->camera()->calculatePositionRelativeToCamera(
+        QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
                     defaultLightPos, 0.0f, 1.0f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
                                QVector3D(0.0f, 1.0f, 0.0f));
@@ -1131,7 +1132,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1191,7 +1192,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1244,7 +1245,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
                                     alignment);
 
                 // Side wall
@@ -1266,7 +1267,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                     QVector3D(0.0f, 0.0f, zComp),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->camera(), true, true, Drawer::LabelMid,
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
                                     alignment);
             }
             labelNbr++;
@@ -1334,7 +1335,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, 0.0f, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_cachedScene->camera(), true, false, Drawer::LabelMid);
+                            m_labelObj, m_cachedScene->activeCamera(), true, false, Drawer::LabelMid);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;

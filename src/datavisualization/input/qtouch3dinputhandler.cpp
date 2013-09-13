@@ -25,20 +25,40 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 const qreal maxTapAndHoldJitter = 10;
 const int tapAndHoldTime = 250;
 
+/*!
+   \class QTouch3DInputHandler
+   \inmodule QtDataVisualization
+   \brief Basic touch display based input handler.
+   \since 1.0.0
+
+    QTouch3DInputHandler is the basic input handler for touch screen devices.
+*/
+
+/*!
+ * Constructs the basic touch display input handler. An optional \a parent parameter can be given
+ * and is then passed to QObject constructor.
+ */
 QTouch3DInputHandler::QTouch3DInputHandler(QObject *parent)
     : Q3DInputHandler(parent),
       d_ptr(new QTouch3DInputHandlerPrivate(this))
 {
 }
 
+/*!
+ *  Destroys the input handler.
+ */
 QTouch3DInputHandler::~QTouch3DInputHandler()
 {
 }
 
 // Input event listeners
+/*!
+ * Override this to change handling of mouse double click events.
+ * Mouse double click event is given in the \a event.
+ */
 void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!scene()->isSlicingActivated()) {
+    if (!scene()->isSlicingActive()) {
         setInputState(QDataVis::InputOnScene);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(event->pos());
@@ -47,12 +67,16 @@ void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+/*!
+ * Override this to change handling of touch events.
+ * Touch event is given in the \a event.
+ */
 void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
 {
     QList<QTouchEvent::TouchPoint> points;
     points = event->touchPoints();
 
-    if (!scene()->isSlicingActivated() && points.count() == 2) {
+    if (!scene()->isSlicingActive() && points.count() == 2) {
         d_ptr->m_holdTimer->stop();
 
         setInputState(QDataVis::InputOnPinch);
@@ -60,7 +84,7 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();
         int zoomRate = 1;
-        int zoomLevel = scene()->camera()->zoomLevel();
+        int zoomLevel = scene()->activeCamera()->zoomLevel();
         if (zoomLevel > 100)
             zoomRate = 5;
         if (newDistance > prevDistance())
@@ -71,9 +95,9 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             zoomLevel = 500;
         else if (zoomLevel < 10)
             zoomLevel = 10;
-        scene()->camera()->setZoomLevel(zoomLevel);
+        scene()->activeCamera()->setZoomLevel(zoomLevel);
         setPrevDistance(newDistance);
-    } else if (!scene()->isSlicingActivated() && points.count() == 1) {
+    } else if (!scene()->isSlicingActive() && points.count() == 1) {
         if (event->type() == QEvent::TouchBegin) {
             // Tap-and-hold selection start
             d_ptr->m_startHoldPos = points.at(0).pos();
@@ -89,15 +113,20 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     }
 }
 
+/*!
+ * Override this to change handling of mouse press events.
+ * Mouse press event is given in the \a event and the mouse position in \a mousePos.
+ * \warning This method is subject to change or removal.
+ */
 void QTouch3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     // TODO: This code needs revisiting with new Qt releases and possibly move to using touch events for these as well.
     if (Qt::LeftButton == event->button()) {
-        if (scene()->isSlicingActivated()) {
-            if (scene()->isInputInsideMainView(mousePos)) {
+        if (scene()->isSlicingActive()) {
+            if (scene()->isPointInPrimarySubView(mousePos)) {
                 setInputState(QDataVis::InputOnOverview);
                 //qDebug() << "Mouse pressed on overview";
-            } else if (scene()->isInputInsideSliceView(mousePos)) {
+            } else if (scene()->isPointInSecondarySubView(mousePos)) {
                 setInputState(QDataVis::InputOnSlice);
                 //qDebug() << "Mouse pressed on zoom";
             } else {

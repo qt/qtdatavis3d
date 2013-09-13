@@ -19,6 +19,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dinputhandler.h"
 #include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "q3dlight.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -32,28 +33,46 @@ const int nearZoomRangeDivider = 12;
 const int midZoomRangeDivider  = 60;
 const int farZoomRangeDivider  = 120;
 
-const qreal rotationSpeed    = 100.0;
+const float rotationSpeed    = 100.0f;
 
+/*!
+   \class Q3DInputHandler
+   \inmodule QtDataVisualization
+   \brief Basic wheel mouse based input handler.
+   \since 1.0.0
+
+    Q3DInputHandler is the basic input handler for wheel mouse type of input devices.
+*/
+
+/*!
+ * Constructs the basic mouse input handler. An optional \a parent parameter can be given
+ * and is then passed to QObject constructor.
+ */
 Q3DInputHandler::Q3DInputHandler(QObject *parent) :
     QAbstract3DInputHandler(parent)
 {
 }
 
+/*!
+ *  Destroys the input handler.
+ */
 Q3DInputHandler::~Q3DInputHandler()
 {
 }
 
 // Input event listeners
+/*!
+ * Override this to change handling of mouse press events.
+ * Mouse press event is given in the \a event and the mouse position in \a mousePos.
+ */
 void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (Qt::LeftButton == event->button()) {
-        if (scene()->isSlicingActivated()) {
-            if (scene()->isInputInsideMainView(mousePos)) {
+        if (scene()->isSlicingActive()) {
+            if (scene()->isPointInPrimarySubView(mousePos)) {
                 setInputState(QDataVis::InputOnOverview);
-                //qDebug() << "Mouse pressed on overview";
-            } else if (scene()->isInputInsideSliceView(mousePos)) {
+            } else if (scene()->isPointInSecondarySubView(mousePos)) {
                 setInputState(QDataVis::InputOnSlice);
-                //qDebug() << "Mouse pressed on zoom";
             } else {
                 setInputState(QDataVis::InputNone);
             }
@@ -63,21 +82,23 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
             setInputPosition(mousePos);
             // TODO: Get rid of these (QTRD-2307)
             emit selectionAtPoint(mousePos);
-            //qDebug() << "Mouse pressed on scene";
-
         }
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
         setInputPosition(QPoint(0, 0));
     } else if (Qt::RightButton == event->button()) {
         // disable rotating when in slice view
-        if (!scene()->isSlicingActivated())
+        if (!scene()->isSlicingActive())
             setInputState(QDataVis::InputRotating);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
 }
 
+/*!
+ * Override this to change handling of mouse release events.
+ * Mouse release event is given in the \a event and the mouse position in \a mousePos.
+ */
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
@@ -88,13 +109,17 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
     setInputState(QDataVis::InputNone);
 }
 
+/*!
+ * Override this to change handling of mouse move events.
+ * Mouse move event is given in the \a event and the mouse position in \a mousePos.
+ */
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
 
     if (QDataVis::InputRotating == inputState()) {
         // Calculate mouse movement since last frame
-        QPointF rotations = scene()->camera()->rotations();
+        QPointF rotations = scene()->activeCamera()->rotations();
         GLfloat xRotation = rotations.x();
         GLfloat yRotation = rotations.y();
         GLfloat mouseMoveX = GLfloat(inputPosition().x() - mousePos.x())
@@ -104,22 +129,26 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
         // Apply to rotations
         xRotation -= mouseMoveX;
         yRotation -= mouseMoveY;
-        scene()->camera()->setRotations(QPointF(xRotation, yRotation));
-        scene()->camera()->updateViewMatrix(1.0f);
+        scene()->activeCamera()->setRotations(QPointF(xRotation, yRotation));
+        scene()->activeCamera()->d_ptr->updateViewMatrix(1.0f);
 
         setPreviousInputPos(inputPosition());
         setInputPosition(mousePos);
     }
 }
 
+/*!
+ * Override this to change handling of wheel events.
+ * The wheel event is given in the \a event.
+ */
 void Q3DInputHandler::wheelEvent(QWheelEvent *event)
 {
     // disable zooming if in slice view
-    if (scene()->isSlicingActivated())
+    if (scene()->isSlicingActive())
         return;
 
     // Adjust zoom level based on what zoom range we're in.
-    int zoomLevel = scene()->camera()->zoomLevel();
+    int zoomLevel = scene()->activeCamera()->zoomLevel();
     if (zoomLevel > oneToOneZoomLevel)
         zoomLevel += event->angleDelta().y() / nearZoomRangeDivider;
     else if (zoomLevel > halfSizeZoomLevel)
@@ -131,7 +160,7 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
     else if (zoomLevel < minZoomLevel)
         zoomLevel = minZoomLevel;
 
-    scene()->camera()->setZoomLevel(zoomLevel);
+    scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

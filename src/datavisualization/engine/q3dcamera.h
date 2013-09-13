@@ -37,7 +37,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_PROPERTY(QMatrix4x4 viewMatrix READ viewMatrix WRITE setViewMatrix)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(int zoomLevel READ zoomLevel WRITE setZoomLevel)
-
+    Q_PROPERTY(bool viewMatrixAutoUpdateEnabled READ isViewMatrixAutoUpdateEnabled WRITE setViewMatrixAutoUpdateEnabled)
 
 public:
     Q3DCamera(QObject *parent = 0);
@@ -45,27 +45,24 @@ public:
 
     void copyValuesFrom(const Q3DCamera &source);
 
-    // Set camera rotation in degrees
-    virtual void setRotations(const QPointF &rotation);
-    // Get camera rotations
     virtual QPointF rotations() const;
+    virtual void setRotations(const QPointF &rotation);
 
-    virtual void setViewMatrix(const QMatrix4x4 &viewMatrix);
     virtual QMatrix4x4 viewMatrix() const;
+    virtual void setViewMatrix(const QMatrix4x4 &viewMatrix);
 
-    // Set default camera orientation. Position's x and y should be 0.
-    virtual void setDefaultOrientation(const QVector3D &defaultPosition,
-                                       const QVector3D &defaultTarget,
-                                       const QVector3D &defaultUp);
+    virtual bool isViewMatrixAutoUpdateEnabled();
+    virtual void setViewMatrixAutoUpdateEnabled(bool isEnabled);
 
-    // Calculate view matrix based on zoomadjustment, current rotation and current zoom level
-    virtual void updateViewMatrix(qreal zoomAdjustment);
-
-    virtual void setCameraPreset(QDataVis::CameraPreset preset);
     virtual QDataVis::CameraPreset cameraPreset();
+    virtual void setCameraPreset(QDataVis::CameraPreset preset);
 
-    virtual void setZoomLevel(int zoomLevel);
     virtual int zoomLevel();
+    virtual void setZoomLevel(int zoomLevel);
+
+    virtual void setBaseOrientation(const QVector3D &defaultPosition,
+                                    const QVector3D &defaultTarget,
+                                    const QVector3D &defaultUp);
 
     virtual QVector3D calculatePositionRelativeToCamera(const QVector3D &relativePosition,
                                                         qreal fixedRotation,
@@ -78,6 +75,12 @@ private:
 
     friend class Q3DCameraPrivate;
     friend class Q3DScenePrivate;
+    friend class Bars3DRenderer;
+    friend class Surface3DRenderer;
+    friend class Scatter3DRenderer;
+    friend class SelectionPointer;
+    friend class Q3DInputHandler;
+    friend class QMac3DInputHandler;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

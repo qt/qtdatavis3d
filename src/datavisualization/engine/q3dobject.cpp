@@ -18,19 +18,40 @@
 
 #include "q3dobject.h"
 #include "q3dobject_p.h"
+#include "q3dscene.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+/*!
+   \class Q3DObject
+   \inmodule QtDataVisualization
+   \brief Simple baseclass for all the objects in the 3D scene.
+   \since 1.0.0
+
+    Q3DObject is a baseclass that contains only position information for an object in 3D scene.
+    The object is considered to be a single point in the coordinate space without dimensions.
+*/
+
+/*!
+ * Constructs a new 3D object with position set to origo by default. An
+ * optional \a parent parameter can be given and is then passed to QObject constructor.
+ */
 Q3DObject::Q3DObject(QObject *parent) :
     QObject(parent),
     d_ptr(new Q3DObjectPrivate(this))
 {
 }
 
+/*!
+ *  Destroys the 3D object.
+ */
 Q3DObject::~Q3DObject()
 {
 }
 
+/*!
+ * Copies the 3D object position from the given \a source 3D object to this 3D object instance.
+ */
 void Q3DObject::copyValuesFrom(const Q3DObject &source)
 {
     d_ptr->m_position.setX(source.d_ptr->m_position.x());
@@ -39,17 +60,25 @@ void Q3DObject::copyValuesFrom(const Q3DObject &source)
     setDirty(true);
 }
 
-void Q3DObject::setParentScene(Q3DScene *parentScene)
-{
-    if (d_ptr->m_parentScene != parentScene) {
-        d_ptr->m_parentScene = parentScene;
-        setDirty(true);
-    }
-}
-
+/*!
+ * \property Q3DObject::parentScene
+ *
+ * This property contains the parent scene as read only value.
+ * If the object has no parent scene the value is 0.
+ */
 Q3DScene *Q3DObject::parentScene()
 {
-    return d_ptr->m_parentScene;
+    return qobject_cast<Q3DScene *>(parent());
+}
+
+/*!
+ * \property Q3DObject::position
+ *
+ * This property contains the 3D position of the object.
+ */
+QVector3D Q3DObject::position() const
+{
+    return d_ptr->m_position;
 }
 
 void Q3DObject::setPosition(const QVector3D &position)
@@ -60,13 +89,9 @@ void Q3DObject::setPosition(const QVector3D &position)
     }
 }
 
-QVector3D Q3DObject::position() const
-{
-    return d_ptr->m_position;
-}
-
 /*!
- * \internal
+ * Sets and clears the \a dirty flag that is used to track
+ * when the 3D object has changed since last update.
  */
 void Q3DObject::setDirty(bool dirty)
 {
@@ -74,7 +99,7 @@ void Q3DObject::setDirty(bool dirty)
 }
 
 /*!
- * \internal
+ * \return flag that indicates if the 3D object has changed.
  */
 bool Q3DObject::isDirty() const
 {
@@ -83,7 +108,6 @@ bool Q3DObject::isDirty() const
 
 Q3DObjectPrivate::Q3DObjectPrivate(Q3DObject *q) :
     q_ptr(q),
-    m_parentScene(0),
     m_isDirty(true)
 {
 }

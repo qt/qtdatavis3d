@@ -40,8 +40,8 @@ class Q3DScene;
 
 struct Q3DSceneChangeBitField {
     bool viewportChanged               : 1;
-    bool mainViewportChanged           : 1;
-    bool sliceViewportChanged          : 1;
+    bool primarySubViewportChanged     : 1;
+    bool secondarySubViewportChanged   : 1;
     bool cameraChanged                 : 1;
     bool lightChanged                  : 1;
     bool underSideCameraEnabledChanged : 1;
@@ -49,8 +49,8 @@ struct Q3DSceneChangeBitField {
 
     Q3DSceneChangeBitField()
         : viewportChanged(true),
-          mainViewportChanged(true),
-          sliceViewportChanged(true),
+          primarySubViewportChanged(true),
+          secondarySubViewportChanged(true),
           cameraChanged(true),
           lightChanged(true),
           underSideCameraEnabledChanged(true),
@@ -71,12 +71,12 @@ public:
     Q3DSceneChangeBitField m_changeTracker;
 
     QRect m_viewport;
-    QRect m_mainViewport;
-    QRect m_sliceViewport;
+    QRect m_primarySubViewport;
+    QRect m_secondarySubViewport;
     Q3DCamera *m_camera;
     Q3DLight *m_light;
     bool m_isUnderSideCameraEnabled;
-    bool m_isSlicingActivated;
+    bool m_isSlicingActive;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

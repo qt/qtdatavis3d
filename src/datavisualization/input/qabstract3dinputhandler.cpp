@@ -19,51 +19,99 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+/*!
+   \class QAbstract3DInputHandler
+   \inmodule QtDataVisualization
+   \brief Baseclass for implementations of input handlers.
+   \since 1.0.0
+
+    QAbstract3DInputHandler is a baseclass that is subclassed by different input handling implementations
+    that take input events and translate those to camera and light movements. Input handlers also translate
+    raw input events to slicing and selection events in the scene.
+*/
+
+/*!
+ * Constructs the baseclass. An optional \a parent parameter can be given
+ * and is then passed to QObject constructor.
+ */
 QAbstract3DInputHandler::QAbstract3DInputHandler(QObject *parent) :
     QObject(parent),
     d_ptr(new QAbstract3DInputHandlerPrivate(this))
 {
 }
 
+/*!
+ *  Destroys the baseclass.
+ */
 QAbstract3DInputHandler::~QAbstract3DInputHandler()
 {
 }
 
 // Input event listeners
+/*!
+ * Override this to handle mouse double click events.
+ * Mouse double click event is given in the \a event.
+ */
 void QAbstract3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 }
 
+/*!
+ * Override this to handle touch input events.
+ * Touch event is given in the \a event.
+ */
 void QAbstract3DInputHandler::touchEvent(QTouchEvent *event)
 {
     Q_UNUSED(event);
 }
 
+/*!
+ * Override this to handle mouse press events.
+ * Mouse press event is given in the \a event and the mouse position in \a mousePos.
+ */
 void QAbstract3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 }
 
+/*!
+ * Override this to handle mouse release events.
+ * Mouse release event is given in the \a event and the mouse position in \a mousePos.
+ */
 void QAbstract3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 }
 
+/*!
+ * Override this to handle mouse move events.
+ * Mouse move event is given in the \a event and the mouse position in \a mousePos.
+ */
 void QAbstract3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 }
 
+/*!
+ * Override this to handle wheel events.
+ * Wheel event is given in the \a event.
+ */
 void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
 {
     Q_UNUSED(event);
 }
 
 // Property get/set
+/*!
+ * \property QAbstract3DInputHandler::inputState
+ *
+ * Current enumerated input state based on the processed input events.
+ * When the state changes inputStateChanged() is emitted.
+ */
 QDataVis::InputState QAbstract3DInputHandler::inputState()
 {
     return d_ptr->m_inputState;
@@ -77,6 +125,11 @@ void QAbstract3DInputHandler::setInputState(QDataVis::InputState inputState)
     }
 }
 
+/*!
+ * \property QAbstract3DInputHandler::inputPosition
+ *
+ * Last input position based on the processed input events.
+ */
 QPoint QAbstract3DInputHandler::inputPosition() const
 {
     return d_ptr->m_inputPosition;
@@ -90,17 +143,27 @@ void QAbstract3DInputHandler::setInputPosition(const QPoint &position)
     }
 }
 
-void QAbstract3DInputHandler::setPrevDistance(int distance)
-{
-    d_ptr->m_prevDistance = distance;
-}
-
+/*!
+ * \return the manhattan length between last two input positions.
+ */
 int QAbstract3DInputHandler::prevDistance() const
 {
     return d_ptr->m_prevDistance;
 }
 
+/*!
+ * Sets the \a distance (manhattan length) between last two input positions.
+ */
+void QAbstract3DInputHandler::setPrevDistance(int distance)
+{
+    d_ptr->m_prevDistance = distance;
+}
 
+/*!
+ * \property QAbstract3DInputHandler::scene
+ *
+ * The 3D scene this abstract inputhandler is controlling. Only one scene can be controlled by one input handler.
+ */
 Q3DScene *QAbstract3DInputHandler::scene() const
 {
     return d_ptr->m_scene;
@@ -111,16 +174,22 @@ void QAbstract3DInputHandler::setScene(Q3DScene *scene)
     d_ptr->m_scene = scene;
 }
 
+/*!
+ * Sets the previous input position to the point given by \a position.
+ */
 void QAbstract3DInputHandler::setPreviousInputPos(const QPoint &position)
 {
     d_ptr->m_previousInputPos = position;
 }
 
+/*!
+ * Returns the previous input position.
+ * \return Previous input position.
+ */
 QPoint QAbstract3DInputHandler::previousInputPos() const
 {
     return d_ptr->m_previousInputPos;
 }
-
 
 
 QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputHandler *q) :

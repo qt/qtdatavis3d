@@ -27,16 +27,38 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+/*!
+   \class Q3DCamera
+   \inmodule QtDataVisualization
+   \brief Representation of a camera in 3D space.
+   \since 1.0.0
+
+    Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the data visualization.
+    The class offers simple methods for setting the orbit point in rotations, but allows also setting the 4x4 viewmatrix
+    directly in case a more customized camera behavior is needed.
+*/
+
+/*!
+ * Constructs a new 3D camera with position set to origo, up direction facing towards the Y-axis and looking at origo by default. An
+ * optional \a parent parameter can be given and is then passed to QObject constructor.
+ */
 Q3DCamera::Q3DCamera(QObject *parent) :
     Q3DObject(parent),
     d_ptr(new Q3DCameraPrivate(this))
 {
 }
 
+/*!
+ *  Destroys the camera object.
+ */
 Q3DCamera::~Q3DCamera()
 {
 }
 
+/*!
+ * Copies the 3D camera's properties from the given source camera.
+ * Values are copied from the \a source to this object.
+ */
 void Q3DCamera::copyValuesFrom(const Q3DCamera &source)
 {
     Q3DObject::copyValuesFrom(source);
@@ -61,6 +83,18 @@ void Q3DCamera::copyValuesFrom(const Q3DCamera &source)
     d_ptr->m_activePreset = source.d_ptr->m_activePreset;
 }
 
+/*!
+ * \property Q3DCamera::rotations
+ *
+ * This property contains the rotation angles of the camera around the target point in degrees starting from
+ * the current base position set by the setBaseOrientation() methods.
+ */
+QPointF Q3DCamera::rotations() const
+{
+    QPointF rotations(d_ptr->m_xRotation, d_ptr->m_yRotation);
+    return rotations;
+}
+
 void Q3DCamera::setRotations(const QPointF &rotation)
 {
     d_ptr->setRotations(rotation);
@@ -70,24 +104,36 @@ void Q3DCamera::setRotations(const QPointF &rotation)
     }
 }
 
-void Q3DCamera::setDefaultOrientation(const QVector3D &defaultPosition,
-                                      const QVector3D &defaultTarget,
-                                      const QVector3D &defaultUp)
+/*!
+ * Sets the base values for the camera that are used when calculating the camera position using the rotation values.
+ * The base position of the camera is defined by \a basePosition, expectation is that the x and y values are 0.
+ * Look at target point is defined by \a target and the camera rotates around it. Up direction for the camera is
+ * defined by \a baseUp, normally this is a vector with only y values set to 1.
+ */
+void Q3DCamera::setBaseOrientation(const QVector3D &basePosition,
+                                   const QVector3D &target,
+                                   const QVector3D &baseUp)
 {
-    if (position() != defaultPosition
-            || d_ptr->m_target != defaultTarget
-            || d_ptr->m_up != defaultUp) {
-        setPosition(defaultPosition);
-        d_ptr->m_target   = defaultTarget;
-        d_ptr->m_up       = defaultUp;
+    if (position() != basePosition
+            || d_ptr->m_target != target
+            || d_ptr->m_up != baseUp) {
+        setPosition(basePosition);
+        d_ptr->m_target   = target;
+        d_ptr->m_up       = baseUp;
         setDirty(true);
     }
 }
 
-QPointF Q3DCamera::rotations() const
+/*!
+ * \property Q3DCamera::viewMatrix
+ *
+ * This property contains the view matrix used in the 3D calculations. When the default orbiting camera behavior is sufficient
+ * there is no need to touch this property. But if the default behavior is insufficient the view matrix can be set directly.
+ * When setting the view matrix directly remember to set Q3DCamera::viewMatrixAutoUpdateEnabled to false.
+ */
+QMatrix4x4 Q3DCamera::viewMatrix() const
 {
-    QPointF rotations(d_ptr->m_xRotation, d_ptr->m_yRotation);
-    return rotations;
+    return d_ptr->m_viewMatrix;
 }
 
 void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
@@ -98,46 +144,31 @@ void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
     }
 }
 
-QMatrix4x4 Q3DCamera::viewMatrix() const
+/*!
+ * \property Q3DCamera::viewMatrixAutoUpdateEnabled
+ *
+ * This property determines if view matrix is automatically updated each render cycle using the current base orientation and
+ * rotations. If set to false, no automatic recalculation is done and the view matrix can be set using the
+ * Q3DMatrix::viewMatrix property.
+ */
+bool Q3DCamera::isViewMatrixAutoUpdateEnabled()
 {
-    return d_ptr->m_viewMatrix;
+    return d_ptr->m_isViewMatrixUpdateActive;
 }
 
-void Q3DCamera::updateViewMatrix(qreal zoomAdjustment)
+void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
 {
-    bool showUnder = parentScene()->isUnderSideCameraEnabled();
-    int zoom = zoomLevel() * zoomAdjustment;
-    QMatrix4x4 viewMatrix;
-    GLfloat lowerLimit = 0.0f;
-    if (showUnder)
-        lowerLimit = -90.0f;
-
-    // Reset at 360 in x and limit to 0...90 in y
-    if (qAbs(d_ptr->m_xRotation) >= 360.0f)
-        d_ptr->m_xRotation = 0.0f;
-    if (d_ptr->m_yRotation >= 90.0f)
-        d_ptr->m_yRotation = 90.0f;
-    else if (d_ptr->m_yRotation <= lowerLimit)
-        d_ptr->m_yRotation = lowerLimit;
-
-    // Apply to view matrix
-    viewMatrix.lookAt(position(), d_ptr->m_target, d_ptr->m_up);
-    // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(d_ptr->m_target.x(), d_ptr->m_target.y(), d_ptr->m_target.z());
-    // Apply rotations
-    // Handle x and z rotation when y -angle is other than 0
-    viewMatrix.rotate(d_ptr->m_xRotation, 0, qCos(qDegreesToRadians(d_ptr->m_yRotation)),
-                      qSin(qDegreesToRadians(d_ptr->m_yRotation)));
-    // y rotation is always "clean"
-    viewMatrix.rotate(d_ptr->m_yRotation, 1.0f, 0.0f, 0.0f);
-    // handle zoom by scaling
-    viewMatrix.scale((GLfloat)zoom / 100.0f);
-    // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(-d_ptr->m_target.x(), -d_ptr->m_target.y(), -d_ptr->m_target.z());
-
-    setViewMatrix(viewMatrix);
+    d_ptr->m_isViewMatrixUpdateActive = isEnabled;
 }
 
+/*!
+ * \property Q3DCamera::cameraPreset
+ *
+ * This property contains the currently active camera preset,
+ * if no preset is active the value is QDataVis::NoPreset.
+ * \note The base camera orientation set by setBaseOrientation() will affect
+ * the presets as all calculations are based on those values.
+ */
 QDataVis::CameraPreset Q3DCamera::cameraPreset()
 {
     return d_ptr->m_activePreset;
@@ -253,6 +284,17 @@ void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
     }
 }
 
+/*!
+ * \property Q3DCamera::zoomLevel
+ *
+ * This property contains the the camera zoom level in percentages.
+ * 100% means there is no zoom in or out set in the camera.
+ */
+int Q3DCamera::zoomLevel()
+{
+    return d_ptr->m_zoomLevel;
+}
+
 void Q3DCamera::setZoomLevel(int zoomLevel)
 {
     if (d_ptr->m_zoomLevel != zoomLevel) {
@@ -261,11 +303,14 @@ void Q3DCamera::setZoomLevel(int zoomLevel)
     }
 }
 
-int Q3DCamera::zoomLevel()
-{
-    return d_ptr->m_zoomLevel;
-}
-
+/*!
+ * Calculates and returns a position relative to the camera using the given parameters
+ * and the current camera viewMatrix property.
+ * \a relativePosition defines the relative 3D offset to the current camera position.
+ * \a fixedRotation is optional, if given fixes rotation of the calculated point around the data visualization area to the given value in degrees.
+ * \a distanceModifier is also optional, if given modifies the distance of the calculated point from the data visualization.
+ * \return Calculated position relative to this camera's position.
+ */
 QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relativePosition,
                                                        qreal fixedRotation,
                                                        qreal distanceModifier) const
@@ -294,6 +339,7 @@ QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relative
 
 Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     q_ptr(q),
+    m_isViewMatrixUpdateActive(true),
     m_xRotation(0.0f),
     m_yRotation(0.0f),
     m_zoomLevel(100),
@@ -325,5 +371,46 @@ void Q3DCameraPrivate::setRotations(const QPointF &rotation)
         q_ptr->setDirty(true);
     }
 }
+
+// Recalculates the view matrix based on the currently set base orientation, rotation and zoom level values.
+//  zoomAdjustment is adjustment to ensure that the 3D visualization stays inside the view area in the 100% zoom.
+void Q3DCameraPrivate::updateViewMatrix(qreal zoomAdjustment)
+{
+    if (!m_isViewMatrixUpdateActive)
+        return;
+
+    bool showUnder = q_ptr->parentScene()->isUnderSideCameraEnabled();
+    int zoom = m_zoomLevel * zoomAdjustment;
+    QMatrix4x4 viewMatrix;
+    GLfloat lowerLimit = 0.0f;
+    if (showUnder)
+        lowerLimit = -90.0f;
+
+    // Reset at 360 in x and limit to 0...90 in y
+    if (qAbs(m_xRotation) >= 360.0f)
+        m_xRotation = 0.0f;
+    if (m_yRotation >= 90.0f)
+        m_yRotation = 90.0f;
+    else if (m_yRotation <= lowerLimit)
+        m_yRotation = lowerLimit;
+
+    // Apply to view matrix
+    viewMatrix.lookAt(q_ptr->position(), m_target, m_up);
+    // Compensate for translation (if d_ptr->m_target is off origin)
+    viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
+    // Apply rotations
+    // Handle x and z rotation when y -angle is other than 0
+    viewMatrix.rotate(m_xRotation, 0, qCos(qDegreesToRadians(m_yRotation)),
+                      qSin(qDegreesToRadians(m_yRotation)));
+    // y rotation is always "clean"
+    viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
+    // handle zoom by scaling
+    viewMatrix.scale((GLfloat)zoom / 100.0f);
+    // Compensate for translation (if d_ptr->m_target is off origin)
+    viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
+
+    q_ptr->setViewMatrix(viewMatrix);
+}
+
 
 QT_DATAVISUALIZATION_END_NAMESPACE
