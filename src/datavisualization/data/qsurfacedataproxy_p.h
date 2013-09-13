@@ -45,8 +45,23 @@ public:
 
     bool resetArray(QSurfaceDataArray *newArray);
 
+    void setValueRangeRows(qreal min, qreal max);
+    void setValueRangeColumns(qreal min, qreal max);
+    void setMinValueRows(qreal min);
+    void setMaxValueRows(qreal max);
+    void setMinValueColumns(qreal min);
+    void setMaxValueColumns(qreal max);
+
+    qreal rowValue(int segment, int segmentCount);
+    qreal columnValue(int segment, int segmentCount);
+
 private:
+    QSurfaceDataProxy *qptr();
     QSurfaceDataArray *m_dataArray;
+    qreal m_minValueRows;
+    qreal m_maxValueRows;
+    qreal m_minValueColumns;
+    qreal m_maxValueColumns;
 
     friend class QSurfaceDataProxy;
 };

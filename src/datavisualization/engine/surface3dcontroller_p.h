@@ -71,14 +71,6 @@ public:
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
-    // Set segment count and step. Note; segmentCount * step should be the maximum possible value of data
-    // set. Minimum is the absolute minimum possible value a bar can have. This is especially
-    // important to set if values can be negative.
-    void setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum = 0.0f);
-
-    //TODO: Temp solution
-    void setData(QList<qreal> series, int width, int depth);
-
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);

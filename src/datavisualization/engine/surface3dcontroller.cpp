@@ -136,16 +136,6 @@ void Surface3DController::handleArrayReset()
     emitNeedRender();
 }
 
-void Surface3DController::setSegmentCount(GLint segmentCount, GLfloat step, GLfloat minimum)
-{
-    m_segmentCount   = segmentCount;
-    m_segmentStep    = step;
-    m_segmentMinimum = minimum;
-
-    emit segmentCountChanged(m_segmentCount, m_segmentStep, m_segmentMinimum);
-    emitNeedRender();
-}
-
 void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 {
     Theme t = theme();

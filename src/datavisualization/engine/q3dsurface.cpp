@@ -311,17 +311,6 @@ void Q3DSurface::setHeight(const int height)
     QWindow::setHeight(height);
 }
 
-/*
-  TODO: REMOVE
- */
-/*!
- * \internal
- */
-void Q3DSurface::setSegmentCount(int segmentCount, qreal step, qreal minimum)
-{
-    d_ptr->m_shared->setSegmentCount(GLint(segmentCount), GLfloat(step), GLfloat(minimum));
-}
-
 /*!
  * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.

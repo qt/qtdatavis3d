@@ -59,9 +59,6 @@ void ChartModifier::toggleSurfaceGrid(bool enable)
 
 void ChartModifier::toggleSqrtSin(bool enable)
 {
-    qreal biggest = -9999.0;
-    qreal smallest = 9999.0;
-
     if (enable) {
         qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
 
@@ -77,20 +74,20 @@ void ChartModifier::toggleSqrtSin(bool enable)
                 qreal R = qSqrt(i*i + j*j) + 0.01;
                 qreal y = (sin(R)/R + 0.24) * 1.61;
                 (*newRow)[index++] = y;
-                if (y > biggest) biggest = y;
-                if (y < smallest) smallest = y;
             }
             *dataArray << newRow;
         }
 
-        m_chart->axisX()->setRange(0.0, qreal(m_xCount - 1));
+        m_chart->axisX()->setRange(-8.0, 8.0);
         m_chart->axisY()->setRange(0.0, 2.0);
-        m_chart->axisZ()->setRange(0.0, qreal(m_zCount - 1));
+        m_chart->axisZ()->setRange(-8.0, 8.0);
         m_chart->activeDataProxy()->resetArray(dataArray);
+        m_chart->activeDataProxy()->setValueRangeColumns(-8.0, 8.0);
+        m_chart->activeDataProxy()->setValueRangeRows(-8.0, 8.0);
+        m_chart->axisX()->setLabelFormat("%.2f");
+        m_chart->axisZ()->setLabelFormat("%.2f");
 
         m_activeSample = ChartModifier::SqrtSin;
-
-        //qDebug() << "biggest = " << biggest << ", smallest = " << smallest;
     } else {
         qDebug() << "Remove surface";
     }
@@ -111,12 +108,14 @@ void ChartModifier::togglePlane(bool enable)
             *dataArray << newRow;
         }
 
-        m_chart->axisX()->setSegmentCount(3);
-        m_chart->axisX()->setRange(0.0, qreal(m_xCount - 1));
-        //m_chart->axisY()->setSegmentCount(4);
+        m_chart->axisX()->setSegmentCount(4);
+        m_chart->axisX()->setRange(2.0, 7.0);
         m_chart->axisY()->setRange(0.0, 2.0);
-        //m_chart->axisZ()->setSegmentCount(4/*m_zCount - 1*/);
-        m_chart->axisZ()->setRange(0.0, qreal(m_zCount - 1));
+        m_chart->axisZ()->setRange(2.0, 8.0);
+        m_chart->activeDataProxy()->setValueRangeColumns(0.0, qreal(m_xCount - 1));
+        m_chart->activeDataProxy()->setValueRangeRows(0.0, qreal(m_zCount - 1));
+        m_chart->axisX()->setLabelFormat("%.2f");
+        m_chart->axisZ()->setLabelFormat("%.2f");
 
         m_chart->activeDataProxy()->resetArray(dataArray);
 
@@ -142,9 +141,13 @@ void ChartModifier::setHeightMapData(bool enable)
             *dataArray << newRow;
         }
 
-        m_chart->axisX()->setRange(0.0, qreal(image.width() - 1));
+        m_chart->activeDataProxy()->setValueRangeColumns(18.0, 24.0);
+        m_chart->activeDataProxy()->setValueRangeRows(34.0, 40.0);
+        m_chart->axisX()->setRange(18.0, 24.0);
         m_chart->axisY()->setRange(0.0, 255.0);
-        m_chart->axisZ()->setRange(0.0, qreal(image.height() - 1));
+        m_chart->axisZ()->setRange(34.0, 40.0);
+        m_chart->axisX()->setLabelFormat("%.1f N");
+        m_chart->axisZ()->setLabelFormat("%.1f E");
 
         m_chart->activeDataProxy()->resetArray(dataArray);
 

@@ -75,9 +75,6 @@ public:
     void releaseDataProxy(QSurfaceDataProxy *proxy);
     QList<QSurfaceDataProxy *> dataProxies() const;
 
-    // TODO: Remove when axes handling in use
-    void setSegmentCount(int segmentCount, qreal step, qreal minimum = 0.0f);
-
     // TODO: Do these need to be public? Where are they called from?
     // Size
     void setWidth(const int width);

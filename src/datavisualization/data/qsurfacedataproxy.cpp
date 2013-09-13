@@ -27,8 +27,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Proxy class for Q3DSurface.
  * \since 1.0.0
  *
- * DOCUMENTATION GOES HERE
+ * QSurfaceDataProxy takes care of surface related data handling.
  *
+ * Make sure that amount of items on QSurfaceDataRow is the same for all rows.
  */
 
 /*!
@@ -88,13 +89,26 @@ const QSurfaceDataArray *QSurfaceDataProxy::array() const
 }
 
 /*!
- * \property QSurfaceDataProxy::itemCount
+ * \property QSurfaceDataProxy::rowCount
  *
- * \return item count in the array.
+ * \return number of rows in the data.
  */
-int QSurfaceDataProxy::itemCount() const
+int QSurfaceDataProxy::rowCount() const
 {
     return dptrc()->m_dataArray->size();
+}
+
+/*!
+ * \property QSurfaceDataProxy::columnCount
+ *
+ * \return number of items in the columns.
+ */
+int QSurfaceDataProxy::columnCount() const
+{
+    if (dptrc()->m_dataArray->size() > 0)
+        return dptrc()->m_dataArray->at(0)->size();
+    else
+        return 0;
 }
 
 /*!
@@ -128,13 +142,104 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  * Emitted when data array is reset.
  */
 
+/*!
+ * Sets the value range for rows from \a min to \a max.
+ * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
+ */
+void QSurfaceDataProxy::setValueRangeRows(qreal min, qreal max)
+{
+    dptr()->setValueRangeRows(min, max);
+}
+
+/*!
+ * Sets the value range for columns from \a min to \a max.
+ * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
+ */
+void QSurfaceDataProxy::setValueRangeColumns(qreal min, qreal max)
+{
+    dptr()->setValueRangeColumns(min, max);
+}
+
+/*!
+ * \property QSurfaceDataProxy::minValueRows
+ *
+ * Defines the minimum value of the range for rows.
+ * When setting this property the max is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+void QSurfaceDataProxy::setMinValueRows(qreal min)
+{
+    dptr()->setMinValueRows(min);
+}
+
+qreal QSurfaceDataProxy::minValueRows() const
+{
+    return dptrc()->m_minValueRows;
+}
+
+/*!
+ * \property QSurfaceDataProxy::maxValueRows
+ *
+ * Defines the maximum value of the range for rows.
+ * When setting this property the min is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+void QSurfaceDataProxy::setMaxValueRows(qreal max)
+{
+    dptr()->setMaxValueRows(max);
+}
+
+qreal QSurfaceDataProxy::maxValueRows() const
+{
+    return dptrc()->m_maxValueRows;
+}
+
+/*!
+ * \property QSurfaceDataProxy::minValueColumns
+ *
+ * Defines the minimum value of the range for columns.
+ * When setting this property the min is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+void QSurfaceDataProxy::setMinValueColumns(qreal min)
+{
+    dptr()->setMinValueColumns(min);
+}
+
+qreal QSurfaceDataProxy::minValueColumns() const
+{
+    return dptrc()->m_minValueColumns;
+}
+
+/*!
+ * \property QSurfaceDataProxy::maxValueColumns
+ *
+ * Defines the maximum value of the range for columns.
+ * When setting this property the min is adjusted if necessary, to ensure that the range remains
+ * valid.
+ */
+void QSurfaceDataProxy::setMaxValueColumns(qreal max)
+{
+    dptr()->setMaxValueColumns(max);
+}
+
+qreal QSurfaceDataProxy::maxValueColumns() const
+{
+    return dptrc()->m_maxValueColumns;
+}
+
+
 //
 //  QSurfaceDataProxyPrivate
 //
 
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
-      m_dataArray(new QSurfaceDataArray)
+      m_dataArray(new QSurfaceDataArray),
+      m_minValueRows(0.0),
+      m_maxValueRows(0.0),
+      m_minValueColumns(0.0),
+      m_maxValueColumns(0.0)
 {
     m_itemLabelFormat = QStringLiteral("(@yLabel)");
 }
@@ -160,5 +265,117 @@ bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray)
 
     return true;
 }
+
+void QSurfaceDataProxyPrivate::setValueRangeRows(qreal min, qreal max)
+{
+    bool changed = false;
+    if (m_minValueRows != min) {
+        m_minValueRows = min;
+        changed = true;
+    }
+    if (m_maxValueRows != max || min >= max) {
+        if (min >= max) {
+            m_maxValueRows = min + 1.0;
+            qWarning() << "Warning: Tried to set invalid range for value range."
+                          " Range automatically adjusted to a valid one:"
+                       << min << "-" << max << "-->" << m_minValueRows << "-" << m_maxValueRows;
+        } else {
+            m_maxValueRows = max;
+        }
+        changed = true;
+    }
+
+    if (changed)
+        emit qptr()->valueRangeRowsChanged(min, max);
+}
+
+void QSurfaceDataProxyPrivate::setValueRangeColumns(qreal min, qreal max)
+{
+    bool changed = false;
+    if (m_minValueColumns != min) {
+        m_minValueColumns = min;
+        changed = true;
+    }
+    if (m_maxValueColumns != max || min >= max) {
+        if (min >= max) {
+            m_maxValueColumns = min + 1.0;
+            qWarning() << "Warning: Tried to set invalid range for value range."
+                          " Range automatically adjusted to a valid one:"
+                       << min << "-" << max << "-->" << m_minValueColumns << "-" << m_maxValueColumns;
+        } else {
+            m_maxValueColumns = max;
+        }
+        changed = true;
+    }
+
+    if (changed)
+        emit qptr()->valueRangeColumnsChanged(min, max);
+}
+
+void QSurfaceDataProxyPrivate::setMinValueRows(qreal min)
+{
+    if (min != m_minValueRows) {
+        if (min >= m_maxValueRows) {
+            qreal oldMax = m_maxValueRows;
+            m_maxValueRows = min + 1.0;
+            qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
+                          " value range. Maximum automatically adjusted to a valid one:"
+                       << oldMax <<  "-->" << m_maxValueRows;
+        }
+        m_minValueRows = min;
+        emit qptr()->valueRangeRowsChanged(m_minValueRows, m_maxValueRows);
+    }
+}
+
+void QSurfaceDataProxyPrivate::setMaxValueRows(qreal max)
+{
+    if (m_maxValueRows != max) {
+        if (max <= m_minValueRows) {
+            qreal oldMin = m_minValueRows;
+            m_minValueRows = max - 1.0;
+            qWarning() << "Warning: Tried to set maximum to equal or smaller than minimum for"
+                          " value range. Minimum automatically adjusted to a valid one:"
+                       << oldMin <<  "-->" << m_minValueRows;
+        }
+        m_maxValueRows = max;
+        emit qptr()->valueRangeRowsChanged(m_minValueRows, m_maxValueRows);
+    }
+}
+
+void QSurfaceDataProxyPrivate::setMinValueColumns(qreal min)
+{
+    if (min != m_minValueColumns) {
+        if (min >= m_maxValueColumns) {
+            qreal oldMax = m_maxValueColumns;
+            m_maxValueColumns = min + 1.0;
+            qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
+                          " value range. Maximum automatically adjusted to a valid one:"
+                       << oldMax <<  "-->" << m_maxValueColumns;
+        }
+        m_minValueColumns = min;
+        emit qptr()->valueRangeColumnsChanged(m_minValueColumns, m_maxValueRows);
+    }
+}
+
+void QSurfaceDataProxyPrivate::setMaxValueColumns(qreal max)
+{
+    if (m_maxValueColumns != max) {
+        if (max <= m_minValueColumns) {
+            qreal oldMin = m_minValueColumns;
+            m_minValueColumns = max - 1.0;
+            qWarning() << "Warning: Tried to set maximum to equal or smaller than minimum for"
+                          " value range. Minimum automatically adjusted to a valid one:"
+                       << oldMin <<  "-->" << m_minValueColumns;
+        }
+        m_maxValueColumns = max;
+        emit qptr()->valueRangeColumnsChanged(m_minValueColumns, m_maxValueColumns);
+    }
+}
+
+QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()
+{
+    return static_cast<QSurfaceDataProxy *>(q_ptr);
+}
+
 
 QT_DATAVISUALIZATION_END_NAMESPACE

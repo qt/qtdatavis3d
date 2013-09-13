@@ -134,6 +134,7 @@ private:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    QRect calculateSampleRect(QSurfaceDataProxy *dataProxy);
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();

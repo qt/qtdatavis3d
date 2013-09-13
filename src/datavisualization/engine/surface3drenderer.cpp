@@ -173,9 +173,14 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 
     const QSurfaceDataArray *array = dataProxy->array();
 
-    m_dataArray.reserve(array->size());
-    for (int i = 0; i < array->size(); i++) {
-        QSurfaceDataRow *newRow = new QSurfaceDataRow(*array->at(i));
+    QRect sampleSpace = calculateSampleRect(dataProxy);
+
+    m_dataArray.reserve(sampleSpace.height());
+    for (int i = 0; i < sampleSpace.height(); i++) {
+        QSurfaceDataRow *newRow = new QSurfaceDataRow();
+        newRow->resize(sampleSpace.width());
+        for (int j = 0; j < sampleSpace.width(); j++)
+            (*newRow)[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
         m_dataArray << newRow;
     }
 
@@ -207,6 +212,33 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
     calculateSceneScalingFactors();
 
     Abstract3DRenderer::updateDataModel(dataProxy);
+}
+
+QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
+{
+    QRect sampleSpace(0, 0, dataProxy->columnCount(), dataProxy->rowCount());
+
+    if (dataProxy->minValueColumns() == 0.0 && dataProxy->maxValueColumns() == 0.0 &&
+        dataProxy->minValueRows() == 0.0 && dataProxy->maxValueRows() == 0.0) {
+        // The user hasn't set anything, return default
+        return sampleSpace;
+    }
+
+    qreal valueWidth = dataProxy->maxValueColumns() - dataProxy->minValueColumns();
+    qreal columnBeginDiff = qAbs(dataProxy->minValueColumns() - m_axisCacheX.min());
+    sampleSpace.setX(columnBeginDiff / valueWidth * dataProxy->columnCount());
+
+    qreal columnEndPos = (m_axisCacheX.max() - dataProxy->minValueColumns()) / valueWidth * dataProxy->columnCount();
+    sampleSpace.setWidth(columnEndPos - sampleSpace.x());
+
+    qreal valueHeight = dataProxy->maxValueRows() - dataProxy->minValueRows();
+    qreal rowBeginDiff = qAbs(dataProxy->minValueRows() - m_axisCacheZ.min());
+    sampleSpace.setY(rowBeginDiff / valueHeight * dataProxy->rowCount());
+
+    qreal rowEndPos = (m_axisCacheZ.max() - dataProxy->minValueRows()) / valueHeight * dataProxy->rowCount();
+    sampleSpace.setHeight(rowEndPos - sampleSpace.y());
+
+    return sampleSpace;
 }
 
 void Surface3DRenderer::updateScene(Q3DScene *scene)
