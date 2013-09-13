@@ -213,7 +213,6 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     // If slicing has been activated by this render pass, we need another render
     if (slicingActivated !=  m_cachedScene->isSlicingActivated())
         emit needRender();
-
 }
 
 void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
@@ -294,8 +293,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item->height();
 
         QVector3D barColor = baseColor + heightColor;
+        if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
+            barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
 #else
         QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+        if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
+            barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
 #endif
 
         if (item->height() != 0) {
@@ -412,8 +415,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
 
-    //m_selection = selectionSkipColor;
-
     // Specify viewport
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
                m_mainViewPort.width(), m_mainViewPort.height());
@@ -477,7 +478,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowNone/*!m_cachedIsSlicingActivated*/) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone /*&& !m_cachedIsSlicingActivated*/) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -776,7 +777,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert position data into render item. We have no ownership, don't delete the previous one
-                    if (!m_cachedIsSlicingActivated) {
+                    if (selectionDirty) {
                         selectedBar = &item;
                         selectedBar->setPosition(QPoint(row, bar));
                         item.setTranslation(modelMatrix.column(3).toVector3D());
