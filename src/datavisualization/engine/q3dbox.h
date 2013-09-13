@@ -20,10 +20,12 @@
 #define Q3DBOX_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
-#include <QMatrix4x4>
-#include <QVector3D>
+#include <QtGui/QMatrix4x4>
+#include <QtGui/QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+
+class Q3DBox; // Needed to circumvent an issue with qdoc. If this line is removed, make docs will not work for this.
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBox
 {
@@ -176,8 +178,6 @@ QT_DATAVISUALIZATION_EXPORT QDebug operator<<(QDebug dbg, const Q3DBox &box);
 QT_DATAVISUALIZATION_EXPORT QDataStream &operator<<(QDataStream &stream, const Q3DBox &box);
 QT_DATAVISUALIZATION_EXPORT QDataStream &operator>>(QDataStream &stream, Q3DBox &box);
 #endif
-
-//Q_DECLARE_METATYPE(Q3DBox)
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
