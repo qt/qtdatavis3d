@@ -234,16 +234,6 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     projectionMatrix.perspective(45.0f, (GLfloat)m_sliceViewPort.width()
                                  / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
 
-#ifdef ROTATE_ZOOM_SELECTION
-    // Get light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    lightPos =  m_cachedScene->light()->position();
-
-    if (viewMatrix.row(0).z() <= 0) {
-        startBar = m_sliceSelection->size() - 1;
-        stopBar = -1;
-        stepBar = -1;
-    }
-#else
     // Set view matrix
     QMatrix4x4 viewMatrix;
 
@@ -256,7 +246,6 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
     // Set light position
     lightPos = QVector3D(0.0f, -m_yAdjustment, zComp);
-#endif
 
     // Bind bar shader
     m_barShader->bind();
@@ -310,9 +299,9 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                          itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
             m_barShader->setUniformValue(m_barShader->color(), barColor);
-            m_barShader->setUniformValue(m_barShader->lightS(), 0.25f);
+            m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
             m_barShader->setUniformValue(m_barShader->ambientS(),
-                                         m_cachedTheme.m_ambientStrength * 1.5f);
+                                         m_cachedTheme.m_ambientStrength * 2.0f);
 
             // Draw the object
             m_drawer->drawObject(m_barShader, m_barObj);
@@ -472,13 +461,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QVector3D lightPos =  m_cachedScene->light()->position();
 
     // Skip depth rendering if we're in slice mode
-    // TODO: Fix this, causes problems if depth rendering is off in slice mode
     // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowNone /*&& !m_cachedIsSlicingActivated*/) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone && !m_cachedIsSlicingActivated) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -777,7 +765,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     // Insert position data into render item. We have no ownership, don't delete the previous one
-                    if (selectionDirty) {
+                    if (!m_cachedIsSlicingActivated) {
                         selectedBar = &item;
                         selectedBar->setPosition(QPoint(row, bar));
                         item.setTranslation(modelMatrix.column(3).toVector3D());
@@ -785,6 +773,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     if (selectionDirty && m_cachedSelectionMode >= QDataVis::ModeSliceRow) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
+                        item.setPosition(QPoint(row, bar));
                         m_sliceSelection->append(&item);
                         barSelectionFound = true;
                         if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
@@ -1701,6 +1690,10 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
     if (isSlicing) {
         m_mainViewPort = QRect(0, m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / 5,
                                m_cachedBoundingRect.width() / 5, m_cachedBoundingRect.height() / 5);
+        if (m_depthTexture) {
+            m_textureHelper->deleteTexture(&m_depthTexture);
+            m_depthTexture = 0;
+        }
     } else {
         m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
                                this->m_cachedBoundingRect.height());

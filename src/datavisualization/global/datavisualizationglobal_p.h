@@ -35,8 +35,6 @@
 #include <QVector3D>
 #include <QDebug>
 
-//#define ROTATE_ZOOM_SELECTION
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 // Constants used in several files
