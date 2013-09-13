@@ -378,18 +378,13 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         // Draw labels
         if (m_sliceCache->labelItems().size() > col) {
             const LabelItem *labelItem(0);
-            // If draw order of bars is flipped, label draw order should be too
-            if (m_xFlipped) {
-                labelItem = m_sliceCache->labelItems().at(
-                            m_sliceCache->labelItems().size() - col - 1);
-            } else {
-                labelItem = m_sliceCache->labelItems().at(col);
-            }
+            labelItem = m_sliceCache->labelItems().at(col);
             m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, -45.0f), item->height(),
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelBelow);
+                                m_labelObj, m_cachedScene->camera(), false, false,
+                                Drawer::LabelBelow);
         }
     }
 
