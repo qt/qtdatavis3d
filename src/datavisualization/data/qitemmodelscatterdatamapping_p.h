@@ -26,11 +26,11 @@
 //
 // We mean it.
 
-#include "qitemmodelscatterdatamapping.h"
-#include "qabstractdatamapping_p.h"
-
 #ifndef QITEMMODELSCATTERDATAMAPPING_P_H
 #define QITEMMODELSCATTERDATAMAPPING_P_H
+
+#include "qitemmodelscatterdatamapping.h"
+#include "qabstractdatamapping_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

@@ -295,7 +295,7 @@ void Q3DValueAxisPrivate::setRange(qreal min, qreal max)
         m_min = min;
         dirty = true;
     }
-    if (m_max != max) {
+    if (m_max != max || min >= max) {
         if (min >= max) {
             m_max = min + 1.0;
             qWarning() << "Warning: Tried to set invalid range for value axis."

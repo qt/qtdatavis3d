@@ -67,7 +67,7 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(int rows READ rows WRITE setRows)
     Q_PROPERTY(int columns READ columns WRITE setColumns)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
-    Q_PROPERTY(QPointF selectedBarPos READ selectedBarPos WRITE setSelectedBarPos)
+    Q_PROPERTY(QPointF selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
@@ -174,6 +174,7 @@ public:
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void selectedBarPosChanged(const QPointF &position);
 
 protected:
     Bars3DController *m_shared;

@@ -47,7 +47,6 @@ Item {
             font.family: "STCaiyun"
             font.pointSize: 35
             cameraPreset: Surface3D.PresetIsometricLeft
-            //itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             dataProxy: surfaceData.proxy
             axisX.min: 0.0
             axisX.max: 99.0

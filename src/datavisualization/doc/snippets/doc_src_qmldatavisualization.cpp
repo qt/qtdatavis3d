@@ -93,8 +93,6 @@ SurfaceDataMapping {
     rowRole: "latitude"
     columnRole: "longitude"
     valueRole: "population"
-    rowCategories: ["64.5", "64.6", "64.7", "64.8", "64.9", "65.0", "65.1", "65.2", "65.3", "65.4"]
-    columnCategories: ["24.5", "24.75", "25.0", "25.25", "25.5", "25.75", "26.0", "26.25", "26.5", "26.75"]
 }
 //! [6]
 

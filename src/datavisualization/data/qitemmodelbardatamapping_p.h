@@ -50,7 +50,12 @@ private:
     QStringList m_rowCategories;
     QStringList m_columnCategories;
 
+    bool m_useModelCategories;
+    bool m_autoRowCategories;
+    bool m_autoColumnCategories;
+
     friend class QItemModelBarDataMapping;
+    friend class BarItemModelHandler;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

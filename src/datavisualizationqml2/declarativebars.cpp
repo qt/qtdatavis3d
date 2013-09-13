@@ -42,6 +42,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     m_shared = new Bars3DController(boundingRect().toRect());
     QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &DeclarativeBars::handleShadowQualityUpdate);
+    QObject::connect(m_shared, &Bars3DController::selectedBarPosChanged, this,
+                     &DeclarativeBars::selectedBarPosChanged);
 
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
     m_shared->setActiveDataProxy(proxy);

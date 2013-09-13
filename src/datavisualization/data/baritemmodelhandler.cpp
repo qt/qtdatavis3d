@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "baritemmodelhandler_p.h"
-#include <QTimer>
+#include "qitemmodelbardatamapping_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -40,33 +40,47 @@ void BarItemModelHandler::resolveModel()
         return;
     }
 
-    bool useModelRows(false);
-    if (!mapping->rowCategories().size() || !mapping->columnCategories().size()) {
-        useModelRows = true;
-    } else if (mapping->rowRole().isEmpty() || mapping->columnRole().isEmpty()) {
+    if (!mapping->useModelCategories()
+            && (mapping->rowRole().isEmpty() || mapping->columnRole().isEmpty())) {
         m_proxy->resetArray(0);
         return;
     }
 
+    QStringList rowLabels;
+    QStringList columnLabels;
+
     QBarDataArray *newProxyArray = new QBarDataArray;
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
+
     // Default to display role if no mapping
     int valueRole = roleHash.key(mapping->valueRole().toLatin1(), Qt::DisplayRole);
     int rowCount = m_itemModel->rowCount();
     int columnCount = m_itemModel->columnCount();
 
-    if (useModelRows) {
+    if (mapping->useModelCategories()) {
         for (int i = 0; i < rowCount; i++) {
             QBarDataRow *newProxyRow = new QBarDataRow(columnCount);
             for (int j = 0; j < columnCount; j++)
                 (*newProxyRow)[j].setValue(m_itemModel->index(i, j).data(valueRole).toReal());
             newProxyArray->append(newProxyRow);
         }
+        // Generate labels from headers if using model rows/columns
+        for (int i = 0; i < rowCount; i++)
+            rowLabels << m_itemModel->headerData(i, Qt::Vertical).toString();
+        for (int i = 0; i < columnCount; i++)
+            columnLabels << m_itemModel->headerData(i, Qt::Horizontal).toString();
     } else {
         int rowRole = roleHash.key(mapping->rowRole().toLatin1());
         int columnRole = roleHash.key(mapping->columnRole().toLatin1());
-        const QStringList &rowList = mapping->rowCategories();
-        const QStringList &columnList = mapping->columnCategories();
+
+        bool generateRows = mapping->autoRowCategories();
+        bool generateColumns = mapping->autoColumnCategories();
+        QStringList rowList;
+        QStringList columnList;
+        // For detecting duplicates in categories generation, using QHashes should be faster than
+        // simple QStringList::contains() check.
+        QHash<QString, bool> rowListHash;
+        QHash<QString, bool> columnListHash;
 
         // Sort values into rows and columns
         typedef QHash<QString, qreal> ColumnValueMap;
@@ -74,10 +88,29 @@ void BarItemModelHandler::resolveModel()
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
-                itemValueMap[index.data(rowRole).toString()][index.data(columnRole).toString()]
-                        = index.data(valueRole).toReal();
+                QString rowRoleStr = index.data(rowRole).toString();
+                QString columnRoleStr = index.data(columnRole).toString();
+                itemValueMap[rowRoleStr][columnRoleStr] = index.data(valueRole).toReal();
+                if (generateRows && !rowListHash.value(rowRoleStr, false)) {
+                    rowListHash.insert(rowRoleStr, true);
+                    rowList << rowRoleStr;
+                }
+                if (generateColumns && !columnListHash.value(columnRoleStr, false)) {
+                    columnListHash.insert(columnRoleStr, true);
+                    columnList << columnRoleStr;
+                }
             }
         }
+
+        if (generateRows)
+            mapping->dptr()->m_rowCategories = rowList;
+        else
+            rowList = mapping->rowCategories();
+
+        if (generateColumns)
+            mapping->dptr()->m_columnCategories = columnList;
+        else
+            columnList = mapping->columnCategories();
 
         // Create new data array from itemValueMap
         foreach (QString rowKey, rowList) {
@@ -86,16 +119,9 @@ void BarItemModelHandler::resolveModel()
                 (*newProxyRow)[i].setValue(itemValueMap[rowKey][columnList.at(i)]);
             newProxyArray->append(newProxyRow);
         }
-    }
 
-    // Generate labels from headers if using model rows/columns
-    QStringList rowLabels;
-    QStringList columnLabels;
-    if (useModelRows) {
-        for (int i = 0; i < rowCount; i++)
-            rowLabels << m_itemModel->headerData(i, Qt::Vertical).toString();
-        for (int i = 0; i < columnCount; i++)
-            columnLabels << m_itemModel->headerData(i, Qt::Horizontal).toString();
+        rowLabels = rowList;
+        columnLabels = columnList;
     }
 
     m_proxy->resetArray(newProxyArray, rowLabels, columnLabels);

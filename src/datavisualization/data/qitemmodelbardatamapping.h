@@ -35,10 +35,15 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataMapping : public QAbstractDat
     Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole)
     Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
+    Q_PROPERTY(bool useModelCategories READ useModelCategories WRITE setUseModelCategories)
+    Q_PROPERTY(bool autoRowCategories READ autoRowCategories WRITE setAutoRowCategories)
+    Q_PROPERTY(bool autoColumnCategories READ autoColumnCategories WRITE setAutoColumnCategories)
 
 public:
     explicit QItemModelBarDataMapping(QObject *parent = 0);
     QItemModelBarDataMapping(const QString &valueRole, QObject *parent = 0);
+    QItemModelBarDataMapping(const QString &rowRole, const QString &columnRole,
+                             const QString &valueRole, QObject *parent = 0);
     QItemModelBarDataMapping(const QString &rowRole, const QString &columnRole,
                              const QString &valueRole, const QStringList &rowCategories,
                              const QStringList &columnCategories, QObject *parent = 0);
@@ -56,6 +61,13 @@ public:
     void setColumnCategories(const QStringList &categories);
     QStringList columnCategories() const;
 
+    void setUseModelCategories(bool enable);
+    bool useModelCategories() const;
+    void setAutoRowCategories(bool enable);
+    bool autoRowCategories() const;
+    void setAutoColumnCategories(bool enable);
+    bool autoColumnCategories() const;
+
     void remap(const QString &rowRole, const QString &columnRole,
                const QString &valueRole, const QStringList &rowCategories,
                const QStringList &columnCategories);
@@ -69,6 +81,8 @@ protected:
 
 private:
     Q_DISABLE_COPY(QItemModelBarDataMapping)
+
+    friend class BarItemModelHandler;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -20,15 +20,14 @@ import QtQuick 2.1
 import com.digia.QtDataVisualization 1.0
 
 Item {
-    property alias row: rowAxis
     property alias column: columnAxis
     property alias expenses: expensesAxis
     property alias income: incomeAxis
 
-    CategoryAxis3D {
-        id: rowAxis
-        categoryLabels: ["2000", "2001", "2002", "2003"]
-    }
+    // For row labels we can use row labels from data proxy, so default axis
+    // suffices for rows.
+
+    // Custom labels for columns, since the data contains abbreviated month names.
     CategoryAxis3D {
         id: columnAxis
         categoryLabels: ["January", "February", "March", "April", "May", "June",

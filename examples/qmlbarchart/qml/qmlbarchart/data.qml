@@ -29,9 +29,6 @@ Item {
         rowRole: "year"
         columnRole: "month"
         valueRole: "expenses"
-        rowCategories: ["2000", "2001", "2002", "2003"]
-        columnCategories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     }
 
     ItemModelBarDataProxy {
@@ -42,6 +39,32 @@ Item {
 
     ListModel {
         id: dataModel
+        ListElement{ year: "1998"; month: "Jan"; expenses: "4";  income: "5" }
+        ListElement{ year: "1998"; month: "Feb"; expenses: "5";  income: "6" }
+        ListElement{ year: "1998"; month: "Mar"; expenses: "7";  income: "4" }
+        ListElement{ year: "1998"; month: "Apr"; expenses: "3";  income: "2" }
+        ListElement{ year: "1998"; month: "May"; expenses: "4";  income: "1" }
+        ListElement{ year: "1998"; month: "Jun"; expenses: "2";  income: "2" }
+        ListElement{ year: "1998"; month: "Jul"; expenses: "1";  income: "3" }
+        ListElement{ year: "1998"; month: "Aug"; expenses: "5";  income: "1" }
+        ListElement{ year: "1998"; month: "Sep"; expenses: "2";  income: "3" }
+        ListElement{ year: "1998"; month: "Oct"; expenses: "5";  income: "2" }
+        ListElement{ year: "1998"; month: "Nov"; expenses: "8";  income: "5" }
+        ListElement{ year: "1998"; month: "Dec"; expenses: "3";  income: "3" }
+
+        ListElement{ year: "1999"; month: "Jan"; expenses: "3";  income: "1" }
+        ListElement{ year: "1999"; month: "Feb"; expenses: "4";  income: "2" }
+        ListElement{ year: "1999"; month: "Mar"; expenses: "12"; income: "4" }
+        ListElement{ year: "1999"; month: "Apr"; expenses: "13"; income: "6" }
+        ListElement{ year: "1999"; month: "May"; expenses: "14"; income: "11" }
+        ListElement{ year: "1999"; month: "Jun"; expenses: "7";  income: "7" }
+        ListElement{ year: "1999"; month: "Jul"; expenses: "6";  income: "4" }
+        ListElement{ year: "1999"; month: "Aug"; expenses: "4";  income: "15" }
+        ListElement{ year: "1999"; month: "Sep"; expenses: "2";  income: "18" }
+        ListElement{ year: "1999"; month: "Oct"; expenses: "29"; income: "25" }
+        ListElement{ year: "1999"; month: "Nov"; expenses: "23"; income: "29" }
+        ListElement{ year: "1999"; month: "Dec"; expenses: "5";  income: "9" }
+
         ListElement{ year: "2000"; month: "Jan"; expenses: "3";  income: "8" }
         ListElement{ year: "2000"; month: "Feb"; expenses: "8";  income: "14" }
         ListElement{ year: "2000"; month: "Mar"; expenses: "10"; income: "20" }
@@ -93,5 +116,18 @@ Item {
         ListElement{ year: "2003"; month: "Oct"; expenses: "13"; income: "15"  }
         ListElement{ year: "2003"; month: "Nov"; expenses: "8";  income: "17"  }
         ListElement{ year: "2003"; month: "Dec"; expenses: "7";  income: "10"  }
+
+        ListElement{ year: "2004"; month: "Jan"; expenses: "12";  income: "16"  }
+        ListElement{ year: "2004"; month: "Feb"; expenses: "24";  income: "28"  }
+        ListElement{ year: "2004"; month: "Mar"; expenses: "27";  income: "22"  }
+        ListElement{ year: "2004"; month: "Apr"; expenses: "29";  income: "25"  }
+        ListElement{ year: "2004"; month: "May"; expenses: "27";  income: "29"  }
+        ListElement{ year: "2004"; month: "Jun"; expenses: "19";  income: "18"  }
+        ListElement{ year: "2004"; month: "Jul"; expenses: "13";  income: "17"  }
+        ListElement{ year: "2004"; month: "Aug"; expenses: "15";  income: "19"  }
+        ListElement{ year: "2004"; month: "Sep"; expenses: "3";   income: "8"  }
+        ListElement{ year: "2004"; month: "Oct"; expenses: "3";   income: "6"  }
+        ListElement{ year: "2004"; month: "Nov"; expenses: "4";   income: "8"  }
+        ListElement{ year: "2004"; month: "Dec"; expenses: "5";   income: "9"  }
     }
 }

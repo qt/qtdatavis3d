@@ -65,5 +65,14 @@ proxy->activeMapping()->setValueRole(QStringLiteral("expenses"));
 QItemModelScatterDataMapping *mapping = new QItemModelScatterDataMapping(QStringLiteral("density"),
                                                                          QStringLiteral("hardness"),
                                                                          QStringLiteral("conductivity"))
+
 QItemModelScatterDataProxy *proxy = new QItemModelScatterDataProxy(customModel, mapping);
 //! [4]
+
+//! [5]
+QItemModelSurfaceDataMapping *mapping = new QItemModelSurfaceDataMapping(QStringLiteral("longitude"), // Row role
+                                                                         QStringLiteral("latitude"), // Column role
+                                                                         QStringLiteral("height")); // value role
+
+QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel, mapping);
+//! [5]

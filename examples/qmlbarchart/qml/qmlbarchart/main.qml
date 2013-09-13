@@ -49,17 +49,36 @@ Item {
             selectionMode: Bars3D.ModeItem
             font.pointSize: 35
             theme: Bars3D.ThemeBrownSand
-            rows: 4
+            rows: 7
             columns: 12
             dataProxy: chartData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
             cameraPreset: Bars3D.PresetRight
-            rowAxis: chartAxes.row
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+            onSelectedBarPosChanged: {
+                // Set tableView current row to selected bar
+                var rowRole = chartData.proxy.rowLabels[position.x];
+                var colRole = chartData.proxy.columnLabels[position.y];
+                var currentRow = tableView.currentRow
+                if (currentRow === -1 || rowRole !== chartData.model.get(currentRow).year
+                        || colRole !== chartData.model.get(currentRow).month) {
+                    var totalRows = tableView.rowCount;
+                    for (var i = 0; i < totalRows; i++) {
+                        var currentRowRole = chartData.model.get(i).year
+                        var currentColRole = chartData.model.get(i).month
+                        console.log(currentRowRole, currentColRole)
+                        if (currentRowRole === rowRole && currentColRole === colRole) {
+                            tableView.currentRow = i
+                            break
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -68,7 +87,7 @@ Item {
         x: 0
         y: 0
         width: 298
-        height: parent.height - mappingToggle.height - shadowToggle.height
+        height: parent.height - mappingToggle.height - shadowToggle.height - dataToggle.height
         TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
         TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
         TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
@@ -112,6 +131,27 @@ Item {
             } else {
                 testchart.shadowQuality = Bars3D.ShadowNone;
                 text = "Show Shadows"
+            }
+        }
+    }
+
+    Button {
+        id: dataToggle
+        anchors.bottom: shadowToggle.top
+        width: tableView.width
+        text: "Show 2000 - 2002"
+        onClicked: {
+            if (testchart.rows !== 7) {
+                text = "Show 2000 - 2002"
+                chartData.mapping.autoRowCategories = true
+                testchart.rows = 7;
+            } else {
+                testchart.rows = 3;
+                text = "Show all years"
+                // Explicitly defining row categories, since we do not want to show data for
+                // all years in the model, just for the selected ones.
+                chartData.mapping.autoRowCategories = false
+                chartData.mapping.rowCategories = ["2000", "2001", "2002"]
             }
         }
     }
