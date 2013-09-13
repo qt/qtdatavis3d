@@ -211,7 +211,7 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     drawScene(defaultFboHandle);
 
     // If slicing has been activated by this render pass, we need another render
-    if (slicingActivated !=  m_cachedScene->isSlicingActivated())
+    if (slicingActivated != m_cachedScene->isSlicingActivated())
         emit needRender();
 }
 
@@ -1529,6 +1529,7 @@ void Bars3DRenderer::updateSelectedBarPos(const QPoint &position)
         m_selection = selectionSkipColor;
     else
         m_selection = QVector3D(position.x(), position.y(), 0);
+    emit needRender();
 }
 
 void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
