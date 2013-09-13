@@ -33,7 +33,7 @@ QTouch3DInputHandler::~QTouch3DInputHandler()
 void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!scene()->isSlicingActivated()) {
-        setInputState( QDataVis::InputOnScene );
+        setInputState(QDataVis::InputOnScene);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition( event->pos() );
     }
@@ -45,7 +45,7 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     points = event->touchPoints();
 
     if (!scene()->isSlicingActivated() && points.count() == 2) {
-        setInputState( QDataVis::InputOnPinch );
+        setInputState(QDataVis::InputOnPinch);
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();

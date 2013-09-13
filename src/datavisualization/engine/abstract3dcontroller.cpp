@@ -669,6 +669,10 @@ QDataVis::CameraPreset Abstract3DController::cameraPreset() const
 
 void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
 {
+    // disable camera movement if in slice view
+    if (scene()->isSlicingActivated())
+        return;
+
     m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_scene->camera()->setZoomLevel(qBound(10, distance, 500));

@@ -59,12 +59,11 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
         setInputPosition(QPoint(0, 0));
     } else if (Qt::RightButton == event->button()) {
         // disable rotating when in slice view
-        setInputState(QDataVis::InputRotating);
+        if (!scene()->isSlicingActivated())
+            setInputState(QDataVis::InputRotating);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
-    // TODO: Call actual camera class when it's been written.
-    //m_cameraHelper->updateMousePos(m_mousePos);}
 }
 
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
@@ -80,8 +79,8 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-    if (QDataVis::InputRotating == inputState()) {
 
+    if (QDataVis::InputRotating == inputState()) {
         // Calculate mouse movement since last frame
         QPointF rotations = scene()->camera()->rotations();
         GLfloat xRotation = rotations.x();
