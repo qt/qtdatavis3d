@@ -808,6 +808,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     if (QDataVis::ModeSliceRow == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
+                        item.setPosition(QPoint(row, bar));
                         if (selectionDirty)
                             m_sliceSelection->append(&item);
                     }
@@ -819,6 +820,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
                     if (QDataVis::ModeSliceColumn == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
+                        item.setPosition(QPoint(row, bar));
                         if (selectionDirty)
                             m_sliceSelection->append(&item);
                     }
