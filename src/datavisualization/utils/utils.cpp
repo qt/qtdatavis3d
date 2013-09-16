@@ -44,80 +44,6 @@ QVector3D Utils::vectorFromColor(const QColor &color)
     return QVector3D(color.redF(), color.greenF(), color.blueF());
 }
 
-void Utils::printText(QPainter *painter, const QString &text, const QSize &position,
-                      bool absoluteCoords, qreal rotation, qreal scale)
-{
-    painter->save();
-    painter->setCompositionMode(QPainter::CompositionMode_Source);
-    painter->setPen(Qt::black); // TODO: Use black, as nothing works
-    QFont bgrFont = QFont(QStringLiteral("Arial"), 17);
-    QFont valueFont = QFont(QStringLiteral("Arial"), 11);
-    valueFont.setBold(true);
-    painter->setFont(bgrFont);
-    QFontMetrics valueFM(valueFont);
-    QFontMetrics bgrFM(bgrFont);
-    int valueStrLen = valueFM.width(text);
-    int bgrStrLen = 0;
-    int bgrHeight = valueFM.height() + 8;
-    QString bgrStr = QString();
-    do {
-        bgrStr.append(QStringLiteral("I"));
-        bgrStrLen = bgrFM.width(bgrStr);
-    } while (bgrStrLen <= (valueStrLen + 8));
-#if 0
-    // Hack solution, as drawRect doesn't work
-    painter->drawText(position.width() - (bgrStrLen / 2),
-                      position.height() - bgrHeight,
-                      bgrStrLen, bgrHeight,
-                      Qt::AlignCenter | Qt::AlignVCenter,
-                      bgrStr);
-    //painter->setPen(d_ptr->m_textColor);
-    painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
-    painter->setFont(valueFont);
-    painter->drawText(position.width() - (valueStrLen / 2),
-                      position.height() - bgrHeight,
-                      valueStrLen, bgrHeight,
-                      Qt::AlignCenter | Qt::AlignVCenter,
-                      text);
-#else
-    //qDebug() << painter->window() << painter->viewport();
-    painter->scale(scale, scale);
-    if (absoluteCoords) {
-        // This assumes absolute screen coordinates
-        painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * qCos(qDegreesToRadians(rotation)))
-                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
-                           position.height()
-                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
-                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
-    } else {
-        // This calculates y as a distance from screen bottom
-        painter->translate(position.width() - (((float)bgrStrLen / 2.0f)
-                                               * qCos(qDegreesToRadians(rotation)))
-                           + (((float)bgrHeight / 2.0f) * qSin(qDegreesToRadians(rotation))),
-                           painter->window().height() - position.height()
-                           - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
-                              + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation)))));
-    }
-    //qDebug() << painter->window().height() - position.height()
-    //            - ((((float)bgrHeight / 2.0f) * qCos(qDegreesToRadians(rotation)))
-    //               + (((float)bgrStrLen / 2.0f) * qSin(qDegreesToRadians(rotation))));
-    painter->rotate(rotation);
-    painter->drawText(0, 0,
-                      bgrStrLen, bgrHeight,
-                      Qt::AlignCenter | Qt::AlignVCenter,
-                      bgrStr);
-    painter->setPen(Qt::lightGray); // TODO: Use lightGray, as nothing works
-    painter->setFont(valueFont);
-    painter->drawText(6, 0,
-                      valueStrLen, bgrHeight,
-                      Qt::AlignCenter | Qt::AlignVCenter,
-                      text);
-    painter->resetTransform();
-#endif
-    painter->restore();
-}
-
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
                                const QColor &txtColor, QDataVis::LabelTransparency transparency,
                                int maxLabelWidth)
@@ -138,10 +64,11 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     // Android can't handle textures with dimensions not in power of 2. Resize labels accordingly.
     // Add some padding before converting to power of two to avoid too tight fit
     GLuint prePadding = 5;
-    // Android needs to use this always because of the power of 2 -issue.
-    valueStrWidth = maxLabelWidth;
+    // Android needs to use this always (when given) because of the power of 2 -issue.
+    if (maxLabelWidth)
+        valueStrWidth = maxLabelWidth;
     labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
-    //qDebug() << "label size before padding" << labelSize;
+    //qDebug() << "label size before padding" << text << labelSize;
     labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
     labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
