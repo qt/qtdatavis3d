@@ -278,16 +278,24 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
 #if 0
-        QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
-        QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item->height();
+        QVector3D baseColor;
+        if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
+            baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
+        else if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
+            baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
+        else
+            baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
 
+        QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item->height();
         QVector3D barColor = baseColor + heightColor;
-        if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
-            barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
 #else
-        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+        QVector3D barColor;
         if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
             barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
+        else if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
+            barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
+        else
+            barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
 #endif
 
         if (item->height() != 0) {
