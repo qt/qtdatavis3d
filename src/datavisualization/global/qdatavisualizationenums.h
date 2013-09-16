@@ -92,7 +92,15 @@ public:
         ThemeBrownSand,
         ThemeDark,
         ThemeHighContrast,
-        ThemeLight
+        ThemeLight,
+        ThemeQt,
+        ThemePrimaryColors,
+        ThemeDigia,
+        ThemeStoneMoss,
+        ThemeArmyBlue,
+        ThemeRetro,
+        ThemeEbony,
+        ThemeIsabelle
     };
 
     enum SelectionMode {

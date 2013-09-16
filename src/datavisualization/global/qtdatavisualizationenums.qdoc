@@ -68,7 +68,7 @@
     Predefined positions for camera.
 
     \value NoPreset
-           Used only in QML to indicate a preset has not been set.
+           Used to indicate a preset has not been set, or the scene has been rotated freely.
     \value PresetFrontLow
     \value PresetFront
     \value PresetFrontHigh
@@ -113,6 +113,14 @@
     \value ThemeDark
     \value ThemeHighContrast
     \value ThemeLight
+    \value ThemeQt
+    \value ThemePrimaryColors
+    \value ThemeDigia
+    \value ThemeStoneMoss
+    \value ThemeArmyBlue
+    \value ThemeRetro
+    \value ThemeEbony
+    \value ThemeIsabelle
 */
 
 /*!

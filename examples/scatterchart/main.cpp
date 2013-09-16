@@ -61,6 +61,14 @@ int main(int argc, char **argv)
     themeList->addItem(QStringLiteral("Dark"));
     themeList->addItem(QStringLiteral("High Contrast"));
     themeList->addItem(QStringLiteral("Light"));
+    themeList->addItem(QStringLiteral("Qt"));
+    themeList->addItem(QStringLiteral("Primary Colors"));
+    themeList->addItem(QStringLiteral("Digia"));
+    themeList->addItem(QStringLiteral("Stone Moss"));
+    themeList->addItem(QStringLiteral("Army Blue"));
+    themeList->addItem(QStringLiteral("Retro"));
+    themeList->addItem(QStringLiteral("Ebony"));
+    themeList->addItem(QStringLiteral("Isabelle"));
     themeList->setCurrentIndex(4);
 
     QPushButton *labelButton = new QPushButton(widget);
