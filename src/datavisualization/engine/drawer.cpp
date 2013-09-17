@@ -216,31 +216,30 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         break;
     }
     case LabelOver: {
-        float mod = 0.1f;
+        float mod = 0.3f;
         if (itemHeight < 0)
-            mod = -0.1f;
-        yPosition = item.translation().y() - (positionComp.y() / 2.0f - 0.2f)
-                + itemHeight + mod;
+            mod = 0.15f;
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight + mod;
         break;
     }
     case LabelBottom: {
-        yPosition = -1.95f; // TODO: Calculate from scene
+        yPosition = -2.95f + positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelTop: {
-        yPosition = 1.95f; // TODO: Calculate from scene
+        yPosition = 2.95f - positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelLeft: {
         yPosition = 0.0f;
-        xPosition = -2.5f; // TODO: Calculate from scene
+        xPosition = -2.95f;
         break;
     }
     case LabelRight: {
         yPosition = 0.0f;
-        xPosition = 2.5f; // TODO: Calculate from scene
+        xPosition = 2.95f;
         break;
     }
     }
