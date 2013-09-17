@@ -96,9 +96,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 
     QMatrix4x4 itModelMatrix;
 
-    // Calculate view matrix
-    //TODO: m_autoScaleAdjustment
-    camera->updateViewMatrix(1.0f);
+    // Get view matrix
     QMatrix4x4 viewMatrix = camera->viewMatrix();
 
     itModelMatrix.scale(m_scale);
