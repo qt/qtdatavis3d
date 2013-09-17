@@ -19,6 +19,8 @@
 //! [3]
 #include <QtDataVisualization>
 
+using namespace QtDataVisualization;
+
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
@@ -29,8 +31,8 @@ int main(int argc, char **argv)
     //! [1]
     QScatterDataArray data;
     data << QVector3D(1.0f, 0.5f, 1.0f) << QVector3D(-1.0f, -0.5f, -1.0f) << QVector3D(0.5f, 0.0f, 0.0f);
-    scatter->dataProxy()->addItems(data);
-   //! [1]
+    scatter->activeDataProxy()->addItems(data);
+    //! [1]
     //! [2]
     scatter->show();
     //! [2]

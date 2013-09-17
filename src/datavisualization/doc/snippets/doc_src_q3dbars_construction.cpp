@@ -19,6 +19,8 @@
 //! [3]
 #include <QtDataVisualization>
 
+using namespace QtDataVisualization;
+
 int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
@@ -30,7 +32,7 @@ int main(int argc, char **argv)
     //! [1]
     QBarDataRow data;
     data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
-    bars->dataProxy()->addRow(&data);
+    bars->activeDataProxy()->addRow(&data);
     //! [1]
     //! [2]
     bars->show();
