@@ -36,6 +36,7 @@ public:
 
     QStringList categoryLabels() const;
 
+
 public slots:
     void setCategoryLabels(const QStringList &labels);
 

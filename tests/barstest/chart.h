@@ -62,12 +62,15 @@ public:
     void setSpacingSpecsZ(int spacing);
     void setSampleCountX(int samples);
     void setSampleCountZ(int samples);
+    void setMinX(int min);
+    void setMinZ(int min);
     void start();
     void restart(bool dynamicData);
     void selectBar();
     void swapAxis();
     void releaseAxes();
     void releaseProxies();
+    void createMassiveArray();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -81,11 +84,11 @@ private:
     Q3DBars *m_chart;
     int m_columnCount;
     int m_rowCount;
-    float m_xRotation;
-    float m_yRotation;
+    qreal m_xRotation;
+    qreal m_yRotation;
     bool m_static;
-    float m_barSpacingX;
-    float m_barSpacingZ;
+    qreal m_barSpacingX;
+    qreal m_barSpacingZ;
     int m_fontSize;
     int m_segments;
     int m_subSegments;

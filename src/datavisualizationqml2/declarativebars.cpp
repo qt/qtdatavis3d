@@ -82,11 +82,6 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     return node;
 }
 
-void DeclarativeBars::setDataWindow(int rowCount, int columnCount)
-{
-    m_shared->setDataWindow(rowCount, columnCount);
-}
-
 void DeclarativeBars::setBarColor(const QColor &baseColor, bool uniform)
 {
     m_shared->setObjectColor(baseColor, uniform);
@@ -297,26 +292,6 @@ void DeclarativeBars::setShadowQuality(QDataVis::ShadowQuality quality)
 QDataVis::ShadowQuality DeclarativeBars::shadowQuality()
 {
     return m_shared->shadowQuality();
-}
-
-int DeclarativeBars::rows() const
-{
-    return m_shared->rowCount();
-}
-
-void DeclarativeBars::setRows(int rows)
-{
-    setDataWindow(rows, columns());
-}
-
-int DeclarativeBars::columns() const
-{
-    return m_shared->columnCount();
-}
-
-void DeclarativeBars::setColumns(int columns)
-{
-    setDataWindow(rows(), columns);
 }
 
 void DeclarativeBars::setItemLabelFormat(const QString &format)

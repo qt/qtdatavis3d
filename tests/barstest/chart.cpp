@@ -30,11 +30,11 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     : m_chart(barchart),
       m_columnCount(21),
       m_rowCount(21),
-      m_xRotation(0.0f),
-      m_yRotation(0.0f),
+      m_xRotation(0.0),
+      m_yRotation(0.0),
       m_static(true),
-      m_barSpacingX(0.1f),
-      m_barSpacingZ(0.1f),
+      m_barSpacingX(0.1),
+      m_barSpacingZ(0.1),
       m_fontSize(20),
       m_segments(4),
       m_subSegments(3),
@@ -54,7 +54,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
 {
     // Generate generic labels
     QStringList genericColumnLabels;
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
         if (i % 5)
             genericColumnLabels << QString();
         else
@@ -80,9 +80,10 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_fixedRangeAxis->setRange(0.0, 100.0);
 
     m_genericRowAxis->setTitle("Generic Row");
+    m_genericRowAxis->setRange(0, m_rowCount - 1);
 
     m_genericColumnAxis->setTitle("Generic Column");
-    m_genericColumnAxis->setCategoryLabels(genericColumnLabels);
+    m_genericColumnAxis->setRange(0, m_columnCount - 1);
 
     m_temperatureAxis->setTitle("Average temperature");
     m_temperatureAxis->setSegmentCount(m_segments);
@@ -106,6 +107,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+    m_genericData->setColumnLabels(genericColumnLabels);
 
     m_chart->addDataProxy(m_temperatureData);
     m_chart->addDataProxy(m_genericData);
@@ -138,7 +140,6 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_yearAxis);
         m_chart->setColumnAxis(m_monthAxis);
 
-        m_chart->setDataWindow(m_years.size(), m_months.size());
         m_chart->setSelectionMode(QDataVis::ModeItem);
     } else {
         m_chart->setActiveDataProxy(m_genericData);
@@ -149,7 +150,6 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_genericRowAxis);
         m_chart->setColumnAxis(m_genericColumnAxis);
 
-        m_chart->setDataWindow(m_rowCount, m_columnCount);
         m_chart->setSelectionMode(QDataVis::ModeItem);
     }
 }
@@ -205,18 +205,54 @@ void ChartModifier::releaseProxies()
     m_chart->releaseDataProxy(m_genericData);
 }
 
+void ChartModifier::createMassiveArray()
+{
+    const int arrayDimension = 1000;
+    QTime timer;
+    timer.start();
+
+    QStringList genericColumnLabels;
+    for (int i = 0; i < arrayDimension; i++) {
+        if (i % 5)
+            genericColumnLabels << QString();
+        else
+            genericColumnLabels << QStringLiteral("Column %1").arg(i);
+    }
+
+    QStringList genericRowLabels;
+    for (int i = 0; i < arrayDimension; i++) {
+        if (i % 5)
+            genericRowLabels << QString();
+        else
+            genericRowLabels << QStringLiteral("Row %1").arg(i);
+    }
+
+    QBarDataArray *dataArray = new QBarDataArray;
+    dataArray->reserve(arrayDimension);
+    for (int i = 0; i < arrayDimension; i++) {
+        QBarDataRow *dataRow = new QBarDataRow(arrayDimension);
+        for (int j = 0; j < arrayDimension; j++)
+            (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % 100));
+        dataArray->append(dataRow);
+    }
+
+    m_chart->activeDataProxy()->resetArray(dataArray, genericRowLabels, genericColumnLabels);
+
+    qDebug() << "Created Massive Array (" << arrayDimension << "), time:" << timer.elapsed();
+}
+
 void ChartModifier::resetTemperatureData()
 {
 
     // Set up data
-    static const float temp[7][12] = {
-        {-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
-        {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
-        {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
-        {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
-        {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
-        {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
-        {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}      // 2012
+    static const qreal temp[7][12] = {
+        {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2006
+        {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2007
+        {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2008
+        {-7.8, -8.8, -4.2, 0.7, 9.3, 13.2, 15.8, 15.5, 11.2, 0.6, 0.7, -8.4},      // 2009
+        {-14.4, -12.1, -7.0, 2.3, 11.0, 12.6, 18.8, 13.8, 9.4, 3.9, -5.6, -13.0},  // 2010
+        {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2},     // 2011
+        {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
     };
 
     // Create data rows
@@ -248,8 +284,8 @@ static int changeCounter = 0;
 void ChartModifier::addRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (float i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+    for (qreal i = 0; i < m_columnCount; i++)
+        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % 100));
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     QString label = QStringLiteral("Add %1").arg(addCounter++);
@@ -275,8 +311,8 @@ void ChartModifier::addRows()
 void ChartModifier::insertRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (float i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % 100));
+    for (qreal i = 0; i < m_columnCount; i++)
+        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % 100));
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBarPos.x(), 0);
@@ -509,24 +545,34 @@ void ChartModifier::setSpecsRatio(int barwidth)
 
 void ChartModifier::setSpacingSpecsX(int spacing)
 {
-    m_barSpacingX = (float)spacing / 100.0f;
+    m_barSpacingX = (qreal)spacing / 100.0;
     m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSpacingSpecsZ(int spacing)
 {
-    m_barSpacingZ = (float)spacing / 100.0f;
+    m_barSpacingZ = (qreal)spacing / 100.0;
     m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void ChartModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
-    m_chart->setDataWindow(m_rowCount, m_columnCount);
+    m_genericColumnAxis->setRange(m_genericRowAxis->min(), m_genericRowAxis->min() + samples - 1);
 }
 
 void ChartModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
-    m_chart->setDataWindow(m_rowCount, m_columnCount);
+    m_genericRowAxis->setRange(m_genericColumnAxis->min(), m_genericColumnAxis->min() + samples - 1);
+}
+
+void ChartModifier::setMinX(int min)
+{
+    m_genericRowAxis->setRange(min, min + m_rowCount - 1);
+}
+
+void ChartModifier::setMinZ(int min)
+{
+    m_genericColumnAxis->setRange(min, min + m_rowCount - 1);
 }

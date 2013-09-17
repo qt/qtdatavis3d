@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/q3dcategoryaxis.h>
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -66,7 +67,8 @@ MainApp::MainApp(Q3DBars *window)
       m_lowFreq(SpectrumLowFreq),
       m_highFreq(SpectrumHighFreq)
 {
-    m_chart->setDataWindow(SpectrumNumBands * 2, SpectrumNumBands);
+    m_chart->rowAxis()->setMax(SpectrumNumBands * 2);
+    m_chart->columnAxis()->setMax(SpectrumNumBands - 1);
     // Disable grid
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining explicit range

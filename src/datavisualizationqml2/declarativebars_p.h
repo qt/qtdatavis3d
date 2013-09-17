@@ -64,8 +64,6 @@ class DeclarativeBars : public QQuickItem
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(int rows READ rows WRITE setRows)
-    Q_PROPERTY(int columns READ columns WRITE setColumns)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_PROPERTY(QPointF selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
@@ -78,9 +76,6 @@ class DeclarativeBars : public QQuickItem
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
-
-    // how many samples per row and column
-    Q_INVOKABLE void setDataWindow(int rowCount, int columnCount);
 
     // Set color if you don't want to use themes. Set uniform to false if you want the (height)
     // color to change from bottom to top
@@ -158,12 +153,6 @@ public:
     // Adjust shadow quality
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality();
-
-    int rows() const;
-    void setRows(int rows);
-
-    int columns() const;
-    void setColumns(int columns);
 
     void setItemLabelFormat(const QString &format);
     QString itemLabelFormat();

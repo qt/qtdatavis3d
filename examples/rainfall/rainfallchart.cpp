@@ -100,9 +100,6 @@ void RainfallChart::updateYearsList(int start, int end)
         m_years << QString::number(i);
 
     m_rowCount = m_years.size();
-
-    // Set up sample space; make it match actual resolved data size
-    m_chart->setDataWindow(m_rowCount, m_columnCount);
 }
 
 void RainfallChart::addDataSet()

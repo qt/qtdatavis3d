@@ -32,8 +32,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Bars3DController::Bars3DController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_rowCount(10),
-      m_columnCount(10),
       m_selectedBarPos(noSelectionPoint()),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
@@ -81,11 +79,6 @@ void Bars3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
-    if (m_changeTracker.sampleSpaceChanged) {
-        m_renderer->updateSampleSpace(m_rowCount, m_columnCount);
-        m_changeTracker.sampleSpaceChanged = false;
-    }
-
     if (m_changeTracker.barSpecsChanged) {
         m_renderer->updateBarSpecs(m_barThicknessRatio, m_barSpacing, m_isBarSpecRelative);
         m_changeTracker.barSpecsChanged = false;
@@ -133,7 +126,7 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, this,
                      &Bars3DController::handleDataColumnLabelsChanged);
 
-    adjustValueAxisRange();
+    adjustAxisRanges();
 
     // Always clear selection on proxy change
     setSelectedBarPos(noSelectionPoint());
@@ -145,7 +138,7 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 void Bars3DController::handleArrayReset()
 {
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
     // Clear selection unless still valid
     setSelectedBarPos(m_selectedBarPos);
@@ -156,10 +149,9 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
 }
@@ -168,10 +160,9 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
 }
@@ -180,10 +171,9 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
 
     // Clear selection unless still valid
@@ -196,10 +186,9 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
 }
@@ -208,10 +197,9 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     Q_UNUSED(rowIndex)
     Q_UNUSED(columnIndex)
-    // TODO check if affects data window
     // TODO should update slice instead of deactivating?
     scene()->setSlicingActivated(false);
-    adjustValueAxisRange();
+    adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
 }
@@ -220,8 +208,9 @@ void Bars3DController::handleDataRowLabelsChanged()
 {
     if (m_axisX && m_data) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
-        // TODO once axis controls data window, this needs to change
-        QStringList subList = static_cast<QBarDataProxy *>(m_data)->rowLabels().mid(0, m_rowCount);
+        int min = int(m_axisX->min());
+        int count = int(m_axisX->max()) - min + 1;
+        QStringList subList = static_cast<QBarDataProxy *>(m_data)->rowLabels().mid(min, count);
         static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
     }
 }
@@ -230,8 +219,9 @@ void Bars3DController::handleDataColumnLabelsChanged()
 {
     if (m_axisZ && m_data) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
-        // TODO once axis controls data window, this needs to change
-        QStringList subList = static_cast<QBarDataProxy *>(m_data)->columnLabels().mid(0, m_columnCount);
+        int min = int(m_axisZ->min());
+        int count = int(m_axisZ->max()) - min + 1;
+        QStringList subList = static_cast<QBarDataProxy *>(m_data)->columnLabels().mid(min, count);
         static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
     }
 }
@@ -253,7 +243,7 @@ void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
-    adjustValueAxisRange();
+    adjustAxisRanges();
 }
 
 QPoint Bars3DController::noSelectionPoint()
@@ -272,6 +262,25 @@ void Bars3DController::setAxisZ(Q3DAbstractAxis *axis)
 {
     Abstract3DController::setAxisZ(axis);
     handleDataColumnLabelsChanged();
+}
+
+void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
+{
+    // Data window changed
+    if (sender == m_axisX || sender == m_axisZ) {
+        // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
+        scene()->setSlicingActivated(false);
+
+        // Clear selection unless still valid
+        setSelectedBarPos(m_selectedBarPos);
+
+        if (sender == m_axisX)
+            handleDataRowLabelsChanged();
+        if (sender == m_axisZ)
+            handleDataColumnLabelsChanged();
+    }
+
+    Abstract3DController::handleAxisRangeChangedBySender(sender);
 }
 
 void Bars3DController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)
@@ -319,29 +328,6 @@ void Bars3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
     Abstract3DController::setMeshFileName(objFile);
 }
 
-// TODO: This sets data window. Needs more parameters, now assumes window always starts at 0,0.
-void Bars3DController::setDataWindow(int rowCount, int columnCount)
-{
-    // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-    scene()->setSlicingActivated(false);
-
-    m_rowCount = rowCount;
-    m_columnCount = columnCount;
-
-    adjustValueAxisRange();
-
-    // Clear selection unless still valid
-    setSelectedBarPos(m_selectedBarPos);
-
-    m_changeTracker.sampleSpaceChanged = true;
-    m_isDataDirty = true; // Render item array is recreated in renderer
-
-    handleDataRowLabelsChanged();
-    handleDataColumnLabelsChanged();
-
-    emitNeedRender();
-}
-
 void Bars3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
     // Disable zoom if selection mode changes
@@ -353,13 +339,19 @@ void Bars3DController::setSelectedBarPos(const QPoint &position)
 {
     // If the selection is outside data window or targets non-existent
     // bar, clear selection instead.
-    // TODO this will break once data window offset is implemented
     QPoint pos = position;
-    if (pos.x() < 0 || pos.y() < 0
-            || pos.x() >= static_cast<QBarDataProxy *>(m_data)->rowCount()
-            || pos.y() >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()
-            || pos.x() >= m_rowCount || pos.y() >= m_columnCount) {
-        pos = noSelectionPoint();
+
+    if (pos != noSelectionPoint()) {
+        int minRow = int(m_axisX->min());
+        int maxRow = int(m_axisX->max());
+        int minCol = int(m_axisZ->min());
+        int maxCol = int(m_axisZ->max());
+
+        if (pos.x() < minRow || pos.x() > maxRow || pos.y() < minCol || pos.y() > maxCol
+                || pos.x() + minRow >= static_cast<QBarDataProxy *>(m_data)->rowCount()
+                || pos.y() + minCol >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()) {
+            pos = noSelectionPoint();
+        }
     }
 
     if (pos != m_selectedBarPos) {
@@ -375,23 +367,37 @@ QPoint Bars3DController::selectedBarPos() const
     return m_selectedBarPos;
 }
 
-int Bars3DController::columnCount()
+void Bars3DController::adjustAxisRanges()
 {
-    return m_columnCount;
-}
+    const QBarDataProxy *proxy = static_cast<QBarDataProxy *>(m_data);
+    const QBarDataArray *array = proxy->array();
 
-int Bars3DController::rowCount()
-{
-    return m_rowCount;
-}
+    Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
+    if (categoryAxisX && categoryAxisX->isAutoAdjustRange() && proxy) {
+        int rowCount = proxy->rowCount();
+        if (rowCount)
+            rowCount--;
+        categoryAxisX->dptr()->setRange(0.0, qreal(rowCount));
+    }
 
-void Bars3DController::adjustValueAxisRange()
-{
+    Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
+    if (categoryAxisZ && categoryAxisZ->isAutoAdjustRange() && proxy) {
+        int columnCount = 0;
+        for (int i = 0; i < array->size(); i++) {
+            if (columnCount < array->at(i)->size())
+                columnCount = array->at(i)->size();
+        }
+        if (columnCount)
+            columnCount--;
+        categoryAxisZ->dptr()->setRange(0.0, qreal(columnCount));
+    }
+
     Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
-    if (valueAxis && valueAxis->isAutoAdjustRange() && m_data) {
-        QPair<GLfloat, GLfloat> limits =
-                static_cast<QBarDataProxy *>(m_data)->dptr()->limitValues(0, m_rowCount,
-                                                                          0, m_columnCount);
+    if (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange() && proxy) {
+        QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisX->min(),
+                                                                    categoryAxisX->max(),
+                                                                    categoryAxisZ->min(),
+                                                                    categoryAxisZ->max());
         if (limits.first < 0) {
             // TODO: Currently we only support symmetric y-axis for bar chart if there are negative values
             qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));

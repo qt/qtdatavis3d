@@ -231,7 +231,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty point Bars3D::selectedBarPos
- * Position of the selected bar, if any. Only one bar can be selected at a time.
+ * Position of the selected bar in data window. Only one bar can be selected at a time.
  * To clear selection, specify an illegal position, e.g. Qt.point(-1.0, -1.0).
  */
 
@@ -405,23 +405,6 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * Set up data window to \a samplesRow rows and \a samplesColumn columns. Both are preset to \c 10
- * by default.
- */
-void Q3DBars::setDataWindow(int samplesRow, int samplesColumn)
-{
-    d_ptr->m_shared->setDataWindow(samplesRow, samplesColumn);
-}
-
-/*!
- * \return size of the sample space in QSize.
- */
-QSize Q3DBars::dataWindow() const
-{
-    return QSize(d_ptr->m_shared->rowCount(), d_ptr->m_shared->columnCount());
-}
-
-/*!
  * \property Q3DBars::cameraPreset
  *
  * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
@@ -584,7 +567,8 @@ bool Q3DBars::isBackgroundVisible() const
 /*!
  * \property Q3DBars::selectedBarPos
  *
- * Selects a bar in a \a position. Only one bar can be selected at a time.
+ * Selects a bar in a \a position. The position is the position in data window.
+ * Only one bar can be selected at a time.
  * To clear selection, specify an illegal \a position, e.g. (-1, -1).
  */
 void Q3DBars::setSelectedBarPos(const QPoint &position)

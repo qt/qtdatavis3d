@@ -42,15 +42,13 @@ Item {
         anchors.right: parent.right;
 
         Bars3D {
-            id: testchart
+            id: testChart
             width: dataView.width
             height: dataView.height
             shadowQuality: Bars3D.ShadowMedium
             selectionMode: Bars3D.ModeItem
             font.pointSize: 35
             theme: Bars3D.ThemeBrownSand
-            rows: 7
-            columns: 12
             dataProxy: chartData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
@@ -71,7 +69,6 @@ Item {
                     for (var i = 0; i < totalRows; i++) {
                         var currentRowRole = chartData.model.get(i).year
                         var currentColRole = chartData.model.get(i).month
-                        console.log(currentRowRole, currentColRole)
                         if (currentRowRole === rowRole && currentColRole === colRole) {
                             tableView.currentRow = i
                             break
@@ -97,7 +94,7 @@ Item {
         onCurrentRowChanged: {
             var rowIndex = chartData.proxy.activeMapping.rowCategoryIndex(chartData.model.get(currentRow).year)
             var colIndex = chartData.proxy.activeMapping.columnCategoryIndex(chartData.model.get(currentRow).month)
-            testchart.selectedBarPos = Qt.point(rowIndex, colIndex)
+            testChart.selectedBarPos = Qt.point(rowIndex, colIndex)
         }
     }
 
@@ -110,11 +107,11 @@ Item {
             if (chartData.mapping.valueRole === "expenses") {
                 chartData.mapping.valueRole = "income"
                 text = "Show Expenses"
-                testchart.valueAxis = chartAxes.income
+                testChart.valueAxis = chartAxes.income
             } else {
                 chartData.mapping.valueRole = "expenses"
                 text = "Show Income"
-                testchart.valueAxis = chartAxes.expenses
+                testChart.valueAxis = chartAxes.expenses
             }
         }
     }
@@ -125,11 +122,11 @@ Item {
         width: tableView.width
         text: "Hide Shadows"
         onClicked: {
-            if (testchart.shadowQuality == Bars3D.ShadowNone) {
-                testchart.shadowQuality = Bars3D.ShadowMedium;
+            if (testChart.shadowQuality == Bars3D.ShadowNone) {
+                testChart.shadowQuality = Bars3D.ShadowMedium;
                 text = "Hide Shadows"
             } else {
-                testchart.shadowQuality = Bars3D.ShadowNone;
+                testChart.shadowQuality = Bars3D.ShadowNone;
                 text = "Show Shadows"
             }
         }
@@ -139,19 +136,17 @@ Item {
         id: dataToggle
         anchors.bottom: shadowToggle.top
         width: tableView.width
-        text: "Show 2000 - 2002"
+        text: "Show 2010 - 2012"
         onClicked: {
-            if (testchart.rows !== 7) {
-                text = "Show 2000 - 2002"
+            if (testChart.rowAxis.max !== 6) {
+                text = "Show 2010 - 2012"
                 chartData.mapping.autoRowCategories = true
-                testchart.rows = 7;
             } else {
-                testchart.rows = 3;
                 text = "Show all years"
                 // Explicitly defining row categories, since we do not want to show data for
                 // all years in the model, just for the selected ones.
                 chartData.mapping.autoRowCategories = false
-                chartData.mapping.rowCategories = ["2000", "2001", "2002"]
+                chartData.mapping.rowCategories = ["2010", "2011", "2012"]
             }
         }
     }

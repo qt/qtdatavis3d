@@ -23,6 +23,17 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+const int minZoomLevel         = 10;
+const int halfSizeZoomLevel    = 50;
+const int oneToOneZoomLevel    = 100;
+const int maxZoomLevel         = 500;
+
+const int nearZoomRangeDivider = 12;
+const int midZoomRangeDivider  = 60;
+const int farZoomRangeDivider  = 120;
+
+const qreal rotationSpeed    = 100.0;
+
 Q3DInputHandler::Q3DInputHandler(QObject *parent) :
     QAbstract3DInputHandler(parent)
 {

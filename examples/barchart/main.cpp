@@ -169,9 +169,6 @@ void ChartDataGenerator::setupModel()
             m_tableWidget->model()->setData(index, hours[week][day]);
         }
     }
-
-    // Set up sample space based on prepared data
-    m_chart->setDataWindow(weeks.size(), days.size());
 }
 
 void ChartDataGenerator::addRow()

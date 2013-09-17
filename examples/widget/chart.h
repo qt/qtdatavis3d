@@ -59,8 +59,8 @@ signals:
 
 private:
     Q3DBars *m_chart;
-    float m_xRotation;
-    float m_yRotation;
+    qreal m_xRotation;
+    qreal m_yRotation;
     int m_fontSize;
     int m_segments;
     int m_subSegments;

@@ -87,8 +87,12 @@ int main(int argc, char **argv)
     removeRowButton->setEnabled(false);
 
     QPushButton *removeRowsButton = new QPushButton(widget);
-    removeRowsButton->setText(QStringLiteral("remove three rows from selected"));
+    removeRowsButton->setText(QStringLiteral("Remove three rows from selected"));
     removeRowsButton->setEnabled(false);
+
+    QPushButton *massiveArrayButton = new QPushButton(widget);
+    massiveArrayButton->setText(QStringLiteral("Create massive array"));
+    massiveArrayButton->setEnabled(false);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -167,16 +171,29 @@ int main(int argc, char **argv)
 
     QSlider *sampleSliderX = new QSlider(Qt::Horizontal, widget);
     sampleSliderX->setTickInterval(1);
-    sampleSliderX->setMinimum(2);
-    sampleSliderX->setValue(10);
+    sampleSliderX->setMinimum(1);
+    sampleSliderX->setValue(21);
     sampleSliderX->setMaximum(200);
     sampleSliderX->setEnabled(false);
     QSlider *sampleSliderZ = new QSlider(Qt::Horizontal, widget);
     sampleSliderZ->setTickInterval(1);
-    sampleSliderZ->setMinimum(2);
-    sampleSliderZ->setValue(10);
+    sampleSliderZ->setMinimum(1);
+    sampleSliderZ->setValue(21);
     sampleSliderZ->setMaximum(200);
     sampleSliderZ->setEnabled(false);
+
+    QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
+    minSliderX->setTickInterval(1);
+    minSliderX->setMinimum(0);
+    minSliderX->setValue(0);
+    minSliderX->setMaximum(200);
+    minSliderX->setEnabled(false);
+    QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
+    minSliderZ->setTickInterval(1);
+    minSliderZ->setMinimum(0);
+    minSliderZ->setValue(0);
+    minSliderZ->setMaximum(200);
+    minSliderZ->setEnabled(false);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
@@ -205,6 +222,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(changeRowsButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeRowButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeRowsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(massiveArrayButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -227,6 +245,9 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust sample count")), 0, Qt::AlignTop);
     vLayout2->addWidget(sampleSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(sampleSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window minimums")), 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -255,6 +276,10 @@ int main(int argc, char **argv)
                      &ChartModifier::setSampleCountX);
     QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
                      &ChartModifier::setSampleCountZ);
+    QObject::connect(minSliderX, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setMinX);
+    QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
+                     &ChartModifier::setMinZ);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
@@ -283,6 +308,7 @@ int main(int argc, char **argv)
     QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::changeRows);
     QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &ChartModifier::removeRow);
     QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::removeRows);
+    QObject::connect(massiveArrayButton, &QPushButton::clicked, modifier, &ChartModifier::createMassiveArray);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changeSelectionMode);
     QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
@@ -329,9 +355,15 @@ int main(int argc, char **argv)
                      &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, removeRowsButton,
                      &QPushButton::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, massiveArrayButton,
+                     &QPushButton::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderX,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, sampleSliderZ,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderX,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderZ,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);

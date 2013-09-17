@@ -194,30 +194,21 @@ void Abstract3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.axisXRangeChanged) {
+        m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationX, m_axisX->min(),
+                                    m_axisX->max());
         m_changeTracker.axisXRangeChanged = false;
-        if (m_axisX->type() & Q3DAbstractAxis::AxisTypeValue) {
-            Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
-            m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationX,
-                                        valueAxisX->min(), valueAxisX->max());
-        }
     }
 
     if (m_changeTracker.axisYRangeChanged) {
+        m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationY, m_axisY->min(),
+                                    m_axisY->max());
         m_changeTracker.axisYRangeChanged = false;
-        if (m_axisY->type() & Q3DAbstractAxis::AxisTypeValue) {
-            Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
-            m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationY,
-                                        valueAxisY->min(), valueAxisY->max());
-        }
     }
 
     if (m_changeTracker.axisZRangeChanged) {
+        m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationZ, m_axisZ->min(),
+                                    m_axisZ->max());
         m_changeTracker.axisZRangeChanged = false;
-        if (m_axisZ->type() & Q3DAbstractAxis::AxisTypeValue) {
-            Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
-            m_renderer->updateAxisRange(Q3DAbstractAxis::AxisOrientationZ,
-                                        valueAxisZ->min(), valueAxisZ->max());
-        }
     }
 
     if (m_changeTracker.axisXSegmentCountChanged) {
@@ -989,6 +980,10 @@ void Abstract3DController::setAxisHelper(Q3DAbstractAxis::AxisOrientation orient
                      this, &Abstract3DController::handleAxisTitleChanged);
     QObject::connect(axis, &Q3DAbstractAxis::labelsChanged,
                      this, &Abstract3DController::handleAxisLabelsChanged);
+    QObject::connect(axis, &Q3DAbstractAxis::rangeChanged,
+                     this, &Abstract3DController::handleAxisRangeChanged);
+    QObject::connect(axis, &Q3DAbstractAxis::autoAdjustRangeChanged,
+                     this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
 
     if (orientation == Q3DAbstractAxis::AxisOrientationX)
         m_changeTracker.axisXTypeChanged = true;
@@ -999,25 +994,21 @@ void Abstract3DController::setAxisHelper(Q3DAbstractAxis::AxisOrientation orient
 
     handleAxisTitleChangedBySender(axis);
     handleAxisLabelsChangedBySender(axis);
+    handleAxisRangeChangedBySender(axis);
+    handleAxisAutoAdjustRangeChangedInOrientation(axis->orientation(),
+                                                  axis->isAutoAdjustRange());
 
     if (axis->type() & Q3DAbstractAxis::AxisTypeValue) {
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(axis);
-        QObject::connect(valueAxis, &Q3DValueAxis::rangeChanged,
-                         this, &Abstract3DController::handleAxisRangeChanged);
         QObject::connect(valueAxis, &Q3DValueAxis::segmentCountChanged,
                          this, &Abstract3DController::handleAxisSegmentCountChanged);
         QObject::connect(valueAxis, &Q3DValueAxis::subSegmentCountChanged,
                          this, &Abstract3DController::handleAxisSubSegmentCountChanged);
-        QObject::connect(valueAxis, &Q3DValueAxis::autoAdjustRangeChanged,
-                         this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
         QObject::connect(valueAxis, &Q3DValueAxis::labelFormatChanged,
                          this, &Abstract3DController::handleAxisLabelFormatChanged);
 
-        handleAxisRangeChangedBySender(valueAxis);
         handleAxisSegmentCountChangedBySender(valueAxis);
         handleAxisSubSegmentCountChangedBySender(valueAxis);
-        handleAxisAutoAdjustRangeChangedInOrientation(valueAxis->orientation(),
-                                                      valueAxis->isAutoAdjustRange());
         handleAxisLabelFormatChangedBySender(valueAxis);
     }
 }
@@ -1051,6 +1042,7 @@ Q3DCategoryAxis *Abstract3DController::createDefaultCategoryAxis()
     // Default category axis has no labels
     // TODO: Grid should be also hidden, but that is not currently controlled by axis.
     Q3DCategoryAxis *defaultAxis = new Q3DCategoryAxis;
+    defaultAxis->setAutoAdjustRange(true);
     defaultAxis->d_ptr->setDefaultAxis(true);
     return defaultAxis;
 }

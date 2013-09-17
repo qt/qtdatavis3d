@@ -28,38 +28,26 @@ class Q3DValueAxisPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DValueAxis : public Q3DAbstractAxis
 {
     Q_OBJECT
-    Q_PROPERTY(qreal min READ min WRITE setMin NOTIFY rangeChanged)
-    Q_PROPERTY(qreal max READ max WRITE setMax NOTIFY rangeChanged)
     Q_PROPERTY(int segmentCount READ segmentCount WRITE setSegmentCount NOTIFY segmentCountChanged)
     Q_PROPERTY(int subSegmentCount READ subSegmentCount WRITE setSubSegmentCount NOTIFY subSegmentCountChanged)
-    Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
 
 public:
     explicit Q3DValueAxis(QObject *parent = 0);
     virtual ~Q3DValueAxis();
 
-    qreal min() const;
-    qreal max() const;
     int segmentCount() const;
     int subSegmentCount() const;
-    bool isAutoAdjustRange() const;
     QString labelFormat() const;
 
 public slots:
-    void setRange(qreal min, qreal max);
-    void setMin(qreal min);
-    void setMax(qreal max);
     void setSegmentCount(int count);
     void setSubSegmentCount(int count);
-    void setAutoAdjustRange(bool autoAdjust);
     void setLabelFormat(const QString &format);
 
 signals:
-    void rangeChanged(qreal min, qreal max);
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);
-    void autoAdjustRangeChanged(bool autoAdjust);
     void labelFormatChanged(QString format);
 
 protected:

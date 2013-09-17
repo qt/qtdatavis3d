@@ -119,6 +119,8 @@ Q3DCategoryAxisPrivate::Q3DCategoryAxisPrivate(Q3DCategoryAxis *q)
     : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeCategory),
       m_labelsExplicitlySet(false)
 {
+    m_onlyPositiveValues = true;
+    m_allowMinMaxSame = true;
 }
 
 Q3DCategoryAxisPrivate::~Q3DCategoryAxisPrivate()

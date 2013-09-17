@@ -126,7 +126,6 @@ public slots:
                         bool relative = true);
     void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
-    void updateSampleSpace(int rowCount, int columnCount);
     void updateBackgroundEnabled(bool enable);
     void updateSelectedBarPos(const QPoint &position);
 

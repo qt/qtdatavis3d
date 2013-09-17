@@ -150,18 +150,49 @@ void Bars3DRenderer::initializeOpenGL()
 
 void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
 {
+    int minRow = m_axisCacheX.min();
+    int maxRow = m_axisCacheX.max();
+    int minCol = m_axisCacheZ.min();
+    int maxCol = m_axisCacheZ.max();
+    int newRows = maxRow - minRow + 1;
+    int newColumns = maxCol - minCol + 1;
+    if (newRows != m_renderItemArray.size() || newColumns != m_renderItemArray.at(0).size()) {
+        // Destroy old render items and reallocate new array
+        m_renderItemArray.clear();
+        m_renderItemArray.resize(newRows);
+        for (int i = 0; i < newRows; i++)
+            m_renderItemArray[i].resize(newColumns);
+
+        // Force update for selection related items
+        m_sliceCache = 0;
+        m_sliceTitleItem = 0;
+        if (m_sliceSelection)
+            m_sliceSelection->clear();
+
+        m_cachedColumnCount = newColumns;
+        m_cachedRowCount    = newRows;
+        // TODO: Invent foolproof max scene size formula
+        // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
+        m_maxSceneSize = 2 * qSqrt(newColumns * newRows);
+        // Calculate here and at setting bar specs
+        calculateSceneScalingFactors();
+    }
+
     // Update cached data window
     int dataRowCount = dataProxy->rowCount();
-    for (int i = 0; i < m_renderItemArray.size(); i++) {
+    int dataRowIndex = minRow;
+    for (int i = 0; i < newRows; i++) {
         int j = 0;
-        if (i < dataRowCount) {
-            const QBarDataRow *dataRow = dataProxy->rowAt(i);
-            int updateSize = qMin(dataRow->size(), m_renderItemArray[i].size());
+        if (dataRowIndex < dataRowCount) {
+            const QBarDataRow *dataRow = dataProxy->rowAt(dataRowIndex);
+            int updateSize = qMin((dataRow->size() - minCol), m_renderItemArray[i].size());
             if (dataRow) {
+                int dataColIndex = minCol;
                 for (; j < updateSize ; j++) {
-                    qreal value = dataRow->at(j).value();
+                    qreal value = dataRow->at(dataColIndex).value();
                     m_renderItemArray[i][j].setValue(value);
                     m_renderItemArray[i][j].setHeight(value / m_heightNormalizer);
+                    dataColIndex++;
                 }
             }
         }
@@ -169,6 +200,7 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
             m_renderItemArray[i][j].setValue(0.0);
             m_renderItemArray[i][j].setHeight(0.0f);
         }
+        dataRowIndex++;
     }
 
     Abstract3DRenderer::updateDataModel(dataProxy);
@@ -1489,47 +1521,26 @@ void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, const QSizeF &spacin
 void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
-    calculateHeightAdjustment();
-    // Check if we have negative values
-    if (min < 0 && !m_hasNegativeValues) {
-        m_hasNegativeValues = true;
-        // Reload background
-        loadBackgroundMesh();
 
-    } else if (min >= 0 && m_hasNegativeValues) {
-        m_hasNegativeValues = false;
-        // Reload background
-        loadBackgroundMesh();
+    if (orientation == Q3DAbstractAxis::AxisOrientationY) {
+        calculateHeightAdjustment();
+        // Check if we have negative values
+        if (min < 0 && !m_hasNegativeValues) {
+            m_hasNegativeValues = true;
+            // Reload background
+            loadBackgroundMesh();
+            emit needRender();
+        } else if (min >= 0 && m_hasNegativeValues) {
+            m_hasNegativeValues = false;
+            // Reload background
+            loadBackgroundMesh();
+            emit needRender();
+        }
+
+        // TODO Currently barchart only supports zero centered or zero minimum ranges
+        if (min > 0.0 || (min != 0.0 && (qFabs(min) != qFabs(max))))
+            qWarning() << __FUNCTION__ << "Bar chart currently properly supports only zero-centered and zero minimum ranges for Y-axis.";
     }
-
-    // TODO Currently barchart only supports zero centered or zero minimum ranges
-    if (min > 0.0 || (min != 0.0 && (qFabs(min) != qFabs(max))))
-        qWarning() << __FUNCTION__ << "Bar chart currently properly supports only zero-centered and zero minimum ranges for Y-axis.";
-}
-
-void Bars3DRenderer::updateSampleSpace(int rowCount, int columnCount)
-{
-    // Destroy old render items and reallocate new array
-    // TODO is there a way to allocate the whole array with one allocation?
-    m_renderItemArray.clear();
-    m_renderItemArray.resize(rowCount);
-    for (int i = 0; i < rowCount; i++)
-        m_renderItemArray[i].resize(columnCount);
-
-    // Force update for selection related items
-    m_sliceCache = 0;
-    m_sliceTitleItem = 0;
-    if (m_sliceSelection)
-        m_sliceSelection->clear();
-
-    m_cachedColumnCount = columnCount;
-    m_cachedRowCount    = rowCount;
-    // TODO: Invent "idiotproof" max scene size formula..
-    // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
-    m_maxSceneSize = 2 * qSqrt(columnCount * rowCount);
-    //qDebug() << "maxSceneSize" << m_maxSceneSize;
-    // Calculate here and at setting bar specs
-    calculateSceneScalingFactors();
 }
 
 void Bars3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)

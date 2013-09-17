@@ -45,21 +45,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * counts to divide the range into.
  */
 
-/*!
- * \qmlproperty real ValueAxis3D::min
- *
- * Defines the minimum value on the axis.
- * When setting this property the max is adjusted if necessary, to ensure that the range remains
- * valid.
- */
-
-/*!
- * \qmlproperty real ValueAxis3D::max
- *
- * Defines the maximum value on the axis.
- * When setting this property the min is adjusted if necessary, to ensure that the range remains
- * valid.
- */
 
 /*!
  * \qmlproperty int ValueAxis3D::segmentCount
@@ -75,13 +60,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
  * each subsegment, in addition to each segment.
  * The preset default is \c 1, and it can not be below \c 1.
- */
-
-/*!
- * \qmlproperty bool ValueAxis3D::autoAdjustRange
- *
- * Determines if the axis is to automatically calculate the range instead of setting range or
- * adjusting min or max property.
  */
 
 /*!
@@ -106,51 +84,6 @@ Q3DValueAxis::~Q3DValueAxis()
 {
 }
 
-/*!
- * Sets value range of the axis from \a min to \a max.
- * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
- */
-void Q3DValueAxis::setRange(qreal min, qreal max)
-{
-    dptr()->setRange(min, max);
-    setAutoAdjustRange(false);
-}
-
-/*!
- * \property Q3DValueAxis::min
- *
- * Defines the minimum value on the axis.
- * When setting this property the max is adjusted if necessary, to ensure that the range remains
- * valid.
- */
-void Q3DValueAxis::setMin(qreal min)
-{
-    dptr()->setMin(min);
-    setAutoAdjustRange(false);
-}
-
-/*!
- * \property Q3DValueAxis::max
- *
- * Defines the maximum value on the axis.
- * When setting this property the min is adjusted if necessary, to ensure that the range remains
- * valid.
- */
-void Q3DValueAxis::setMax(qreal max)
-{
-    dptr()->setMax(max);
-    setAutoAdjustRange(false);
-}
-
-qreal Q3DValueAxis::min() const
-{
-    return dptrc()->m_min;
-}
-
-qreal Q3DValueAxis::max() const
-{
-    return dptrc()->m_max;
-}
 
 /*!
  * \property Q3DValueAxis::segmentCount
@@ -208,27 +141,6 @@ int Q3DValueAxis::subSegmentCount() const
 }
 
 /*!
- * \property Q3DValueAxis::autoAdjustRange
- *
- * Tells the axis to automatically calculate the range instead of setting range or adjusting min or
- * max property.
- *
- * \sa setRange(), setMin(), setMax()
- */
-void Q3DValueAxis::setAutoAdjustRange(bool autoAdjust)
-{
-    if (dptr()->m_autoAdjust != autoAdjust) {
-        dptr()->m_autoAdjust = autoAdjust;
-        emit autoAdjustRangeChanged(autoAdjust);
-    }
-}
-
-bool Q3DValueAxis::isAutoAdjustRange() const
-{
-    return dptrc()->m_autoAdjust;
-}
-
-/*!
  * \property Q3DValueAxis::labelFormat
  *
  * Defines the label format to be used for the labels on this axis. Supported specifiers are:
@@ -270,11 +182,8 @@ const Q3DValueAxisPrivate *Q3DValueAxis::dptrc() const
 
 Q3DValueAxisPrivate::Q3DValueAxisPrivate(Q3DValueAxis *q)
     : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeValue),
-      m_min(0.0),
-      m_max(10.0),
       m_segmentCount(5),
       m_subSegmentCount(1),
-      m_autoAdjust(true),
       m_labelFormat(Utils::defaultLabelFormat()),
       m_labelsDirty(true)
 {
@@ -286,62 +195,32 @@ Q3DValueAxisPrivate::~Q3DValueAxisPrivate()
 
 void Q3DValueAxisPrivate::setRange(qreal min, qreal max)
 {
-    // If min >= max, we adjust ranges so that
-    // m_max becomes (min + 1.0)
-    // as axes need some kind of valid range.
-    // TODO: Make "reverse" axes work (i.e. min > max)
-    bool dirty = false;
-    if (m_min != min) {
-        m_min = min;
-        dirty = true;
-    }
-    if (m_max != max || min >= max) {
-        if (min >= max) {
-            m_max = min + 1.0;
-            qWarning() << "Warning: Tried to set invalid range for value axis."
-                          " Range automatically adjusted to a valid one:"
-                       << min << "-" << max << "-->" << m_min << "-" << m_max;
-        } else {
-            m_max = max;
-        }
-        dirty = true;
-    }
-    if (dirty) {
+    bool dirty = (min != m_min || max != m_max);
+
+    Q3DAbstractAxisPrivate::setRange(min, max);
+
+    if (dirty)
         emitLabelsChanged();
-        emit qptr()->rangeChanged(min, max);
-    }
 }
 
 void Q3DValueAxisPrivate::setMin(qreal min)
 {
-    if (m_min != min) {
-        if (min >= m_max) {
-            qreal oldMax = m_max;
-            m_max = min + 1.0;
-            qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
-                          " value axis. Maximum automatically adjusted to a valid one:"
-                       << oldMax <<  "-->" << m_max;
-        }
-        m_min = min;
+    bool dirty = (min != m_min);
+
+    Q3DAbstractAxisPrivate::setMin(min);
+
+    if (dirty)
         emitLabelsChanged();
-        emit qptr()->rangeChanged(m_min, m_max);
-    }
 }
 
 void Q3DValueAxisPrivate::setMax(qreal max)
 {
-    if (m_max != max) {
-        if (max <= m_min) {
-            qreal oldMin = m_min;
-            m_min = max - 1.0;
-            qWarning() << "Warning: Tried to set maximum to equal or smaller than minimum for"
-                          " value axis. Minimum automatically adjusted to a valid one:"
-                       << oldMin <<  "-->" << m_min;
-        }
-        m_max = max;
+    bool dirty = (max != m_max);
+
+    Q3DAbstractAxisPrivate::setMax(max);
+
+    if (dirty)
         emitLabelsChanged();
-        emit qptr()->rangeChanged(m_min, m_max);
-    }
 }
 
 void Q3DValueAxisPrivate::emitLabelsChanged()

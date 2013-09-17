@@ -42,19 +42,16 @@ public:
     Q3DValueAxisPrivate(Q3DValueAxis *q);
     virtual ~Q3DValueAxisPrivate();
 
-    void setRange(qreal min, qreal max);
-    void setMin(qreal min);
-    void setMax (qreal max);
+    virtual void setRange(qreal min, qreal max);
+    virtual void setMin(qreal min);
+    virtual void setMax (qreal max);
 
 protected:
     void emitLabelsChanged();
     virtual void updateLabels();
 
-    qreal m_min;
-    qreal m_max;
     int m_segmentCount;
     int m_subSegmentCount;
-    bool m_autoAdjust;
     QString m_labelFormat;
     bool m_labelsDirty;
 

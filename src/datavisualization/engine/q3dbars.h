@@ -57,10 +57,6 @@ public:
 
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
-    // TODO: This defines the data window, needs additional parameters startRow, startColumn
-    void setDataWindow(int samplesRow, int samplesColumn);
-    QSize dataWindow() const; // TODO: Return QRect once data window properly implemented?
-
     void setCameraPreset(QDataVis::CameraPreset preset);
     QDataVis::CameraPreset cameraPreset() const;
 

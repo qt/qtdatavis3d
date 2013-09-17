@@ -54,7 +54,7 @@ public:
     void removeRows(int rowIndex, int removeCount, bool removeLabels);
 
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount,
-                                        int columnCount);
+                                        int columnCount) const;
 
 private:
     QBarDataProxy *qptr();

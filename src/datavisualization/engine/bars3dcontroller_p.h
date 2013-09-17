@@ -41,13 +41,11 @@ class QBarDataProxy;
 
 struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
-    bool sampleSpaceChanged       : 1;
     bool barSpecsChanged          : 1;
     bool selectedBarPosChanged    : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
-        sampleSpaceChanged(true),
         barSpecsChanged(true),
         selectedBarPosChanged(true)
     {
@@ -60,10 +58,6 @@ class QT_DATAVISUALIZATION_EXPORT Bars3DController : public Abstract3DController
 
 private:
     Bars3DChangeBitField m_changeTracker;
-
-    // Data
-    int m_rowCount;
-    int m_columnCount;
 
     // Interaction
     QPoint m_selectedBarPos;     // Points to row & column in data window.
@@ -83,9 +77,6 @@ public:
     void initializeOpenGL();
     virtual void synchDataToRenderer();
 
-    int columnCount();
-    int rowCount();
-
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
     // With relative 0.0f means side-to-side, 1.0f = one thickness in between
@@ -98,9 +89,6 @@ public:
 
     // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
-
-    // how many samples per row and column, and names for axes
-    void setDataWindow(int samplesRow, int samplesColumn);
 
     // Change selection mode; single bar, bar and row, bar and column, or all
     void setSelectionMode(QDataVis::SelectionMode mode);
@@ -116,6 +104,8 @@ public:
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual void setAxisZ(Q3DAbstractAxis *axis);
+
+    virtual void handleAxisRangeChangedBySender(QObject *sender);
 
 public slots:
     void handleArrayReset();
@@ -136,7 +126,7 @@ protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
 
 private:
-    void adjustValueAxisRange();
+    void adjustAxisRanges();
 
     Q_DISABLE_COPY(Bars3DController)
 
