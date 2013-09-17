@@ -189,20 +189,24 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
     }
 
     // If data contains only one row, duplicate it to make surface
-    if (sampleSpace.height() == 1)
-        m_dataArray << m_dataArray.last();
+    if (sampleSpace.height() == 1) {
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(*m_dataArray.at(0));
+        m_dataArray << newRow;
+        sampleSpace.setHeight(2);
+    }
 
     // If data contains only one column, duplicate the value to make surface
     if (sampleSpace.width() == 1) {
         for (int i = 0; i < sampleSpace.height(); i++)
-            (*m_dataArray.at(i)) << m_dataArray.at(i)->last();
+            (*m_dataArray.at(i)) << m_dataArray.at(i)->at(0);
+        sampleSpace.setWidth(2);
     }
 
     if (m_dataArray.size() > 0) {
         if (!m_surfaceObj)
             loadSurfaceObj();
 
-        QRect sampleSpace(0, 0, m_dataArray.at(0)->size(), m_dataArray.size());
+        sampleSpace.moveTo(0, 0);
 
         bool dimensionChanged = false;
         if (m_sampleSpace != sampleSpace) {
