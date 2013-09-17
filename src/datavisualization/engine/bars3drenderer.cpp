@@ -343,50 +343,65 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                 QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, 0.0f), 0,
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelTop);
+                                m_labelObj, m_cachedScene->camera(), false, false,
+                                Drawer::LabelTop);
         }
         m_drawer->drawLabel(*dummyItem, zLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelBottom);
+                            m_labelObj, m_cachedScene->camera(), false, false,
+                            Drawer::LabelBottom);
     } else {
         m_drawer->drawLabel(*dummyItem, xLabel, viewMatrix, projectionMatrix,
                             QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelBottom);
+                            m_labelObj, m_cachedScene->camera(), false, false,
+                            Drawer::LabelBottom);
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, 0.0f), 0,
                                 m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelTop);
+                                m_labelObj, m_cachedScene->camera(), false, false,
+                                Drawer::LabelTop);
         }
     }
     m_drawer->drawLabel(*dummyItem, yLabel, viewMatrix, projectionMatrix,
                         QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                         QVector3D(0.0f, 0.0f, 90.0f), 0,
                         m_cachedSelectionMode, m_labelShader,
-                        m_labelObj, m_cachedScene->camera(), false, false, Drawer::LabelLeft);
+                        m_labelObj, m_cachedScene->camera(), false, false,
+                        Drawer::LabelLeft);
 
     // Draw labels for bars
     for (int col = 0; col < m_sliceSelection->size(); col++) {
         BarRenderItem *item = m_sliceSelection->at(col);
         // Draw values
-        m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, m_yAdjustment, zComp),
-                            QVector3D(0.0f, 0.0f, 0.0f),
-                            negativesComp * negativesComp * item->height(),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_cachedScene->camera());
+        if (negativesComp == 1.0f) {
+            m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, 0.0f, 90.0f),
+                                item->height(),
+                                m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, m_cachedScene->camera(), false, false,
+                                Drawer::LabelOver, Qt::AlignTop);
+        } else {
+            m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
+                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, 0.0f, 0.0f),
+                                negativesComp * negativesComp * item->height(),
+                                m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, m_cachedScene->camera());
+        }
 
         // Draw labels
         if (m_sliceCache->labelItems().size() > col) {
             const LabelItem *labelItem(0);
             labelItem = m_sliceCache->labelItems().at(col);
             m_drawer->drawLabel(*item, *labelItem, viewMatrix, projectionMatrix,
-                                QVector3D(0.0f, m_yAdjustment, zComp),
+                                QVector3D(0.0f, m_autoScaleAdjustment, zComp),
                                 QVector3D(0.0f, 0.0f, -45.0f), item->height(),
                                 m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, m_cachedScene->camera(), false, false,

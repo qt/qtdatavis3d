@@ -198,7 +198,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     switch (position) {
     case LabelBelow: {
-        yPosition = -1.6f; // minus maximum negative height (+ some extra for label)
+        yPosition = -2.6f + positionComp.y(); // minus maximum negative height (+ some extra for axis title label)
         break;
     }
     case LabelLow: {
@@ -250,6 +250,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     // Apply alignment
     GLfloat xAlignment = 0.0f;
+    GLfloat yAlignment = 0.0f;
     GLfloat zAlignment = 0.0f;
     switch (alignment) {
     case Qt::AlignLeft: {
@@ -266,6 +267,20 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
                 * qFabs(qSin(qDegreesToRadians(rotation.y())));
         break;
     }
+    case Qt::AlignTop: {
+        yAlignment = ((GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
+        if (itemHeight < 0)
+            yAlignment = -yAlignment;
+        break;
+    }
+    case Qt::AlignBottom: {
+        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
+                * qFabs(qCos(qDegreesToRadians(rotation.y())));
+        if (itemHeight < 0)
+            yAlignment = -yAlignment;
+        break;
+    }
     default: {
         break;
     }
@@ -280,7 +295,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Position label
-    modelMatrix.translate(xPosition + xAlignment, yPosition, zPosition + zAlignment);
+    modelMatrix.translate(xPosition + xAlignment, yPosition + yAlignment, zPosition + zAlignment);
 
     // Rotate
     // TODO: We should convert rotations to use quaternions to avoid rotation order problems
