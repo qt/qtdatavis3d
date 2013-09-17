@@ -37,7 +37,7 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
 }*/
 
 void main() {
-    highp float heightMod = coords_mdl.y + (1.0 - ambientStrength);
+    highp float heightMod = (coords_mdl.y * 0.3) + 0.7; // Add 30% black to the bottom
     highp vec3 materialDiffuseColor = heightMod * color_mdl;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);

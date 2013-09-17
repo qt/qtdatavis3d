@@ -302,7 +302,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemePrimaryColors: {
@@ -320,7 +320,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeDigia: {
@@ -338,7 +338,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeStoneMoss: {
@@ -356,7 +356,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeArmyBlue: {
@@ -374,7 +374,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeRetro: {
@@ -392,7 +392,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeEbony: {
@@ -410,7 +410,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     case QDataVis::ThemeIsabelle: {
@@ -428,7 +428,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = true;
+        m_uniformColor = false;
         break;
     }
     default:
