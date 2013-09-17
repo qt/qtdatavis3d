@@ -241,7 +241,7 @@ QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
       m_minValueColumns(0.0),
       m_maxValueColumns(0.0)
 {
-    m_itemLabelFormat = QStringLiteral("(@yLabel)");
+    m_itemLabelFormat = QStringLiteral("@yLabel (@xLabel, @zLabel)");
 }
 
 QSurfaceDataProxyPrivate::~QSurfaceDataProxyPrivate()

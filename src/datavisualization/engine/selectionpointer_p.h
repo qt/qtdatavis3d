@@ -56,7 +56,7 @@ class QT_DATAVISUALIZATION_EXPORT SelectionPointer : public QObject, protected Q
     Q_OBJECT
 
 public:
-    explicit SelectionPointer(Surface3DController *controller);
+    explicit SelectionPointer(Surface3DController *controller, Drawer *drawer);
     ~SelectionPointer();
 
     void initializeOpenGL();
@@ -64,6 +64,7 @@ public:
     void setPosition(QVector3D position);
     void setScaling(QVector3D scaling);
     void setLabel(QString label);
+    void updateLabel();
     void updateTheme(Theme theme);
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
@@ -81,7 +82,6 @@ private:
     ObjectHelper *m_pointObj;
     TextureHelper *m_textureHelper;
     bool m_isInitialized;
-    QFont m_font;
     Theme m_cachedTheme;
     QDataVis::LabelTransparency m_labelTransparency;
     LabelItem m_labelItem;
@@ -90,6 +90,7 @@ private:
     QVector3D m_position;
     QVector3D m_scale;
     Q3DScene *m_cachedScene;
+    QString m_label;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

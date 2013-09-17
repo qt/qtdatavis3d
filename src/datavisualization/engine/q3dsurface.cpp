@@ -220,7 +220,7 @@ void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DSurface::wheelEvent(QWheelEvent *event)
 {
-    Q_UNUSED(event)
+    d_ptr->m_shared->wheelEvent(event);
 }
 
 /*!
@@ -264,6 +264,40 @@ bool Q3DSurface::isBackgroundVisible() const
 }
 
 /*!
+ * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeSystem by
+ * default. Theme affects label colors, text color, background color, window color and
+ * grid color. Lighting is also adjusted by themes.
+ *
+ * \sa setObjectColor()
+ *
+ * \warning This method is subject to change.
+ */
+void Q3DSurface::setTheme(QDataVis::ColorTheme theme)
+{
+    d_ptr->m_shared->setColorTheme(theme);
+}
+
+/*!
+ * \property Q3DSurface::shadowQuality
+ *
+ * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
+ * \c QDataVis::ShadowMedium by default.
+ *
+ * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
+ * until it is successful and shadowQualityChanged signal is emitted for each time the change is
+ * done.
+ */
+void Q3DSurface::setShadowQuality(QDataVis::ShadowQuality quality)
+{
+    return d_ptr->m_shared->setShadowQuality(quality);
+}
+
+QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
+{
+    return d_ptr->m_shared->shadowQuality();
+}
+
+/*!
  * \property Q3DSurface::smoothSurfaceEnabled
  *
  * Sets surface smoothing to \a enabled. It is preset to \c false by default.
@@ -291,6 +325,37 @@ void Q3DSurface::setSurfaceGridEnabled(bool enabled)
 bool Q3DSurface::isSurfaceGridEnabled() const
 {
     return d_ptr->m_shared->surfaceGrid();
+}
+
+/*!
+ * \property Q3DSurface::font
+ *
+ * Sets the \a font for labels. It is preset to \c Arial by default.
+ */
+void Q3DSurface::setFont(const QFont &font)
+{
+    d_ptr->m_shared->setFont(font);
+}
+
+QFont Q3DSurface::font() const
+{
+    return d_ptr->m_shared->font();
+}
+
+/*!
+ * \property Q3DSurface::labelTransparency
+ *
+ * Sets label \a transparency to one of \c QDataVis::LabelTransparency. It is preset to
+ * \c QDataVis::TransparencyFromTheme by default.
+ */
+void Q3DSurface::setLabelTransparency(QDataVis::LabelTransparency transparency)
+{
+    d_ptr->m_shared->setLabelTransparency(transparency);
+}
+
+QDataVis::LabelTransparency Q3DSurface::labelTransparency() const
+{
+    return d_ptr->m_shared->labelTransparency();
 }
 
 /*!

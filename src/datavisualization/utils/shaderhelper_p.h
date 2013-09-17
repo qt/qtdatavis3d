@@ -50,6 +50,7 @@ class ShaderHelper
     void setTextures(const QString &texture, const QString &depthTexture);
 
     void initialize();
+    bool testCompile();
     void bind();
     void release();
     void setUniformValue(GLuint uniform, const QVector3D &value);

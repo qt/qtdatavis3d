@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
+#include <QFont>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -31,10 +32,14 @@ class QSurfaceDataProxy;
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
+    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
 
 public:
     explicit Q3DSurface();
@@ -47,6 +52,11 @@ public:
     // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
+
+    void setTheme(QDataVis::ColorTheme theme);
+
+    void setShadowQuality(QDataVis::ShadowQuality quality);
+    QDataVis::ShadowQuality shadowQuality() const;
 
     // Enable or disable the smoothes of the surface
     void setSmoothSurfaceEnabled(bool enabled);
@@ -74,6 +84,12 @@ public:
     void addDataProxy(QSurfaceDataProxy *proxy);
     void releaseDataProxy(QSurfaceDataProxy *proxy);
     QList<QSurfaceDataProxy *> dataProxies() const;
+
+    void setFont(const QFont &font);
+    QFont font() const;
+
+    void setLabelTransparency(QDataVis::LabelTransparency transparency);
+    QDataVis::LabelTransparency labelTransparency() const;
 
     // TODO: Do these need to be public? Where are they called from?
     // Size

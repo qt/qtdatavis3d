@@ -33,7 +33,7 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-SelectionPointer::SelectionPointer(Surface3DController *controller)
+SelectionPointer::SelectionPointer(Surface3DController *controller, Drawer *drawer)
     : QObject(controller),
       m_controller(controller),
       m_labelShader(0),
@@ -43,11 +43,13 @@ SelectionPointer::SelectionPointer(Surface3DController *controller)
       m_textureHelper(0),
       m_isInitialized(false),
       m_cachedScene(0),
-      m_font(QFont(QStringLiteral("Arial"))),
       m_labelTransparency(QDataVis::TransparencyFromTheme),
-      m_drawer(new Drawer(m_cachedTheme, m_font, m_labelTransparency))
+      m_drawer(drawer)
 {
     initializeOpenGL();
+
+    QObject::connect(m_drawer, &Drawer::drawerChanged,
+                     this, &SelectionPointer::updateLabel);
 }
 
 SelectionPointer::~SelectionPointer()
@@ -57,8 +59,6 @@ SelectionPointer::~SelectionPointer()
     delete m_labelObj;
     delete m_pointObj;
     delete m_textureHelper;
-    delete m_drawer;
-    delete m_cachedScene;
 }
 
 void SelectionPointer::initializeOpenGL()
@@ -84,9 +84,7 @@ void SelectionPointer::initializeOpenGL()
 
 void SelectionPointer::updateScene(Q3DScene *scene)
 {
-    Q_UNUSED(scene)
-    // Synchronize the scenes
-    // TODO
+    m_cachedScene = scene;
 }
 
 void SelectionPointer::render(GLuint defaultFboHandle)
@@ -106,7 +104,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     itModelMatrix.scale(m_scale);
 
     // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_font.pointSizeF() / 500.0f;
+    GLfloat scaledFontSize = 0.05f + m_drawer->font().pointSizeF() / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Set up projection matrix
@@ -208,20 +206,26 @@ void SelectionPointer::setScaling(QVector3D scaling)
 
 void SelectionPointer::setLabel(QString label)
 {
+    m_label = label;
+
     m_labelItem.clear();
 
     // Print label into a QImage
-    QImage image = Utils::printTextToImage(m_font,
+    QImage image = Utils::printTextToImage(m_drawer->font(),
                                            label,
                                            m_cachedTheme.m_textBackgroundColor,
                                            m_cachedTheme.m_textColor,
                                            m_labelTransparency);
-    //label.save("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavisualization_2\\notification.png");
 
     // Set label size
     m_labelItem.setSize(image.size());
     // Insert text texture into label (also deletes the old texture)
     m_labelItem.setTextureId(m_textureHelper->create2DTexture(image, true, true));
+}
+
+void SelectionPointer::updateLabel()
+{
+    setLabel(m_label);
 }
 
 void SelectionPointer::updateTheme(Theme theme)

@@ -86,6 +86,18 @@ void ShaderHelper::initialize()
     m_initialized = true;
 }
 
+bool ShaderHelper::testCompile()
+{
+    if (m_program)
+        delete m_program;
+    m_program = new QOpenGLShaderProgram(m_caller);
+    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, m_vertexShaderFile))
+        return false;
+    if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
+        return false;
+    return true;
+}
+
 void ShaderHelper::bind()
 {
     m_program->bind();

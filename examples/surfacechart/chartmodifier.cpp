@@ -30,7 +30,8 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
       m_xCount(10),
       m_zCount(10),
-      m_activeSample(0)
+      m_activeSample(0),
+      m_fontSize(40.0f)
 {
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
@@ -133,7 +134,6 @@ void ChartModifier::setHeightMapData(bool enable)
 
         int p = image.width() * 4 * (image.height() - 1);
         dataArray->reserve(image.height());
-        qDebug() << image.height() << image.width();
         for (int i = image.height(); i > 0; i--, p -= image.width() * 4) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(image.width());
             for (int j = 0; j < image.width(); j++)
@@ -184,6 +184,39 @@ void ChartModifier::adjustZCount(int count)
     updateSamples();
 
     qDebug() << "Z count = " << count;
+}
+
+void ChartModifier::colorPressed()
+{
+    m_chart->setGradientColorAt(0.0, Qt::blue);
+}
+
+void ChartModifier::changeFont(const QFont &font)
+{
+    QFont newFont = font;
+    newFont.setPointSizeF(m_fontSize);
+    m_chart->setFont(newFont);
+}
+
+void ChartModifier::changeTransparency()
+{
+    static int transparency = QDataVis::TransparencyNone;
+
+    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
+
+    if (++transparency > QDataVis::TransparencyNoBackground)
+        transparency = QDataVis::TransparencyNone;
+}
+
+void ChartModifier::changeTheme(int theme)
+{
+    m_chart->setTheme((QDataVis::ColorTheme)theme);
+}
+
+void ChartModifier::changeShadowQuality(int quality)
+{
+    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    m_chart->setShadowQuality(sq);
 }
 
 void ChartModifier::updateSamples()

@@ -38,21 +38,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Surface3DRenderer;
 
+struct Surface3DChangeBitField {
+    bool gradientColorChanged     : 1;
+    bool smoothStatusChanged      : 1;
+    bool surfaceGridChanged       : 1;
+
+    Surface3DChangeBitField() :
+        gradientColorChanged(true),
+        smoothStatusChanged(true),
+        surfaceGridChanged(true)
+    {
+    }
+};
+
 class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DController
 {
     Q_OBJECT
 
 private:
-    Surface3DRenderer *m_renderer;
-    QList<qreal> m_series; // TODO: TEMP
-    int m_dataWidth;
-    int m_dataDepth;
-    bool m_smoothSurface;
-    bool m_surfaceGrid;
+    Surface3DChangeBitField m_changeTracker;
 
-    GLint m_segmentCount;
-    GLfloat m_segmentStep;
-    GLfloat m_segmentMinimum;
+    // Rendering
+    Surface3DRenderer *m_renderer;
+    bool m_isSmoothSurfaceEnabled;
+    bool m_isSurfaceGridEnabled;
+    QLinearGradient m_userDefinedGradient;
 
 public:
     explicit Surface3DController(QRect rect);

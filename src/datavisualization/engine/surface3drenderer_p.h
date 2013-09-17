@@ -64,11 +64,9 @@ public:
 
     // Visual parameters
     QRect m_boundingRect;
-    Theme m_cachedTheme;
     QDataVis::LabelTransparency m_labelTransparency;
     QFont m_font;
     bool m_isGridEnabled;
-    QDataVis::ShadowQuality m_shadowQuality;
 
 private:
     // Data parameters
@@ -102,15 +100,19 @@ private:
     GLfloat m_shadowQualityToShader;
     bool m_querySelection;
     bool m_cachedSmoothSurface;
+    bool m_flatSupported;
     bool m_cachedSurfaceGridOn;
     SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
-    ScatterRenderItem m_dummyRenderItem; // Let's use scatter for dummy for now
+    AbstractRenderItem m_dummyRenderItem;
     QSurfaceDataArray m_dataArray;
     QRect m_sampleSpace;
+    GLint m_shadowQualityMultiplier;
+
+    bool m_hasHeightAdjustmentChanged;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -125,9 +127,9 @@ protected:
     virtual void loadMeshFile();
 
 public slots:
-    void updateSmoothStatus(bool enable);
+    bool updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
-    void updateSurfaceGradient();
+    void updateSurfaceGradient(const QLinearGradient &gradient);
     virtual void requestSelectionAtPoint(const QPoint &point);
 
 private:
@@ -151,6 +153,9 @@ private:
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(int id);
+    QString createSelectionLabel(qreal value, int column, int row);
+    qreal columnInRange(int column);
+    qreal rowInRange(int row);
     void surfacePointCleared();
     QVector3D normalize(float x, float y, float z);
 #if !defined(QT_OPENGL_ES_2)

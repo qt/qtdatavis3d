@@ -34,8 +34,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
-      m_smoothSurface(false),
-      m_surfaceGrid(true)
+      m_isSmoothSurfaceEnabled(false),
+      m_isSurfaceGridEnabled(true)
 {
     setActiveDataProxy(0);
 
@@ -47,6 +47,9 @@ Surface3DController::Surface3DController(QRect rect)
     setAxisZ(0);
     QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::selectionAtPoint,
                      this, &Surface3DController::handleSelectionAtPoint);
+
+    // Set the default from the theme
+    m_userDefinedGradient = theme().m_surfaceGradient;
 }
 
 Surface3DController::~Surface3DController()
@@ -73,6 +76,21 @@ void Surface3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
+    if (m_changeTracker.gradientColorChanged) {
+        m_renderer->updateSurfaceGradient(m_userDefinedGradient);
+        m_changeTracker.gradientColorChanged = false;
+    }
+
+    if (m_changeTracker.smoothStatusChanged) {
+        m_isSmoothSurfaceEnabled = m_renderer->updateSmoothStatus(m_isSmoothSurfaceEnabled);
+        m_changeTracker.smoothStatusChanged = false;
+    }
+
+    if (m_changeTracker.surfaceGridChanged) {
+        m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
+        m_changeTracker.surfaceGridChanged = false;
+    }
+
     if (m_isDataDirty) {
         m_renderer->updateDataModel(static_cast<QSurfaceDataProxy *>(m_data));
         m_isDataDirty = false;
@@ -89,26 +107,33 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
 
 void Surface3DController::setSmoothSurface(bool enable)
 {
-    m_smoothSurface = enable;
-    emit smoothStatusChanged(m_smoothSurface);
+    m_isSmoothSurfaceEnabled = enable;
+    m_changeTracker.smoothStatusChanged = true;
     emitNeedRender();
 }
 
 bool Surface3DController::smoothSurface()
 {
-    return m_smoothSurface;
+    return m_isSmoothSurfaceEnabled;
 }
 
 void Surface3DController::setSurfaceGrid(bool enable)
 {
-    m_surfaceGrid = enable;
-    emit surfaceGridChanged(m_surfaceGrid);
+    m_isSurfaceGridEnabled = enable;
+    m_changeTracker.surfaceGridChanged = true;
     emitNeedRender();
 }
 
 bool Surface3DController::surfaceGrid()
 {
-    return m_surfaceGrid;
+    return m_isSurfaceGridEnabled;
+}
+
+void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
+{
+    m_userDefinedGradient.setColorAt(pos, color);
+    m_changeTracker.gradientColorChanged = true;
+    emitNeedRender();
 }
 
 void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
@@ -136,12 +161,6 @@ void Surface3DController::handleArrayReset()
     emitNeedRender();
 }
 
-void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
-{
-    Theme t = theme();
-    t.m_surfaceGradient.setColorAt(pos, color);
-    emitNeedRender();
-}
 
 void Surface3DController::handleSelectionAtPoint(const QPoint &point)
 {

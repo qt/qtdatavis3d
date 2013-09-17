@@ -54,7 +54,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
-      m_shadowQuality(QDataVis::ShadowLow),
       m_segmentYCount(0),
       m_segmentYStep(0.0f),
       m_shader(0),
@@ -80,20 +79,27 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
       m_querySelection(false),
+      m_flatSupported(true),
       m_selectionPointer(0),
       m_selectionActive(false),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
-      m_sampleSpace(QRect(0, 0, 0, 0))
+      m_sampleSpace(QRect(0, 0, 0, 0)),
+      m_shadowQualityMultiplier(3),
+      m_hasHeightAdjustmentChanged(true)
 {
     // Listen to changes in the controller
-    QObject::connect(m_controller, &Surface3DController::smoothStatusChanged, this,
-                     &Surface3DRenderer::updateSmoothStatus);
-    QObject::connect(m_controller, &Surface3DController::surfaceGridChanged, this,
-                     &Surface3DRenderer::updateSurfaceGridStatus);
     QObject::connect(m_controller, &Surface3DController::leftMousePressed, this,
                      &Surface3DRenderer::requestSelectionAtPoint); // TODO: Possible temp
+
+    // Check if flat feature is supported
+    ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                        QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+    if (!tester.testCompile()) {
+        m_flatSupported = false;
+        m_controller->setSmoothSurface(true);
+    }
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
@@ -160,8 +166,6 @@ void Surface3DRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
-
-    updateSurfaceGradient();
 }
 
 void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
@@ -182,6 +186,16 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
         for (int j = 0; j < sampleSpace.width(); j++)
             (*newRow)[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
         m_dataArray << newRow;
+    }
+
+    // If data contains only one row, duplicate it to make surface
+    if (sampleSpace.height() == 1)
+        m_dataArray << m_dataArray.last();
+
+    // If data contains only one column, duplicate the value to make surface
+    if (sampleSpace.width() == 1) {
+        for (int i = 0; i < sampleSpace.height(); i++)
+            (*m_dataArray.at(i)) << m_dataArray.at(i)->last();
     }
 
     if (m_dataArray.size() > 0) {
@@ -247,16 +261,21 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     scene->setMainViewport(m_mainViewPort);
     scene->setUnderSideCameraEnabled(m_hasNegativeValues);
 
-    // TODO: bars have m_hasHeightAdjustmentChanged, which is always true!
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
-                                  QVector3D(0.0f, 0.0f, zComp),
-                                  QVector3D(0.0f, 1.0f, 0.0f));
+    if (m_hasHeightAdjustmentChanged) {
+        scene->camera()->setDefaultOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+                                      QVector3D(0.0f, 0.0f, zComp),
+                                      QVector3D(0.0f, 1.0f, 0.0f));
+        // For now this is used just to make things once. Proper use will come
+        m_hasHeightAdjustmentChanged = false;
+    }
 
-    // TODO: m_autoScaleAdjustment
-    scene->camera()->updateViewMatrix(1.0f);
+    scene->camera()->updateViewMatrix(m_autoScaleAdjustment);
     scene->setLightPositionRelativeToCamera(defaultLightPos);
+
+    if (m_selectionPointer)
+        m_selectionPointer->updateScene(scene);
 
     Abstract3DRenderer::updateScene(scene);
 }
@@ -264,18 +283,10 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     m_cachedScene->setUnderSideCameraEnabled(m_hasNegativeValues);
-    if (defaultFboHandle) {
-        glDepthMask(true);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }
+    // Handle GL state setup for FBO buffers and clearing of the render surface
+    Abstract3DRenderer::render(defaultFboHandle);
 
-    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
-    glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    // Draw the surface scene
     drawScene(defaultFboHandle);
 
     // If selection pointer is active, pass the render request for it also
@@ -297,9 +308,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
                                  / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
-    // Calculate view matrix TODO: m_autoScaleAdjustment
-    camera->updateViewMatrix(1.0f);
-    QMatrix4x4 viewMatrix = camera->viewMatrix();
+    // Calculate view matrix
+    QMatrix4x4 viewMatrix = m_cachedScene->camera()->viewMatrix();
 
     // Calculate flipping indicators
     if (viewMatrix.row(0).x() > 0)
@@ -377,7 +387,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Draw the triangles
         glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), m_surfaceObj->indicesType(), (void *)0);
-        //m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture, 0);
 
         // Free buffers
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -521,7 +530,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_shadowQuality > QDataVis::ShadowNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
@@ -944,11 +953,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
 }
 
-void Surface3DRenderer::updateSurfaceGradient()
+void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
 {
     QImage image(QSize(4, 100), QImage::Format_RGB32);
     QPainter pmp(&image);
-    pmp.setBrush(QBrush(m_cachedTheme.m_surfaceGradient));
+    pmp.setBrush(QBrush(gradient));
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, 4, 100);
 
@@ -1078,12 +1087,20 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_scaleZ = (coordSpace * m_sampleSpace.height()) / m_scaleFactor;
 }
 
-void Surface3DRenderer::updateSmoothStatus(bool enable)
+bool Surface3DRenderer::updateSmoothStatus(bool enable)
 {
     m_cachedSmoothSurface = enable;
+    if (!m_cachedSmoothSurface && !m_flatSupported) {
+        qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
+                      " Requires at least GLSL version 1.5.";
+        m_cachedSmoothSurface = true;
+    }
 
     if (!m_surfaceObj)
-        return;
+        return m_cachedSmoothSurface;
+
+    if (m_cachedSmoothSurface == false && !m_flatSupported)
+        m_cachedSmoothSurface = true;
 
     if (m_cachedSmoothSurface)
         m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
@@ -1091,6 +1108,8 @@ void Surface3DRenderer::updateSmoothStatus(bool enable)
         m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
 
     initSurfaceShaders();
+
+    return m_cachedSmoothSurface;
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)
@@ -1146,30 +1165,46 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    // TODO: bars uses some m_cachedShadowQuality
-    if (m_shadowQuality > QDataVis::ShadowNone && !m_mainViewPort.size().isEmpty()) {
+    if (m_cachedShadowQuality > QDataVis::ShadowNone && !m_mainViewPort.size().isEmpty()) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
-                                                             m_shadowQuality);
+                                                             m_shadowQualityMultiplier);
         if (!m_depthTexture) {
-            qDebug() << "Failed to create m_depthTexture";
-            //            switch (m_shadowQuality) {
-            //            case ShadowHigh:
-            //                qWarning("Creating high quality shadows failed. Changing to medium quality.");
-            //                (void)setShadowQuality(ShadowMedium);
-            //                break;
-            //            case ShadowMedium:
-            //                qWarning("Creating medium quality shadows failed. Changing to low quality.");
-            //                (void)setShadowQuality(ShadowLow);
-            //                break;
-            //            case ShadowLow:
-            //                qWarning("Creating low quality shadows failed. Switching shadows off.");
-            //                (void)setShadowQuality(ShadowNone);
-            //                break;
-            //            default:
-            //                // You'll never get here
-            //                break;
-            //            }
+            switch (m_cachedShadowQuality) {
+            case QDataVis::ShadowHigh:
+                qWarning("Creating high quality shadows failed. Changing to medium quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
+                updateShadowQuality(QDataVis::ShadowMedium);
+                break;
+            case QDataVis::ShadowMedium:
+                qWarning("Creating medium quality shadows failed. Changing to low quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
+                updateShadowQuality(QDataVis::ShadowLow);
+                break;
+            case QDataVis::ShadowLow:
+                qWarning("Creating low quality shadows failed. Switching shadows off.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
+                break;
+            case QDataVis::ShadowSoftHigh:
+                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftMedium);
+                updateShadowQuality(QDataVis::ShadowSoftMedium);
+                break;
+            case QDataVis::ShadowSoftMedium:
+                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftLow);
+                updateShadowQuality(QDataVis::ShadowSoftLow);
+                break;
+            case QDataVis::ShadowSoftLow:
+                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
+                break;
+            default:
+                // You'll never get here
+                break;
+            }
         }
     }
 }
@@ -1182,15 +1217,73 @@ void Surface3DRenderer::surfacePointSelected(int id)
     qreal value = m_dataArray.at(row)->at(column);
 
     if (!m_selectionPointer)
-        m_selectionPointer = new SelectionPointer(m_controller);
+        m_selectionPointer = new SelectionPointer(m_controller, m_drawer);
 
     m_selectionPointer->setPosition(normalize(float(column), value, float(row)));
     m_selectionPointer->setScaling(QVector3D(m_scaleX, 1.0f, m_scaleZ));
-    m_selectionPointer->setLabel(QString::number(value));
+    m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
     m_selectionPointer->updateBoundingRect(m_mainViewPort);
+    m_selectionPointer->updateScene(m_cachedScene);
 
     //Put the selection pointer flag active
     m_selectionActive = true;
+}
+
+QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row)
+{
+    QString labelText = itemLabelFormat();
+    static const QString xTitleTag(QStringLiteral("@xTitle"));
+    static const QString yTitleTag(QStringLiteral("@yTitle"));
+    static const QString zTitleTag(QStringLiteral("@zTitle"));
+    static const QString xLabelTag(QStringLiteral("@xLabel"));
+    static const QString yLabelTag(QStringLiteral("@yLabel"));
+    static const QString zLabelTag(QStringLiteral("@zLabel"));
+
+    labelText.replace(xTitleTag, m_axisCacheX.title());
+    labelText.replace(yTitleTag, m_axisCacheY.title());
+    labelText.replace(zTitleTag, m_axisCacheZ.title());
+
+    if (labelText.contains(xLabelTag)) {
+        QString labelFormat = m_axisCacheX.labelFormat();
+        if (labelFormat.isEmpty())
+            labelFormat = Utils::defaultLabelFormat();
+        QString valueLabelText = generateValueLabel(labelFormat, columnInRange(column));
+        labelText.replace(xLabelTag, valueLabelText);
+    }
+    if (labelText.contains(yLabelTag)) {
+        QString labelFormat = m_axisCacheY.labelFormat();
+        if (labelFormat.isEmpty())
+            labelFormat = Utils::defaultLabelFormat();
+        QString valueLabelText = generateValueLabel(labelFormat, value);
+        labelText.replace(yLabelTag, valueLabelText);
+    }
+    if (labelText.contains(zLabelTag)) {
+        QString labelFormat = m_axisCacheZ.labelFormat();
+        if (labelFormat.isEmpty())
+            labelFormat = Utils::defaultLabelFormat();
+        QString valueLabelText = generateValueLabel(labelFormat, rowInRange(row));
+        labelText.replace(zLabelTag, valueLabelText);
+    }
+
+    return labelText;
+}
+
+// Transforms the model column coordinate to axis coordinate
+qreal Surface3DRenderer::columnInRange(int column)
+{
+    // At this point we'll work only with fixed grid and demand that the user uses proper steps on
+    // value axis. Zero prevented when doing duplicate from the data.
+    qreal stepInRange = (m_axisCacheX.max() - m_axisCacheX.min()) / qreal(m_dataArray.at(0)->size() - 1);
+    return stepInRange * qreal(column) + m_axisCacheX.min();
+}
+
+// Transforms the model row coordinate to axis coordinate
+qreal Surface3DRenderer::rowInRange(int row)
+{
+    // At this point we'll work only with fixed grid and demand that the user uses proper steps on
+    // value axis. Zero prevented when doing duplicate from the data.
+    qreal stepInRange = (m_axisCacheZ.max() - m_axisCacheZ.min()) / qreal(m_dataArray.size() - 1);
+    return stepInRange * qreal(row) + m_axisCacheZ.min();
 }
 
 QVector3D Surface3DRenderer::normalize(float x, float y, float z)
@@ -1218,8 +1311,39 @@ void Surface3DRenderer::loadMeshFile()
 
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    Q_UNUSED(quality)
-    qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
+    m_cachedShadowQuality = quality;
+    switch (quality) {
+    case QDataVis::ShadowLow:
+        m_shadowQualityToShader = 33.3f;
+        m_shadowQualityMultiplier = 1;
+        break;
+    case QDataVis::ShadowMedium:
+        m_shadowQualityToShader = 100.0f;
+        m_shadowQualityMultiplier = 3;
+        break;
+    case QDataVis::ShadowHigh:
+        m_shadowQualityToShader = 200.0f;
+        m_shadowQualityMultiplier = 5;
+        break;
+    case QDataVis::ShadowSoftLow:
+        m_shadowQualityToShader = 5.0f;
+        m_shadowQualityMultiplier = 1;
+        break;
+    case QDataVis::ShadowSoftMedium:
+        m_shadowQualityToShader = 10.0f;
+        m_shadowQualityMultiplier = 3;
+        break;
+    case QDataVis::ShadowSoftHigh:
+        m_shadowQualityToShader = 15.0f;
+        m_shadowQualityMultiplier = 4;
+        break;
+    default:
+        m_shadowQualityToShader = 0.0f;
+        m_shadowQualityMultiplier = 1;
+        break;
+    }
+
+    updateDepthBuffer();
 }
 
 void Surface3DRenderer::loadLabelMesh()

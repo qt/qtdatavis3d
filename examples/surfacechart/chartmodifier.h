@@ -48,6 +48,13 @@ public:
     void adjustXCount(int count);
     void adjustZCount(int count);
     void updateSamples();
+    void colorPressed();
+    void changeFont(const QFont &font);
+    void changeTransparency();
+
+public slots:
+    void changeShadowQuality(int quality);
+    void changeTheme(int theme);
 
 private:
     Q3DSurface *m_chart;
@@ -57,6 +64,7 @@ private:
     int m_xCount;
     int m_zCount;
     int m_activeSample;
+    int m_fontSize;
 };
 
 #endif // CHARTMODIFIER_H

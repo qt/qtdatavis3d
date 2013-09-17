@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QScreen>
 #include <QPainter>
+#include <QFontComboBox>
 #include <QDebug>
 
 using namespace QtDataVisualization;
@@ -84,19 +85,19 @@ int main(int argc, char *argv[])
 
     QSlider *gridSliderX = new QSlider(Qt::Horizontal, widget);
     gridSliderX->setTickInterval(1);
-    gridSliderX->setMinimum(2);
+    gridSliderX->setMinimum(1);
     gridSliderX->setValue(10);
     gridSliderX->setMaximum(200);
     gridSliderX->setEnabled(true);
     QSlider *gridSliderZ = new QSlider(Qt::Horizontal, widget);
     gridSliderZ->setTickInterval(1);
-    gridSliderZ->setMinimum(2);
+    gridSliderZ->setMinimum(1);
     gridSliderZ->setValue(10);
     gridSliderZ->setMaximum(200);
     gridSliderZ->setEnabled(true);
 
     QLinearGradient gr(0, 0, 100, 1);
-    gr.setColorAt(0.0, Qt::green);
+    gr.setColorAt(0.0, Qt::blue);
     gr.setColorAt(0.5, Qt::yellow);
     gr.setColorAt(1.0, Qt::red);
     QPixmap pm(100, 24);
@@ -104,11 +105,36 @@ int main(int argc, char *argv[])
     pmp.setBrush(QBrush(gr));
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, 100, 24);
-    //pm.save("C:\\Users\\misalmel\\Work\\test.png", "png");
-    QPushButton *color = new QPushButton();
-    color->setIcon(QIcon(pm));
-    color->setIconSize(QSize(100, 24));
-    color->setFlat(true);
+    QPushButton *colorPB = new QPushButton();
+    colorPB->setIcon(QIcon(pm));
+    colorPB->setIconSize(QSize(100, 24));
+
+    QFontComboBox *fontList = new QFontComboBox(widget);
+    fontList->setCurrentFont(QFont("Arial"));
+
+    QPushButton *labelButton = new QPushButton(widget);
+    labelButton->setText(QStringLiteral("Change label style"));
+
+    QComboBox *themeList = new QComboBox(widget);
+    themeList->addItem(QStringLiteral("System"));
+    themeList->addItem(QStringLiteral("Blue Cerulean"));
+    themeList->addItem(QStringLiteral("Blue Icy"));
+    themeList->addItem(QStringLiteral("Blue Ncs"));
+    themeList->addItem(QStringLiteral("Brown Sand"));
+    themeList->addItem(QStringLiteral("Dark"));
+    themeList->addItem(QStringLiteral("High Contrast"));
+    themeList->addItem(QStringLiteral("Light"));
+    themeList->setCurrentIndex(4);
+
+    QComboBox *shadowQuality = new QComboBox(widget);
+    shadowQuality->addItem(QStringLiteral("None"));
+    shadowQuality->addItem(QStringLiteral("Low"));
+    shadowQuality->addItem(QStringLiteral("Medium"));
+    shadowQuality->addItem(QStringLiteral("High"));
+    shadowQuality->addItem(QStringLiteral("Low Soft"));
+    shadowQuality->addItem(QStringLiteral("Medium Soft"));
+    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->setCurrentIndex(3);
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
@@ -121,7 +147,14 @@ int main(int argc, char *argv[])
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
-    vLayout->addWidget(color);
+    vLayout->addWidget(colorPB);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout->addWidget(fontList);
+    vLayout->addWidget(labelButton);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout->addWidget(themeList);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(shadowQuality);
 
     widget->show();
 
@@ -144,37 +177,20 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::adjustXCount);
     QObject::connect(gridSliderZ, &QSlider::valueChanged,
                      modifier, &ChartModifier::adjustZCount);
+    QObject::connect(colorPB, &QPushButton::pressed,
+                     modifier, &ChartModifier::colorPressed);
+    QObject::connect(fontList, &QFontComboBox::currentFontChanged,
+                     modifier, &ChartModifier::changeFont);
+    QObject::connect(labelButton, &QPushButton::clicked,
+                     modifier, &ChartModifier::changeTransparency);
+    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
+                     modifier, SLOT(changeTheme(int)));
+    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
+                     modifier, SLOT(changeShadowQuality(int)));
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
-
-//    QList<qreal> lowList;
-//    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 15.0;
-//    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
-//    lowList << 105.0 << 170.0 << 215.0 << 240.0 << 245.0 << 240.0 << 215.0 << 170.0 << 105.0;
-//    lowList << 65.0  << 105.0 << 135.0 << 155.0 << 190.0 << 155.0 << 135.0 << 105.0 << 65.0;
-//    lowList << 15.0  << 35.0  << 55.0  << 75.0  << 80.0  << 75.0  << 55.0  << 35.0  << 16.1;
-
-//    lowList << 15.0 << 65.0  << 105.0 << 65.0  << 15.0;
-//    lowList << 35.0 << 105.0 << 170.0 << 105.0 << 35;
-//    lowList << 55.0 << 135.0 << 215.0 << 135.0 << 55;
-//    lowList << 75.0 << 155.0 << 240.0 << 155.0 << 75;
-//    lowList << 80.0 << 190.0 << 245.0 << 190.0 << 80;
-//    lowList << 75.0 << 155.0 << 240.0 << 155.0 << 75.0;
-//    lowList << 55.0 << 135.0 << 215.0 << 135.0 << 55;
-//    lowList << 35.0 << 105.0 << 170.0 << 105.0 << 35.0;
-//    lowList << 15.0 << 65.0  << 105.0 << 65.0  << 16.1;
-
-//   surfaceChart->appendSeries(lowList, 9, 5);
-
-//    QList<qreal> topList;
-//    topList << 2.1 << 2.2;
-//    surfaceChart.appendSeries(topList);
-
-//    surfaceChart.resize(screenSize.width() / 1.5, screenSize.height() / 1.5);
-//    surfaceChart.setPosition(screenSize.width() / 6, screenSize.height() / 6);
-//    surfaceChart.show();
 
     return app.exec();
 }
