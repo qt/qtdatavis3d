@@ -56,6 +56,7 @@
         <file alias="vertexSurfaceGrid">shaders/surfaceGrid.vert</file>
         <file alias="vertexSurfaceFlat">shaders/surfaceFlat.vert</file>
         <file alias="fragmentSurfaceFlat">shaders/surfaceFlat.frag</file>
+        <file alias="fragmentSurfaceES2">shaders/surface_ES2.frag</file>
     </qresource>
     <qresource prefix="/textures"/>
 </RCC>

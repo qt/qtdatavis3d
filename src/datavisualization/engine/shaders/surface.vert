@@ -1,5 +1,3 @@
-#version 120
-
 attribute highp vec3 vertexPosition_mdl;
 attribute highp vec2 vertexUV;
 attribute highp vec3 vertexNormal_mdl;

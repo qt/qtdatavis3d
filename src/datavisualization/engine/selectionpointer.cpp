@@ -42,9 +42,9 @@ SelectionPointer::SelectionPointer(Surface3DController *controller, Drawer *draw
       m_pointObj(0),
       m_textureHelper(0),
       m_isInitialized(false),
-      m_cachedScene(0),
       m_labelTransparency(QDataVis::TransparencyFromTheme),
-      m_drawer(drawer)
+      m_drawer(drawer),
+      m_cachedScene(0)
 {
     initializeOpenGL();
 
