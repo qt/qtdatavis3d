@@ -91,11 +91,6 @@ public:
     void setLabelTransparency(QDataVis::LabelTransparency transparency);
     QDataVis::LabelTransparency labelTransparency() const;
 
-    // TODO: Do these need to be public? Where are they called from?
-    // Size
-    void setWidth(const int width);
-    void setHeight(const int height);
-
 protected:
     void render();
 

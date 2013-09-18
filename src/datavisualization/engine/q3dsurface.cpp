@@ -31,7 +31,63 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
  * \since 1.0.0
  *
- * DOCUMENTATION GOES HERE
+ * This class enables developers to render 3D surface plots and to view them by rotating the scene
+ * freely. The class provides configurable gradient texture to illustrate the height on the data. The
+ * surface plotting includes also gridline that can be set on or off. The visual appearance of the
+ * surface can be changed by controlling the smooth status.
+ *
+ * The Q3DSurface supports selection by showing a highlighted ball on the data point where the user has clicked
+ * with left mouse button (when default input handler is in use). The selection pointer is accompanied with
+ * a label which in default case shows the value of the data point and the coordinates of the point.
+ *
+ * The value range and the label format shown on the axis can be controlled through Q3DValueAxis.
+ * The Q3DSurface supports only a grid with fixed steps, so when setting ranges set a value that matches
+ * the grid step. To calculate the steps divide the whole data range with the number of segments.
+ *
+ * To rotate the graph, hold down the right mouse button and move the mouse. Zooming is done using mouse
+ * wheel. Both assume the default input handler is in use.
+ *
+ * If no axes are explicitly set to Q3DSurface, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is explicitly
+ * set for the orientation, the default axis for that orientation is destroyed.
+ *
+ * Data proxies work similarly: If no data proxy is explicitly set, Q3DSurface creates a default
+ * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
+ * added to it is destroyed.
+ *
+ * \section1 How to construct a minimal Q3DSurface chart
+ *
+ * First, construct Q3DSurface:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 0
+ *
+ * Now Q3DSurface is ready to receive data to be rendered. Create data elements to receive values:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 1
+ *
+ * First feed the data to the row element and then add it's pointer to the data element:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 2
+ *
+ * For the active data proxy set pointer of the data element:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 3
+ *
+ * Finally you will need to set it visible:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 4
+ *
+ * The complete code needed to create and display this chart is:
+ *
+ * \snippet doc_src_q3dsurface_construction.cpp 5
+ *
+ * And this is what those few lines of code produce:
+ *
+ * \image q3dsurface-minimal.png
+ *
+ * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
+ * code example.
+ *
  *
  * \sa Q3DBars, Q3DScatter, {Qt Data Visualization C++ Classes}
  */
@@ -91,11 +147,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty Surface3D.SelectionMode Surface3D::selectionMode
- * Bar selection mode.
- */
-
-/*!
  * \qmlproperty Surface3D.LabelTransparency Surface3D::labelTransparency
  * Label transparency.
  */
@@ -112,7 +163,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty Surface3D.ColorTheme Surface3D::theme
- * Theme of the graph. Theme affects bar colors, label colors, text color, background color, window
+ * Theme of the graph. Theme affects label colors, text color, background color, window
  * color and grid color. Lighting is also adjusted by themes.
  */
 
@@ -268,8 +319,6 @@ bool Q3DSurface::isBackgroundVisible() const
  * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
- * \sa setObjectColor()
- *
  * \warning This method is subject to change.
  */
 void Q3DSurface::setTheme(QDataVis::ColorTheme theme)
@@ -301,6 +350,9 @@ QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
  * \property Q3DSurface::smoothSurfaceEnabled
  *
  * Sets surface smoothing to \a enabled. It is preset to \c false by default.
+ * When enabled the normals on the surface are interpolated making edges looking round. If turned
+ * off the normals are kept same on a triangle making the color of the triangle solid. This makes
+ * the data more readable from the model.
  */
 void Q3DSurface::setSmoothSurfaceEnabled(bool enabled)
 {
@@ -356,24 +408,6 @@ void Q3DSurface::setLabelTransparency(QDataVis::LabelTransparency transparency)
 QDataVis::LabelTransparency Q3DSurface::labelTransparency() const
 {
     return d_ptr->m_shared->labelTransparency();
-}
-
-/*!
- * Sets window \a width.
- */
-void Q3DSurface::setWidth(const int width)
-{
-    d_ptr->m_shared->setWidth(width);
-    QWindow::setWidth(width);
-}
-
-/*!
- * Sets window \a height.
- */
-void Q3DSurface::setHeight(const int height)
-{
-    d_ptr->m_shared->setHeight(height);
-    QWindow::setHeight(height);
 }
 
 /*!
@@ -549,7 +583,7 @@ QList<QSurfaceDataProxy *> Q3DSurface::dataProxies() const
 
 
 /*!
- * Sets gradient color to \a color at \a pos.
+ * Modifies the current surface gradient. Sets gradient color to \a color at \a pos.
  */
 void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
 {

@@ -31,9 +31,33 @@ const qreal defaultMaxValue = 10.0;
  * \brief Proxy class for Q3DSurface.
  * \since 1.0.0
  *
- * QSurfaceDataProxy takes care of surface related data handling.
+ * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the data
+ * in rows and for this it provides two auxiliary typedefs. QSurfaceDataArray is a QList for
+ * controlling the rows. For rows there is a QVector typedef QSurfaceDataRow which takes in qreal
+ * values. See Q3DSurface documentation and basic sample code there how to feed the data for the
+ * QSurfaceDataProxy.
  *
- * Make sure that amount of items on QSurfaceDataRow is the same for all rows.
+ * All rows must have same number of values.
+ *
+ * QSurfaceDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
+ * \table
+ *   \row
+ *     \li @xTitle    \li Title from X axis
+ *   \row
+ *     \li @yTitle    \li Title from Y axis
+ *   \row
+ *     \li @zTitle    \li Title from Z axis
+ *   \row
+ *     \li @xLabel    \li Item value formatted using the same format as the X axis attached to the graph uses,
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li @yLabel    \li Item value formatted using the same format as the Y axis attached to the graph uses,
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li @zLabel    \li Item value formatted using the same format as the Z axis attached to the graph uses,
+ *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ * \endtable
+ *
  */
 
 /*!
@@ -45,8 +69,41 @@ const qreal defaultMaxValue = 10.0;
  */
 
 /*!
- * \qmlproperty int SurfaceDataProxy::itemCount
- * Item count in the array.
+ * \qmlproperty int SurfaceDataProxy::rowCount
+ * Number of the rows in the array.
+ */
+
+/*!
+ * \qmlproperty int SurfaceDataProxy::columnCount
+ * Number of the columns in the array.
+ */
+
+/*!
+ * \qmlproperty qreal QSurfaceDataProxy::minValueRows
+ *
+ * The minimum value of the range in rows. For instance if function z value varies between -8.0
+ * and 8.0 set this property to -8.0.
+ */
+
+/*!
+ * \qmlproperty qreal QSurfaceDataProxy::maxValueRows
+ *
+ * The maximum value of the range in rows. For instance if function z value varies between -8.0
+ * and 8.0 set this property to 8.0.
+ */
+
+/*!
+ * \qmlproperty qreal QSurfaceDataProxy::minValueColumns
+ *
+ * The minimum value of the range in columns. For instance if function x value varies between -8.0
+ * and 8.0 set this property to -8.0.
+ */
+
+/*!
+ * \qmlproperty qreal QSurfaceDataProxy::maxValueColumns
+ *
+ * The maximum value of the range in columns. For instance if function x value varies between -8.0
+ * and 8.0 set this property to 8.0.
  */
 
 /*!
@@ -163,7 +220,8 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  */
 
 /*!
- * Sets the value range for rows from \a min to \a max.
+ * Sets the value range for rows from \a min to \a max. For instance if function z value varies between -8.0
+ * and 8.0 set \a min to -8.0 and \a max to 8.0.
  * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
  */
 void QSurfaceDataProxy::setValueRangeRows(qreal min, qreal max)
@@ -172,7 +230,8 @@ void QSurfaceDataProxy::setValueRangeRows(qreal min, qreal max)
 }
 
 /*!
- * Sets the value range for columns from \a min to \a max.
+ * Sets the value range for columns from \a min to \a max. For instance if function x value varies between -8.0
+ * and 8.0 set \a min to -8.0 and \a max to 8.0.
  * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
  */
 void QSurfaceDataProxy::setValueRangeColumns(qreal min, qreal max)
@@ -183,7 +242,8 @@ void QSurfaceDataProxy::setValueRangeColumns(qreal min, qreal max)
 /*!
  * \property QSurfaceDataProxy::minValueRows
  *
- * Defines the minimum value of the range for rows.
+ * Defines the minimum value of the range for rows. For instance if function z value varies between -8.0
+ * and 8.0 set this property to -8.0.
  * When setting this property the max is adjusted if necessary, to ensure that the range remains
  * valid.
  */
@@ -200,7 +260,8 @@ qreal QSurfaceDataProxy::minValueRows() const
 /*!
  * \property QSurfaceDataProxy::maxValueRows
  *
- * Defines the maximum value of the range for rows.
+ * Defines the maximum value of the range for rows. For instance if function z value varies between -8.0
+ * and 8.0 set this property to 8.0.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  */
@@ -217,7 +278,8 @@ qreal QSurfaceDataProxy::maxValueRows() const
 /*!
  * \property QSurfaceDataProxy::minValueColumns
  *
- * Defines the minimum value of the range for columns.
+ * Defines the minimum value of the range for columns. For instance if function x value varies between -8.0
+ * and 8.0 set this property to -8.0.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  */
@@ -234,7 +296,8 @@ qreal QSurfaceDataProxy::minValueColumns() const
 /*!
  * \property QSurfaceDataProxy::maxValueColumns
  *
- * Defines the maximum value of the range for columns.
+ * Defines the maximum value of the range for columns. For instance if function x value varies between -8.0
+ * and 8.0 set this property to 8.0.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  */

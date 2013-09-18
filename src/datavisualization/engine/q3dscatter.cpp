@@ -40,6 +40,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * reset to default camera view by clicking mouse wheel. In touch devices rotation is done
  * by tap-and-move, selection by tap-and-hold and zoom by pinch.
  *
+ * If no axes are explicitly set to Q3DScatter, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is explicitly
+ * set for the orientation, the default axis for that orientation is destroyed.
+ *
+ * Data proxies work similarly: If no data proxy is explicitly set, Q3DScatter creates a default
+ * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
+ * added to it is destroyed.
+ *
  * Methods are provided for changing item styles, themes, item selection modes and so on. See the
  * methods for more detailed descriptions.
  *
@@ -68,14 +76,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
  * code example. You can learn more by familiarizing yourself with the examples provided, like
  * the \l{Scatter Chart Example}.
- *
- * If no axes are explicitly set to Q3DScatter, temporary default axes with no labels are created.
- * These default axes can be modified via axis accessors, but as soon any axis is explicitly
- * set for the orientation, the default axis for that orientation is destroyed.
- *
- * Data proxies work similarly: If no data proxy is explicitly set, Q3DScatter creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
  *
  * \sa Q3DBars, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
