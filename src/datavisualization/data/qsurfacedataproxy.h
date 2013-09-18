@@ -62,6 +62,8 @@ public:
     qreal maxValueColumns() const;
 
     void resetArray(QSurfaceDataArray *newArray);
+    void resetArray(QSurfaceDataArray *newArray, qreal minValueRows, qreal maxValueRows,
+                    qreal minValueColumns, qreal maxValueColumns);
 
 signals:
     void arrayReset();

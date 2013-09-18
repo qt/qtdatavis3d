@@ -21,6 +21,10 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+// Default ranges correspond value axis defaults
+const qreal defaultMinValue = 0.0;
+const qreal defaultMaxValue = 10.0;
+
 /*!
  * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
@@ -73,10 +77,26 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
  * to further modify data after QSurfaceDataProxy assumes ownership of it, as such modifications will
  * not trigger proper signals.
  * Passing null array clears all data.
+ * Row and column ranges are reset to defaults.
  */
 void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
 {
-    if (dptr()->resetArray(newArray))
+    if (dptr()->resetArray(newArray, defaultMinValue, defaultMaxValue, defaultMinValue, defaultMaxValue))
+        emit arrayReset();
+}
+
+/*!
+ * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
+ * to further modify data after QSurfaceDataProxy assumes ownership of it, as such modifications will
+ * not trigger proper signals.
+ * Passing null array clears all data.
+ * Row and column ranges are set to values defined by the rest of the parameters.
+ */
+void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
+                                   qreal maxValueRows, qreal minValueColumns,
+                                   qreal maxValueColumns)
+{
+    if (dptr()->resetArray(newArray, minValueRows, maxValueRows, minValueColumns, maxValueColumns))
         emit arrayReset();
 }
 
@@ -236,10 +256,10 @@ qreal QSurfaceDataProxy::maxValueColumns() const
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
       m_dataArray(new QSurfaceDataArray),
-      m_minValueRows(0.0),
-      m_maxValueRows(10.0), // Same as valueaxis default
-      m_minValueColumns(0.0),
-      m_maxValueColumns(10.0) // Same as valueaxis default
+      m_minValueRows(defaultMinValue),
+      m_maxValueRows(defaultMaxValue),
+      m_minValueColumns(defaultMinValue),
+      m_maxValueColumns(defaultMaxValue)
 {
     m_itemLabelFormat = QStringLiteral("@yLabel (@xLabel, @zLabel)");
 }
@@ -250,7 +270,9 @@ QSurfaceDataProxyPrivate::~QSurfaceDataProxyPrivate()
     delete m_dataArray;
 }
 
-bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray)
+bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
+                                          qreal maxValueRows, qreal minValueColumns,
+                                          qreal maxValueColumns)
 {
     if (!m_dataArray->size() && (!newArray || !newArray->size()))
         return false;
@@ -258,10 +280,19 @@ bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray)
     m_dataArray->clear();
     delete m_dataArray;
 
-    if (newArray)
+    if (newArray) {
+        for (int i = 0; i < newArray->size(); i++) {
+            Q_ASSERT_X((newArray->at(i) && newArray->at(i)->size() == newArray->at(0)->size()),
+                       __FUNCTION__,
+                       "All rows of QSurfaceDataArray mustn't be NULL and must be of equal size.");
+        }
         m_dataArray = newArray;
-    else
+    } else {
         m_dataArray = new QSurfaceDataArray;
+    }
+
+    setValueRangeRows(minValueRows, maxValueRows);
+    setValueRangeColumns(minValueColumns, maxValueColumns);
 
     return true;
 }
@@ -375,6 +406,42 @@ void QSurfaceDataProxyPrivate::setMaxValueColumns(qreal max)
 QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()
 {
     return static_cast<QSurfaceDataProxy *>(q_ptr);
+}
+
+void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues)
+{
+    qreal min = 0.0;
+    qreal max = 0.0;
+
+    int rows = m_dataArray->size();
+    int columns = 0;
+    if (rows)
+        columns = m_dataArray->at(0)->size();
+
+    if (rows && columns) {
+        min = m_dataArray->at(0)->at(0);
+        max = m_dataArray->at(0)->at(0);
+    }
+
+    for (int i = 0; i < rows; i++) {
+        QSurfaceDataRow *row = m_dataArray->at(i);
+        if (row) {
+            for (int j = 0; j < columns; j++) {
+                qreal itemValue = m_dataArray->at(i)->at(j);
+                if (min > itemValue)
+                    min = itemValue;
+                if (max < itemValue)
+                    max = itemValue;
+            }
+        }
+    }
+
+    minValues.setX(m_minValueColumns);
+    minValues.setY(min);
+    minValues.setZ(m_minValueRows);
+    maxValues.setX(m_maxValueColumns);
+    maxValues.setY(max);
+    maxValues.setZ(m_maxValueRows);
 }
 
 

@@ -102,7 +102,7 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
 
-    // TODO: Implement!
+    adjustValueAxisRange();
 }
 
 void Surface3DController::setSmoothSurface(bool enable)
@@ -150,13 +150,15 @@ void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
     QSurfaceDataProxy *surfaceDataProxy = static_cast<QSurfaceDataProxy *>(m_data);
 
-    // TODO connections and handler for proxy changes
     QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
                      this, &Surface3DController::handleArrayReset);
+
+    adjustValueAxisRange();
 }
 
 void Surface3DController::handleArrayReset()
 {
+    adjustValueAxisRange();
     m_isDataDirty = true;
     emitNeedRender();
 }
@@ -165,6 +167,38 @@ void Surface3DController::handleArrayReset()
 void Surface3DController::handleSelectionAtPoint(const QPoint &point)
 {
     emit leftMousePressed(point);
+}
+
+void Surface3DController::adjustValueAxisRange()
+{
+    if (m_data) {
+        QVector3D minLimits;
+        QVector3D maxLimits;
+        static_cast<QSurfaceDataProxy *>(m_data)->dptr()->limitValues(minLimits, maxLimits);
+        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (minLimits.x() != maxLimits.x())
+                valueAxis->dptr()->setRange(minLimits.x(), maxLimits.x());
+            else
+                valueAxis->dptr()->setRange(minLimits.x() - 1.0f, minLimits.x() + 1.0f); // Default to some valid range
+        }
+
+        valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (minLimits.y() != maxLimits.y())
+                valueAxis->dptr()->setRange(minLimits.y(), maxLimits.y());
+            else
+                valueAxis->dptr()->setRange(minLimits.y() - 1.0f, minLimits.y() + 1.0f); // Default to some valid range
+        }
+
+        valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
+        if (valueAxis && valueAxis->isAutoAdjustRange()) {
+            if (minLimits.z() != maxLimits.z())
+                valueAxis->dptr()->setRange(minLimits.z(), maxLimits.z());
+            else
+                valueAxis->dptr()->setRange(minLimits.z() - 1.0f, minLimits.z() + 1.0f); // Default to some valid range
+        }
+    }
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

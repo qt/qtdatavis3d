@@ -48,10 +48,6 @@ Item {
             font.pointSize: 35
             cameraPreset: Surface3D.PresetIsometricLeft
             dataProxy: surfaceData.proxy
-            axisX.min: 0.0
-            axisX.max: 99.0
-            axisZ.min: 0.0
-            axisZ.max: 99.0
             axisY.min: 0.0
             axisY.max: 50.0
             axisX.segmentCount: 10

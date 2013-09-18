@@ -96,6 +96,8 @@ signals:
     void leftMousePressed(const QPoint &point); // My temp solution
 
 private:
+    void adjustValueAxisRange();
+
     Q_DISABLE_COPY(Surface3DController)
 };
 

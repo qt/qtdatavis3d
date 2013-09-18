@@ -36,9 +36,6 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
-
-    QSurfaceDataProxy *proxy = new QSurfaceDataProxy;
-    m_chart->setActiveDataProxy(proxy);
 }
 
 ChartModifier::~ChartModifier()
@@ -79,14 +76,11 @@ void ChartModifier::toggleSqrtSin(bool enable)
             *dataArray << newRow;
         }
 
-        m_chart->axisX()->setRange(-8.0, 8.0);
         m_chart->axisY()->setRange(0.0, 2.0);
-        m_chart->axisZ()->setRange(-8.0, 8.0);
-        m_chart->activeDataProxy()->resetArray(dataArray);
-        m_chart->activeDataProxy()->setValueRangeColumns(-8.0, 8.0);
-        m_chart->activeDataProxy()->setValueRangeRows(-8.0, 8.0);
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
+
+        m_chart->activeDataProxy()->resetArray(dataArray, -8.0, 8.0, -8.0, 8.0);
 
         m_activeSample = ChartModifier::SqrtSin;
     } else {
@@ -100,7 +94,7 @@ void ChartModifier::togglePlane(bool enable)
 
     if (enable) {
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-        qreal y = 2.0 / qreal(m_zCount - 1);
+        qreal y = 2.0 / qreal(m_zCount);
         dataArray->reserve(m_zCount);
         for (int i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
@@ -109,12 +103,8 @@ void ChartModifier::togglePlane(bool enable)
             *dataArray << newRow;
         }
 
+        m_chart->axisY()->setAutoAdjustRange(true);
         m_chart->axisX()->setSegmentCount(4);
-        m_chart->axisX()->setRange(0.0, 10.0);
-        m_chart->axisY()->setRange(0.0, 2.0);
-        m_chart->axisZ()->setRange(0.0, 10.0);
-        m_chart->activeDataProxy()->setValueRangeColumns(0.0, 10.0);
-        m_chart->activeDataProxy()->setValueRangeRows(0.0, 10.0);
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
@@ -141,15 +131,11 @@ void ChartModifier::setHeightMapData(bool enable)
             *dataArray << newRow;
         }
 
-        m_chart->activeDataProxy()->setValueRangeColumns(18.0, 24.0);
-        m_chart->activeDataProxy()->setValueRangeRows(34.0, 40.0);
-        m_chart->axisX()->setRange(18.0, 24.0);
-        m_chart->axisY()->setRange(0.0, 255.0);
-        m_chart->axisZ()->setRange(34.0, 40.0);
+        m_chart->axisY()->setAutoAdjustRange(true);
         m_chart->axisX()->setLabelFormat("%.1f N");
         m_chart->axisZ()->setLabelFormat("%.1f E");
 
-        m_chart->activeDataProxy()->resetArray(dataArray);
+        m_chart->activeDataProxy()->resetArray(dataArray, 34.0, 40.0, 18.0, 24.0);
 
         m_activeSample = ChartModifier::Map;
     }

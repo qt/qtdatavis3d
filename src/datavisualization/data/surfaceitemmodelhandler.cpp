@@ -46,6 +46,11 @@ void SurfaceItemModelHandler::resolveModel()
         return;
     }
 
+    float minRowValue = 0.0f;
+    float maxRowValue = 1.0f;
+    float minColumnValue = 0.0f;
+    float maxColumnValue = 1.0f;
+
     QSurfaceDataArray *newProxyArray = new QSurfaceDataArray;
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
@@ -61,30 +66,21 @@ void SurfaceItemModelHandler::resolveModel()
                 (*newProxyRow)[j] = m_itemModel->index(i, j).data(valueRole).toReal();
             newProxyArray->append(newProxyRow);
         }
+        if (rowCount) {
+            minRowValue = m_itemModel->headerData(0, Qt::Vertical).toFloat();
+            maxRowValue = m_itemModel->headerData(rowCount - 1, Qt::Vertical).toFloat();
+        }
+        if (columnCount) {
+            minColumnValue = m_itemModel->headerData(0, Qt::Horizontal).toFloat();
+            maxColumnValue = m_itemModel->headerData(columnCount - 1, Qt::Horizontal).toFloat();
+        }
     } else {
         int rowRole = roleHash.key(mapping->rowRole().toLatin1());
         int columnRole = roleHash.key(mapping->columnRole().toLatin1());
 
         bool generateRows = mapping->autoRowCategories();
         bool generateColumns = mapping->autoColumnCategories();
-        float minRowValue = 0.0f;
-        float maxRowValue = 0.0f;
-        float minColumnValue = 0.0f;
-        float maxColumnValue = 0.0f;
-        // Init min/max values
-        if ((generateRows || generateColumns) && rowCount > 0 && columnCount > 0) {
-            QModelIndex index = m_itemModel->index(0, 0);
-            QString rowRoleStr = index.data(rowRole).toString();
-            QString columnRoleStr = index.data(columnRole).toString();
-            if (generateRows) {
-                minRowValue = rowRoleStr.toFloat();
-                maxRowValue = minRowValue;
-            }
-            if (generateRows) {
-                minColumnValue = columnRoleStr.toFloat();
-                maxColumnValue = minColumnValue;
-            }
-        }
+
         QStringList rowList;
         QStringList columnList;
         // For detecting duplicates in categories generation, using QHashes should be faster than
@@ -104,39 +100,23 @@ void SurfaceItemModelHandler::resolveModel()
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
-                    float rowValue = rowRoleStr.toFloat();
-                    if (minRowValue > rowValue)
-                        minRowValue = rowValue;
-                    if (maxRowValue < rowValue)
-                        maxRowValue = rowValue;
                 }
                 if (generateColumns && !columnListHash.value(columnRoleStr, false)) {
                     columnListHash.insert(columnRoleStr, true);
                     columnList << columnRoleStr;
-                    float columnValue = columnRoleStr.toFloat();
-                    if (minColumnValue > columnValue)
-                        minColumnValue = columnValue;
-                    if (maxColumnValue < columnValue)
-                        maxColumnValue = columnValue;
                 }
             }
         }
 
-        if (generateRows) {
+        if (generateRows)
             mapping->dptr()->m_rowCategories = rowList;
-            m_proxy->setMinValueRows(minRowValue);
-            m_proxy->setMaxValueRows(maxRowValue);
-        } else {
+        else
             rowList = mapping->rowCategories();
-        }
 
-        if (generateColumns) {
+        if (generateColumns)
             mapping->dptr()->m_columnCategories = columnList;
-            m_proxy->setMinValueColumns(minColumnValue);
-            m_proxy->setMaxValueColumns(maxColumnValue);
-        } else {
+        else
             columnList = mapping->columnCategories();
-        }
 
         // Create new data array from itemValueMap
         foreach (QString rowKey, rowList) {
@@ -145,9 +125,19 @@ void SurfaceItemModelHandler::resolveModel()
                 (*newProxyRow)[i] = itemValueMap[rowKey][columnList.at(i)];
             newProxyArray->append(newProxyRow);
         }
+
+        // Use first and last roles converted to values for limits
+        if (rowList.size()) {
+            minRowValue = rowList.first().toFloat();
+            maxRowValue = rowList.last().toFloat();
+        }
+        if (columnList.size()) {
+            minColumnValue = columnList.first().toFloat();
+            maxColumnValue = columnList.last().toFloat();
+        }
     }
 
-    m_proxy->resetArray(newProxyArray);
+    m_proxy->resetArray(newProxyArray, minRowValue, maxRowValue, minColumnValue, maxColumnValue);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

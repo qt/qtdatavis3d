@@ -58,6 +58,7 @@ private:
     Q_DISABLE_COPY(Q3DValueAxis)
     friend class Bars3DController;
     friend class Scatter3DController;
+    friend class Surface3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

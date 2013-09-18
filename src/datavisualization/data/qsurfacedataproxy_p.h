@@ -43,7 +43,8 @@ public:
     QSurfaceDataProxyPrivate(QSurfaceDataProxy *q);
     virtual ~QSurfaceDataProxyPrivate();
 
-    bool resetArray(QSurfaceDataArray *newArray);
+    bool resetArray(QSurfaceDataArray *newArray, qreal minValueRows, qreal maxValueRows,
+                    qreal minValueColumns, qreal maxValueColumns);
 
     void setValueRangeRows(qreal min, qreal max);
     void setValueRangeColumns(qreal min, qreal max);
@@ -54,6 +55,8 @@ public:
 
     qreal rowValue(int segment, int segmentCount);
     qreal columnValue(int segment, int segmentCount);
+
+    void limitValues(QVector3D &minValues, QVector3D &maxValues);
 
 private:
     QSurfaceDataProxy *qptr();
