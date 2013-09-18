@@ -93,6 +93,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     QObject::connect(m_controller, &Surface3DController::leftMousePressed, this,
                      &Surface3DRenderer::requestSelectionAtPoint); // TODO: Possible temp
 
+#if !defined(QT_OPENGL_ES_2)
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
@@ -100,6 +101,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
         m_flatSupported = false;
         m_controller->setSmoothSurface(true);
     }
+#endif
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
