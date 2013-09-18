@@ -61,6 +61,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
             setInputState(QDataVis::InputOnScene);
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
+            // TODO: Get rid of these (QTRD-2307)
             emit selectionAtPoint(mousePos);
             //qDebug() << "Mouse pressed on scene";
 

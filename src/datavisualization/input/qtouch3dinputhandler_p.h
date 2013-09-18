@@ -16,32 +16,30 @@
 **
 ****************************************************************************/
 
-#ifndef QTOUCH3DINPUTHANDLER_H
-#define QTOUCH3DINPUTHANDLER_H
+#ifndef QTOUCH3DINPUTHANDLER_P_H
+#define QTOUCH3DINPUTHANDLER_P_H
 
-#include <QtDataVisualization/q3dinputhandler.h>
+#include "qtouch3dinputhandler.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QTouch3DInputHandlerPrivate;
+class QAbstract3DInputHandler;
 
-class QT_DATAVISUALIZATION_EXPORT QTouch3DInputHandler : public Q3DInputHandler
+class QTouch3DInputHandlerPrivate : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit QTouch3DInputHandler(QObject *parent = 0);
-    virtual ~QTouch3DInputHandler();
+    QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q);
+    ~QTouch3DInputHandlerPrivate();
 
-    // Input event listeners
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void touchEvent(QTouchEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
+    void tapAndHold();
 
-private:
-    Q_DISABLE_COPY(QTouch3DInputHandler)
-
-    QScopedPointer<QTouch3DInputHandlerPrivate> d_ptr;
+public:
+    QTouch3DInputHandler *q_ptr;
+    QTimer *m_holdTimer;
+    QPointF m_startHoldPos;
+    QPointF m_touchHoldPos;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

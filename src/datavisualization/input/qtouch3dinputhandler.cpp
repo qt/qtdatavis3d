@@ -15,13 +15,19 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
-#include "qtouch3dinputhandler.h"
+
+#include "qtouch3dinputhandler_p.h"
 #include "q3dcamera.h"
+#include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-QTouch3DInputHandler::QTouch3DInputHandler(QObject *parent) :
-    Q3DInputHandler(parent)
+const qreal maxTapAndHoldJitter = 10;
+const int tapAndHoldTime = 250;
+
+QTouch3DInputHandler::QTouch3DInputHandler(QObject *parent)
+    : Q3DInputHandler(parent),
+      d_ptr(new QTouch3DInputHandlerPrivate(this))
 {
 }
 
@@ -35,7 +41,9 @@ void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
     if (!scene()->isSlicingActivated()) {
         setInputState(QDataVis::InputOnScene);
         // update mouse positions to prevent jumping when releasing or repressing a button
-        setInputPosition( event->pos() );
+        setInputPosition(event->pos());
+        // TODO: Get rid of these (QTRD-2307)
+        emit selectionAtPoint(inputPosition());
     }
 }
 
@@ -45,6 +53,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     points = event->touchPoints();
 
     if (!scene()->isSlicingActivated() && points.count() == 2) {
+        d_ptr->m_holdTimer->stop();
+
         setInputState(QDataVis::InputOnPinch);
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
@@ -63,6 +73,19 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             zoomLevel = 10;
         scene()->camera()->setZoomLevel(zoomLevel);
         setPrevDistance(newDistance);
+    } else if (!scene()->isSlicingActivated() && points.count() == 1) {
+        if (event->type() == QEvent::TouchBegin) {
+            // Tap-and-hold selection start
+            d_ptr->m_startHoldPos = points.at(0).pos();
+            d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
+            d_ptr->m_holdTimer->start();
+        } else if (event->type() == QEvent::TouchEnd) {
+            d_ptr->m_holdTimer->stop();
+        } else if (event->type() == QEvent::TouchUpdate) {
+            d_ptr->m_touchHoldPos = points.at(0).pos();
+        }
+    } else {
+        d_ptr->m_holdTimer->stop();
     }
 }
 
@@ -94,6 +117,33 @@ void QTouch3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mou
         setInputState(QDataVis::InputOnScene);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
+    }
+}
+
+QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q)
+    : q_ptr(q),
+      m_holdTimer(0)
+{
+    m_holdTimer = new QTimer();
+    m_holdTimer->setSingleShot(true);
+    m_holdTimer->setInterval(tapAndHoldTime);
+    QObject::connect(m_holdTimer, &QTimer::timeout, this, &QTouch3DInputHandlerPrivate::tapAndHold);
+}
+
+QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
+{
+    m_holdTimer->stop();
+    delete m_holdTimer;
+}
+
+void QTouch3DInputHandlerPrivate::tapAndHold()
+{
+    QPointF distance = m_startHoldPos - m_touchHoldPos;
+    if (distance.manhattanLength() < maxTapAndHoldJitter) {
+        q_ptr->setInputPosition(QPoint(int(m_touchHoldPos.x()), int(m_touchHoldPos.y())));
+        q_ptr->setInputState(QDataVis::InputOnScene);
+        // TODO: Get rid of these (QTRD-2307)
+        emit q_ptr->selectionAtPoint(q_ptr->inputPosition());
     }
 }
 
