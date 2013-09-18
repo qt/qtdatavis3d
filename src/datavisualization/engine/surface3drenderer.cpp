@@ -236,25 +236,15 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
 {
     QRect sampleSpace(0, 0, dataProxy->columnCount(), dataProxy->rowCount());
 
-    if (dataProxy->minValueColumns() == 0.0 && dataProxy->maxValueColumns() == 0.0 &&
-        dataProxy->minValueRows() == 0.0 && dataProxy->maxValueRows() == 0.0) {
-        // The user hasn't set anything, return default
-        return sampleSpace;
+    // TODO: Calculate the actual sample rect, for now it is required data and axis ranges are the same
+    if (m_axisCacheX.min() != dataProxy->minValueColumns() || m_axisCacheX.max() != dataProxy->maxValueColumns()
+            || m_axisCacheZ.min() != dataProxy->minValueRows() || m_axisCacheZ.max() != dataProxy->maxValueRows()) {
+        qWarning() << "Warning: Technology preview doesn't support axis ranges that are different from data ranges -"
+                   << m_axisCacheX.min() << dataProxy->minValueColumns() << "-"
+                   << m_axisCacheX.max() << dataProxy->maxValueColumns() << "-"
+                   << m_axisCacheZ.min() << dataProxy->minValueRows() << "-"
+                   << m_axisCacheZ.max() << dataProxy->maxValueRows();
     }
-
-    qreal valueWidth = dataProxy->maxValueColumns() - dataProxy->minValueColumns();
-    qreal columnBeginDiff = qAbs(dataProxy->minValueColumns() - m_axisCacheX.min());
-    sampleSpace.setX(columnBeginDiff / valueWidth * dataProxy->columnCount());
-
-    qreal columnEndPos = (m_axisCacheX.max() - dataProxy->minValueColumns()) / valueWidth * dataProxy->columnCount();
-    sampleSpace.setWidth(columnEndPos - sampleSpace.x());
-
-    qreal valueHeight = dataProxy->maxValueRows() - dataProxy->minValueRows();
-    qreal rowBeginDiff = qAbs(dataProxy->minValueRows() - m_axisCacheZ.min());
-    sampleSpace.setY(rowBeginDiff / valueHeight * dataProxy->rowCount());
-
-    qreal rowEndPos = (m_axisCacheZ.max() - dataProxy->minValueRows()) / valueHeight * dataProxy->rowCount();
-    sampleSpace.setHeight(rowEndPos - sampleSpace.y());
 
     return sampleSpace;
 }

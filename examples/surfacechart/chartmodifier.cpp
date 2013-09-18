@@ -110,11 +110,11 @@ void ChartModifier::togglePlane(bool enable)
         }
 
         m_chart->axisX()->setSegmentCount(4);
-        m_chart->axisX()->setRange(2.0, 7.0);
+        m_chart->axisX()->setRange(0.0, 10.0);
         m_chart->axisY()->setRange(0.0, 2.0);
-        m_chart->axisZ()->setRange(2.0, 8.0);
-        m_chart->activeDataProxy()->setValueRangeColumns(0.0, qreal(m_xCount - 1));
-        m_chart->activeDataProxy()->setValueRangeRows(0.0, qreal(m_zCount - 1));
+        m_chart->axisZ()->setRange(0.0, 10.0);
+        m_chart->activeDataProxy()->setValueRangeColumns(0.0, 10.0);
+        m_chart->activeDataProxy()->setValueRangeRows(0.0, 10.0);
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 

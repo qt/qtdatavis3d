@@ -67,6 +67,24 @@ void SurfaceItemModelHandler::resolveModel()
 
         bool generateRows = mapping->autoRowCategories();
         bool generateColumns = mapping->autoColumnCategories();
+        float minRowValue = 0.0f;
+        float maxRowValue = 0.0f;
+        float minColumnValue = 0.0f;
+        float maxColumnValue = 0.0f;
+        // Init min/max values
+        if ((generateRows || generateColumns) && rowCount > 0 && columnCount > 0) {
+            QModelIndex index = m_itemModel->index(0, 0);
+            QString rowRoleStr = index.data(rowRole).toString();
+            QString columnRoleStr = index.data(columnRole).toString();
+            if (generateRows) {
+                minRowValue = rowRoleStr.toFloat();
+                maxRowValue = minRowValue;
+            }
+            if (generateRows) {
+                minColumnValue = columnRoleStr.toFloat();
+                maxColumnValue = minColumnValue;
+            }
+        }
         QStringList rowList;
         QStringList columnList;
         // For detecting duplicates in categories generation, using QHashes should be faster than
@@ -86,23 +104,39 @@ void SurfaceItemModelHandler::resolveModel()
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
+                    float rowValue = rowRoleStr.toFloat();
+                    if (minRowValue > rowValue)
+                        minRowValue = rowValue;
+                    if (maxRowValue < rowValue)
+                        maxRowValue = rowValue;
                 }
                 if (generateColumns && !columnListHash.value(columnRoleStr, false)) {
                     columnListHash.insert(columnRoleStr, true);
                     columnList << columnRoleStr;
+                    float columnValue = columnRoleStr.toFloat();
+                    if (minColumnValue > columnValue)
+                        minColumnValue = columnValue;
+                    if (maxColumnValue < columnValue)
+                        maxColumnValue = columnValue;
                 }
             }
         }
 
-        if (generateRows)
+        if (generateRows) {
             mapping->dptr()->m_rowCategories = rowList;
-        else
+            m_proxy->setMinValueRows(minRowValue);
+            m_proxy->setMaxValueRows(maxRowValue);
+        } else {
             rowList = mapping->rowCategories();
+        }
 
-        if (generateColumns)
+        if (generateColumns) {
             mapping->dptr()->m_columnCategories = columnList;
-        else
+            m_proxy->setMinValueColumns(minColumnValue);
+            m_proxy->setMaxValueColumns(maxColumnValue);
+        } else {
             columnList = mapping->columnCategories();
+        }
 
         // Create new data array from itemValueMap
         foreach (QString rowKey, rowList) {

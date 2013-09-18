@@ -237,9 +237,9 @@ QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
       m_dataArray(new QSurfaceDataArray),
       m_minValueRows(0.0),
-      m_maxValueRows(0.0),
+      m_maxValueRows(10.0), // Same as valueaxis default
       m_minValueColumns(0.0),
-      m_maxValueColumns(0.0)
+      m_maxValueColumns(10.0) // Same as valueaxis default
 {
     m_itemLabelFormat = QStringLiteral("@yLabel (@xLabel, @zLabel)");
 }
