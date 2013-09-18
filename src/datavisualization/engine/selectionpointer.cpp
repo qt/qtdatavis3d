@@ -213,7 +213,8 @@ void SelectionPointer::setLabel(QString label)
                                            label,
                                            m_cachedTheme.m_textBackgroundColor,
                                            m_cachedTheme.m_textColor,
-                                           m_labelTransparency);
+                                           m_labelTransparency,
+                                           m_cachedTheme.m_labelBorders);
 
     // Set label size
     m_labelItem.setSize(image.size());

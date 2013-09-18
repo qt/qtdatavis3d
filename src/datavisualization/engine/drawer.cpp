@@ -349,6 +349,7 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
                                                m_theme.m_textBackgroundColor,
                                                m_theme.m_textColor,
                                                m_transparency,
+                                               m_theme.m_labelBorders,
                                                widestLabel);
 
         // Set label size

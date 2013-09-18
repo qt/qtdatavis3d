@@ -46,7 +46,7 @@ QVector3D Utils::vectorFromColor(const QColor &color)
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
                                const QColor &txtColor, QDataVis::LabelTransparency transparency,
-                               int maxLabelWidth)
+                               bool borders, int maxLabelWidth)
 {
     GLuint paddingWidth = 15;
     GLuint paddingHeight = 15;
@@ -108,7 +108,10 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     }
     case QDataVis::TransparencyFromTheme: {
         painter.setBrush(QBrush(bgrColor));
-        painter.setPen(bgrColor);
+        if (borders)
+            painter.setPen(QPen(QBrush(txtColor), 5, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+        else
+            painter.setPen(bgrColor);
         painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
         painter.setFont(valueFont);
         painter.setPen(txtColor);
@@ -121,7 +124,10 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     }
     case QDataVis::TransparencyNone: {
         painter.setBrush(QBrush(bgrColor));
-        painter.setPen(bgrColor);
+        if (borders)
+            painter.setPen(QPen(QBrush(txtColor), 7.5));
+        else
+            painter.setPen(bgrColor);
         painter.drawRect(0, 0, labelSize.width(), labelSize.height());
         painter.setFont(valueFont);
         painter.setPen(txtColor);

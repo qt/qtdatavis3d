@@ -74,6 +74,7 @@ private:
     float m_ambientStrength;
     float m_highlightLightStrength;
     bool m_uniformColor;
+    bool m_labelBorders;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

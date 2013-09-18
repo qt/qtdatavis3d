@@ -41,7 +41,8 @@ Theme::Theme()
       m_lightStrength(4.0f),
       m_ambientStrength(0.3f),
       m_highlightLightStrength(8.0f),
-      m_uniformColor(true)
+      m_uniformColor(true),
+      m_labelBorders(false)
 {
     // Default values for surface gradient
     m_surfaceGradient.setColorAt(0.0, Qt::green);
@@ -92,7 +93,6 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 4.0f;
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 6.0f;
-        m_uniformColor = true;
 #elif defined(Q_OS_LINUX)
         m_baseColor = QColor(QRgb(0x60a6e6));
         m_heightColor = QColor(QRgb(0xfc5751));
@@ -108,7 +108,6 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 4.0f;
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 6.0f;
-        m_uniformColor = true;
 #elif defined(Q_OS_MAC)
         m_baseColor = QColor(QRgb(0x60a6e6));
         m_heightColor = QColor(QRgb(0xfc5751));
@@ -124,7 +123,6 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 4.0f;
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 6.0f;
-        m_uniformColor = true;
 #else
         m_baseColor = QColor(QRgb(0x60a6e6));
         m_heightColor = QColor(QRgb(0xfc5751));
@@ -140,8 +138,9 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 4.0f;
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 6.0f;
-        m_uniformColor = true;
 #endif
+        m_uniformColor = true;
+        m_labelBorders = true;
         break;
     }
     case QDataVis::ThemeBlueCerulean: {
@@ -161,6 +160,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 10.0f;
         m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeBlueIcy: {
@@ -182,6 +182,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeBlueNcs: {
@@ -203,6 +204,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 6.0f;
         m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeBrownSand: {
@@ -223,6 +225,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = false;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeDark: {
@@ -242,6 +245,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.2f;
         m_highlightLightStrength = 8.0f;
         m_uniformColor = false;
+        m_labelBorders = true;
         break;
     }
     case QDataVis::ThemeHighContrast: {
@@ -264,6 +268,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 10.0f;
         m_uniformColor = false;
+        m_labelBorders = true;
         break;
     }
     case QDataVis::ThemeLight: {
@@ -285,6 +290,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.3f;
         m_highlightLightStrength = 7.0f;
         m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeQt: {
@@ -302,7 +308,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = false;
+        m_uniformColor = true;
+        m_labelBorders = true;
         break;
     }
     case QDataVis::ThemePrimaryColors: {
@@ -312,7 +319,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_backgroundColor = QColor(QRgb(0xffffff));
         m_windowColor = QColor(QRgb(0xffffff));
         m_textColor = QColor(QRgb(0x000000));
-        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x01);
+        m_textBackgroundColor = QColor(0xff, 0xff, 0xff, 0x99);
         m_gridLine = QColor(QRgb(0xd7d6d5));
         m_highlightBarColor = QColor(QRgb(0x27beee));
         m_highlightRowColor = QColor(QRgb(0xee1414));
@@ -320,7 +327,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = false;
+        m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeDigia: {
@@ -339,6 +347,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
         m_uniformColor = false;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeStoneMoss: {
@@ -356,7 +365,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = false;
+        m_uniformColor = true;
+        m_labelBorders = true;
         break;
     }
     case QDataVis::ThemeArmyBlue: {
@@ -375,6 +385,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
         m_uniformColor = false;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeRetro: {
@@ -393,6 +404,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
         m_uniformColor = false;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeEbony: {
@@ -410,7 +422,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = false;
+        m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     case QDataVis::ThemeIsabelle: {
@@ -428,7 +441,8 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
         m_lightStrength = 5.0f;
         m_ambientStrength = 0.5f;
         m_highlightLightStrength = 5.0f;
-        m_uniformColor = false;
+        m_uniformColor = true;
+        m_labelBorders = false;
         break;
     }
     default:
@@ -455,6 +469,7 @@ void Theme::setFromTheme(Theme &theme)
     m_ambientStrength = theme.m_ambientStrength;
     m_highlightLightStrength = theme.m_highlightLightStrength;
     m_uniformColor = theme.m_uniformColor;
+    m_labelBorders = theme.m_labelBorders;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

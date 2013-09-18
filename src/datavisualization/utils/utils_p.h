@@ -60,6 +60,7 @@ public:
                                    const QColor &bgrColor,
                                    const QColor &txtColor,
                                    QDataVis::LabelTransparency transparency,
+                                   bool borders = false,
                                    int maxLabelWidth = 0);
     static QVector3D getSelection(QPoint mousepos, int height);
 
