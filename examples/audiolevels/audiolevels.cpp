@@ -36,7 +36,6 @@ AudioLevels::AudioLevels(Q3DBars *chart, QObject *parent)
     // Set up the graph
     QBarDataRow *row = new QBarDataRow;
     m_graph->activeDataProxy()->addRow(row);
-    m_graph->setDataWindow(1, 700);
     m_graph->setBarThickness(0.04);
     m_graph->setBarSpacing(QSizeF(0.0, 0.0));
     m_graph->setGridVisible(false);
