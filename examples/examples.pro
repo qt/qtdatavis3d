@@ -1,11 +1,13 @@
 TEMPLATE = subdirs
-SUBDIRS += barchart \
-           rainfall \
-           widget \
-           qmlbarchart \
+SUBDIRS += qmlbarchart \
            qmlscatter \
-           qmlsurface \
-           surfacechart \
-           scatterchart
+           qmlsurface
+!android: {
+    SUBDIRS += barchart \
+               rainfall \
+               widget \
+               surfacechart \
+               scatterchart
+}
 
 qtHaveModule(multimedia):!android: SUBDIRS += audiolevels
