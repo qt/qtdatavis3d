@@ -134,7 +134,8 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     m_pointShader->setUniformValue(m_pointShader->view(), viewMatrix);
     m_pointShader->setUniformValue(m_pointShader->model(), modelMatrix);
     m_pointShader->setUniformValue(m_pointShader->nModel(), itModelMatrix.inverted().transposed());
-    m_pointShader->setUniformValue(m_pointShader->color(), QVector3D(1.0f, 0.0f, 0.0f));
+    m_pointShader->setUniformValue(m_pointShader->color(),
+                                   Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor));
     m_pointShader->setUniformValue(m_pointShader->MVP(), MVPMatrix);
     m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme.m_ambientStrength);
     m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme.m_lightStrength * 2.0f);
