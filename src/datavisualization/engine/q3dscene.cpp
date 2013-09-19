@@ -204,8 +204,10 @@ Q3DCamera *Q3DScene::activeCamera() const
 
 void Q3DScene::setActiveCamera(Q3DCamera *camera)
 {
+    Q_ASSERT(camera);
+
     // Add new camera as child of the scene
-    if (!children().contains(camera))
+    if (camera->parent() != this)
         camera->setParent(this);
 
     if (camera != d_ptr->m_camera) {
@@ -227,8 +229,10 @@ Q3DLight *Q3DScene::activeLight() const
 
 void Q3DScene::setActiveLight(Q3DLight *light)
 {
+    Q_ASSERT(light);
+
     // Add new light as child of the scene
-    if (!children().contains(light))
+    if (light->parent() != this)
         light->setParent(this);
 
     if (light != d_ptr->m_light) {
