@@ -572,20 +572,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 0.0f, zComp);
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        modelMatrix.scale(
-                    QVector3D(
-                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        backgroundMargin,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor));
+        QVector3D bgScale((aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
+                          backgroundMargin,
+                          (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
 #else // ..and this if we want uniform scaling based on largest dimension
-        modelMatrix.scale(QVector3D((aspectRatio * backgroundMargin),
-                                    backgroundMargin,
-                                    (aspectRatio * backgroundMargin)));
+        QVector3D bgScale((aspectRatio * backgroundMargin),
+                          backgroundMargin,
+                          (aspectRatio * backgroundMargin));
 #endif
-        // We can copy modelMatrix to itModelMatrix as it has not been translated
-        itModelMatrix = modelMatrix;
+        modelMatrix.translate(0.0f, 0.0f, zComp);
+        modelMatrix.scale(bgScale);
+        itModelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
             modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);

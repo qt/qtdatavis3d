@@ -86,13 +86,13 @@ int main(int argc, char *argv[])
     QSlider *gridSliderX = new QSlider(Qt::Horizontal, widget);
     gridSliderX->setTickInterval(1);
     gridSliderX->setMinimum(2);
-    gridSliderX->setValue(10);
+    gridSliderX->setValue(30);
     gridSliderX->setMaximum(200);
     gridSliderX->setEnabled(true);
     QSlider *gridSliderZ = new QSlider(Qt::Horizontal, widget);
     gridSliderZ->setTickInterval(1);
     gridSliderZ->setMinimum(2);
-    gridSliderZ->setValue(10);
+    gridSliderZ->setValue(30);
     gridSliderZ->setMaximum(200);
     gridSliderZ->setEnabled(true);
 

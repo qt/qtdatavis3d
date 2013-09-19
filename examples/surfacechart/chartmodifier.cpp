@@ -28,8 +28,8 @@ QT_DATAVISUALIZATION_USE_NAMESPACE
 
 ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
-      m_xCount(10),
-      m_zCount(10),
+      m_xCount(30),
+      m_zCount(30),
       m_activeSample(0),
       m_fontSize(40.0f)
 {
@@ -94,7 +94,7 @@ void ChartModifier::togglePlane(bool enable)
 
     if (enable) {
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-        qreal y = 2.0 / qreal(m_zCount);
+        qreal y = 2.0 / qreal(m_zCount - 1);
         dataArray->reserve(m_zCount);
         for (int i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
@@ -108,7 +108,7 @@ void ChartModifier::togglePlane(bool enable)
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
-        m_chart->activeDataProxy()->resetArray(dataArray);
+        m_chart->activeDataProxy()->resetArray(dataArray, -2.0, 10.0, 16.0, 22.0);
 
         m_activeSample = ChartModifier::Plane;
     }

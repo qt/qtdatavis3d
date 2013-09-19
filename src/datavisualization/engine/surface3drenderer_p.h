@@ -86,6 +86,8 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_scaleX;
     GLfloat m_scaleZ;
+    GLfloat m_scaleXWithBackground;
+    GLfloat m_scaleZWithBackground;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -111,6 +113,7 @@ private:
     QSurfaceDataArray m_dataArray;
     QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
+    QSizeF m_areaSize;
 
     bool m_hasHeightAdjustmentChanged;
 
