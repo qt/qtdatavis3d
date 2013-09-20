@@ -242,6 +242,7 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
     QRect sampleSpace(0, 0, dataProxy->columnCount(), dataProxy->rowCount());
 
     // TODO: Calculate the actual sample rect, for now it is required data and axis ranges are the same
+#if 0
     if (m_axisCacheX.min() != dataProxy->minValueColumns() || m_axisCacheX.max() != dataProxy->maxValueColumns()
             || m_axisCacheZ.min() != dataProxy->minValueRows() || m_axisCacheZ.max() != dataProxy->maxValueRows()) {
         qWarning() << "Warning: Technology preview doesn't support axis ranges that are different from data ranges -"
@@ -250,7 +251,7 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
                    << m_axisCacheZ.min() << dataProxy->minValueRows() << "-"
                    << m_axisCacheZ.max() << dataProxy->maxValueRows();
     }
-
+#endif
     return sampleSpace;
 }
 

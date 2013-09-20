@@ -28,6 +28,8 @@ HEADERS += \
     $$PWD/scatteritemmodelhandler_p.h \
     $$PWD/qsurfacedataproxy.h \
     $$PWD/qsurfacedataproxy_p.h \
+    $$PWD/qheightmapsurfacedataproxy.h \
+    $$PWD/qheightmapsurfacedataproxy_p.h \
     $$PWD/qitemmodelsurfacedatamapping.h \
     $$PWD/qitemmodelsurfacedatamapping_p.h \
     $$PWD/qitemmodelsurfacedataproxy.h \
@@ -53,6 +55,7 @@ SOURCES += \
     $$PWD/qabstractdatamapping.cpp \
     $$PWD/scatteritemmodelhandler.cpp \
     $$PWD/qsurfacedataproxy.cpp \
+    $$PWD/qheightmapsurfacedataproxy.cpp \
     $$PWD/qitemmodelsurfacedatamapping.cpp \
     $$PWD/qitemmodelsurfacedataproxy.cpp \
     $$PWD/surfaceitemmodelhandler.cpp

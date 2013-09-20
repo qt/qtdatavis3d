@@ -29,6 +29,7 @@
 #include "qitemmodelbardataproxy.h"
 #include "qitemmodelscatterdataproxy.h"
 #include "qitemmodelsurfacedataproxy.h"
+#include "qheightmapsurfacedataproxy.h"
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
 
@@ -59,6 +60,7 @@ Q_DECLARE_METATYPE(QScatterDataProxy *)
 Q_DECLARE_METATYPE(QItemModelScatterDataProxy *)
 Q_DECLARE_METATYPE(QSurfaceDataProxy *)
 Q_DECLARE_METATYPE(QItemModelSurfaceDataProxy *)
+Q_DECLARE_METATYPE(QHeightMapSurfaceDataProxy *)
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

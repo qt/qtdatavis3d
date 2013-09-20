@@ -4,4 +4,7 @@
         <file alias="Button.qml">qml/qmlsurface/button.qml</file>
         <file alias="Data.qml">qml/qmlsurface/data.qml</file>
     </qresource>
+    <qresource prefix="/heightmaps">
+        <file alias="image">heightmap.png</file>
+    </qresource>
 </RCC>

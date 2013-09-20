@@ -41,26 +41,30 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
+            theme: Surface3D.ThemeStoneMoss
             shadowQuality: Surface3D.ShadowMedium
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"
             font.pointSize: 35
             cameraPreset: Surface3D.PresetIsometricLeft
-            dataProxy: surfaceData.proxy
+            dataProxy: surfaceData.heightProxy
             axisY.min: 0.0
-            axisY.max: 50.0
+            axisY.max: 255.0
+            axisX.max: 40.0
+            axisZ.max: 40.0
             axisX.segmentCount: 10
-            axisX.subSegmentCount: 5
+            axisX.subSegmentCount: 2
             axisX.labelFormat: "%i"
             axisZ.segmentCount: 10
-            axisZ.subSegmentCount: 5
+            axisZ.subSegmentCount: 2
             axisZ.labelFormat: "%i"
             axisY.segmentCount: 5
-            axisY.subSegmentCount: 5
+            axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
             Component.onCompleted: {
                 setGradientColorAt(0, "black");
+                setGradientColorAt(0.5, "lightgray");
                 setGradientColorAt(1, "white");
             }
         }
@@ -126,6 +130,28 @@ Item {
             } else {
                 surfaceplot.gridVisible = true;
                 text = "Hide Grid"
+            }
+        }
+    }
+
+    Button {
+        id: proxyToggle
+        anchors.top: gridToggle.bottom
+        width: gridToggle.width
+        text: "Switch to Item Model Proxy"
+        onClicked: {
+            if (surfaceplot.dataProxy === surfaceData.heightProxy) {
+                surfaceplot.axisY.max = 500.0
+                surfaceplot.axisX.max = 99.0
+                surfaceplot.axisZ.max = 99.0
+                surfaceplot.dataProxy = surfaceData.proxy
+                text = "Switch to Height Map Proxy"
+            } else {
+                surfaceplot.axisY.max = 255.0
+                surfaceplot.axisX.max = 40.0
+                surfaceplot.axisZ.max = 40.0
+                surfaceplot.dataProxy = surfaceData.heightProxy
+                text = "Switch to Item Model Proxy"
             }
         }
     }
