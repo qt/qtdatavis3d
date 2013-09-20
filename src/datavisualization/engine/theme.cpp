@@ -45,9 +45,6 @@ Theme::Theme()
       m_labelBorders(false)
 {
     // Default values for surface gradient
-    m_surfaceGradient.setColorAt(0.0, Qt::green);
-    m_surfaceGradient.setColorAt(0.5, Qt::yellow);
-    m_surfaceGradient.setColorAt(1.0, Qt::red);
 }
 
 Theme::~Theme()
@@ -448,6 +445,14 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
     default:
         break;
     }
+    if (m_uniformColor) {
+        m_surfaceGradient.setColorAt(0.0, m_baseColor);
+    } else {
+        m_surfaceGradient.setColorAt(0.0, QColor(m_baseColor.redF() * 0.7,
+                                                 m_baseColor.greenF() * 0.7,
+                                                 m_baseColor.blueF() * 0.7));
+    }
+    m_surfaceGradient.setColorAt(1.0, m_baseColor);
 }
 
 void Theme::setFromTheme(Theme &theme)

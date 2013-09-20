@@ -64,7 +64,6 @@ Item {
             axisY.labelFormat: "%i"
             Component.onCompleted: {
                 setGradientColorAt(0, "black");
-                setGradientColorAt(0.5, "lightgray");
                 setGradientColorAt(1, "white");
             }
         }

@@ -1225,8 +1225,8 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 void Surface3DRenderer::updateTextures()
 {
     qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
-    // Drawer has changed; this flag needs to be checked when checking if we need to update labels
-    //m_updateLabels = true;
+
+    updateSurfaceGradient(m_cachedTheme.m_surfaceGradient);
 }
 
 void Surface3DRenderer::calculateSceneScalingFactors()
