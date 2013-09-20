@@ -23,6 +23,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+class Q3DInputHandler; // Workaround for qdoc bug, removing this will cause qdoc compiler to not find the class.
+
 class QT_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {
     Q_OBJECT
