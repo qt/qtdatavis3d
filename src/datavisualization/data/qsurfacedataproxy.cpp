@@ -330,8 +330,7 @@ QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
 
 QSurfaceDataProxyPrivate::~QSurfaceDataProxyPrivate()
 {
-    m_dataArray->clear();
-    delete m_dataArray;
+    clearArray();
 }
 
 bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
@@ -341,8 +340,7 @@ bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray, qreal min
     if (!m_dataArray->size() && (!newArray || !newArray->size()))
         return false;
 
-    m_dataArray->clear();
-    delete m_dataArray;
+    clearArray();
 
     if (newArray) {
         for (int i = 0; i < newArray->size(); i++) {
@@ -508,5 +506,20 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
     maxValues.setZ(m_maxValueRows);
 }
 
+void QSurfaceDataProxyPrivate::clearRow(int rowIndex)
+{
+    if (m_dataArray->at(rowIndex)) {
+        delete m_dataArray->at(rowIndex);
+        (*m_dataArray)[rowIndex] = 0;
+    }
+}
+
+void QSurfaceDataProxyPrivate::clearArray()
+{
+    for (int i = 0; i < m_dataArray->size(); i++)
+        clearRow(i);
+    m_dataArray->clear();
+    delete m_dataArray;
+}
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -60,6 +60,9 @@ public:
 
 private:
     QSurfaceDataProxy *qptr();
+    void clearRow(int rowIndex);
+    void clearArray();
+
     QSurfaceDataArray *m_dataArray;
     qreal m_minValueRows;
     qreal m_maxValueRows;

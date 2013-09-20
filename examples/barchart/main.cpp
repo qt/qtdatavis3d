@@ -212,8 +212,8 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    QWidget *widget = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    QWidget widget;
+    QVBoxLayout *layout = new QVBoxLayout(&widget);
 
     Q3DBars *chart = new Q3DBars();
     QSize screenSize = chart->screen()->size();
@@ -224,9 +224,9 @@ int main(int argc, char **argv)
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Hours playing banjo"));
+    widget.setWindowTitle(QStringLiteral("Hours playing banjo"));
 
-    QTableWidget *tableWidget = new QTableWidget(widget);
+    QTableWidget *tableWidget = new QTableWidget(&widget);
     tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tableWidget->setAlternatingRowColors(true);
 
@@ -240,15 +240,15 @@ int main(int argc, char **argv)
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), mapping);
     chart->setActiveDataProxy(proxy);
 
-    ChartDataGenerator *generator = new ChartDataGenerator(chart, tableWidget);
+    ChartDataGenerator generator(chart, tableWidget);
 
-    QObject::connect(chart, &Q3DBars::selectedBarPosChanged, generator,
+    QObject::connect(chart, &Q3DBars::selectedBarPosChanged, &generator,
                      &ChartDataGenerator::selectFromTable);
-    QObject::connect(tableWidget, &QTableWidget::currentCellChanged, generator,
+    QObject::connect(tableWidget, &QTableWidget::currentCellChanged, &generator,
                      &ChartDataGenerator::selectedFromTable);
 
-    widget->show();
-    generator->start();
+    widget.show();
+    generator.start();
 
     return app.exec();
 }

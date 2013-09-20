@@ -74,7 +74,7 @@ void Q3DCamera::copyValuesFrom(const Q3DCamera &source)
     float *values = new float[16];
     source.d_ptr->m_viewMatrix.copyDataTo(values);
     d_ptr->m_viewMatrix = QMatrix4x4(values);
-    delete values;
+    delete[] values;
 
     d_ptr->m_xRotation = source.d_ptr->m_xRotation;
     d_ptr->m_yRotation = source.d_ptr->m_yRotation;

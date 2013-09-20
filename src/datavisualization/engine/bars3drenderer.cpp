@@ -52,6 +52,8 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
       m_cachedIsSlicingActivated(false),
+      m_cachedRowCount(0),
+      m_cachedColumnCount(0),
       m_selectedBar(0),
       m_sliceSelection(0),
       m_sliceCache(0),

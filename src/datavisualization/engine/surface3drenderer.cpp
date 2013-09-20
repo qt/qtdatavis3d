@@ -142,6 +142,11 @@ Surface3DRenderer::~Surface3DRenderer()
 
     if (m_selectionPointer)
         delete m_selectionPointer;
+
+    for (int i = 0; i < m_dataArray.size(); i++)
+        delete m_dataArray.at(i);
+    m_dataArray.clear();
+
 }
 
 void Surface3DRenderer::initializeOpenGL()
