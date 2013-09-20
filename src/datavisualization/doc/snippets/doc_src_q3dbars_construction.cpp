@@ -27,7 +27,8 @@ int main(int argc, char **argv)
 
     //! [0]
     Q3DBars *bars = new Q3DBars();
-    bars->setDataWindow(5, 5);
+    bars->rowAxis()->setRange(0, 4);
+    bars->columnAxis()->setRange(0, 4);
     //! [0]
     //! [1]
     QBarDataRow data;

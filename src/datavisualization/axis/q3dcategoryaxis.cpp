@@ -30,7 +30,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since 1.0.0
  *
  * Q3DCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
- * categories based on \l {Q3DBars::setDataWindow()}{data window} size.
+ * categories based on the data window size defined by setting the axis range.
  *
  * Grid lines are drawn between categories, if visible. Labels are drawn to positions of categories
  * if provided.

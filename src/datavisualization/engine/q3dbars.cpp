@@ -54,9 +54,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \section1 How to construct a minimal Q3DBars chart
  *
- * After constructing Q3DBars, you should set data window using setDataWindow(). It is not
- * mandatory, as data window has default value of 10 x 10. For the example, let's set the data
- * window to 5 rows and 5 columns:
+ * After constructing Q3DBars, you can set the data window by changing the range on the row and
+ * column axes. It is not mandatory, as data window will default to showing all of the data in
+ * the data proxy. If the amount of data is large, it is usually preferable to show just a
+ * portion of it. For the example, let's set the data window to show first five rows and columns:
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
  *

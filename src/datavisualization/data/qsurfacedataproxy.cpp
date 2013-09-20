@@ -147,7 +147,8 @@ void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
  * to further modify data after QSurfaceDataProxy assumes ownership of it, as such modifications will
  * not trigger proper signals.
  * Passing null array clears all data.
- * Row and column ranges are set to values defined by the rest of the parameters.
+ * Row and column ranges are set to values defined by the rest of the parameters: \a minValueRows,
+ * \a maxValueRows, \a minValueColumns, and \a maxValueColumns.
  */
 void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
                                    qreal maxValueRows, qreal minValueColumns,
