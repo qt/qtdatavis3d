@@ -43,7 +43,7 @@ AudioLevels::AudioLevels(Q3DBars *chart, QObject *parent)
     m_graph->valueAxis()->setRange(0.0, 1.0);
     m_graph->setShadowQuality(QDataVis::ShadowNone);
     m_graph->setCameraPosition(-20.0, 10.0, 10);
-    m_graph->setTheme(QDataVis::ThemeHighContrast);
+    m_graph->setTheme(QDataVis::ThemeIsabelle);
 
     QAudioFormat formatAudio;
     formatAudio.setSampleRate(8000);

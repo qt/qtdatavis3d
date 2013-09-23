@@ -105,14 +105,6 @@
 
     \value ThemeDefault
            Used only in QML to indicate a theme has not been set.
-    \value ThemeSystem
-    \value ThemeBlueCerulean
-    \value ThemeBlueIcy
-    \value ThemeBlueNcs
-    \value ThemeBrownSand
-    \value ThemeDark
-    \value ThemeHighContrast
-    \value ThemeLight
     \value ThemeQt
     \value ThemePrimaryColors
     \value ThemeDigia

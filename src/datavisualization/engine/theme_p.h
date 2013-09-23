@@ -37,7 +37,7 @@ class QColor;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Theme
+class QT_DATAVISUALIZATION_EXPORT Theme
 {
 public:
     explicit Theme();

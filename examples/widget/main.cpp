@@ -53,14 +53,6 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     QComboBox *themeList = new QComboBox(widget);
-    themeList->addItem(QStringLiteral("System"));
-    themeList->addItem(QStringLiteral("Blue Cerulean"));
-    themeList->addItem(QStringLiteral("Blue Icy"));
-    themeList->addItem(QStringLiteral("Blue Ncs"));
-    themeList->addItem(QStringLiteral("Brown Sand"));
-    themeList->addItem(QStringLiteral("Dark"));
-    themeList->addItem(QStringLiteral("High Contrast"));
-    themeList->addItem(QStringLiteral("Light"));
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
     themeList->addItem(QStringLiteral("Digia"));

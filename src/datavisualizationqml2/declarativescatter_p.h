@@ -157,7 +157,6 @@ protected:
 
 private:
     QSize m_initialisedSize;
-    QDataVis::ColorTheme m_theme;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

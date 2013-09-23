@@ -20,14 +20,14 @@
 #include "declarativesurfacerenderer_p.h"
 #include "q3dvalueaxis.h"
 #include "qitemmodelsurfacedataproxy.h"
+#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_initialisedSize(0, 0),
-      m_theme(QDataVis::ThemeDefault)
+      m_initialisedSize(0, 0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -137,14 +137,12 @@ void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
 void DeclarativeSurface::setTheme(QDataVis::ColorTheme theme)
 {
     // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
-    // We need to save this locally, as there are no getters for it in controller
-    m_theme = theme;
     m_shared->setColorTheme(theme);
 }
 
 QDataVis::ColorTheme DeclarativeSurface::theme()
 {
-    return m_theme;
+    return m_shared->theme().colorTheme();
 }
 
 void DeclarativeSurface::setFont(const QFont &font)

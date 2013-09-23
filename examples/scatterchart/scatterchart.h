@@ -34,7 +34,6 @@ public:
     void addData();
     void changeStyle();
     void changePresetCamera();
-    void changeTheme();
     void changeTransparency();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);

@@ -116,15 +116,15 @@ int main(int argc, char *argv[])
     labelButton->setText(QStringLiteral("Change label style"));
 
     QComboBox *themeList = new QComboBox(widget);
-    themeList->addItem(QStringLiteral("System"));
-    themeList->addItem(QStringLiteral("Blue Cerulean"));
-    themeList->addItem(QStringLiteral("Blue Icy"));
-    themeList->addItem(QStringLiteral("Blue Ncs"));
-    themeList->addItem(QStringLiteral("Brown Sand"));
-    themeList->addItem(QStringLiteral("Dark"));
-    themeList->addItem(QStringLiteral("High Contrast"));
-    themeList->addItem(QStringLiteral("Light"));
-    themeList->setCurrentIndex(4);
+    themeList->addItem(QStringLiteral("Qt"));
+    themeList->addItem(QStringLiteral("Primary Colors"));
+    themeList->addItem(QStringLiteral("Digia"));
+    themeList->addItem(QStringLiteral("Stone Moss"));
+    themeList->addItem(QStringLiteral("Army Blue"));
+    themeList->addItem(QStringLiteral("Retro"));
+    themeList->addItem(QStringLiteral("Ebony"));
+    themeList->addItem(QStringLiteral("Isabelle"));
+    themeList->setCurrentIndex(0);
 
     QComboBox *shadowQuality = new QComboBox(widget);
     shadowQuality->addItem(QStringLiteral("None"));

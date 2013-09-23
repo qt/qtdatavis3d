@@ -36,7 +36,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     font.setPointSize(m_fontSize);
     m_chart->setFont(font);
     m_chart->setObjectType(QDataVis::Spheres, true);
-    m_chart->setTheme(QDataVis::ThemeBrownSand);
+    m_chart->setTheme(QDataVis::ThemeEbony);
     m_chart->setShadowQuality(QDataVis::ShadowHigh);
     m_chart->setCameraPreset(QDataVis::PresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
@@ -115,16 +115,6 @@ void ScatterDataModifier::changePresetCamera()
 
     if (++preset > QDataVis::PresetDirectlyAboveCCW45)
         preset = QDataVis::PresetFrontLow;
-}
-
-void ScatterDataModifier::changeTheme()
-{
-    static int theme = QDataVis::ThemeSystem;
-
-    m_chart->setTheme((QDataVis::ColorTheme)theme);
-
-    if (++theme > QDataVis::ThemeLight)
-        theme = QDataVis::ThemeSystem;
 }
 
 void ScatterDataModifier::changeTransparency()

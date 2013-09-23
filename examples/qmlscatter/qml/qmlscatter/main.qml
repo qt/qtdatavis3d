@@ -41,7 +41,7 @@ Item {
             font.family: "Lucida Handwriting"
             font.pointSize: 40
             dataProxy: chartData.proxy
-            theme: Scatter3D.ThemeHighContrast
+            theme: Scatter3D.ThemeIsabelle
             shadowQuality: Scatter3D.ShadowSoftLow
             selectionMode: Scatter3D.ModeItem
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
@@ -110,10 +110,10 @@ Item {
         text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
-            if (testscatter.theme === Scatter3D.ThemeBlueCerulean) {
-                testscatter.theme = Scatter3D.ThemeHighContrast;
+            if (testscatter.theme === Scatter3D.ThemeArmyBlue) {
+                testscatter.theme = Scatter3D.ThemeIsabelle;
             } else {
-                testscatter.theme = Scatter3D.ThemeBlueCerulean;
+                testscatter.theme = Scatter3D.ThemeArmyBlue;
             }
         }
     }

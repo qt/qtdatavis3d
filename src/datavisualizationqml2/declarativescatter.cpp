@@ -19,6 +19,7 @@
 #include "declarativescatter_p.h"
 #include "declarativescatterrenderer_p.h"
 #include "qitemmodelscatterdataproxy.h"
+#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -27,8 +28,7 @@ const QString smoothString(QStringLiteral("Smooth"));
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : QQuickItem(parent),
       m_shared(0),
-      m_initialisedSize(0, 0),
-      m_theme(QDataVis::ThemeDefault)
+      m_initialisedSize(0, 0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -189,19 +189,12 @@ QDataVis::CameraPreset DeclarativeScatter::cameraPreset()
 
 void DeclarativeScatter::setTheme(QDataVis::ColorTheme theme)
 {
-    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
-    // We need to save this locally, as there are no getters for it in controller
-    m_theme = theme;
     m_shared->setColorTheme(theme);
-
-    // TODO: Investigate why the beforeSynchronizing() signal requires update and is not sent automatically when this value changes,
-    // but is sent wen e.g. enable/disable background changes.
-    update();
 }
 
 QDataVis::ColorTheme DeclarativeScatter::theme()
 {
-    return m_theme;
+    return m_shared->theme().colorTheme();
 }
 
 void DeclarativeScatter::setFont(const QFont &font)

@@ -453,12 +453,12 @@ void ChartModifier::changePresetCamera()
 
 void ChartModifier::changeTheme()
 {
-    static int theme = QDataVis::ThemeSystem;
+    static int theme = QDataVis::ThemeQt;
 
     m_chart->setTheme((QDataVis::ColorTheme)theme);
 
-    if (++theme > QDataVis::ThemeLight)
-        theme = QDataVis::ThemeSystem;
+    if (++theme > QDataVis::ThemeIsabelle)
+        theme = QDataVis::ThemeQt;
 }
 
 void ChartModifier::changeTransparency()

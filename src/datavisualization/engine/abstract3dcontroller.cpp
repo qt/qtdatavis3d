@@ -59,7 +59,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_data(0),
     m_renderPending(false)
 {
-    m_theme.useColorTheme(QDataVis::ThemeSystem);
+    m_theme.useColorTheme(QDataVis::ThemeQt);
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);

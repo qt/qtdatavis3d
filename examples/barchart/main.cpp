@@ -95,11 +95,11 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
 #else
     // Set selection mode to zoom row
     m_chart->setSelectionMode(QDataVis::ModeSliceRow);
-    m_chart->setFont(QFont("Impact", 25));
+    m_chart->setFont(QFont("Impact", 20));
 #endif
 
     // Set theme
-    m_chart->setTheme(QDataVis::ThemeLight);
+    m_chart->setTheme(QDataVis::ThemeDigia);
 
     // Set preset camera position
     m_chart->setCameraPreset(QDataVis::PresetFront);

@@ -315,7 +315,7 @@ bool Q3DSurface::isBackgroundVisible() const
 }
 
 /*!
- * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeSystem by
+ * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeQt by
  * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *

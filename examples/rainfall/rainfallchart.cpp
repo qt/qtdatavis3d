@@ -69,7 +69,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setSelectionMode(QDataVis::ModeSliceColumn);
 
     // Set theme
-    m_chart->setTheme(QDataVis::ThemeBlueNcs);
+    m_chart->setTheme(QDataVis::ThemeArmyBlue);
 
     // Set preset camera position
     m_chart->setCameraPreset(QDataVis::PresetIsometricRightHigh);

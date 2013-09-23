@@ -85,14 +85,6 @@ public:
 
     enum ColorTheme {
         ThemeDefault = -1,
-        ThemeSystem = 0,
-        ThemeBlueCerulean,
-        ThemeBlueIcy,
-        ThemeBlueNcs,
-        ThemeBrownSand,
-        ThemeDark,
-        ThemeHighContrast,
-        ThemeLight,
         ThemeQt,
         ThemePrimaryColors,
         ThemeDigia,
