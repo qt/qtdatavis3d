@@ -43,6 +43,8 @@ static const int ID_TO_RGBA_MASK = 0xff;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+//#define SHOW_DEPTH_TEXTURE_SCENE
+
 // TODO Uniform scaling is broken on surface
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
@@ -62,6 +64,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_segmentYCount(0),
       m_segmentYStep(0.0f),
       m_shader(0),
+      m_depthShader(0),
       m_backgroundShader(0),
       m_surfaceShader(0),
       m_surfaceGridShader(0),
@@ -113,6 +116,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
 
+    // Shadows are disabled for Q3DSurface in Tech Preview
+    updateShadowQuality(QDataVis::ShadowNone);
+
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -129,6 +135,7 @@ Surface3DRenderer::~Surface3DRenderer()
     m_textureHelper->deleteTexture(&m_selectionResultTexture);
 
     delete m_shader;
+    delete m_depthShader;
     delete m_backgroundShader;
     delete m_selectionShader;
     delete m_surfaceShader;
@@ -160,6 +167,11 @@ void Surface3DRenderer::initializeOpenGL()
 
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
+
+#if !defined(QT_OPENGL_ES_2)
+    // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
+    initDepthShader();
+#endif
 
     // Init selection shader
     initSelectionShaders();
@@ -264,7 +276,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
     scene->setPrimarySubViewport(m_mainViewPort);
-    scene->setUnderSideCameraEnabled(m_hasNegativeValues);
+    scene->setUnderSideCameraEnabled(false);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
@@ -287,7 +299,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
-    m_cachedScene->setUnderSideCameraEnabled(m_hasNegativeValues);
+    m_cachedScene->setUnderSideCameraEnabled(false);
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -337,26 +349,126 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     else if (viewMatrix.row(0).x() <= 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 0.0f;
 
-    // TODO: add 0.0f, 1.0f / m_autoScaleAdjustment
     QVector3D lightPos = m_cachedScene->activeLight()->position();
 
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
-    depthProjectionMatrix = projectionMatrix; // TODO
-    depthViewMatrix.lookAt(lightPos, QVector3D(0.0f, 0.0f, zComp),
-                           QVector3D(0.0f, 1.0f, 0.0f)); // TODO: Move
-
-    QMatrix4x4 depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
+    QMatrix4x4 depthProjectionViewMatrix;
 
     GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
-
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
 
     //
     //  Do the surface drawing
     //
 
+    // Draw depth buffer
+#if !defined(QT_OPENGL_ES_2)
+    if (m_cachedShadowQuality > QDataVis::ShadowNone && m_surfaceObj) {
+        // Render scene into a depth texture for using with shadow mapping
+        // Enable drawing to depth framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Bind depth shader
+        m_depthShader->bind();
+
+        // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
+        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+                   m_mainViewPort.width() * m_shadowQualityMultiplier,
+                   m_mainViewPort.height() * m_shadowQualityMultiplier);
+
+        // Get the depth view matrix
+        // It may be possible to hack lightPos here if we want to make some tweaks to shadow
+        QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
+                    QVector3D(0.0f, 0.0f, zComp), 0.0f, 1.5f / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
+                               QVector3D(0.0f, 1.0f, 0.0f));
+
+        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
+        // That causes the scene to be not drawn from above -> must be fixed
+        // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
+        // Set the depth projection matrix
+#ifndef USE_WIDER_SHADOWS
+        // Use this for perspective shadows
+        depthProjectionMatrix.perspective(10.0f, (GLfloat)m_mainViewPort.width()
+                                          / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
+#else
+        // Use these for orthographic shadows
+        depthProjectionMatrix.ortho(-2.0f * 2.0f, 2.0f * 2.0f,
+                                    -2.0f, 2.0f,
+                                    0.0f, 100.0f);
+#endif
+        depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
+
+        glCullFace(GL_FRONT);
+
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+
+        modelMatrix.translate(0.0f, 0.0f, zComp);
+        modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
+
+        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+
+        m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
+
+        // 1st attribute buffer : vertices
+        glEnableVertexAttribArray(m_depthShader->posAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, m_surfaceObj->vertexBuf());
+        glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                              (void *)0);
+
+        // Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceObj->elementBuf());
+
+        // Draw the triangles
+        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), GL_UNSIGNED_SHORT,
+                       (void *)0);
+
+        // Free buffers
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDisableVertexAttribArray(m_depthShader->posAtt());
+
+        // Disable drawing to depth framebuffer (= enable drawing to screen)
+        glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
+
+        // Release depth shader
+        m_depthShader->release();
+
+        // Revert to original viewport
+        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+                   m_mainViewPort.width(), m_mainViewPort.height());
+
+        // Reset culling to normal
+        glCullFace(GL_BACK);
+
+#if 0 // Use this if you want to see what is being drawn to the framebuffer
+        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
+        {
+            m_labelShader->bind();
+            glEnable(GL_TEXTURE_2D);
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 viewmatrix;
+            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
+                              QVector3D(0.0f, 0.0f, zComp),
+                              QVector3D(0.0f, 1.0f, 0.0f));
+            modelMatrix.translate(0.0, 0.0, zComp);
+            QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
+            m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
+            m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
+            glDisable(GL_TEXTURE_2D);
+            m_labelShader->release();
+        }
+#endif
+    }
+#endif
+
+    // Enable texturing
+    glEnable(GL_TEXTURE_2D);
+
+    // Draw selection buffer
     if (m_querySelection && m_surfaceObj) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -377,33 +489,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
 
-        // Activate texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_selectionTexture);
-        m_selectionShader->setUniformValue(m_selectionShader->texture(), 0);
-
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(m_selectionShader->posAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, m_surfaceObj->vertexBuf());
-        glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-        // 3rd attribute buffer : UVs
-        glEnableVertexAttribArray(m_selectionShader->uvAtt());
-        glBindBuffer(GL_ARRAY_BUFFER, m_surfaceObj->uvBuf());
-        glVertexAttribPointer(m_selectionShader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceObj->elementBuf());
-
-        // Draw the triangles
-        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), m_surfaceObj->indicesType(), (void *)0);
-
-        // Free buffers
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        glDisableVertexAttribArray(m_selectionShader->uvAtt());
-        glDisableVertexAttribArray(m_selectionShader->posAtt());
+        m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture);
 
         glEnable(GL_DITHER);
 
@@ -427,8 +513,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             //surfacePointCleared();
             m_selectionActive = false;
         }
+        glEnable(GL_CULL_FACE);
     }
 
+    // Draw surface
     if (m_surfaceObj) {
         m_surfaceShader->bind();
         // m_selectionShader->bind(); // IFDEF print selection
@@ -450,31 +538,41 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        // TODO Check the usage?
         depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
         // Set shader bindings
         m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
         m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
         m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->nModel(), itModelMatrix.inverted().transposed());
+        m_surfaceShader->setUniformValue(m_surfaceShader->nModel(),
+                                         itModelMatrix.inverted().transposed());
         m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
-        //m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix); // IFDEF print selection
-        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
+                                         m_cachedTheme.m_ambientStrength);
 
-        //IF QT_OPENGL_ES_2 TODO
-        // Shadow quality etc.
-        //m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(), m_shadowQualityToShader);
-        //m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
-                                         m_cachedTheme.m_lightStrength * 2.0f);
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+            // Set shadow shader bindings
+            m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
+            m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
+            m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
 
-        m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
-        //m_drawer->drawObject(m_selectionShader, m_surfaceObj, m_selectionTexture, 0); // IFDEF print selection
+            // Draw the object
+            m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
+        } else
+#endif
+        {
+            // Set shadowless shader bindings
+            m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
+                                             m_cachedTheme.m_lightStrength);
+
+            // Draw the object
+            m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture);
+        }
 
         m_surfaceShader->release();
-        //m_selectionShader->release(); // IFDEF print selection
 
+        // Draw surface grid
         if (m_cachedSurfaceGridOn) {
             // Draw the grid over the surface
             glPolygonOffset(1.0f, 1.0f);
@@ -482,14 +580,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
             m_surfaceGridShader->bind();
 
-            QVector3D gridColor = Utils::vectorFromColor(QColor(Qt::white));
             // Set shader bindings
-            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->view(), viewMatrix);
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->model(), modelMatrix);
-            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->nModel(), itModelMatrix.inverted().transposed());
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
-            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(), gridColor);
-            //m_surfaceGridShader->setUniformValue(m_surfaceGridShader->ambientS(), m_theme->m_ambientStrength);
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
+                                                 Utils::vectorFromColor(m_cachedTheme.m_gridLine));
+
             m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
 
             m_surfaceGridShader->release();
@@ -497,15 +593,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             glPolygonOffset(0.0f, 0.0f);
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
+        glEnable(GL_CULL_FACE);
     }
 
     // Bind background shader
     m_backgroundShader->bind();
-
-    if (m_hasNegativeValues)
-        glDisable(GL_CULL_FACE);
-    else
-        glCullFace(GL_BACK);
+    glCullFace(GL_BACK);
 
     // Draw background
     if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
@@ -573,15 +666,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Release background shader
     m_backgroundShader->release();
 
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
-
-    // Reset culling
-    if (m_hasNegativeValues) {
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-    }
-
     // Draw grid lines
     QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
     QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
@@ -638,8 +722,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -745,8 +828,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -794,8 +876,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -850,8 +931,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -901,8 +981,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
+                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
 
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -926,7 +1005,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw axis labels
     m_labelShader->bind();
-    glEnable(GL_TEXTURE_2D);
 
     if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
         glEnable(GL_BLEND);
@@ -972,8 +1050,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true,
-                                    Drawer::LabelMid, alignment);
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
             labelPos -= posStep;
@@ -1017,8 +1095,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true,
-                                    Drawer::LabelMid, alignment);
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
             labelPos += posStep;
@@ -1071,8 +1149,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTrans);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true,
-                                    Drawer::LabelMid, alignment);
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    true, true, Drawer::LabelMid, alignment);
 
                 // Side wall
                 if (m_xFlipped)
@@ -1091,8 +1169,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTrans);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true,
-                                    Drawer::LabelMid, alignment);
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
             labelPos += posStep;
@@ -1100,12 +1178,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     glDisable(GL_TEXTURE_2D);
+
     if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
         glDisable(GL_BLEND);
 
     // Release label shader
     m_labelShader->release();
-
 }
 
 void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
@@ -1288,10 +1366,7 @@ void Surface3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
-    if (m_hasNegativeValues)
-        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
-    else
-        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
+    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
     m_backgroundObj->load();
 }
 
@@ -1323,59 +1398,6 @@ void Surface3DRenderer::handleResize()
 
     Abstract3DRenderer::handleResize();
 }
-
-#if !defined(QT_OPENGL_ES_2)
-void Surface3DRenderer::updateDepthBuffer()
-{
-    if (m_depthTexture) {
-        m_textureHelper->deleteTexture(&m_depthTexture);
-        m_depthTexture = 0;
-    }
-
-    if (m_cachedShadowQuality > QDataVis::ShadowNone && !m_mainViewPort.size().isEmpty()) {
-        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
-                                                             m_depthFrameBuffer,
-                                                             m_shadowQualityMultiplier);
-        if (!m_depthTexture) {
-            switch (m_cachedShadowQuality) {
-            case QDataVis::ShadowHigh:
-                qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
-                updateShadowQuality(QDataVis::ShadowMedium);
-                break;
-            case QDataVis::ShadowMedium:
-                qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
-                updateShadowQuality(QDataVis::ShadowLow);
-                break;
-            case QDataVis::ShadowLow:
-                qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
-                updateShadowQuality(QDataVis::ShadowNone);
-                break;
-            case QDataVis::ShadowSoftHigh:
-                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftMedium);
-                updateShadowQuality(QDataVis::ShadowSoftMedium);
-                break;
-            case QDataVis::ShadowSoftMedium:
-                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftLow);
-                updateShadowQuality(QDataVis::ShadowSoftLow);
-                break;
-            case QDataVis::ShadowSoftLow:
-                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
-                updateShadowQuality(QDataVis::ShadowNone);
-                break;
-            default:
-                // You'll never get here
-                break;
-            }
-        }
-    }
-}
-#endif
 
 void Surface3DRenderer::surfacePointSelected(int id)
 {
@@ -1478,7 +1500,8 @@ void Surface3DRenderer::loadMeshFile()
 
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_cachedShadowQuality = quality;
+    qWarning() << "Shadows have been disabled for Q3DSurface in technology preview";
+    m_cachedShadowQuality = QDataVis::ShadowNone; //quality;
     switch (quality) {
     case QDataVis::ShadowLow:
         m_shadowQualityToShader = 33.3f;
@@ -1584,5 +1607,68 @@ void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_labelShader->initialize();
 }
+
+#if !defined(QT_OPENGL_ES_2)
+void Surface3DRenderer::initDepthShader()
+{
+    // TODO: Implement a depth shader for surface after technology preview
+    if (m_depthShader)
+        delete m_depthShader;
+    m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
+                                     QStringLiteral(":/shaders/fragmentDepth"));
+    m_depthShader->initialize();
+}
+
+void Surface3DRenderer::updateDepthBuffer()
+{
+    if (m_depthTexture) {
+        m_textureHelper->deleteTexture(&m_depthTexture);
+        m_depthTexture = 0;
+    }
+
+    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
+                                                             m_depthFrameBuffer,
+                                                             m_shadowQualityMultiplier);
+        if (!m_depthTexture) {
+            switch (m_cachedShadowQuality) {
+            case QDataVis::ShadowHigh:
+                qWarning("Creating high quality shadows failed. Changing to medium quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
+                updateShadowQuality(QDataVis::ShadowMedium);
+                break;
+            case QDataVis::ShadowMedium:
+                qWarning("Creating medium quality shadows failed. Changing to low quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
+                updateShadowQuality(QDataVis::ShadowLow);
+                break;
+            case QDataVis::ShadowLow:
+                qWarning("Creating low quality shadows failed. Switching shadows off.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
+                break;
+            case QDataVis::ShadowSoftHigh:
+                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftMedium);
+                updateShadowQuality(QDataVis::ShadowSoftMedium);
+                break;
+            case QDataVis::ShadowSoftMedium:
+                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftLow);
+                updateShadowQuality(QDataVis::ShadowSoftLow);
+                break;
+            case QDataVis::ShadowSoftLow:
+                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
+                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
+                updateShadowQuality(QDataVis::ShadowNone);
+                break;
+            default:
+                // You'll never get here
+                break;
+            }
+        }
+    }
+}
+#endif
 
 QT_DATAVISUALIZATION_END_NAMESPACE

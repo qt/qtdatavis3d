@@ -77,6 +77,7 @@ private:
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
     ShaderHelper *m_shader;
+    ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceShader;
     ShaderHelper *m_surfaceGridShader;
@@ -152,6 +153,7 @@ private:
     void initSelectionShaders();
     void initSurfaceShaders();
     void initSelectionBuffer();
+    void initDepthShader();
     void updateSelectionTexture();
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
