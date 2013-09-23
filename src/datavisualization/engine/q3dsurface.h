@@ -92,7 +92,6 @@ public:
     QDataVis::LabelTransparency labelTransparency() const;
 
 protected:
-    void render();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);

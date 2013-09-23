@@ -203,6 +203,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
 {
+    setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
                      &Q3DScatter::selectedItemIndexChanged);
@@ -215,15 +216,6 @@ Q3DScatter::Q3DScatter()
  */
 Q3DScatter::~Q3DScatter()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::render()
-{
-    d_ptr->m_shared->synchDataToRenderer();
-    d_ptr->m_shared->render();
 }
 
 #if defined(Q_OS_ANDROID)

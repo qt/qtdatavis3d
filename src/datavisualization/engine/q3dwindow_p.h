@@ -37,6 +37,7 @@ class QOpenGLPaintDevice;
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DWindow;
+class Abstract3DController;
 
 class Q3DWindowPrivate
 {
@@ -48,8 +49,9 @@ public:
     Q3DWindow *q_ptr;
 
     bool m_updatePending;
-
     QOpenGLContext *m_context;
+    Abstract3DController *m_visualController;
+    qreal m_devicePixelRatio;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

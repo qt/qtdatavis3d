@@ -18,7 +18,7 @@
 
 #include "q3dwindow.h"
 #include "q3dwindow_p.h"
-
+#include "abstract3dcontroller_p.h"
 #include <QGuiApplication>
 
 #include <QOpenGLContext>
@@ -93,8 +93,33 @@ Q3DWindow::~Q3DWindow()
 /*!
  * \internal
  */
+void Q3DWindow::setVisualController(Abstract3DController *controller)
+{
+    d_ptr->m_visualController = controller;
+}
+
+/*!
+ * \internal
+ */
+void Q3DWindow::handleDevicePixelRatioChange()
+{
+    if (QWindow::devicePixelRatio() == d_ptr->m_devicePixelRatio || !d_ptr->m_visualController)
+        return;
+
+    // Device pixel ratio changed, resize accordingly and inform the scene
+    d_ptr->m_devicePixelRatio = QWindow::devicePixelRatio();
+    d_ptr->m_visualController->updateDevicePixelRatio(d_ptr->m_devicePixelRatio);
+
+}
+
+/*!
+ * \internal
+ */
 void Q3DWindow::render()
 {
+    handleDevicePixelRatioChange();
+    d_ptr->m_visualController->synchDataToRenderer();
+    d_ptr->m_visualController->render();
 }
 
 /*!
@@ -153,7 +178,9 @@ void Q3DWindow::renderNow()
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
     : q_ptr(q),
       m_updatePending(false),
-      m_context(new QOpenGLContext(q))
+      m_context(new QOpenGLContext(q)),
+      m_visualController(0),
+      m_devicePixelRatio(1.f)
 {
 }
 

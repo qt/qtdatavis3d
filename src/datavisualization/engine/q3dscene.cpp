@@ -242,6 +242,23 @@ void Q3DScene::setActiveLight(Q3DLight *light)
 }
 
 /*!
+ * \property Q3DScene::devicePixelRatio
+ *
+ * This property contains the current device pixel ratio that is used when mapping input
+ * coordinates to pixel coordinates.
+ */
+qreal Q3DScene::devicePixelRatio() const
+{
+    return d_ptr->m_devicePixelRatio;
+}
+
+void Q3DScene::setDevicePixelRatio(qreal pixelRatio)
+{
+    d_ptr->m_devicePixelRatio = pixelRatio;
+}
+
+
+/*!
  * Calculates and sets the light position relative to the currently active camera using the given parameters.
  * \a relativePosition defines the relative 3D offset to the current camera position.
  * Optional \a fixedRotation fixes the light rotation around the data visualization area to the given value in degrees.
@@ -272,6 +289,7 @@ void Q3DScene::setUnderSideCameraEnabled(bool isEnabled)
 
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     q_ptr(q),
+    m_devicePixelRatio(1.f),
     m_camera(),
     m_light(),
     m_isUnderSideCameraEnabled(false),
@@ -327,6 +345,12 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
         other.q_ptr->setSlicingActive(q_ptr->isSlicingActive());
         m_changeTracker.slicingActivatedChanged = false;
         other.m_changeTracker.slicingActivatedChanged = false;
+    }
+
+    if (m_changeTracker.devicePixelRatioChanged) {
+        other.q_ptr->setDevicePixelRatio(q_ptr->devicePixelRatio());
+        m_changeTracker.devicePixelRatioChanged = false;
+        other.m_changeTracker.devicePixelRatioChanged = false;
     }
 }
 

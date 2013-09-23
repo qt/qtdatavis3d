@@ -203,6 +203,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Q3DSurface::Q3DSurface()
     : d_ptr(new Q3DSurfacePrivate(this, geometry()))
 {
+    setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
@@ -213,15 +214,6 @@ Q3DSurface::Q3DSurface()
  */
 Q3DSurface::~Q3DSurface()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::render()
-{
-    d_ptr->m_shared->synchDataToRenderer();
-    d_ptr->m_shared->render();
 }
 
 #if defined(Q_OS_ANDROID)

@@ -242,6 +242,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
 {
+    setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarPosChanged, this,
                      &Q3DBars::selectedBarPosChanged);
@@ -254,15 +255,6 @@ Q3DBars::Q3DBars()
  */
 Q3DBars::~Q3DBars()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DBars::render()
-{
-    d_ptr->m_shared->synchDataToRenderer();
-    d_ptr->m_shared->render();
 }
 
 #if defined(Q_OS_ANDROID)

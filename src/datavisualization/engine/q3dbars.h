@@ -124,7 +124,6 @@ signals:
     void selectedBarPosChanged(QPoint position);
 
 protected:
-    void render();
 
 #if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);

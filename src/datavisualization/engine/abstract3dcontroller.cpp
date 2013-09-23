@@ -448,6 +448,11 @@ void Abstract3DController::setSecondarySubViewport(const QRect &secondarySubView
     m_scene->setSecondarySubViewport(secondarySubViewport);
 }
 
+void Abstract3DController::updateDevicePixelRatio(qreal ratio)
+{
+    m_scene->setDevicePixelRatio(ratio);
+}
+
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
 {
     setAxisHelper(Q3DAbstractAxis::AxisOrientationX, axis, &m_axisX);

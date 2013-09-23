@@ -235,6 +235,7 @@ public:
     virtual void releaseDataProxy(QAbstractDataProxy *proxy);
     virtual QList<QAbstractDataProxy *> dataProxies() const;
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+    virtual void updateDevicePixelRatio(qreal ratio);
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);

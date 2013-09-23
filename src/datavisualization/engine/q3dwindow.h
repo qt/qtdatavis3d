@@ -23,12 +23,14 @@
 
 #include <QWindow>
 #include <QOpenGLFunctions>
+#include <QScreen>
 
 class QPainter;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DWindowPrivate;
+class Abstract3DController;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
@@ -47,6 +49,8 @@ protected:
 
     bool event(QEvent *event);
     void exposeEvent(QExposeEvent *event);
+    void setVisualController(Abstract3DController *controller);
+    void handleDevicePixelRatioChange();
 
 private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;

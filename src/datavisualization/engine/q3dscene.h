@@ -39,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive)
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera)
     Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight)
+    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio)
 
 public:
     Q3DScene(QObject *parent = 0);
@@ -64,6 +65,9 @@ public:
 
     Q3DLight *activeLight() const;
     void setActiveLight(Q3DLight *light);
+
+    qreal devicePixelRatio() const;
+    void setDevicePixelRatio(qreal pixelRatio);
 
     void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
                                           qreal fixedRotation = 0.0,
