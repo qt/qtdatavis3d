@@ -309,10 +309,11 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);
 
     if (useDepth && !rotateAlong) {
+        qreal yComp = qreal(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
         // Apply negative camera rotations to keep labels facing camera
         QPointF camRotations = camera->rotations();
         modelMatrix.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
-        modelMatrix.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
+        modelMatrix.rotate(-camRotations.y() - yComp, 1.0f, 0.0f, 0.0f);
     }
 
     // Scale label based on text size

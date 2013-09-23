@@ -173,7 +173,7 @@ int AxisRenderCache::maxLabelWidth(const QStringList &labels) const
 {
     int labelWidth = 0;
     QFont labelFont = m_font;
-    labelFont.setPointSize(50);
+    labelFont.setPointSize(textureFontSize);
     QFontMetrics labelFM(labelFont);
     for (int i = 0; i < labels.size(); i++) {
         int newWidth = labelFM.width(labels.at(i));

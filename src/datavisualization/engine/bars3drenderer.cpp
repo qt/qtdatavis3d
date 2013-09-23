@@ -216,7 +216,7 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
     scene->setUnderSideCameraEnabled(m_hasNegativeValues);
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
                                                   QVector3D(0.0f, -m_yAdjustment, zComp),
                                                   QVector3D(0.0f, 1.0f, 0.0f));
         m_hasHeightAdjustmentChanged = false;
@@ -363,10 +363,8 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glCullFace(GL_BACK);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Draw labels for axes
     BarRenderItem *dummyItem(0);
@@ -439,8 +437,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     }
 
     glDisable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
     // Release label shader
@@ -1233,10 +1230,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     m_labelShader->bind();
 
     glEnable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Calculate the positions for row and column labels and store them
     for (int row = 0; row != m_cachedRowCount; row++) {
@@ -1472,8 +1467,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     glDisable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
     // Release label shader
     m_labelShader->release();

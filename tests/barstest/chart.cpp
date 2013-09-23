@@ -468,7 +468,7 @@ void ChartModifier::changeTransparency()
     m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 
     if (++transparency > QDataVis::TransparencyNoBackground)
-        transparency = QDataVis::TransparencyFromTheme;
+        transparency = QDataVis::TransparencyNone;
 }
 
 void ChartModifier::changeSelectionMode()

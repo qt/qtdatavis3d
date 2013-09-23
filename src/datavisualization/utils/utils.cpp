@@ -52,7 +52,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     GLuint paddingHeight = 15;
     // Calculate text dimensions
     QFont valueFont = font;
-    valueFont.setPointSize(50);
+    valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
     if (maxLabelWidth && QDataVis::TransparencyNoBackground != transparency)
@@ -88,9 +88,9 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     // Paint text
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.setFont(valueFont);
     switch (transparency) {
     case QDataVis::TransparencyNoBackground: {
-        painter.setFont(valueFont);
         painter.setPen(txtColor);
 #if defined(Q_OS_ANDROID)
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
@@ -108,12 +108,14 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     }
     case QDataVis::TransparencyFromTheme: {
         painter.setBrush(QBrush(bgrColor));
-        if (borders)
+        if (borders) {
             painter.setPen(QPen(QBrush(txtColor), 5, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
-        else
+            painter.drawRoundedRect(5, 5, labelSize.width() - 10, labelSize.height() - 10,
+                                    10.0, 10.0);
+        } else {
             painter.setPen(bgrColor);
-        painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0f);
-        painter.setFont(valueFont);
+            painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0);
+        }
         painter.setPen(txtColor);
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
                          (labelSize.height() - valueStrHeight) / 2.0f,
@@ -123,13 +125,16 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         break;
     }
     case QDataVis::TransparencyNone: {
-        painter.setBrush(QBrush(bgrColor));
-        if (borders)
-            painter.setPen(QPen(QBrush(txtColor), 7.5));
-        else
-            painter.setPen(bgrColor);
-        painter.drawRect(0, 0, labelSize.width(), labelSize.height());
-        painter.setFont(valueFont);
+        QColor labelColor = QColor(bgrColor);
+        labelColor.setAlphaF(1.0);
+        painter.setBrush(QBrush(labelColor));
+        if (borders) {
+            painter.setPen(QPen(QBrush(txtColor), 7.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+            painter.drawRect(7.5, 7.5, labelSize.width() - 15, labelSize.height() - 15);
+        } else {
+            painter.setPen(labelColor);
+            painter.drawRect(0, 0, labelSize.width(), labelSize.height());
+        }
         painter.setPen(txtColor);
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
                          (labelSize.height() - valueStrHeight) / 2.0f,

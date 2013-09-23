@@ -281,7 +281,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
                                                   QVector3D(0.0f, 0.0f, zComp),
                                                   QVector3D(0.0f, 1.0f, 0.0f));
         // For now this is used just to make things once. Proper use will come
@@ -1006,10 +1006,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw axis labels
     m_labelShader->bind();
 
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, zComp);
@@ -1179,8 +1177,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     glDisable(GL_TEXTURE_2D);
 
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
     // Release label shader
     m_labelShader->release();

@@ -170,7 +170,7 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, 6.0f + zComp),
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
                                                   QVector3D(0.0f, 0.0f, zComp),
                                                   QVector3D(0.0f, 1.0f, 0.0f));
         m_hasHeightAdjustmentChanged = false;
@@ -1071,10 +1071,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     m_labelShader->bind();
 
     glEnable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
@@ -1333,7 +1331,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                             QVector3D(0.0f, 0.0f, zComp),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, m_cachedScene->activeCamera(), true, false, Drawer::LabelMid);
+                            m_labelObj, m_cachedScene->activeCamera(), true, false,
+                            Drawer::LabelMid);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;
@@ -1341,8 +1340,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
 
     glDisable(GL_TEXTURE_2D);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
     // Release label shader
     m_labelShader->release();
