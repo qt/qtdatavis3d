@@ -76,6 +76,16 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
       m_scaleZWithBackground(0.0f),
+      m_surfaceScaleX(0.0f),
+      m_surfaceScaleZ(0.0f),
+      m_surfaceOffsetX(0.0f),
+      m_surfaceOffsetZ(0.0f),
+      m_minVisibleColumnValue(0.0f),
+      m_maxVisibleColumnValue(0.0f),
+      m_minVisibleRowValue(0.0f),
+      m_maxVisibleRowValue(0.0f),
+      m_dataStepX(0.0f),
+      m_dataStepZ(0.0f),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -196,45 +206,17 @@ void Surface3DRenderer::initializeOpenGL()
 
 void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 {
-    // Make a copy of data array.
     for (int i = 0; i < m_dataArray.size(); i++)
         delete m_dataArray.at(i);
     m_dataArray.clear();
 
-    const QSurfaceDataArray *array = dataProxy->array();
-
-    QRect sampleSpace = calculateSampleRect(dataProxy);
-
-    m_dataArray.reserve(sampleSpace.height());
-    for (int i = 0; i < sampleSpace.height(); i++) {
-        QSurfaceDataRow *newRow = new QSurfaceDataRow();
-        newRow->resize(sampleSpace.width());
-        for (int j = 0; j < sampleSpace.width(); j++)
-            (*newRow)[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
-        m_dataArray << newRow;
-    }
-
-    // If data contains only one row, duplicate it to make surface
-    if (sampleSpace.height() == 1) {
-        QSurfaceDataRow *newRow = new QSurfaceDataRow(*m_dataArray.at(0));
-        m_dataArray << newRow;
-        sampleSpace.setHeight(2);
-    }
-
-    // If data contains only one column, duplicate the value to make surface
-    if (sampleSpace.width() == 1) {
-        for (int i = 0; i < sampleSpace.height(); i++)
-            (*m_dataArray.at(i)) << m_dataArray.at(i)->at(0);
-        sampleSpace.setWidth(2);
-    }
-
     calculateSceneScalingFactors();
 
-    if (m_dataArray.size() > 0) {
-        if (!m_surfaceObj)
-            loadSurfaceObj();
+    const QSurfaceDataArray *array = dataProxy->array();
 
-        sampleSpace.moveTo(0, 0);
+    // Need minimum of 2x2 array to draw a surface
+    if (array->size() >= 2 && array->at(0)->size() >= 2) {
+        QRect sampleSpace = calculateSampleRect(dataProxy);
 
         bool dimensionChanged = false;
         if (m_sampleSpace != sampleSpace) {
@@ -242,13 +224,31 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
             m_sampleSpace = sampleSpace;
         }
 
-        if (m_cachedSmoothSurface)
-            m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
-        else
-            m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+        // TODO: Handle partial surface grids on the graph edges
+        if (sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
+            m_dataArray.reserve(sampleSpace.height());
+            for (int i = 0; i < sampleSpace.height(); i++) {
+                QSurfaceDataRow *newRow = new QSurfaceDataRow();
+                newRow->resize(sampleSpace.width());
+                for (int j = 0; j < sampleSpace.width(); j++)
+                    (*newRow)[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
+                m_dataArray << newRow;
+            }
 
-        if (dimensionChanged)
-            updateSelectionTexture();
+            if (m_dataArray.size() > 0) {
+                if (!m_surfaceObj)
+                    loadSurfaceObj();
+
+                // Note: Data setup can change samplespace (as min width/height is 1)
+                if (m_cachedSmoothSurface)
+                    m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+                else
+                    m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+
+                if (dimensionChanged)
+                    updateSelectionTexture();
+            }
+        }
     }
 
     Abstract3DRenderer::updateDataModel(dataProxy);
@@ -256,19 +256,57 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 
 QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
 {
-    QRect sampleSpace(0, 0, dataProxy->columnCount(), dataProxy->rowCount());
+    QRect sampleSpace;
 
-    // TODO: Calculate the actual sample rect, for now it is required data and axis ranges are the same
-#if 0
-    if (m_axisCacheX.min() != dataProxy->minValueColumns() || m_axisCacheX.max() != dataProxy->maxValueColumns()
-            || m_axisCacheZ.min() != dataProxy->minValueRows() || m_axisCacheZ.max() != dataProxy->maxValueRows()) {
-        qWarning() << "Warning: Technology preview doesn't support axis ranges that are different from data ranges -"
-                   << m_axisCacheX.min() << dataProxy->minValueColumns() << "-"
-                   << m_axisCacheX.max() << dataProxy->maxValueColumns() << "-"
-                   << m_axisCacheZ.min() << dataProxy->minValueRows() << "-"
-                   << m_axisCacheZ.max() << dataProxy->maxValueRows();
+    m_minVisibleColumnValue = dataProxy->minValueColumns();
+    m_maxVisibleColumnValue = dataProxy->maxValueColumns();
+    m_minVisibleRowValue = dataProxy->minValueRows();
+    m_maxVisibleRowValue = dataProxy->maxValueRows();
+    m_dataStepX = (m_maxVisibleColumnValue - m_minVisibleColumnValue) / (dataProxy->columnCount() - 1);
+    m_dataStepZ = (m_maxVisibleRowValue - m_minVisibleRowValue) / (dataProxy->rowCount() - 1);
+
+    if (m_minVisibleColumnValue >  m_axisCacheX.max() || m_maxVisibleColumnValue <  m_axisCacheX.min()
+            || m_minVisibleRowValue >  m_axisCacheZ.max() || m_maxVisibleRowValue <  m_axisCacheZ.min()) {
+        sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
     }
-#endif
+
+    int index = 0;
+    while (m_minVisibleColumnValue < m_axisCacheX.min()) {
+        m_minVisibleColumnValue += m_dataStepX;
+        index++;
+    }
+    sampleSpace.setLeft(index);
+
+    index = dataProxy->columnCount() - 1;
+    while (m_maxVisibleColumnValue > m_axisCacheX.max()) {
+        m_maxVisibleColumnValue -= m_dataStepX;
+        index--;
+    }
+    sampleSpace.setRight(index);
+
+    index = 0;
+    while (m_minVisibleRowValue < m_axisCacheZ.min()) {
+        m_minVisibleRowValue += m_dataStepZ;
+        index++;
+    }
+    sampleSpace.setTop(index);
+
+    index = dataProxy->rowCount() - 1;
+    while (m_maxVisibleRowValue > m_axisCacheZ.max()) {
+        m_maxVisibleRowValue -= m_dataStepZ;
+        index--;
+    }
+    sampleSpace.setBottom(index);
+
+    m_surfaceScaleX = m_scaleX * (m_maxVisibleColumnValue - m_minVisibleColumnValue) / m_areaSize.width();
+    m_surfaceScaleZ = m_scaleZ * (m_maxVisibleRowValue - m_minVisibleRowValue) / m_areaSize.height();
+    GLfloat axis2XCenterX = (m_axisCacheX.min() + m_axisCacheX.max());
+    GLfloat axis2XCenterZ = (m_axisCacheZ.min() + m_axisCacheZ.max());
+    GLfloat data2XCenterX = (m_minVisibleColumnValue + m_maxVisibleColumnValue);
+    GLfloat data2XCenterZ = (m_minVisibleRowValue + m_maxVisibleRowValue);
+    m_surfaceOffsetX = m_scaleX * (data2XCenterX - axis2XCenterX) / m_areaSize.width();
+    m_surfaceOffsetZ = -m_scaleZ * (data2XCenterZ - axis2XCenterZ) / m_areaSize.height() + zComp;
+
     return sampleSpace;
 }
 
@@ -361,6 +399,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     //  Do the surface drawing
     //
 
+    QVector3D surfaceScaler(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);
+    QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
+
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowNone && m_surfaceObj) {
@@ -405,8 +446,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(0.0f, 0.0f, zComp);
-        modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
+        modelMatrix.translate(surfaceOffset);
+        modelMatrix.scale(surfaceScaler);
 
         MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
@@ -469,7 +510,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (m_querySelection && m_surfaceObj) {
+    if (m_querySelection && m_surfaceObj && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -482,8 +523,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
 
-        modelMatrix.translate(0.0f, 0.0f, zComp);
-        modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
+        modelMatrix.translate(surfaceOffset);
+        modelMatrix.scale(surfaceScaler);
 
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -516,8 +557,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_CULL_FACE);
     }
 
-    // Draw surface
-    if (m_surfaceObj) {
+    if (m_surfaceObj && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         m_surfaceShader->bind();
         // m_selectionShader->bind(); // IFDEF print selection
 
@@ -529,9 +569,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 0.0f, zComp);
-        modelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
-        itModelMatrix.scale(QVector3D(m_scaleX, 1.0f, m_scaleZ));
+        modelMatrix.translate(surfaceOffset);
+        modelMatrix.scale(surfaceScaler);
+        itModelMatrix.scale(surfaceScaler);
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1372,7 +1412,6 @@ void Surface3DRenderer::loadSurfaceObj()
     if (m_surfaceObj)
         delete m_surfaceObj;
     m_surfaceObj = new SurfaceObject();
-    //m_surfaceObj->setUpData();
 }
 
 void Surface3DRenderer::loadGridLineMesh()
@@ -1405,8 +1444,11 @@ void Surface3DRenderer::surfacePointSelected(int id)
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_controller, m_drawer);
 
-    m_selectionPointer->setPosition(normalize(float(column), value, float(row)));
-    m_selectionPointer->setScaling(QVector3D(m_scaleX, 1.0f, m_scaleZ));
+    QVector3D pos(normalize(float(column), value, float(row)));
+    pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ - zComp);
+
+    m_selectionPointer->setPosition(pos);
+    m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ));
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
     m_selectionPointer->updateBoundingRect(m_mainViewPort);
     m_selectionPointer->updateScene(m_cachedScene);
@@ -1457,19 +1499,13 @@ QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row
 // Transforms the model column coordinate to axis coordinate
 qreal Surface3DRenderer::columnInRange(int column)
 {
-    // At this point we'll work only with fixed grid and demand that the user uses proper steps on
-    // value axis. Zero prevented when doing duplicate from the data.
-    qreal stepInRange = (m_axisCacheX.max() - m_axisCacheX.min()) / qreal(m_dataArray.at(0)->size() - 1);
-    return stepInRange * qreal(column) + m_axisCacheX.min();
+    return m_dataStepX * qreal(column) + m_minVisibleColumnValue;
 }
 
 // Transforms the model row coordinate to axis coordinate
 qreal Surface3DRenderer::rowInRange(int row)
 {
-    // At this point we'll work only with fixed grid and demand that the user uses proper steps on
-    // value axis. Zero prevented when doing duplicate from the data.
-    qreal stepInRange = (m_axisCacheZ.max() - m_axisCacheZ.min()) / qreal(m_dataArray.size() - 1);
-    return stepInRange * qreal(row) + m_axisCacheZ.min();
+    return m_dataStepZ * qreal(row) + m_minVisibleRowValue;
 }
 
 QVector3D Surface3DRenderer::normalize(float x, float y, float z)

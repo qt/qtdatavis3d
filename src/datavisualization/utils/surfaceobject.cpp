@@ -29,13 +29,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 SurfaceObject::SurfaceObject()
 {
     m_indicesType = GL_UNSIGNED_INT;
+    initializeOpenGLFunctions();
 }
 
 SurfaceObject::~SurfaceObject()
 {
 }
 
-void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry)
 {
     int columns = space.width();
     int rows = space.height();
@@ -129,7 +130,7 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, QRect sp
 }
 
 
-void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, QRect space, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry)
 {
     int columns = space.width();
     int rows = space.height();
@@ -226,7 +227,6 @@ void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVec
                    const QVector<QVector3D> &normals, const GLint *indices,
                    const GLint *gridIndices, bool changeGeometry)
 {
-    initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);

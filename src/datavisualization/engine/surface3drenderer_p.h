@@ -89,6 +89,16 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleXWithBackground;
     GLfloat m_scaleZWithBackground;
+    GLfloat m_surfaceScaleX;
+    GLfloat m_surfaceScaleZ;
+    GLfloat m_surfaceOffsetX;
+    GLfloat m_surfaceOffsetZ;
+    qreal m_minVisibleColumnValue;
+    qreal m_maxVisibleColumnValue;
+    qreal m_minVisibleRowValue;
+    qreal m_maxVisibleRowValue;
+    qreal m_dataStepX;
+    qreal m_dataStepZ;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;

@@ -39,6 +39,9 @@ const qreal defaultMaxValue = 10.0;
  *
  * All rows must have same number of values.
  *
+ * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
+ * not get rendered.
+ *
  * QSurfaceDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
  * \table
  *   \row

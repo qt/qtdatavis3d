@@ -31,6 +31,7 @@
 
 #include "qheightmapsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
+#include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -40,14 +41,15 @@ class QHeightMapSurfaceDataProxyPrivate : public QSurfaceDataProxyPrivate
 
 public:
     QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q);
-    QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q, const QImage &image);
     virtual ~QHeightMapSurfaceDataProxyPrivate();
 
 private:
     QHeightMapSurfaceDataProxy *qptr();
+    void handlePendingResolve();
 
     QImage m_heightMap;
     QString m_heightMapFile;
+    QTimer m_resolveTimer;
 
     friend class QHeightMapSurfaceDataProxy;
 };

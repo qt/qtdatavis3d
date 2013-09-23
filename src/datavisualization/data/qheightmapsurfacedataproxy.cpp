@@ -82,7 +82,7 @@ QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(QObject *parent) :
  * \sa heightMap
  */
 QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(const QImage &image, QObject *parent) :
-    QSurfaceDataProxy(new QHeightMapSurfaceDataProxyPrivate(this, image), parent)
+    QSurfaceDataProxy(new QHeightMapSurfaceDataProxyPrivate(this), parent)
 {
     setHeightMap(image);
 }
@@ -118,50 +118,17 @@ QHeightMapSurfaceDataProxy::~QHeightMapSurfaceDataProxy()
  * grayscale images may improve data conversion speed for large images.
  *
  * Not recommended formats: all mono formats (for example QImage::Format_Mono).
+ *
+ * The height map is resolved asynchronously. QSurfaceDataProxy::arrayReset() is emitted when the
+ * data has been resolved.
  */
 void QHeightMapSurfaceDataProxy::setHeightMap(const QImage &image)
 {
     dptr()->m_heightMap = image;
 
-    QImage heightImage = image;
-    // Convert to RGB32 to be sure we're reading the right bytes
-    if (heightImage.format() != QImage::Format_RGB32)
-        heightImage = image.convertToFormat(QImage::Format_RGB32);
-
-    uchar *bits = heightImage.bits();
-
-    int imageHeight = heightImage.height();
-    int imageWidth = heightImage.width();
-    int bitCount = imageWidth * 4 * (imageHeight - 1);
-    int widthBits = imageWidth * 4;
-    qreal height = 0;
-
-    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-    dataArray->reserve(imageHeight);
-    if (heightImage.isGrayscale()) {
-        // Grayscale, it's enough to read Red byte
-        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
-            for (int j = 0; j < imageWidth; j++)
-                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
-            *dataArray << newRow;
-        }
-    } else {
-        // Not grayscale, we'll need to calculate height from RGB
-        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
-            for (int j = 0; j < imageWidth; j++) {
-                int nextpixel = j * 4;
-                height = (qreal(bits[bitCount + nextpixel])
-                        + qreal(bits[1 + bitCount + nextpixel])
-                        + qreal(bits[2 + bitCount + nextpixel]));
-                (*newRow)[j] = (height / 3.0) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
-            }
-            *dataArray << newRow;
-        }
-    }
-
-    resetArray(dataArray, 0.0, imageHeight, 0.0, imageWidth);
+    // We do resolving asynchronously to make qml onArrayReset handlers actually get the initial reset
+    if (!dptr()->m_resolveTimer.isActive())
+        dptr()->m_resolveTimer.start(0);
 }
 
 QImage QHeightMapSurfaceDataProxy::heightMap() const
@@ -210,17 +177,61 @@ const QHeightMapSurfaceDataProxyPrivate *QHeightMapSurfaceDataProxy::dptrc() con
 QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q)
 {
-}
-
-QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q,
-                                                                     const QImage &image)
-    : QSurfaceDataProxyPrivate(q),
-      m_heightMap(image)
-{
+    m_resolveTimer.setSingleShot(true);
+    QObject::connect(&m_resolveTimer, &QTimer::timeout,
+                     this, &QHeightMapSurfaceDataProxyPrivate::handlePendingResolve);
 }
 
 QHeightMapSurfaceDataProxyPrivate::~QHeightMapSurfaceDataProxyPrivate()
 {
+}
+
+QHeightMapSurfaceDataProxy *QHeightMapSurfaceDataProxyPrivate::qptr()
+{
+    return static_cast<QHeightMapSurfaceDataProxy *>(q_ptr);
+}
+
+void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
+{
+    QImage heightImage = m_heightMap;
+    // Convert to RGB32 to be sure we're reading the right bytes
+    if (heightImage.format() != QImage::Format_RGB32)
+        heightImage = heightImage.convertToFormat(QImage::Format_RGB32);
+
+    uchar *bits = heightImage.bits();
+
+    int imageHeight = heightImage.height();
+    int imageWidth = heightImage.width();
+    int bitCount = imageWidth * 4 * (imageHeight - 1);
+    int widthBits = imageWidth * 4;
+    qreal height = 0;
+
+    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
+    dataArray->reserve(imageHeight);
+    if (heightImage.isGrayscale()) {
+        // Grayscale, it's enough to read Red byte
+        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
+            for (int j = 0; j < imageWidth; j++)
+                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
+            *dataArray << newRow;
+        }
+    } else {
+        // Not grayscale, we'll need to calculate height from RGB
+        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
+            for (int j = 0; j < imageWidth; j++) {
+                int nextpixel = j * 4;
+                height = (qreal(bits[bitCount + nextpixel])
+                        + qreal(bits[1 + bitCount + nextpixel])
+                        + qreal(bits[2 + bitCount + nextpixel]));
+                (*newRow)[j] = (height / 3.0) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
+            }
+            *dataArray << newRow;
+        }
+    }
+
+    qptr()->resetArray(dataArray, 0.0, imageHeight, 0.0, imageWidth);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

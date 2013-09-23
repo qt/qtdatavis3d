@@ -17,25 +17,36 @@
 ****************************************************************************/
 
 #include "chartmodifier.h"
-#include <Q3DValueAxis>
-#include <QSurfaceDataProxy>
+#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QSurfaceDataProxy>
 
 #include <qmath.h>
-
 #include <QDebug>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
 ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
-      m_xCount(30),
-      m_zCount(30),
+      m_gridSliderX(0),
+      m_gridSliderZ(0),
+      m_axisRangeSliderX(0),
+      m_axisRangeSliderZ(0),
+      m_axisMinSliderX(0),
+      m_axisMinSliderZ(0),
+      m_xCount(50),
+      m_zCount(50),
       m_activeSample(0),
-      m_fontSize(40.0f)
+      m_fontSize(40),
+      m_rangeX(16.0),
+      m_rangeZ(16.0),
+      m_minX(-8.0),
+      m_minZ(-8.0)
 {
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->axisX()->setRange(m_minX, m_minX + m_rangeX);
+    m_chart->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
 }
 
 ChartModifier::~ChartModifier()
@@ -80,7 +91,7 @@ void ChartModifier::toggleSqrtSin(bool enable)
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
-        m_chart->activeDataProxy()->resetArray(dataArray, -8.0, 8.0, -8.0, 8.0);
+        resetArrayAndSliders(dataArray, -8.0, 8.0, -8.0, 8.0);
 
         m_activeSample = ChartModifier::SqrtSin;
     } else {
@@ -94,21 +105,20 @@ void ChartModifier::togglePlane(bool enable)
 
     if (enable) {
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-        qreal y = 2.0 / qreal(m_zCount - 1);
+        qreal y = 1.0 / (qreal(m_zCount - 1) + qreal(m_xCount - 1));
         dataArray->reserve(m_zCount);
         for (int i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             for (int j = 0; j < m_xCount; j++)
-                (*newRow)[j] = i * y;
+                (*newRow)[j] = (i + j) * y;
             *dataArray << newRow;
         }
 
-        m_chart->axisY()->setAutoAdjustRange(true);
-        m_chart->axisX()->setSegmentCount(4);
+        m_chart->axisY()->setRange(0.0, 1.0);
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
-        m_chart->activeDataProxy()->resetArray(dataArray, -2.0, 10.0, 16.0, 22.0);
+        resetArrayAndSliders(dataArray, -10.0, 10.0, -10.0, 20.0);
 
         m_activeSample = ChartModifier::Plane;
     }
@@ -135,7 +145,7 @@ void ChartModifier::setHeightMapData(bool enable)
         m_chart->axisX()->setLabelFormat("%.1f N");
         m_chart->axisZ()->setLabelFormat("%.1f E");
 
-        m_chart->activeDataProxy()->resetArray(dataArray, 34.0, 40.0, 18.0, 24.0);
+        resetArrayAndSliders(dataArray, 18.0, 24.0, 34.0, 40.0);
 
         m_activeSample = ChartModifier::Map;
     }
@@ -160,7 +170,7 @@ void ChartModifier::adjustXCount(int count)
 
     updateSamples();
 
-    qDebug() << "X count = " << count;
+    qDebug() << "X count =" << count;
 }
 
 void ChartModifier::adjustZCount(int count)
@@ -169,7 +179,39 @@ void ChartModifier::adjustZCount(int count)
 
     updateSamples();
 
-    qDebug() << "Z count = " << count;
+    qDebug() << "Z count =" << count;
+}
+
+void ChartModifier::adjustXRange(int range)
+{
+    m_rangeX = range;
+    m_chart->axisX()->setRange(m_minX, m_minX + m_rangeX);
+
+    qDebug() << "X Range =" << range;
+}
+
+void ChartModifier::adjustZRange(int range)
+{
+    m_rangeZ = range;
+    m_chart->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+
+    qDebug() << "Z Range =" << range;
+}
+
+void ChartModifier::adjustXMin(int min)
+{
+    m_minX = min;
+    m_chart->axisX()->setRange(m_minX, m_minX + m_rangeX);
+
+    qDebug() << "X Minimum =" << min;
+}
+
+void ChartModifier::adjustZMin(int min)
+{
+    m_minZ = min;
+    m_chart->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+
+    qDebug() << "Z Minimum =" << min;
 }
 
 void ChartModifier::colorPressed()
@@ -197,6 +239,16 @@ void ChartModifier::changeTransparency()
 void ChartModifier::changeTheme(int theme)
 {
     m_chart->setTheme((QDataVis::ColorTheme)theme);
+}
+
+void ChartModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX, qreal maxX)
+{
+    m_axisMinSliderX->setValue(minX);
+    m_axisMinSliderZ->setValue(minZ);
+    m_axisRangeSliderX->setValue(maxX - minX);
+    m_axisRangeSliderZ->setValue(maxZ - minZ);
+
+    m_chart->activeDataProxy()->resetArray(array, minZ, maxZ, minX, maxX);
 }
 
 void ChartModifier::changeShadowQuality(int quality)

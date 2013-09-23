@@ -19,7 +19,6 @@
 #include "chartmodifier.h"
 
 #include <QApplication>
-#include <QApplication>
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -96,6 +95,32 @@ int main(int argc, char *argv[])
     gridSliderZ->setMaximum(200);
     gridSliderZ->setEnabled(true);
 
+    QSlider *axisRangeSliderX = new QSlider(Qt::Horizontal, widget);
+    axisRangeSliderX->setTickInterval(1);
+    axisRangeSliderX->setMinimum(2);
+    axisRangeSliderX->setValue(16);
+    axisRangeSliderX->setMaximum(100);
+    axisRangeSliderX->setEnabled(true);
+    QSlider *axisRangeSliderZ = new QSlider(Qt::Horizontal, widget);
+    axisRangeSliderZ->setTickInterval(1);
+    axisRangeSliderZ->setMinimum(2);
+    axisRangeSliderZ->setValue(16);
+    axisRangeSliderZ->setMaximum(100);
+    axisRangeSliderZ->setEnabled(true);
+
+    QSlider *axisMinSliderX = new QSlider(Qt::Horizontal, widget);
+    axisMinSliderX->setTickInterval(1);
+    axisMinSliderX->setMinimum(-50);
+    axisMinSliderX->setValue(-8);
+    axisMinSliderX->setMaximum(50);
+    axisMinSliderX->setEnabled(true);
+    QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal, widget);
+    axisMinSliderZ->setTickInterval(1);
+    axisMinSliderZ->setMinimum(-50);
+    axisMinSliderZ->setValue(-8);
+    axisMinSliderZ->setMaximum(50);
+    axisMinSliderZ->setEnabled(true);
+
     QLinearGradient gr(0, 0, 100, 1);
     gr.setColorAt(0.0, Qt::blue);
     gr.setColorAt(0.5, Qt::yellow);
@@ -126,15 +151,15 @@ int main(int argc, char *argv[])
     themeList->addItem(QStringLiteral("Isabelle"));
     themeList->setCurrentIndex(0);
 
-    QComboBox *shadowQuality = new QComboBox(widget);
-    shadowQuality->addItem(QStringLiteral("None"));
-    shadowQuality->addItem(QStringLiteral("Low"));
-    shadowQuality->addItem(QStringLiteral("Medium"));
-    shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->addItem(QStringLiteral("Low Soft"));
-    shadowQuality->addItem(QStringLiteral("Medium Soft"));
-    shadowQuality->addItem(QStringLiteral("High Soft"));
-    shadowQuality->setCurrentIndex(3);
+//    QComboBox *shadowQuality = new QComboBox(widget);
+//    shadowQuality->addItem(QStringLiteral("None"));
+//    shadowQuality->addItem(QStringLiteral("Low"));
+//    shadowQuality->addItem(QStringLiteral("Medium"));
+//    shadowQuality->addItem(QStringLiteral("High"));
+//    shadowQuality->addItem(QStringLiteral("Low Soft"));
+//    shadowQuality->addItem(QStringLiteral("Medium Soft"));
+//    shadowQuality->addItem(QStringLiteral("High Soft"));
+//    shadowQuality->setCurrentIndex(3);
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
@@ -147,14 +172,20 @@ int main(int argc, char *argv[])
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
+    vLayout->addWidget(axisRangeSliderX);
+    vLayout->addWidget(axisRangeSliderZ);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis minimum")));
+    vLayout->addWidget(axisMinSliderX);
+    vLayout->addWidget(axisMinSliderZ);
     vLayout->addWidget(colorPB);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(labelButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality);
+//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+//    vLayout->addWidget(shadowQuality);
 
     widget->show();
 
@@ -177,6 +208,14 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::adjustXCount);
     QObject::connect(gridSliderZ, &QSlider::valueChanged,
                      modifier, &ChartModifier::adjustZCount);
+    QObject::connect(axisRangeSliderX, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustXRange);
+    QObject::connect(axisRangeSliderZ, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustZRange);
+    QObject::connect(axisMinSliderX, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustXMin);
+    QObject::connect(axisMinSliderZ, &QSlider::valueChanged,
+                     modifier, &ChartModifier::adjustZMin);
     QObject::connect(colorPB, &QPushButton::pressed,
                      modifier, &ChartModifier::colorPressed);
     QObject::connect(fontList, &QFontComboBox::currentFontChanged,
@@ -185,12 +224,17 @@ int main(int argc, char *argv[])
                      modifier, &ChartModifier::changeTransparency);
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeTheme(int)));
-    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
-                     modifier, SLOT(changeShadowQuality(int)));
+//    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
+//                     modifier, SLOT(changeShadowQuality(int)));
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
+    modifier->setAxisRangeSliderX(axisRangeSliderX);
+    modifier->setAxisRangeSliderZ(axisRangeSliderZ);
+    modifier->setAxisMinSliderX(axisMinSliderX);
+    modifier->setAxisMinSliderZ(axisMinSliderZ);
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
+    sqrtSinCB->setChecked(true);
 
     return app.exec();
 }

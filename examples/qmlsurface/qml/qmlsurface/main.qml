@@ -50,9 +50,7 @@ Item {
             cameraPreset: Surface3D.PresetIsometricLeft
             dataProxy: surfaceData.heightProxy
             axisY.min: 0.0
-            axisY.max: 255.0
-            axisX.max: 40.0
-            axisZ.max: 40.0
+            axisY.max: 250.0
             axisX.segmentCount: 10
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%i"
@@ -141,14 +139,10 @@ Item {
         onClicked: {
             if (surfaceplot.dataProxy === surfaceData.heightProxy) {
                 surfaceplot.axisY.max = 500.0
-                surfaceplot.axisX.max = 99.0
-                surfaceplot.axisZ.max = 99.0
                 surfaceplot.dataProxy = surfaceData.proxy
                 text = "Switch to Height Map Proxy"
             } else {
-                surfaceplot.axisY.max = 255.0
-                surfaceplot.axisX.max = 40.0
-                surfaceplot.axisZ.max = 40.0
+                surfaceplot.axisY.max = 250.0
                 surfaceplot.dataProxy = surfaceData.heightProxy
                 text = "Switch to Item Model Proxy"
             }
