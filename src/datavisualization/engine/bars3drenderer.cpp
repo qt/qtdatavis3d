@@ -34,10 +34,6 @@
 #include <qmath.h>
 #include <QDebug>
 
-// Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
-// orthographic projection.
-//#define USE_WIDER_SHADOWS
-
 // You can verify that depth buffer drawing works correctly by uncommenting this.
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
@@ -545,19 +541,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
         // That causes the scene to be not drawn from above -> must be fixed
         // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
+
         // Set the depth projection matrix
-#ifndef USE_WIDER_SHADOWS
-        // Use this for perspective shadows
-        depthProjectionMatrix.perspective(15.0f, (GLfloat)m_mainViewPort.width()
+        depthProjectionMatrix.perspective(10.0f, (GLfloat)m_mainViewPort.width()
                                           / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
-#else
-        // Use these for orthographic shadows
-        //GLfloat testAspectRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
-        //qDebug() << m_autoScaleAdjustment << m_yAdjustment;
-        depthProjectionMatrix.ortho(-2.0f * 2.0f, 2.0f * 2.0f,
-                                    -2.0f, 2.0f,
-                                    0.0f, 100.0f);
-#endif
+
         // Draw bars to depth buffer
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
@@ -565,12 +553,19 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 if (!item.value())
                     continue;
 
-                // Set front face culling for positive valued bars and back face culling for
-                // negative valued bars to reduce self-shadowing issues
-                if (item.height() < 0)
+                GLfloat shadowOffset = 0.0f;
+
+                // Set front face culling for negative valued bars and back face culling for
+                // positive valued bars to remove peter-panning issues
+                if (item.height() > 0) {
                     glCullFace(GL_BACK);
-                else
+                    if (m_yFlipped)
+                        shadowOffset = 0.015f;
+                } else {
                     glCullFace(GL_FRONT);
+                    if (!m_yFlipped)
+                        shadowOffset = -0.015f;
+                }
 
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -578,10 +573,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 colPos = (bar + 0.5f) * (m_cachedBarSpacing.width());
                 rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
+                // Draw shadows for bars "on the other side" a bit off ground to avoid seeing
+                // shadows through the ground
                 modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                      item.height() - m_yAdjustment,
+                                      item.height() - m_yAdjustment + shadowOffset,
                                       (m_columnDepth - rowPos) / m_scaleFactor + zComp);
-                modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
+                // Scale the bars down in X and Z to reduce self-shadowing issues
+                modelMatrix.scale(QVector3D(m_scaleX * 0.9f, item.height(), m_scaleZ * 0.9f));
 
                 MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
 
@@ -1582,7 +1580,7 @@ void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
         m_shadowQualityMultiplier = 5;
         break;
     case QDataVis::ShadowSoftLow:
-        m_shadowQualityToShader = 5.0f;
+        m_shadowQualityToShader = 7.5f;
         m_shadowQualityMultiplier = 1;
         break;
     case QDataVis::ShadowSoftMedium:
