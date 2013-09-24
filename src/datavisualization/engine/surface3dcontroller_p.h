@@ -71,13 +71,14 @@ public:
     void initializeOpenGL();
     virtual void synchDataToRenderer();
 
-    // Enable or disable the smoothes of the surface
     void setSmoothSurface(bool enable);
     bool smoothSurface();
 
-    // Enable or disable the grid on the surface
     void setSurfaceGrid(bool enable);
     bool surfaceGrid();
+
+    void setGradient(const QLinearGradient &gradient);
+    QLinearGradient gradient() const;
 
     void setGradientColorAt(qreal pos, const QColor &color);
 

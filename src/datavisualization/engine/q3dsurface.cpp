@@ -198,6 +198,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty var Surface3D::gradient
+ * The current surface gradient. Setting this property replaces the previous gradient.
+ */
+
+/*!
  * Constructs a new 3D surface window.
  */
 Q3DSurface::Q3DSurface()
@@ -307,15 +312,22 @@ bool Q3DSurface::isBackgroundVisible() const
 }
 
 /*!
- * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeQt by
+ * \property Q3DSurface::theme
+ *
+ * A predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeQt by
  * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
- * \warning This method is subject to change.
+ * \warning This property is subject to change.
  */
 void Q3DSurface::setTheme(QDataVis::ColorTheme theme)
 {
     d_ptr->m_shared->setColorTheme(theme);
+}
+
+QDataVis::ColorTheme Q3DSurface::theme() const
+{
+    return d_ptr->m_shared->theme().colorTheme();
 }
 
 /*!
@@ -369,6 +381,22 @@ void Q3DSurface::setSurfaceGridEnabled(bool enabled)
 bool Q3DSurface::isSurfaceGridEnabled() const
 {
     return d_ptr->m_shared->surfaceGrid();
+}
+
+/*!
+ * \property Q3DSurface::gradient
+ *
+ * The current surface gradient. Setting this property replaces the previous gradient with
+ * the given \a gradient.
+ */
+void Q3DSurface::setGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setGradient(gradient);
+}
+
+QLinearGradient Q3DSurface::gradient() const
+{
+    return d_ptr->m_shared->gradient();
 }
 
 /*!

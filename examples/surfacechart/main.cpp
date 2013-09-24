@@ -122,9 +122,10 @@ int main(int argc, char *argv[])
     axisMinSliderZ->setEnabled(true);
 
     QLinearGradient gr(0, 0, 100, 1);
-    gr.setColorAt(0.0, Qt::blue);
-    gr.setColorAt(0.5, Qt::yellow);
-    gr.setColorAt(1.0, Qt::red);
+    gr.setColorAt(0.0, Qt::black);
+    gr.setColorAt(0.33, Qt::blue);
+    gr.setColorAt(0.67, Qt::red);
+    gr.setColorAt(1.0, Qt::yellow);
     QPixmap pm(100, 24);
     QPainter pmp(&pm);
     pmp.setBrush(QBrush(gr));
@@ -217,7 +218,7 @@ int main(int argc, char *argv[])
     QObject::connect(axisMinSliderZ, &QSlider::valueChanged,
                      modifier, &ChartModifier::adjustZMin);
     QObject::connect(colorPB, &QPushButton::pressed,
-                     modifier, &ChartModifier::colorPressed);
+                     modifier, &ChartModifier::gradientPressed);
     QObject::connect(fontList, &QFontComboBox::currentFontChanged,
                      modifier, &ChartModifier::changeFont);
     QObject::connect(labelButton, &QPushButton::clicked,

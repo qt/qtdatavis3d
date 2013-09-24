@@ -57,7 +57,7 @@ public:
     void adjustXMin(int min);
     void adjustZMin(int min);
     void updateSamples();
-    void colorPressed();
+    void gradientPressed();
     void changeFont(const QFont &font);
     void changeTransparency();
 

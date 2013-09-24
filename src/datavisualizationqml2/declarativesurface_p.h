@@ -59,6 +59,7 @@ class DeclarativeSurface : public QQuickItem
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
+    Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
@@ -82,46 +83,38 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    // Select preset camera placement
     void setCameraPreset(QDataVis::CameraPreset preset);
     QDataVis::CameraPreset cameraPreset();
 
-    // Set theme (object colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
     void setTheme(QDataVis::ColorTheme theme);
     QDataVis::ColorTheme theme();
 
-    // Change selection mode
     void setSelectionMode(QDataVis::SelectionMode mode);
     QDataVis::SelectionMode selectionMode();
 
-    // Set font
     void setFont(const QFont &font);
     QFont font();
 
-    // Label transparency adjustment
     void setLabelTransparency(QDataVis::LabelTransparency transparency);
     QDataVis::LabelTransparency labelTransparency();
 
-    // Enable or disable background grid
     void setGridVisible(bool visible);
     bool isGridVisible();
 
-    // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible();
 
-    // Enable or disable the smoothes of the surface
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
-    // Enable or disable the grid on the surface
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
 
-    // Adjust shadow quality
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality();
+
+    void setGradient(const QLinearGradient &gradient);
+    QLinearGradient gradient() const;
 
     void setItemLabelFormat(const QString &format);
     QString itemLabelFormat();

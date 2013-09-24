@@ -225,6 +225,16 @@ QDataVis::ShadowQuality DeclarativeSurface::shadowQuality()
     return m_shared->shadowQuality();
 }
 
+void DeclarativeSurface::setGradient(const QLinearGradient &gradient)
+{
+    m_shared->setGradient(gradient);
+}
+
+QLinearGradient DeclarativeSurface::gradient() const
+{
+    return m_shared->gradient();
+}
+
 void DeclarativeSurface::setItemLabelFormat(const QString &format)
 {
     m_shared->activeDataProxy()->setItemLabelFormat(format);

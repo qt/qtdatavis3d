@@ -37,6 +37,12 @@ Item {
         height: mainview.height
         anchors.right: mainview.right;
 
+        Gradient {
+            id: surfaceGradient
+            GradientStop { position: 0.0; color: "darkslategray" }
+            GradientStop { position: 1.0; color: "peru" }
+        }
+
         Surface3D {
             id: surfaceplot
             width: surfaceView.width
@@ -60,9 +66,10 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
+            //gradient: surfaceGradient
             Component.onCompleted: {
-                setGradientColorAt(0, "black");
-                setGradientColorAt(1, "white");
+                setGradientColorAt(0, "darkslategray");
+                setGradientColorAt(1, "peru");
             }
         }
     }

@@ -21,6 +21,7 @@
 #include <QtDataVisualization/QSurfaceDataProxy>
 
 #include <qmath.h>
+#include <QLinearGradient>
 #include <QDebug>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
@@ -214,9 +215,14 @@ void ChartModifier::adjustZMin(int min)
     qDebug() << "Z Minimum =" << min;
 }
 
-void ChartModifier::colorPressed()
+void ChartModifier::gradientPressed()
 {
-    m_chart->setGradientColorAt(0.0, Qt::blue);
+    QLinearGradient gradient;
+    gradient.setColorAt(0.0, Qt::black);
+    gradient.setColorAt(0.33, Qt::blue);
+    gradient.setColorAt(0.67, Qt::red);
+    gradient.setColorAt(1.0, Qt::yellow);
+    m_chart->setGradient(gradient);
 }
 
 void ChartModifier::changeFont(const QFont &font)

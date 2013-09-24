@@ -46,6 +46,7 @@ Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
 Q_DECLARE_METATYPE(QItemModelSurfaceDataMapping *)
 
 Q_DECLARE_METATYPE(const QAbstractItemModel *)
+Q_DECLARE_METATYPE(QLinearGradient)
 
 Q_DECLARE_METATYPE(QDataVis *)
 

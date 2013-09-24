@@ -129,6 +129,20 @@ bool Surface3DController::surfaceGrid()
     return m_isSurfaceGridEnabled;
 }
 
+void Surface3DController::setGradient(const QLinearGradient &gradient)
+{
+    m_userDefinedGradient = gradient;
+    m_userDefinedGradient.setStart(1, 1000);
+    m_userDefinedGradient.setFinalStop(0, 0);
+    m_changeTracker.gradientColorChanged = true;
+    emitNeedRender();
+}
+
+QLinearGradient Surface3DController::gradient() const
+{
+    return m_userDefinedGradient;
+}
+
 void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 {
     m_userDefinedGradient.setColorAt(pos, color);

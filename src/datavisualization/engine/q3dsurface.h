@@ -22,6 +22,7 @@
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
 #include <QFont>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -33,11 +34,13 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
+    Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
 
@@ -45,26 +48,26 @@ public:
     explicit Q3DSurface();
     ~Q3DSurface();
 
-    // Enable or disable background grid
     void setGridVisible(bool visible);
     bool isGridVisible() const;
 
-    // Enable or disable background mesh
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
     void setTheme(QDataVis::ColorTheme theme);
+    QDataVis::ColorTheme theme() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    // Enable or disable the smoothes of the surface
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
-    // Enable or disable the grid on the surface
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
+
+    void setGradient(const QLinearGradient &gradient);
+    QLinearGradient gradient() const;
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
