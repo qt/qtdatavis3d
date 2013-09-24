@@ -213,7 +213,7 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
         for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
             for (int j = 0; j < imageWidth; j++)
-                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
+                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
             *dataArray << newRow;
         }
     } else {
@@ -225,7 +225,7 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
                 height = (qreal(bits[bitCount + nextpixel])
                         + qreal(bits[1 + bitCount + nextpixel])
                         + qreal(bits[2 + bitCount + nextpixel]));
-                (*newRow)[j] = (height / 3.0) + 0.1; // Add 0.1 to raise it above ground to avoid glimmering at 0 height
+                (*newRow)[j] = (height / 3.0);
             }
             *dataArray << newRow;
         }
