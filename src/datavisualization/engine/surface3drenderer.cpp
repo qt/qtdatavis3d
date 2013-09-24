@@ -53,7 +53,9 @@ const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 
 const GLfloat labelMargin = 0.05f;
 const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
-const GLfloat coordSpace = 2.0f; // From -1.0 to 1.0
+const GLfloat surfaceGridYOffsetValue = 0.001f;
+// The second offset to opposite direction is double because same matrix is translated twice
+const GLfloat surfaceGridYOffset[2] = {-surfaceGridYOffsetValue, 2.0f * surfaceGridYOffsetValue};
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
@@ -614,24 +616,18 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
-            // Draw the grid over the surface
-            glPolygonOffset(1.0f, 1.0f);
-            glEnable(GL_POLYGON_OFFSET_FILL);
-
             m_surfaceGridShader->bind();
 
-            // Set shader bindings
-            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->model(), modelMatrix);
-            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme.m_gridLine));
+            // Draw the grid twice, with slight offset on Y axis to each direction
+            for (int i = 0; i < 2; i++) {
+                MVPMatrix.translate(0.0f, surfaceGridYOffset[i], 0.0f);
 
-            m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
-
+                m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+                m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
+            }
             m_surfaceGridShader->release();
-
-            glPolygonOffset(0.0f, 0.0f);
-            glDisable(GL_POLYGON_OFFSET_FILL);
         }
         glEnable(GL_CULL_FACE);
     }
