@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 const QString smoothString(QStringLiteral("Smooth"));
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
-    : QQuickItem(parent),
+    : AbstractDeclarative(parent),
       m_shared(0),
       m_initialisedSize(0, 0)
 {
@@ -39,20 +39,13 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Scatter3DController(boundingRect().toRect());
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &DeclarativeScatter::handleShadowQualityUpdate);
-
+    setSharedController(m_shared);
     m_shared->setActiveDataProxy(new QItemModelScatterDataProxy);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
 {
     delete m_shared;
-}
-
-void DeclarativeScatter::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
 }
 
 QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -76,11 +69,6 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     node->setRect(boundingRect());
     m_shared->setBoundingRect(boundingRect().toRect());
     return node;
-}
-
-void DeclarativeScatter::setCameraPosition(qreal horizontal, qreal vertical, int distance)
-{
-    m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
 void DeclarativeScatter::setObjectColor(const QColor &baseColor, bool uniform)
@@ -135,7 +123,7 @@ void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
     m_shared->setObjectType(style, smooth);
 }
 
-QDataVis::MeshStyle DeclarativeScatter::objectType()
+QDataVis::MeshStyle DeclarativeScatter::objectType() const
 {
     QString objFile = m_shared->meshFileName();
     if (objFile.contains("/sphere"))
@@ -161,7 +149,7 @@ void DeclarativeScatter::setObjectSmoothingEnabled(bool enabled)
     m_shared->setMeshFileName(objFile);
 }
 
-bool DeclarativeScatter::isObjectSmoothingEnabled()
+bool DeclarativeScatter::isObjectSmoothingEnabled() const
 {
     QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);
@@ -172,144 +160,9 @@ void DeclarativeScatter::setMeshFileName(const QString &objFileName)
     m_shared->setMeshFileName(objFileName);
 }
 
-QString DeclarativeScatter::meshFileName()
+QString DeclarativeScatter::meshFileName() const
 {
     return m_shared->meshFileName();
-}
-
-void DeclarativeScatter::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset DeclarativeScatter::cameraPreset()
-{
-    return m_shared->cameraPreset();
-}
-
-void DeclarativeScatter::setTheme(QDataVis::ColorTheme theme)
-{
-    m_shared->setColorTheme(theme);
-}
-
-QDataVis::ColorTheme DeclarativeScatter::theme()
-{
-    return m_shared->theme().colorTheme();
-}
-
-void DeclarativeScatter::setFont(const QFont &font)
-{
-    m_shared->setFont(font);
-}
-
-QFont DeclarativeScatter::font()
-{
-    return m_shared->font();
-}
-
-void DeclarativeScatter::setLabelTransparency(QDataVis::LabelTransparency transparency)
-{
-    m_shared->setLabelTransparency(transparency);
-}
-
-QDataVis::LabelTransparency DeclarativeScatter::labelTransparency()
-{
-    return m_shared->labelTransparency();
-}
-
-void DeclarativeScatter::setGridVisible(bool visible)
-{
-    m_shared->setGridEnabled(visible);
-}
-
-bool DeclarativeScatter::isGridVisible()
-{
-    return m_shared->gridEnabled();
-}
-
-void DeclarativeScatter::setBackgroundVisible(bool visible)
-{
-    m_shared->setBackgroundEnabled(visible);
-}
-
-bool DeclarativeScatter::isBackgroundVisible()
-{
-    return m_shared->backgroundEnabled();
-}
-
-void DeclarativeScatter::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionMode DeclarativeScatter::selectionMode()
-{
-    return m_shared->selectionMode();
-}
-
-void DeclarativeScatter::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality DeclarativeScatter::shadowQuality()
-{
-    return m_shared->shadowQuality();
-}
-
-void DeclarativeScatter::setItemLabelFormat(const QString &format)
-{
-    m_shared->activeDataProxy()->setItemLabelFormat(format);
-}
-
-QString DeclarativeScatter::itemLabelFormat()
-{
-    return m_shared->activeDataProxy()->itemLabelFormat();
-}
-
-void DeclarativeScatter::mouseDoubleClickEvent(QMouseEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->mouseDoubleClickEvent(event);
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeScatter::touchEvent(QTouchEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->touchEvent(event);
-    update();
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeScatter::mousePressEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mousePressEvent(event, mousePos);
-}
-
-void DeclarativeScatter::mouseReleaseEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseReleaseEvent(event, mousePos);
-}
-
-void DeclarativeScatter::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseMoveEvent(event, mousePos);
-}
-
-void DeclarativeScatter::wheelEvent(QWheelEvent *event)
-{
-    m_shared->wheelEvent(event);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

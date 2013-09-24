@@ -25,7 +25,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
-    : QQuickItem(parent),
+    : AbstractDeclarative(parent),
       m_shared(0),
       m_initialisedSize(0, 0)
 {
@@ -38,8 +38,7 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Surface3DController(boundingRect().toRect());
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &DeclarativeSurface::handleShadowQualityUpdate);
+    setSharedController(m_shared);
 
     QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy;
     m_shared->setActiveDataProxy(proxy);
@@ -48,11 +47,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 DeclarativeSurface::~DeclarativeSurface()
 {
     delete m_shared;
-}
-
-void DeclarativeSurface::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
 }
 
 QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -93,17 +87,6 @@ QSurfaceDataProxy *DeclarativeSurface::dataProxy() const
     return static_cast<QSurfaceDataProxy *>(m_shared->activeDataProxy());
 }
 
-void DeclarativeSurface::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset DeclarativeSurface::cameraPreset()
-{
-    return m_shared->cameraPreset();
-
-}
-
 Q3DValueAxis *DeclarativeSurface::axisX() const
 {
     return static_cast<Q3DValueAxis *>(m_shared->axisX());
@@ -134,57 +117,6 @@ void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
     m_shared->setAxisZ(axis);
 }
 
-void DeclarativeSurface::setTheme(QDataVis::ColorTheme theme)
-{
-    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
-    m_shared->setColorTheme(theme);
-}
-
-QDataVis::ColorTheme DeclarativeSurface::theme()
-{
-    return m_shared->theme().colorTheme();
-}
-
-void DeclarativeSurface::setFont(const QFont &font)
-{
-    m_shared->setFont(font);
-}
-
-QFont DeclarativeSurface::font()
-{
-    return m_shared->font();
-}
-
-void DeclarativeSurface::setLabelTransparency(QDataVis::LabelTransparency transparency)
-{
-    m_shared->setLabelTransparency(transparency);
-}
-
-QDataVis::LabelTransparency DeclarativeSurface::labelTransparency()
-{
-    return m_shared->labelTransparency();
-}
-
-void DeclarativeSurface::setGridVisible(bool visible)
-{
-    m_shared->setGridEnabled(visible);
-}
-
-bool DeclarativeSurface::isGridVisible()
-{
-    return m_shared->gridEnabled();
-}
-
-void DeclarativeSurface::setBackgroundVisible(bool visible)
-{
-    m_shared->setBackgroundEnabled(visible);
-}
-
-bool DeclarativeSurface::isBackgroundVisible()
-{
-    return m_shared->backgroundEnabled();
-}
-
 void DeclarativeSurface::setSmoothSurfaceEnabled(bool enabled)
 {
     m_shared->setSmoothSurface(enabled);
@@ -205,26 +137,6 @@ bool DeclarativeSurface::isSurfaceGridEnabled() const
     return m_shared->surfaceGrid();
 }
 
-void DeclarativeSurface::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionMode DeclarativeSurface::selectionMode()
-{
-    return m_shared->selectionMode();
-}
-
-void DeclarativeSurface::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality DeclarativeSurface::shadowQuality()
-{
-    return m_shared->shadowQuality();
-}
-
 void DeclarativeSurface::setGradient(const QLinearGradient &gradient)
 {
     m_shared->setGradient(gradient);
@@ -233,61 +145,6 @@ void DeclarativeSurface::setGradient(const QLinearGradient &gradient)
 QLinearGradient DeclarativeSurface::gradient() const
 {
     return m_shared->gradient();
-}
-
-void DeclarativeSurface::setItemLabelFormat(const QString &format)
-{
-    m_shared->activeDataProxy()->setItemLabelFormat(format);
-}
-
-QString DeclarativeSurface::itemLabelFormat()
-{
-    return m_shared->activeDataProxy()->itemLabelFormat();
-}
-
-void DeclarativeSurface::mouseDoubleClickEvent(QMouseEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->mouseDoubleClickEvent(event);
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeSurface::touchEvent(QTouchEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->touchEvent(event);
-    update();
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeSurface::mousePressEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mousePressEvent(event, mousePos);
-}
-
-void DeclarativeSurface::mouseReleaseEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseReleaseEvent(event, mousePos);
-}
-
-void DeclarativeSurface::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseMoveEvent(event, mousePos);
-}
-
-void DeclarativeSurface::wheelEvent(QWheelEvent *event)
-{
-    m_shared->wheelEvent(event);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

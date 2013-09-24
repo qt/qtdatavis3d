@@ -1,0 +1,79 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+  \qmltype AbstractDeclarative
+  \inmodule QtDataVisualization
+
+  This type is the base class for all 3D visualizations in Qt Quick 2.
+
+  It resides in the data visualization module that can be imported like this:
+
+  \snippet doc_src_qmldatavisualization.cpp 0
+
+  Note that this type is uncreatable, but contains properties that are shared between
+  the 3D visualizations.
+
+
+  \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+  \qmlproperty AbstractDeclarative.SelectionMode AbstractDeclarative::selectionMode
+  Active selection mode in the visualization.
+ */
+/*!
+  \qmlproperty AbstractDeclarative.LabelTransparency AbstractDeclarative::labelTransparency
+  Label transparency.
+ */
+
+/*!
+  \qmlproperty AbstractDeclarative.ShadowQuality AbstractDeclarative::shadowQuality
+  Shadow quality.
+ */
+
+/*!
+  \qmlproperty AbstractDeclarative.CameraPreset AbstractDeclarative::cameraPreset
+  Camera preset.
+ */
+
+/*!
+  \qmlproperty AbstractDeclarative.ColorTheme AbstractDeclarative::theme
+  Theme of the graph. Theme affects visualization colors, label colors, text color, background color, window
+  color and grid color. Lighting is also adjusted by themes.
+ */
+
+/*!
+  \qmlproperty font AbstractDeclarative::font
+  Font used for labels.
+ */
+
+/*!
+  \qmlproperty bool AbstractDeclarative::gridVisible
+  Grid visibility. If false, grid lines are not drawn.
+ */
+
+/*!
+  \qmlproperty bool AbstractDeclarative::backgroundVisible
+  Background visibility. If false, background is not drawn.
+ */
+
+/*!
+  \qmlproperty string AbstractDeclarative::itemLabelFormat
+  Label format of single item labels, e.g. a selected datapoint.
+ */

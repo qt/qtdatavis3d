@@ -30,6 +30,7 @@
 #define DECLARATIVESURFACE_P_H
 
 #include "datavisualizationglobal_p.h"
+#include "abstractdeclarative_p.h"
 #include "surface3dcontroller_p.h"
 #include "declarativesurface_p.h"
 #include "q3dvalueaxis.h"
@@ -42,30 +43,16 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class DeclarativeSurface : public QQuickItem
+class DeclarativeSurface : public AbstractDeclarative
 {
     Q_OBJECT
     Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
-    Q_ENUMS(QtDataVisualization::QDataVis::ColorTheme)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
@@ -83,62 +70,19 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    void setCameraPreset(QDataVis::CameraPreset preset);
-    QDataVis::CameraPreset cameraPreset();
-
-    void setTheme(QDataVis::ColorTheme theme);
-    QDataVis::ColorTheme theme();
-
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode();
-
-    void setFont(const QFont &font);
-    QFont font();
-
-    void setLabelTransparency(QDataVis::LabelTransparency transparency);
-    QDataVis::LabelTransparency labelTransparency();
-
-    void setGridVisible(bool visible);
-    bool isGridVisible();
-
-    void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible();
-
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
 
-    void setShadowQuality(QDataVis::ShadowQuality quality);
-    QDataVis::ShadowQuality shadowQuality();
-
     void setGradient(const QLinearGradient &gradient);
     QLinearGradient gradient() const;
-
-    void setItemLabelFormat(const QString &format);
-    QString itemLabelFormat();
-
-signals:
-    // Signals shadow quality changes.
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
-
 protected:
-    Surface3DController *m_shared;
-
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
-
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
-
 private:
+    Surface3DController *m_shared;
     QSize m_initialisedSize;
 };
 

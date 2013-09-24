@@ -1,0 +1,87 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+  \qmltype Surface3D
+  \inherits AbstractDeclarative
+  \inmodule QtDataVisualization
+
+  This type enables developers to render surface plots in 3D with Qt Quick 2.
+
+  You will need to import data visualization module to use this type:
+
+  \snippet doc_src_qmldatavisualization.cpp 0
+
+  After that you can use Surface3D in your qml files:
+
+  \snippet doc_src_qmldatavisualization.cpp 3
+
+  See \l{Qt Quick 2 Surface Example} for more thorough usage example.
+
+  \sa ItemModelSurfaceDataProxy, Bars3D, Scatter3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+  \qmlproperty SurfaceDataProxy Surface3D::dataProxy
+  The active data proxy.
+
+  If a proxy is not given, a temporary default proxy is created and activated.
+  This temporary proxy is destroyed if another proxy is explicitly set active via this property.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Surface3D::axisX
+  A user-defined X axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Surface3D::axisY
+  A user-defined Y axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Surface3D::axisZ
+  A user-defined Z axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty bool Surface3D::smoothSurfaceEnabled
+  Smoothing of surface. If false, shading of the surface is flat.
+ */
+
+/*!
+  \qmlproperty bool Surface3D::surfaceGridEnabled
+  Surface grid visibility. If false, no surface grid is drawn.
+ */
+
+/*!
+  \qmlproperty var Surface3D::gradient
+  The current surface gradient. Setting this property replaces the previous gradient.
+ */

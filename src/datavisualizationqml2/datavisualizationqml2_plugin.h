@@ -37,6 +37,7 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
+Q_DECLARE_METATYPE(AbstractDeclarative *)
 Q_DECLARE_METATYPE(DeclarativeBars *)
 Q_DECLARE_METATYPE(DeclarativeScatter *)
 Q_DECLARE_METATYPE(DeclarativeSurface *)

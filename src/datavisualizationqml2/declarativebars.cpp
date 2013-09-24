@@ -27,7 +27,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 const QString smoothString(QStringLiteral("Smooth"));
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
-    : QQuickItem(parent),
+    : AbstractDeclarative(parent),
       m_shared(0),
       m_initialisedSize(0, 0)
 {
@@ -40,8 +40,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3DController(boundingRect().toRect());
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &DeclarativeBars::handleShadowQualityUpdate);
+    AbstractDeclarative::setSharedController(m_shared);
     QObject::connect(m_shared, &Bars3DController::selectedBarPosChanged, this,
                      &DeclarativeBars::selectedBarPosChanged);
 
@@ -54,10 +53,6 @@ DeclarativeBars::~DeclarativeBars()
     delete m_shared;
 }
 
-void DeclarativeBars::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
-}
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
@@ -85,11 +80,6 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 void DeclarativeBars::setBarColor(const QColor &baseColor, bool uniform)
 {
     m_shared->setObjectColor(baseColor, uniform);
-}
-
-void DeclarativeBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
-{
-    m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
 }
 
 void DeclarativeBars::setDataProxy(QBarDataProxy *dataProxy)
@@ -137,7 +127,7 @@ void DeclarativeBars::setBarThickness(qreal thicknessRatio)
     m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
 }
 
-qreal DeclarativeBars::barThickness()
+qreal DeclarativeBars::barThickness() const
 {
     return m_shared->barThickness();
 }
@@ -147,7 +137,7 @@ void DeclarativeBars::setBarSpacing(QSizeF spacing)
     m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
 }
 
-QSizeF DeclarativeBars::barSpacing()
+QSizeF DeclarativeBars::barSpacing() const
 {
     return m_shared->barSpacing();
 }
@@ -157,7 +147,7 @@ void DeclarativeBars::setBarSpacingRelative(bool relative)
     m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
 }
 
-bool DeclarativeBars::isBarSpacingRelative()
+bool DeclarativeBars::isBarSpacingRelative() const
 {
     return m_shared->isBarSpecRelative();
 }
@@ -169,7 +159,7 @@ void DeclarativeBars::setBarType(QDataVis::MeshStyle style)
     m_shared->setBarType(style, smooth);
 }
 
-QDataVis::MeshStyle DeclarativeBars::barType()
+QDataVis::MeshStyle DeclarativeBars::barType() const
 {
     QString objFile = m_shared->meshFileName();
     if (objFile.contains("/sphere"))
@@ -195,7 +185,7 @@ void DeclarativeBars::setBarSmoothingEnabled(bool enabled)
     m_shared->setMeshFileName(objFile);
 }
 
-bool DeclarativeBars::isBarSmoothingEnabled()
+bool DeclarativeBars::isBarSmoothingEnabled() const
 {
     QString objFile = m_shared->meshFileName();
     return objFile.endsWith(smoothString);
@@ -206,100 +196,9 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
     m_shared->setMeshFileName(objFileName);
 }
 
-QString DeclarativeBars::meshFileName()
+QString DeclarativeBars::meshFileName() const
 {
     return m_shared->meshFileName();
-}
-
-void DeclarativeBars::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset DeclarativeBars::cameraPreset()
-{
-    return m_shared->cameraPreset();
-}
-
-void DeclarativeBars::setTheme(QDataVis::ColorTheme theme)
-{
-    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
-    m_shared->setColorTheme(theme);
-}
-
-QDataVis::ColorTheme DeclarativeBars::theme()
-{
-    return m_shared->theme().colorTheme();
-}
-
-void DeclarativeBars::setFont(const QFont &font)
-{
-    m_shared->setFont(font);
-}
-
-QFont DeclarativeBars::font()
-{
-    return m_shared->font();
-}
-
-void DeclarativeBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
-{
-    m_shared->setLabelTransparency(transparency);
-}
-
-QDataVis::LabelTransparency DeclarativeBars::labelTransparency()
-{
-    return m_shared->labelTransparency();
-}
-
-void DeclarativeBars::setGridVisible(bool visible)
-{
-    m_shared->setGridEnabled(visible);
-}
-
-bool DeclarativeBars::isGridVisible()
-{
-    return m_shared->gridEnabled();
-}
-
-void DeclarativeBars::setBackgroundVisible(bool visible)
-{
-    m_shared->setBackgroundEnabled(visible);
-}
-
-bool DeclarativeBars::isBackgroundVisible()
-{
-    return m_shared->backgroundEnabled();
-}
-
-void DeclarativeBars::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionMode DeclarativeBars::selectionMode()
-{
-    return m_shared->selectionMode();
-}
-
-void DeclarativeBars::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality DeclarativeBars::shadowQuality()
-{
-    return m_shared->shadowQuality();
-}
-
-void DeclarativeBars::setItemLabelFormat(const QString &format)
-{
-    m_shared->activeDataProxy()->setItemLabelFormat(format);
-}
-
-QString DeclarativeBars::itemLabelFormat()
-{
-    return m_shared->activeDataProxy()->itemLabelFormat();
 }
 
 void DeclarativeBars::setSelectedBarPos(const QPointF &position)
@@ -310,51 +209,6 @@ void DeclarativeBars::setSelectedBarPos(const QPointF &position)
 QPointF DeclarativeBars::selectedBarPos() const
 {
     return QPointF(m_shared->selectedBarPos());
-}
-
-void DeclarativeBars::mouseDoubleClickEvent(QMouseEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->mouseDoubleClickEvent(event);
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeBars::touchEvent(QTouchEvent *event)
-{
-#if defined(Q_OS_ANDROID)
-    m_shared->touchEvent(event);
-    update();
-#else
-    Q_UNUSED(event)
-#endif
-}
-
-void DeclarativeBars::mousePressEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mousePressEvent(event, mousePos);
-}
-
-void DeclarativeBars::mouseReleaseEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseReleaseEvent(event, mousePos);
-}
-
-void DeclarativeBars::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
-    m_shared->mouseMoveEvent(event, mousePos);
-}
-
-void DeclarativeBars::wheelEvent(QWheelEvent *event)
-{
-    m_shared->wheelEvent(event);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

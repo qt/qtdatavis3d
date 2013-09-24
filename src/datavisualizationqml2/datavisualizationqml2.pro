@@ -23,7 +23,8 @@ SOURCES += \
     declarativescatter.cpp \
     declarativescatterrenderer.cpp \
     declarativesurface.cpp \
-    declarativesurfacerenderer.cpp
+    declarativesurfacerenderer.cpp \
+    abstractdeclarative.cpp
 
 HEADERS += \
     datavisualizationqml2_plugin.h \
@@ -32,7 +33,8 @@ HEADERS += \
     declarativescatter_p.h \
     declarativescatterrenderer_p.h \
     declarativesurface_p.h \
-    declarativesurfacerenderer_p.h
+    declarativesurfacerenderer_p.h \
+    abstractdeclarative_p.h
 
 OTHER_FILES = qmldir
 

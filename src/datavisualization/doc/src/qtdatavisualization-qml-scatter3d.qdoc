@@ -1,0 +1,102 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+  \qmltype Scatter3D
+  \inherits AbstractDeclarative
+  \inmodule QtDataVisualization
+
+  This type enables developers to render scatter graphs in 3D with Qt Quick 2.
+
+  You will need to import data visualization module to use this type:
+
+  \snippet doc_src_qmldatavisualization.cpp 0
+
+  After that you can use Scatter3D in your qml files:
+
+  \snippet doc_src_qmldatavisualization.cpp 2
+
+  See \l{Qt Quick 2 Scatter Example} for more thorough usage example.
+
+  \sa ItemModelScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+ * \qmlmethod void Scatter3D::setObjectColor(const QColor &baseColor, bool uniform)
+ * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
+ * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
+ * be applied by height. It is \c true by default.
+ *
+ * Calling this method overrides colors from theme.
+ *
+ * \sa AbstractDeclarative::theme
+ *
+ * \warning This method is subject to change.
+ */
+
+/*!
+  \qmlproperty ScatterDataProxy Scatter3D::dataProxy
+  The active data proxy.
+
+  If a proxy is not given, a temporary default proxy is created and activated.
+  This temporary proxy is destroyed if another proxy is explicitly set active via this property.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Scatter3D::axisX
+  A user-defined X axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Scatter3D::axisY
+  A user-defined Y axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty ValueAxis3D Scatter3D::axisZ
+  A user-defined Z axis.
+
+  If an axis is not given, a temporary default axis with no labels and automatically adjusting
+  range is created.
+  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+ */
+
+/*!
+  \qmlproperty Scatter3D.MeshStyle Scatter3D::objectType
+  Dot object type.
+ */
+
+/*!
+  \qmlproperty bool Scatter3D::objectSmoothingEnabled
+  Dot smoothing. If false, dot shading is flat.
+ */
+
+/*!
+  \qmlproperty string Scatter3D::meshFileName
+  Override object type with a mesh object.
+  \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
+  It also needs to be in triangles.
+ */
