@@ -171,7 +171,6 @@ private:
     QString createSelectionLabel(qreal value, int column, int row);
     qreal columnInRange(int column);
     qreal rowInRange(int row);
-    void surfacePointCleared();
     QVector3D normalize(float x, float y, float z);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();

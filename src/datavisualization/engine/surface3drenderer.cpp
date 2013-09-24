@@ -159,8 +159,7 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_gridLineObj;
     delete m_labelObj;
 
-    if (m_selectionPointer)
-        delete m_selectionPointer;
+    delete m_selectionPointer;
 
     for (int i = 0; i < m_dataArray.size(); i++)
         delete m_dataArray.at(i);
@@ -252,6 +251,8 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
             }
         }
     }
+
+    m_selectionActive = false;
 
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
@@ -1511,15 +1512,6 @@ QVector3D Surface3DRenderer::normalize(float x, float y, float z)
     float resZ = z / ((float(m_sampleSpace.height()) - 1.0f) / -2.0f) + 1.0f;
 
     return QVector3D(resX, resY, resZ);
-}
-
-void Surface3DRenderer::surfacePointCleared()
-{
-    if (m_selectionPointer) {
-        delete m_selectionPointer;
-        m_selectionPointer = 0;
-        m_selectionActive = false;
-    }
 }
 
 void Surface3DRenderer::loadMeshFile()
