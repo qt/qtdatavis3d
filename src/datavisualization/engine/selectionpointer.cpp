@@ -269,7 +269,7 @@ void SelectionPointer::loadPointMesh()
 {
     if (m_pointObj)
         delete m_pointObj;
-    m_pointObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/sphere"));
+    m_pointObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/sphereSmooth"));
     m_pointObj->load();
 }
 
