@@ -37,32 +37,33 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
-Q_DECLARE_METATYPE(AbstractDeclarative *)
-Q_DECLARE_METATYPE(DeclarativeBars *)
-Q_DECLARE_METATYPE(DeclarativeScatter *)
-Q_DECLARE_METATYPE(DeclarativeSurface *)
+QML_DECLARE_TYPE(AbstractDeclarative)
+QML_DECLARE_TYPE(DeclarativeBars)
+QML_DECLARE_TYPE(DeclarativeScatter)
+QML_DECLARE_TYPE(DeclarativeSurface)
 
-Q_DECLARE_METATYPE(QItemModelBarDataMapping *)
-Q_DECLARE_METATYPE(QItemModelScatterDataMapping *)
-Q_DECLARE_METATYPE(QItemModelSurfaceDataMapping *)
+QML_DECLARE_TYPE(QItemModelBarDataMapping)
+QML_DECLARE_TYPE(QItemModelScatterDataMapping)
+QML_DECLARE_TYPE(QItemModelSurfaceDataMapping)
 
-Q_DECLARE_METATYPE(const QAbstractItemModel *)
-Q_DECLARE_METATYPE(QLinearGradient)
+QML_DECLARE_TYPE(const QAbstractItemModel)
+QML_DECLARE_TYPE(QDataVis)
 
-Q_DECLARE_METATYPE(QDataVis *)
+QML_DECLARE_TYPE(Q3DAbstractAxis)
+QML_DECLARE_TYPE(Q3DCategoryAxis)
+QML_DECLARE_TYPE(Q3DValueAxis)
 
-Q_DECLARE_METATYPE(Q3DAbstractAxis *)
-Q_DECLARE_METATYPE(Q3DCategoryAxis *)
-Q_DECLARE_METATYPE(Q3DValueAxis *)
+QML_DECLARE_TYPE(QAbstractDataProxy)
+QML_DECLARE_TYPE(QBarDataProxy)
+QML_DECLARE_TYPE(QItemModelBarDataProxy)
+QML_DECLARE_TYPE(QScatterDataProxy)
+QML_DECLARE_TYPE(QItemModelScatterDataProxy)
+QML_DECLARE_TYPE(QSurfaceDataProxy)
+QML_DECLARE_TYPE(QItemModelSurfaceDataProxy)
+QML_DECLARE_TYPE(QHeightMapSurfaceDataProxy)
 
-Q_DECLARE_METATYPE(QAbstractDataProxy *)
-Q_DECLARE_METATYPE(QBarDataProxy *)
-Q_DECLARE_METATYPE(QItemModelBarDataProxy *)
-Q_DECLARE_METATYPE(QScatterDataProxy *)
-Q_DECLARE_METATYPE(QItemModelScatterDataProxy *)
-Q_DECLARE_METATYPE(QSurfaceDataProxy *)
-Q_DECLARE_METATYPE(QItemModelSurfaceDataProxy *)
-Q_DECLARE_METATYPE(QHeightMapSurfaceDataProxy *)
+QML_DECLARE_TYPE(ColorGradientStop)
+QML_DECLARE_TYPE(ColorGradient)
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

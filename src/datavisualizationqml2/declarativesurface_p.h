@@ -35,6 +35,7 @@
 #include "declarativesurface_p.h"
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
+#include "colorgradient_p.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -52,13 +53,11 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
-    Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
+    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
     ~DeclarativeSurface();
-
-    Q_INVOKABLE void setGradientColorAt(qreal pos, const QColor &color);
 
     QSurfaceDataProxy *dataProxy() const;
     void setDataProxy(QSurfaceDataProxy *dataProxy);
@@ -76,14 +75,21 @@ public:
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
 
-    void setGradient(const QLinearGradient &gradient);
-    QLinearGradient gradient() const;
+    void setGradient(ColorGradient *gradient);
+    ColorGradient *gradient() const;
+
 protected:
+    void handleGradientUpdate();
+
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 private:
     Surface3DController *m_shared;
+
+    void setControllerGradient(const ColorGradient &gradient);
+
     QSize m_initialisedSize;
+    ColorGradient *m_gradient; // Not owned
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

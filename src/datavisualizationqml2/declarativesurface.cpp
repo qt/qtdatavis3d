@@ -27,7 +27,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_shared(0),
-      m_initialisedSize(0, 0)
+      m_initialisedSize(0, 0),
+      m_gradient(0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -47,6 +48,12 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 DeclarativeSurface::~DeclarativeSurface()
 {
     delete m_shared;
+}
+
+void DeclarativeSurface::handleGradientUpdate()
+{
+    if (m_gradient)
+        setControllerGradient(*m_gradient);
 }
 
 QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -70,11 +77,6 @@ QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     node->setRect(boundingRect());
     m_shared->setBoundingRect(boundingRect().toRect());
     return node;
-}
-
-void DeclarativeSurface::setGradientColorAt(qreal pos, const QColor &color)
-{
-    m_shared->setGradientColorAt(pos, color);
 }
 
 void DeclarativeSurface::setDataProxy(QSurfaceDataProxy *dataProxy)
@@ -137,14 +139,47 @@ bool DeclarativeSurface::isSurfaceGridEnabled() const
     return m_shared->surfaceGrid();
 }
 
-void DeclarativeSurface::setGradient(const QLinearGradient &gradient)
+void DeclarativeSurface::setGradient(ColorGradient *gradient)
 {
-    m_shared->setGradient(gradient);
+    // connect new / disconnect old
+    if (gradient != m_gradient) {
+        if (m_gradient)
+            QObject::disconnect(m_gradient, 0, this, 0);
+
+        m_gradient = gradient;
+
+        if (m_gradient) {
+            QObject::connect(m_gradient, &ColorGradient::updated, this,
+                             &DeclarativeSurface::handleGradientUpdate);
+        }
+    }
+
+    if (m_gradient)
+        setControllerGradient(*m_gradient);
 }
 
-QLinearGradient DeclarativeSurface::gradient() const
+ColorGradient *DeclarativeSurface::gradient() const
 {
-    return m_shared->gradient();
+
+    return m_gradient;
+}
+
+void DeclarativeSurface::setControllerGradient(const ColorGradient &gradient)
+{
+    QLinearGradient newGradient;
+    QGradientStops stops;
+    QList<ColorGradientStop *> qmlstops = gradient.m_stops;
+
+    // Get sorted gradient stops
+    for (int i = 0; i < qmlstops.size(); i++) {
+        int j = 0;
+        while (j < stops.size() && stops.at(j).first < qmlstops[i]->position())
+            j++;
+        stops.insert(j, QGradientStop(qmlstops.at(i)->position(), qmlstops.at(i)->color()));
+    }
+
+    newGradient.setStops(stops);
+    m_shared->setGradient(newGradient);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -42,6 +42,8 @@ const qreal defaultMaxValue = 10.0;
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
  * not get rendered.
  *
+ * \note The way row and column values are handled is subject to change after technology preview.
+ *
  * QSurfaceDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
  * \table
  *   \row
@@ -86,6 +88,8 @@ const qreal defaultMaxValue = 10.0;
  *
  * The minimum value of the range in rows. For instance if function z value varies between -8.0
  * and 8.0 set this property to -8.0.
+ *
+ * \note The way row and column values are handled is subject to change after technology preview.
  */
 
 /*!
@@ -93,6 +97,8 @@ const qreal defaultMaxValue = 10.0;
  *
  * The maximum value of the range in rows. For instance if function z value varies between -8.0
  * and 8.0 set this property to 8.0.
+ *
+ * \note The way row and column values are handled is subject to change after technology preview.
  */
 
 /*!
@@ -100,6 +106,8 @@ const qreal defaultMaxValue = 10.0;
  *
  * The minimum value of the range in columns. For instance if function x value varies between -8.0
  * and 8.0 set this property to -8.0.
+ *
+ * \note The way row and column values are handled is subject to change after technology preview.
  */
 
 /*!
@@ -107,6 +115,8 @@ const qreal defaultMaxValue = 10.0;
  *
  * The maximum value of the range in columns. For instance if function x value varies between -8.0
  * and 8.0 set this property to 8.0.
+ *
+ * \note The way row and column values are handled is subject to change after technology preview.
  */
 
 /*!

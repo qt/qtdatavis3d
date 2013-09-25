@@ -37,10 +37,11 @@ Item {
         height: mainview.height
         anchors.right: mainview.right;
 
-        Gradient {
+        ColorGradient {
             id: surfaceGradient
-            GradientStop { position: 0.0; color: "darkslategray" }
-            GradientStop { position: 1.0; color: "peru" }
+            ColorGradientStop { position: 0.0; color: "darkslategray" }
+            ColorGradientStop { id: middleGradient; position: 0.55; color: "peru" }
+            ColorGradientStop { position: 1.0; color: "red" }
         }
 
         Surface3D {
@@ -66,11 +67,7 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
-            //gradient: surfaceGradient
-            Component.onCompleted: {
-                setGradientColorAt(0, "darkslategray");
-                setGradientColorAt(1, "peru");
-            }
+            gradient: surfaceGradient
         }
     }
 
@@ -147,10 +144,12 @@ Item {
             if (surfaceplot.dataProxy === surfaceData.heightProxy) {
                 surfaceplot.axisY.max = 500.0
                 surfaceplot.dataProxy = surfaceData.proxy
+                middleGradient.position = 0.25
                 text = "Switch to Height Map Proxy"
             } else {
                 surfaceplot.axisY.max = 250.0
                 surfaceplot.dataProxy = surfaceData.heightProxy
+                middleGradient.position = 0.55
                 text = "Switch to Item Model Proxy"
             }
         }
