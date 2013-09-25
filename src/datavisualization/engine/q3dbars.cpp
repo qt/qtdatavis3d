@@ -109,6 +109,27 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlmethod void Bars3D::setCameraPosition(qreal horizontal, qreal vertical, int distance)
+ * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
+ * to -180...180 in horizontal direction and either -90...90 or 0...90 in vertical, depending
+ * on data values. Negative vertical angles are allowed only if there are negative bar values.
+ * \a distance is adjustable between 10 and 500, being \c 100 by default.
+ */
+
+/*!
+ * \qmlmethod void Bars3D::setBarColor(const QColor &baseColor, bool uniform)
+ * Set bar color using your own color. \a baseColor sets the base color of a bar. The \a uniform
+ * -flag is used to define if color needs to be uniform throughout bar's length, or will the colors
+ * be applied by height, starting with dark at the bottom. It is \c true by default.
+ *
+ * Calling this method overrides colors from theme.
+ *
+ * \sa theme
+ *
+ * \warning This method is subject to change.
+ */
+
+/*!
  * \qmlproperty BarDataProxy Bars3D::dataProxy
  * The active data proxy.
  *

@@ -100,6 +100,26 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlmethod void Scatter3D::setCameraPosition(qreal horizontal, qreal vertical, int distance)
+ * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
+ * to -180...180 in horizontal direction and -90...90 in vertical. \a distance is adjustable
+ * between 10 and 500, being \c 100 by default.
+ */
+
+/*!
+ * \qmlmethod void Scatter3D::setObjectColor(const QColor &baseColor, bool uniform)
+ * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
+ * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
+ * be applied by height. It is \c true by default.
+ *
+ * Calling this method overrides colors from theme.
+ *
+ * \sa theme
+ *
+ * \warning This method is subject to change.
+ */
+
+/*!
  * \qmlproperty ScatterDataProxy Scatter3D::dataProxy
  * The active data proxy.
  *
