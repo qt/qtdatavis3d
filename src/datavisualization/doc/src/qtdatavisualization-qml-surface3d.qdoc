@@ -18,7 +18,7 @@
 
 /*!
   \qmltype Surface3D
-  \inherits AbstractDeclarative
+  \inherits AbstractGraph3D
   \inmodule QtDataVisualization
 
   This type enables developers to render surface plots in 3D with Qt Quick 2.

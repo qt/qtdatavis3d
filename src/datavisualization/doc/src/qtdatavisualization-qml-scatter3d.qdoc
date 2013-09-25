@@ -18,7 +18,7 @@
 
 /*!
   \qmltype Scatter3D
-  \inherits AbstractDeclarative
+  \inherits AbstractGraph3D
   \inmodule QtDataVisualization
 
   This type enables developers to render scatter graphs in 3D with Qt Quick 2.
@@ -44,7 +44,7 @@
  *
  * Calling this method overrides colors from theme.
  *
- * \sa AbstractDeclarative::theme
+ * \sa AbstractGraph3D::theme
  *
  * \warning This method is subject to change.
  */

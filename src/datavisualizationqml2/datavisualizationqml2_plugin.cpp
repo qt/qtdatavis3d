@@ -41,8 +41,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                   QLatin1String("Trying to create uncreatable: ScatterDataProxy."));
     qmlRegisterUncreatableType<QSurfaceDataProxy>(uri, 1, 0, "SurfaceDataProxy",
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
-    qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractDeclarative",
-                                                  QLatin1String("Trying to create uncreatable: AbstractDeclarative."));
+    qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
+                                                  QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
 
     qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
     qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");

@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 /*!
-  \qmltype AbstractDeclarative
+  \qmltype AbstractGraph3D
   \inmodule QtDataVisualization
 
   This type is the base class for all 3D visualizations in Qt Quick 2.
@@ -34,46 +34,46 @@
  */
 
 /*!
-  \qmlproperty AbstractDeclarative.SelectionMode AbstractDeclarative::selectionMode
+  \qmlproperty AbstractGraph3D.SelectionMode AbstractGraph3D::selectionMode
   Active selection mode in the visualization.
  */
 /*!
-  \qmlproperty AbstractDeclarative.LabelTransparency AbstractDeclarative::labelTransparency
+  \qmlproperty AbstractGraph3D.LabelTransparency AbstractGraph3D::labelTransparency
   Label transparency.
  */
 
 /*!
-  \qmlproperty AbstractDeclarative.ShadowQuality AbstractDeclarative::shadowQuality
+  \qmlproperty AbstractGraph3D.ShadowQuality AbstractGraph3D::shadowQuality
   Shadow quality.
  */
 
 /*!
-  \qmlproperty AbstractDeclarative.CameraPreset AbstractDeclarative::cameraPreset
+  \qmlproperty AbstractGraph3D.CameraPreset AbstractGraph3D::cameraPreset
   Camera preset.
  */
 
 /*!
-  \qmlproperty AbstractDeclarative.ColorTheme AbstractDeclarative::theme
+  \qmlproperty AbstractGraph3D.ColorTheme AbstractGraph3D::theme
   Theme of the graph. Theme affects visualization colors, label colors, text color, background color, window
   color and grid color. Lighting is also adjusted by themes.
  */
 
 /*!
-  \qmlproperty font AbstractDeclarative::font
+  \qmlproperty font AbstractGraph3D::font
   Font used for labels.
  */
 
 /*!
-  \qmlproperty bool AbstractDeclarative::gridVisible
+  \qmlproperty bool AbstractGraph3D::gridVisible
   Grid visibility. If false, grid lines are not drawn.
  */
 
 /*!
-  \qmlproperty bool AbstractDeclarative::backgroundVisible
+  \qmlproperty bool AbstractGraph3D::backgroundVisible
   Background visibility. If false, background is not drawn.
  */
 
 /*!
-  \qmlproperty string AbstractDeclarative::itemLabelFormat
+  \qmlproperty string AbstractGraph3D::itemLabelFormat
   Label format of single item labels, e.g. a selected datapoint.
  */
