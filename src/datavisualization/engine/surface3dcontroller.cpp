@@ -45,8 +45,6 @@ Surface3DController::Surface3DController(QRect rect)
     setAxisX(0);
     setAxisY(0);
     setAxisZ(0);
-    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::selectionAtPoint,
-                     this, &Surface3DController::handleSelectionAtPoint);
 
     // Set the default from the theme
     m_userDefinedGradient = theme().m_surfaceGradient;
@@ -150,6 +148,19 @@ void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
     emitNeedRender();
 }
 
+void Surface3DController::setSelectionMode(QDataVis::SelectionMode mode)
+{
+    if (!(mode == QDataVis::ModeNone || mode == QDataVis::ModeItem || mode == QDataVis::ModeSliceRow
+        || mode == QDataVis::ModeSliceColumn)) {
+        qWarning("Unsupported selection mode.");
+        return;
+    }
+    // Disable zoom if selection mode changes
+    setSlicingActive(false);
+    Abstract3DController::setSelectionMode(mode);
+}
+
+
 void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
     // Setting null proxy indicates default proxy
@@ -175,12 +186,6 @@ void Surface3DController::handleArrayReset()
     adjustValueAxisRange();
     m_isDataDirty = true;
     emitNeedRender();
-}
-
-
-void Surface3DController::handleSelectionAtPoint(const QPoint &point)
-{
-    emit leftMousePressed(point);
 }
 
 void Surface3DController::adjustValueAxisRange()

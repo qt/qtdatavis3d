@@ -259,6 +259,23 @@ bool Q3DSurface::isSmoothSurfaceEnabled() const
 }
 
 /*!
+ * \property Q3DSurface::selectionMode
+ *
+ * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports ModeItem,
+ * ModeSliceRow and ModeSliceColumn. It is preset to \c QDataVis::ModeItem by default.
+ */
+void Q3DSurface::setSelectionMode(QDataVis::SelectionMode mode)
+{
+    d_ptr->m_shared->setSelectionMode(mode);
+}
+
+QDataVis::SelectionMode Q3DSurface::selectionMode() const
+{
+    return d_ptr->m_shared->selectionMode();
+}
+
+
+/*!
  * \property Q3DSurface::surfaceGridEnabled
  *
  * Sets surface grid to \a enabled. It is preset to \c true by default.

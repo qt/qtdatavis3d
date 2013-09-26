@@ -92,13 +92,24 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 {
     Q_UNUSED(defaultFboHandle)
 
+    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+               m_mainViewPort.width(), m_mainViewPort.height());
+
     Q3DCamera *camera = m_cachedScene->activeCamera();
     QSize textureSize = m_labelItem.size();
 
     QMatrix4x4 itModelMatrix;
 
     // Get view matrix
-    QMatrix4x4 viewMatrix = camera->viewMatrix();
+    QMatrix4x4 viewMatrix;
+    if (m_cachedIsSlicingActivated) {
+        GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment + zComp;
+        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced),
+                          QVector3D(0.0f, 0.0f, zComp),
+                          QVector3D(0.0f, 1.0f, 0.0f));
+    } else {
+        viewMatrix = camera->viewMatrix();
+    }
 
     itModelMatrix.scale(m_scale);
 
@@ -148,50 +159,50 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     //
     // Draw the label
     //
-    if (m_labelItem.textureId()) {
-        QMatrix4x4 modelMatrixLabel;
+    QMatrix4x4 modelMatrixLabel;
 
-        // Position label
-        QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
-        modelMatrixLabel.translate(m_position * m_scale + labelAlign + QVector3D(0.0f, 0.0f, zComp));
+    // Position label
+    QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
+    modelMatrixLabel.translate(m_position * m_scale + labelAlign + QVector3D(0.0f, 0.0f, zComp));
 
-        // Position the label towards the camera
-        QPointF camRotations = camera->rotations();
+    // Position the label towards the camera
+    QPointF camRotations = camera->rotations();
+    if (!m_cachedIsSlicingActivated) {
         modelMatrixLabel.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
         modelMatrixLabel.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
-
-        // Scale label based on text size
-        modelMatrixLabel.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,
-                                         scaledFontSize,
-                                         0.0f));
-
-        // Make label to be always on top
-        glDisable(GL_DEPTH_TEST);
-
-        // Make label transparent
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        m_labelShader->bind();
-
-        // Set shader bindings
-        MVPMatrix = projectionMatrix * viewMatrix * modelMatrixLabel;
-        m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-
-        // Draw the object
-        m_drawer->drawObject(m_labelShader, m_labelObj, m_labelItem.textureId());
-
-        m_labelShader->release();
-
-        // Disable textures
-        glDisable(GL_TEXTURE_2D);
-
-        // Disable transparency
-        glDisable(GL_BLEND);
-
-        // Depth test back to normal
-        glEnable(GL_DEPTH_TEST);
     }
+
+    // Scale label based on text size
+    modelMatrixLabel.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,
+                                     scaledFontSize,
+                                     0.0f));
+
+    // Make label to be always on top
+    glDisable(GL_DEPTH_TEST);
+
+    // Make label transparent
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    m_labelShader->bind();
+
+    // Set shader bindings
+    MVPMatrix = projectionMatrix * viewMatrix * modelMatrixLabel;
+    m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
+
+    // Draw the object
+    m_drawer->drawObject(m_labelShader, m_labelObj, m_labelItem.textureId());
+
+    m_labelShader->release();
+
+    // Disable textures
+    glDisable(GL_TEXTURE_2D);
+
+    // Disable transparency
+    glDisable(GL_BLEND);
+
+    // Depth test back to normal
+    glEnable(GL_DEPTH_TEST);
 }
 
 void SelectionPointer::setPosition(QVector3D position)
@@ -202,6 +213,12 @@ void SelectionPointer::setPosition(QVector3D position)
 void SelectionPointer::setScaling(QVector3D scaling)
 {
     m_scale = scaling;
+}
+
+void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment)
+{
+    m_cachedIsSlicingActivated = sliceActivated;
+    m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
 void SelectionPointer::setLabel(QString label)

@@ -263,6 +263,31 @@ void ChartModifier::changeShadowQuality(int quality)
     m_chart->setShadowQuality(sq);
 }
 
+void ChartModifier::changeSelectionMode(int mode)
+{
+    switch (mode) {
+    case 0:
+        qDebug() << "QDataVis::ModeNone";
+        m_chart->setSelectionMode(QDataVis::ModeNone);
+        break;
+    case 1:
+        qDebug() << "QDataVis::ModeItem";
+        m_chart->setSelectionMode(QDataVis::ModeItem);
+        break;
+    case 2:
+        qDebug() << "QDataVis::ModeSliceRow";
+        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
+        break;
+    case 3:
+        qDebug() << "QDataVis::ModeSliceColumn";
+        m_chart->setSelectionMode(QDataVis::ModeSliceColumn);
+        break;
+    default:
+        qDebug() << __FUNCTION__ << " Unsupported selection mode.";
+        break;
+    }
+}
+
 void ChartModifier::updateSamples()
 {
     switch (m_activeSample) {

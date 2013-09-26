@@ -53,7 +53,9 @@ const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 
 const GLfloat labelMargin = 0.05f;
 const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
+const GLfloat sliceZScale = 0.1f;
 const GLfloat surfaceGridYOffsetValue = 0.001f;
+const int subViewDivider = 5;
 // The second offset to opposite direction is double because same matrix is translated twice
 const GLfloat surfaceGridYOffset[2] = {-surfaceGridYOffsetValue, 2.0f * surfaceGridYOffsetValue};
 
@@ -63,8 +65,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
-      m_segmentYCount(0),
-      m_segmentYStep(0.0f),
       m_shader(0),
       m_depthShader(0),
       m_backgroundShader(0),
@@ -92,6 +92,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_gridLineObj(0),
       m_labelObj(0),
       m_surfaceObj(0),
+      m_sliceSurfaceObj(0),
       m_depthTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -100,7 +101,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionTexture(0),
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
-      m_querySelection(false),
       m_flatSupported(true),
       m_selectionPointer(0),
       m_selectionActive(false),
@@ -111,10 +111,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQualityMultiplier(3),
       m_hasHeightAdjustmentChanged(true)
 {
-    // Listen to changes in the controller
-    QObject::connect(m_controller, &Surface3DController::leftMousePressed, this,
-                     &Surface3DRenderer::requestSelectionAtPoint); // TODO: Possible temp
-
 #if !defined(QT_OPENGL_ES_2)
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -156,6 +152,7 @@ Surface3DRenderer::~Surface3DRenderer()
 
     delete m_backgroundObj;
     delete m_surfaceObj;
+    delete m_sliceSurfaceObj;
     delete m_gridLineObj;
     delete m_labelObj;
 
@@ -165,6 +162,9 @@ Surface3DRenderer::~Surface3DRenderer()
         delete m_dataArray.at(i);
     m_dataArray.clear();
 
+    for (int i = 0; i < m_sliceDataArray.size(); i++)
+        delete m_sliceDataArray.at(i);
+    m_sliceDataArray.clear();
 }
 
 void Surface3DRenderer::initializeOpenGL()
@@ -192,10 +192,6 @@ void Surface3DRenderer::initializeOpenGL()
 
     // Load label mesh
     loadLabelMesh();
-
-    // Set view port
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
 
     // Resize in case we've missed resize events
     // Resize calls initSelectionBuffer and initDepthBuffer, so they don't need to be called here
@@ -257,6 +253,45 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
 
+void Surface3DRenderer::updateSliceDataModel(int selectionId)
+{
+    int column = (selectionId - 1) % m_sampleSpace.width();
+    int row = (selectionId - 1) / m_sampleSpace.width();
+
+    for (int i = 0; i < m_sliceDataArray.size(); i++)
+        delete m_sliceDataArray.at(i);
+    m_sliceDataArray.clear();
+
+    m_sliceDataArray.reserve(2);
+    QSurfaceDataRow *sliceRow;
+
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+        sliceRow = new QSurfaceDataRow(*m_dataArray.at(row));
+    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+        sliceRow = new QSurfaceDataRow();
+        sliceRow->resize(m_sampleSpace.height());
+        for (int i = 0; i < m_sampleSpace.height(); i++)
+            (*sliceRow)[i] = m_dataArray.at(i)->at(column);
+    }
+    m_sliceDataArray << sliceRow;
+
+    // Make a duplicate, so that we get a little bit depth
+    QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
+    m_sliceDataArray << duplicateRow;
+
+    QRect sliceRect(0, 0, sliceRow->size(), 2);
+
+    if (sliceRow->size() > 0) {
+        if (!m_sliceSurfaceObj)
+            loadSliceSurfaceObj();
+
+        if (m_cachedSmoothSurface)
+            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer, true);
+        else
+            m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer, true);
+    }
+}
+
 QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
 {
     QRect sampleSpace;
@@ -308,7 +343,7 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
     GLfloat data2XCenterX = (m_minVisibleColumnValue + m_maxVisibleColumnValue);
     GLfloat data2XCenterZ = (m_minVisibleRowValue + m_maxVisibleRowValue);
     m_surfaceOffsetX = m_scaleX * (data2XCenterX - axis2XCenterX) / m_areaSize.width();
-    m_surfaceOffsetZ = -m_scaleZ * (data2XCenterZ - axis2XCenterZ) / m_areaSize.height() + zComp;
+    m_surfaceOffsetZ = -m_scaleZ * (data2XCenterZ - axis2XCenterZ) / m_areaSize.height();
 
     return sampleSpace;
 }
@@ -316,6 +351,7 @@ QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
 void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
+    scene->setSecondarySubViewport(m_sliceViewPort);
     scene->setPrimarySubViewport(m_mainViewPort);
     scene->setUnderSideCameraEnabled(false);
 
@@ -340,9 +376,15 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
-    m_cachedScene->setUnderSideCameraEnabled(false);
+    bool slicingActivated = m_cachedScene->isSlicingActive();
+    updateSlicingActive(slicingActivated);
+
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
+
+    // If slice selection is on, draw the sliced scene
+    if (m_cachedIsSlicingActivated)
+        drawSlicedScene();
 
     // Draw the surface scene
     drawScene(defaultFboHandle);
@@ -352,9 +394,324 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
         m_selectionPointer->render(defaultFboHandle);
 }
 
+void Surface3DRenderer::drawSlicedScene()
+{
+    QVector3D lightPos;
+
+    // Specify viewport
+    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
+               m_sliceViewPort.width(), m_sliceViewPort.height());
+
+    // Set up projection matrix
+    QMatrix4x4 projectionMatrix;
+    projectionMatrix.perspective(45.0f, (GLfloat)m_sliceViewPort.width()
+                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
+
+    // Set view matrix
+    QMatrix4x4 viewMatrix;
+
+    // Adjust scaling (zoom rate based on aspect ratio)
+    GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment + zComp;
+
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced),
+                      QVector3D(0.0f, 0.0f, zComp),
+                      QVector3D(0.0f, 1.0f, 0.0f));
+
+    // Set light position
+    lightPos = m_cachedScene->activeLight()->position();
+
+    QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
+
+    GLfloat scaleX;
+    GLfloat scaleXBackground;
+    GLfloat offset;
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+        scaleX = m_surfaceScaleX;
+        scaleXBackground = m_scaleXWithBackground;
+        offset = m_surfaceOffsetX;
+    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+        scaleX = m_surfaceScaleZ;
+        scaleXBackground = m_scaleZWithBackground;
+        offset = -m_surfaceOffsetZ;
+    }
+
+    if (m_surfaceObj) {
+        ShaderHelper *surfaceShader = m_shader;
+        surfaceShader->bind();
+
+        // For surface we can see climpses from underneath
+        glDisable(GL_CULL_FACE);
+
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        QMatrix4x4 itModelMatrix;
+
+        modelMatrix.translate(offset, 0.0f, zComp);
+        QVector3D scaling(scaleX, 1.0f, sliceZScale);
+        modelMatrix.scale(scaling);
+        itModelMatrix.scale(scaling);
+
+        MVPMatrix = projectionViewMatrix * modelMatrix;
+
+        QVector3D color;
+        if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+            color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
+        else
+            color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
+
+        // Set shader bindings
+        surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
+        surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
+        surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
+        surfaceShader->setUniformValue(surfaceShader->nModel(), itModelMatrix.inverted().transposed());
+        surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
+        surfaceShader->setUniformValue(surfaceShader->color(), color);
+        surfaceShader->setUniformValue(surfaceShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        surfaceShader->setUniformValue(surfaceShader->lightS(),
+                                       m_cachedTheme.m_lightStrength * 2.0f);
+
+        m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
+
+        surfaceShader->release();
+
+        glEnable(GL_CULL_FACE);
+
+        // Draw surface grid
+        if (m_cachedSurfaceGridOn) {
+            m_surfaceGridShader->bind();
+
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
+                                                 Utils::vectorFromColor(m_cachedTheme.m_gridLine));
+            // Draw the grid twice, with slight offset on Y axis to each direction
+            for (int i = 0; i < 2; i++) {
+                MVPMatrix.translate(0.0f, surfaceGridYOffset[i], 0.0f);
+
+                m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+                m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_sliceSurfaceObj);
+            }
+            m_surfaceGridShader->release();
+        }
+    }
+
+    // Disable textures
+    glDisable(GL_TEXTURE_2D);
+
+    ShaderHelper *lineShader = m_backgroundShader;
+    // Bind line shader
+    lineShader->bind();
+
+    // lines to the back
+    if (m_axisCacheY.segmentCount() > 0) {
+        QVector3D gridLineScaleX(scaleXBackground, gridLineWidth, gridLineWidth);
+
+        // Set unchanging shader bindings
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        lineShader->setUniformValue(lineShader->lightP(), lightPos);
+        lineShader->setUniformValue(lineShader->view(), viewMatrix);
+        lineShader->setUniformValue(lineShader->color(), lineColor);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+
+        // Back wall
+        GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
+        GLfloat linePos = -1.0f;
+        int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
+
+        for (int segment = 0; segment <= lastSegment; segment++) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
+
+            modelMatrix.translate(0.0f, linePos, zComp - sliceZScale);
+
+            modelMatrix.scale(gridLineScaleX);
+            itModelMatrix.scale(gridLineScaleX);
+
+            MVPMatrix = projectionViewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            lineShader->setUniformValue(lineShader->model(), modelMatrix);
+            lineShader->setUniformValue(lineShader->nModel(),
+                                        itModelMatrix.inverted().transposed());
+            lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+            // Set shadowless shader bindings, no shadows on slice view
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme.m_lightStrength);
+
+            // Draw the object
+            m_drawer->drawObject(lineShader, m_gridLineObj);
+
+            linePos += lineStep;
+        }
+    }
+
+    // Floor lines
+    QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, sliceZScale);
+    QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
+
+    int lastSegment;
+    GLfloat lineStep;
+    GLfloat linePos;
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+        lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
+        lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
+        linePos = m_scaleX;
+    } else {
+        lineStep = -2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
+        lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
+        linePos = m_scaleZ;
+    }
+
+    for (int segment = 0; segment <= lastSegment; segment++) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        QMatrix4x4 itModelMatrix;
+
+        modelMatrix.translate(linePos, -backgroundMargin, zComp);
+
+        modelMatrix.scale(gridLineScaleZ);
+        itModelMatrix.scale(gridLineScaleZ);
+
+        MVPMatrix = projectionViewMatrix * modelMatrix;
+
+        // Set the rest of the shader bindings
+        lineShader->setUniformValue(lineShader->model(), modelMatrix);
+        lineShader->setUniformValue(lineShader->nModel(),
+                                    itModelMatrix.inverted().transposed());
+        lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+        // Set shadowless shader bindings
+        lineShader->setUniformValue(lineShader->lightS(),
+                                    m_cachedTheme.m_lightStrength);
+
+        // Draw the object
+        m_drawer->drawObject(lineShader, m_gridLineObj);
+
+        linePos += lineStep;
+    }
+
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+        linePos = m_scaleX;
+    else
+        linePos = m_scaleZ;
+
+    for (int segment = 0; segment <= lastSegment; segment++) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 MVPMatrix;
+        QMatrix4x4 itModelMatrix;
+
+        modelMatrix.translate(linePos, 0.0f, zComp - sliceZScale);
+        modelMatrix.scale(gridLineScaleY);
+        itModelMatrix.scale(gridLineScaleY);
+
+        MVPMatrix = projectionViewMatrix * modelMatrix;
+
+        // Set the rest of the shader bindings
+        lineShader->setUniformValue(lineShader->model(), modelMatrix);
+        lineShader->setUniformValue(lineShader->nModel(),
+                                    itModelMatrix.inverted().transposed());
+        lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+        // Set shadowless shader bindings
+        lineShader->setUniformValue(lineShader->lightS(),
+                                    m_cachedTheme.m_lightStrength);
+
+        // Draw the object
+        m_drawer->drawObject(lineShader, m_gridLineObj);
+
+        linePos += lineStep;
+    }
+
+    // Release line shader
+    lineShader->release();
+
+    // Draw axis labels
+    m_labelShader->bind();
+    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    // Y Labels to back wall
+    GLfloat posStep = 2.0f * m_axisCacheY.segmentStep() / m_heightNormalizer;
+    GLfloat labelPos = -1.0f;
+    int labelNbr = 0;
+
+    QVector3D positionComp(0.0f, 0.0f, zComp);
+    QVector3D rotation(0.0f, 0.0f, 0.0f);
+    QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, labelPos, zComp);
+    for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
+        if (m_axisCacheY.labelItems().size() > labelNbr) {
+            labelTrans.setY(labelPos);
+            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                positionComp, rotation, 0, m_cachedSelectionMode, m_labelShader,
+                                m_labelObj, m_cachedScene->activeCamera(),
+                                true, true, Drawer::LabelMid, Qt::AlignRight);
+        }
+        labelNbr++;
+        labelPos += posStep;
+    }
+
+    // X Labels to ground
+    int countLabelItems;
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+        posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
+        labelPos = -m_scaleX;
+        lastSegment = m_axisCacheX.segmentCount();
+        countLabelItems = m_axisCacheX.labelItems().size();
+    } else {
+        posStep = 2.0f * aspectRatio * m_axisCacheZ.segmentStep() / m_scaleFactor;
+        labelPos = -m_scaleZ;
+        lastSegment = m_axisCacheZ.segmentCount();
+        countLabelItems = m_axisCacheZ.labelItems().size();
+    }
+
+    labelNbr = 0;
+    positionComp.setY(backgroundMargin);
+    rotation.setZ(-45.0f);
+    labelTrans.setY(-backgroundMargin);
+    for (int segment = 0; segment <= lastSegment; segment++) {
+        if (countLabelItems > labelNbr) {
+            // Draw the label here
+            labelTrans.setX(labelPos);
+
+            m_dummyRenderItem.setTranslation(labelTrans);
+
+            LabelItem *axisLabelItem;
+            if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+                axisLabelItem = m_axisCacheX.labelItems().at(labelNbr);
+            else
+                axisLabelItem = m_axisCacheZ.labelItems().at(labelNbr);
+
+            m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
+                                positionComp, rotation, 0, QDataVis::ModeSliceRow, m_labelShader,
+                                m_labelObj, m_cachedScene->activeCamera(), false, false,
+                                Drawer::LabelBelow, Qt::AlignTop);
+        }
+        labelNbr++;
+        labelPos += posStep;
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_DEPTH_TEST);
+    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
+        glDisable(GL_BLEND);
+
+    // Release label shader
+    m_labelShader->release();
+}
+
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
+    uint selectionId = 0;
 
     // Specify viewport
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
@@ -398,12 +755,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
 
-    //
-    //  Do the surface drawing
-    //
-
     QVector3D surfaceScaler(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);
-    QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
+    QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ + zComp);
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
@@ -513,7 +866,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (m_querySelection && m_surfaceObj && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
+    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputOnScene && m_surfaceObj
+        && m_cachedSelectionMode > QDataVis::ModeNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -537,8 +891,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glEnable(GL_DITHER);
 
-        m_querySelection = false;
-
         QPoint point = m_controller->inputPosition();
         GLubyte pixel[4] = {0};
         glReadPixels(point.x(), m_cachedBoundingRect.height() - point.y(), 1, 1,
@@ -550,19 +902,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->release();
 
         // Put the RGBA value back to uint
-        uint id = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
-        if (id) {
-            surfacePointSelected(id);
-        } else {
-            //surfacePointCleared();
-            m_selectionActive = false;
-        }
-        glEnable(GL_CULL_FACE);
+        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
     }
 
+    // Draw the surface
     if (m_surfaceObj && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         m_surfaceShader->bind();
-        // m_selectionShader->bind(); // IFDEF print selection
 
         // For surface we can see climpses from underneath
         glDisable(GL_CULL_FACE);
@@ -615,6 +960,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         m_surfaceShader->release();
 
+        glEnable(GL_CULL_FACE);
+
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
             m_surfaceGridShader->bind();
@@ -630,7 +977,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
             m_surfaceGridShader->release();
         }
-        glEnable(GL_CULL_FACE);
     }
 
     // Bind background shader
@@ -1169,6 +1515,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_axisCacheY.labelItems().size() > labelNbr) {
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
+                // Side wall
                 QVector3D labelTrans = QVector3D(labelXTrans, labelPos,
                                                  labelZTrans + labelMarginZTrans + zComp);
                 if (m_xFlipped)
@@ -1187,7 +1534,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
                                     true, true, Drawer::LabelMid, alignment);
 
-                // Side wall
+                // Back wall
                 if (m_xFlipped)
                     alignment = Qt::AlignLeft;
                 else
@@ -1218,6 +1565,30 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Release label shader
     m_labelShader->release();
+
+    // Selection handling
+    if (m_controller->inputState() == QDataVis::InputOnScene) {
+        if (m_cachedSelectionMode == QDataVis::ModeItem) {
+            if (selectionId)
+                surfacePointSelected(selectionId);
+            else
+                m_selectionActive = false;
+        }
+        if (m_cachedSelectionMode == QDataVis::ModeSliceRow || m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+            if (selectionId) {
+                updateSliceDataModel(selectionId);
+                m_cachedScene->setSlicingActive(true);
+
+                surfacePointSelected(selectionId);
+            }
+        }
+    }
+    if (m_controller->inputState() == QDataVis::InputOnOverview) {
+        if (m_cachedIsSlicingActivated) {
+            m_cachedScene->setSlicingActive(false);
+            m_selectionActive = false;
+        }
+    }
 }
 
 void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
@@ -1234,18 +1605,6 @@ void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
     }
 
     m_gradientTexture = m_textureHelper->create2DTexture(image, false, true);
-}
-
-void Surface3DRenderer::requestSelectionAtPoint(const QPoint &point)
-{
-    Q_UNUSED(point)
-
-    //    QMutexLocker locker(&m_mutex);
-    //    m_selectionPointRequest.setX(point.x());
-    //    m_selectionPointRequest.setY(point.y());
-    //    m_isSelectionPointRequestActive = true;
-
-    m_querySelection = true;
 }
 
 // This one needs to be called when the data size changes
@@ -1280,10 +1639,6 @@ void Surface3DRenderer::updateSelectionTexture()
         }
         id++;
     }
-
-    // Use this to save the ID image to file
-    //QImage image(bits, idImageWidth, idImageHeight, QImage::Format_ARGB32);
-    //image.save("C:\\Users\\misalmel\\Work\\gerrit\\qtdatavisualization_2\\selection.png");
 
     // If old texture exists, delete it
     if (m_selectionTexture) {
@@ -1411,6 +1766,13 @@ void Surface3DRenderer::loadSurfaceObj()
     m_surfaceObj = new SurfaceObject();
 }
 
+void Surface3DRenderer::loadSliceSurfaceObj()
+{
+    if (m_sliceSurfaceObj)
+        delete m_sliceSurfaceObj;
+    m_sliceSurfaceObj = new SurfaceObject();
+}
+
 void Surface3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
@@ -1424,10 +1786,23 @@ void Surface3DRenderer::handleResize()
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
 
-    m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+    // Set view port
+    if (m_cachedIsSlicingActivated) {
+        m_mainViewPort = QRect(0,
+                               m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / subViewDivider,
+                               m_cachedBoundingRect.width() / subViewDivider,
+                               m_cachedBoundingRect.height() / subViewDivider);
+    } else {
+        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+    }
+    m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
 
-    if (m_selectionPointer)
-        m_selectionPointer->updateBoundingRect(m_mainViewPort);
+    if (m_selectionPointer) {
+        if (m_cachedIsSlicingActivated)
+            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+        else
+            m_selectionPointer->updateBoundingRect(m_mainViewPort);
+    }
 
     Abstract3DRenderer::handleResize();
 }
@@ -1441,13 +1816,29 @@ void Surface3DRenderer::surfacePointSelected(int id)
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_controller, m_drawer);
 
-    QVector3D pos(normalize(float(column), value, float(row)));
-    pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ - zComp);
+    QVector3D pos;
+    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+        pos = normalize(float(column), value, 0.0f);
+        pos += QVector3D(m_surfaceOffsetX, 0.0f, -1.0f);
+        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, sliceZScale));
+        m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+        m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
+    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+        pos = normalize(float(row), value, 0.0f);
+        pos += QVector3D(m_surfaceOffsetZ, 0.0f, -1.0f);
+        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleZ, 1.0f, sliceZScale));
+        m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+        m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
+    } else {
+        pos = normalize(float(column), value, float(row));
+        pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
+        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ));
+        m_selectionPointer->updateBoundingRect(m_mainViewPort);
+        m_selectionPointer->updateSliceData(false, m_autoScaleAdjustment);
+    }
 
     m_selectionPointer->setPosition(pos);
-    m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ));
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
-    m_selectionPointer->updateBoundingRect(m_mainViewPort);
     m_selectionPointer->updateScene(m_cachedScene);
 
     //Put the selection pointer flag active
@@ -1557,6 +1948,29 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer();
 #endif
+}
+
+void Surface3DRenderer::updateSlicingActive(bool isSlicing)
+{
+    if (isSlicing == m_cachedIsSlicingActivated)
+        return;
+
+    m_cachedIsSlicingActivated = isSlicing;
+    if (isSlicing) {
+        m_mainViewPort = QRect(0, m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / subViewDivider,
+                               m_cachedBoundingRect.width() / subViewDivider, m_cachedBoundingRect.height() / subViewDivider);
+        if (m_depthTexture) {
+            m_textureHelper->deleteTexture(&m_depthTexture);
+            m_depthTexture = 0;
+        }
+    } else {
+        m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
+                               this->m_cachedBoundingRect.height());
+        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+#if !defined(QT_OPENGL_ES_2)
+        updateDepthBuffer(); // Re-init depth buffer as well
+#endif
+    }
 }
 
 void Surface3DRenderer::loadLabelMesh()

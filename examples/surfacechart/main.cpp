@@ -34,6 +34,8 @@
 
 using namespace QtDataVisualization;
 
+const int initialTheme = 4;
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -45,6 +47,9 @@ int main(int argc, char *argv[])
 
     Q3DSurface *surfaceChart = new Q3DSurface();
     QSize screenSize = surfaceChart->screen()->size();
+
+    // Set to default, should be same as the initial on themeList
+    surfaceChart->setTheme(QDataVis::ColorTheme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceChart);
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
@@ -150,7 +155,7 @@ int main(int argc, char *argv[])
     themeList->addItem(QStringLiteral("Retro"));
     themeList->addItem(QStringLiteral("Ebony"));
     themeList->addItem(QStringLiteral("Isabelle"));
-    themeList->setCurrentIndex(0);
+    themeList->setCurrentIndex(initialTheme);
 
 //    QComboBox *shadowQuality = new QComboBox(widget);
 //    shadowQuality->addItem(QStringLiteral("None"));
@@ -161,6 +166,12 @@ int main(int argc, char *argv[])
 //    shadowQuality->addItem(QStringLiteral("Medium Soft"));
 //    shadowQuality->addItem(QStringLiteral("High Soft"));
 //    shadowQuality->setCurrentIndex(3);
+    QComboBox *selectionMode = new QComboBox(widget);
+    selectionMode->addItem(QStringLiteral("ModeNone"));
+    selectionMode->addItem(QStringLiteral("ModeItem"));
+    selectionMode->addItem(QStringLiteral("ModeSliceRow"));
+    selectionMode->addItem(QStringLiteral("ModeSliceColumn"));
+    selectionMode->setCurrentIndex(1);
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
@@ -187,6 +198,8 @@ int main(int argc, char *argv[])
     vLayout->addWidget(themeList);
 //    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
 //    vLayout->addWidget(shadowQuality);
+    vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
+    vLayout->addWidget(selectionMode);
 
     widget->show();
 
@@ -227,6 +240,8 @@ int main(int argc, char *argv[])
                      modifier, SLOT(changeTheme(int)));
 //    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
 //                     modifier, SLOT(changeShadowQuality(int)));
+    QObject::connect(selectionMode, SIGNAL(currentIndexChanged(int)),
+                     modifier, SLOT(changeSelectionMode(int)));
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);

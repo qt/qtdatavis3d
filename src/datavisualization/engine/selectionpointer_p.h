@@ -68,6 +68,7 @@ public:
     void updateTheme(Theme theme);
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
+    void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
 
 private:
     void initShaders();
@@ -91,6 +92,8 @@ private:
     QVector3D m_scale;
     Q3DScene *m_cachedScene;
     QString m_label;
+    bool m_cachedIsSlicingActivated;
+    GLfloat m_autoScaleAdjustment;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

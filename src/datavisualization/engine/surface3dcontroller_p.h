@@ -82,6 +82,8 @@ public:
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
+    void setSelectionMode(QDataVis::SelectionMode mode);
+
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
@@ -94,7 +96,6 @@ signals:
     void smoothStatusChanged(bool enable);
     void surfaceGridChanged(bool enable);
     void segmentCountChanged(GLint segmentCount, GLfloat step, GLfloat minimum);
-    void leftMousePressed(const QPoint &point); // My temp solution
 
 private:
     void adjustValueAxisRange();

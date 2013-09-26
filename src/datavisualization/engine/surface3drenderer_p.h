@@ -69,13 +69,11 @@ public:
     bool m_isGridEnabled;
 
 private:
-    // Data parameters
-    QList<qreal> m_series; // TODO: TEMP
-    GLint m_segmentYCount;
-    GLfloat m_segmentYStep;
+    bool m_cachedIsSlicingActivated;
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
+    QRect m_sliceViewPort;
     ShaderHelper *m_shader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
@@ -103,6 +101,7 @@ private:
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
     SurfaceObject *m_surfaceObj;
+    SurfaceObject *m_sliceSurfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
@@ -111,7 +110,6 @@ private:
     GLuint m_selectionTexture;
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
-    bool m_querySelection;
     bool m_cachedSmoothSurface;
     bool m_flatSupported;
     bool m_cachedSurfaceGridOn;
@@ -122,6 +120,7 @@ private:
     bool m_yFlipped;
     AbstractRenderItem m_dummyRenderItem;
     QSurfaceDataArray m_dataArray;
+    QSurfaceDataArray m_sliceDataArray;
     QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
@@ -134,6 +133,7 @@ public:
 
     void updateDataModel(QSurfaceDataProxy *dataProxy);
     void updateScene(Q3DScene *scene);
+    void drawSlicedScene();
     void render(GLuint defaultFboHandle = 0);
 
 protected:
@@ -144,9 +144,10 @@ public slots:
     bool updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
-    virtual void requestSelectionAtPoint(const QPoint &point);
+    void updateSlicingActive(bool isSlicing);
 
 private:
+    void updateSliceDataModel(int selectionId);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -155,6 +156,7 @@ private:
     void loadGridLineMesh();
     void loadLabelMesh();
     void loadSurfaceObj();
+    void loadSliceSurfaceObj();
     void drawScene(GLuint defaultFboHandle);
     void handleResize();
     void calculateSceneScalingFactors();

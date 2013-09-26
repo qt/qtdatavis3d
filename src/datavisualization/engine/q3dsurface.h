@@ -33,6 +33,7 @@ class QSurfaceDataProxy;
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -63,6 +64,8 @@ public:
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
+    void setSelectionMode(QDataVis::SelectionMode mode);
+    QDataVis::SelectionMode selectionMode() const;
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
 
