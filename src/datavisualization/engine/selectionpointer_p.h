@@ -62,7 +62,6 @@ public:
     void initializeOpenGL();
     void render(GLuint defaultFboHandle = 0);
     void setPosition(QVector3D position);
-    void setScaling(QVector3D scaling);
     void setLabel(QString label);
     void updateLabel();
     void updateTheme(Theme theme);
@@ -89,7 +88,6 @@ private:
     Drawer *m_drawer;
     QRect m_mainViewPort;
     QVector3D m_position;
-    QVector3D m_scale;
     Q3DScene *m_cachedScene;
     QString m_label;
     bool m_cachedIsSlicingActivated;

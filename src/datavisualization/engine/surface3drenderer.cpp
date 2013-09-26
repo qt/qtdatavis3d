@@ -1819,20 +1819,21 @@ void Surface3DRenderer::surfacePointSelected(int id)
     QVector3D pos;
     if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
         pos = normalize(float(column), value, 0.0f);
-        pos += QVector3D(m_surfaceOffsetX, 0.0f, -1.0f);
-        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, sliceZScale));
+        pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
+        pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
-        pos = normalize(float(row), value, 0.0f);
-        pos += QVector3D(m_surfaceOffsetZ, 0.0f, -1.0f);
-        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleZ, 1.0f, sliceZScale));
+        pos = normalize(0.0f, value, float(row));
+        pos.setX(-pos.z());
+        pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
+        pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else {
         pos = normalize(float(column), value, float(row));
+        pos *= QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);;
         pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
-        m_selectionPointer->setScaling(QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ));
         m_selectionPointer->updateBoundingRect(m_mainViewPort);
         m_selectionPointer->updateSliceData(false, m_autoScaleAdjustment);
     }

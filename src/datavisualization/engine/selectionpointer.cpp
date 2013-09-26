@@ -111,8 +111,6 @@ void SelectionPointer::render(GLuint defaultFboHandle)
         viewMatrix = camera->viewMatrix();
     }
 
-    itModelMatrix.scale(m_scale);
-
     // Calculate scale factor to get uniform font size
     GLfloat scaledFontSize = 0.05f + m_drawer->font().pointSizeF() / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
@@ -126,7 +124,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 MVPMatrix;
 
     // Position the pointer ball
-    modelMatrix.translate(m_position * m_scale + QVector3D(0.0f, 0.0f, zComp));
+    modelMatrix.translate(m_position + QVector3D(0.0f, 0.0f, zComp));
 
     // Scale the point with fixed values (at this point)
     modelMatrix.scale(QVector3D(0.05f, 0.05f, 0.05f));
@@ -163,7 +161,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 
     // Position label
     QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
-    modelMatrixLabel.translate(m_position * m_scale + labelAlign + QVector3D(0.0f, 0.0f, zComp));
+    modelMatrixLabel.translate(m_position + labelAlign + QVector3D(0.0f, 0.0f, zComp));
 
     // Position the label towards the camera
     QPointF camRotations = camera->rotations();
@@ -208,11 +206,6 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 void SelectionPointer::setPosition(QVector3D position)
 {
     m_position = position;
-}
-
-void SelectionPointer::setScaling(QVector3D scaling)
-{
-    m_scale = scaling;
 }
 
 void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment)
