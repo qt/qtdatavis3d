@@ -23,7 +23,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
-      m_proxy(proxy)
+      m_proxy(proxy),
+      m_proxyArray(0)
 {
 }
 
@@ -51,7 +52,6 @@ void SurfaceItemModelHandler::resolveModel()
     float minColumnValue = 0.0f;
     float maxColumnValue = 1.0f;
 
-    QSurfaceDataArray *newProxyArray = new QSurfaceDataArray;
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
@@ -60,11 +60,20 @@ void SurfaceItemModelHandler::resolveModel()
     int columnCount = m_itemModel->columnCount();
 
     if (mapping->useModelCategories()) {
+        // If dimensions have changed, recreate the array
+        if (!m_proxyArray || columnCount != m_proxy->columnCount()
+                || rowCount != m_proxyArray->size()) {
+            m_proxyArray = new QSurfaceDataArray;
+            m_proxyArray->reserve(rowCount);
+            for (int i = 0; i < rowCount; i++) {
+                QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnCount);
+                m_proxyArray->append(newProxyRow);
+            }
+        }
         for (int i = 0; i < rowCount; i++) {
-            QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnCount);
+            QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++)
-                (*newProxyRow)[j] = m_itemModel->index(i, j).data(valueRole).toReal();
-            newProxyArray->append(newProxyRow);
+                newProxyRow[j] = m_itemModel->index(i, j).data(valueRole).toReal();
         }
         if (rowCount) {
             minRowValue = m_itemModel->headerData(0, Qt::Vertical).toFloat();
@@ -118,12 +127,22 @@ void SurfaceItemModelHandler::resolveModel()
         else
             columnList = mapping->columnCategories();
 
-        // Create new data array from itemValueMap
-        foreach (QString rowKey, rowList) {
-            QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnList.size());
-            for (int i = 0; i < columnList.size(); i++)
-                (*newProxyRow)[i] = itemValueMap[rowKey][columnList.at(i)];
-            newProxyArray->append(newProxyRow);
+        // If dimensions have changed, recreate the array
+        if (!m_proxyArray || columnList.size() != m_proxy->columnCount()
+                || rowList.size() != m_proxyArray->size()) {
+            m_proxyArray = new QSurfaceDataArray;
+            m_proxyArray->reserve(rowList.size());
+            for (int i = 0; i < rowList.size(); i++) {
+                QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnList.size());
+                m_proxyArray->append(newProxyRow);
+            }
+        }
+        // Create data array from itemValueMap
+        for (int i = 0; i < rowList.size(); i++) {
+            QString rowKey = rowList.at(i);
+            QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
+            for (int j = 0; j < columnList.size(); j++)
+                newProxyRow[j] = itemValueMap[rowKey][columnList.at(j)];
         }
 
         // Use first and last roles converted to values for limits
@@ -137,7 +156,7 @@ void SurfaceItemModelHandler::resolveModel()
         }
     }
 
-    m_proxy->resetArray(newProxyArray, minRowValue, maxRowValue, minColumnValue, maxColumnValue);
+    m_proxy->resetArray(m_proxyArray, minRowValue, maxRowValue, minColumnValue, maxColumnValue);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -22,6 +22,7 @@
 #include <QtDataVisualization/Q3DSurface>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QSlider>
+#include <QTimer>
 
 using namespace QtDataVisualization;
 
@@ -65,6 +66,7 @@ public slots:
     void changeShadowQuality(int quality);
     void changeTheme(int theme);
     void changeSelectionMode(int mode);
+    void timeout();
 
 private:
     void resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX,
@@ -86,6 +88,8 @@ private:
     qreal m_rangeZ;
     qreal m_minX;
     qreal m_minZ;
+    QTimer m_timer;
+    QSurfaceDataArray *m_planeArray;
 };
 
 #endif // CHARTMODIFIER_H

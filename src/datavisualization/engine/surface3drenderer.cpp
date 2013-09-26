@@ -203,10 +203,6 @@ void Surface3DRenderer::initializeOpenGL()
 
 void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 {
-    for (int i = 0; i < m_dataArray.size(); i++)
-        delete m_dataArray.at(i);
-    m_dataArray.clear();
-
     calculateSceneScalingFactors();
 
     const QSurfaceDataArray *array = dataProxy->array();
@@ -219,17 +215,22 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
         if (m_sampleSpace != sampleSpace) {
             dimensionChanged = true;
             m_sampleSpace = sampleSpace;
+
+            for (int i = 0; i < m_dataArray.size(); i++)
+                delete m_dataArray.at(i);
+            m_dataArray.clear();
         }
 
         // TODO: Handle partial surface grids on the graph edges
         if (sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
-            m_dataArray.reserve(sampleSpace.height());
+            if (dimensionChanged) {
+                m_dataArray.reserve(sampleSpace.height());
+                for (int i = 0; i < sampleSpace.height(); i++)
+                    m_dataArray << new QSurfaceDataRow(sampleSpace.width());
+            }
             for (int i = 0; i < sampleSpace.height(); i++) {
-                QSurfaceDataRow *newRow = new QSurfaceDataRow();
-                newRow->resize(sampleSpace.width());
                 for (int j = 0; j < sampleSpace.width(); j++)
-                    (*newRow)[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
-                m_dataArray << newRow;
+                    (*(m_dataArray.at(i)))[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
             }
 
             if (m_dataArray.size() > 0) {
@@ -237,10 +238,15 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
                     loadSurfaceObj();
 
                 // Note: Data setup can change samplespace (as min width/height is 1)
-                if (m_cachedSmoothSurface)
-                    m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
-                else
-                    m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, dimensionChanged);
+                if (m_cachedSmoothSurface) {
+                    m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
+                                                  dimensionChanged,
+                                                  m_cachedSelectionMode != QDataVis::ModeNone);
+                } else {
+                    m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer,
+                                            dimensionChanged,
+                                            m_cachedSelectionMode != QDataVis::ModeNone);
+                }
 
                 if (dimensionChanged)
                     updateSelectionTexture();
@@ -285,10 +291,13 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
         if (!m_sliceSurfaceObj)
             loadSliceSurfaceObj();
 
-        if (m_cachedSmoothSurface)
-            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer, true);
-        else
-            m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer, true);
+        if (m_cachedSmoothSurface) {
+            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer,
+                                               true, true);
+        } else {
+            m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer, true,
+                                         true);
+        }
     }
 }
 
@@ -1736,10 +1745,13 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     if (m_cachedSmoothSurface == false && !m_flatSupported)
         m_cachedSmoothSurface = true;
 
-    if (m_cachedSmoothSurface)
-        m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
-    else
-        m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true);
+    if (m_cachedSmoothSurface) {
+        m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+                                      m_cachedSelectionMode != QDataVis::ModeNone);
+    } else {
+        m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+                                m_cachedSelectionMode != QDataVis::ModeNone);
+    }
 
     initSurfaceShaders();
 

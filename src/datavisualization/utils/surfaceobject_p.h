@@ -44,8 +44,10 @@ public:
     SurfaceObject();
     ~SurfaceObject();
 
-    void setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry);
-    void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry);
+    void setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
+                   bool changeGeometry, bool needTexture);
+    void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
+                         bool changeGeometry, bool needTexture);
     GLuint gridElementBuf();
     GLuint gridIndexCount();
 
@@ -61,6 +63,8 @@ private:
     GLfloat m_yRange;
     GLuint m_gridElementbuffer;
     GLuint m_gridIndexCount;
+    QVector<QVector3D> m_vertices;
+    QVector<QVector3D> m_normals;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

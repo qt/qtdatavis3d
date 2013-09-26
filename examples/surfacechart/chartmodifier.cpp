@@ -26,6 +26,8 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
+//#define JITTER_PLANE
+
 ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
       m_gridSliderX(0),
@@ -41,13 +43,16 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
       m_rangeX(16.0),
       m_rangeZ(16.0),
       m_minX(-8.0),
-      m_minZ(-8.0)
+      m_minZ(-8.0),
+      m_planeArray(0)
 {
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
     m_chart->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_chart->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+
+    connect(&m_timer, &QTimer::timeout, this, &ChartModifier::timeout);
 }
 
 ChartModifier::~ChartModifier()
@@ -105,24 +110,33 @@ void ChartModifier::togglePlane(bool enable)
     qDebug() << "ChartModifier::togglePlane " << enable;
 
     if (enable) {
-        QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-        qreal y = 1.0 / (qreal(m_zCount - 1) + qreal(m_xCount - 1));
-        dataArray->reserve(m_zCount);
-        for (int i = 0; i < m_zCount; i++) {
-            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-            for (int j = 0; j < m_xCount; j++)
-                (*newRow)[j] = (i + j) * y;
-            *dataArray << newRow;
-        }
+        m_planeArray = new QSurfaceDataArray;
 
+#ifdef JITTER_PLANE
+        m_timer.start(0);
+#endif
         m_chart->axisY()->setRange(0.0, 1.0);
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
-        resetArrayAndSliders(dataArray, -10.0, 10.0, -10.0, 20.0);
+        qreal y = 1.0 / (qreal(m_zCount - 1) + qreal(m_xCount - 1));
+        m_planeArray->reserve(m_zCount);
+        for (int i = 0; i < m_zCount; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            for (int j = 0; j < m_xCount; j++)
+                (*newRow)[j] = (i + j) * y;
+            *m_planeArray << newRow;
+        }
+
+        resetArrayAndSliders(m_planeArray, -10.0, 10.0, -10.0, 20.0);
 
         m_activeSample = ChartModifier::Plane;
     }
+#ifdef JITTER_PLANE
+    else {
+        m_timer.stop();
+    }
+#endif
 }
 
 void ChartModifier::setHeightMapData(bool enable)
@@ -245,6 +259,21 @@ void ChartModifier::changeTransparency()
 void ChartModifier::changeTheme(int theme)
 {
     m_chart->setTheme((QDataVis::ColorTheme)theme);
+}
+
+void ChartModifier::timeout()
+{
+    int rows = m_planeArray->size();
+    int columns = m_planeArray->at(0)->size();
+
+    // Induce minor random jitter to the existing plane array
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++)
+            (*m_planeArray->at(i))[j] = m_planeArray->at(i)->at(j) * ((qreal((rand() % 10) + 4) / 1000.0) + 0.99) + 0.001;
+    }
+
+    // Reset same array to make it redraw
+    m_chart->activeDataProxy()->resetArray(m_planeArray);
 }
 
 void ChartModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX, qreal maxX)

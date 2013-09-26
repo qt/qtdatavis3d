@@ -143,23 +143,29 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
 }
 
 /*!
- * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
- * to further modify data after QSurfaceDataProxy assumes ownership of it, as such modifications will
- * not trigger proper signals.
- * Passing null array clears all data.
- * Row and column ranges are reset to defaults.
+ * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
+ * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * signal.
+ * Passing null array deletes the old array and creates a new empty array.
+ * All rows in \a newArray must be of same length.
+ * Row and column ranges are reset to defaults, unless \a newArray is the same as the old array.
+ * In that case, old row and column ranges are kept.
  */
 void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
 {
-    if (dptr()->resetArray(newArray, defaultMinValue, defaultMaxValue, defaultMinValue, defaultMaxValue))
-        emit arrayReset();
+    if (dptr()->m_dataArray != newArray) {
+        dptr()->resetArray(newArray, defaultMinValue, defaultMaxValue, defaultMinValue,
+                           defaultMaxValue);
+    }
+    emit arrayReset();
 }
 
 /*!
- * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
- * to further modify data after QSurfaceDataProxy assumes ownership of it, as such modifications will
- * not trigger proper signals.
- * Passing null array clears all data.
+ * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
+ * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * signal and updates row/column values.
+ * Passing null array deletes the old array and creates a new empty array.
+ * All rows in \a newArray must be of same length.
  * Row and column ranges are set to values defined by the rest of the parameters: \a minValueRows,
  * \a maxValueRows, \a minValueColumns, and \a maxValueColumns.
  */
@@ -167,8 +173,8 @@ void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray, qreal minValueRo
                                    qreal maxValueRows, qreal minValueColumns,
                                    qreal maxValueColumns)
 {
-    if (dptr()->resetArray(newArray, minValueRows, maxValueRows, minValueColumns, maxValueColumns))
-        emit arrayReset();
+    dptr()->resetArray(newArray, minValueRows, maxValueRows, minValueColumns, maxValueColumns);
+    emit arrayReset();
 }
 
 /*!
@@ -346,30 +352,20 @@ QSurfaceDataProxyPrivate::~QSurfaceDataProxyPrivate()
     clearArray();
 }
 
-bool QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
+void QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray, qreal minValueRows,
                                           qreal maxValueRows, qreal minValueColumns,
                                           qreal maxValueColumns)
 {
-    if (!m_dataArray->size() && (!newArray || !newArray->size()))
-        return false;
+    if (!newArray)
+        newArray = new QSurfaceDataArray;
 
-    clearArray();
-
-    if (newArray) {
-        for (int i = 0; i < newArray->size(); i++) {
-            Q_ASSERT_X((newArray->at(i) && newArray->at(i)->size() == newArray->at(0)->size()),
-                       __FUNCTION__,
-                       "All rows of QSurfaceDataArray mustn't be NULL and must be of equal size.");
-        }
+    if (newArray != m_dataArray) {
+        clearArray();
         m_dataArray = newArray;
-    } else {
-        m_dataArray = new QSurfaceDataArray;
     }
 
     setValueRangeRows(minValueRows, maxValueRows);
     setValueRangeColumns(minValueColumns, maxValueColumns);
-
-    return true;
 }
 
 void QSurfaceDataProxyPrivate::setValueRangeRows(qreal min, qreal max)

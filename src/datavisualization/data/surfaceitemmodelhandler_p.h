@@ -45,6 +45,7 @@ protected:
     void virtual resolveModel();
 
     QItemModelSurfaceDataProxy *m_proxy; // Not owned
+    QSurfaceDataArray *m_proxyArray; // Not owned
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -206,28 +206,35 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
     int widthBits = imageWidth * 4;
     qreal height = 0;
 
-    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
-    dataArray->reserve(imageHeight);
+    // Do not recreate array if dimensions have not changed
+    QSurfaceDataArray *dataArray = m_dataArray;
+    if (imageWidth != qptr()->columnCount() || imageHeight != dataArray->size()) {
+        dataArray = new QSurfaceDataArray;
+        dataArray->reserve(imageHeight);
+        for (int i = 0; i < imageHeight; i++) {
+            QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(imageWidth);
+            dataArray->append(newProxyRow);
+        }
+    }
+
     if (heightImage.isGrayscale()) {
         // Grayscale, it's enough to read Red byte
-        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
+        for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
+            QSurfaceDataRow &newRow = *dataArray->at(i);
             for (int j = 0; j < imageWidth; j++)
-                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
-            *dataArray << newRow;
+                newRow[j] = qreal(bits[bitCount + (j * 4)]);
         }
     } else {
         // Not grayscale, we'll need to calculate height from RGB
-        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-            QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
+        for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
+            QSurfaceDataRow &newRow = *dataArray->at(i);
             for (int j = 0; j < imageWidth; j++) {
                 int nextpixel = j * 4;
                 height = (qreal(bits[bitCount + nextpixel])
                         + qreal(bits[1 + bitCount + nextpixel])
                         + qreal(bits[2 + bitCount + nextpixel]));
-                (*newRow)[j] = (height / 3.0);
+                newRow[j] = height / 3.0;
             }
-            *dataArray << newRow;
         }
     }
 

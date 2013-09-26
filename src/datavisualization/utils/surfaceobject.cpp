@@ -30,66 +30,87 @@ SurfaceObject::SurfaceObject()
 {
     m_indicesType = GL_UNSIGNED_INT;
     initializeOpenGLFunctions();
+    glGenBuffers(1, &m_vertexbuffer);
+    glGenBuffers(1, &m_normalbuffer);
+    glGenBuffers(1, &m_uvbuffer);
+    glGenBuffers(1, &m_elementbuffer);
+    glGenBuffers(1, &m_gridElementbuffer);
 }
 
 SurfaceObject::~SurfaceObject()
 {
+    glDeleteBuffers(1, &m_gridElementbuffer);
 }
 
-void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
+                                    GLfloat yRange, bool changeGeometry, bool needTexture)
 {
     int columns = space.width();
     int rows = space.height();
+    int totalSize = rows * columns;
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
     GLfloat height = yRange / 2.0f;
 
-    // Create vertice table
-    QVector<QVector3D> vertices;
+    // Create/populate vertice table
+    if (changeGeometry)
+        m_vertices.resize(totalSize);
+
     QVector<QVector2D> uvs;
+    if (needTexture)
+        uvs.resize(totalSize);
     float uvX = 1.0 / float(columns - 1);
     float uvY = 1.0 / float(rows - 1);
-    int row = 0;
-    for (float i = 0.0f; i < float(rows); i += 1.0, row += columns) {
-        for (float j = 0; j < columns; j++) {
-            vertices.append(QVector3D(j / width - 1.0f,
-                                      dataArray.at(int(i))->at(int(j)) / height - 1.0f,
-                                      i / depth + 1.0f));
-            uvs.append(QVector2D(j * uvX, i * uvY));
+    int totalIndex = 0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            m_vertices[totalIndex] = QVector3D(float(j) / width - 1.0f,
+                                               float(dataArray.at(i)->at(j)) / height - 1.0f,
+                                               float(i) / depth + 1.0f);
+            if (needTexture)
+                uvs[totalIndex] = QVector2D(float(j) * uvX, float(i) * uvY);
+            totalIndex++;
         }
     }
 
     // Create normals
-    QVector<QVector3D> normals;
-    for (int row = 0; row < (rows - 1) * columns; row += columns) {
-        for (int j = 0; j < columns - 1; j++) {
-            normals.append(normal(vertices.at(row + j),
-                                  vertices.at(row + j + 1),
-                                  vertices.at(row + columns + j)));
+    int rowLimit = rows - 1;
+    int colLimit = columns - 1;
+    int rowColLimit = rowLimit * columns;
+    int totalLimit = totalSize - 1;
+    if (changeGeometry)
+        m_normals.resize(totalSize);
+
+    totalIndex = 0;
+    for (int row = 0; row < rowColLimit; row += columns) {
+        for (int j = 0; j < colLimit; j++) {
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j),
+                                             m_vertices.at(row + j + 1),
+                                             m_vertices.at(row + columns + j));
         }
-        int p = row + columns - 1;
-        normals.append(normal(vertices.at(p),
-                              vertices.at(p + columns),
-                              vertices.at(p - 1)));
+        int p = row + colLimit;
+        m_normals[totalIndex++] = normal(m_vertices.at(p),
+                                         m_vertices.at(p + columns),
+                                         m_vertices.at(p - 1));
     }
-    for (int j = (rows - 1) * columns ; j < rows * columns - 1; j++) {
-        normals.append(normal(vertices.at(j),
-                              vertices.at(j - columns),
-                              vertices.at(j + 1)));
+    for (int j = rowColLimit; j < totalLimit; j++) {
+        m_normals[totalIndex++] = normal(m_vertices.at(j),
+                                         m_vertices.at(j - columns),
+                                         m_vertices.at(j + 1));
     }
-    int p = rows * columns - 1;
-    normals.append(normal(vertices.at(p),
-                          vertices.at(p - 1),
-                          vertices.at(p - columns - 1)));
+    int p = rows * colLimit;
+    m_normals[totalIndex++] = normal(m_vertices.at(p),
+                                     m_vertices.at(p - 1),
+                                     m_vertices.at(p - columns - 1));
 
     // Create indices table
     GLint *indices = 0;
     if (changeGeometry) {
-        m_indexCount = 6 * (columns - 1) * (rows - 1);
+        m_indexCount = 6 * colLimit * rowLimit;
         indices = new GLint[m_indexCount];
         p = 0;
-        for (int row = 0; row < (rows - 1) * columns; row += columns) {
-            for (int j = 0; j < columns - 1; j++) {
+        for (int row = 0; row < rowLimit * columns; row += columns) {
+            for (int j = 0; j < colLimit; j++) {
                 // Left triangle
                 indices[p++] = row + j + 1;
                 indices[p++] = row + columns + j;
@@ -106,16 +127,16 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     // Create line element indices
     GLint *gridIndices = 0;
     if (changeGeometry) {
-        m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
+        m_gridIndexCount = 2 * columns * rowLimit + 2 * rows * colLimit;
         gridIndices = new GLint[m_gridIndexCount];
         p = 0;
         for (int i = 0, row = 0; i < rows; i++, row += columns) {
-            for (int j = 0; j < columns - 1; j++) {
+            for (int j = 0; j < colLimit; j++) {
                 gridIndices[p++] = row + j;
                 gridIndices[p++] = row + j + 1;
             }
         }
-        for (int i = 0, row = 0; i < rows - 1; i++, row += columns) {
+        for (int i = 0, row = 0; i < rowLimit; i++, row += columns) {
             for (int j = 0; j < columns; j++) {
                 gridIndices[p++] = row + j;
                 gridIndices[p++] = row + j + columns;
@@ -123,17 +144,19 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
         }
     }
 
-    createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
+    createBuffers(m_vertices, uvs, m_normals, indices, gridIndices, changeGeometry);
 
     delete[] indices;
     delete[] gridIndices;
 }
 
 
-void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange, bool changeGeometry)
+void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
+                              GLfloat yRange, bool changeGeometry, bool needTexture)
 {
     int columns = space.width();
     int rows = space.height();
+    int totalSize = rows * columns * 2;
     GLfloat width = (GLfloat(columns) - 1.0f) / 2.0f;
     GLfloat depth = (GLfloat(rows) - 1.0f) / -2.0f;
     GLfloat height = yRange / 2.0f;
@@ -141,46 +164,63 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     float uvY = 1.0 / float(rows - 1);
 
     // Create vertice table
-    QVector<QVector3D> vertices;
+    if (changeGeometry)
+        m_vertices.resize(totalSize);
+
     QVector<QVector2D> uvs;
-    int row = 0;
-    for (float i = 0.0f; i < float(rows); i += 1.0f, row += columns) {
-        for (float j = 0.0f; j < float(columns); j += 1.0f) {
-            vertices.append(QVector3D(j / width - 1.0f,
-                                      dataArray.at(int(i))->at(int(j)) / height - 1.0f,
-                                      i / depth + 1.0f));
-            uvs.append(QVector2D(j * uvX, i * uvY));
-            if (j > 0 && j < columns - 1) {
-                vertices.append(vertices.last());
-                uvs.append(uvs.last());
+    if (needTexture)
+        uvs.resize(totalSize);
+
+    int totalIndex = 0;
+    int rowLimit = rows - 1;
+    int colLimit = columns - 1;
+    int doubleColumns = columns * 2 - 2;
+    int rowColLimit = rowLimit * doubleColumns;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            m_vertices[totalIndex] = QVector3D(float(j) / width - 1.0f,
+                                               float(dataArray.at(i)->at(j)) / height - 1.0f,
+                                               float(i) / depth + 1.0f);
+
+            if (needTexture)
+                uvs[totalIndex] = QVector2D(float(j) * uvX, float(i) * uvY);
+
+            totalIndex++;
+
+            if (j > 0 && j < colLimit) {
+                m_vertices[totalIndex] = m_vertices[totalIndex - 1];
+                if (needTexture)
+                    uvs[totalIndex] = uvs[totalIndex - 1];
+                totalIndex++;
             }
         }
     }
 
     // Create normals & indices table
-    QVector<QVector3D> normals;
-    int doubleColumns = columns * 2 - 2;
-
     GLint *indices = 0;
     int p = 0;
     if (changeGeometry) {
-        m_indexCount = 6 * (columns - 1) * (rows - 1);
+        int normalCount = 2 * colLimit * rowLimit;
+        m_indexCount = 3 * normalCount;
         indices = new GLint[m_indexCount];
+        m_normals.resize(normalCount);
     }
 
+    totalIndex = 0;
     for (int row = 0, upperRow = doubleColumns;
-         row < (rows - 1) * doubleColumns;
+         row < rowColLimit;
          row += doubleColumns, upperRow += doubleColumns) {
         for (int j = 0; j < doubleColumns; j += 2) {
             // Normal for the left triangle
-            normals.append(normal(vertices.at(row + j),
-                                  vertices.at(row + j + 1),
-                                  vertices.at(upperRow + j)));
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j),
+                                             m_vertices.at(row + j + 1),
+                                             m_vertices.at(upperRow + j));
 
             // Normal for the right triangle
-            normals.append(normal(vertices.at(row + j + 1),
-                                  vertices.at(upperRow + j + 1),
-                                  vertices.at(upperRow + j)));
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j + 1),
+                                             m_vertices.at(upperRow + j + 1),
+                                             m_vertices.at(upperRow + j));
 
             if (changeGeometry) {
                 // Left triangle
@@ -197,79 +237,66 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     }
 
     // Create grid line element indices
-    m_gridIndexCount = 2 * columns * (rows - 1) + 2 * rows * (columns - 1);
-    GLint *gridIndices = new GLint[m_gridIndexCount];
-    p = 0;
-    int rowLimit = (rows - 1) * doubleColumns;
-    for (int row = 0; row < rows * doubleColumns; row += doubleColumns) {
-        for (int j = 0; j < doubleColumns; j += 2) {
-            gridIndices[p++] = row + j;
-            gridIndices[p++] = row + j + 1;
-
-            if (row < rowLimit) {
+    GLint *gridIndices = 0;
+    if (changeGeometry) {
+        m_gridIndexCount = 2 * columns * rowLimit + 2 * rows * colLimit;
+        gridIndices = new GLint[m_gridIndexCount];
+        p = 0;
+        int fullRowLimit = rows * doubleColumns;
+        for (int row = 0; row < fullRowLimit; row += doubleColumns) {
+            for (int j = 0; j < doubleColumns; j += 2) {
                 gridIndices[p++] = row + j;
-                gridIndices[p++] = row + j + doubleColumns;
+                gridIndices[p++] = row + j + 1;
+
+                if (row < rowColLimit) {
+                    gridIndices[p++] = row + j;
+                    gridIndices[p++] = row + j + doubleColumns;
+                }
             }
         }
-    }
-    for (int i = doubleColumns - 1; i < rowLimit; i += doubleColumns) {
-        gridIndices[p++] = i;
-        gridIndices[p++] = i  + doubleColumns;
+        for (int i = doubleColumns - 1; i < rowColLimit; i += doubleColumns) {
+            gridIndices[p++] = i;
+            gridIndices[p++] = i  + doubleColumns;
+        }
     }
 
-    createBuffers(vertices, uvs, normals, indices, gridIndices, changeGeometry);
+    createBuffers(m_vertices, uvs, m_normals, indices, gridIndices, changeGeometry);
 
     delete[] indices;
     delete[] gridIndices;
 }
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                   const QVector<QVector3D> &normals, const GLint *indices,
-                   const GLint *gridIndices, bool changeGeometry)
+                                  const QVector<QVector3D> &normals, const GLint *indices,
+                                  const GLint *gridIndices, bool changeGeometry)
 {
-    if (m_meshDataLoaded) {
-        // Delete old data
-        glDeleteBuffers(1, &m_vertexbuffer);
-        glDeleteBuffers(1, &m_normalbuffer);
-        if (changeGeometry) {
-            glDeleteBuffers(1, &m_uvbuffer);
-            glDeleteBuffers(1, &m_elementbuffer);
-            glDeleteBuffers(1, &m_gridElementbuffer);
-        }
-    }
-
     // Move to buffers
-    glGenBuffers(1, &m_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(QVector3D),
-                 &vertices.at(0), GL_STATIC_DRAW);
+                 &vertices.at(0), GL_DYNAMIC_DRAW);
 
-    glGenBuffers(1, &m_normalbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(QVector3D),
-                 &normals.at(0), GL_STATIC_DRAW);
+                 &normals.at(0), GL_DYNAMIC_DRAW);
 
     if (changeGeometry) {
-        glGenBuffers(1, &m_uvbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
         glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
                      &uvs.at(0), GL_STATIC_DRAW);
 
-        glGenBuffers(1, &m_elementbuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
                      indices, GL_STATIC_DRAW);
 
-        glGenBuffers(1, &m_gridElementbuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLint),
                      gridIndices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // We're done. Set the flag ON
     m_meshDataLoaded = true;
 }
 
@@ -293,56 +320,3 @@ QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QV
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE
-
-
-
-// For rainy days
-
-//    QVector3D vertices[] = {
-//        QVector3D(-0.5f, 0.0f, 0.1f),
-//        QVector3D(0.5f, 0.0f, 0.1f),
-//        QVector3D(0.0f, 1.0f, -0.5f)
-//    };
-
-//    QVector3D normals[] = {
-//        QVector3D(0.5, 0.0, 1.0),
-//        QVector3D(0.5, 0.0, 1.0),
-//        QVector3D(0.5, 0.0, 1.0)
-//    };
-
-//    vertices.append(QVector3D(-1.0f, 0.0f, 0.1f));
-//    vertices.append(QVector3D(0.0f, 0.0f, 0.1f));
-//    vertices.append(QVector3D(0.0f, 0.5f, -0.5f));
-
-//    normals.append(QVector3D(0.5, 0.0, 1.0));
-//    normals.append(QVector3D(0.5, 0.0, 1.0));
-//    normals.append(QVector3D(0.5, 0.0, 1.0));
-
-//GLushort indices[] = {0, 1, 2, 1, 3, 2};
-//GLushort indices[] = {1, 3, 2};
-
-//qDebug() << indices[p + 0] << ", " << indices[p + 1] << ", " << indices[p + 2];
-//qDebug() << indices[p + 3] << ", " << indices[p + 4] << ", " << indices[p + 5];
-
-//qDebug() << "(" << float(j) / width << ", 0.0, " << float(i) / depth * -1.0f << ")";
-
-//normals.append(QVector3D(1,0,0));
-//normals.append(QVector3D(0,1,0));
-//normals.append(QVector3D(0,0,1));
-//normals.append(QVector3D(1,0,1));
-
-//normals.append(QVector3D(1,0,0));
-//normals.append(QVector3D(0,1,0));
-//normals.append(QVector3D(0,0,1));
-//normals.append(QVector3D(1,0,1));
-
-//normals.append(QVector3D(1,0,0));
-//normals.append(QVector3D(0,1,0));
-//normals.append(QVector3D(0,0,1));
-//normals.append(QVector3D(1,0,1));
-
-
-//qDebug() << "Left normal from (" << row + j << ", " << row + j + 1 << ", " << row + doubleColumns + j << ")";
-
-//qDebug() << "right normal from (" << row + j +1  << ", " << row + doubleColumns + j + 1 << ", " << row + doubleColumns + j << ")";
-
