@@ -20,20 +20,23 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#include <QHeightMapSurfaceDataProxy>
-#include <Q3DValueAxis>
+#include <QtDataVisualization/QHeightMapSurfaceDataProxy>
+#include <QtDataVisualization/Q3DValueAxis>
+#include <QScrollBar>
+#include <QSize>
 
 #include <QDebug>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
-SurfaceData::SurfaceData(Q3DSurface *surface, QLabel *statusLabel) :
+SurfaceData::SurfaceData(Q3DSurface *surface, QTextEdit *statusArea) :
     m_surface(surface),
-    m_statusLabel(statusLabel),
+    m_statusArea(statusArea),
     m_resize(true),
     m_resolution(QSize(320, 240))
 {
     // Initialize surface
+    m_surface->setTheme(QDataVis::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -46,6 +49,9 @@ SurfaceData::SurfaceData(Q3DSurface *surface, QLabel *statusLabel) :
     m_surface->setGridVisible(false);
     m_surface->setSmoothSurfaceEnabled(false);
     m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
+
+    // Hide scroll bar
+    m_statusArea->verticalScrollBar()->setVisible(false);
 
     // Connect Kinect signals
     connect(&m_kinect, &QKinect::QKinectWrapper::dataNotification, this, &SurfaceData::updateData);
@@ -70,19 +76,22 @@ void SurfaceData::updateStatus(QKinect::KinectStatus status)
 {
     switch (status) {
     case QKinect::Idle: {
-        m_statusLabel->setText(QStringLiteral("Stopped"));
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Stopped"));
+        m_statusArea->append(QStringLiteral("<br><b>Ready</b><br>"));
         break;
     }
     case QKinect::Initializing: {
-        m_statusLabel->setText(QStringLiteral("Initializing"));
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Initializing"));
         break;
     }
     case QKinect::OkRun: {
-        m_statusLabel->setText(QStringLiteral("Ok"));
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Running"));
+        m_statusArea->append(QString(QStringLiteral("<i> - resolution: %1 x %2</i>")).arg(
+                                 m_resolution.width()).arg(m_resolution.height()));
         break;
     }
     default: {
-        m_statusLabel->setText(QStringLiteral("Error"));
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Error"));
         break;
     }
     };
@@ -90,22 +99,18 @@ void SurfaceData::updateStatus(QKinect::KinectStatus status)
 
 void SurfaceData::start()
 {
-    if (m_kinect.isStopped()) {
+    if (m_kinect.isStopped())
         m_kinect.start();
-#ifdef USE_TIMER_UPDATE
-        m_updateTimer.start();
-#endif
-    }
+    else
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Already running"));
 }
 
 void SurfaceData::stop()
 {
-    if (m_kinect.isRunning()) {
+    if (m_kinect.isRunning())
         m_kinect.stop();
-#ifdef USE_TIMER_UPDATE
-        m_updateTimer.stop();
-#endif
-    }
+    else
+        m_statusArea->append(QStringLiteral("<b>Kinect:</b> Already stopped"));
 }
 
 void SurfaceData::setDistance(int distance)
@@ -137,4 +142,37 @@ void SurfaceData::setResolution(int selection)
         break;
     }
     };
+    m_statusArea->append(QString(QStringLiteral("<b>Resolution:</b> %1 x %2")).arg(
+                             m_resolution.width()).arg(m_resolution.height()));
+    if (m_kinect.isStopped())
+        m_statusArea->append(QStringLiteral("<i> - change takes effect once Kinect is running</i>"));
+}
+
+void SurfaceData::scrollDown()
+{
+    QScrollBar *scrollbar = m_statusArea->verticalScrollBar();
+    scrollbar->setValue(scrollbar->maximum());
+}
+
+void SurfaceData::useGradientOne()
+{
+    m_surface->setTheme(QDataVis::ThemeIsabelle);
+    QLinearGradient gradient;
+    gradient.setColorAt(0.0, Qt::black);
+    gradient.setColorAt(0.33, Qt::blue);
+    gradient.setColorAt(0.67, Qt::red);
+    gradient.setColorAt(1.0, Qt::yellow);
+    m_surface->setGradient(gradient);
+    m_statusArea->append(QStringLiteral("<b>Colors:</b> Thermal image imitation"));
+}
+
+void SurfaceData::useGradientTwo()
+{
+    m_surface->setTheme(QDataVis::ThemeQt);
+    QLinearGradient gradient;
+    gradient.setColorAt(0.0, Qt::white);
+    gradient.setColorAt(0.8, Qt::red);
+    gradient.setColorAt(1.0, Qt::green);
+    m_surface->setGradient(gradient);
+    m_statusArea->append(QStringLiteral("<b>Colors:</b> Highlight foreground"));
 }

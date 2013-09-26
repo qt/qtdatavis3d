@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QSlider>
+#include <QTextEdit>
 #include <QScreen>
 
 int main(int argc, char **argv)
@@ -70,8 +71,39 @@ int main(int argc, char **argv)
     distanceSlider->setValue(50);
     distanceSlider->setMaximum(200);
 
-    QLabel *status = new QLabel(widget);
-    status->setText(QStringLiteral("Stopped"));
+    QLinearGradient gradientOne(0, 0, 200, 1);
+    gradientOne.setColorAt(0.0, Qt::black);
+    gradientOne.setColorAt(0.33, Qt::blue);
+    gradientOne.setColorAt(0.67, Qt::red);
+    gradientOne.setColorAt(1.0, Qt::yellow);
+
+    QPixmap pm(200, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(gradientOne));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 200, 24);
+
+    QPushButton *gradientOneButton = new QPushButton(widget);
+    gradientOneButton->setIcon(QIcon(pm));
+    gradientOneButton->setIconSize(QSize(200, 24));
+    gradientOneButton->setToolTip(QStringLiteral("Colors: Thermal Imitation"));
+
+    QLinearGradient gradientTwo(0, 0, 200, 1);
+    gradientTwo.setColorAt(0.0, Qt::white);
+    gradientTwo.setColorAt(0.8, Qt::red);
+    gradientTwo.setColorAt(1.0, Qt::green);
+
+    pmp.setBrush(QBrush(gradientTwo));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 200, 24);
+
+    QPushButton *gradientTwoButton = new QPushButton(widget);
+    gradientTwoButton->setIcon(QIcon(pm));
+    gradientTwoButton->setIconSize(QSize(200, 24));
+    gradientTwoButton->setToolTip(QStringLiteral("Colors: Highlight Foreground"));
+
+    QTextEdit *status = new QTextEdit(QStringLiteral("<b>Ready</b><br>"), widget);
+    status->setReadOnly(true);
 
     vLayout->addWidget(startButton);
     vLayout->addWidget(stopButton);
@@ -79,8 +111,10 @@ int main(int argc, char **argv)
     vLayout->addWidget(resolutionBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust far distance")));
     vLayout->addWidget(distanceSlider);
-    vLayout->addWidget(new QLabel(QStringLiteral("Kinect state:")), 1, Qt::AlignBottom);
-    vLayout->addWidget(status, 0, Qt::AlignBottom);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
+    vLayout->addWidget(gradientOneButton);
+    vLayout->addWidget(gradientTwoButton);
+    vLayout->addWidget(status, 1, Qt::AlignBottom);
 
     widget->show();
 
@@ -90,6 +124,11 @@ int main(int argc, char **argv)
     QObject::connect(stopButton, &QPushButton::clicked, datagen, &SurfaceData::stop);
     QObject::connect(distanceSlider, &QSlider::valueChanged, datagen, &SurfaceData::setDistance);
     QObject::connect(resolutionBox, SIGNAL(activated(int)), datagen, SLOT(setResolution(int)));
+    QObject::connect(status, &QTextEdit::textChanged, datagen, &SurfaceData::scrollDown);
+    QObject::connect(gradientOneButton, &QPushButton::clicked, datagen,
+                     &SurfaceData::useGradientOne);
+    QObject::connect(gradientTwoButton, &QPushButton::clicked, datagen,
+                     &SurfaceData::useGradientTwo);
 
     datagen->setDistance(distanceSlider->value());
 

@@ -21,7 +21,7 @@
 
 #include "QKinectWrapper.h"
 #include <QtDataVisualization/q3dsurface.h>
-#include <QLabel>
+#include <QTextEdit>
 
 using namespace QtDataVisualization;
 
@@ -30,7 +30,7 @@ class SurfaceData : public QObject
     Q_OBJECT
 
 public:
-    explicit SurfaceData(Q3DSurface *surface, QLabel *statusLabel);
+    explicit SurfaceData(Q3DSurface *surface, QTextEdit *statusLabel);
     ~SurfaceData();
 
     void start();
@@ -40,13 +40,16 @@ public:
     void updateStatus(QKinect::KinectStatus status);
 
     void setDistance(int distance);
+    void scrollDown();
+    void useGradientOne();
+    void useGradientTwo();
 
 public slots:
     void setResolution(int selection);
 
 private:
     Q3DSurface *m_surface;
-    QLabel *m_statusLabel;
+    QTextEdit *m_statusArea;
     bool m_resize;
     QSize m_resolution;
     QKinect::QKinectWrapper m_kinect;
