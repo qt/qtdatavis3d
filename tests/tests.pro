@@ -8,6 +8,7 @@ contains(QT_CONFIG, opengles1) {
 TEMPLATE = subdirs
 
 SUBDIRS += barstest \
-           scattertest
+           scattertest \
+           kinectsurface
 
 qtHaveModule(multimedia):!android: SUBDIRS += spectrum
