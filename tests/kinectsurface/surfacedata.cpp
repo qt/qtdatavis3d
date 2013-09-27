@@ -20,8 +20,10 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#ifdef USE_SCATTER
+#if defined(USE_SCATTER)
 #include <QtDataVisualization/QScatterDataProxy>
+#elif defined(USE_BARS)
+#include <QtDataVisualization/QBarDataProxy>
 #else
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 #endif
@@ -34,7 +36,7 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
-#ifdef USE_SCATTER
+#if defined(USE_SCATTER)
 SurfaceData::SurfaceData(Q3DScatter *surface, QTextEdit *statusArea) :
     m_surface(surface),
     m_statusArea(statusArea),
@@ -43,9 +45,7 @@ SurfaceData::SurfaceData(Q3DScatter *surface, QTextEdit *statusArea) :
 {
     // Initialize scatter
     m_surface->setTheme(QDataVis::ThemeStoneMoss);
-    m_surface->setGridVisible(false);
     m_surface->setObjectType(QDataVis::Dots, false);
-    m_surface->setSelectionMode(QDataVis::ModeNone);
     m_surface->setShadowQuality(QDataVis::ShadowSoftLow);
     m_surface->setCameraPosition(0.0, 85.0, 110);
     m_surface->axisY()->setMax(255);
@@ -53,6 +53,23 @@ SurfaceData::SurfaceData(Q3DScatter *surface, QTextEdit *statusArea) :
     m_surface->axisX()->setMax(m_resolution.width() / 2);
     m_surface->axisZ()->setMin(-m_resolution.height() / 2);
     m_surface->axisZ()->setMax(m_resolution.height() / 2);
+#elif defined(USE_BARS)
+SurfaceData::SurfaceData(Q3DBars *surface, QTextEdit *statusArea) :
+    m_surface(surface),
+    m_statusArea(statusArea),
+    m_resize(true),
+    m_resolution(QSize(80, 60))
+{
+    // Initialize scatter
+    m_surface->setTheme(QDataVis::ThemeQt);
+    m_surface->setBarType(QDataVis::Bars, true);
+#if 1
+    m_surface->setShadowQuality(QDataVis::ShadowLow);
+#else
+    m_surface->setBarSpacing(QSizeF(0.0, 0.0));
+#endif
+    m_surface->setCameraPosition(0.0, 75.0);
+    m_surface->valueAxis()->setMax(255);
 #else
 SurfaceData::SurfaceData(Q3DSurface *surface, QTextEdit *statusArea) :
     m_surface(surface),
@@ -71,10 +88,13 @@ SurfaceData::SurfaceData(Q3DSurface *surface, QTextEdit *statusArea) :
     m_surface->axisY()->setMax(255);
     m_surface->setSurfaceGridEnabled(false);
     m_surface->setBackgroundVisible(false);
-    m_surface->setGridVisible(false);
     m_surface->setSmoothSurfaceEnabled(false);
     m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
 #endif
+
+    // Common initializers
+    m_surface->setSelectionMode(QDataVis::ModeNone);
+    m_surface->setGridVisible(false);
 
     // Hide scroll bar
     m_statusArea->verticalScrollBar()->setVisible(false);
@@ -95,7 +115,7 @@ void SurfaceData::updateData()
     QImage depthMap = m_kinect.getDepth();
     if (m_resize) // Resize for better performance
         depthMap = depthMap.scaled(m_resolution);
-#ifdef USE_SCATTER
+#if defined(USE_SCATTER) || defined(USE_BARS)
     setData(depthMap);
 #else
     static_cast<QHeightMapSurfaceDataProxy *>(m_surface->activeDataProxy())->setHeightMap(depthMap);
@@ -172,13 +192,16 @@ void SurfaceData::setResolution(int selection)
         break;
     }
     };
-#ifdef USE_SCATTER
+#if defined(USE_SCATTER)
     m_resize = true;
     m_resolution /= 4;
     m_surface->axisX()->setMin(-m_resolution.width() / 2);
     m_surface->axisX()->setMax(m_resolution.width() / 2);
     m_surface->axisZ()->setMin(-m_resolution.height() / 2);
     m_surface->axisZ()->setMax(m_resolution.height() / 2);
+#elif defined(USE_BARS)
+    m_resize = true;
+    m_resolution /= 4;
 #endif
 
     m_statusArea->append(QString(QStringLiteral("<b>Resolution:</b> %1 x %2")).arg(
@@ -193,7 +216,7 @@ void SurfaceData::scrollDown()
     scrollbar->setValue(scrollbar->maximum());
 }
 
-#ifndef USE_SCATTER
+#if !defined(USE_SCATTER) && !defined(USE_BARS)
 void SurfaceData::useGradientOne()
 {
     m_surface->setTheme(QDataVis::ThemeIsabelle);
@@ -228,6 +251,7 @@ void SurfaceData::setData(const QImage &image)
     int bitCount = imageWidth * 4 * (imageHeight - 1);
     int widthBits = imageWidth * 4;
 
+#if defined(USE_SCATTER)
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(imageHeight * imageWidth);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
@@ -247,6 +271,18 @@ void SurfaceData::setData(const QImage &image)
     }
 
     static_cast<QScatterDataProxy *>(m_surface->activeDataProxy())->resetArray(dataArray);
+#elif defined(USE_BARS)
+    QBarDataArray *dataArray = new QBarDataArray;
+    dataArray->reserve(imageHeight);
+    for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
+        QBarDataRow *newRow = new QBarDataRow(imageWidth);
+        for (int j = 0; j < imageWidth; j++)
+            (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
+        *dataArray << newRow;
+    }
+
+    static_cast<QBarDataProxy *>(m_surface->activeDataProxy())->resetArray(dataArray);
+#endif
 }
 
 #endif

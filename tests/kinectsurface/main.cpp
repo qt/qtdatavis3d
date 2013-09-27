@@ -37,8 +37,10 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
 
-#ifdef USE_SCATTER
+#if defined(USE_SCATTER)
     Q3DScatter *surface = new Q3DScatter();
+#elif defined(USE_BARS)
+    Q3DBars *surface = new Q3DBars();
 #else
     Q3DSurface *surface = new Q3DSurface();
 #endif
@@ -76,7 +78,7 @@ int main(int argc, char **argv)
     distanceSlider->setValue(50);
     distanceSlider->setMaximum(200);
 
-#ifndef USE_SCATTER
+#if !defined(USE_SCATTER) && !defined(USE_BARS)
     QLinearGradient gradientOne(0, 0, 200, 1);
     gradientOne.setColorAt(0.0, Qt::black);
     gradientOne.setColorAt(0.33, Qt::blue);
@@ -118,7 +120,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(resolutionBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust far distance")));
     vLayout->addWidget(distanceSlider);
-#ifndef USE_SCATTER
+#if !defined(USE_SCATTER) && !defined(USE_BARS)
     vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
     vLayout->addWidget(gradientOneButton);
     vLayout->addWidget(gradientTwoButton);
@@ -134,7 +136,7 @@ int main(int argc, char **argv)
     QObject::connect(distanceSlider, &QSlider::valueChanged, datagen, &SurfaceData::setDistance);
     QObject::connect(resolutionBox, SIGNAL(activated(int)), datagen, SLOT(setResolution(int)));
     QObject::connect(status, &QTextEdit::textChanged, datagen, &SurfaceData::scrollDown);
-#ifndef USE_SCATTER
+#if !defined(USE_SCATTER) && !defined(USE_BARS)
     QObject::connect(gradientOneButton, &QPushButton::clicked, datagen,
                      &SurfaceData::useGradientOne);
     QObject::connect(gradientTwoButton, &QPushButton::clicked, datagen,
