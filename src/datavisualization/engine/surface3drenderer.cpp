@@ -1732,28 +1732,33 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 
 bool Surface3DRenderer::updateSmoothStatus(bool enable)
 {
-    m_cachedSmoothSurface = enable;
-    if (!m_cachedSmoothSurface && !m_flatSupported) {
+    if (!enable && !m_flatSupported) {
         qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
                       " Requires at least GLSL version 1.5.";
-        m_cachedSmoothSurface = true;
+        enable = true;
     }
 
-    if (!m_surfaceObj)
+    bool changed = false;
+    if (enable != m_cachedSmoothSurface) {
+        m_cachedSmoothSurface = enable;
+        changed = true;
+    }
+
+    if (changed)
+        initSurfaceShaders();
+
+    // If no surface object created yet, don't try to update the object, instead return
+    if (!m_surfaceObj || !changed) {
         return m_cachedSmoothSurface;
-
-    if (m_cachedSmoothSurface == false && !m_flatSupported)
-        m_cachedSmoothSurface = true;
-
-    if (m_cachedSmoothSurface) {
-        m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
-                                      m_cachedSelectionMode != QDataVis::ModeNone);
     } else {
-        m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
-                                m_cachedSelectionMode != QDataVis::ModeNone);
+        if (m_cachedSmoothSurface) {
+            m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+                                          m_cachedSelectionMode != QDataVis::ModeNone);
+        } else {
+            m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+                                    m_cachedSelectionMode != QDataVis::ModeNone);
+        }
     }
-
-    initSurfaceShaders();
 
     return m_cachedSmoothSurface;
 }
