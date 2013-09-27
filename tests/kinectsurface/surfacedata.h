@@ -19,8 +19,14 @@
 #ifndef SURFACEDATA_H
 #define SURFACEDATA_H
 
+//#define USE_SCATTER
+
 #include "QKinectWrapper.h"
-#include <QtDataVisualization/q3dsurface.h>
+#ifdef USE_SCATTER
+#include <QtDataVisualization/Q3DScatter>
+#else
+#include <QtDataVisualization/Q3DSurface>
+#endif
 #include <QTextEdit>
 
 using namespace QtDataVisualization;
@@ -30,7 +36,11 @@ class SurfaceData : public QObject
     Q_OBJECT
 
 public:
+#ifdef USE_SCATTER
+    explicit SurfaceData(Q3DScatter *surface, QTextEdit *statusLabel);
+#else
     explicit SurfaceData(Q3DSurface *surface, QTextEdit *statusLabel);
+#endif
     ~SurfaceData();
 
     void start();
@@ -41,14 +51,22 @@ public:
 
     void setDistance(int distance);
     void scrollDown();
+#ifndef USE_SCATTER
     void useGradientOne();
     void useGradientTwo();
+#else
+    void setData(const QImage &image);
+#endif
 
 public slots:
     void setResolution(int selection);
 
 private:
+#ifdef USE_SCATTER
+    Q3DScatter *m_surface;
+#else
     Q3DSurface *m_surface;
+#endif
     QTextEdit *m_statusArea;
     bool m_resize;
     QSize m_resolution;

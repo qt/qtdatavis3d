@@ -37,7 +37,12 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
 
+#ifdef USE_SCATTER
+    Q3DScatter *surface = new Q3DScatter();
+#else
     Q3DSurface *surface = new Q3DSurface();
+#endif
+
     QSize screenSize = surface->screen()->size();
 
     QWidget *container = QWidget::createWindowContainer(surface);
@@ -71,6 +76,7 @@ int main(int argc, char **argv)
     distanceSlider->setValue(50);
     distanceSlider->setMaximum(200);
 
+#ifndef USE_SCATTER
     QLinearGradient gradientOne(0, 0, 200, 1);
     gradientOne.setColorAt(0.0, Qt::black);
     gradientOne.setColorAt(0.33, Qt::blue);
@@ -101,6 +107,7 @@ int main(int argc, char **argv)
     gradientTwoButton->setIcon(QIcon(pm));
     gradientTwoButton->setIconSize(QSize(200, 24));
     gradientTwoButton->setToolTip(QStringLiteral("Colors: Highlight Foreground"));
+#endif
 
     QTextEdit *status = new QTextEdit(QStringLiteral("<b>Ready</b><br>"), widget);
     status->setReadOnly(true);
@@ -111,9 +118,11 @@ int main(int argc, char **argv)
     vLayout->addWidget(resolutionBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust far distance")));
     vLayout->addWidget(distanceSlider);
+#ifndef USE_SCATTER
     vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
     vLayout->addWidget(gradientOneButton);
     vLayout->addWidget(gradientTwoButton);
+#endif
     vLayout->addWidget(status, 1, Qt::AlignBottom);
 
     widget->show();
@@ -125,10 +134,12 @@ int main(int argc, char **argv)
     QObject::connect(distanceSlider, &QSlider::valueChanged, datagen, &SurfaceData::setDistance);
     QObject::connect(resolutionBox, SIGNAL(activated(int)), datagen, SLOT(setResolution(int)));
     QObject::connect(status, &QTextEdit::textChanged, datagen, &SurfaceData::scrollDown);
+#ifndef USE_SCATTER
     QObject::connect(gradientOneButton, &QPushButton::clicked, datagen,
                      &SurfaceData::useGradientOne);
     QObject::connect(gradientTwoButton, &QPushButton::clicked, datagen,
                      &SurfaceData::useGradientTwo);
+#endif
 
     datagen->setDistance(distanceSlider->value());
 
