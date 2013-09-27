@@ -23,6 +23,9 @@
 #include <QtDataVisualization/Q3DScatter>
 #include <QtDataVisualization/Q3DBars>
 #include <QtDataVisualization/Q3DSurface>
+#include <QtDataVisualization/QScatterDataProxy>
+#include <QtDataVisualization/QBarDataProxy>
+#include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 #include <QTextEdit>
 
 using namespace QtDataVisualization;
@@ -68,6 +71,8 @@ private:
     QSize m_resolution;
     int m_resolutionLevel;
     VisualizationMode m_mode;
+    QScatterDataArray *m_scatterDataArray;
+    QBarDataArray *m_barDataArray;
     QKinect::QKinectWrapper m_kinect;
 };
 

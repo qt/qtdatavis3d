@@ -20,9 +20,6 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#include <QtDataVisualization/QScatterDataProxy>
-#include <QtDataVisualization/QBarDataProxy>
-#include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QScrollBar>
 #include <QSize>
@@ -95,7 +92,6 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 
 SurfaceData::~SurfaceData()
 {
-    delete m_surface;
 }
 
 void SurfaceData::updateData()
@@ -188,9 +184,17 @@ void SurfaceData::setResolution(int selection)
         m_scatter->axisX()->setMax(m_resolution.width() / 2);
         m_scatter->axisZ()->setMin(-m_resolution.height() / 2);
         m_scatter->axisZ()->setMax(m_resolution.height() / 2);
+        m_scatterDataArray = new QScatterDataArray;
+        m_scatterDataArray->resize(m_resolution.width() * m_resolution.height());
     } else if (m_mode == Bars) {
         m_resize = true;
         m_resolution /= 4;
+        m_barDataArray = new QBarDataArray;
+        m_barDataArray->reserve(m_resolution.height());
+        for (int i = 0; i < m_resolution.height(); i++) {
+            QBarDataRow *newProxyRow = new QBarDataRow(m_resolution.width());
+            m_barDataArray->append(newProxyRow);
+        }
     }
 
     m_statusArea->append(QString(QStringLiteral("<b>Resolution:</b> %1 x %2")).arg(
@@ -240,8 +244,7 @@ void SurfaceData::setData(const QImage &image)
     int widthBits = imageWidth * 4;
 
     if (m_mode == Scatter) {
-        QScatterDataArray *dataArray = new QScatterDataArray;
-        dataArray->resize(imageHeight * imageWidth);
+        QScatterDataArray *dataArray = m_scatterDataArray;
         QScatterDataItem *ptrToDataArray = &dataArray->first();
 
         int limitsX = imageWidth / 2;
@@ -260,13 +263,11 @@ void SurfaceData::setData(const QImage &image)
 
         static_cast<QScatterDataProxy *>(m_scatter->activeDataProxy())->resetArray(dataArray);
     } else {
-        QBarDataArray *dataArray = new QBarDataArray;
-        dataArray->reserve(imageHeight);
-        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-            QBarDataRow *newRow = new QBarDataRow(imageWidth);
+        QBarDataArray *dataArray = m_barDataArray;
+        for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
+            QBarDataRow &newRow = *dataArray->at(i);
             for (int j = 0; j < imageWidth; j++)
-                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
-            *dataArray << newRow;
+                newRow[j] = qreal(bits[bitCount + (j * 4)]);
         }
 
         static_cast<QBarDataProxy *>(m_bars->activeDataProxy())->resetArray(dataArray);
