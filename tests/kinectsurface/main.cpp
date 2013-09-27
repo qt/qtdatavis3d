@@ -37,25 +37,37 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
 
-#if defined(USE_SCATTER)
-    Q3DScatter *surface = new Q3DScatter();
-#elif defined(USE_BARS)
-    Q3DBars *surface = new Q3DBars();
-#else
     Q3DSurface *surface = new Q3DSurface();
-#endif
+    Q3DScatter *scatter = new Q3DScatter();
+    Q3DBars *bars = new Q3DBars();
 
     QSize screenSize = surface->screen()->size();
 
-    QWidget *container = QWidget::createWindowContainer(surface);
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
-    container->setMaximumSize(screenSize);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
+    QWidget *containerSurface = QWidget::createWindowContainer(surface);
+    containerSurface->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    containerSurface->setMaximumSize(screenSize);
+    containerSurface->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    containerSurface->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Surface mapping from Kinect depth data"));
+    QWidget *containerScatter = QWidget::createWindowContainer(scatter);
+    containerScatter->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    containerScatter->setMaximumSize(screenSize);
+    containerScatter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    containerScatter->setFocusPolicy(Qt::StrongFocus);
+    containerScatter->setVisible(false);
 
-    hLayout->addWidget(container, 1);
+    QWidget *containerBars = QWidget::createWindowContainer(bars);
+    containerBars->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    containerBars->setMaximumSize(screenSize);
+    containerBars->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    containerBars->setFocusPolicy(Qt::StrongFocus);
+    containerBars->setVisible(false);
+
+    widget->setWindowTitle(QStringLiteral("Visualization from Kinect depth data"));
+
+    hLayout->addWidget(containerSurface, 1);
+    hLayout->addWidget(containerScatter, 1);
+    hLayout->addWidget(containerBars, 1);
     hLayout->addLayout(vLayout);
 
     QPushButton *startButton = new QPushButton(widget);
@@ -71,6 +83,12 @@ int main(int argc, char **argv)
     resolutionBox->addItem(QStringLiteral("Max")); // Comment this out if demo machine is low-perf
     resolutionBox->setCurrentIndex(0);
 
+    QComboBox *modeBox = new QComboBox(widget);
+    modeBox->addItem(QStringLiteral("Surface Plot"));
+    modeBox->addItem(QStringLiteral("Scatter Chart"));
+    modeBox->addItem(QStringLiteral("Bar Chart"));
+    modeBox->setCurrentIndex(0);
+
     QSlider *distanceSlider = new QSlider(Qt::Horizontal, widget);
     distanceSlider->setTickInterval(10);
     distanceSlider->setTickPosition(QSlider::TicksBelow);
@@ -78,7 +96,6 @@ int main(int argc, char **argv)
     distanceSlider->setValue(50);
     distanceSlider->setMaximum(200);
 
-#if !defined(USE_SCATTER) && !defined(USE_BARS)
     QLinearGradient gradientOne(0, 0, 200, 1);
     gradientOne.setColorAt(0.0, Qt::black);
     gradientOne.setColorAt(0.33, Qt::blue);
@@ -109,7 +126,6 @@ int main(int argc, char **argv)
     gradientTwoButton->setIcon(QIcon(pm));
     gradientTwoButton->setIconSize(QSize(200, 24));
     gradientTwoButton->setToolTip(QStringLiteral("Colors: Highlight Foreground"));
-#endif
 
     QTextEdit *status = new QTextEdit(QStringLiteral("<b>Ready</b><br>"), widget);
     status->setReadOnly(true);
@@ -118,30 +134,32 @@ int main(int argc, char **argv)
     vLayout->addWidget(stopButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change resolution")));
     vLayout->addWidget(resolutionBox);
+    vLayout->addWidget(new QLabel(QStringLiteral("Change visualization type")));
+    vLayout->addWidget(modeBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust far distance")));
     vLayout->addWidget(distanceSlider);
-#if !defined(USE_SCATTER) && !defined(USE_BARS)
     vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
     vLayout->addWidget(gradientOneButton);
     vLayout->addWidget(gradientTwoButton);
-#endif
     vLayout->addWidget(status, 1, Qt::AlignBottom);
 
     widget->show();
 
-    SurfaceData *datagen = new SurfaceData(surface, status);
+    SurfaceData *datagen = new SurfaceData(surface, scatter, bars, status);
+    ContainerChanger changer(containerSurface, containerScatter, containerBars,
+                             gradientOneButton, gradientTwoButton);
 
     QObject::connect(startButton, &QPushButton::clicked, datagen, &SurfaceData::start);
     QObject::connect(stopButton, &QPushButton::clicked, datagen, &SurfaceData::stop);
     QObject::connect(distanceSlider, &QSlider::valueChanged, datagen, &SurfaceData::setDistance);
     QObject::connect(resolutionBox, SIGNAL(activated(int)), datagen, SLOT(setResolution(int)));
+    QObject::connect(modeBox, SIGNAL(activated(int)), &changer, SLOT(changeContainer(int)));
+    QObject::connect(modeBox, SIGNAL(activated(int)), datagen, SLOT(changeMode(int)));
     QObject::connect(status, &QTextEdit::textChanged, datagen, &SurfaceData::scrollDown);
-#if !defined(USE_SCATTER) && !defined(USE_BARS)
     QObject::connect(gradientOneButton, &QPushButton::clicked, datagen,
                      &SurfaceData::useGradientOne);
     QObject::connect(gradientTwoButton, &QPushButton::clicked, datagen,
                      &SurfaceData::useGradientTwo);
-#endif
 
     datagen->setDistance(distanceSlider->value());
 

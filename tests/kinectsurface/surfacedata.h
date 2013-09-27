@@ -19,17 +19,10 @@
 #ifndef SURFACEDATA_H
 #define SURFACEDATA_H
 
-//#define USE_SCATTER
-//#define USE_BARS
-
 #include "QKinectWrapper.h"
-#if defined(USE_SCATTER)
 #include <QtDataVisualization/Q3DScatter>
-#elif defined(USE_BARS)
 #include <QtDataVisualization/Q3DBars>
-#else
 #include <QtDataVisualization/Q3DSurface>
-#endif
 #include <QTextEdit>
 
 using namespace QtDataVisualization;
@@ -39,13 +32,8 @@ class SurfaceData : public QObject
     Q_OBJECT
 
 public:
-#if defined(USE_SCATTER)
-    explicit SurfaceData(Q3DScatter *surface, QTextEdit *statusLabel);
-#elif defined(USE_BARS)
-    explicit SurfaceData(Q3DBars *surface, QTextEdit *statusLabel);
-#else
-    explicit SurfaceData(Q3DSurface *surface, QTextEdit *statusLabel);
-#endif
+    explicit SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
+                         QTextEdit *statusLabel);
     ~SurfaceData();
 
     void start();
@@ -56,28 +44,51 @@ public:
 
     void setDistance(int distance);
     void scrollDown();
-#if defined(USE_SCATTER) || defined(USE_BARS)
     void setData(const QImage &image);
-#else
     void useGradientOne();
     void useGradientTwo();
-#endif
+
+public:
+    enum VisualizationMode {
+        Surface = 0,
+        Scatter,
+        Bars
+    };
 
 public slots:
     void setResolution(int selection);
+    void changeMode(int mode);
 
 private:
-#if defined(USE_SCATTER)
-    Q3DScatter *m_surface;
-#elif defined(USE_BARS)
-    Q3DBars *m_surface;
-#else
     Q3DSurface *m_surface;
-#endif
+    Q3DScatter *m_scatter;
+    Q3DBars *m_bars;
     QTextEdit *m_statusArea;
     bool m_resize;
     QSize m_resolution;
+    int m_resolutionLevel;
+    VisualizationMode m_mode;
     QKinect::QKinectWrapper m_kinect;
+};
+
+class ContainerChanger : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit ContainerChanger(QWidget *surface, QWidget *scatter, QWidget *bars,
+                              QWidget *buttonOne, QWidget *buttonTwo);
+    ~ContainerChanger();
+
+public slots:
+    void changeContainer(int container);
+
+private:
+    QWidget *m_surface;
+    QWidget *m_scatter;
+    QWidget *m_bars;
+    QWidget *m_button1;
+    QWidget *m_button2;
 };
 
 #endif

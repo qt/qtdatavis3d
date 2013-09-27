@@ -20,62 +20,26 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#if defined(USE_SCATTER)
 #include <QtDataVisualization/QScatterDataProxy>
-#elif defined(USE_BARS)
 #include <QtDataVisualization/QBarDataProxy>
-#else
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
-#endif
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QScrollBar>
 #include <QSize>
 #include <QImage>
 
-#include <QDebug>
-
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
-#if defined(USE_SCATTER)
-SurfaceData::SurfaceData(Q3DScatter *surface, QTextEdit *statusArea) :
+SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
+                         QTextEdit *statusArea) :
     m_surface(surface),
+    m_scatter(scatter),
+    m_bars(bars),
     m_statusArea(statusArea),
     m_resize(true),
-    m_resolution(QSize(80, 60))
-{
-    // Initialize scatter
-    m_surface->setTheme(QDataVis::ThemeStoneMoss);
-    m_surface->setObjectType(QDataVis::Dots, false);
-    m_surface->setShadowQuality(QDataVis::ShadowSoftLow);
-    m_surface->setCameraPosition(0.0, 85.0, 110);
-    m_surface->axisY()->setMax(255);
-    m_surface->axisX()->setMin(-m_resolution.width() / 2);
-    m_surface->axisX()->setMax(m_resolution.width() / 2);
-    m_surface->axisZ()->setMin(-m_resolution.height() / 2);
-    m_surface->axisZ()->setMax(m_resolution.height() / 2);
-#elif defined(USE_BARS)
-SurfaceData::SurfaceData(Q3DBars *surface, QTextEdit *statusArea) :
-    m_surface(surface),
-    m_statusArea(statusArea),
-    m_resize(true),
-    m_resolution(QSize(80, 60))
-{
-    // Initialize scatter
-    m_surface->setTheme(QDataVis::ThemeQt);
-    m_surface->setBarType(QDataVis::Bars, true);
-#if 1
-    m_surface->setShadowQuality(QDataVis::ShadowLow);
-#else
-    m_surface->setBarSpacing(QSizeF(0.0, 0.0));
-#endif
-    m_surface->setCameraPosition(0.0, 75.0);
-    m_surface->valueAxis()->setMax(255);
-#else
-SurfaceData::SurfaceData(Q3DSurface *surface, QTextEdit *statusArea) :
-    m_surface(surface),
-    m_statusArea(statusArea),
-    m_resize(true),
-    m_resolution(QSize(320, 240))
+    m_resolution(QSize(320, 240)),
+    m_resolutionLevel(0),
+    m_mode(Surface)
 {
     // Initialize surface
     m_surface->setTheme(QDataVis::ThemeIsabelle);
@@ -84,17 +48,41 @@ SurfaceData::SurfaceData(Q3DSurface *surface, QTextEdit *statusArea) :
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
+    m_surface->setSelectionMode(QDataVis::ModeNone);
+    m_surface->setGridVisible(false);
     m_surface->setGradient(gradient);
     m_surface->axisY()->setMax(255);
     m_surface->setSurfaceGridEnabled(false);
     m_surface->setBackgroundVisible(false);
     m_surface->setSmoothSurfaceEnabled(false);
     m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
-#endif
 
-    // Common initializers
-    m_surface->setSelectionMode(QDataVis::ModeNone);
-    m_surface->setGridVisible(false);
+    // Initialize scatter
+    m_scatter->setTheme(QDataVis::ThemeStoneMoss);
+    m_scatter->setSelectionMode(QDataVis::ModeNone);
+    m_scatter->setGridVisible(false);
+    m_scatter->setObjectType(QDataVis::Dots, false);
+    m_scatter->setShadowQuality(QDataVis::ShadowSoftLow);
+    m_scatter->setCameraPosition(0.0, 85.0, 110);
+    m_scatter->axisY()->setMin(-128);
+    m_scatter->axisY()->setMax(128);
+    m_scatter->axisX()->setMin(-m_resolution.width() / 2);
+    m_scatter->axisX()->setMax(m_resolution.width() / 2);
+    m_scatter->axisZ()->setMin(-m_resolution.height() / 2);
+    m_scatter->axisZ()->setMax(m_resolution.height() / 2);
+
+    // Initialize bars
+    m_bars->setTheme(QDataVis::ThemeQt);
+    m_bars->setSelectionMode(QDataVis::ModeNone);
+    m_bars->setGridVisible(false);
+    m_bars->setBarType(QDataVis::Bars, true);
+#if 1
+    m_bars->setShadowQuality(QDataVis::ShadowLow);
+#else
+    m_bars->setBarSpacing(QSizeF(0.0, 0.0));
+#endif
+    m_bars->setCameraPosition(0.0, 75.0);
+    m_bars->valueAxis()->setMax(255);
 
     // Hide scroll bar
     m_statusArea->verticalScrollBar()->setVisible(false);
@@ -115,11 +103,11 @@ void SurfaceData::updateData()
     QImage depthMap = m_kinect.getDepth();
     if (m_resize) // Resize for better performance
         depthMap = depthMap.scaled(m_resolution);
-#if defined(USE_SCATTER) || defined(USE_BARS)
-    setData(depthMap);
-#else
-    static_cast<QHeightMapSurfaceDataProxy *>(m_surface->activeDataProxy())->setHeightMap(depthMap);
-#endif
+    if (m_mode != Surface)
+        setData(depthMap);
+    else
+        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->activeDataProxy())->setHeightMap(
+                depthMap);
 }
 
 void SurfaceData::updateStatus(QKinect::KinectStatus status)
@@ -170,6 +158,7 @@ void SurfaceData::setDistance(int distance)
 
 void SurfaceData::setResolution(int selection)
 {
+    m_resolutionLevel = selection;
     switch (selection) {
     case 0: {
         m_resize = true;
@@ -192,17 +181,17 @@ void SurfaceData::setResolution(int selection)
         break;
     }
     };
-#if defined(USE_SCATTER)
-    m_resize = true;
-    m_resolution /= 4;
-    m_surface->axisX()->setMin(-m_resolution.width() / 2);
-    m_surface->axisX()->setMax(m_resolution.width() / 2);
-    m_surface->axisZ()->setMin(-m_resolution.height() / 2);
-    m_surface->axisZ()->setMax(m_resolution.height() / 2);
-#elif defined(USE_BARS)
-    m_resize = true;
-    m_resolution /= 4;
-#endif
+    if (m_mode == Scatter) {
+        m_resize = true;
+        m_resolution /= 4;
+        m_scatter->axisX()->setMin(-m_resolution.width() / 2);
+        m_scatter->axisX()->setMax(m_resolution.width() / 2);
+        m_scatter->axisZ()->setMin(-m_resolution.height() / 2);
+        m_scatter->axisZ()->setMax(m_resolution.height() / 2);
+    } else if (m_mode == Bars) {
+        m_resize = true;
+        m_resolution /= 4;
+    }
 
     m_statusArea->append(QString(QStringLiteral("<b>Resolution:</b> %1 x %2")).arg(
                              m_resolution.width()).arg(m_resolution.height()));
@@ -216,7 +205,6 @@ void SurfaceData::scrollDown()
     scrollbar->setValue(scrollbar->maximum());
 }
 
-#if !defined(USE_SCATTER) && !defined(USE_BARS)
 void SurfaceData::useGradientOne()
 {
     m_surface->setTheme(QDataVis::ThemeIsabelle);
@@ -239,7 +227,7 @@ void SurfaceData::useGradientTwo()
     m_surface->setGradient(gradient);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Highlight foreground"));
 }
-#else
+
 void SurfaceData::setData(const QImage &image)
 {
     QImage heightImage = image;
@@ -251,38 +239,101 @@ void SurfaceData::setData(const QImage &image)
     int bitCount = imageWidth * 4 * (imageHeight - 1);
     int widthBits = imageWidth * 4;
 
-#if defined(USE_SCATTER)
-    QScatterDataArray *dataArray = new QScatterDataArray;
-    dataArray->resize(imageHeight * imageWidth);
-    QScatterDataItem *ptrToDataArray = &dataArray->first();
+    if (m_mode == Scatter) {
+        QScatterDataArray *dataArray = new QScatterDataArray;
+        dataArray->resize(imageHeight * imageWidth);
+        QScatterDataItem *ptrToDataArray = &dataArray->first();
 
-    int limitsX = imageWidth / 2;
-    int limitsZ = imageHeight / 2;
-    qreal height = 0;
+        int limitsX = imageWidth / 2;
+        int limitsZ = imageHeight / 2;
+        qreal height = 0;
 
-    for (int i = -limitsZ; i < limitsZ; i++, bitCount -= widthBits) {
-        for (int j = -limitsX; j < limitsX; j++) {
-            height = qreal(bits[bitCount + ((j + limitsX) * 4)]);
-            if (height > 0) {
-                ptrToDataArray->setPosition(QVector3D(qreal(j), height, qreal(i)));
-                ptrToDataArray++;
+        for (int i = -limitsZ; i < limitsZ; i++, bitCount -= widthBits) {
+            for (int j = -limitsX; j < limitsX; j++) {
+                height = qreal(bits[bitCount + ((j + limitsX) * 4)]) - 128.0;
+                if (height > -128) {
+                    ptrToDataArray->setPosition(QVector3D(qreal(j), height, qreal(i)));
+                    ptrToDataArray++;
+                }
             }
         }
-    }
 
-    static_cast<QScatterDataProxy *>(m_surface->activeDataProxy())->resetArray(dataArray);
-#elif defined(USE_BARS)
-    QBarDataArray *dataArray = new QBarDataArray;
-    dataArray->reserve(imageHeight);
-    for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
-        QBarDataRow *newRow = new QBarDataRow(imageWidth);
-        for (int j = 0; j < imageWidth; j++)
-            (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
-        *dataArray << newRow;
-    }
+        static_cast<QScatterDataProxy *>(m_scatter->activeDataProxy())->resetArray(dataArray);
+    } else {
+        QBarDataArray *dataArray = new QBarDataArray;
+        dataArray->reserve(imageHeight);
+        for (int i = imageHeight; i > 0; i--, bitCount -= widthBits) {
+            QBarDataRow *newRow = new QBarDataRow(imageWidth);
+            for (int j = 0; j < imageWidth; j++)
+                (*newRow)[j] = qreal(bits[bitCount + (j * 4)]);
+            *dataArray << newRow;
+        }
 
-    static_cast<QBarDataProxy *>(m_surface->activeDataProxy())->resetArray(dataArray);
-#endif
+        static_cast<QBarDataProxy *>(m_bars->activeDataProxy())->resetArray(dataArray);
+    }
 }
 
-#endif
+void SurfaceData::changeMode(int mode)
+{
+    m_mode = VisualizationMode(mode);
+    switch (m_mode) {
+    case Surface: {
+        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Surface"));
+        break;
+    }
+    case Scatter: {
+        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Scatter"));
+        break;
+    }
+    default: {
+        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Bars"));
+        break;
+    }
+    }
+    // Reset resolution after mode change
+    setResolution(m_resolutionLevel);
+}
+
+ContainerChanger::ContainerChanger(QWidget *surface, QWidget *scatter, QWidget *bars,
+                                   QWidget *buttonOne, QWidget *buttonTwo)
+    : m_surface(surface),
+      m_scatter(scatter),
+      m_bars(bars),
+      m_button1(buttonOne),
+      m_button2(buttonTwo)
+{
+}
+
+ContainerChanger::~ContainerChanger()
+{
+}
+
+void ContainerChanger::changeContainer(int container)
+{
+    switch (container) {
+    case 0: {
+        m_scatter->setVisible(false);
+        m_bars->setVisible(false);
+        m_surface->setVisible(true);
+        m_button1->setEnabled(true);
+        m_button2->setEnabled(true);
+        break;
+    }
+    case 1: {
+        m_surface->setVisible(false);
+        m_bars->setVisible(false);
+        m_scatter->setVisible(true);
+        m_button1->setEnabled(false);
+        m_button2->setEnabled(false);
+        break;
+    }
+    case 2: {
+        m_surface->setVisible(false);
+        m_scatter->setVisible(false);
+        m_bars->setVisible(true);
+        m_button1->setEnabled(false);
+        m_button2->setEnabled(false);
+        break;
+    }
+    }
+}
