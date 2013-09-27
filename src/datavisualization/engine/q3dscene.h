@@ -33,13 +33,13 @@ class Q3DScenePrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QRect viewport READ viewport WRITE setViewport)
-    Q_PROPERTY(QRect primarySubViewport READ primarySubViewport WRITE setPrimarySubViewport)
-    Q_PROPERTY(QRect secondarySubViewport READ secondarySubViewport WRITE setSecondarySubViewport)
-    Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive)
-    Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera)
-    Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight)
-    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio)
+    Q_PROPERTY(QRect viewport READ viewport WRITE setViewport NOTIFY viewportChanged)
+    Q_PROPERTY(QRect primarySubViewport READ primarySubViewport WRITE setPrimarySubViewport NOTIFY primarySubViewportChanged)
+    Q_PROPERTY(QRect secondarySubViewport READ secondarySubViewport WRITE setSecondarySubViewport NOTIFY secondarySubViewportChanged)
+    Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive NOTIFY slicingActiveChanged)
+    Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
+    Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight NOTIFY activeLightChanged)
+    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
 
 public:
     Q3DScene(QObject *parent = 0);
@@ -73,10 +73,16 @@ public:
                                           qreal fixedRotation = 0.0,
                                           qreal distanceModifier = 0.0);
 
-private:
-    bool isUnderSideCameraEnabled() const;
-    void setUnderSideCameraEnabled(bool isEnabled);
+signals:
+    void viewportChanged(QRect viewport);
+    void primarySubViewportChanged(QRect subViewport);
+    void secondarySubViewportChanged(QRect subViewport);
+    void slicingActiveChanged(bool isSlicingActive);
+    void activeCameraChanged(const Q3DCamera *camera);
+    void activeLightChanged(const Q3DLight *light);
+    void devicePixelRatioChanged(qreal pixelRatio);
 
+private:
     QScopedPointer<Q3DScenePrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DScene)

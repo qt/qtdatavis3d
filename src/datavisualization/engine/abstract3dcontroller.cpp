@@ -35,8 +35,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     QObject(parent),
     m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
-    m_horizontalRotation(-45.0f),
-    m_verticalRotation(15.0f),
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::SelectionModeItem),
@@ -304,37 +302,49 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
 
 void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    m_activeInputHandler->mouseDoubleClickEvent(event);
+    if (m_activeInputHandler)
+        m_activeInputHandler->mouseDoubleClickEvent(event);
+
     emitNeedRender();
 }
 
 void Abstract3DController::touchEvent(QTouchEvent *event)
 {
-    m_activeInputHandler->touchEvent(event);
+    if (m_activeInputHandler)
+        m_activeInputHandler->touchEvent(event);
+
     emitNeedRender();
 }
 
 void Abstract3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    m_activeInputHandler->mousePressEvent(event, mousePos);
+    if (m_activeInputHandler)
+        m_activeInputHandler->mousePressEvent(event, mousePos);
+
     emitNeedRender();
 }
 
 void Abstract3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    m_activeInputHandler->mouseReleaseEvent(event, mousePos);
+    if (m_activeInputHandler)
+        m_activeInputHandler->mouseReleaseEvent(event, mousePos);
+
     emitNeedRender();
 }
 
 void Abstract3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    m_activeInputHandler->mouseMoveEvent(event, mousePos);
+    if (m_activeInputHandler)
+        m_activeInputHandler->mouseMoveEvent(event, mousePos);
+
     emitNeedRender();
 }
 
 void Abstract3DController::wheelEvent(QWheelEvent *event)
 {
-    m_activeInputHandler->wheelEvent(event);
+    if (m_activeInputHandler)
+        m_activeInputHandler->wheelEvent(event);
+
     emitNeedRender();
 }
 
@@ -609,6 +619,9 @@ void Abstract3DController::releaseInputHandler(QAbstract3DInputHandler *inputHan
 
 void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
 {
+    if (inputHandler == m_activeInputHandler)
+        return;
+
     // If existing input handler is the default input handler, delete it
     if (m_activeInputHandler) {
         if (m_activeInputHandler->d_ptr->m_isDefaultHandler) {
@@ -621,10 +634,15 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
     }
 
     // Assume ownership and connect to this controller's scene
-    addInputHandler(inputHandler);
+    if (inputHandler)
+        addInputHandler(inputHandler);
+
     m_activeInputHandler = inputHandler;
     if (m_activeInputHandler)
         m_activeInputHandler->setScene(m_scene);
+
+    // Notify change of input handler
+    emit activeInputHandlerChanged(m_activeInputHandler);
 }
 
 QAbstract3DInputHandler* Abstract3DController::activeInputHandler()
@@ -642,32 +660,6 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     m_scene->activeCamera()->setZoomLevel(zoomLevel);
 
     m_changeTracker.zoomLevelChanged = true;
-    emitNeedRender();
-}
-
-void Abstract3DController::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    m_scene->activeCamera()->setCameraPreset(preset);
-    emitNeedRender();
-}
-
-QDataVis::CameraPreset Abstract3DController::cameraPreset() const
-{
-    return m_scene->activeCamera()->cameraPreset();
-}
-
-void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance)
-{
-    // disable camera movement if in slice view
-    if (scene()->isSlicingActive())
-        return;
-
-    m_horizontalRotation = qBound(-180.0f, horizontal, 180.0f);
-    m_verticalRotation = qBound(0.0f, vertical, 90.0f);
-    m_scene->activeCamera()->setZoomLevel(qBound(10, distance, 500));
-    m_scene->activeCamera()->setRotations(QPointF(m_horizontalRotation,
-                                                  m_verticalRotation));
-    //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
     emitNeedRender();
 }
 
@@ -787,12 +779,18 @@ void Abstract3DController::setSlicingActive(bool isSlicing)
 
 QDataVis::InputState Abstract3DController::inputState()
 {
-    return m_activeInputHandler->inputState();
+    if (m_activeInputHandler)
+        return m_activeInputHandler->inputState();
+    else
+        return QDataVis::InputStateNone;
 }
 
 QPoint Abstract3DController::inputPosition()
 {
-    return m_activeInputHandler->inputPosition();
+    if (m_activeInputHandler)
+        return m_activeInputHandler->inputPosition();
+    else
+        return QPoint(0,0);
 }
 
 void Abstract3DController::setMeshFileName(const QString &fileName)

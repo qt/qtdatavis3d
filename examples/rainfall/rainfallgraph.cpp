@@ -19,6 +19,8 @@
 #include "rainfallgraph.h"
 #include <QtDataVisualization/q3dcategoryaxis.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dcamera.h>
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>
@@ -72,7 +74,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->setTheme(QDataVis::ThemeArmyBlue);
 
     // Set preset camera position
-    m_graph->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
+    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
 
     // Disable grid
     m_graph->setGridVisible(false);

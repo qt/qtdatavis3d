@@ -19,6 +19,8 @@
 #include "scatterdatamodifier.h"
 #include <QtDataVisualization/qscatterdataproxy.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dcamera.h>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -38,7 +40,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_graph->setTheme(QDataVis::ThemeEbony);
     m_graph->setShadowQuality(QDataVis::ShadowQualityHigh);
-    m_graph->setCameraPreset(QDataVis::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
@@ -113,7 +115,7 @@ void ScatterDataModifier::changePresetCamera()
 {
     static int preset = QDataVis::CameraPresetFrontLow;
 
-    m_graph->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
 
     if (++preset > QDataVis::CameraPresetDirectlyAboveCCW45)
         preset = QDataVis::CameraPresetFrontLow;

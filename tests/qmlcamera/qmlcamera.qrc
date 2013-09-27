@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="main.qml">qml/qmlcamera/main.qml</file>
+        <file alias="Data.qml">qml/qmlcamera/Data.qml</file>
+        <file alias="Axes.qml">qml/qmlcamera/Axes.qml</file>
+    </qresource>
+</RCC>

@@ -21,6 +21,7 @@
 #include "q3dscene.h"
 #include "q3dbox.h"
 #include "q3dobject.h"
+#include "utils_p.h"
 
 #include <qmath.h>
 #include <QVector3D>
@@ -79,28 +80,201 @@ void Q3DCamera::copyValuesFrom(const Q3DCamera &source)
     d_ptr->m_xRotation = source.d_ptr->m_xRotation;
     d_ptr->m_yRotation = source.d_ptr->m_yRotation;
 
+    d_ptr->m_minXRotation = source.d_ptr->m_minXRotation;
+    d_ptr->m_minYRotation = source.d_ptr->m_minYRotation;
+    d_ptr->m_maxXRotation = source.d_ptr->m_maxXRotation;
+    d_ptr->m_maxYRotation = source.d_ptr->m_maxYRotation;
+
+    d_ptr->m_wrapXRotation = source.d_ptr->m_wrapXRotation;
+    d_ptr->m_wrapYRotation = source.d_ptr->m_wrapYRotation;
+
     d_ptr->m_zoomLevel = source.d_ptr->m_zoomLevel;
     d_ptr->m_activePreset = source.d_ptr->m_activePreset;
 }
 
 /*!
- * \property Q3DCamera::rotations
+ * \property Q3DCamera::xRotation
  *
- * This property contains the rotation angles of the camera around the target point in degrees starting from
+ * This property contains the X-rotation angle of the camera around the target point in degrees starting from
  * the current base position set by the setBaseOrientation() methods.
  */
-QPointF Q3DCamera::rotations() const
-{
-    QPointF rotations(d_ptr->m_xRotation, d_ptr->m_yRotation);
-    return rotations;
+qreal Q3DCamera::xRotation() const {
+    return d_ptr->m_xRotation;
 }
 
-void Q3DCamera::setRotations(const QPointF &rotation)
+void Q3DCamera::setXRotation(qreal rotation)
 {
-    d_ptr->setRotations(rotation);
-    if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
-        d_ptr->m_activePreset = QDataVis::CameraPresetNone;
-        setDirty(true);
+    if (d_ptr->m_wrapXRotation)
+        rotation = Utils::wrapValue(rotation, d_ptr->m_minXRotation, d_ptr->m_maxXRotation);
+    else
+        rotation = qBound(qreal(d_ptr->m_minXRotation), qreal(rotation), qreal(d_ptr->m_maxXRotation));
+
+    if (d_ptr->m_xRotation != rotation) {
+        d_ptr->setXRotation(rotation);
+        if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
+            d_ptr->m_activePreset = QDataVis::CameraPresetNone;
+            setDirty(true);
+        }
+
+        emit xRotationChanged(d_ptr->m_xRotation);
+    }
+}
+
+/*!
+ * \property Q3DCamera::yRotation
+ *
+ * This property contains the Y-rotation angle of the camera around the target point in degrees starting from
+ * the current base position set by the setBaseOrientation() methods.
+ */
+qreal Q3DCamera::yRotation() const {
+    return d_ptr->m_yRotation;
+}
+
+void Q3DCamera::setYRotation(qreal rotation)
+{
+    if (d_ptr->m_wrapYRotation)
+        rotation = Utils::wrapValue(rotation, d_ptr->m_minYRotation, d_ptr->m_maxYRotation);
+    else
+        rotation = qBound(qreal(d_ptr->m_minYRotation), qreal(rotation), qreal(d_ptr->m_maxYRotation));
+
+    if (d_ptr->m_yRotation != rotation) {
+        d_ptr->setYRotation(rotation);
+        if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
+            d_ptr->m_activePreset = QDataVis::CameraPresetNone;
+            setDirty(true);
+        }
+
+        emit yRotationChanged(d_ptr->m_yRotation);
+    }
+}
+
+/*!
+ * \property Q3DCamera::minXRotation
+ *
+ * This property contains the current minimum X-rotation for the camera.
+ * The full circle range is [-180,180] and the minimum value is limited to -180.
+ * Also the value can't be higher than maximum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, maxXRotation
+ */
+qreal Q3DCamera::minXRotation() const
+{
+    return d_ptr->m_minXRotation;
+}
+
+/*!
+ * \internal
+ */
+void Q3DCamera::setMinXRotation(qreal minRotation)
+{
+    minRotation = qBound(-180.0, minRotation, 180.0);
+    if (minRotation > d_ptr->m_maxXRotation)
+        minRotation = d_ptr->m_maxXRotation;
+
+    if (d_ptr->m_minXRotation != minRotation) {
+        d_ptr->m_minXRotation = minRotation;
+        emit minXRotationChanged(minRotation);
+
+        if (d_ptr->m_xRotation < d_ptr->m_minXRotation)
+            setXRotation(d_ptr->m_xRotation);
+    }
+}
+
+/*!
+ * \property Q3DCamera::minYRotation
+ *
+ * This property contains the current minimum Y-rotation for the camera.
+ * The full Y angle range is [-90,90] and the minimum value is limited to -90.
+ * Also the value can't be higher than maximum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, maxYRotation
+ */
+qreal Q3DCamera::minYRotation() const
+{
+    return d_ptr->m_minYRotation;
+}
+
+/*!
+ * \internal
+ */
+void Q3DCamera::setMinYRotation(qreal minRotation)
+{
+    minRotation = qBound(-90.0, minRotation, 90.0);
+    if (minRotation > d_ptr->m_maxYRotation)
+        minRotation = d_ptr->m_maxYRotation;
+
+    if (d_ptr->m_minYRotation != minRotation) {
+        d_ptr->m_minYRotation = minRotation;
+        emit minYRotationChanged(minRotation);
+
+        if (d_ptr->m_yRotation < d_ptr->m_minYRotation)
+            setYRotation(d_ptr->m_yRotation);
+    }
+}
+
+/*!
+ * \property Q3DCamera::maxXRotation
+ *
+ * This property contains the current maximum X-rotation for the camera.
+ * The full circle range is [-180,180] and the maximum value is limited to 180.
+ * Also the value can't be lower than minimum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, minXRotation
+ */
+qreal Q3DCamera::maxXRotation() const
+{
+    return d_ptr->m_maxXRotation;
+}
+
+/*!
+ * \internal
+ */
+void Q3DCamera::setMaxXRotation(qreal maxRotation)
+{
+    maxRotation = qBound(-180.0, maxRotation, 180.0);
+
+    if (maxRotation < d_ptr->m_minXRotation)
+        maxRotation = d_ptr->m_minXRotation;
+
+    if (d_ptr->m_maxXRotation != maxRotation) {
+        d_ptr->m_maxXRotation = maxRotation;
+        emit maxXRotationChanged(maxRotation);
+
+        if (d_ptr->m_xRotation > d_ptr->m_maxXRotation)
+            setXRotation(d_ptr->m_xRotation);
+    }
+}
+
+/*!
+ * \property Q3DCamera::maxYRotation
+ *
+ * This property contains the current maximum Y-rotation for the camera.
+ * The full Y angle range is [-90,90] and the maximum value is limited to 90.
+ * Also the value can't be lower than minimum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, minYRotation
+ */
+qreal Q3DCamera::maxYRotation() const
+{
+    return d_ptr->m_maxYRotation;
+}
+
+/*!
+ * \internal
+ */
+void Q3DCamera::setMaxYRotation(qreal maxRotation)
+{
+    maxRotation = qBound(-90.0, maxRotation, 90.0);
+
+    if (maxRotation < d_ptr->m_minYRotation)
+        maxRotation = d_ptr->m_minYRotation;
+
+    if (d_ptr->m_maxYRotation != maxRotation) {
+        d_ptr->m_maxYRotation = maxRotation;
+        emit maxYRotationChanged(maxRotation);
+
+        if (d_ptr->m_yRotation > d_ptr->m_maxYRotation)
+            setYRotation(d_ptr->m_yRotation);
     }
 }
 
@@ -141,6 +315,7 @@ void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
     if (d_ptr->m_viewMatrix != viewMatrix) {
         d_ptr->m_viewMatrix = viewMatrix;
         setDirty(true);
+        emit viewMatrixChanged(d_ptr->m_viewMatrix);
     }
 }
 
@@ -159,6 +334,7 @@ bool Q3DCamera::isViewMatrixAutoUpdateEnabled()
 void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
 {
     d_ptr->m_isViewMatrixUpdateActive = isEnabled;
+    emit viewMatrixAutoUpdateChanged(isEnabled);
 }
 
 /*!
@@ -178,99 +354,123 @@ void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
 {
     switch (preset) {
     case QDataVis::CameraPresetFrontLow: {
-        d_ptr->setRotations(QPointF(0.0f, 0.0f));
+        setXRotation(0.0);
+        setYRotation(0.0);
         break;
     }
     case QDataVis::CameraPresetFront: {
-        d_ptr->setRotations(QPointF(0.0f, 22.5f));
+        setXRotation(0.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetFrontHigh: {
-        d_ptr->setRotations(QPointF(0.0f, 45.0f));
+        setXRotation(0.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetLeftLow: {
-        d_ptr->setRotations(QPointF(90.0f, 0.0f));
+        setXRotation(90.0);
+        setYRotation(0.0);
         break;
     }
     case QDataVis::CameraPresetLeft: {
-        d_ptr->setRotations(QPointF(90.0f, 22.5f));
+        setXRotation(90.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetLeftHigh: {
-        d_ptr->setRotations(QPointF(90.0f, 45.0f));
+        setXRotation(90.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetRightLow: {
-        d_ptr->setRotations(QPointF(-90.0f, 0.0f));
+        setXRotation(-90.0);
+        setYRotation(0.0);
         break;
     }
     case QDataVis::CameraPresetRight: {
-        d_ptr->setRotations(QPointF(-90.0f, 22.5f));
+        setXRotation(-90.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetRightHigh: {
-        d_ptr->setRotations(QPointF(-90.0f, 45.0f));
+        setXRotation(-90.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetBehindLow: {
-        d_ptr->setRotations(QPointF(180.0f, 0.0f));
+        setXRotation(180.0);
+        setYRotation(0.0);
         break;
     }
     case QDataVis::CameraPresetBehind: {
-        d_ptr->setRotations(QPointF(180.0f, 22.5f));
+        setXRotation(180.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetBehindHigh: {
-        d_ptr->setRotations(QPointF(180.0f, 45.0f));
+        setXRotation(180.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetIsometricLeft: {
-        d_ptr->setRotations(QPointF(45.0f, 22.5f));
+        setXRotation(45.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetIsometricLeftHigh: {
-        d_ptr->setRotations(QPointF(45.0f, 45.0f));
+        setXRotation(45.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetIsometricRight: {
-        d_ptr->setRotations(QPointF(-45.0f, 22.5f));
+        setXRotation(-45.0);
+        setYRotation(22.5);
         break;
     }
     case QDataVis::CameraPresetIsometricRightHigh: {
-        d_ptr->setRotations(QPointF(-45.0f, 45.0f));
+        setXRotation(-45.0);
+        setYRotation(45.0);
         break;
     }
     case QDataVis::CameraPresetDirectlyAbove: {
-        d_ptr->setRotations(QPointF(0.0f, 90.0f));
+        setXRotation(0.0);
+        setYRotation(90.0);
         break;
     }
     case QDataVis::CameraPresetDirectlyAboveCW45: {
-        d_ptr->setRotations(QPointF(-45.0f, 90.0f));
+        setXRotation(-45.0);
+        setYRotation(90.0);
         break;
     }
     case QDataVis::CameraPresetDirectlyAboveCCW45: {
-        d_ptr->setRotations(QPointF(45.0f, 90.0f));
+        setXRotation(45.0);
+        setYRotation(90.0);
         break;
     }
     case QDataVis::CameraPresetFrontBelow: {
-        d_ptr->setRotations(QPointF(0.0f, -45.0f));
+        setXRotation(0.0);
+        setYRotation(-45.0);
         break;
     }
     case QDataVis::CameraPresetLeftBelow: {
-        d_ptr->setRotations(QPointF(90.0f, -45.0f));
+        setXRotation(90.0);
+        setYRotation(-45.0);
         break;
     }
     case QDataVis::CameraPresetRightBelow: {
-        d_ptr->setRotations(QPointF(-90.0f, -45.0f));
+        setXRotation(-90.0);
+        setYRotation(-45.0);
         break;
     }
     case QDataVis::CameraPresetBehindBelow: {
-        d_ptr->setRotations(QPointF(180.0f, -45.0f));
+        setXRotation(180.0);
+        setYRotation(-45.0);
         break;
     }
     case QDataVis::CameraPresetDirectlyBelow: {
-        d_ptr->setRotations(QPointF(0.0f, -90.0f));
+        setXRotation(0.0);
+        setYRotation(-90.0);
         break;
     }
     default:
@@ -281,6 +481,7 @@ void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
     if (d_ptr->m_activePreset != preset) {
         d_ptr->m_activePreset = preset;
         setDirty(true);
+        emit cameraPresetChanged(preset);
     }
 }
 
@@ -300,6 +501,7 @@ void Q3DCamera::setZoomLevel(int zoomLevel)
     if (d_ptr->m_zoomLevel != zoomLevel) {
         d_ptr->m_zoomLevel = zoomLevel;
         setDirty(true);
+        emit zoomLevelChanged(zoomLevel);
     }
 }
 
@@ -336,17 +538,70 @@ QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relative
                      zPos + relativePosition.z());
 }
 
+/*!
+ * \property Q3DCamera::wrapXRotation
+ *
+ * This property determines the behavior of the minimum and maximum limits in the X-rotation.
+ * By default the X-rotation wraps from minimum value to maximum and from maximum to minimum.
+ *
+ * If set to true the X-rotation of the camera is wrapped from minimum to maximum and from maximum to minimum.
+ * If set to false the X-rotation of the camera is limited to the sector determined by minimum and maximum values.
+ */
+bool Q3DCamera::wrapXRotation() const
+{
+    return d_ptr->m_wrapXRotation;
+}
+
+void Q3DCamera::setWrapXRotation(bool isEnabled)
+{
+    d_ptr->m_wrapXRotation = isEnabled;
+}
+
+/*!
+ * \property Q3DCamera::wrapYRotation
+ *
+ * This property determines the behavior of the minimum and maximum limits in the Y-rotation.
+ * By default the Y-rotation is limited between the minimum and maximum values without any wrapping.
+ *
+ * If true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum to minimum.
+ * If false the Y-rotation of the camera is limited to the sector determined by minimum and maximum values.
+ */
+bool Q3DCamera::wrapYRotation() const
+{
+    return d_ptr->m_wrapYRotation;
+}
+
+void Q3DCamera::setWrapYRotation(bool isEnabled)
+{
+    d_ptr->m_wrapYRotation = isEnabled;
+}
+
+/*!
+ * Utility function that sets the camera rotations and distance.\a horizontal and \a vertical define the camera rotations to be used.
+ * Optional \a zoom parameter can be given to set the zoom of the camera in range of 10-500%.
+ */
+void Q3DCamera::setCameraPosition(qreal horizontal, qreal vertical, qreal zoom)
+{
+    setZoomLevel(qBound(10.0, distance, 500.0));
+    setXRotation(horizontal);
+    setYRotation(vertical);
+}
 
 Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     q_ptr(q),
     m_isViewMatrixUpdateActive(true),
-    m_xRotation(0.0f),
-    m_yRotation(0.0f),
+    m_xRotation(0.0),
+    m_yRotation(0.0),
+    m_minXRotation(-180.0),
+    m_minYRotation(0.0),
+    m_maxXRotation(180.0),
+    m_maxYRotation(90.0),
+    m_wrapXRotation(true),
+    m_wrapYRotation(false),
     m_zoomLevel(100),
     m_activePreset(QDataVis::CameraPresetNone)
 {
 }
-
 
 Q3DCameraPrivate::~Q3DCameraPrivate()
 {
@@ -363,11 +618,50 @@ void Q3DCameraPrivate::sync(Q3DCamera &other)
     }
 }
 
-void Q3DCameraPrivate::setRotations(const QPointF &rotation)
+void Q3DCameraPrivate::setXRotation(const qreal rotation)
 {
-    if (m_xRotation != rotation.x() || m_yRotation != rotation.y()) {
-        m_xRotation = rotation.x();
-        m_yRotation = rotation.y();
+    if (m_xRotation != rotation) {
+        m_xRotation = rotation;
+        q_ptr->setDirty(true);
+    }
+}
+
+void Q3DCameraPrivate::setYRotation(const qreal rotation)
+{
+    if (m_yRotation != rotation) {
+        m_yRotation = rotation;
+        q_ptr->setDirty(true);
+    }
+}
+
+void Q3DCameraPrivate::setMinXRotation(const qreal rotation)
+{
+    if (m_minXRotation != rotation) {
+        m_minXRotation = rotation;
+        q_ptr->setDirty(true);
+    }
+}
+
+void Q3DCameraPrivate::setMinYRotation(const qreal rotation)
+{
+    if (m_minYRotation != rotation) {
+        m_minYRotation = rotation;
+        q_ptr->setDirty(true);
+    }
+}
+
+void Q3DCameraPrivate::setMaxXRotation(const qreal rotation)
+{
+    if (m_maxXRotation != rotation) {
+        m_maxXRotation = rotation;
+        q_ptr->setDirty(true);
+    }
+}
+
+void Q3DCameraPrivate::setMaxYRotation(const qreal rotation)
+{
+    if (m_maxYRotation != rotation) {
+        m_maxYRotation = rotation;
         q_ptr->setDirty(true);
     }
 }
@@ -379,20 +673,8 @@ void Q3DCameraPrivate::updateViewMatrix(qreal zoomAdjustment)
     if (!m_isViewMatrixUpdateActive)
         return;
 
-    bool showUnder = q_ptr->parentScene()->isUnderSideCameraEnabled();
     int zoom = m_zoomLevel * zoomAdjustment;
     QMatrix4x4 viewMatrix;
-    GLfloat lowerLimit = 0.0f;
-    if (showUnder)
-        lowerLimit = -90.0f;
-
-    // Reset at 360 in x and limit to 0...90 in y
-    if (qAbs(m_xRotation) >= 360.0f)
-        m_xRotation = 0.0f;
-    if (m_yRotation >= 90.0f)
-        m_yRotation = 90.0f;
-    else if (m_yRotation <= lowerLimit)
-        m_yRotation = lowerLimit;
 
     // Apply to view matrix
     viewMatrix.lookAt(q_ptr->position(), m_target, m_up);

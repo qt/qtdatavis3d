@@ -20,6 +20,8 @@
 #include <QtDataVisualization/q3dcategoryaxis.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dcamera.h>
 #include <QTime>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
@@ -134,7 +136,7 @@ void GraphModifier::changePresetCamera()
 {
     static int preset = QDataVis::CameraPresetFrontLow;
 
-    m_graph->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
 
     if (++preset > QDataVis::CameraPresetDirectlyBelow)
         preset = QDataVis::CameraPresetFrontLow;
@@ -192,13 +194,13 @@ void GraphModifier::changeShadowQuality(int quality)
 void GraphModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;
-    m_graph->setCameraPosition(m_xRotation, m_yRotation);
+    m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
 
 void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
-    m_graph->setCameraPosition(m_xRotation, m_yRotation);
+    m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)

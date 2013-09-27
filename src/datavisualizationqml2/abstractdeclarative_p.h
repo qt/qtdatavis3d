@@ -31,6 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
+#include "qabstract3dinputhandler.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -44,26 +45,27 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
+    Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
+    Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
     Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
     Q_ENUMS(QtDataVisualization::QDataVis::Theme)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
     virtual ~AbstractDeclarative();
 
-    Q_INVOKABLE void setCameraPosition(qreal horizontal, qreal vertical, int distance);
+    virtual Q3DScene *scene() const;
 
-    virtual void setCameraPreset(QDataVis::CameraPreset preset);
-    virtual QDataVis::CameraPreset cameraPreset() const;
+    virtual QAbstract3DInputHandler *inputHandler() const;
+    virtual void setInputHandler(QAbstract3DInputHandler *inputHandler);
 
     virtual void setTheme(QDataVis::Theme theme);
     virtual QDataVis::Theme theme() const;
@@ -101,10 +103,12 @@ protected:
 
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
     virtual void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
-
+    virtual void handleInputHandlerUpdate(QAbstract3DInputHandler *inputHandler);
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void sceneChanged(Q3DScene *scene);
+    void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
 
 private:
     Abstract3DController *m_controller;

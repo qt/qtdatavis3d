@@ -54,7 +54,7 @@ Item {
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
-            cameraPreset: Bars3D.CameraPresetRight
+            scene.activeCamera.cameraPreset: Bars3D.CameraPresetRight
             columnAxis: graphAxes.column
             valueAxis: graphAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"

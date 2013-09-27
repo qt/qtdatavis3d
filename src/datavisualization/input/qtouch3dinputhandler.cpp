@@ -188,9 +188,8 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
     if (QDataVis::InputStateRotating == q_ptr->inputState()) {
         Q3DScene *scene = q_ptr->scene();
         Q3DCamera *camera = scene->activeCamera();
-        QPointF rotations = camera->rotations();
-        float xRotation = rotations.x();
-        float yRotation = rotations.y();
+        float xRotation = camera->xRotation();
+        float yRotation = camera->yRotation();
         QPointF inputPos = q_ptr->inputPosition();
         float mouseMoveX = float(inputPos.x() - position.x())
                 / (scene->viewport().width() / rotationSpeed);
@@ -198,7 +197,8 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
                 / (scene->viewport().height() / rotationSpeed);
         xRotation -= mouseMoveX;
         yRotation -= mouseMoveY;
-        camera->setRotations(QPointF(xRotation, yRotation));
+        camera->setXRotation(xRotation);
+        camera->setYRotation(yRotation);
         camera->d_ptr->updateViewMatrix(1.0f);
 
         q_ptr->setPreviousInputPos(inputPos.toPoint());

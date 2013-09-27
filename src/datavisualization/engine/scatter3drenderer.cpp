@@ -176,7 +176,9 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
     scene->setPrimarySubViewport(m_mainViewPort);
-    scene->setUnderSideCameraEnabled(true);
+
+    // TODO: See QTRD-2374
+    scene->activeCamera()->setMinYRotation(-90.0f);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.

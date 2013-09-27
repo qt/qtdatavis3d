@@ -41,6 +41,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
                                                   QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+    qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
+                                                  QLatin1String("Trying to create uncreatable: Scene3D."));
 
     qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
     qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
@@ -53,6 +55,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<Q3DValueAxis>(uri, 1, 0, "ValueAxis3D");
     qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
 
+    qmlRegisterType<Q3DCamera>(uri, 1, 0, "Camera3D");
+
     qmlRegisterType<QItemModelBarDataProxy>(uri, 1, 0, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelScatterDataProxy>(uri, 1, 0, "ItemModelScatterDataProxy");
     qmlRegisterType<QItemModelSurfaceDataProxy>(uri, 1, 0, "ItemModelSurfaceDataProxy");
@@ -60,7 +64,6 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 
     qmlRegisterType<ColorGradientStop>(uri, 1, 0, "ColorGradientStop");
     qmlRegisterType<ColorGradient>(uri, 1, 0, "ColorGradient");
-
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

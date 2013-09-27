@@ -31,19 +31,9 @@ AbstractDeclarative::~AbstractDeclarative()
 {
 }
 
-void AbstractDeclarative::setCameraPosition(qreal horizontal, qreal vertical, int distance)
+Q3DScene* AbstractDeclarative::scene() const
 {
-    m_controller->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
-}
-
-void AbstractDeclarative::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    m_controller->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset AbstractDeclarative::cameraPreset() const
-{
-    return m_controller->cameraPreset();
+    return m_controller->scene();
 }
 
 void AbstractDeclarative::setTheme(QDataVis::Theme theme)
@@ -133,6 +123,20 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     m_controller = controller;
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
                      &AbstractDeclarative::handleShadowQualityUpdate);
+    emit sceneChanged(m_controller->scene());
+    QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
+                     &AbstractDeclarative::handleInputHandlerUpdate);
+    emit inputHandlerChanged(m_controller->activeInputHandler());
+}
+
+QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const
+{
+    return m_controller->activeInputHandler();
+}
+
+void AbstractDeclarative::setInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    m_controller->setActiveInputHandler(inputHandler);
 }
 
 void AbstractDeclarative::mouseDoubleClickEvent(QMouseEvent *event)
@@ -175,6 +179,11 @@ void AbstractDeclarative::wheelEvent(QWheelEvent *event)
 void AbstractDeclarative::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
     emit shadowQualityChanged(quality);
+}
+
+void AbstractDeclarative::handleInputHandlerUpdate(QAbstract3DInputHandler *inputHandler)
+{
+    emit inputHandlerChanged(inputHandler);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

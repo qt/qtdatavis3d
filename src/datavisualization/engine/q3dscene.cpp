@@ -81,6 +81,7 @@ void Q3DScene::setViewport(const QRect &viewport)
         d_ptr->m_viewport.setX(0);
         d_ptr->m_viewport.setY(0);
         d_ptr->m_changeTracker.viewportChanged = true;
+        emit viewportChanged(viewport);
     }
 }
 
@@ -89,10 +90,12 @@ void Q3DScene::setViewport(const QRect &viewport)
  */
 void Q3DScene::setViewportSize(int width, int height)
 {
-    if (d_ptr->m_viewport.width() != width || d_ptr->m_viewport.height() != height) {
+    if (d_ptr->m_viewport.width() != width
+            || d_ptr->m_viewport.height() != height) {
         d_ptr->m_viewport.setWidth(width);
         d_ptr->m_viewport.setHeight(height);
         d_ptr->m_changeTracker.viewportChanged = true;
+        emit viewportChanged(d_ptr->m_viewport);
     }
 }
 
@@ -112,6 +115,7 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
     if (d_ptr->m_primarySubViewport != primarySubViewport) {
         d_ptr->m_primarySubViewport = primarySubViewport;
         d_ptr->m_changeTracker.primarySubViewportChanged = true;
+        emit primarySubViewportChanged(primarySubViewport);
     }
 }
 
@@ -169,6 +173,7 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
     if (d_ptr->m_secondarySubViewport != secondarySubViewport) {
         d_ptr->m_secondarySubViewport = secondarySubViewport;
         d_ptr->m_changeTracker.secondarySubViewportChanged = true;
+        emit secondarySubViewportChanged(secondarySubViewport);
     }
 }
 
@@ -188,6 +193,7 @@ void Q3DScene::setSlicingActive(bool isSlicing)
     if (d_ptr->m_isSlicingActive != isSlicing) {
         d_ptr->m_isSlicingActive = isSlicing;
         d_ptr->m_changeTracker.slicingActivatedChanged = true;
+        emit slicingActiveChanged(isSlicing);
     }
 }
 
@@ -213,6 +219,7 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
     if (camera != d_ptr->m_camera) {
         d_ptr->m_camera = camera;
         d_ptr->m_changeTracker.cameraChanged = true;
+        emit activeCameraChanged(camera);
     }
 }
 
@@ -238,6 +245,7 @@ void Q3DScene::setActiveLight(Q3DLight *light)
     if (light != d_ptr->m_light) {
         d_ptr->m_light = light;
         d_ptr->m_changeTracker.lightChanged = true;
+        emit activeLightChanged(light);
     }
 }
 
@@ -254,9 +262,11 @@ qreal Q3DScene::devicePixelRatio() const
 
 void Q3DScene::setDevicePixelRatio(qreal pixelRatio)
 {
-    d_ptr->m_devicePixelRatio = pixelRatio;
+    if (d_ptr->m_devicePixelRatio != pixelRatio) {
+        d_ptr->m_devicePixelRatio = pixelRatio;
+        emit devicePixelRatioChanged(pixelRatio);
+    }
 }
-
 
 /*!
  * Calculates and sets the light position relative to the currently active camera using the given parameters.
@@ -272,20 +282,6 @@ void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePositio
                                                                    fixedRotation,
                                                                    distanceModifier));
 }
-
-bool Q3DScene::isUnderSideCameraEnabled() const
-{
-    return d_ptr->m_isUnderSideCameraEnabled;
-}
-
-void Q3DScene::setUnderSideCameraEnabled(bool isEnabled)
-{
-    if (d_ptr->m_isUnderSideCameraEnabled != isEnabled) {
-        d_ptr->m_isUnderSideCameraEnabled = isEnabled;
-        d_ptr->m_changeTracker.underSideCameraEnabledChanged = true;
-    }
-}
-
 
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     q_ptr(q),
@@ -336,11 +332,6 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
     }
     m_light->d_ptr->sync(*other.m_light);
 
-    if (m_changeTracker.underSideCameraEnabledChanged) {
-        other.q_ptr->setUnderSideCameraEnabled(q_ptr->isUnderSideCameraEnabled());
-        m_changeTracker.underSideCameraEnabledChanged = false;
-        other.m_changeTracker.underSideCameraEnabledChanged = false;
-    }
     if (m_changeTracker.slicingActivatedChanged) {
         other.q_ptr->setSlicingActive(q_ptr->isSlicingActive());
         m_changeTracker.slicingActivatedChanged = false;

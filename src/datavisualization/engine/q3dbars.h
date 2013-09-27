@@ -30,6 +30,7 @@ class Q3DAbstractAxis;
 class Q3DCategoryAxis;
 class Q3DValueAxis;
 class QBarDataProxy;
+class Q3DScene;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
@@ -37,7 +38,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
@@ -46,6 +46,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(QPoint selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
+    Q_PROPERTY(Q3DScene* scene READ scene)
+
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
@@ -56,11 +58,6 @@ public:
     ~Q3DBars();
 
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
-
-    void setCameraPreset(QDataVis::CameraPreset preset);
-    QDataVis::CameraPreset cameraPreset() const;
-
-    void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
     void setTheme(QDataVis::Theme theme);
 
@@ -84,6 +81,8 @@ public:
 
     void setFont(const QFont &font);
     QFont font() const;
+
+    Q3DScene *scene() const;
 
     void setLabelStyle(QDataVis::LabelStyle style);
     QDataVis::LabelStyle labelStyle() const;

@@ -45,7 +45,7 @@ public:
     inline const QVector3D &position() const { return m_position; }
     inline void setPosition(const QVector3D &pos);
 
-    inline const bool isVisible() const { return m_visible; }
+    inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
 
     //inline void setSize(qreal size);

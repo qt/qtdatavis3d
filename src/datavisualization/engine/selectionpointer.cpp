@@ -166,10 +166,11 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     modelMatrixLabel.translate(m_position + labelAlign + QVector3D(0.0f, 0.0f, zComp));
 
     // Position the label towards the camera
-    QPointF camRotations = camera->rotations();
+    qreal camRotationsX = camera->xRotation();
+    qreal camRotationsY = camera->yRotation();
     if (!m_cachedIsSlicingActivated) {
-        modelMatrixLabel.rotate(-camRotations.x(), 0.0f, 1.0f, 0.0f);
-        modelMatrixLabel.rotate(-camRotations.y(), 1.0f, 0.0f, 0.0f);
+        modelMatrixLabel.rotate(-camRotationsX, 0.0f, 1.0f, 0.0f);
+        modelMatrixLabel.rotate(-camRotationsY, 1.0f, 0.0f, 0.0f);
     }
 
     // Scale label based on text size

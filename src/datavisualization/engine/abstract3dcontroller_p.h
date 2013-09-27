@@ -29,8 +29,6 @@
 #ifndef CONTROLLER3DBASE_H
 #define CONTROLLER3DBASE_H
 
-#include <QObject>
-
 #include "datavisualizationglobal_p.h"
 #include "theme_p.h"
 #include "q3dabstractaxis.h"
@@ -39,6 +37,8 @@
 #include "qabstractdataproxy.h"
 #include "q3dscene.h"
 #include "q3dbox.h"
+
+#include <QObject>
 
 class QFont;
 
@@ -240,15 +240,6 @@ public:
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
 
-    // Select preset camera placement
-    virtual void setCameraPreset(QDataVis::CameraPreset preset);
-    virtual QDataVis::CameraPreset cameraPreset() const;
-
-    // Set camera rotation if you don't want to use the presets (in horizontal (-180...180) and
-    // vertical (0...90) (or (-90...90) if there are negative values) angles and distance in
-    // percentage (10...500))
-    virtual void setCameraPosition(GLfloat horizontal, GLfloat vertical, GLint distance = 100);
-
     // Set color if you don't want to use themes.
     virtual void setObjectColor(const QColor &baseColor, bool uniform = true);
     virtual QColor objectColor() const;
@@ -324,6 +315,7 @@ public slots:
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void needRender();
 
 protected:

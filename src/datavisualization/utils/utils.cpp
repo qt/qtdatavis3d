@@ -239,4 +239,25 @@ QString Utils::defaultLabelFormat()
     return defaultFormat;
 }
 
+qreal Utils::wrapValue(qreal value, qreal min, qreal max)
+{
+    if (value > max) {
+        value = min + (value - max);
+
+        // In case single wrap fails, jump to opposite end.
+        if (value > max)
+            value = min;
+    }
+
+    if (value < min) {
+        value = max + (value - min);
+
+        // In case single wrap fails, jump to opposite end.
+        if (value < min)
+            value = max;
+    }
+
+    return value;
+}
+
 QT_DATAVISUALIZATION_END_NAMESPACE

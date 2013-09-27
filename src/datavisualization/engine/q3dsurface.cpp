@@ -20,6 +20,7 @@
 #include "q3dsurface_p.h"
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
+#include "q3dcamera.h"
 
 #include <QMouseEvent>
 
@@ -239,31 +240,6 @@ QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
 }
 
 /*!
- * \property Q3DSurface::cameraPreset
- *
- * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
- */
-void Q3DSurface::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    d_ptr->m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset Q3DSurface::cameraPreset() const
-{
-    return d_ptr->m_shared->cameraPreset();
-}
-
-/*!
- * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
- * to -180...180 in horizontal direction and 0...90 in vertical. \a distance is adjustable
- * between 10 and 500, being \c 100 by default.
- */
-void Q3DSurface::setCameraPosition(qreal horizontal, qreal vertical, int distance)
-{
-    d_ptr->m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
-}
-
-/*!
  * \property Q3DSurface::smoothSurfaceEnabled
  *
  * Sets surface smoothing to \a enabled. It is preset to \c false by default.
@@ -342,6 +318,16 @@ void Q3DSurface::setFont(const QFont &font)
 QFont Q3DSurface::font() const
 {
     return d_ptr->m_shared->font();
+}
+
+/*!
+ * \property Q3DSurface::scene
+ *
+ * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ */
+Q3DScene *Q3DSurface::scene() const
+{
+    return d_ptr->m_shared->scene();
 }
 
 /*!

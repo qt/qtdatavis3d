@@ -22,6 +22,7 @@
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
 #include "qbardataproxy.h"
+#include "q3dcamera.h"
 
 #include <QMouseEvent>
 
@@ -253,32 +254,6 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * \property Q3DBars::cameraPreset
- *
- * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
- */
-void Q3DBars::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    d_ptr->m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset Q3DBars::cameraPreset() const
-{
-    return d_ptr->m_shared->cameraPreset();
-}
-
-/*!
- * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
- * to -180...180 in horizontal direction and either -90...90 or 0...90 in vertical, depending
- * on data values. Negative vertical angles are allowed only if there are negative bar values.
- * \a distance is adjustable between 10 and 500, being \c 100 by default.
- */
-void Q3DBars::setCameraPosition(qreal horizontal, qreal vertical, int distance)
-{
-    d_ptr->m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
-}
-
-/*!
  * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
  * default. Theme affects bar colors, label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
@@ -364,6 +339,16 @@ void Q3DBars::setFont(const QFont &font)
 QFont Q3DBars::font() const
 {
     return d_ptr->m_shared->font();
+}
+
+/*!
+ * \property Q3DBars::scene
+ *
+ * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ */
+Q3DScene *Q3DBars::scene() const
+{
+    return d_ptr->m_shared->scene();
 }
 
 /*!

@@ -21,9 +21,9 @@
 #include "scatter3dcontroller_p.h"
 #include "q3dvalueaxis.h"
 #include "qscatterdataproxy.h"
+#include "q3dcamera.h"
 
 #include <QMouseEvent>
-
 #include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -189,31 +189,6 @@ void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * \property Q3DScatter::cameraPreset
- *
- * The \a preset position of the camera. The position can be one of \c QDataVis::CameraPreset.
- */
-void Q3DScatter::setCameraPreset(QDataVis::CameraPreset preset)
-{
-    d_ptr->m_shared->setCameraPreset(preset);
-}
-
-QDataVis::CameraPreset Q3DScatter::cameraPreset() const
-{
-    return d_ptr->m_shared->cameraPreset();
-}
-
-/*!
- * Move camera to a wanted position based on \a horizontal and \a vertical angles. Angles are limited
- * to -180...180 in horizontal direction and -90...90 in vertical. \a distance is adjustable
- * between 10 and 500, being \c 100 by default.
- */
-void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distance)
-{
-    d_ptr->m_shared->setCameraPosition(GLfloat(horizontal), GLfloat(vertical), GLint(distance));
-}
-
-/*!
  * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
  * default. Theme affects bar colors, label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
@@ -299,6 +274,16 @@ void Q3DScatter::setFont(const QFont &font)
 QFont Q3DScatter::font() const
 {
     return d_ptr->m_shared->font();
+}
+
+/*!
+ * \property Q3DScatter::scene
+ *
+ * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ */
+Q3DScene *Q3DScatter::scene() const
+{
+    return d_ptr->m_shared->scene();
 }
 
 /*!

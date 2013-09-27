@@ -68,6 +68,8 @@ public:
     static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
     static QString defaultLabelFormat();
 
+    static qreal wrapValue(qreal value, qreal min, qreal max);
+
 private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);
 };

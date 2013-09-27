@@ -10,6 +10,7 @@ TEMPLATE = subdirs
 SUBDIRS += barstest \
            scattertest \
            kinectsurface \
-           surfacetest
+           surfacetest \
+           qmlcamera
 
 qtHaveModule(multimedia):!android: SUBDIRS += spectrum

@@ -32,6 +32,9 @@
 #include "qheightmapsurfacedataproxy.h"
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
+#include "q3dobject.h"
+#include "q3dcamera.h"
+#include "q3dscene.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -52,6 +55,9 @@ QML_DECLARE_TYPE(QDataVis)
 QML_DECLARE_TYPE(Q3DAbstractAxis)
 QML_DECLARE_TYPE(Q3DCategoryAxis)
 QML_DECLARE_TYPE(Q3DValueAxis)
+
+QML_DECLARE_TYPE(Q3DScene)
+QML_DECLARE_TYPE(Q3DCamera)
 
 QML_DECLARE_TYPE(QAbstractDataProxy)
 QML_DECLARE_TYPE(QBarDataProxy)

@@ -44,7 +44,6 @@ struct Q3DSceneChangeBitField {
     bool secondarySubViewportChanged   : 1;
     bool cameraChanged                 : 1;
     bool lightChanged                  : 1;
-    bool underSideCameraEnabledChanged : 1;
     bool slicingActivatedChanged       : 1;
     bool devicePixelRatioChanged       : 1;
 
@@ -54,7 +53,6 @@ struct Q3DSceneChangeBitField {
           secondarySubViewportChanged(true),
           cameraChanged(true),
           lightChanged(true),
-          underSideCameraEnabledChanged(true),
           slicingActivatedChanged(true),
           devicePixelRatioChanged(true)
     {

@@ -21,6 +21,8 @@
 
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dcamera.h>
 
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
@@ -42,7 +44,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->setBackgroundVisible(false);
     m_graph->valueAxis()->setRange(0.0, 1.0);
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->setCameraPosition(-20.0, 10.0, 10);
+    m_graph->scene()->activeCamera()->setCameraPosition(-20.0, 10.0, 10);
     m_graph->setTheme(QDataVis::ThemeIsabelle);
 
     QAudioFormat formatAudio;

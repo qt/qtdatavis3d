@@ -209,7 +209,13 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
     scene->setSecondarySubViewport(m_sliceViewPort);
     scene->setPrimarySubViewport(m_mainViewPort);
-    scene->setUnderSideCameraEnabled(m_hasNegativeValues);
+
+    // TODO: See QTRD-2374
+    if (m_hasNegativeValues)
+        scene->activeCamera()->setMinYRotation(-90.0);
+    else
+        scene->activeCamera()->setMinYRotation(0.0);
+
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
         scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
@@ -256,7 +262,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     GLfloat negativesComp = 1.0f;
 
     // Compensate bar scaling a bit to avoid drawing on axis titles when we have negative values
-    if (m_cachedScene->isUnderSideCameraEnabled())
+    if (m_hasNegativeValues)
         negativesComp = 0.67f;
 
     // Specify viewport

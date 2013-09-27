@@ -20,19 +20,19 @@
 #define Q3DOBJECT_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/q3dscene.h>
+
 #include <QObject>
 #include <QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
-
-class Q3DScene;
 class Q3DObjectPrivate;
 
 class Q3DObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Q3DScene* parentScene READ parentScene)
-    Q_PROPERTY(QVector3D position READ position WRITE setPosition)
+    Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
 
 public:
     Q3DObject(QObject *parent = 0);
@@ -40,10 +40,13 @@ public:
 
     void copyValuesFrom(const Q3DObject &source);
 
-    virtual Q3DScene *parentScene();
+    Q3DScene *parentScene();
 
-    virtual QVector3D position() const;
-    virtual void setPosition(const QVector3D &position);
+    QVector3D position() const;
+    void setPosition(const QVector3D &position);
+
+signals:
+    void positionChanged(QVector3D position);
 
 protected:
     void setDirty(bool dirty);

@@ -86,6 +86,7 @@ void Q3DObject::setPosition(const QVector3D &position)
     if (d_ptr->m_position != position) {
         d_ptr->m_position = position;
         setDirty(true);
+        emit positionChanged(d_ptr->m_position);
     }
 }
 

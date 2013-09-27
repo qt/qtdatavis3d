@@ -44,7 +44,12 @@ public:
 
     void sync(Q3DCamera &other);
 
-    void setRotations(const QPointF &rotation);
+    void setXRotation(qreal rotation);
+    void setYRotation(qreal rotation);
+    void setMinXRotation(qreal rotation);
+    void setMinYRotation(qreal rotation);
+    void setMaxXRotation(qreal rotation);
+    void setMaxYRotation(qreal rotation);
 
     void updateViewMatrix(qreal zoomAdjustment);
 
@@ -59,6 +64,12 @@ public:
 
     GLfloat m_xRotation;
     GLfloat m_yRotation;
+    GLfloat m_minXRotation;
+    GLfloat m_minYRotation;
+    GLfloat m_maxXRotation;
+    GLfloat m_maxYRotation;
+    bool m_wrapXRotation;
+    bool m_wrapYRotation;
     int m_zoomLevel;
     QDataVis::CameraPreset m_activePreset;
 

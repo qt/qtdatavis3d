@@ -23,6 +23,8 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dcategoryaxis.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dcamera.h>
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -92,7 +94,7 @@ MainApp::MainApp(Q3DBars *window)
     // Set bar type, flat bars
     m_chart->setBarType(QDataVis::MeshStyleBars, false);
     // Adjust camera position
-    m_chart->setCameraPosition(10.0f, 7.5f, 75);
+    m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75);
 #endif
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::red), false);
