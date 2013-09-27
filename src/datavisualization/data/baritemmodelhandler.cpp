@@ -23,7 +23,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
-      m_proxy(proxy)
+      m_proxy(proxy),
+      m_proxyArray(0),
+      m_columnCount(0)
 {
 }
 
@@ -49,7 +51,6 @@ void BarItemModelHandler::resolveModel()
     QStringList rowLabels;
     QStringList columnLabels;
 
-    QBarDataArray *newProxyArray = new QBarDataArray;
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
@@ -58,17 +59,25 @@ void BarItemModelHandler::resolveModel()
     int columnCount = m_itemModel->columnCount();
 
     if (mapping->useModelCategories()) {
+        // If dimensions have changed, recreate the array
+        if (m_proxyArray != m_proxy->array() || columnCount != m_columnCount
+                || rowCount != m_proxyArray->size()) {
+            m_proxyArray = new QBarDataArray;
+            m_proxyArray->reserve(rowCount);
+            for (int i = 0; i < rowCount; i++)
+                m_proxyArray->append(new QBarDataRow(columnCount));
+        }
         for (int i = 0; i < rowCount; i++) {
-            QBarDataRow *newProxyRow = new QBarDataRow(columnCount);
+            QBarDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++)
-                (*newProxyRow)[j].setValue(m_itemModel->index(i, j).data(valueRole).toReal());
-            newProxyArray->append(newProxyRow);
+                newProxyRow[j].setValue(m_itemModel->index(i, j).data(valueRole).toReal());
         }
         // Generate labels from headers if using model rows/columns
         for (int i = 0; i < rowCount; i++)
             rowLabels << m_itemModel->headerData(i, Qt::Vertical).toString();
         for (int i = 0; i < columnCount; i++)
             columnLabels << m_itemModel->headerData(i, Qt::Horizontal).toString();
+        m_columnCount = columnCount;
     } else {
         int rowRole = roleHash.key(mapping->rowRole().toLatin1());
         int columnRole = roleHash.key(mapping->columnRole().toLatin1());
@@ -112,19 +121,28 @@ void BarItemModelHandler::resolveModel()
         else
             columnList = mapping->columnCategories();
 
+        // If dimensions have changed, recreate the array
+        if (m_proxyArray != m_proxy->array() || columnList.size() != m_columnCount
+                || rowList.size() != m_proxyArray->size()) {
+            m_proxyArray = new QBarDataArray;
+            m_proxyArray->reserve(rowList.size());
+            for (int i = 0; i < rowList.size(); i++)
+                m_proxyArray->append(new QBarDataRow(columnList.size()));
+        }
         // Create new data array from itemValueMap
-        foreach (QString rowKey, rowList) {
-            QBarDataRow *newProxyRow = new QBarDataRow(columnList.size());
-            for (int i = 0; i < columnList.size(); i++)
-                (*newProxyRow)[i].setValue(itemValueMap[rowKey][columnList.at(i)]);
-            newProxyArray->append(newProxyRow);
+        for (int i = 0; i < rowList.size(); i++) {
+            QString rowKey = rowList.at(i);
+            QBarDataRow &newProxyRow = *m_proxyArray->at(i);
+            for (int j = 0; j < columnList.size(); j++)
+                newProxyRow[j].setValue(itemValueMap[rowKey][columnList.at(j)]);
         }
 
         rowLabels = rowList;
         columnLabels = columnList;
+        m_columnCount = columnList.size();
     }
 
-    m_proxy->resetArray(newProxyArray, rowLabels, columnLabels);
+    m_proxy->resetArray(m_proxyArray, rowLabels, columnLabels);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

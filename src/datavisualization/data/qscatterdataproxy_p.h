@@ -42,7 +42,7 @@ public:
     QScatterDataProxyPrivate(QScatterDataProxy *q);
     virtual ~QScatterDataProxyPrivate();
 
-    bool resetArray(QScatterDataArray *newArray);
+    void resetArray(QScatterDataArray *newArray);
     void setItem(int index, const QScatterDataItem &item);
     void setItems(int index, const QScatterDataArray &items);
     int addItem(const QScatterDataItem &item);

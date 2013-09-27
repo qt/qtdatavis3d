@@ -45,6 +45,8 @@ protected:
     void virtual resolveModel();
 
     QItemModelBarDataProxy *m_proxy; // Not owned
+    QBarDataArray *m_proxyArray; // Not owned
+    int m_columnCount;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

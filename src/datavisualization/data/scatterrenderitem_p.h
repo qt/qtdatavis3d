@@ -45,11 +45,15 @@ public:
     inline const QVector3D &position() const { return m_position; }
     inline void setPosition(const QVector3D &pos);
 
+    inline const bool isVisible() const { return m_visible; }
+    inline void setVisible(bool visible) { m_visible = visible; }
+
     //inline void setSize(qreal size);
     //inline qreal size() const { return m_size; }
 
 protected:
     QVector3D m_position;
+    bool m_visible;
     //qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
     friend class QScatterDataItem;

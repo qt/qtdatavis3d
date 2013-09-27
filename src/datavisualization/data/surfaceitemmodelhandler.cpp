@@ -38,12 +38,14 @@ void SurfaceItemModelHandler::resolveModel()
     QItemModelSurfaceDataMapping *mapping = static_cast<QItemModelSurfaceDataMapping *>(m_activeMapping);
     if (m_itemModel.isNull() || !mapping) {
         m_proxy->resetArray(0);
+        m_proxyArray = 0;
         return;
     }
 
     if (!mapping->useModelCategories()
             && (mapping->rowRole().isEmpty() || mapping->columnRole().isEmpty())) {
         m_proxy->resetArray(0);
+        m_proxyArray = 0;
         return;
     }
 
@@ -61,14 +63,12 @@ void SurfaceItemModelHandler::resolveModel()
 
     if (mapping->useModelCategories()) {
         // If dimensions have changed, recreate the array
-        if (!m_proxyArray || columnCount != m_proxy->columnCount()
+        if (m_proxyArray != m_proxy->array() || columnCount != m_proxy->columnCount()
                 || rowCount != m_proxyArray->size()) {
             m_proxyArray = new QSurfaceDataArray;
             m_proxyArray->reserve(rowCount);
-            for (int i = 0; i < rowCount; i++) {
-                QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnCount);
-                m_proxyArray->append(newProxyRow);
-            }
+            for (int i = 0; i < rowCount; i++)
+                m_proxyArray->append(new QSurfaceDataRow(columnCount));
         }
         for (int i = 0; i < rowCount; i++) {
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
@@ -128,14 +128,12 @@ void SurfaceItemModelHandler::resolveModel()
             columnList = mapping->columnCategories();
 
         // If dimensions have changed, recreate the array
-        if (!m_proxyArray || columnList.size() != m_proxy->columnCount()
+        if (m_proxyArray != m_proxy->array() || columnList.size() != m_proxy->columnCount()
                 || rowList.size() != m_proxyArray->size()) {
             m_proxyArray = new QSurfaceDataArray;
             m_proxyArray->reserve(rowList.size());
-            for (int i = 0; i < rowList.size(); i++) {
-                QSurfaceDataRow *newProxyRow = new QSurfaceDataRow(columnList.size());
-                m_proxyArray->append(newProxyRow);
-            }
+            for (int i = 0; i < rowList.size(); i++)
+                m_proxyArray->append(new QSurfaceDataRow(columnList.size()));
         }
         // Create data array from itemValueMap
         for (int i = 0; i < rowList.size(); i++) {

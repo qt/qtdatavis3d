@@ -237,6 +237,8 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  * \fn void QSurfaceDataProxy::arrayReset()
  *
  * Emitted when data array is reset.
+ * If you change the whole array contents without calling resetArray(), you need to
+ * emit this signal yourself or the graph won't get updated.
  */
 
 /*!

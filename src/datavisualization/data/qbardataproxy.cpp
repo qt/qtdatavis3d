@@ -34,8 +34,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * QBarDataProxy takes ownership of all QBarDataRows passed to it, whether directly or
  * in a QBarDataArray container.
- * QBarDataRow pointers should not be used to modify data further after they have been passed to
- * the proxy, as such modifications will not trigger proper signals.
+ * If you use QBarDataRow pointers to directly modify data after adding the array to the proxy,
+ * you must also emit proper signal to make the graph update.
  *
  * QBarDataProxy optionally keeps track of row and column labels, which Q3DCategoryAxis can utilize
  * to show axis labels. The row and column labels are stored in separate array from the data and
@@ -129,34 +129,35 @@ void QBarDataProxy::resetArray()
 }
 
 /*!
- * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
- * to further modify data after QBarDataProxy assumes ownership of it, as such modifications will
- * not trigger proper signals.
- * Passing null array clears all data.
+ * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
+ * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * signal.
+ * Passing null array deletes the old array and creates a new empty array.
  * Row and column labels are not affected.
  */
 void QBarDataProxy::resetArray(QBarDataArray *newArray)
 {
-    if (dptr()->resetArray(newArray, 0, 0))
-        emit arrayReset();
+    dptr()->resetArray(newArray, 0, 0);
+    emit arrayReset();
 }
 
 /*!
- * Clears the existing array and takes ownership of the \a newArray. Do not use \a newArray pointer
- * to further modify data after QBarDataProxy assumes ownership of it, as such modifications will
- * not trigger proper signals.
- * Passing null array clears all data.
+ * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
+ * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * signal.
+ * Passing null array deletes the old array and creates a new empty array.
  * The \a rowLabels and \a columnLabels lists specify the new labels for rows and columns.
  */
 void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLabels,
                                const QStringList &columnLabels)
 {
-    if (dptr()->resetArray(newArray, &rowLabels, &columnLabels))
-        emit arrayReset();
+    dptr()->resetArray(newArray, &rowLabels, &columnLabels);
+    emit arrayReset();
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with \a row.
+ * Changes existing rows by replacing a row at \a rowIndex with \a row. The \a row can be
+ * the same as the existing row already stored at the \a rowIndex.
  * Existing row labels are not affected.
  */
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
@@ -166,7 +167,8 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with \a row.
+ * Changes existing rows by replacing a row at \a rowIndex with \a row. The \a row can be
+ * the same as the existing row already stored at the \a rowIndex.
  * Changes the row label to the \a label.
  */
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row, const QString &label)
@@ -177,7 +179,8 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row, const QString &label)
 
 /*!
  * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
- * Existing row labels are not affected.
+ * Existing row labels are not affected. The rows in the \a rows array can be
+ * the same as the existing rows already stored at the \a rowIndex.
  */
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 {
@@ -187,7 +190,8 @@ void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 
 /*!
  * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
- * The row labels are changed to \a labels.
+ * The row labels are changed to \a labels. The rows in the \a rows array can be
+ * the same as the existing rows already stored at the \a rowIndex.
  */
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows, const QStringList &labels)
 {
@@ -415,18 +419,24 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
  * \fn void QBarDataProxy::arrayReset()
  *
  * Emitted when data array is reset.
+ * If you change the whole array contents without calling resetArray(), you need to
+ * emit this signal yourself or the graph won't get updated.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsAdded(int startIndex, int count)
  *
  * Emitted when rows have been added. Provides \a startIndex and \a count of rows added.
+ * If you add rows directly to the array without calling addRow() or addRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsChanged(int startIndex, int count)
  *
  * Emitted when rows have changed. Provides \a startIndex and \a count of changed rows.
+ * If you change rows directly in the array without calling setRow() or setRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
  */
 
 /*!
@@ -434,18 +444,24 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
  *
  * Emitted when rows have been removed. Provides \a startIndex and \a count of rows removed.
  * Index is the current array size if rows were removed from the end of the array.
+ * If you remove rows directly from the array without calling removeRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsInserted(int startIndex, int count)
  *
  * Emitted when rows have been inserted. Provides \a startIndex and \a count of inserted rows.
+ * If you insert rows directly into the array without calling insertRow() or insertRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
  */
 
 /*!
  * \fn void QBarDataProxy::itemChanged(int rowIndex, int columnIndex)
  *
  * Emitted when an item has changed. Provides \a rowIndex and \a columnIndex of changed item.
+ * If you change an item directly in the array without calling setItem(), you
+ * need to emit this signal yourself or the graph won't get updated.
  */
 
 // QBarDataProxyPrivate
@@ -462,7 +478,7 @@ QBarDataProxyPrivate::~QBarDataProxyPrivate()
     clearArray();
 }
 
-bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray, const QStringList *rowLabels,
+void QBarDataProxyPrivate::resetArray(QBarDataArray *newArray, const QStringList *rowLabels,
                                       const QStringList *columnLabels)
 {
     if (rowLabels)
@@ -470,17 +486,13 @@ bool QBarDataProxyPrivate::resetArray(QBarDataArray *newArray, const QStringList
     if (columnLabels)
         qptr()->setColumnLabels(*columnLabels);
 
-    if (!m_dataArray->size() && (!newArray || !newArray->size()))
-        return false;
+    if (!newArray)
+        newArray = new QBarDataArray;
 
-    clearArray();
-
-    if (newArray)
+    if (newArray != m_dataArray) {
+        clearArray();
         m_dataArray = newArray;
-    else
-        m_dataArray = new QBarDataArray;
-
-    return true;
+    }
 }
 
 void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row, const QString *label)
@@ -489,8 +501,10 @@ void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row, const QString 
 
     if (label)
         fixRowLabels(rowIndex, 1, QStringList(*label), false);
-    clearRow(rowIndex);
-    (*m_dataArray)[rowIndex] = row;
+    if (row != m_dataArray->at(rowIndex)) {
+        clearRow(rowIndex);
+        (*m_dataArray)[rowIndex] = row;
+    }
 }
 
 void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels)
@@ -500,8 +514,10 @@ void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows, cons
     if (labels)
         fixRowLabels(rowIndex, rows.size(), *labels, false);
     for (int i = 0; i < rows.size(); i++) {
-        clearRow(rowIndex);
-        dataArray[rowIndex] = rows.at(i);
+        if (rows.at(i) != dataArray.at(rowIndex)) {
+            clearRow(rowIndex);
+            dataArray[rowIndex] = rows.at(i);
+        }
         rowIndex++;
     }
 }

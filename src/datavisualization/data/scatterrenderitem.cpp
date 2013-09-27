@@ -23,12 +23,14 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 ScatterRenderItem::ScatterRenderItem()
-    : AbstractRenderItem()
+    : AbstractRenderItem(),
+      m_visible(false)
 {
 }
 
 ScatterRenderItem::ScatterRenderItem(const ScatterRenderItem &other)
-    : AbstractRenderItem(other)
+    : AbstractRenderItem(other),
+      m_visible(false)
 {
     m_position = other.m_position;
 }

@@ -42,7 +42,7 @@ public:
     QBarDataProxyPrivate(QBarDataProxy *q);
     virtual ~QBarDataProxyPrivate();
 
-    bool resetArray(QBarDataArray *newArray, const QStringList *rowLabels,
+    void resetArray(QBarDataArray *newArray, const QStringList *rowLabels,
                     const QStringList *columnLabels);
     void setRow(int rowIndex, QBarDataRow *row, const QString *label);
     void setRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels);

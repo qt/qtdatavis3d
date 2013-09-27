@@ -140,23 +140,24 @@ void Scatter3DRenderer::initializeOpenGL()
 
 void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
 {
-    int actualDataSize = 0;
     const QScatterDataArray &dataArray = *dataProxy->array();
     calculateSceneScalingFactors();
     int dataSize = dataArray.size();
-    m_renderItemArray.resize(dataSize);
+    if (dataSize != m_renderItemArray.size())
+        m_renderItemArray.resize(dataSize);
     for (int i = 0; i < dataSize ; i++) {
         QVector3D dotPos = dataArray.at(i).position();
         if ((dotPos.x() >= m_axisCacheX.min() && dotPos.x() <= m_axisCacheX.max())
                 && (dotPos.y() >= m_axisCacheY.min() && dotPos.y() <= m_axisCacheY.max())
                 && (dotPos.z() >= m_axisCacheZ.min() && dotPos.z() <= m_axisCacheZ.max())) {
-            m_renderItemArray[actualDataSize].setPosition(dotPos);
-            calculateTranslation(m_renderItemArray[actualDataSize]);
-            actualDataSize++;
+            m_renderItemArray[i].setPosition(dotPos);
+            m_renderItemArray[i].setVisible(true);
+            calculateTranslation(m_renderItemArray[i]);
+        } else {
+            m_renderItemArray[i].setVisible(false);
         }
     }
-    m_renderItemArray.resize(actualDataSize);
-    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)actualDataSize)), 0.1);
+    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)dataSize)), 0.1);
     m_selectedItem = 0;
 
     Abstract3DRenderer::updateDataModel(dataProxy);
@@ -295,6 +296,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Draw dots to depth buffer
         for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
             const ScatterRenderItem &item = m_renderItemArray.at(dot);
+            if (!item.isVisible())
+                continue;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -382,6 +385,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         for (int dot = 0; dot < arraySize; dot++) {
             const ScatterRenderItem &item = m_renderItemArray.at(dot);
+            if (!item.isVisible())
+                continue;
 
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -479,6 +484,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
         ScatterRenderItem &item = m_renderItemArray[dot];
+        if (!item.isVisible())
+            continue;
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
