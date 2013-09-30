@@ -109,7 +109,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_yFlipped(false),
       m_sampleSpace(QRect(0, 0, 0, 0)),
       m_shadowQualityMultiplier(3),
-      m_hasHeightAdjustmentChanged(true)
+      m_hasHeightAdjustmentChanged(true),
+      m_cachedSelectionId(0),
+      m_selectionModeChanged(false)
 {
 #if !defined(QT_OPENGL_ES_2)
     // Check if flat feature is supported
@@ -871,6 +873,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 #endif
 
+    bool selectionDirty = false;
+
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
@@ -912,6 +916,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Put the RGBA value back to uint
         selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+
+        selectionDirty = true;
     }
 
     // Draw the surface
@@ -1576,26 +1582,37 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     m_labelShader->release();
 
     // Selection handling
-    if (m_controller->inputState() == QDataVis::InputOnScene) {
+    if (m_selectionModeChanged || selectionDirty) {
+        if (selectionDirty)
+            m_cachedSelectionId = selectionId;
+        if (m_cachedSelectionMode == QDataVis::ModeNone) {
+            m_cachedSelectionId = 0;
+            m_selectionActive = false;
+        }
         if (m_cachedSelectionMode == QDataVis::ModeItem) {
-            if (selectionId)
-                surfacePointSelected(selectionId);
+            if (m_cachedSelectionId)
+                surfacePointSelected(m_cachedSelectionId);
             else
                 m_selectionActive = false;
         }
         if (m_cachedSelectionMode == QDataVis::ModeSliceRow || m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
-            if (selectionId) {
-                updateSliceDataModel(selectionId);
+            if (m_cachedSelectionId) {
+                updateSliceDataModel(m_cachedSelectionId);
                 m_cachedScene->setSlicingActive(true);
 
-                surfacePointSelected(selectionId);
+                surfacePointSelected(m_cachedSelectionId);
+
+                emit needRender();
             }
         }
+
+        m_selectionModeChanged = false;
     }
     if (m_controller->inputState() == QDataVis::InputOnOverview) {
         if (m_cachedIsSlicingActivated) {
             m_cachedScene->setSlicingActive(false);
             m_selectionActive = false;
+            m_cachedSelectionId = 0;
         }
     }
 }
@@ -1761,6 +1778,14 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     }
 
     return m_cachedSmoothSurface;
+}
+
+void Surface3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
+{
+    if (mode != m_cachedSelectionMode)
+        m_selectionModeChanged = true;
+
+    Abstract3DRenderer::updateSelectionMode(mode);
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)

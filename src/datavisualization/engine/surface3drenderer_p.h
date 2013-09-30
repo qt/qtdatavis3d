@@ -124,6 +124,8 @@ private:
     QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
+    uint m_cachedSelectionId;
+    bool m_selectionModeChanged;
 
     bool m_hasHeightAdjustmentChanged;
 
@@ -145,6 +147,7 @@ public slots:
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);
+    void updateSelectionMode(QDataVis::SelectionMode mode);
 
 private:
     void updateSliceDataModel(int selectionId);
