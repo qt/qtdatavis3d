@@ -91,7 +91,21 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 }
 
 SurfaceData::~SurfaceData()
-{
+{   // HACK: The current context needs to be destroyed last
+    // TODO: Fix properly in datavis code somehow
+    if (m_mode == Surface) {
+        delete m_scatter;
+        delete m_bars;
+        delete m_surface;
+    } else if (m_mode == Bars) {
+        delete m_scatter;
+        delete m_surface;
+        delete m_bars;
+    } else {
+        delete m_bars;
+        delete m_surface;
+        delete m_scatter;
+    }
 }
 
 void SurfaceData::updateData()

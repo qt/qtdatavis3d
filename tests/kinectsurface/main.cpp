@@ -145,23 +145,23 @@ int main(int argc, char **argv)
 
     widget->show();
 
-    SurfaceData *datagen = new SurfaceData(surface, scatter, bars, status);
+    SurfaceData datagen(surface, scatter, bars, status);
     ContainerChanger changer(containerSurface, containerScatter, containerBars,
                              gradientOneButton, gradientTwoButton);
 
-    QObject::connect(startButton, &QPushButton::clicked, datagen, &SurfaceData::start);
-    QObject::connect(stopButton, &QPushButton::clicked, datagen, &SurfaceData::stop);
-    QObject::connect(distanceSlider, &QSlider::valueChanged, datagen, &SurfaceData::setDistance);
-    QObject::connect(resolutionBox, SIGNAL(activated(int)), datagen, SLOT(setResolution(int)));
+    QObject::connect(startButton, &QPushButton::clicked, &datagen, &SurfaceData::start);
+    QObject::connect(stopButton, &QPushButton::clicked, &datagen, &SurfaceData::stop);
+    QObject::connect(distanceSlider, &QSlider::valueChanged, &datagen, &SurfaceData::setDistance);
+    QObject::connect(resolutionBox, SIGNAL(activated(int)), &datagen, SLOT(setResolution(int)));
     QObject::connect(modeBox, SIGNAL(activated(int)), &changer, SLOT(changeContainer(int)));
-    QObject::connect(modeBox, SIGNAL(activated(int)), datagen, SLOT(changeMode(int)));
-    QObject::connect(status, &QTextEdit::textChanged, datagen, &SurfaceData::scrollDown);
-    QObject::connect(gradientOneButton, &QPushButton::clicked, datagen,
+    QObject::connect(modeBox, SIGNAL(activated(int)), &datagen, SLOT(changeMode(int)));
+    QObject::connect(status, &QTextEdit::textChanged, &datagen, &SurfaceData::scrollDown);
+    QObject::connect(gradientOneButton, &QPushButton::clicked, &datagen,
                      &SurfaceData::useGradientOne);
-    QObject::connect(gradientTwoButton, &QPushButton::clicked, datagen,
+    QObject::connect(gradientTwoButton, &QPushButton::clicked, &datagen,
                      &SurfaceData::useGradientTwo);
 
-    datagen->setDistance(distanceSlider->value());
+    datagen.setDistance(distanceSlider->value());
 
     return app.exec();
 }
