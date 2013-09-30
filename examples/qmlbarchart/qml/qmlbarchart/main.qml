@@ -80,25 +80,6 @@ Item {
         }
     }
 
-    TableView {
-        id: tableView
-        x: 0
-        y: 0
-        width: 298
-        height: parent.height - mappingToggle.height - shadowToggle.height - dataToggle.height
-        TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
-        TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
-        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
-        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
-        model: chartData.model
-
-        onCurrentRowChanged: {
-            var rowIndex = chartData.proxy.activeMapping.rowCategoryIndex(chartData.model.get(currentRow).year)
-            var colIndex = chartData.proxy.activeMapping.columnCategoryIndex(chartData.model.get(currentRow).month)
-            testChart.selectedBarPos = Qt.point(rowIndex, colIndex)
-        }
-    }
-
     Button {
         id: mappingToggle
         anchors.bottom: parent.bottom
@@ -149,6 +130,25 @@ Item {
                 chartData.mapping.autoRowCategories = false
                 chartData.mapping.rowCategories = ["2010", "2011", "2012"]
             }
+        }
+    }
+
+    TableView {
+        id: tableView
+        x: 0
+        y: 0
+        width: 298
+        height: parent.height - mappingToggle.height - shadowToggle.height - dataToggle.height
+        TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
+        TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
+        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
+        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
+        model: chartData.model
+
+        onCurrentRowChanged: {
+            var rowIndex = chartData.proxy.activeMapping.rowCategoryIndex(chartData.model.get(currentRow).year)
+            var colIndex = chartData.proxy.activeMapping.columnCategoryIndex(chartData.model.get(currentRow).month)
+            testChart.selectedBarPos = Qt.point(rowIndex, colIndex)
         }
     }
 }

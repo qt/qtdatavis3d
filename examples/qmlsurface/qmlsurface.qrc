@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="main.qml">qml/qmlsurface/main.qml</file>
-        <file alias="Button.qml">qml/qmlsurface/button.qml</file>
         <file alias="Data.qml">qml/qmlsurface/data.qml</file>
     </qresource>
     <qresource prefix="/heightmaps">

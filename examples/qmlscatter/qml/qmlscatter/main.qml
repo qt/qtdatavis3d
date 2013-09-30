@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.1
+import QtQuick.Controls 1.0
 import com.digia.QtDataVisualization 1.0
 import "."
 
@@ -31,7 +32,7 @@ Item {
     Item {
         id: dataView
         width: parent.width
-        height: parent.height - shadowToggle.height - 3
+        height: parent.height - shadowToggle.height
         anchors.bottom: parent.bottom
 
         Scatter3D {
@@ -75,7 +76,6 @@ Item {
     Button {
         id: smoothToggle
         width: parent.width / 6
-        defaultColor: "gainsboro"
         text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
         onClicked: {
@@ -106,7 +106,6 @@ Item {
     Button {
         id: themeToggle
         width: parent.width / 6
-        defaultColor: "gainsboro"
         text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
@@ -136,16 +135,8 @@ Item {
     Button {
         id: exitButton
         width: parent.width / 6
-        defaultColor: "lightsteelblue"
         text: "Quit"
         anchors.left: backgroundToggle.right
         onClicked: Qt.quit(0);
-    }
-
-    Rectangle {
-        width: parent.width
-        height: 3
-        anchors.top: shadowToggle.bottom
-        anchors.bottom: dataView.top
     }
 }
