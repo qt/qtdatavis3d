@@ -81,20 +81,14 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 }
 
 /*!
+ * \fn void QBarDataItem::setValue(qreal value)
  * Sets \a value to this data item.
  */
-void QBarDataItem::setValue(qreal value)
-{
-    m_value = value;
-}
 
 /*!
+ * \fn qreal QBarDataItem::value() const
  * \return value of this data item.
  */
-qreal QBarDataItem::value() const
-{
-    return m_value;
-}
 
 /*!
  * \internal

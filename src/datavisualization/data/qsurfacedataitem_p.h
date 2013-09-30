@@ -26,42 +26,24 @@
 //
 // We mean it.
 
-#ifndef QHEIGHTMAPSURFACEDATAPROXY_P_H
-#define QHEIGHTMAPSURFACEDATAPROXY_P_H
+#ifndef QSURFACEDATAITEM_P_H
+#define QSURFACEDATAITEM_P_H
 
-#include "qheightmapsurfacedataproxy.h"
-#include "qsurfacedataproxy_p.h"
-#include <QTimer>
+#include "datavisualizationglobal_p.h"
+#include "qsurfacedataitem.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QHeightMapSurfaceDataProxyPrivate : public QSurfaceDataProxyPrivate
+class QSurfaceDataItemPrivate
 {
-    Q_OBJECT
-
 public:
-    QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q);
-    virtual ~QHeightMapSurfaceDataProxyPrivate();
+    QSurfaceDataItemPrivate();
+    virtual ~QSurfaceDataItemPrivate();
 
-    void setValueRanges(float minX, float maxX, float minZ, float maxZ);
-    void setMinXValue(float min);
-    void setMaxXValue(float max);
-    void setMinZValue(float min);
-    void setMaxZValue(float max);
-private:
-    QHeightMapSurfaceDataProxy *qptr();
-    void handlePendingResolve();
+    // TODO stores other data for surface items besides position
 
-    QImage m_heightMap;
-    QString m_heightMapFile;
-    QTimer m_resolveTimer;
-
-    float m_minXValue;
-    float m_maxXValue;
-    float m_minZValue;
-    float m_maxZValue;
-
-    friend class QHeightMapSurfaceDataProxy;
+protected:
+    friend class QSurfaceDataItem;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -33,6 +33,10 @@ class QT_DATAVISUALIZATION_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDa
 
     Q_PROPERTY(QImage heightMap READ heightMap WRITE setHeightMap)
     Q_PROPERTY(QString heightMapFile READ heightMapFile WRITE setHeightMapFile)
+    Q_PROPERTY(float minXValue READ minXValue WRITE setMinXValue)
+    Q_PROPERTY(float maxXValue READ maxXValue WRITE setMaxXValue)
+    Q_PROPERTY(float minZValue READ minZValue WRITE setMinZValue)
+    Q_PROPERTY(float maxZValue READ maxZValue WRITE setMaxZValue)
 
 public:
     explicit QHeightMapSurfaceDataProxy(QObject *parent = 0);
@@ -44,6 +48,16 @@ public:
 
     void setHeightMapFile(const QString &filename);
     QString heightMapFile() const;
+
+    void setValueRanges(float minX, float maxX, float minZ, float maxZ);
+    void setMinXValue(float min);
+    float minXValue() const;
+    void setMaxXValue(float max);
+    float maxXValue() const;
+    void setMinZValue(float min);
+    float minZValue() const;
+    void setMaxZValue(float max);
+    float maxZValue() const;
 
 protected:
     explicit QHeightMapSurfaceDataProxy(QHeightMapSurfaceDataProxyPrivate *d, QObject *parent = 0);

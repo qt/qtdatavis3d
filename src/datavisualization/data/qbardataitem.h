@@ -35,8 +35,8 @@ public:
 
     QBarDataItem &operator=(const QBarDataItem &other);
 
-    void setValue(qreal value);
-    qreal value() const;
+    void setValue(qreal value) { m_value = value; }
+    qreal value() const { return m_value; }
 
     // TODO Set color, label format, ...?
 

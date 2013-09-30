@@ -77,18 +77,18 @@ void ChartModifier::toggleSqrtSin(bool enable)
     if (enable) {
         qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
 
-        qreal stepZ = 16.0 / qreal(m_zCount);
-        qreal stepX = 16.0 / qreal(m_xCount);
+        float stepZ = 16.0 / float(m_zCount);
+        float stepX = 16.0 / float(m_xCount);
 
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
         dataArray->reserve(m_zCount);
-        for (qreal i = -8.0 + stepZ / 2.0 ; i < 8.0 ; i += stepZ) {
+        for (float i = -8.0 + stepZ / 2.0 ; i < 8.0 ; i += stepZ) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             int index = 0;
-            for (qreal j = -8.0 + stepX / 2.0; j < 8.0; j += stepX) {
-                qreal R = qSqrt(i*i + j*j) + 0.01;
-                qreal y = (sin(R)/R + 0.24) * 1.61;
-                (*newRow)[index++] = y;
+            for (float j = -8.0 + stepX / 2.0; j < 8.0; j += stepX) {
+                float R = qSqrt(i*i + j*j) + 0.01;
+                float y = (sin(R)/R + 0.24) * 1.61;
+                (*newRow)[index++].setPosition(QVector3D(j, y, i));
             }
             *dataArray << newRow;
         }
@@ -119,16 +119,21 @@ void ChartModifier::togglePlane(bool enable)
         m_chart->axisX()->setLabelFormat("%.2f");
         m_chart->axisZ()->setLabelFormat("%.2f");
 
-        qreal y = 1.0 / (qreal(m_zCount - 1) + qreal(m_xCount - 1));
         m_planeArray->reserve(m_zCount);
-        for (int i = 0; i < m_zCount; i++) {
+        float minX = -10.0;
+        float maxX = 20.0;
+        float minZ = -10.0;
+        float maxZ = 10.0;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-            for (int j = 0; j < m_xCount; j++)
-                (*newRow)[j] = (i + j) * y;
+            for (float j = 0; j < m_xCount; j++)
+                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, i * stepZ + minZ));
             *m_planeArray << newRow;
         }
 
-        resetArrayAndSliders(m_planeArray, -10.0, 10.0, -10.0, 20.0);
+        resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, maxX);
 
         m_activeSample = ChartModifier::Plane;
     }
@@ -142,6 +147,8 @@ void ChartModifier::togglePlane(bool enable)
 void ChartModifier::setHeightMapData(bool enable)
 {
     if (enable) {
+        // Do the height map the hard way.
+        // Easier alternative would be to use the QHeightMapSurfaceDataProxy.
         QImage image(":/maps/map");
 
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
@@ -149,10 +156,19 @@ void ChartModifier::setHeightMapData(bool enable)
 
         int p = image.width() * 4 * (image.height() - 1);
         dataArray->reserve(image.height());
-        for (int i = image.height(); i > 0; i--, p -= image.width() * 4) {
+        float minX = 34.0;
+        float maxX = 40.0;
+        float minZ = 18.0;
+        float maxZ = 24.0;
+        float xMul = (maxX - minX) / float(image.width() - 1);
+        float zMul = (maxZ - minZ) / float(image.height() - 1);
+        for (int i = 0; i < image.height(); i++, p -= image.width() * 4) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(image.width());
-            for (int j = 0; j < image.width(); j++)
-                (*newRow)[j] = (qreal(bits[p + (j * 4)]) + 1.0) / 1.0;
+            for (int j = 0; j < image.width(); j++) {
+                (*newRow)[j].setPosition(QVector3D((float(j) * xMul) + minX,
+                                                   (float(bits[p + (j * 4)]) + 1.0f) / 1.0f,
+                                                   (float(i) * zMul) + minZ));
+            }
             *dataArray << newRow;
         }
 
@@ -160,7 +176,7 @@ void ChartModifier::setHeightMapData(bool enable)
         m_chart->axisX()->setLabelFormat("%.1f N");
         m_chart->axisZ()->setLabelFormat("%.1f E");
 
-        resetArrayAndSliders(dataArray, 18.0, 24.0, 34.0, 40.0);
+        resetArrayAndSliders(dataArray, minZ, maxZ, minX, maxX);
 
         m_activeSample = ChartModifier::Map;
     }
@@ -268,8 +284,10 @@ void ChartModifier::timeout()
 
     // Induce minor random jitter to the existing plane array
     for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++)
-            (*m_planeArray->at(i))[j] = m_planeArray->at(i)->at(j) * ((qreal((rand() % 10) + 4) / 1000.0) + 0.99) + 0.001;
+        for (int j = 0; j < columns; j++) {
+            (*m_planeArray->at(i))[j].setY(m_planeArray->at(i)->at(j).y()
+                                           * ((float((rand() % 10) + 4) / 1000.0f) + 0.99f) + 0.001f);
+        }
     }
 
     // Reset same array to make it redraw
@@ -283,7 +301,7 @@ void ChartModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, q
     m_axisRangeSliderX->setValue(maxX - minX);
     m_axisRangeSliderZ->setValue(maxZ - minZ);
 
-    m_chart->activeDataProxy()->resetArray(array, minZ, maxZ, minX, maxX);
+    m_chart->activeDataProxy()->resetArray(array);
 }
 
 void ChartModifier::changeShadowQuality(int quality)

@@ -86,8 +86,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_maxVisibleColumnValue(0.0f),
       m_minVisibleRowValue(0.0f),
       m_maxVisibleRowValue(0.0f),
-      m_dataStepX(0.0f),
-      m_dataStepZ(0.0f),
+      m_visibleColumnRange(0.0f),
+      m_visibleRowRange(0.0f),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -207,11 +207,11 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 {
     calculateSceneScalingFactors();
 
-    const QSurfaceDataArray *array = dataProxy->array();
+    const QSurfaceDataArray &array = *dataProxy->array();
 
     // Need minimum of 2x2 array to draw a surface
-    if (array->size() >= 2 && array->at(0)->size() >= 2) {
-        QRect sampleSpace = calculateSampleRect(dataProxy);
+    if (array.size() >= 2 && array.at(0)->size() >= 2) {
+        QRect sampleSpace = calculateSampleRect(array);
 
         bool dimensionChanged = false;
         if (m_sampleSpace != sampleSpace) {
@@ -232,7 +232,7 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
             }
             for (int i = 0; i < sampleSpace.height(); i++) {
                 for (int j = 0; j < sampleSpace.width(); j++)
-                    (*(m_dataArray.at(i)))[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
+                    (*(m_dataArray.at(i)))[j] = array.at(i + sampleSpace.y())->at(j + sampleSpace.x());
             }
 
             if (m_dataArray.size() > 0) {
@@ -242,11 +242,11 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
                 // Note: Data setup can change samplespace (as min width/height is 1)
                 if (m_cachedSmoothSurface) {
                     m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                                  dimensionChanged,
+                                                  m_axisCacheY.min(), dimensionChanged,
                                                   m_cachedSelectionMode != QDataVis::ModeNone);
                 } else {
                     m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                            dimensionChanged,
+                                            m_axisCacheY.min(), dimensionChanged,
                                             m_cachedSelectionMode != QDataVis::ModeNone);
                 }
 
@@ -294,65 +294,107 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
             loadSliceSurfaceObj();
 
         if (m_cachedSmoothSurface) {
-            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer,
-                                               true, true);
+            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_axisCacheY.min(),
+                                               m_heightNormalizer, true, true);
         } else {
-            m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer, true,
-                                         true);
+            m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer,
+                                         m_axisCacheY.min(), true, true);
         }
     }
 }
 
-QRect Surface3DRenderer::calculateSampleRect(QSurfaceDataProxy *dataProxy)
+QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 {
     QRect sampleSpace;
 
-    m_minVisibleColumnValue = dataProxy->minValueColumns();
-    m_maxVisibleColumnValue = dataProxy->maxValueColumns();
-    m_minVisibleRowValue = dataProxy->minValueRows();
-    m_maxVisibleRowValue = dataProxy->maxValueRows();
-    m_dataStepX = (m_maxVisibleColumnValue - m_minVisibleColumnValue) / (dataProxy->columnCount() - 1);
-    m_dataStepZ = (m_maxVisibleRowValue - m_minVisibleRowValue) / (dataProxy->rowCount() - 1);
+    int rowCount = array.size();
+    int columnCount = array.at(0)->size();
 
-    if (m_minVisibleColumnValue >  m_axisCacheX.max() || m_maxVisibleColumnValue <  m_axisCacheX.min()
-            || m_minVisibleRowValue >  m_axisCacheZ.max() || m_maxVisibleRowValue <  m_axisCacheZ.min()) {
+    int i;
+    bool found;
+    float axisMinX = float(m_axisCacheX.min());
+    float axisMaxX = float(m_axisCacheX.max());
+    float axisMinZ = float(m_axisCacheZ.min());
+    float axisMaxZ = float(m_axisCacheZ.max());
+
+    // Comparisons between float and double are not accurate, so fudge our comparison values
+    //a little to get all rows and columns into view that need to be visible.
+    const float fudgeFactor = 0.00001f;
+    float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
+    float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
+    axisMinX -= fudgedAxisXRange;
+    axisMinZ -= fudgedAxisZRange;
+    axisMaxX += fudgedAxisXRange;
+    axisMaxZ += fudgedAxisZRange;
+
+    // m_minVisibleColumnValue
+    for (i = 0, found = false; i < columnCount; i++) {
+        if (array.at(0)->at(i).x() >= axisMinX) {
+            found = true;
+            break;
+        }
+    }
+    if (found) {
+        m_minVisibleColumnValue = array.at(0)->at(i).x();
+        sampleSpace.setLeft(i);
+    } else {
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
+        return sampleSpace;
     }
 
-    int index = 0;
-    while (m_minVisibleColumnValue < m_axisCacheX.min()) {
-        m_minVisibleColumnValue += m_dataStepX;
-        index++;
+    // m_maxVisibleColumnValue
+    for (i = columnCount - 1, found = false; i >= 0; i--) {
+        if (array.at(0)->at(i).x() <= axisMaxX) {
+            found = true;
+            break;
+        }
     }
-    sampleSpace.setLeft(index);
-
-    index = dataProxy->columnCount() - 1;
-    while (m_maxVisibleColumnValue > m_axisCacheX.max()) {
-        m_maxVisibleColumnValue -= m_dataStepX;
-        index--;
+    if (found) {
+        m_maxVisibleColumnValue = array.at(0)->at(i).x();
+        sampleSpace.setRight(i);
+    } else {
+        sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
+        return sampleSpace;
     }
-    sampleSpace.setRight(index);
 
-    index = 0;
-    while (m_minVisibleRowValue < m_axisCacheZ.min()) {
-        m_minVisibleRowValue += m_dataStepZ;
-        index++;
+    // m_minVisibleRowValue
+    for (i = 0, found = false; i < rowCount; i++) {
+        if (array.at(i)->at(0).z() >= axisMinZ) {
+            found = true;
+            break;
+        }
     }
-    sampleSpace.setTop(index);
-
-    index = dataProxy->rowCount() - 1;
-    while (m_maxVisibleRowValue > m_axisCacheZ.max()) {
-        m_maxVisibleRowValue -= m_dataStepZ;
-        index--;
+    if (found) {
+        m_minVisibleRowValue = array.at(i)->at(0).z();
+        sampleSpace.setTop(i);
+    } else {
+        sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
+        return sampleSpace;
     }
-    sampleSpace.setBottom(index);
 
-    m_surfaceScaleX = m_scaleX * (m_maxVisibleColumnValue - m_minVisibleColumnValue) / m_areaSize.width();
-    m_surfaceScaleZ = m_scaleZ * (m_maxVisibleRowValue - m_minVisibleRowValue) / m_areaSize.height();
-    GLfloat axis2XCenterX = (m_axisCacheX.min() + m_axisCacheX.max());
-    GLfloat axis2XCenterZ = (m_axisCacheZ.min() + m_axisCacheZ.max());
-    GLfloat data2XCenterX = (m_minVisibleColumnValue + m_maxVisibleColumnValue);
-    GLfloat data2XCenterZ = (m_minVisibleRowValue + m_maxVisibleRowValue);
+    // m_maxVisibleRowValue
+    for (i = rowCount - 1, found = false; i >= 0; i--) {
+        if (array.at(i)->at(0).z() <= axisMaxZ) {
+            found = true;
+            break;
+        }
+    }
+    if (found) {
+        m_maxVisibleRowValue = array.at(i)->at(0).z();
+        sampleSpace.setBottom(i);
+    } else {
+        sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
+        return sampleSpace;
+    }
+
+    m_visibleColumnRange = m_maxVisibleColumnValue - m_minVisibleColumnValue;
+    m_visibleRowRange = m_maxVisibleRowValue - m_minVisibleRowValue;
+    m_surfaceScaleX = m_scaleX * m_visibleColumnRange / m_areaSize.width();
+    m_surfaceScaleZ = m_scaleZ * m_visibleRowRange / m_areaSize.height();
+    GLfloat axis2XCenterX = axisMinX + axisMaxX;
+    GLfloat axis2XCenterZ = axisMinZ + axisMaxZ;
+    GLfloat data2XCenterX = GLfloat(m_minVisibleColumnValue + m_maxVisibleColumnValue);
+    GLfloat data2XCenterZ = GLfloat(m_minVisibleRowValue + m_maxVisibleRowValue);
     m_surfaceOffsetX = m_scaleX * (data2XCenterX - axis2XCenterX) / m_areaSize.width();
     m_surfaceOffsetZ = -m_scaleZ * (data2XCenterZ - axis2XCenterZ) / m_areaSize.height();
 
@@ -1759,20 +1801,18 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     if (enable != m_cachedSmoothSurface) {
         m_cachedSmoothSurface = enable;
         changed = true;
+        initSurfaceShaders();
     }
 
-    if (changed)
-        initSurfaceShaders();
-
-    // If no surface object created yet, don't try to update the object, instead return
-    if (!m_surfaceObj || !changed) {
-        return m_cachedSmoothSurface;
-    } else {
+    // If no surface object created yet, don't try to update the object
+    if (m_surfaceObj && changed && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         if (m_cachedSmoothSurface) {
-            m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+            m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
+                                          m_axisCacheY.min(), true,
                                           m_cachedSelectionMode != QDataVis::ModeNone);
         } else {
-            m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer, true,
+            m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer,
+                                    m_axisCacheY.min(), true,
                                     m_cachedSelectionMode != QDataVis::ModeNone);
         }
     }
@@ -1853,27 +1893,27 @@ void Surface3DRenderer::surfacePointSelected(int id)
 {
     int column = (id - 1) % m_sampleSpace.width();
     int row = (id - 1) / m_sampleSpace.width();
-    qreal value = m_dataArray.at(row)->at(column);
+    qreal value = qreal(m_dataArray.at(row)->at(column).y());
 
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_controller, m_drawer);
 
     QVector3D pos;
     if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
-        pos = normalize(float(column), value, 0.0f);
+        pos = normalize(column, 0);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
         pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
-        pos = normalize(0.0f, value, float(row));
+        pos = normalize(0, row);
         pos.setX(-pos.z());
         pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
         pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else {
-        pos = normalize(float(column), value, float(row));
+        pos = normalize(column, row);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);;
         pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
         m_selectionPointer->updateBoundingRect(m_mainViewPort);
@@ -1906,7 +1946,8 @@ QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row
         QString labelFormat = m_axisCacheX.labelFormat();
         if (labelFormat.isEmpty())
             labelFormat = Utils::defaultLabelFormat();
-        QString valueLabelText = generateValueLabel(labelFormat, columnInRange(column));
+        QString valueLabelText = generateValueLabel(labelFormat,
+                                                    m_dataArray.at(row)->at(column).x());
         labelText.replace(xLabelTag, valueLabelText);
     }
     if (labelText.contains(yLabelTag)) {
@@ -1920,30 +1961,21 @@ QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row
         QString labelFormat = m_axisCacheZ.labelFormat();
         if (labelFormat.isEmpty())
             labelFormat = Utils::defaultLabelFormat();
-        QString valueLabelText = generateValueLabel(labelFormat, rowInRange(row));
+        QString valueLabelText = generateValueLabel(labelFormat,
+                                                    m_dataArray.at(row)->at(column).z());
         labelText.replace(zLabelTag, valueLabelText);
     }
 
     return labelText;
 }
 
-// Transforms the model column coordinate to axis coordinate
-qreal Surface3DRenderer::columnInRange(int column)
+QVector3D Surface3DRenderer::normalize(int x, int z)
 {
-    return m_dataStepX * qreal(column) + m_minVisibleColumnValue;
-}
-
-// Transforms the model row coordinate to axis coordinate
-qreal Surface3DRenderer::rowInRange(int row)
-{
-    return m_dataStepZ * qreal(row) + m_minVisibleRowValue;
-}
-
-QVector3D Surface3DRenderer::normalize(float x, float y, float z)
-{
-    float resX = x / ((float(m_sampleSpace.width()) - 1.0f) / 2.0f) - 1.0f;
-    float resY = y / (m_heightNormalizer / 2.0f) - 1.0f;
-    float resZ = z / ((float(m_sampleSpace.height()) - 1.0f) / -2.0f) + 1.0f;
+    float resX = (m_dataArray.at(z)->at(x).x() - m_minVisibleColumnValue)
+            / (m_visibleColumnRange / 2.0f) - 1.0f;
+    float resY = m_dataArray.at(z)->at(x).y() / (m_heightNormalizer / 2.0f) - 1.0f; // TODO min
+    float resZ = (m_dataArray.at(z)->at(x).z() - m_minVisibleRowValue)
+            / (m_visibleRowRange / -2.0f) + 1.0f;
 
     return QVector3D(resX, resY, resZ);
 }

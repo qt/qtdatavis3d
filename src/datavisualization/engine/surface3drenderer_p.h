@@ -91,12 +91,12 @@ private:
     GLfloat m_surfaceScaleZ;
     GLfloat m_surfaceOffsetX;
     GLfloat m_surfaceOffsetZ;
-    qreal m_minVisibleColumnValue;
-    qreal m_maxVisibleColumnValue;
-    qreal m_minVisibleRowValue;
-    qreal m_maxVisibleRowValue;
-    qreal m_dataStepX;
-    qreal m_dataStepZ;
+    GLfloat m_minVisibleColumnValue;
+    GLfloat m_maxVisibleColumnValue;
+    GLfloat m_minVisibleRowValue;
+    GLfloat m_maxVisibleRowValue;
+    GLfloat m_visibleColumnRange;
+    GLfloat m_visibleRowRange;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -154,7 +154,7 @@ private:
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    QRect calculateSampleRect(QSurfaceDataProxy *dataProxy);
+    QRect calculateSampleRect(const QSurfaceDataArray &array);
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
@@ -174,9 +174,7 @@ private:
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(int id);
     QString createSelectionLabel(qreal value, int column, int row);
-    qreal columnInRange(int column);
-    qreal rowInRange(int row);
-    QVector3D normalize(float x, float y, float z);
+    QVector3D normalize(int x, int z);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif

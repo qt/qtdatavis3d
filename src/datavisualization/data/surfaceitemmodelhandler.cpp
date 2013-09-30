@@ -49,11 +49,6 @@ void SurfaceItemModelHandler::resolveModel()
         return;
     }
 
-    float minRowValue = 0.0f;
-    float maxRowValue = 1.0f;
-    float minColumnValue = 0.0f;
-    float maxColumnValue = 1.0f;
-
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
@@ -72,16 +67,12 @@ void SurfaceItemModelHandler::resolveModel()
         }
         for (int i = 0; i < rowCount; i++) {
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnCount; j++)
-                newProxyRow[j] = m_itemModel->index(i, j).data(valueRole).toReal();
-        }
-        if (rowCount) {
-            minRowValue = m_itemModel->headerData(0, Qt::Vertical).toFloat();
-            maxRowValue = m_itemModel->headerData(rowCount - 1, Qt::Vertical).toFloat();
-        }
-        if (columnCount) {
-            minColumnValue = m_itemModel->headerData(0, Qt::Horizontal).toFloat();
-            maxColumnValue = m_itemModel->headerData(columnCount - 1, Qt::Horizontal).toFloat();
+            for (int j = 0; j < columnCount; j++) {
+                newProxyRow[j].setPosition(
+                            QVector3D(m_itemModel->headerData(j, Qt::Horizontal).toFloat(),
+                                      m_itemModel->index(i, j).data(valueRole).toFloat(),
+                                      m_itemModel->headerData(i, Qt::Vertical).toFloat()));
+            }
         }
     } else {
         int rowRole = roleHash.key(mapping->rowRole().toLatin1());
@@ -139,22 +130,15 @@ void SurfaceItemModelHandler::resolveModel()
         for (int i = 0; i < rowList.size(); i++) {
             QString rowKey = rowList.at(i);
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnList.size(); j++)
-                newProxyRow[j] = itemValueMap[rowKey][columnList.at(j)];
-        }
-
-        // Use first and last roles converted to values for limits
-        if (rowList.size()) {
-            minRowValue = rowList.first().toFloat();
-            maxRowValue = rowList.last().toFloat();
-        }
-        if (columnList.size()) {
-            minColumnValue = columnList.first().toFloat();
-            maxColumnValue = columnList.last().toFloat();
+            for (int j = 0; j < columnList.size(); j++) {
+                newProxyRow[j].setPosition(QVector3D(columnList.at(j).toFloat(),
+                                                     itemValueMap[rowKey][columnList.at(j)],
+                                                     rowList.at(i).toFloat()));
+            }
         }
     }
 
-    m_proxy->resetArray(m_proxyArray, minRowValue, maxRowValue, minColumnValue, maxColumnValue);
+    m_proxy->resetArray(m_proxyArray);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

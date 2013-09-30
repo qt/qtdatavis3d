@@ -16,25 +16,25 @@
 **
 ****************************************************************************/
 
-#ifndef QSCATTERDATAITEM_H
-#define QSCATTERDATAITEM_H
+#ifndef QSURFACEDATAITEM_H
+#define QSURFACEDATAITEM_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QScatterDataItemPrivate;
+class QSurfaceDataItemPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QScatterDataItem
+class QT_DATAVISUALIZATION_EXPORT QSurfaceDataItem
 {
 public:
-    QScatterDataItem();
-    QScatterDataItem(const QVector3D &position);
-    QScatterDataItem(const QScatterDataItem &other);
-    ~QScatterDataItem();
+    QSurfaceDataItem();
+    QSurfaceDataItem(const QVector3D &position);
+    QSurfaceDataItem(const QSurfaceDataItem &other);
+    ~QSurfaceDataItem();
 
-    QScatterDataItem &operator=(const QScatterDataItem &other);
+    QSurfaceDataItem &operator=(const QSurfaceDataItem &other);
 
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
@@ -45,17 +45,13 @@ public:
     inline float y() const { return m_position.y(); }
     inline float z() const { return m_position.z(); }
 
-    //void setSize(qreal size);
-    //qreal size() const;
-
 protected:
     virtual void createExtraData();
 
-    QScatterDataItemPrivate *d_ptr;
+    QSurfaceDataItemPrivate *d_ptr;
 
 private:
     QVector3D m_position;
-    //qreal m_size;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

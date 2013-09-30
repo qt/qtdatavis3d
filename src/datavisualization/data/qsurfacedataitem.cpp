@@ -16,36 +16,36 @@
 **
 ****************************************************************************/
 
-#include "qscatterdataitem_p.h"
+#include "qsurfacedataitem_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
- * \class QScatterDataItem
+ * \class QSurfaceDataItem
  * \inmodule QtDataVisualization
- * \brief The QScatterDataItem class provides a container for resolved data to be added to scatter
+ * \brief The QSurfaceDataItem class provides a container for resolved data to be added to surface
  * graphs.
  * \since 1.0.0
  *
- * A QScatterDataItem holds data for a single rendered item in a scatter graph.
- * Scatter data proxies parse data into QScatterDataItem instances for visualizing.
+ * A QSurfaceDataItem holds data for a single vertex in surface graph.
+ * Surface data proxies parse data into QSurfaceDataItem instances for visualizing.
  *
- * \sa QScatterDataProxy, {Qt Data Visualization C++ Classes}
+ * \sa QSurfaceDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!
- * Constructs QScatterDataItem.
+ * Constructs QSurfaceDataItem.
  */
-QScatterDataItem::QScatterDataItem()
+QSurfaceDataItem::QSurfaceDataItem()
     : d_ptr(0) // private data doesn't exist by default (optimization)
 
 {
 }
 
 /*!
- * Constructs QScatterDataItem with \a position.
+ * Constructs QSurfaceDataItem with \a position.
  */
-QScatterDataItem::QScatterDataItem(const QVector3D &position)
+QSurfaceDataItem::QSurfaceDataItem(const QVector3D &position)
     : d_ptr(0),
       m_position(position)
 {
@@ -54,22 +54,22 @@ QScatterDataItem::QScatterDataItem(const QVector3D &position)
 /*!
  * Constructs a copy of \a other.
  */
-QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
+QSurfaceDataItem::QSurfaceDataItem(const QSurfaceDataItem &other)
 {
     operator=(other);
 }
 
 /*!
- * Destroys QScatterDataItem.
+ * Destroys QSurfaceDataItem.
  */
-QScatterDataItem::~QScatterDataItem()
+QSurfaceDataItem::~QSurfaceDataItem()
 {
 }
 
 /*!
  *  Assigns a copy of \a other to this object.
  */
-QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
+QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
 {
     m_position = other.m_position;
     //m_size = other.m_size;
@@ -84,39 +84,29 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 }
 
 /*!
- * \fn void QScatterDataItem::setPosition(const QVector3D &position)
+ * \fn void QSurfaceDataItem::setPosition(const QVector3D &position)
  * Sets \a position to this data item.
  */
 
 /*!
- * \fn QVector3D QScatterDataItem::position() const
+ * \fn QVector3D QSurfaceDataItem::position() const
  * \return position of this data item.
  */
-
-//void QScatterDataItem::setSize(qreal size)
-//{
-//    m_size = size;
-//}
-
-//const qreal &QScatterDataItem::size() const
-//{
-//    return m_size;
-//}
 
 /*!
  * \internal
  */
-void QScatterDataItem::createExtraData()
+void QSurfaceDataItem::createExtraData()
 {
     if (!d_ptr)
-        d_ptr = new QScatterDataItemPrivate;
+        d_ptr = new QSurfaceDataItemPrivate;
 }
 
-QScatterDataItemPrivate::QScatterDataItemPrivate()
+QSurfaceDataItemPrivate::QSurfaceDataItemPrivate()
 {
 }
 
-QScatterDataItemPrivate::~QScatterDataItemPrivate()
+QSurfaceDataItemPrivate::~QSurfaceDataItemPrivate()
 {
 }
 

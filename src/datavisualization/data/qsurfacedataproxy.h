@@ -19,12 +19,11 @@
 #ifndef QSURFACEDATAPROXY_H
 #define QSURFACEDATAPROXY_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtDataVisualization/qabstractdataproxy.h>
+#include <QtDataVisualization/qsurfacedataitem.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-typedef qreal QSurfaceDataItem; // Let's stick to this for now, expand if needed
 typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
@@ -36,10 +35,6 @@ class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 
     Q_PROPERTY(int rowCount READ rowCount)
     Q_PROPERTY(int columnCount READ columnCount)
-    Q_PROPERTY(qreal minValueRows READ minValueRows WRITE setMinValueRows NOTIFY valueRangeRowsChanged)
-    Q_PROPERTY(qreal maxValueRows READ maxValueRows WRITE setMaxValueRows NOTIFY valueRangeRowsChanged)
-    Q_PROPERTY(qreal minValueColumns READ minValueColumns WRITE setMinValueColumns NOTIFY valueRangeColumnsChanged)
-    Q_PROPERTY(qreal maxValueColumns READ maxValueColumns WRITE setMaxValueColumns NOTIFY valueRangeColumnsChanged)
 
 public:
     explicit QSurfaceDataProxy(QObject *parent = 0);
@@ -50,20 +45,7 @@ public:
     const QSurfaceDataArray *array() const;
     const QSurfaceDataItem *itemAt(int index) const;
 
-    void setValueRangeRows(qreal min, qreal max);
-    void setValueRangeColumns(qreal min, qreal max);
-    void setMinValueRows(qreal min);
-    qreal minValueRows() const;
-    void setMaxValueRows(qreal max);
-    qreal maxValueRows() const;
-    void setMinValueColumns(qreal min);
-    qreal minValueColumns() const;
-    void setMaxValueColumns(qreal max);
-    qreal maxValueColumns() const;
-
     void resetArray(QSurfaceDataArray *newArray);
-    void resetArray(QSurfaceDataArray *newArray, qreal minValueRows, qreal maxValueRows,
-                    qreal minValueColumns, qreal maxValueColumns);
 
 signals:
     void arrayReset();

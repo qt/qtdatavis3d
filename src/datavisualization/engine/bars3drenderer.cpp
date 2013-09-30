@@ -189,7 +189,7 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
                 for (; j < updateSize ; j++) {
                     qreal value = dataRow->at(dataColIndex).value();
                     m_renderItemArray[i][j].setValue(value);
-                    m_renderItemArray[i][j].setHeight(value / m_heightNormalizer);
+                    m_renderItemArray[i][j].setHeight(GLfloat(value) / m_heightNormalizer);
                     dataColIndex++;
                 }
             }

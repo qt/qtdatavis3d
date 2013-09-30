@@ -28,13 +28,11 @@ Item {
     HeightMapSurfaceDataProxy {
         id: heightMapProxy
         heightMapFile: ":/heightmaps/image"
-        onArrayReset: {
-            // We don't want the default data values set by heightmap proxy.
-            minValueRows = 30
-            maxValueRows = 60
-            minValueColumns = 67
-            maxValueColumns = 97
-        }
+        // We don't want the default data values set by heightmap proxy.
+        minZValue: 30
+        maxZValue: 60
+        minXValue: 67
+        maxXValue: 97
     }
 
     SurfaceDataMapping {

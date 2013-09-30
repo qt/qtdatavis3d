@@ -34,7 +34,9 @@ HEADERS += \
     $$PWD/qitemmodelsurfacedatamapping_p.h \
     $$PWD/qitemmodelsurfacedataproxy.h \
     $$PWD/qitemmodelsurfacedataproxy_p.h \
-    $$PWD/surfaceitemmodelhandler_p.h
+    $$PWD/surfaceitemmodelhandler_p.h \
+    $$PWD/qsurfacedataitem.h \
+    $$PWD/qsurfacedataitem_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -58,4 +60,5 @@ SOURCES += \
     $$PWD/qheightmapsurfacedataproxy.cpp \
     $$PWD/qitemmodelsurfacedatamapping.cpp \
     $$PWD/qitemmodelsurfacedataproxy.cpp \
-    $$PWD/surfaceitemmodelhandler.cpp
+    $$PWD/surfaceitemmodelhandler.cpp \
+    $$PWD/qsurfacedataitem.cpp
