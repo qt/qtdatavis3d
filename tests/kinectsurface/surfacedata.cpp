@@ -258,12 +258,12 @@ void SurfaceData::setData(const QImage &image)
     int widthBits = imageWidth * 4;
 
     if (m_mode == Scatter) {
-        QScatterDataArray *dataArray = m_scatterDataArray;
-        QScatterDataItem *ptrToDataArray = &dataArray->first();
+        QScatterDataItem *ptrToDataArray = &m_scatterDataArray->first();
 
         int limitsX = imageWidth / 2;
         int limitsZ = imageHeight / 2;
         qreal height = 0;
+        int count = 0;
 
         for (int i = -limitsZ; i < limitsZ; i++, bitCount -= widthBits) {
             for (int j = -limitsX; j < limitsX; j++) {
@@ -271,10 +271,12 @@ void SurfaceData::setData(const QImage &image)
                 if (height > -128) {
                     ptrToDataArray->setPosition(QVector3D(qreal(j), height, qreal(i)));
                     ptrToDataArray++;
+                    count++;
                 }
             }
         }
 
+        QScatterDataArray *dataArray = new QScatterDataArray(m_scatterDataArray->mid(0, count));
         static_cast<QScatterDataProxy *>(m_scatter->activeDataProxy())->resetArray(dataArray);
     } else {
         QBarDataArray *dataArray = m_barDataArray;

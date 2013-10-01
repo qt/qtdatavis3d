@@ -143,13 +143,22 @@ void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
     const QScatterDataArray &dataArray = *dataProxy->array();
     calculateSceneScalingFactors();
     int dataSize = dataArray.size();
+    float minX = float(m_axisCacheX.min());
+    float maxX = float(m_axisCacheX.max());
+    float minY = float(m_axisCacheY.min());
+    float maxY = float(m_axisCacheY.max());
+    float minZ = float(m_axisCacheZ.min());
+    float maxZ = float(m_axisCacheZ.max());
+
     if (dataSize != m_renderItemArray.size())
         m_renderItemArray.resize(dataSize);
     for (int i = 0; i < dataSize ; i++) {
         QVector3D dotPos = dataArray.at(i).position();
-        if ((dotPos.x() >= m_axisCacheX.min() && dotPos.x() <= m_axisCacheX.max())
-                && (dotPos.y() >= m_axisCacheY.min() && dotPos.y() <= m_axisCacheY.max())
-                && (dotPos.z() >= m_axisCacheZ.min() && dotPos.z() <= m_axisCacheZ.max())) {
+        // TODO: Check if this still works always when ranges are no longer required to be zero centered
+        // TODO: qreal -> float conversion for axis min/max may cause issues like in surface
+        if ((dotPos.x() >= minX && dotPos.x() <= maxX )
+                && (dotPos.y() >= minY && dotPos.y() <= maxY)
+                && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
             m_renderItemArray[i].setPosition(dotPos);
             m_renderItemArray[i].setVisible(true);
             calculateTranslation(m_renderItemArray[i]);
