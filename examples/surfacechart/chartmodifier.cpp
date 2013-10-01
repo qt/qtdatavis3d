@@ -77,17 +77,17 @@ void ChartModifier::toggleSqrtSin(bool enable)
     if (enable) {
         qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
 
-        float stepZ = 16.0 / float(m_zCount);
-        float stepX = 16.0 / float(m_xCount);
+        float stepZ = 16.0f / float(m_zCount);
+        float stepX = 16.0f / float(m_xCount);
 
         QSurfaceDataArray *dataArray = new QSurfaceDataArray;
         dataArray->reserve(m_zCount);
-        for (float i = -8.0 + stepZ / 2.0 ; i < 8.0 ; i += stepZ) {
+        for (float i = -8.0f + stepZ / 2.0f ; i < 8.0f ; i += stepZ) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             int index = 0;
-            for (float j = -8.0 + stepX / 2.0; j < 8.0; j += stepX) {
-                float R = qSqrt(i*i + j*j) + 0.01;
-                float y = (sin(R)/R + 0.24) * 1.61;
+            for (float j = -8.0f + stepX / 2.0f; j < 8.0f; j += stepX) {
+                float R = qSqrt(i * i + j * j) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f;
                 (*newRow)[index++].setPosition(QVector3D(j, y, i));
             }
             *dataArray << newRow;
@@ -285,8 +285,12 @@ void ChartModifier::timeout()
     // Induce minor random jitter to the existing plane array
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
+            (*m_planeArray->at(i))[j].setX(m_planeArray->at(i)->at(j).x()
+                                           * ((float((rand() % 10) + 5.0f) / 10000.0f) + 0.999f));
             (*m_planeArray->at(i))[j].setY(m_planeArray->at(i)->at(j).y()
-                                           * ((float((rand() % 10) + 4) / 1000.0f) + 0.99f) + 0.001f);
+                                           * ((float((rand() % 10) + 5.0f) / 1000.0f) + 0.99f) + 0.0001f);
+            (*m_planeArray->at(i))[j].setZ(m_planeArray->at(i)->at(j).z()
+                                           * ((float((rand() % 10) + 5.0f) / 10000.0f) + 0.999f));
         }
     }
 
