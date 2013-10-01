@@ -1973,7 +1973,8 @@ QVector3D Surface3DRenderer::normalize(int x, int z)
 {
     float resX = (m_dataArray.at(z)->at(x).x() - m_minVisibleColumnValue)
             / (m_visibleColumnRange / 2.0f) - 1.0f;
-    float resY = m_dataArray.at(z)->at(x).y() / (m_heightNormalizer / 2.0f) - 1.0f; // TODO min
+    float resY = (m_dataArray.at(z)->at(x).y() - float(m_axisCacheY.min()))
+            / (m_heightNormalizer / 2.0f) - 1.0f;
     float resZ = (m_dataArray.at(z)->at(x).z() - m_minVisibleRowValue)
             / (m_visibleRowRange / -2.0f) + 1.0f;
 
