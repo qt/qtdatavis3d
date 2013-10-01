@@ -89,12 +89,18 @@ void Abstract3DController::synchDataToRenderer()
     if (!m_renderer)
         return;
 
-    m_renderer->updateScene(m_scene);
+    if (m_changeTracker.boundingRectChanged || m_changeTracker.sizeChanged) {
+        m_renderer->updateBoundingRect(m_boundingRect);
+        m_changeTracker.boundingRectChanged = false;
+        m_changeTracker.sizeChanged = false;
+    }
 
     if (m_changeTracker.positionChanged) {
         m_renderer->updatePosition(m_boundingRect);
         m_changeTracker.positionChanged = false;
     }
+
+    m_renderer->updateScene(m_scene);
 
     if (m_changeTracker.themeChanged) {
         m_renderer->updateTheme(m_theme);
@@ -109,12 +115,6 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.labelTransparencyChanged) {
         m_renderer->updateLabelTransparency(m_labelTransparency);
         m_changeTracker.labelTransparencyChanged = false;
-    }
-
-    if (m_changeTracker.boundingRectChanged || m_changeTracker.sizeChanged) {
-        m_renderer->updateBoundingRect(m_boundingRect);
-        m_changeTracker.boundingRectChanged = false;
-        m_changeTracker.sizeChanged = false;
     }
 
     if (m_changeTracker.shadowQualityChanged) {
