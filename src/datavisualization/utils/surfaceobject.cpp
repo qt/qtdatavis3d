@@ -43,8 +43,7 @@ SurfaceObject::~SurfaceObject()
 }
 
 void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
-                                    GLfloat yRange, GLfloat yMin, bool changeGeometry,
-                                    bool needTexture)
+                                    GLfloat yRange, GLfloat yMin, bool changeGeometry)
 {
     int columns = space.width();
     int rows = space.height();
@@ -54,13 +53,15 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+    GLfloat uvX = 1.0 / GLfloat(columns - 1);
+    GLfloat uvY = 1.0 / GLfloat(rows - 1);
 
     // Create/populate vertice table
     if (changeGeometry)
         m_vertices.resize(totalSize);
 
     QVector<QVector2D> uvs;
-    if (needTexture)
+    if (changeGeometry)
         uvs.resize(totalSize);
     int totalIndex = 0;
     for (int i = 0; i < rows; i++) {
@@ -71,8 +72,8 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
             float normalizedY = ((data.y() - yMin) / yNormalizer);
             float normalizedZ = ((data.z() - zMin) / zNormalizer);
             m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
-            if (needTexture)
-                uvs[totalIndex] = QVector2D(normalizedX / 2.0f, normalizedZ / -2.0f);
+            if (changeGeometry)
+                uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
             totalIndex++;
         }
     }
@@ -156,7 +157,7 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
 
 
 void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
-                              GLfloat yRange, GLfloat yMin, bool changeGeometry, bool needTexture)
+                              GLfloat yRange, GLfloat yMin, bool changeGeometry)
 {
     int columns = space.width();
     int rows = space.height();
@@ -166,13 +167,15 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+    GLfloat uvX = 1.0 / GLfloat(columns - 1);
+    GLfloat uvY = 1.0 / GLfloat(rows - 1);
 
     // Create vertice table
     if (changeGeometry)
         m_vertices.resize(totalSize);
 
     QVector<QVector2D> uvs;
-    if (needTexture)
+    if (changeGeometry)
         uvs.resize(totalSize);
 
     int totalIndex = 0;
@@ -189,14 +192,14 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
             float normalizedY = ((data.y() - yMin) / yNormalizer);
             float normalizedZ = ((data.z() - zMin) / zNormalizer);
             m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
-            if (needTexture)
-                uvs[totalIndex] = QVector2D(normalizedX / 2.0f, normalizedZ / -2.0f);
+            if (changeGeometry)
+                uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
 
             totalIndex++;
 
             if (j > 0 && j < colLimit) {
                 m_vertices[totalIndex] = m_vertices[totalIndex - 1];
-                if (needTexture)
+                if (changeGeometry)
                     uvs[totalIndex] = uvs[totalIndex - 1];
                 totalIndex++;
             }

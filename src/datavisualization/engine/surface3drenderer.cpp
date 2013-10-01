@@ -242,12 +242,10 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
                 // Note: Data setup can change samplespace (as min width/height is 1)
                 if (m_cachedSmoothSurface) {
                     m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                                  m_axisCacheY.min(), dimensionChanged,
-                                                  m_cachedSelectionMode != QDataVis::ModeNone);
+                                                  m_axisCacheY.min(), dimensionChanged);
                 } else {
                     m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                            m_axisCacheY.min(), dimensionChanged,
-                                            m_cachedSelectionMode != QDataVis::ModeNone);
+                                            m_axisCacheY.min(), dimensionChanged);
                 }
 
                 if (dimensionChanged)
@@ -295,10 +293,10 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
 
         if (m_cachedSmoothSurface) {
             m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_axisCacheY.min(),
-                                               m_heightNormalizer, true, true);
+                                               m_heightNormalizer, true);
         } else {
             m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer,
-                                         m_axisCacheY.min(), true, true);
+                                         m_axisCacheY.min(), true);
         }
     }
 }
@@ -1808,12 +1806,10 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     if (m_surfaceObj && changed && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         if (m_cachedSmoothSurface) {
             m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                          m_axisCacheY.min(), true,
-                                          m_cachedSelectionMode != QDataVis::ModeNone);
+                                          m_axisCacheY.min(), true);
         } else {
             m_surfaceObj->setUpData(m_dataArray, m_sampleSpace, m_heightNormalizer,
-                                    m_axisCacheY.min(), true,
-                                    m_cachedSelectionMode != QDataVis::ModeNone);
+                                    m_axisCacheY.min(), true);
         }
     }
 

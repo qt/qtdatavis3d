@@ -45,9 +45,9 @@ public:
     ~SurfaceObject();
 
     void setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
-                   GLfloat yMin, bool changeGeometry, bool needTexture);
+                   GLfloat yMin, bool changeGeometry);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
-                         GLfloat yMin, bool changeGeometry, bool needTexture);
+                         GLfloat yMin, bool changeGeometry);
     GLuint gridElementBuf();
     GLuint gridIndexCount();
 
