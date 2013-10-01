@@ -37,13 +37,17 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
+    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
     explicit Q3DSurface();
@@ -60,6 +64,11 @@ public:
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
+
+    void setCameraPreset(QDataVis::CameraPreset preset);
+    QDataVis::CameraPreset cameraPreset() const;
+
+    void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;

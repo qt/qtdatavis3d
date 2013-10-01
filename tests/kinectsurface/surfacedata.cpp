@@ -53,6 +53,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_surface->setBackgroundVisible(false);
     m_surface->setSmoothSurfaceEnabled(false);
     m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
+    m_surface->setCameraPosition(0.0, 90.0, 105);
 
     // Initialize scatter
     m_scatter->setTheme(QDataVis::ThemeStoneMoss);
