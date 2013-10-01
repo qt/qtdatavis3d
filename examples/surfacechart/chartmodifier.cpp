@@ -27,6 +27,7 @@
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
 //#define JITTER_PLANE
+//#define WONKY_PLANE
 
 ChartModifier::ChartModifier(Q3DSurface *chart)
     : m_chart(chart),
@@ -132,14 +133,38 @@ void ChartModifier::togglePlane(bool enable)
         float maxZ = 10.0;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+#ifdef WONKY_PLANE
+        float halfZ = m_zCount / 2;
+        float wonkyFactor = 0.01f;
+        float maxStepX = 0.0f;
+        for (float i = 0; i < m_zCount; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            if (i < halfZ) {
+                stepX += wonkyFactor;
+                maxStepX = stepX;
+            } else {
+                stepX -= wonkyFactor;
+            }
+            for (float j = 0; j < m_xCount; j++) {
+                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f,
+                                                   i * stepZ + minZ));
+
+            }
+            *m_planeArray << newRow;
+        }
+
+        resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, m_xCount * maxStepX + minZ);
+#else
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             for (float j = 0; j < m_xCount; j++)
                 (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, i * stepZ + minZ));
+
             *m_planeArray << newRow;
         }
 
         resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, maxX);
+#endif
 
         m_activeSample = ChartModifier::Plane;
     }
