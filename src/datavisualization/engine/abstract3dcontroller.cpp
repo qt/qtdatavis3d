@@ -67,12 +67,14 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     // Create initial default input handler
     QAbstract3DInputHandler *inputHandler;
 #if defined(Q_OS_ANDROID)
-        inputHandler = new QTouch3DInputHandler();
+    inputHandler = new QTouch3DInputHandler();
 #else
-        inputHandler = new Q3DInputHandler();
+    inputHandler = new Q3DInputHandler();
 #endif
-        inputHandler->d_ptr->m_isDefaultHandler = true;
-        setActiveInputHandler(inputHandler);
+    inputHandler->d_ptr->m_isDefaultHandler = true;
+    setActiveInputHandler(inputHandler);
+    connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
+            &Abstract3DController::emitNeedRender);
 }
 
 Abstract3DController::~Abstract3DController()
@@ -673,7 +675,7 @@ void Abstract3DController::setCameraPosition(GLfloat horizontal, GLfloat vertica
     m_verticalRotation = qBound(0.0f, vertical, 90.0f);
     m_scene->activeCamera()->setZoomLevel(qBound(10, distance, 500));
     m_scene->activeCamera()->setRotations(QPointF(m_horizontalRotation,
-                                            m_verticalRotation));
+                                                  m_verticalRotation));
     //qDebug() << "camera rotation set to" << m_horizontalRotation << m_verticalRotation;
     emitNeedRender();
 }

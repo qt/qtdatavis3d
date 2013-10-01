@@ -142,6 +142,12 @@ bool Q3DWindow::event(QEvent *event)
     case QEvent::UpdateRequest:
         renderNow();
         return true;
+    case QEvent::TouchBegin:
+    case QEvent::TouchCancel:
+    case QEvent::TouchUpdate:
+    case QEvent::TouchEnd:
+        d_ptr->m_visualController->touchEvent(static_cast<QTouchEvent *>(event));
+        return true;
     default:
         return QWindow::event(event);
     }

@@ -18,7 +18,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dinputhandler.h"
-#include "q3dcamera.h"
 #include "q3dcamera_p.h"
 #include "q3dlight.h"
 
@@ -80,8 +79,6 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
             setInputState(QDataVis::InputOnScene);
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
-            // TODO: Get rid of these (QTRD-2307)
-            emit selectionAtPoint(mousePos);
         }
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
@@ -120,11 +117,11 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
     if (QDataVis::InputRotating == inputState()) {
         // Calculate mouse movement since last frame
         QPointF rotations = scene()->activeCamera()->rotations();
-        GLfloat xRotation = rotations.x();
-        GLfloat yRotation = rotations.y();
-        GLfloat mouseMoveX = GLfloat(inputPosition().x() - mousePos.x())
+        float xRotation = rotations.x();
+        float yRotation = rotations.y();
+        float mouseMoveX = float(inputPosition().x() - mousePos.x())
                 / (scene()->viewport().width() / rotationSpeed);
-        GLfloat mouseMoveY = GLfloat(inputPosition().y() - mousePos.y())
+        float mouseMoveY = float(inputPosition().y() - mousePos.y())
                 / (scene()->viewport().height() / rotationSpeed);
         // Apply to rotations
         xRotation -= mouseMoveX;

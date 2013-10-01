@@ -20,7 +20,6 @@
 #define QTOUCH3DINPUTHANDLER_H
 
 #include <QtDataVisualization/q3dinputhandler.h>
-#include "q3dcamera.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -35,9 +34,7 @@ public:
     virtual ~QTouch3DInputHandler();
 
     // Input event listeners
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void touchEvent(QTouchEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
 
 private:
     Q_DISABLE_COPY(QTouch3DInputHandler)

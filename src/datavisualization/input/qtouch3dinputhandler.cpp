@@ -17,13 +17,17 @@
 ****************************************************************************/
 
 #include "qtouch3dinputhandler_p.h"
-#include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-const qreal maxTapAndHoldJitter = 10;
+const qreal maxTapAndHoldJitter = 20;
 const int tapAndHoldTime = 250;
+const float rotationSpeed = 200.0f;
+const int zoomRateFar = 9;
+const int zoomRateMid = 5;
+const int zoomRateNear = 1;
 
 /*!
    \class QTouch3DInputHandler
@@ -51,22 +55,6 @@ QTouch3DInputHandler::~QTouch3DInputHandler()
 {
 }
 
-// Input event listeners
-/*!
- * Override this to change handling of mouse double click events.
- * Mouse double click event is given in the \a event.
- */
-void QTouch3DInputHandler::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    if (!scene()->isSlicingActive()) {
-        setInputState(QDataVis::InputOnScene);
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        setInputPosition(event->pos());
-        // TODO: Get rid of these (QTRD-2307)
-        emit selectionAtPoint(inputPosition());
-    }
-}
-
 /*!
  * Override this to change handling of touch events.
  * Touch event is given in the \a event.
@@ -83,10 +71,12 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
 
         QPointF distance = points.at(0).pos() - points.at(1).pos();
         int newDistance = distance.manhattanLength();
-        int zoomRate = 1;
+        int zoomRate = zoomRateFar;
         int zoomLevel = scene()->activeCamera()->zoomLevel();
-        if (zoomLevel > 100)
-            zoomRate = 5;
+        if (zoomLevel > 250)
+            zoomRate = zoomRateNear;
+        else if (zoomLevel > 100)
+            zoomRate = zoomRateMid;
         if (newDistance > prevDistance())
             zoomLevel += zoomRate;
         else
@@ -97,55 +87,57 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             zoomLevel = 10;
         scene()->activeCamera()->setZoomLevel(zoomLevel);
         setPrevDistance(newDistance);
-    } else if (!scene()->isSlicingActive() && points.count() == 1) {
+    } else if (points.count() == 1) {
+        QPointF pointerPos = points.at(0).pos();
         if (event->type() == QEvent::TouchBegin) {
-            // Tap-and-hold selection start
-            d_ptr->m_startHoldPos = points.at(0).pos();
-            d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
-            d_ptr->m_holdTimer->start();
+            if (scene()->isSlicingActive()) {
+                if (scene()->isPointInPrimarySubView(pointerPos.toPoint()))
+                    setInputState(QDataVis::InputOnOverview);
+                else if (scene()->isPointInSecondarySubView(pointerPos.toPoint()))
+                    setInputState(QDataVis::InputOnSlice);
+                else
+                    setInputState(QDataVis::InputNone);
+            } else {
+                // Possible tap-and-hold selection start
+                d_ptr->m_startHoldPos = pointerPos;
+                d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
+                d_ptr->m_holdTimer->start();
+                // Set state to rotating
+                setInputState(QDataVis::InputRotating);
+                // update pointer positions to prevent jumping when releasing or repressing a button
+                setInputPosition(pointerPos.toPoint());
+            }
         } else if (event->type() == QEvent::TouchEnd) {
             d_ptr->m_holdTimer->stop();
+            setInputState(QDataVis::InputNone);
+            // update pointer positions to prevent jumping when releasing or repressing a button
+            setPreviousInputPos(pointerPos.toPoint());
         } else if (event->type() == QEvent::TouchUpdate) {
-            d_ptr->m_touchHoldPos = points.at(0).pos();
+            if (!scene()->isSlicingActive()) {
+                d_ptr->m_touchHoldPos = pointerPos;
+                if (QDataVis::InputRotating == inputState()) {
+                    // Calculate mouse movement since last frame
+                    QPointF rotations = scene()->activeCamera()->rotations();
+                    float xRotation = rotations.x();
+                    float yRotation = rotations.y();
+                    // TODO: Replace with event's previous position functionality?
+                    float mouseMoveX = float(inputPosition().x() - pointerPos.x())
+                            / (scene()->viewport().width() / rotationSpeed);
+                    float mouseMoveY = float(inputPosition().y() - pointerPos.y())
+                            / (scene()->viewport().height() / rotationSpeed);
+                    // Apply to rotations
+                    xRotation -= mouseMoveX;
+                    yRotation -= mouseMoveY;
+                    scene()->activeCamera()->setRotations(QPointF(xRotation, yRotation));
+                    scene()->activeCamera()->d_ptr->updateViewMatrix(1.0f);
+
+                    setPreviousInputPos(inputPosition());
+                    setInputPosition(pointerPos.toPoint());
+                }
+            }
         }
     } else {
         d_ptr->m_holdTimer->stop();
-    }
-}
-
-/*!
- * Override this to change handling of mouse press events.
- * Mouse press event is given in the \a event and the mouse position in \a mousePos.
- * \warning This method is subject to change or removal.
- */
-void QTouch3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
-{
-    // TODO: This code needs revisiting with new Qt releases and possibly move to using touch events for these as well.
-    if (Qt::LeftButton == event->button()) {
-        if (scene()->isSlicingActive()) {
-            if (scene()->isPointInPrimarySubView(mousePos)) {
-                setInputState(QDataVis::InputOnOverview);
-                //qDebug() << "Mouse pressed on overview";
-            } else if (scene()->isPointInSecondarySubView(mousePos)) {
-                setInputState(QDataVis::InputOnSlice);
-                //qDebug() << "Mouse pressed on zoom";
-            } else {
-                setInputState(QDataVis::InputNone);
-            }
-        } else {
-            setInputState(QDataVis::InputRotating);
-            // update mouse positions to prevent jumping when releasing or repressing a button
-            setInputPosition(mousePos);
-            //qDebug() << "Mouse pressed on scene";
-        }
-    } else if (Qt::MiddleButton == event->button()) {
-        // reset rotations
-        setInputPosition(QPoint(0, 0));
-    } else if (Qt::RightButton == event->button()) {
-        // disable rotating when in slice view
-        setInputState(QDataVis::InputOnScene);
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        setInputPosition(mousePos);
     }
 }
 
@@ -156,7 +148,7 @@ QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q
     m_holdTimer = new QTimer();
     m_holdTimer->setSingleShot(true);
     m_holdTimer->setInterval(tapAndHoldTime);
-    QObject::connect(m_holdTimer, &QTimer::timeout, this, &QTouch3DInputHandlerPrivate::tapAndHold);
+    connect(m_holdTimer, &QTimer::timeout, this, &QTouch3DInputHandlerPrivate::tapAndHold);
 }
 
 QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
@@ -169,10 +161,8 @@ void QTouch3DInputHandlerPrivate::tapAndHold()
 {
     QPointF distance = m_startHoldPos - m_touchHoldPos;
     if (distance.manhattanLength() < maxTapAndHoldJitter) {
-        q_ptr->setInputPosition(QPoint(int(m_touchHoldPos.x()), int(m_touchHoldPos.y())));
+        q_ptr->setInputPosition(m_touchHoldPos.toPoint());
         q_ptr->setInputState(QDataVis::InputOnScene);
-        // TODO: Get rid of these (QTRD-2307)
-        emit q_ptr->selectionAtPoint(q_ptr->inputPosition());
     }
 }
 
