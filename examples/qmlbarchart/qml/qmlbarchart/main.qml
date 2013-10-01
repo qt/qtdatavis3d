@@ -84,6 +84,7 @@ Item {
         id: mappingToggle
         anchors.bottom: parent.bottom
         width: tableView.width
+        height: 60
         text: "Show Income"
         onClicked: {
             if (chartData.mapping.valueRole === "expenses") {
@@ -102,6 +103,7 @@ Item {
         id: shadowToggle
         anchors.bottom: mappingToggle.top
         width: tableView.width
+        height: 60
         text: "Hide Shadows"
         onClicked: {
             if (testChart.shadowQuality == Bars3D.ShadowNone) {
@@ -118,6 +120,7 @@ Item {
         id: dataToggle
         anchors.bottom: shadowToggle.top
         width: tableView.width
+        height: 60
         text: "Show 2010 - 2012"
         onClicked: {
             if (testChart.rowAxis.max !== 6) {

@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
 import com.digia.QtDataVisualization 1.0
 import "."
 
@@ -71,8 +70,9 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: surfaceGridToggle
+        anchors.top: parent.top
         anchors.left: parent.left
         width: 200
         text: "Show Surface Grid"
@@ -87,7 +87,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: smoothSurfaceToggle
         anchors.top: surfaceGridToggle.bottom
         width: surfaceGridToggle.width
@@ -103,7 +103,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: backgroundToggle
         anchors.top: smoothSurfaceToggle.bottom
         width: smoothSurfaceToggle.width
@@ -119,7 +119,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: gridToggle
         anchors.top: backgroundToggle.bottom
         width: backgroundToggle.width
@@ -135,7 +135,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: proxyToggle
         anchors.top: gridToggle.bottom
         width: gridToggle.width

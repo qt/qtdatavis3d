@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtQuick.Controls 1.0
 import com.digia.QtDataVisualization 1.0
 import "."
 
@@ -58,7 +57,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: shadowToggle
         width: parent.width / 6
         text: "Hide Shadows"
@@ -73,7 +72,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: smoothToggle
         width: parent.width / 6
         text: "Use Smooth Dots"
@@ -89,7 +88,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: cameraToggle
         width: parent.width / 6
         text: "Change Camera Placement"
@@ -103,7 +102,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: themeToggle
         width: parent.width / 6
         text: "Change Theme"
@@ -117,7 +116,7 @@ Item {
         }
     }
 
-    Button {
+    NewButton {
         id: backgroundToggle
         width: parent.width / 6
         text: "Hide Background"
@@ -132,7 +131,8 @@ Item {
             }
         }
     }
-    Button {
+
+    NewButton {
         id: exitButton
         width: parent.width / 6
         text: "Quit"
