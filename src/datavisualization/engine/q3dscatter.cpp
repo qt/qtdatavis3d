@@ -101,7 +101,6 @@ Q3DScatter::~Q3DScatter()
 {
 }
 
-#if defined(Q_OS_ANDROID)
 /*!
  * \internal
  */
@@ -117,7 +116,6 @@ void Q3DScatter::touchEvent(QTouchEvent *event)
 {
     d_ptr->m_shared->touchEvent(event);
 }
-#endif
 
 /*!
  * \internal

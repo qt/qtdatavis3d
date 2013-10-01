@@ -19,15 +19,17 @@
 #include "qtouch3dinputhandler_p.h"
 #include "q3dcamera_p.h"
 #include <QTimer>
+#include <qmath.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 const qreal maxTapAndHoldJitter = 20;
+const int maxPinchJitter = 10;
+const int maxSelectionJitter = 5;
 const int tapAndHoldTime = 250;
 const float rotationSpeed = 200.0f;
-const int zoomRateFar = 9;
-const int zoomRateMid = 5;
-const int zoomRateNear = 1;
+const int minZoomLevel = 10;
+const int maxZoomLevel = 500;
 
 /*!
    \class QTouch3DInputHandler
@@ -66,27 +68,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
 
     if (!scene()->isSlicingActive() && points.count() == 2) {
         d_ptr->m_holdTimer->stop();
-
-        setInputState(QDataVis::InputOnPinch);
-
         QPointF distance = points.at(0).pos() - points.at(1).pos();
-        int newDistance = distance.manhattanLength();
-        int zoomRate = zoomRateFar;
-        int zoomLevel = scene()->activeCamera()->zoomLevel();
-        if (zoomLevel > 250)
-            zoomRate = zoomRateNear;
-        else if (zoomLevel > 100)
-            zoomRate = zoomRateMid;
-        if (newDistance > prevDistance())
-            zoomLevel += zoomRate;
-        else
-            zoomLevel -= zoomRate;
-        if (zoomLevel > 500)
-            zoomLevel = 500;
-        else if (zoomLevel < 10)
-            zoomLevel = 10;
-        scene()->activeCamera()->setZoomLevel(zoomLevel);
-        setPrevDistance(newDistance);
+        d_ptr->handlePinchZoom(distance.manhattanLength());
     } else if (points.count() == 1) {
         QPointF pointerPos = points.at(0).pos();
         if (event->type() == QEvent::TouchBegin) {
@@ -98,42 +81,23 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
                 else
                     setInputState(QDataVis::InputNone);
             } else {
-                // Possible tap-and-hold selection start
+                // Handle possible tap-and-hold selection
                 d_ptr->m_startHoldPos = pointerPos;
                 d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
                 d_ptr->m_holdTimer->start();
-                // Set state to rotating
+                // Start rotating
                 setInputState(QDataVis::InputRotating);
-                // update pointer positions to prevent jumping when releasing or repressing a button
                 setInputPosition(pointerPos.toPoint());
             }
         } else if (event->type() == QEvent::TouchEnd) {
             d_ptr->m_holdTimer->stop();
-            setInputState(QDataVis::InputNone);
-            // update pointer positions to prevent jumping when releasing or repressing a button
-            setPreviousInputPos(pointerPos.toPoint());
+            // Handle possible selection
+            d_ptr->handleSelection(pointerPos);
         } else if (event->type() == QEvent::TouchUpdate) {
             if (!scene()->isSlicingActive()) {
                 d_ptr->m_touchHoldPos = pointerPos;
-                if (QDataVis::InputRotating == inputState()) {
-                    // Calculate mouse movement since last frame
-                    QPointF rotations = scene()->activeCamera()->rotations();
-                    float xRotation = rotations.x();
-                    float yRotation = rotations.y();
-                    // TODO: Replace with event's previous position functionality?
-                    float mouseMoveX = float(inputPosition().x() - pointerPos.x())
-                            / (scene()->viewport().width() / rotationSpeed);
-                    float mouseMoveY = float(inputPosition().y() - pointerPos.y())
-                            / (scene()->viewport().height() / rotationSpeed);
-                    // Apply to rotations
-                    xRotation -= mouseMoveX;
-                    yRotation -= mouseMoveY;
-                    scene()->activeCamera()->setRotations(QPointF(xRotation, yRotation));
-                    scene()->activeCamera()->d_ptr->updateViewMatrix(1.0f);
-
-                    setPreviousInputPos(inputPosition());
-                    setInputPosition(pointerPos.toPoint());
-                }
+                // Handle rotation
+                d_ptr->handleRotation(pointerPos);
             }
         }
     } else {
@@ -148,7 +112,7 @@ QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q
     m_holdTimer = new QTimer();
     m_holdTimer->setSingleShot(true);
     m_holdTimer->setInterval(tapAndHoldTime);
-    connect(m_holdTimer, &QTimer::timeout, this, &QTouch3DInputHandlerPrivate::tapAndHold);
+    connect(m_holdTimer, &QTimer::timeout, this, &QTouch3DInputHandlerPrivate::handleTapAndHold);
 }
 
 QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
@@ -157,12 +121,67 @@ QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
     delete m_holdTimer;
 }
 
-void QTouch3DInputHandlerPrivate::tapAndHold()
+void QTouch3DInputHandlerPrivate::handlePinchZoom(qreal distance)
+{
+    int newDistance = distance;
+    int prevDist = q_ptr->prevDistance();
+    if (prevDist > 0 && qAbs(prevDist - newDistance) < maxPinchJitter)
+        return;
+    q_ptr->setInputState(QDataVis::InputOnPinch);
+    Q3DCamera *camera = q_ptr->scene()->activeCamera();
+    int zoomLevel = camera->zoomLevel();
+    qreal zoomRate = qSqrt(qSqrt(zoomLevel));
+    if (newDistance > prevDist)
+        zoomLevel += zoomRate;
+    else
+        zoomLevel -= zoomRate;
+    if (zoomLevel > maxZoomLevel)
+        zoomLevel = maxZoomLevel;
+    else if (zoomLevel < minZoomLevel)
+        zoomLevel = minZoomLevel;
+    camera->setZoomLevel(zoomLevel);
+    q_ptr->setPrevDistance(newDistance);
+}
+
+void QTouch3DInputHandlerPrivate::handleTapAndHold()
 {
     QPointF distance = m_startHoldPos - m_touchHoldPos;
     if (distance.manhattanLength() < maxTapAndHoldJitter) {
         q_ptr->setInputPosition(m_touchHoldPos.toPoint());
         q_ptr->setInputState(QDataVis::InputOnScene);
+    }
+}
+
+void QTouch3DInputHandlerPrivate::handleSelection(const QPointF &position)
+{
+    QPointF distance = m_startHoldPos - position;
+    if (distance.manhattanLength() < maxSelectionJitter)
+        q_ptr->setInputState(QDataVis::InputOnScene);
+    else
+        q_ptr->setInputState(QDataVis::InputNone);
+    q_ptr->setPreviousInputPos(position.toPoint());
+}
+
+void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
+{
+    if (QDataVis::InputRotating == q_ptr->inputState()) {
+        Q3DScene *scene = q_ptr->scene();
+        Q3DCamera *camera = scene->activeCamera();
+        QPointF rotations = camera->rotations();
+        float xRotation = rotations.x();
+        float yRotation = rotations.y();
+        QPointF inputPos = q_ptr->inputPosition();
+        float mouseMoveX = float(inputPos.x() - position.x())
+                / (scene->viewport().width() / rotationSpeed);
+        float mouseMoveY = float(inputPos.y() - position.y())
+                / (scene->viewport().height() / rotationSpeed);
+        xRotation -= mouseMoveX;
+        yRotation -= mouseMoveY;
+        camera->setRotations(QPointF(xRotation, yRotation));
+        camera->d_ptr->updateViewMatrix(1.0f);
+
+        q_ptr->setPreviousInputPos(inputPos.toPoint());
+        q_ptr->setInputPosition(position.toPoint());
     }
 }
 

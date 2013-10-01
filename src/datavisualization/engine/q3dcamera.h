@@ -80,7 +80,7 @@ private:
     friend class Scatter3DRenderer;
     friend class SelectionPointer;
     friend class Q3DInputHandler;
-    friend class QTouch3DInputHandler;
+    friend class QTouch3DInputHandlerPrivate;
     friend class QMac3DInputHandler;
 };
 

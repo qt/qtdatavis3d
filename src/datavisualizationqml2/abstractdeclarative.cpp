@@ -135,24 +135,15 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::handleShadowQualityUpdate);
 }
 
-
 void AbstractDeclarative::mouseDoubleClickEvent(QMouseEvent *event)
 {
-#if defined(Q_OS_ANDROID)
     m_controller->mouseDoubleClickEvent(event);
-#else
-    Q_UNUSED(event)
-#endif
 }
 
 void AbstractDeclarative::touchEvent(QTouchEvent *event)
 {
-#if defined(Q_OS_ANDROID)
     m_controller->touchEvent(event);
     update();
-#else
-    Q_UNUSED(event)
-#endif
 }
 
 void AbstractDeclarative::mousePressEvent(QMouseEvent *event)

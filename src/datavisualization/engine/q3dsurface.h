@@ -98,11 +98,8 @@ public:
     QDataVis::LabelTransparency labelTransparency() const;
 
 protected:
-
-#if defined(Q_OS_ANDROID)
     void mouseDoubleClickEvent(QMouseEvent *event);
     void touchEvent(QTouchEvent *event);
-#endif
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

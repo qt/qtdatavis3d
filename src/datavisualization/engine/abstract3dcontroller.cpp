@@ -26,12 +26,7 @@
 #include "q3dlight.h"
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dinputhandler_p.h"
-
-#if defined(Q_OS_ANDROID)
 #include "qtouch3dinputhandler.h"
-#else
-#include "q3dinputhandler.h"
-#endif
 
 #include <QThread>
 
@@ -66,11 +61,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
 
     // Create initial default input handler
     QAbstract3DInputHandler *inputHandler;
-#if defined(Q_OS_ANDROID)
     inputHandler = new QTouch3DInputHandler();
-#else
-    inputHandler = new Q3DInputHandler();
-#endif
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
     connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,

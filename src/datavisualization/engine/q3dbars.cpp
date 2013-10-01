@@ -110,7 +110,6 @@ Q3DBars::~Q3DBars()
 {
 }
 
-#if defined(Q_OS_ANDROID)
 /*!
  * \internal
  */
@@ -126,7 +125,6 @@ void Q3DBars::touchEvent(QTouchEvent *event)
 {
     d_ptr->m_shared->touchEvent(event);
 }
-#endif
 
 /*!
  * \internal

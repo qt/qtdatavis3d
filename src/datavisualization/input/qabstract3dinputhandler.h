@@ -75,6 +75,7 @@ private:
     QScopedPointer<QAbstract3DInputHandlerPrivate> d_ptr;
 
     friend class Abstract3DController;
+    friend class QTouch3DInputHandlerPrivate;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

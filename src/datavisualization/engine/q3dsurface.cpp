@@ -111,13 +111,12 @@ Q3DSurface::~Q3DSurface()
 {
 }
 
-#if defined(Q_OS_ANDROID)
 /*!
  * \internal
  */
 void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    d_ptr->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -125,9 +124,8 @@ void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DSurface::touchEvent(QTouchEvent *event)
 {
-    Q_UNUSED(event)
+    d_ptr->m_shared->touchEvent(event);
 }
-#endif
 
 /*!
  * \internal
