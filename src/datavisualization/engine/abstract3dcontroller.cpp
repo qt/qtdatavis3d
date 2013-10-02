@@ -54,7 +54,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_data(0),
     m_renderPending(false)
 {
-    m_theme.useColorTheme(QDataVis::ThemeQt);
+    m_theme.useTheme(QDataVis::ThemeQt);
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);
@@ -685,9 +685,9 @@ QColor Abstract3DController::objectColor() const
     return m_theme.m_baseColor;
 }
 
-void Abstract3DController::setColorTheme(QDataVis::ColorTheme colorTheme)
+void Abstract3DController::setTheme(QDataVis::Theme theme)
 {
-    m_theme.useColorTheme(colorTheme);
+    m_theme.useTheme(theme);
 
     m_changeTracker.themeChanged = true;
     emitNeedRender();

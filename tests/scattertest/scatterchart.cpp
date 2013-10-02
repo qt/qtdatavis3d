@@ -127,7 +127,7 @@ void ScatterDataModifier::changeTheme()
 {
     static int theme = QDataVis::ThemeQt;
 
-    m_chart->setTheme((QDataVis::ColorTheme)theme);
+    m_chart->setTheme((QDataVis::Theme)theme);
 
     if (++theme > QDataVis::ThemeIsabelle)
         theme = QDataVis::ThemeQt;

@@ -214,7 +214,7 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
 }
 
 /*!
- * Sets a predefined \a theme from \c QDataVis::ColorTheme. It is preset to \c QDataVis::ThemeQt by
+ * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
  * default. Theme affects bar colors, label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
@@ -222,9 +222,9 @@ void Q3DScatter::setCameraPosition(qreal horizontal, qreal vertical, int distanc
  *
  * \warning This method is subject to change.
  */
-void Q3DScatter::setTheme(QDataVis::ColorTheme theme)
+void Q3DScatter::setTheme(QDataVis::Theme theme)
 {
-    d_ptr->m_shared->setColorTheme(theme);
+    d_ptr->m_shared->setTheme(theme);
 }
 
 /*!

@@ -43,8 +43,8 @@ public:
     explicit Theme();
     ~Theme();
 
-    void useColorTheme(QDataVis::ColorTheme theme);
-    QDataVis::ColorTheme colorTheme();
+    void useTheme(QDataVis::Theme theme);
+    QDataVis::Theme theme();
     void setFromTheme(Theme &theme);
 
 private:
@@ -57,7 +57,7 @@ private:
     friend class SelectionPointer;
     friend class Drawer;
 
-    QDataVis::ColorTheme m_colorTheme;
+    QDataVis::Theme m_theme;
     QColor m_baseColor;
     QColor m_heightColor;
     QColor m_depthColor;

@@ -305,7 +305,7 @@ void ChartModifier::changeTransparency()
 
 void ChartModifier::changeTheme(int theme)
 {
-    m_chart->setTheme((QDataVis::ColorTheme)theme);
+    m_chart->setTheme((QDataVis::Theme)theme);
 }
 
 void ChartModifier::timeout()

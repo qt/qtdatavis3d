@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     QSize screenSize = surfaceChart->screen()->size();
 
     // Set to default, should be same as the initial on themeList
-    surfaceChart->setTheme(QDataVis::ColorTheme(initialTheme));
+    surfaceChart->setTheme(QDataVis::Theme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceChart);
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));

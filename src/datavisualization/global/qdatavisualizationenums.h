@@ -30,7 +30,7 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
     Q_OBJECT
     Q_ENUMS(MeshStyle)
     Q_ENUMS(CameraPreset)
-    Q_ENUMS(ColorTheme)
+    Q_ENUMS(Theme)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelTransparency)
@@ -83,7 +83,7 @@ public:
         PresetDirectlyBelow
     };
 
-    enum ColorTheme {
+    enum Theme {
         ThemeDefault = -1,
         ThemeQt,
         ThemePrimaryColors,

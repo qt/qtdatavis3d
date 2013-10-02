@@ -255,7 +255,7 @@ public:
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    virtual void setColorTheme(QDataVis::ColorTheme colorTheme);
+    virtual void setTheme(QDataVis::Theme theme);
     virtual Theme theme();
 
     // Set font

@@ -35,7 +35,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
+    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
@@ -59,8 +59,8 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
-    void setTheme(QDataVis::ColorTheme theme);
-    QDataVis::ColorTheme theme() const;
+    void setTheme(QDataVis::Theme theme);
+    QDataVis::Theme theme() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;

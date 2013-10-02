@@ -46,15 +46,15 @@ QDataVis::CameraPreset AbstractDeclarative::cameraPreset() const
     return m_controller->cameraPreset();
 }
 
-void AbstractDeclarative::setTheme(QDataVis::ColorTheme theme)
+void AbstractDeclarative::setTheme(QDataVis::Theme theme)
 {
     // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
-    m_controller->setColorTheme(theme);
+    m_controller->setTheme(theme);
 }
 
-QDataVis::ColorTheme AbstractDeclarative::theme() const
+QDataVis::Theme AbstractDeclarative::theme() const
 {
-    return m_controller->theme().colorTheme();
+    return m_controller->theme().theme();
 }
 
 void AbstractDeclarative::setSelectionMode(QDataVis::SelectionMode mode)

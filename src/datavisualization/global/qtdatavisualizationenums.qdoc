@@ -99,9 +99,9 @@
 */
 
 /*!
-    \enum QtDataVisualization::QDataVis::ColorTheme
+    \enum QtDataVisualization::QDataVis::Theme
 
-    Predefined color themes.
+    Predefined themes.
 
     \value ThemeDefault
            Used only in QML to indicate a theme has not been set.

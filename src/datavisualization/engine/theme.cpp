@@ -51,15 +51,15 @@ Theme::~Theme()
 {
 }
 
-QDataVis::ColorTheme Theme::colorTheme()
+QDataVis::Theme Theme::theme()
 {
-    return m_colorTheme;
+    return m_theme;
 }
 
-void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
+void Theme::useTheme(QDataVis::Theme theme)
 {
-    m_colorTheme = colorTheme;
-    switch (colorTheme) {
+    m_theme = theme;
+    switch (theme) {
     case QDataVis::ThemeQt: {
         m_baseColor = QColor(QRgb(0x80c342));
         //m_heightColor = QColor(QRgb(0x));
@@ -227,7 +227,7 @@ void Theme::useColorTheme(QDataVis::ColorTheme colorTheme)
 
 void Theme::setFromTheme(Theme &theme)
 {
-    m_colorTheme = theme.m_colorTheme;
+    m_theme = theme.m_theme;
     m_baseColor = theme.m_baseColor;
     m_heightColor = theme.m_heightColor;
     m_depthColor = theme.m_depthColor;

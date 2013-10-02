@@ -62,7 +62,7 @@ public:
 
     void setCameraPosition(qreal horizontal, qreal vertical, int distance = 100);
 
-    void setTheme(QDataVis::ColorTheme theme);
+    void setTheme(QDataVis::Theme theme);
 
     void setBarThickness(qreal thicknessRatio);
     qreal barThickness();

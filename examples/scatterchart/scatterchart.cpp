@@ -104,7 +104,7 @@ void ScatterDataModifier::setSmoothDots(int smooth)
 
 void ScatterDataModifier::changeTheme(int theme)
 {
-    m_chart->setTheme((QDataVis::ColorTheme)theme);
+    m_chart->setTheme((QDataVis::Theme)theme);
 }
 
 void ScatterDataModifier::changePresetCamera()

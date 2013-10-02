@@ -45,7 +45,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorTheme theme READ theme WRITE setTheme)
+    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
@@ -53,7 +53,7 @@ class AbstractDeclarative : public QQuickItem
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
     Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
     Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
-    Q_ENUMS(QtDataVisualization::QDataVis::ColorTheme)
+    Q_ENUMS(QtDataVisualization::QDataVis::Theme)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
 
 public:
@@ -65,8 +65,8 @@ public:
     virtual void setCameraPreset(QDataVis::CameraPreset preset);
     virtual QDataVis::CameraPreset cameraPreset() const;
 
-    virtual void setTheme(QDataVis::ColorTheme theme);
-    virtual QDataVis::ColorTheme theme() const;
+    virtual void setTheme(QDataVis::Theme theme);
+    virtual QDataVis::Theme theme() const;
 
     virtual void setSelectionMode(QDataVis::SelectionMode mode);
     virtual QDataVis::SelectionMode selectionMode() const;
