@@ -15,13 +15,8 @@ include($$PWD/axis/axis.pri)
 include($$PWD/data/data.pri)
 include($$PWD/input/input.pri)
 
-wince* {
-    # The Microsoft MIPS compiler crashes if /Og is specified.
-    # -O2/1 expands to /Og plus additional arguments.
-    contains(DEFINES, MIPS) {
-        QMAKE_CXXFLAGS_RELEASE ~= s/-O2/-Oi -Ot -Oy -Ob2/
-        QMAKE_CXXFLAGS_RELEASE ~= s/-O1/-Os -Oy -Ob2/
-    }
+android {
+    CONFIG += static
 }
 
 OTHER_FILES += doc/qtdatavisualization.qdocconf \
