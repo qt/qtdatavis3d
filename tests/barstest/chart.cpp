@@ -140,7 +140,7 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_yearAxis);
         m_chart->setColumnAxis(m_monthAxis);
 
-        m_chart->setSelectionMode(QDataVis::ModeItem);
+        m_chart->setSelectionMode(QDataVis::SelectionModeItem);
     } else {
         m_chart->setActiveDataProxy(m_genericData);
 
@@ -150,7 +150,7 @@ void ChartModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_genericRowAxis);
         m_chart->setColumnAxis(m_genericColumnAxis);
 
-        m_chart->setSelectionMode(QDataVis::ModeItem);
+        m_chart->setSelectionMode(QDataVis::SelectionModeItem);
     }
 }
 
@@ -475,8 +475,8 @@ void ChartModifier::changeSelectionMode()
 {
     static int selectionMode = m_chart->selectionMode();
 
-    if (++selectionMode > QDataVis::ModeSliceColumn)
-        selectionMode = QDataVis::ModeNone;
+    if (++selectionMode > QDataVis::SelectionModeSliceColumn)
+        selectionMode = QDataVis::SelectionModeNone;
 
     m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 }

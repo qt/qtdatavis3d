@@ -302,7 +302,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         QMatrix4x4 itModelMatrix;
 
         GLfloat barPosY = negativesComp * item->translation().y() - m_yAdjustment / 2.0f + 0.2f; // we need some room for labels underneath; add +0.2f
-        if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
+        if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode)
             barPosX = item->translation().x();
         else
             barPosX = -(item->translation().z() - zComp); // flip z; frontmost bar to the left
@@ -316,7 +316,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         QVector3D baseColor;
         if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
             baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
-        else if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
+        else if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode)
             baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
         else
             baseColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
@@ -327,7 +327,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         QVector3D barColor;
         if (m_selection.x() == item->position().x() && m_selection.y() == item->position().y())
             barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
-        else if (QDataVis::ModeSliceRow == m_cachedSelectionMode)
+        else if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode)
             barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
         else
             barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
@@ -365,7 +365,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     // Draw labels for axes
     BarRenderItem *dummyItem(0);
     const LabelItem &sliceSelectionLabel = *m_sliceTitleItem;
-    if (QDataVis::ModeSliceRow == m_cachedSelectionMode) {
+    if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode) {
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
                                 QVector3D(0.0f, m_autoScaleAdjustment, zComp),
@@ -640,7 +640,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #endif
 
     // Skip selection mode drawing if we're slicing or have no selection mode
-    if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::ModeNone) {
+    if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::SelectionModeNone) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -810,7 +810,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
             GLfloat lightStrength = m_cachedTheme.m_lightStrength;
 
-            if (m_cachedSelectionMode > QDataVis::ModeNone) {
+            if (m_cachedSelectionMode > QDataVis::SelectionModeNone) {
                 Bars3DController::SelectionType selectionType = isSelected(row, bar);
 
                 switch (selectionType) {
@@ -824,19 +824,19 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         barSelectionFound = true;
                     }
-                    if (selectionDirty && m_cachedSelectionMode >= QDataVis::ModeSliceRow) {
+                    if (selectionDirty && m_cachedSelectionMode >= QDataVis::SelectionModeSliceRow) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         item.setPosition(QPoint(row, bar));
                         m_sliceSelection->append(&item);
                         barSelectionFound = true;
-                        if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+                        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
                             if (m_axisCacheX.labelItems().size() > row)
                                 m_sliceTitleItem = m_axisCacheX.labelItems().at(row);
                             if (!m_sliceCache) {
                                 // m_sliceCache is the axis for labels, while title comes from different axis.
                                 m_sliceCache = &m_axisCacheZ;
                             }
-                        } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+                        } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
                             if (m_axisCacheZ.labelItems().size() > bar)
                                 m_sliceTitleItem = m_axisCacheZ.labelItems().at(bar);
                             if (!m_sliceCache) {
@@ -851,7 +851,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Current bar is on the same row as the selected bar
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
-                    if (QDataVis::ModeSliceRow == m_cachedSelectionMode) {
+                    if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         item.setPosition(QPoint(row, bar));
                         if (selectionDirty)
@@ -863,7 +863,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     // Current bar is on the same column as the selected bar
                     barColor = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
                     lightStrength = m_cachedTheme.m_highlightLightStrength;
-                    if (QDataVis::ModeSliceColumn == m_cachedSelectionMode) {
+                    if (QDataVis::SelectionModeSliceColumn == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         item.setPosition(QPoint(row, bar));
                         if (selectionDirty)
@@ -1391,7 +1391,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     || QDataVis::InputOnOverview == m_controller->inputState())) {
             m_cachedScene->setSlicingActive(false);
         }
-    } else if (m_cachedSelectionMode >= QDataVis::ModeSliceRow && selectionDirty) {
+    } else if (m_cachedSelectionMode >= QDataVis::SelectionModeSliceRow && selectionDirty) {
         // Activate slice mode
         m_cachedScene->setSlicingActive(true);
 
@@ -1537,9 +1537,9 @@ void Bars3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
     Abstract3DRenderer::updateSelectionMode(mode);
 
     // Create zoom selection if there isn't one
-    if (mode >= QDataVis::ModeSliceRow && !m_sliceSelection) {
+    if (mode >= QDataVis::SelectionModeSliceRow && !m_sliceSelection) {
         m_sliceSelection = new QList<BarRenderItem *>;
-        if (mode == QDataVis::ModeSliceRow)
+        if (mode == QDataVis::SelectionModeSliceRow)
             m_sliceSelection->reserve(m_cachedRowCount);
         else
             m_sliceSelection->reserve(m_cachedColumnCount);
@@ -1700,14 +1700,14 @@ Bars3DController::SelectionType Bars3DRenderer::isSelected(GLint row, GLint bar)
     if (current == m_selection) {
         isSelectedType = Bars3DController::SelectionItem;
     }
-    else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::ModeItemAndColumn
-                                                || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::ModeSliceColumn)) {
+    else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndColumn
+                                                || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
+                                                || m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn)) {
         isSelectedType = Bars3DController::SelectionColumn;
     }
-    else if (current.x() == m_selection.x() && (m_cachedSelectionMode == QDataVis::ModeItemAndRow
-                                                || m_cachedSelectionMode == QDataVis::ModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::ModeSliceRow)) {
+    else if (current.x() == m_selection.x() && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndRow
+                                                || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
+                                                || m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)) {
         isSelectedType = Bars3DController::SelectionRow;
     }
     return isSelectedType;

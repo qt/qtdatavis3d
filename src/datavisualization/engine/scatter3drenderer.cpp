@@ -377,7 +377,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
     // Skip selection mode drawing if we have no selection mode
-    if (m_cachedSelectionMode > QDataVis::ModeNone) {
+    if (m_cachedSelectionMode > QDataVis::SelectionModeNone) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -535,7 +535,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-        if (m_cachedSelectionMode > QDataVis::ModeNone && (selectedIndex == dot)) {
+        if (m_cachedSelectionMode > QDataVis::SelectionModeNone && (selectedIndex == dot)) {
             dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
             lightStrength = m_cachedTheme.m_highlightLightStrength;
             // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one

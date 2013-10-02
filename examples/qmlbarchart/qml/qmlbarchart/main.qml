@@ -46,7 +46,7 @@ Item {
             width: dataView.width
             height: dataView.height
             shadowQuality: Bars3D.ShadowQualityMedium
-            selectionMode: Bars3D.ModeItem
+            selectionMode: Bars3D.SelectionModeItem
             font.pointSize: 35
             theme: Bars3D.ThemeRetro
             labelStyle: Bars3D.LabelStyleFromTheme

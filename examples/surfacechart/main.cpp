@@ -167,10 +167,10 @@ int main(int argc, char *argv[])
 //    shadowQuality->addItem(QStringLiteral("High Soft"));
 //    shadowQuality->setCurrentIndex(3);
     QComboBox *selectionMode = new QComboBox(widget);
-    selectionMode->addItem(QStringLiteral("ModeNone"));
-    selectionMode->addItem(QStringLiteral("ModeItem"));
-    selectionMode->addItem(QStringLiteral("ModeSliceRow"));
-    selectionMode->addItem(QStringLiteral("ModeSliceColumn"));
+    selectionMode->addItem(QStringLiteral("SelectionModeNone"));
+    selectionMode->addItem(QStringLiteral("SelectionModeItem"));
+    selectionMode->addItem(QStringLiteral("SelectionModeSliceRow"));
+    selectionMode->addItem(QStringLiteral("SelectionModeSliceColumn"));
     selectionMode->setCurrentIndex(1);
 
     // Add controls to the layout

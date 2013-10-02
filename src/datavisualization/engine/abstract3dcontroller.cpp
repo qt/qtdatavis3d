@@ -39,7 +39,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_verticalRotation(15.0f),
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
-    m_selectionMode(QDataVis::ModeItem),
+    m_selectionMode(QDataVis::SelectionModeItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
     m_labelStyle(QDataVis::LabelStyleTransparent),
     m_isBackgroundEnabled(true),

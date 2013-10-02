@@ -271,9 +271,9 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
     m_sliceDataArray.reserve(2);
     QSurfaceDataRow *sliceRow;
 
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         sliceRow = new QSurfaceDataRow(*m_dataArray.at(row));
-    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
         sliceRow = new QSurfaceDataRow();
         sliceRow->resize(m_sampleSpace.height());
         for (int i = 0; i < m_sampleSpace.height(); i++)
@@ -476,11 +476,11 @@ void Surface3DRenderer::drawSlicedScene()
     GLfloat scaleX;
     GLfloat scaleXBackground;
     GLfloat offset;
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         scaleX = m_surfaceScaleX;
         scaleXBackground = m_scaleXWithBackground;
         offset = m_surfaceOffsetX;
-    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
         scaleX = m_surfaceScaleZ;
         scaleXBackground = m_scaleZWithBackground;
         offset = -m_surfaceOffsetZ;
@@ -505,7 +505,7 @@ void Surface3DRenderer::drawSlicedScene()
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
         QVector3D color;
-        if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
             color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
         else
             color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
@@ -603,7 +603,7 @@ void Surface3DRenderer::drawSlicedScene()
     int lastSegment;
     GLfloat lineStep;
     GLfloat linePos;
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
         lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
         linePos = m_scaleX;
@@ -641,7 +641,7 @@ void Surface3DRenderer::drawSlicedScene()
         linePos += lineStep;
     }
 
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
         linePos = m_scaleX;
     else
         linePos = m_scaleZ;
@@ -712,7 +712,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     // X Labels to ground
     int countLabelItems;
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
         labelPos = -m_scaleX;
         lastSegment = m_axisCacheX.segmentCount();
@@ -736,15 +736,15 @@ void Surface3DRenderer::drawSlicedScene()
             m_dummyRenderItem.setTranslation(labelTrans);
 
             LabelItem *axisLabelItem;
-            if (m_cachedSelectionMode == QDataVis::ModeSliceRow)
+            if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
                 axisLabelItem = m_axisCacheX.labelItems().at(labelNbr);
             else
                 axisLabelItem = m_axisCacheZ.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, rotation, 0, QDataVis::ModeSliceRow, m_labelShader,
-                                m_labelObj, m_cachedScene->activeCamera(), false, false,
-                                Drawer::LabelBelow, Qt::AlignTop);
+                                positionComp, rotation, 0, QDataVis::SelectionModeSliceRow,
+                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                false, false, Drawer::LabelBelow, Qt::AlignTop);
         }
         labelNbr++;
         labelPos += posStep;
@@ -919,8 +919,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputOnScene && m_surfaceObj
-        && m_cachedSelectionMode > QDataVis::ModeNone) {
+    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputOnScene
+            && m_surfaceObj && m_cachedSelectionMode > QDataVis::SelectionModeNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -1625,17 +1625,18 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     if (m_selectionModeChanged || selectionDirty) {
         if (selectionDirty)
             m_cachedSelectionId = selectionId;
-        if (m_cachedSelectionMode == QDataVis::ModeNone) {
+        if (m_cachedSelectionMode == QDataVis::SelectionModeNone) {
             m_cachedSelectionId = 0;
             m_selectionActive = false;
         }
-        if (m_cachedSelectionMode == QDataVis::ModeItem) {
+        if (m_cachedSelectionMode == QDataVis::SelectionModeItem) {
             if (m_cachedSelectionId)
                 surfacePointSelected(m_cachedSelectionId);
             else
                 m_selectionActive = false;
         }
-        if (m_cachedSelectionMode == QDataVis::ModeSliceRow || m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow
+                || m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
             if (m_cachedSelectionId) {
                 updateSliceDataModel(m_cachedSelectionId);
                 m_cachedScene->setSlicingActive(true);
@@ -1893,13 +1894,13 @@ void Surface3DRenderer::surfacePointSelected(int id)
         m_selectionPointer = new SelectionPointer(m_drawer);
 
     QVector3D pos;
-    if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {
+    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         pos = normalize(column, 0);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
         pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
-    } else if (m_cachedSelectionMode == QDataVis::ModeSliceColumn) {
+    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
         pos = normalize(0, row);
         pos.setX(-pos.z());
         pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);

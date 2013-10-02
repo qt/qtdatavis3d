@@ -316,7 +316,7 @@ QColor Q3DBars::barColor() const
  * \property Q3DBars::selectionMode
  *
  * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
- * \c QDataVis::ModeItem by default.
+ * \c QDataVis::SelectionModeItem by default.
  */
 void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
 {

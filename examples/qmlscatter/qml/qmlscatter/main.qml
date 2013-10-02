@@ -43,7 +43,7 @@ Item {
             dataProxy: chartData.proxy
             theme: Scatter3D.ThemeIsabelle
             shadowQuality: Scatter3D.ShadowQualitySoftLow
-            selectionMode: Scatter3D.ModeItem
+            selectionMode: Scatter3D.SelectionModeItem
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             axisX.segmentCount: 3
             axisX.subSegmentCount: 2

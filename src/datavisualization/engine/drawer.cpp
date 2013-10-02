@@ -295,7 +295,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (QDataVis::ModeSliceColumn == mode)
+        else if (QDataVis::SelectionModeSliceColumn == mode)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 

@@ -207,7 +207,7 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
 
 void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    if (mode > QDataVis::ModeItem) {
+    if (mode > QDataVis::SelectionModeItem) {
         qWarning("Unsupported selection mode.");
         return;
     }

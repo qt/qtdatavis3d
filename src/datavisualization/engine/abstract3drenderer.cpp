@@ -37,7 +37,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedBoundingRect(QRect(0,0,0,0)),
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedSelectionMode(QDataVis::ModeNone),
+      m_cachedSelectionMode(QDataVis::SelectionModeNone),
       m_cachedIsGridEnabled(false),
       m_cachedIsBackgroundEnabled(false),
       m_cachedScene(new Q3DScene())

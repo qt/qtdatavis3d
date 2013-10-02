@@ -96,13 +96,13 @@ public:
     };
 
     enum SelectionMode {
-        ModeNone = 0,
-        ModeItem,
-        ModeItemAndRow,
-        ModeItemAndColumn,
-        ModeItemRowAndColumn,
-        ModeSliceRow,
-        ModeSliceColumn
+        SelectionModeNone = 0,
+        SelectionModeItem,
+        SelectionModeItemAndRow,
+        SelectionModeItemAndColumn,
+        SelectionModeItemRowAndColumn,
+        SelectionModeSliceRow,
+        SelectionModeSliceColumn
     };
 
     enum ShadowQuality {

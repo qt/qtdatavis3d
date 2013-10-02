@@ -150,8 +150,9 @@ void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
 
 void Surface3DController::setSelectionMode(QDataVis::SelectionMode mode)
 {
-    if (!(mode == QDataVis::ModeNone || mode == QDataVis::ModeItem || mode == QDataVis::ModeSliceRow
-        || mode == QDataVis::ModeSliceColumn)) {
+    if (!(mode == QDataVis::SelectionModeNone || mode == QDataVis::SelectionModeItem
+          || mode == QDataVis::SelectionModeSliceRow
+          || mode == QDataVis::SelectionModeSliceColumn)) {
         qWarning("Unsupported selection mode.");
         return;
     }

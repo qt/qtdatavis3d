@@ -69,7 +69,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
 
     m_chart->setFont(QFont("Times Roman", 20));
 
-    m_chart->setSelectionMode(QDataVis::ModeItem);
+    m_chart->setSelectionMode(QDataVis::SelectionModeItem);
 
     resetTemperatureData();
 }

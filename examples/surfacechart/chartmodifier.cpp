@@ -350,20 +350,20 @@ void ChartModifier::changeSelectionMode(int mode)
 {
     switch (mode) {
     case 0:
-        qDebug() << "QDataVis::ModeNone";
-        m_chart->setSelectionMode(QDataVis::ModeNone);
+        qDebug() << "QDataVis::SelectionModeNone";
+        m_chart->setSelectionMode(QDataVis::SelectionModeNone);
         break;
     case 1:
-        qDebug() << "QDataVis::ModeItem";
-        m_chart->setSelectionMode(QDataVis::ModeItem);
+        qDebug() << "QDataVis::SelectionModeItem";
+        m_chart->setSelectionMode(QDataVis::SelectionModeItem);
         break;
     case 2:
-        qDebug() << "QDataVis::ModeSliceRow";
-        m_chart->setSelectionMode(QDataVis::ModeSliceRow);
+        qDebug() << "QDataVis::SelectionModeSliceRow";
+        m_chart->setSelectionMode(QDataVis::SelectionModeSliceRow);
         break;
     case 3:
-        qDebug() << "QDataVis::ModeSliceColumn";
-        m_chart->setSelectionMode(QDataVis::ModeSliceColumn);
+        qDebug() << "QDataVis::SelectionModeSliceColumn";
+        m_chart->setSelectionMode(QDataVis::SelectionModeSliceColumn);
         break;
     default:
         qDebug() << __FUNCTION__ << " Unsupported selection mode.";

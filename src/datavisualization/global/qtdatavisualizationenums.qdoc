@@ -120,22 +120,22 @@
 
     Item selection modes.
 
-    \value ModeNone
+    \value SelectionModeNone
            Selection mode disabled.
-    \value ModeItem
+    \value SelectionModeItem
            Selection selects a single item.
-    \value ModeItemAndRow
+    \value SelectionModeItemAndRow
            Selection selects a single item and highlights the row it is on. In Q3DBars only.
-    \value ModeItemAndColumn
+    \value SelectionModeItemAndColumn
            Selection selects a single item and highlights the column it is on. In Q3DBars only.
-    \value ModeItemRowAndColumn
+    \value SelectionModeItemRowAndColumn
            Selection selects a single item and highlights the row and the column it is on. In
            Q3DBars only.
-    \value ModeSliceRow
+    \value SelectionModeSliceRow
            Selection selects a single item and displays the row it is on in a separate view. The
            original view is shrunk into upper left corner. Original view is restored by clicking
            on it. In Q3DBars only.
-    \value ModeSliceColumn
+    \value SelectionModeSliceColumn
            Selection selects a single item and displays the column it is on in a separate view. The
            original view is shrunk into upper left corner. Original view is restored by clicking
            on it. In Q3DBars only.

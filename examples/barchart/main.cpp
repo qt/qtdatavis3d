@@ -85,7 +85,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_chart->setSelectionMode(QDataVis::ModeItemRowAndColumn);
+    m_chart->setSelectionMode(QDataVis::SelectionModeItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
     m_chart->rowAxis()->setCategoryLabels(QStringList(QString()));
@@ -94,7 +94,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_chart->activeDataProxy()->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
     // Set selection mode to zoom row
-    m_chart->setSelectionMode(QDataVis::ModeSliceRow);
+    m_chart->setSelectionMode(QDataVis::SelectionModeSliceRow);
     m_chart->setFont(QFont("Impact", 20));
 #endif
 
