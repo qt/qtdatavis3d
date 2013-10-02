@@ -174,7 +174,6 @@ private:
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(int id);
     QString createSelectionLabel(qreal value, int column, int row);
-    QVector3D normalize(int x, int z);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif

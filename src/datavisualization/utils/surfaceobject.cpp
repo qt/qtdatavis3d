@@ -45,16 +45,18 @@ SurfaceObject::~SurfaceObject()
 void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
                                     GLfloat yRange, GLfloat yMin, bool changeGeometry)
 {
-    int columns = space.width();
-    int rows = space.height();
-    int totalSize = rows * columns;
+    m_columns = space.width();
+    m_rows = space.height();
+    int totalSize = m_rows * m_columns;
     GLfloat xMin = dataArray.at(0)->at(0).x();
     GLfloat zMin = dataArray.at(0)->at(0).z();
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-    GLfloat uvX = 1.0 / GLfloat(columns - 1);
-    GLfloat uvY = 1.0 / GLfloat(rows - 1);
+    GLfloat uvX = 1.0 / GLfloat(m_columns - 1);
+    GLfloat uvY = 1.0 / GLfloat(m_rows - 1);
+
+    m_surfaceType = SurfaceSmooth;
 
     // Create/populate vertice table
     if (changeGeometry)
@@ -64,9 +66,9 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     if (changeGeometry)
         uvs.resize(totalSize);
     int totalIndex = 0;
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &p = *dataArray.at(i);
-        for (int j = 0; j < columns; j++) {
+        for (int j = 0; j < m_columns; j++) {
             const QSurfaceDataItem &data = p.at(j);
             float normalizedX = ((data.x() - xMin) / xNormalizer);
             float normalizedY = ((data.y() - yMin) / yNormalizer);
@@ -79,34 +81,34 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     }
 
     // Create normals
-    int rowLimit = rows - 1;
-    int colLimit = columns - 1;
-    int rowColLimit = rowLimit * columns;
+    int rowLimit = m_rows - 1;
+    int colLimit = m_columns - 1;
+    int rowColLimit = rowLimit * m_columns;
     int totalLimit = totalSize - 1;
     if (changeGeometry)
         m_normals.resize(totalSize);
 
     totalIndex = 0;
-    for (int row = 0; row < rowColLimit; row += columns) {
+    for (int row = 0; row < rowColLimit; row += m_columns) {
         for (int j = 0; j < colLimit; j++) {
             m_normals[totalIndex++] = normal(m_vertices.at(row + j),
                                              m_vertices.at(row + j + 1),
-                                             m_vertices.at(row + columns + j));
+                                             m_vertices.at(row + m_columns + j));
         }
         int p = row + colLimit;
         m_normals[totalIndex++] = normal(m_vertices.at(p),
-                                         m_vertices.at(p + columns),
+                                         m_vertices.at(p + m_columns),
                                          m_vertices.at(p - 1));
     }
     for (int j = rowColLimit; j < totalLimit; j++) {
         m_normals[totalIndex++] = normal(m_vertices.at(j),
-                                         m_vertices.at(j - columns),
+                                         m_vertices.at(j - m_columns),
                                          m_vertices.at(j + 1));
     }
-    int p = rows * colLimit;
+    int p = m_rows * colLimit;
     m_normals[totalIndex++] = normal(m_vertices.at(p),
                                      m_vertices.at(p - 1),
-                                     m_vertices.at(p - columns - 1));
+                                     m_vertices.at(p - m_columns - 1));
 
     // Create indices table
     GLint *indices = 0;
@@ -114,16 +116,16 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
         m_indexCount = 6 * colLimit * rowLimit;
         indices = new GLint[m_indexCount];
         p = 0;
-        for (int row = 0; row < rowLimit * columns; row += columns) {
+        for (int row = 0; row < rowLimit * m_columns; row += m_columns) {
             for (int j = 0; j < colLimit; j++) {
                 // Left triangle
                 indices[p++] = row + j + 1;
-                indices[p++] = row + columns + j;
+                indices[p++] = row + m_columns + j;
                 indices[p++] = row + j;
 
                 // Right triangle
-                indices[p++] = row + columns + j + 1;
-                indices[p++] = row + columns + j;
+                indices[p++] = row + m_columns + j + 1;
+                indices[p++] = row + m_columns + j;
                 indices[p++] = row + j + 1;
             }
         }
@@ -132,19 +134,19 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     // Create line element indices
     GLint *gridIndices = 0;
     if (changeGeometry) {
-        m_gridIndexCount = 2 * columns * rowLimit + 2 * rows * colLimit;
+        m_gridIndexCount = 2 * m_columns * rowLimit + 2 * m_rows * colLimit;
         gridIndices = new GLint[m_gridIndexCount];
         p = 0;
-        for (int i = 0, row = 0; i < rows; i++, row += columns) {
+        for (int i = 0, row = 0; i < m_rows; i++, row += m_columns) {
             for (int j = 0; j < colLimit; j++) {
                 gridIndices[p++] = row + j;
                 gridIndices[p++] = row + j + 1;
             }
         }
-        for (int i = 0, row = 0; i < rowLimit; i++, row += columns) {
-            for (int j = 0; j < columns; j++) {
+        for (int i = 0, row = 0; i < rowLimit; i++, row += m_columns) {
+            for (int j = 0; j < m_columns; j++) {
                 gridIndices[p++] = row + j;
-                gridIndices[p++] = row + j + columns;
+                gridIndices[p++] = row + j + m_columns;
             }
         }
     }
@@ -159,16 +161,18 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
 void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
                               GLfloat yRange, GLfloat yMin, bool changeGeometry)
 {
-    int columns = space.width();
-    int rows = space.height();
-    int totalSize = rows * columns * 2;
+    m_columns = space.width();
+    m_rows = space.height();
+    int totalSize = m_rows * m_columns * 2;
     GLfloat xMin = dataArray.at(0)->at(0).x();
     GLfloat zMin = dataArray.at(0)->at(0).z();
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-    GLfloat uvX = 1.0 / GLfloat(columns - 1);
-    GLfloat uvY = 1.0 / GLfloat(rows - 1);
+    GLfloat uvX = 1.0 / GLfloat(m_columns - 1);
+    GLfloat uvY = 1.0 / GLfloat(m_rows - 1);
+
+    m_surfaceType = SurfaceFlat;
 
     // Create vertice table
     if (changeGeometry)
@@ -179,14 +183,14 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
         uvs.resize(totalSize);
 
     int totalIndex = 0;
-    int rowLimit = rows - 1;
-    int colLimit = columns - 1;
-    int doubleColumns = columns * 2 - 2;
+    int rowLimit = m_rows - 1;
+    int colLimit = m_columns - 1;
+    int doubleColumns = m_columns * 2 - 2;
     int rowColLimit = rowLimit * doubleColumns;
 
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &row = *dataArray.at(i);
-        for (int j = 0; j < columns; j++) {
+        for (int j = 0; j < m_columns; j++) {
             const QSurfaceDataItem &data = row.at(j);
             float normalizedX = ((data.x() - xMin) / xNormalizer);
             float normalizedY = ((data.y() - yMin) / yNormalizer);
@@ -248,10 +252,10 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     // Create grid line element indices
     GLint *gridIndices = 0;
     if (changeGeometry) {
-        m_gridIndexCount = 2 * columns * rowLimit + 2 * rows * colLimit;
+        m_gridIndexCount = 2 * m_columns * rowLimit + 2 * m_rows * colLimit;
         gridIndices = new GLint[m_gridIndexCount];
         p = 0;
-        int fullRowLimit = rows * doubleColumns;
+        int fullRowLimit = m_rows * doubleColumns;
         for (int row = 0; row < fullRowLimit; row += doubleColumns) {
             for (int j = 0; j < doubleColumns; j += 2) {
                 gridIndices[p++] = row + j;
@@ -320,6 +324,16 @@ GLuint SurfaceObject::gridElementBuf()
 GLuint SurfaceObject::gridIndexCount()
 {
     return m_gridIndexCount;
+}
+
+QVector3D SurfaceObject::vertexAt(int column, int row)
+{
+    int pos = 0;
+    if (m_surfaceType == SurfaceFlat)
+        pos = row * (m_columns * 2 - 2) + column * 2 - (column > 0);
+    else
+        pos = row * m_columns + column;
+    return m_vertices.at(pos);
 }
 
 QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c)

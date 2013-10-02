@@ -272,17 +272,26 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
     QSurfaceDataRow *sliceRow;
 
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
-        sliceRow = new QSurfaceDataRow(*m_dataArray.at(row));
+        QSurfaceDataRow *src = m_dataArray.at(row);
+        sliceRow = new QSurfaceDataRow(src->size());
+        for (int i = 0; i < sliceRow->size(); i++)
+            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y(), -1.0));
     } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
-        sliceRow = new QSurfaceDataRow();
-        sliceRow->resize(m_sampleSpace.height());
-        for (int i = 0; i < m_sampleSpace.height(); i++)
-            (*sliceRow)[i] = m_dataArray.at(i)->at(column);
+        sliceRow = new QSurfaceDataRow(m_sampleSpace.height());
+        for (int i = 0; i < m_sampleSpace.height(); i++) {
+            (*sliceRow)[i].setPosition(QVector3D(m_dataArray.at(i)->at(column).z(),
+                                                 m_dataArray.at(i)->at(column).y(),
+                                                 -1.0));
+        }
     }
+
     m_sliceDataArray << sliceRow;
 
     // Make a duplicate, so that we get a little bit depth
     QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
+    for (int i = 0; i < sliceRow->size(); i++)
+        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y(), 1.0));
+
     m_sliceDataArray << duplicateRow;
 
     QRect sliceRect(0, 0, sliceRow->size(), 2);
@@ -292,8 +301,8 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
             loadSliceSurfaceObj();
 
         if (m_cachedSmoothSurface) {
-            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_axisCacheY.min(),
-                                               m_heightNormalizer, true);
+            m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer,
+                                               m_axisCacheY.min(), true);
         } else {
             m_sliceSurfaceObj->setUpData(m_sliceDataArray, sliceRect, m_heightNormalizer,
                                          m_axisCacheY.min(), true);
@@ -1895,20 +1904,19 @@ void Surface3DRenderer::surfacePointSelected(int id)
 
     QVector3D pos;
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
-        pos = normalize(column, 0);
+        pos = m_sliceSurfaceObj->vertexAt(column, 0);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
         pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
-        pos = normalize(0, row);
-        pos.setX(-pos.z());
+        pos = m_sliceSurfaceObj->vertexAt(row, 0);
         pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
         pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
         m_selectionPointer->updateBoundingRect(m_sliceViewPort);
         m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
     } else {
-        pos = normalize(column, row);
+        pos = m_surfaceObj->vertexAt(column, row);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);;
         pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
         m_selectionPointer->updateBoundingRect(m_mainViewPort);
@@ -1962,18 +1970,6 @@ QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row
     }
 
     return labelText;
-}
-
-QVector3D Surface3DRenderer::normalize(int x, int z)
-{
-    float resX = (m_dataArray.at(z)->at(x).x() - m_minVisibleColumnValue)
-            / (m_visibleColumnRange / 2.0f) - 1.0f;
-    float resY = (m_dataArray.at(z)->at(x).y() - float(m_axisCacheY.min()))
-            / (m_heightNormalizer / 2.0f) - 1.0f;
-    float resZ = (m_dataArray.at(z)->at(x).z() - m_minVisibleRowValue)
-            / (m_visibleRowRange / -2.0f) + 1.0f;
-
-    return QVector3D(resX, resY, resZ);
 }
 
 void Surface3DRenderer::loadMeshFile()

@@ -50,6 +50,7 @@ public:
                          GLfloat yMin, bool changeGeometry);
     GLuint gridElementBuf();
     GLuint gridIndexCount();
+    QVector3D vertexAt(int column, int row);
 
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
@@ -58,8 +59,13 @@ private:
                        const GLint *gridIndices, bool changeGeometry);
 
 private:
-    int m_dataWidth;
-    int m_dataDepth;
+    enum SurfaceType {
+        SurfaceSmooth,
+        SurfaceFlat
+    };
+    int m_surfaceType;
+    int m_columns;
+    int m_rows;
     GLfloat m_yRange;
     GLuint m_gridElementbuffer;
     GLuint m_gridIndexCount;
