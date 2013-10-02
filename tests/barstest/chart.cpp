@@ -443,12 +443,12 @@ void ChartModifier::changeStyle()
 
 void ChartModifier::changePresetCamera()
 {
-    static int preset = QDataVis::PresetFrontLow;
+    static int preset = QDataVis::CameraPresetFrontLow;
 
     m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > QDataVis::PresetDirectlyBelow)
-        preset = QDataVis::PresetFrontLow;
+    if (++preset > QDataVis::CameraPresetDirectlyBelow)
+        preset = QDataVis::CameraPresetFrontLow;
 }
 
 void ChartModifier::changeTheme()

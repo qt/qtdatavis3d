@@ -98,8 +98,8 @@ QPointF Q3DCamera::rotations() const
 void Q3DCamera::setRotations(const QPointF &rotation)
 {
     d_ptr->setRotations(rotation);
-    if (d_ptr->m_activePreset != QDataVis::NoPreset) {
-        d_ptr->m_activePreset = QDataVis::NoPreset;
+    if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
+        d_ptr->m_activePreset = QDataVis::CameraPresetNone;
         setDirty(true);
     }
 }
@@ -165,7 +165,7 @@ void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
  * \property Q3DCamera::cameraPreset
  *
  * This property contains the currently active camera preset,
- * if no preset is active the value is QDataVis::NoPreset.
+ * if no preset is active the value is QDataVis::CameraPresetNone.
  * \note The base camera orientation set by setBaseOrientation() will affect
  * the presets as all calculations are based on those values.
  */
@@ -177,104 +177,104 @@ QDataVis::CameraPreset Q3DCamera::cameraPreset()
 void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
 {
     switch (preset) {
-    case QDataVis::PresetFrontLow: {
+    case QDataVis::CameraPresetFrontLow: {
         d_ptr->setRotations(QPointF(0.0f, 0.0f));
         break;
     }
-    case QDataVis::PresetFront: {
+    case QDataVis::CameraPresetFront: {
         d_ptr->setRotations(QPointF(0.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetFrontHigh: {
+    case QDataVis::CameraPresetFrontHigh: {
         d_ptr->setRotations(QPointF(0.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetLeftLow: {
+    case QDataVis::CameraPresetLeftLow: {
         d_ptr->setRotations(QPointF(90.0f, 0.0f));
         break;
     }
-    case QDataVis::PresetLeft: {
+    case QDataVis::CameraPresetLeft: {
         d_ptr->setRotations(QPointF(90.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetLeftHigh: {
+    case QDataVis::CameraPresetLeftHigh: {
         d_ptr->setRotations(QPointF(90.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetRightLow: {
+    case QDataVis::CameraPresetRightLow: {
         d_ptr->setRotations(QPointF(-90.0f, 0.0f));
         break;
     }
-    case QDataVis::PresetRight: {
+    case QDataVis::CameraPresetRight: {
         d_ptr->setRotations(QPointF(-90.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetRightHigh: {
+    case QDataVis::CameraPresetRightHigh: {
         d_ptr->setRotations(QPointF(-90.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetBehindLow: {
+    case QDataVis::CameraPresetBehindLow: {
         d_ptr->setRotations(QPointF(180.0f, 0.0f));
         break;
     }
-    case QDataVis::PresetBehind: {
+    case QDataVis::CameraPresetBehind: {
         d_ptr->setRotations(QPointF(180.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetBehindHigh: {
+    case QDataVis::CameraPresetBehindHigh: {
         d_ptr->setRotations(QPointF(180.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetIsometricLeft: {
+    case QDataVis::CameraPresetIsometricLeft: {
         d_ptr->setRotations(QPointF(45.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetIsometricLeftHigh: {
+    case QDataVis::CameraPresetIsometricLeftHigh: {
         d_ptr->setRotations(QPointF(45.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetIsometricRight: {
+    case QDataVis::CameraPresetIsometricRight: {
         d_ptr->setRotations(QPointF(-45.0f, 22.5f));
         break;
     }
-    case QDataVis::PresetIsometricRightHigh: {
+    case QDataVis::CameraPresetIsometricRightHigh: {
         d_ptr->setRotations(QPointF(-45.0f, 45.0f));
         break;
     }
-    case QDataVis::PresetDirectlyAbove: {
+    case QDataVis::CameraPresetDirectlyAbove: {
         d_ptr->setRotations(QPointF(0.0f, 90.0f));
         break;
     }
-    case QDataVis::PresetDirectlyAboveCW45: {
+    case QDataVis::CameraPresetDirectlyAboveCW45: {
         d_ptr->setRotations(QPointF(-45.0f, 90.0f));
         break;
     }
-    case QDataVis::PresetDirectlyAboveCCW45: {
+    case QDataVis::CameraPresetDirectlyAboveCCW45: {
         d_ptr->setRotations(QPointF(45.0f, 90.0f));
         break;
     }
-    case QDataVis::PresetFrontBelow: {
+    case QDataVis::CameraPresetFrontBelow: {
         d_ptr->setRotations(QPointF(0.0f, -45.0f));
         break;
     }
-    case QDataVis::PresetLeftBelow: {
+    case QDataVis::CameraPresetLeftBelow: {
         d_ptr->setRotations(QPointF(90.0f, -45.0f));
         break;
     }
-    case QDataVis::PresetRightBelow: {
+    case QDataVis::CameraPresetRightBelow: {
         d_ptr->setRotations(QPointF(-90.0f, -45.0f));
         break;
     }
-    case QDataVis::PresetBehindBelow: {
+    case QDataVis::CameraPresetBehindBelow: {
         d_ptr->setRotations(QPointF(180.0f, -45.0f));
         break;
     }
-    case QDataVis::PresetDirectlyBelow: {
+    case QDataVis::CameraPresetDirectlyBelow: {
         d_ptr->setRotations(QPointF(0.0f, -90.0f));
         break;
     }
     default:
-        preset = QDataVis::NoPreset;
+        preset = QDataVis::CameraPresetNone;
         break;
     }
 
@@ -343,7 +343,7 @@ Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     m_xRotation(0.0f),
     m_yRotation(0.0f),
     m_zoomLevel(100),
-    m_activePreset(QDataVis::NoPreset)
+    m_activePreset(QDataVis::CameraPresetNone)
 {
 }
 

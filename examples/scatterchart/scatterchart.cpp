@@ -38,7 +38,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setObjectType(QDataVis::Spheres, true);
     m_chart->setTheme(QDataVis::ThemeEbony);
     m_chart->setShadowQuality(QDataVis::ShadowQualityHigh);
-    m_chart->setCameraPreset(QDataVis::PresetFront);
+    m_chart->setCameraPreset(QDataVis::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
@@ -109,12 +109,12 @@ void ScatterDataModifier::changeTheme(int theme)
 
 void ScatterDataModifier::changePresetCamera()
 {
-    static int preset = QDataVis::PresetFrontLow;
+    static int preset = QDataVis::CameraPresetFrontLow;
 
     m_chart->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > QDataVis::PresetDirectlyAboveCCW45)
-        preset = QDataVis::PresetFrontLow;
+    if (++preset > QDataVis::CameraPresetDirectlyAboveCCW45)
+        preset = QDataVis::CameraPresetFrontLow;
 }
 
 void ScatterDataModifier::changeLabelStyle()

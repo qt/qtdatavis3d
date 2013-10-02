@@ -94,10 +94,10 @@ Item {
         text: "Change Camera Placement"
         anchors.left: smoothToggle.right
         onClicked: {
-            if (testscatter.cameraPreset === Scatter3D.PresetFront) {
-                testscatter.cameraPreset = Scatter3D.PresetIsometricRightHigh;
+            if (testscatter.cameraPreset === Scatter3D.CameraPresetFront) {
+                testscatter.cameraPreset = Scatter3D.CameraPresetIsometricRightHigh;
             } else {
-                testscatter.cameraPreset = Scatter3D.PresetFront;
+                testscatter.cameraPreset = Scatter3D.CameraPresetFront;
             }
         }
     }

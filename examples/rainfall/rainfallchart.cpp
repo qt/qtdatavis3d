@@ -72,7 +72,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setTheme(QDataVis::ThemeArmyBlue);
 
     // Set preset camera position
-    m_chart->setCameraPreset(QDataVis::PresetIsometricRightHigh);
+    m_chart->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
 
     // Disable grid
     m_chart->setGridVisible(false);

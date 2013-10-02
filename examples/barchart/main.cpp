@@ -102,7 +102,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_chart->setTheme(QDataVis::ThemeDigia);
 
     // Set preset camera position
-    m_chart->setCameraPreset(QDataVis::PresetFront);
+    m_chart->setCameraPreset(QDataVis::CameraPresetFront);
 }
 
 ChartDataGenerator::~ChartDataGenerator()

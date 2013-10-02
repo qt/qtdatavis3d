@@ -67,35 +67,35 @@
 
     Predefined positions for camera.
 
-    \value NoPreset
+    \value CameraPresetNone
            Used to indicate a preset has not been set, or the scene has been rotated freely.
-    \value PresetFrontLow
-    \value PresetFront
-    \value PresetFrontHigh
-    \value PresetLeftLow
-    \value PresetLeft
-    \value PresetLeftHigh
-    \value PresetRightLow
-    \value PresetRight
-    \value PresetRightHigh
-    \value PresetBehindLow
-    \value PresetBehind
-    \value PresetBehindHigh
-    \value PresetIsometricLeft
-    \value PresetIsometricLeftHigh
-    \value PresetIsometricRight
-    \value PresetIsometricRightHigh
-    \value PresetDirectlyAbove
-    \value PresetDirectlyAboveCW45
-    \value PresetDirectlyAboveCCW45
-    \value PresetFrontBelow
-           In Q3DBars from PresetFrontBelow onward these only work for graphs including negative
+    \value CameraPresetFrontLow
+    \value CameraPresetFront
+    \value CameraPresetFrontHigh
+    \value CameraPresetLeftLow
+    \value CameraPresetLeft
+    \value CameraPresetLeftHigh
+    \value CameraPresetRightLow
+    \value CameraPresetRight
+    \value CameraPresetRightHigh
+    \value CameraPresetBehindLow
+    \value CameraPresetBehind
+    \value CameraPresetBehindHigh
+    \value CameraPresetIsometricLeft
+    \value CameraPresetIsometricLeftHigh
+    \value CameraPresetIsometricRight
+    \value CameraPresetIsometricRightHigh
+    \value CameraPresetDirectlyAbove
+    \value CameraPresetDirectlyAboveCW45
+    \value CameraPresetDirectlyAboveCCW45
+    \value CameraPresetFrontBelow
+           In Q3DBars from CameraPresetFrontBelow onward these only work for graphs including negative
            values. They act as Preset...Low for positive-only values.
-    \value PresetLeftBelow
-    \value PresetRightBelow
-    \value PresetBehindBelow
-    \value PresetDirectlyBelow
-           Acts as PresetFrontLow for positive -only bars.
+    \value CameraPresetLeftBelow
+    \value CameraPresetRightBelow
+    \value CameraPresetBehindBelow
+    \value CameraPresetDirectlyBelow
+           Acts as CameraPresetFrontLow for positive -only bars.
 */
 
 /*!
