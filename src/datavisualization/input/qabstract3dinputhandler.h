@@ -60,7 +60,6 @@ public:
 signals:
     void positionChanged(const QPoint &position);
     void inputStateChanged(QDataVis::InputState state);
-    void selectionAtPoint(const QPoint &point);
     void sceneChanged(const Q3DScene *scene);
 
 protected:

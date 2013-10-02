@@ -25,20 +25,41 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 const qreal maxTapAndHoldJitter = 20;
 const int maxPinchJitter = 10;
+#if defined (Q_OS_ANDROID)
+const int maxSelectionJitter = 10;
+#else
 const int maxSelectionJitter = 5;
+#endif
 const int tapAndHoldTime = 250;
 const float rotationSpeed = 200.0f;
 const int minZoomLevel = 10;
 const int maxZoomLevel = 500;
 
 /*!
-   \class QTouch3DInputHandler
-   \inmodule QtDataVisualization
-   \brief Basic touch display based input handler.
-   \since 1.0.0
-
-    QTouch3DInputHandler is the basic input handler for touch screen devices.
-*/
+ * \class QTouch3DInputHandler
+ * \inmodule QtDataVisualization
+ * \brief Basic touch display based input handler.
+ * \since 1.0.0
+ *
+ * QTouch3DInputHandler is the basic input handler for touch screen devices.
+ *
+ * Default touch input handler has the following functionalty:
+ * \table
+ *   \header
+ *     \li Gesture                  \li Action
+ *   \row
+ *     \li Touch-And-Move           \li Rotate graph within limits set for Q3DCamera
+ *   \row
+ *     \li Tap                      \li Select item under pointer or remove selection if none
+ *   \row
+ *     \li Tap-And-Hold             \li Select item under pointer or remove selection if none
+ *   \row
+ *     \li Pinch                    \li Zoom in/out within default range (10...500%)
+ *   \row
+ *     \li Tap on secondary view    \li Return to primary view when in slice mode
+ *                                  \note Slice mode is available in Q3DBars and Q3DSurface only
+ * \endtable
+ */
 
 /*!
  * Constructs the basic touch display input handler. An optional \a parent parameter can be given

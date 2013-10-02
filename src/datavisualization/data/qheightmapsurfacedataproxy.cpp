@@ -202,9 +202,9 @@ QString QHeightMapSurfaceDataProxy::heightMapFile() const
 }
 
 /*!
- * A convenience function for setting all minimum and maximum values at the same time
- * The minimum values must be smaller than the corresponding maximum value. Otherwise
- * the values get adjusted so that they are valid.
+ * A convenience function for setting all minimum (\a minX and \a minZ) and maximum
+ * (\a maxX and \a maxZ) values at the same time. The minimum values must be smaller than the
+ * corresponding maximum value. Otherwise the values get adjusted so that they are valid.
  */
 void QHeightMapSurfaceDataProxy::setValueRanges(float minX, float maxX, float minZ, float maxZ)
 {

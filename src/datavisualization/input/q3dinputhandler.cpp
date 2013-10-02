@@ -32,16 +32,31 @@ const int nearZoomRangeDivider = 12;
 const int midZoomRangeDivider  = 60;
 const int farZoomRangeDivider  = 120;
 
-const float rotationSpeed    = 100.0f;
+const float rotationSpeed      = 100.0f;
 
 /*!
-   \class Q3DInputHandler
-   \inmodule QtDataVisualization
-   \brief Basic wheel mouse based input handler.
-   \since 1.0.0
-
-    Q3DInputHandler is the basic input handler for wheel mouse type of input devices.
-*/
+ * \class Q3DInputHandler
+ * \inmodule QtDataVisualization
+ * \brief Basic wheel mouse based input handler.
+ * \since 1.0.0
+ *
+ * Q3DInputHandler is the basic input handler for wheel mouse type of input devices.
+ *
+ * Default input handler has the following functionalty:
+ * \table
+ *   \header
+ *     \li Mouse action                 \li Action
+ *   \row
+ *     \li Right button pressed         \li Rotate graph within limits set for Q3DCamera
+ *   \row
+ *     \li Left click                   \li Select item under cursor or remove selection if none
+ *   \row
+ *     \li Mouse wheel                  \li Zoom in/out within default range (10...500%)
+ *   \row
+ *     \li Left click on secodanry view \li Return to primary view when in slice mode
+ *                                      \note Slice mode is available in Q3DBars and Q3DSurface only
+ * \endtable
+ */
 
 /*!
  * Constructs the basic mouse input handler. An optional \a parent parameter can be given
@@ -66,6 +81,10 @@ Q3DInputHandler::~Q3DInputHandler()
  */
 void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
+#if defined(Q_OS_ANDROID)
+    Q_UNUSED(event);
+    Q_UNUSED(mousePos);
+#else
     if (Qt::LeftButton == event->button()) {
         if (scene()->isSlicingActive()) {
             if (scene()->isPointInPrimarySubView(mousePos)) {
@@ -90,6 +109,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
+#endif
 }
 
 /*!
@@ -99,11 +119,15 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
+#if defined (Q_OS_ANDROID)
+    Q_UNUSED(mousePos);
+#else
     if (QDataVis::InputRotating == inputState()) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
     setInputState(QDataVis::InputNone);
+#endif
 }
 
 /*!
@@ -113,7 +137,9 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-
+#if defined (Q_OS_ANDROID)
+    Q_UNUSED(mousePos);
+#else
     if (QDataVis::InputRotating == inputState()) {
         // Calculate mouse movement since last frame
         QPointF rotations = scene()->activeCamera()->rotations();
@@ -132,6 +158,7 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
         setPreviousInputPos(inputPosition());
         setInputPosition(mousePos);
     }
+#endif
 }
 
 /*!
