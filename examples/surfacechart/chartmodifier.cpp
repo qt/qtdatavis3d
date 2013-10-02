@@ -52,6 +52,7 @@ ChartModifier::ChartModifier(Q3DSurface *chart)
     m_chart->setAxisZ(new Q3DValueAxis);
     m_chart->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_chart->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+    changeTransparency();
 
     connect(&m_timer, &QTimer::timeout, this, &ChartModifier::timeout);
 }
@@ -295,7 +296,7 @@ void ChartModifier::changeFont(const QFont &font)
 
 void ChartModifier::changeTransparency()
 {
-    static int transparency = QDataVis::TransparencyNone;
+    static int transparency = QDataVis::TransparencyFromTheme;
 
     m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
 

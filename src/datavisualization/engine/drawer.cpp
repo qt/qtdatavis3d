@@ -68,6 +68,11 @@ void Drawer::setTheme(const Theme &theme)
     emit drawerChanged();
 }
 
+Theme Drawer::theme() const
+{
+    return m_theme;
+}
+
 void Drawer::setFont(const QFont &font)
 {
     m_font = font;

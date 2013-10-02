@@ -34,15 +34,15 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-SelectionPointer::SelectionPointer(Surface3DController *controller, Drawer *drawer)
-    : QObject(controller),
-      m_controller(controller),
+SelectionPointer::SelectionPointer(Drawer *drawer)
+    : QObject(0),
       m_labelShader(0),
       m_pointShader(0),
       m_labelObj(0),
       m_pointObj(0),
       m_textureHelper(0),
       m_isInitialized(false),
+      m_cachedTheme(drawer->theme()),
       m_labelTransparency(QDataVis::TransparencyFromTheme),
       m_drawer(drawer),
       m_cachedScene(0)
@@ -50,7 +50,7 @@ SelectionPointer::SelectionPointer(Surface3DController *controller, Drawer *draw
     initializeOpenGL();
 
     QObject::connect(m_drawer, &Drawer::drawerChanged,
-                     this, &SelectionPointer::updateLabel);
+                     this, &SelectionPointer::handleDrawerChange);
 }
 
 SelectionPointer::~SelectionPointer()
@@ -76,8 +76,6 @@ void SelectionPointer::initializeOpenGL()
 
     loadLabelMesh();
     loadPointMesh();
-
-    updateTheme(m_controller->theme());
 
     // Set initialized -flag
     m_isInitialized = true;
@@ -218,30 +216,13 @@ void SelectionPointer::setLabel(QString label)
 {
     m_label = label;
 
-    m_labelItem.clear();
-
-    // Print label into a QImage
-    QImage image = Utils::printTextToImage(m_drawer->font(),
-                                           label,
-                                           m_cachedTheme.m_textBackgroundColor,
-                                           m_cachedTheme.m_textColor,
-                                           m_labelTransparency,
-                                           m_cachedTheme.m_labelBorders);
-
-    // Set label size
-    m_labelItem.setSize(image.size());
-    // Insert text texture into label (also deletes the old texture)
-    m_labelItem.setTextureId(m_textureHelper->create2DTexture(image, true, true));
+    m_drawer->generateLabelItem(m_labelItem, m_label);
 }
 
-void SelectionPointer::updateLabel()
+void SelectionPointer::handleDrawerChange()
 {
+    m_cachedTheme = m_drawer->theme();
     setLabel(m_label);
-}
-
-void SelectionPointer::updateTheme(Theme theme)
-{
-    m_cachedTheme.setFromTheme(theme);
 }
 
 void SelectionPointer::updateBoundingRect(QRect rect)

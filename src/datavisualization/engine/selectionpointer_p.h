@@ -56,15 +56,14 @@ class QT_DATAVISUALIZATION_EXPORT SelectionPointer : public QObject, protected Q
     Q_OBJECT
 
 public:
-    explicit SelectionPointer(Surface3DController *controller, Drawer *drawer);
+    explicit SelectionPointer(Drawer *drawer);
     ~SelectionPointer();
 
     void initializeOpenGL();
     void render(GLuint defaultFboHandle = 0);
     void setPosition(QVector3D position);
     void setLabel(QString label);
-    void updateLabel();
-    void updateTheme(Theme theme);
+    void handleDrawerChange();
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
@@ -75,7 +74,6 @@ private:
     void loadPointMesh();
 
 private:
-    Surface3DController *m_controller;
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
     ObjectHelper *m_labelObj;

@@ -1762,8 +1762,6 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 
 void Surface3DRenderer::updateTextures()
 {
-    qDebug() << __FUNCTION__ << "NEED TO DO SOMETHING";
-
     updateSurfaceGradient(m_cachedTheme.m_surfaceGradient);
 }
 
@@ -1892,7 +1890,7 @@ void Surface3DRenderer::surfacePointSelected(int id)
     qreal value = qreal(m_dataArray.at(row)->at(column).y());
 
     if (!m_selectionPointer)
-        m_selectionPointer = new SelectionPointer(m_controller, m_drawer);
+        m_selectionPointer = new SelectionPointer(m_drawer);
 
     QVector3D pos;
     if (m_cachedSelectionMode == QDataVis::ModeSliceRow) {

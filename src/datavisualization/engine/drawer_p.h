@@ -69,6 +69,7 @@ public:
     void initializeOpenGL();
 
     void setTheme(const Theme &theme);
+    Theme theme() const;
     void setFont(const QFont &font);
     QFont font() const;
     void setTransparency(QDataVis::LabelTransparency transparency);
