@@ -38,8 +38,8 @@
   Active selection mode in the visualization.
  */
 /*!
-  \qmlproperty AbstractGraph3D.LabelTransparency AbstractGraph3D::labelTransparency
-  Label transparency.
+  \qmlproperty AbstractGraph3D.LabelStyle AbstractGraph3D::labelStyle
+  Label style.
  */
 
 /*!

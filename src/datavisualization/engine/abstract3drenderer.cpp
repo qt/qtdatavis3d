@@ -32,10 +32,10 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_hasNegativeValues(false),
       m_cachedTheme(),
       m_cachedFont(QFont(QStringLiteral("Arial"))),
-      m_cachedLabelTransparency(QDataVis::TransparencyFromTheme),
-      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelTransparency)),
+      m_cachedLabelStyle(QDataVis::LabelStyleFromTheme),
+      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelStyle)),
       m_cachedBoundingRect(QRect(0,0,0,0)),
-      m_cachedShadowQuality(QDataVis::ShadowMedium),
+      m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::ModeNone),
       m_cachedIsGridEnabled(false),
@@ -162,7 +162,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
 void Abstract3DRenderer::handleShadowQualityChange()
 {
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         if (!m_cachedTheme.m_uniformColor) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
                         QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
@@ -202,10 +202,10 @@ void Abstract3DRenderer::updateFont(const QFont &font)
     m_drawer->setFont(font);
 }
 
-void Abstract3DRenderer::updateLabelTransparency(QDataVis::LabelTransparency transparency)
+void Abstract3DRenderer::updateLabelStyle(QDataVis::LabelStyle style)
 {
-    m_cachedLabelTransparency = transparency;
-    m_drawer->setTransparency(transparency);
+    m_cachedLabelStyle = style;
+    m_drawer->setStyle(style);
 }
 
 void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)

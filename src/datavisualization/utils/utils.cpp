@@ -45,7 +45,7 @@ QVector3D Utils::vectorFromColor(const QColor &color)
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor, QDataVis::LabelTransparency transparency,
+                               const QColor &txtColor, QDataVis::LabelStyle style,
                                bool borders, int maxLabelWidth)
 {
     GLuint paddingWidth = 15;
@@ -55,7 +55,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
-    if (maxLabelWidth && QDataVis::TransparencyNoBackground != transparency)
+    if (maxLabelWidth && QDataVis::LabelStyleTransparent != style)
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     QSize labelSize;
@@ -73,7 +73,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
-    if (QDataVis::TransparencyNoBackground == transparency)
+    if (QDataVis::LabelStyleTransparent == style)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
         labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
@@ -89,8 +89,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     painter.setFont(valueFont);
-    switch (transparency) {
-    case QDataVis::TransparencyNoBackground: {
+    switch (style) {
+    case QDataVis::LabelStyleTransparent: {
         painter.setPen(txtColor);
 #if defined(Q_OS_ANDROID)
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
@@ -106,7 +106,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 #endif
         break;
     }
-    case QDataVis::TransparencyFromTheme: {
+    case QDataVis::LabelStyleFromTheme: {
         painter.setBrush(QBrush(bgrColor));
         if (borders) {
             painter.setPen(QPen(QBrush(txtColor), 5, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
@@ -124,7 +124,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
         break;
     }
-    case QDataVis::TransparencyNone: {
+    case QDataVis::LabelStyleOpaque: {
         QColor labelColor = QColor(bgrColor);
         labelColor.setAlphaF(1.0);
         painter.setBrush(QBrush(labelColor));

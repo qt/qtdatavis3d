@@ -302,19 +302,19 @@ QFont Q3DScatter::font() const
 }
 
 /*!
- * \property Q3DScatter::labelTransparency
+ * \property Q3DScatter::labelStyle
  *
- * Sets label \a transparency to one of \c QDataVis::LabelTransparency. It is preset to
- * \c QDataVis::TransparencyFromTheme by default.
+ * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
+ * \c QDataVis::LabelStyleFromTheme by default.
  */
-void Q3DScatter::setLabelTransparency(QDataVis::LabelTransparency transparency)
+void Q3DScatter::setLabelStyle(QDataVis::LabelStyle style)
 {
-    d_ptr->m_shared->setLabelTransparency(transparency);
+    d_ptr->m_shared->setLabelStyle(style);
 }
 
-QDataVis::LabelTransparency Q3DScatter::labelTransparency() const
+QDataVis::LabelStyle Q3DScatter::labelStyle() const
 {
-    return d_ptr->m_shared->labelTransparency();
+    return d_ptr->m_shared->labelStyle();
 }
 
 /*!
@@ -367,7 +367,7 @@ int Q3DScatter::selectedItemIndex() const
  * \property Q3DScatter::shadowQuality
  *
  * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowMedium by default.
+ * \c QDataVis::ShadowQualityMedium by default.
  *
  * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is

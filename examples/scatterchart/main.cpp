@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &ScatterDataModifier::changeTransparency);
+                     &ScatterDataModifier::changeLabelStyle);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setBackgroundEnabled);

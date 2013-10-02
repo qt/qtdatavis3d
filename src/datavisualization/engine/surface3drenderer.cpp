@@ -62,7 +62,7 @@ const GLfloat surfaceGridYOffset[2] = {-surfaceGridYOffsetValue, 2.0f * surfaceG
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
       m_controller(controller),
-      m_labelTransparency(QDataVis::TransparencyFromTheme),
+      m_labelStyle(QDataVis::LabelStyleFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_shader(0),
@@ -127,7 +127,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     updateSurfaceGridStatus(m_controller->surfaceGrid());
 
     // Shadows are disabled for Q3DSurface in Tech Preview
-    updateShadowQuality(QDataVis::ShadowNone);
+    updateShadowQuality(QDataVis::ShadowQualityNone);
 
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -681,7 +681,7 @@ void Surface3DRenderer::drawSlicedScene()
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone) {
+    if (m_cachedLabelStyle > QDataVis::LabelStyleOpaque) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -752,7 +752,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
-    if (m_cachedLabelTransparency > QDataVis::TransparencyNone)
+    if (m_cachedLabelStyle > QDataVis::LabelStyleOpaque)
         glDisable(GL_BLEND);
 
     // Release label shader
@@ -811,7 +811,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowNone && m_surfaceObj) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -994,7 +994,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                          m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadow shader bindings
             m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
             m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
@@ -1079,7 +1079,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadow shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
@@ -1156,7 +1156,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1204,7 +1204,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1262,7 +1262,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1310,7 +1310,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1365,7 +1365,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1415,7 +1415,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1983,29 +1983,29 @@ void Surface3DRenderer::loadMeshFile()
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     qWarning() << "Shadows have been disabled for Q3DSurface in technology preview";
-    m_cachedShadowQuality = QDataVis::ShadowNone; //quality;
+    m_cachedShadowQuality = QDataVis::ShadowQualityNone; //quality;
     switch (quality) {
-    case QDataVis::ShadowLow:
+    case QDataVis::ShadowQualityLow:
         m_shadowQualityToShader = 33.3f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowMedium:
+    case QDataVis::ShadowQualityMedium:
         m_shadowQualityToShader = 100.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowHigh:
+    case QDataVis::ShadowQualityHigh:
         m_shadowQualityToShader = 200.0f;
         m_shadowQualityMultiplier = 5;
         break;
-    case QDataVis::ShadowSoftLow:
+    case QDataVis::ShadowQualitySoftLow:
         m_shadowQualityToShader = 5.0f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowSoftMedium:
+    case QDataVis::ShadowQualitySoftMedium:
         m_shadowQualityToShader = 10.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowSoftHigh:
+    case QDataVis::ShadowQualitySoftHigh:
         m_shadowQualityToShader = 15.0f;
         m_shadowQualityMultiplier = 4;
         break;
@@ -2131,41 +2131,41 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_cachedShadowQuality > QDataVis::ShadowNone) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_shadowQualityMultiplier);
         if (!m_depthTexture) {
             switch (m_cachedShadowQuality) {
-            case QDataVis::ShadowHigh:
+            case QDataVis::ShadowQualityHigh:
                 qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowMedium);
-                updateShadowQuality(QDataVis::ShadowMedium);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityMedium);
+                updateShadowQuality(QDataVis::ShadowQualityMedium);
                 break;
-            case QDataVis::ShadowMedium:
+            case QDataVis::ShadowQualityMedium:
                 qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowLow);
-                updateShadowQuality(QDataVis::ShadowLow);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityLow);
+                updateShadowQuality(QDataVis::ShadowQualityLow);
                 break;
-            case QDataVis::ShadowLow:
+            case QDataVis::ShadowQualityLow:
                 qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
-                updateShadowQuality(QDataVis::ShadowNone);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
+                updateShadowQuality(QDataVis::ShadowQualityNone);
                 break;
-            case QDataVis::ShadowSoftHigh:
+            case QDataVis::ShadowQualitySoftHigh:
                 qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftMedium);
-                updateShadowQuality(QDataVis::ShadowSoftMedium);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+                updateShadowQuality(QDataVis::ShadowQualitySoftMedium);
                 break;
-            case QDataVis::ShadowSoftMedium:
+            case QDataVis::ShadowQualitySoftMedium:
                 qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowSoftLow);
-                updateShadowQuality(QDataVis::ShadowSoftLow);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftLow);
+                updateShadowQuality(QDataVis::ShadowQualitySoftLow);
                 break;
-            case QDataVis::ShadowSoftLow:
+            case QDataVis::ShadowQualitySoftLow:
                 qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowNone);
-                updateShadowQuality(QDataVis::ShadowNone);
+                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
+                updateShadowQuality(QDataVis::ShadowQualityNone);
                 break;
             default:
                 // You'll never get here

@@ -61,7 +61,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_chart->addAxis(m_yearAxis);
     m_chart->addAxis(m_monthAxis);
 
-    m_chart->setShadowQuality(QDataVis::ShadowSoftMedium);
+    m_chart->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
 
@@ -144,14 +144,14 @@ void ChartModifier::changeTheme(int theme)
     m_chart->setTheme((QDataVis::Theme)theme);
 }
 
-void ChartModifier::changeTransparency()
+void ChartModifier::changeLabelStyle()
 {
-    static int transparency = QDataVis::TransparencyNone;
+    static int style = QDataVis::LabelStyleOpaque;
 
-    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
+    m_chart->setLabelStyle((QDataVis::LabelStyle)style);
 
-    if (++transparency > QDataVis::TransparencyNoBackground)
-        transparency = QDataVis::TransparencyNone;
+    if (++style > QDataVis::LabelStyleTransparent)
+        style = QDataVis::LabelStyleOpaque;
 }
 
 void ChartModifier::changeSelectionMode(int selectionMode)

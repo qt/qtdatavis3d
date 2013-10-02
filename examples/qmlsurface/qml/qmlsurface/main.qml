@@ -48,7 +48,7 @@ Item {
             width: surfaceView.width
             height: surfaceView.height
             theme: Surface3D.ThemeStoneMoss
-            shadowQuality: Surface3D.ShadowMedium
+            shadowQuality: Surface3D.ShadowQualityMedium
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"

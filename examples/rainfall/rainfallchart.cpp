@@ -60,7 +60,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->setBarType(QDataVis::Cylinders, false);
 
     // Set shadows to medium
-    m_chart->setShadowQuality(QDataVis::ShadowMedium);
+    m_chart->setShadowQuality(QDataVis::ShadowQualityMedium);
 
     // Set font
     m_chart->setFont(QFont("Century Gothic", 30));

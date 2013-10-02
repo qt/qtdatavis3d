@@ -159,7 +159,7 @@ int main(int argc, char **argv)
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &ChartModifier::rotateY);
 
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::changeTransparency);
+                     &ChartModifier::changeLabelStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ChartModifier::changePresetCamera);
 

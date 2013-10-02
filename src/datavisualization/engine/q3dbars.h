@@ -35,7 +35,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
@@ -48,7 +48,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QPoint selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
     Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
@@ -85,8 +85,8 @@ public:
     void setFont(const QFont &font);
     QFont font() const;
 
-    void setLabelTransparency(QDataVis::LabelTransparency transparency);
-    QDataVis::LabelTransparency labelTransparency() const;
+    void setLabelStyle(QDataVis::LabelStyle style);
+    QDataVis::LabelStyle labelStyle() const;
 
     void setGridVisible(bool visible);
     bool isGridVisible() const;

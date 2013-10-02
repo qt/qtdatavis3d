@@ -33,7 +33,7 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
     Q_ENUMS(Theme)
     Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelTransparency)
+    Q_ENUMS(LabelStyle)
 
 public:
     enum InputState {
@@ -76,8 +76,8 @@ public:
         PresetDirectlyAbove,
         PresetDirectlyAboveCW45,
         PresetDirectlyAboveCCW45,
-        PresetFrontBelow,           // These work only for graphs including negative values.
-        PresetLeftBelow,            // They act as Preset...Low for positive-only values.
+        PresetFrontBelow,
+        PresetLeftBelow,
         PresetRightBelow,
         PresetBehindBelow,
         PresetDirectlyBelow
@@ -98,7 +98,7 @@ public:
     enum SelectionMode {
         ModeNone = 0,
         ModeItem,
-        ModeItemAndRow,         // From here onwards used for Q3DBars only
+        ModeItemAndRow,
         ModeItemAndColumn,
         ModeItemRowAndColumn,
         ModeSliceRow,
@@ -106,19 +106,19 @@ public:
     };
 
     enum ShadowQuality {
-        ShadowNone = 0,
-        ShadowLow,
-        ShadowMedium,
-        ShadowHigh,
-        ShadowSoftLow,
-        ShadowSoftMedium,
-        ShadowSoftHigh
+        ShadowQualityNone = 0,
+        ShadowQualityLow,
+        ShadowQualityMedium,
+        ShadowQualityHigh,
+        ShadowQualitySoftLow,
+        ShadowQualitySoftMedium,
+        ShadowQualitySoftHigh
     };
 
-    enum LabelTransparency {
-        TransparencyNone = 0,       // Full solid, using colors from theme
-        TransparencyFromTheme,      // Use colors and transparencies from theme
-        TransparencyNoBackground    // Draw just text on transparent background
+    enum LabelStyle {
+        LabelStyleOpaque = 0,
+        LabelStyleFromTheme,
+        LabelStyleTransparent
     };
 };
 }

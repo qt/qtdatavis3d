@@ -77,14 +77,14 @@ QFont AbstractDeclarative::font() const
     return m_controller->font();
 }
 
-void AbstractDeclarative::setLabelTransparency(QDataVis::LabelTransparency transparency)
+void AbstractDeclarative::setLabelStyle(QDataVis::LabelStyle style)
 {
-    m_controller->setLabelTransparency(transparency);
+    m_controller->setLabelStyle(style);
 }
 
-QDataVis::LabelTransparency AbstractDeclarative::labelTransparency() const
+QDataVis::LabelStyle AbstractDeclarative::labelStyle() const
 {
-    return m_controller->labelTransparency();
+    return m_controller->labelStyle();
 }
 
 void AbstractDeclarative::setGridVisible(bool visible)

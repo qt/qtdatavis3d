@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
     QObject::connect(fontList, &QFontComboBox::currentFontChanged,
                      modifier, &ChartModifier::changeFont);
     QObject::connect(labelButton, &QPushButton::clicked,
-                     modifier, &ChartModifier::changeTransparency);
+                     modifier, &ChartModifier::changeStyle);
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeTheme(int)));
 //    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),

@@ -45,11 +45,11 @@ Item {
             id: testChart
             width: dataView.width
             height: dataView.height
-            shadowQuality: Bars3D.ShadowMedium
+            shadowQuality: Bars3D.ShadowQualityMedium
             selectionMode: Bars3D.ModeItem
             font.pointSize: 35
             theme: Bars3D.ThemeRetro
-            labelTransparency: Bars3D.TransparencyFromTheme
+            labelStyle: Bars3D.LabelStyleFromTheme
             dataProxy: chartData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
@@ -106,11 +106,11 @@ Item {
         height: 60
         text: "Hide Shadows"
         onClicked: {
-            if (testChart.shadowQuality == Bars3D.ShadowNone) {
-                testChart.shadowQuality = Bars3D.ShadowMedium;
+            if (testChart.shadowQuality == Bars3D.ShadowQualityNone) {
+                testChart.shadowQuality = Bars3D.ShadowQualityMedium;
                 text = "Hide Shadows"
             } else {
-                testChart.shadowQuality = Bars3D.ShadowNone;
+                testChart.shadowQuality = Bars3D.ShadowQualityNone;
                 text = "Show Shadows"
             }
         }

@@ -64,7 +64,7 @@ public:
 
     // Visual parameters
     QRect m_boundingRect;
-    QDataVis::LabelTransparency m_labelTransparency;
+    QDataVis::LabelStyle m_labelStyle;
     QFont m_font;
     bool m_isGridEnabled;
 

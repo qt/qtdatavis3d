@@ -60,7 +60,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_scatter->setSelectionMode(QDataVis::ModeNone);
     m_scatter->setGridVisible(false);
     m_scatter->setObjectType(QDataVis::Dots, false);
-    m_scatter->setShadowQuality(QDataVis::ShadowSoftLow);
+    m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->setCameraPosition(0.0, 85.0, 110);
     m_scatter->axisY()->setMin(-128);
     m_scatter->axisY()->setMax(128);
@@ -75,7 +75,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_bars->setGridVisible(false);
     m_bars->setBarType(QDataVis::Bars, true);
 #if 1
-    m_bars->setShadowQuality(QDataVis::ShadowLow);
+    m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
 #else
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
 #endif

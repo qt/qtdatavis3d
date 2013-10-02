@@ -146,31 +146,31 @@
 
     Quality of shadows.
 
-    \value ShadowNone
+    \value ShadowQualityNone
            Shadows are disabled.
-    \value ShadowLow
+    \value ShadowQualityLow
            Shadows are rendered in low quality.
-    \value ShadowMedium
+    \value ShadowQualityMedium
            Shadows are rendered in medium quality.
-    \value ShadowHigh
+    \value ShadowQualityHigh
            Shadows are rendered in high quality.
-    \value ShadowSoftLow
+    \value ShadowQualitySoftLow
            Shadows are rendered in low quality with softened edges.
-    \value ShadowSoftMedium
+    \value ShadowQualitySoftMedium
            Shadows are rendered in medium quality with softened edges.
-    \value ShadowSoftHigh
+    \value ShadowQualitySoftHigh
            Shadows are rendered in high quality with softened edges.
 */
 
 /*!
-    \enum QtDataVisualization::QDataVis::LabelTransparency
+    \enum QtDataVisualization::QDataVis::LabelStyle
 
-    Label transparencies.
+    Label styles.
 
-    \value TransparencyNone
-           Full solid, using colors from theme.
-    \value TransparencyFromTheme
-           Use colors and transparencies from theme.
-    \value TransparencyNoBackground
-           Draw just text on transparent background.
+    \value LabelStyleOpaque
+           Fully opaque background, using colors and borders from theme.
+    \value LabelStyleFromTheme
+           Use transparencies, colors and borders from theme.
+    \value LabelStyleTransparent
+           Fully transparent background, using text color from theme.
 */

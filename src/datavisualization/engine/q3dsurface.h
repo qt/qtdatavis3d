@@ -34,7 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
@@ -46,7 +46,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
     Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
@@ -103,8 +103,8 @@ public:
     void setFont(const QFont &font);
     QFont font() const;
 
-    void setLabelTransparency(QDataVis::LabelTransparency transparency);
-    QDataVis::LabelTransparency labelTransparency() const;
+    void setLabelStyle(QDataVis::LabelStyle style);
+    QDataVis::LabelStyle labelStyle() const;
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

@@ -41,7 +41,7 @@ AudioLevels::AudioLevels(Q3DBars *chart, QObject *parent)
     m_graph->setGridVisible(false);
     m_graph->setBackgroundVisible(false);
     m_graph->valueAxis()->setRange(0.0, 1.0);
-    m_graph->setShadowQuality(QDataVis::ShadowNone);
+    m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
     m_graph->setCameraPosition(-20.0, 10.0, 10);
     m_graph->setTheme(QDataVis::ThemeIsabelle);
 

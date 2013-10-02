@@ -74,7 +74,7 @@ MainApp::MainApp(Q3DBars *window)
     // Disable auto-scaling of height by defining explicit range
     m_chart->valueAxis()->setRange(0.0, 1.0);
     // Disable shadows
-    m_chart->setShadowQuality(QDataVis::ShadowNone);
+    m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other

@@ -60,7 +60,7 @@ public:
     void updateSamples();
     void gradientPressed();
     void changeFont(const QFont &font);
-    void changeTransparency();
+    void changeStyle();
 
 public slots:
     void changeShadowQuality(int quality);

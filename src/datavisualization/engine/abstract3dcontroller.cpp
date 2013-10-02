@@ -40,8 +40,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::ModeItem),
-    m_shadowQuality(QDataVis::ShadowMedium),
-    m_labelTransparency(QDataVis::TransparencyNoBackground),
+    m_shadowQuality(QDataVis::ShadowQualityMedium),
+    m_labelStyle(QDataVis::LabelStyleTransparent),
     m_isBackgroundEnabled(true),
     m_isGridEnabled(true),
     m_scene(new Q3DScene()),
@@ -112,9 +112,9 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.fontChanged = false;
     }
 
-    if (m_changeTracker.labelTransparencyChanged) {
-        m_renderer->updateLabelTransparency(m_labelTransparency);
-        m_changeTracker.labelTransparencyChanged = false;
+    if (m_changeTracker.labelStyleChanged) {
+        m_renderer->updateLabelStyle(m_labelStyle);
+        m_changeTracker.labelStyleChanged = false;
     }
 
     if (m_changeTracker.shadowQualityChanged) {
@@ -737,17 +737,17 @@ QDataVis::ShadowQuality Abstract3DController::shadowQuality()
     return m_shadowQuality;
 }
 
-void Abstract3DController::setLabelTransparency(QDataVis::LabelTransparency transparency)
+void Abstract3DController::setLabelStyle(QDataVis::LabelStyle style)
 {
-    m_labelTransparency = transparency;
+    m_labelStyle = style;
 
-    m_changeTracker.labelTransparencyChanged = true;
+    m_changeTracker.labelStyleChanged = true;
     emitNeedRender();
 }
 
-QDataVis::LabelTransparency Abstract3DController::labelTransparency()
+QDataVis::LabelStyle Abstract3DController::labelStyle()
 {
-    return m_labelTransparency;
+    return m_labelStyle;
 }
 
 void Abstract3DController::setBackgroundEnabled(bool enable)

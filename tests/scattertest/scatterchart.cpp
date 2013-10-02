@@ -36,7 +36,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setFont(font);
     m_chart->setObjectType(QDataVis::Spheres, true);
     m_chart->setTheme(QDataVis::ThemeStoneMoss);
-    m_chart->setShadowQuality(QDataVis::ShadowHigh);
+    m_chart->setShadowQuality(QDataVis::ShadowQualityHigh);
     m_chart->setCameraPreset(QDataVis::PresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
@@ -133,14 +133,14 @@ void ScatterDataModifier::changeTheme()
         theme = QDataVis::ThemeQt;
 }
 
-void ScatterDataModifier::changeTransparency()
+void ScatterDataModifier::changeLabelStyle()
 {
-    static int transparency = QDataVis::TransparencyNone;
+    static int style = QDataVis::LabelStyleOpaque;
 
-    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
+    m_chart->setLabelStyle((QDataVis::LabelStyle)style);
 
-    if (++transparency > QDataVis::TransparencyNoBackground)
-        transparency = QDataVis::TransparencyNone;
+    if (++style > QDataVis::LabelStyleTransparent)
+        style = QDataVis::LabelStyleOpaque;
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)

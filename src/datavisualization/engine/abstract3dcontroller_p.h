@@ -52,7 +52,7 @@ struct Abstract3DChangeBitField {
     bool zoomLevelChanged            : 1;
     bool themeChanged                : 1;
     bool fontChanged                 : 1;
-    bool labelTransparencyChanged    : 1;
+    bool labelStyleChanged           : 1;
     bool boundingRectChanged         : 1;
     bool sizeChanged                 : 1;
     bool shadowQualityChanged        : 1;
@@ -87,7 +87,7 @@ struct Abstract3DChangeBitField {
         zoomLevelChanged(true),
         themeChanged(true),
         fontChanged(true),
-        labelTransparencyChanged(true),
+        labelStyleChanged(true),
         boundingRectChanged(true),
         sizeChanged(true),
         shadowQualityChanged(true),
@@ -150,7 +150,7 @@ private:
     QFont m_font;
     QDataVis::SelectionMode m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
-    QDataVis::LabelTransparency m_labelTransparency;
+    QDataVis::LabelStyle m_labelStyle;
     bool m_isBackgroundEnabled;
     bool m_isGridEnabled;
     QString m_objFile;
@@ -270,9 +270,9 @@ public:
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
     virtual QDataVis::ShadowQuality shadowQuality();
 
-    // Label transparency adjustment
-    virtual void setLabelTransparency(QDataVis::LabelTransparency transparency);
-    virtual QDataVis::LabelTransparency labelTransparency();
+    // Label style adjustment
+    virtual void setLabelStyle(QDataVis::LabelStyle style);
+    virtual QDataVis::LabelStyle labelStyle();
 
     // Enable or disable background mesh
     virtual void setBackgroundEnabled(bool enable);

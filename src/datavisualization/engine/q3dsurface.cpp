@@ -222,7 +222,7 @@ QDataVis::Theme Q3DSurface::theme() const
  * \property Q3DSurface::shadowQuality
  *
  * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowMedium by default.
+ * \c QDataVis::ShadowQualityMedium by default.
  *
  * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is
@@ -345,19 +345,19 @@ QFont Q3DSurface::font() const
 }
 
 /*!
- * \property Q3DSurface::labelTransparency
+ * \property Q3DSurface::labelStyle
  *
- * Sets label \a transparency to one of \c QDataVis::LabelTransparency. It is preset to
- * \c QDataVis::TransparencyFromTheme by default.
+ * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
+ * \c QDataVis::LabelStyleFromTheme by default.
  */
-void Q3DSurface::setLabelTransparency(QDataVis::LabelTransparency transparency)
+void Q3DSurface::setLabelStyle(QDataVis::LabelStyle style)
 {
-    d_ptr->m_shared->setLabelTransparency(transparency);
+    d_ptr->m_shared->setLabelStyle(style);
 }
 
-QDataVis::LabelTransparency Q3DSurface::labelTransparency() const
+QDataVis::LabelStyle Q3DSurface::labelStyle() const
 {
-    return d_ptr->m_shared->labelTransparency();
+    return d_ptr->m_shared->labelStyle();
 }
 
 /*!

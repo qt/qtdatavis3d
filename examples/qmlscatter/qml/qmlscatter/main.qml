@@ -42,7 +42,7 @@ Item {
             font.pointSize: 40
             dataProxy: chartData.proxy
             theme: Scatter3D.ThemeIsabelle
-            shadowQuality: Scatter3D.ShadowSoftLow
+            shadowQuality: Scatter3D.ShadowQualitySoftLow
             selectionMode: Scatter3D.ModeItem
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             axisX.segmentCount: 3
@@ -62,11 +62,11 @@ Item {
         width: parent.width / 6
         text: "Hide Shadows"
         onClicked: {
-            if (testscatter.shadowQuality === Scatter3D.ShadowNone) {
-                testscatter.shadowQuality = Scatter3D.ShadowSoftLow;
+            if (testscatter.shadowQuality === Scatter3D.ShadowQualityNone) {
+                testscatter.shadowQuality = Scatter3D.ShadowQualitySoftLow;
                 text = "Hide Shadows";
             } else {
-                testscatter.shadowQuality = Scatter3D.ShadowNone;
+                testscatter.shadowQuality = Scatter3D.ShadowQualityNone;
                 text = "Show Shadows";
             }
         }

@@ -363,19 +363,19 @@ QFont Q3DBars::font() const
 }
 
 /*!
- * \property Q3DBars::labelTransparency
+ * \property Q3DBars::labelStyle
  *
- * Sets label \a transparency to one of \c QDataVis::LabelTransparency. It is preset to
- * \c QDataVis::TransparencyFromTheme by default.
+ * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
+ * \c QDataVis::LabelStyleFromTheme by default.
  */
-void Q3DBars::setLabelTransparency(QDataVis::LabelTransparency transparency)
+void Q3DBars::setLabelStyle(QDataVis::LabelStyle style)
 {
-    d_ptr->m_shared->setLabelTransparency(transparency);
+    d_ptr->m_shared->setLabelStyle(style);
 }
 
-QDataVis::LabelTransparency Q3DBars::labelTransparency() const
+QDataVis::LabelStyle Q3DBars::labelStyle() const
 {
-    return d_ptr->m_shared->labelTransparency();
+    return d_ptr->m_shared->labelStyle();
 }
 
 /*!
@@ -429,7 +429,7 @@ QPoint Q3DBars::selectedBarPos() const
  * \property Q3DBars::shadowQuality
  *
  * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowMedium by default.
+ * \c QDataVis::ShadowQualityMedium by default.
  *
  * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is

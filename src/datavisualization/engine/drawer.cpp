@@ -41,10 +41,10 @@ StaticLibInitializer staticLibInitializer;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelTransparency transparency)
+Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style)
     : m_theme(theme),
       m_font(font),
-      m_transparency(transparency),
+      m_style(style),
       m_textureHelper(0)
 {
 }
@@ -84,9 +84,9 @@ QFont Drawer::font() const
     return m_font;
 }
 
-void Drawer::setTransparency(QDataVis::LabelTransparency transparency)
+void Drawer::setStyle(QDataVis::LabelStyle style)
 {
-    m_transparency = transparency;
+    m_style = style;
     emit drawerChanged();
 }
 
@@ -354,7 +354,7 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
                                                text,
                                                m_theme.m_textBackgroundColor,
                                                m_theme.m_textColor,
-                                               m_transparency,
+                                               m_style,
                                                m_theme.m_labelBorders,
                                                widestLabel);
 

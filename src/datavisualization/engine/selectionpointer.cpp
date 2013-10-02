@@ -43,7 +43,7 @@ SelectionPointer::SelectionPointer(Drawer *drawer)
       m_textureHelper(0),
       m_isInitialized(false),
       m_cachedTheme(drawer->theme()),
-      m_labelTransparency(QDataVis::TransparencyFromTheme),
+      m_labelStyle(QDataVis::LabelStyleFromTheme),
       m_drawer(drawer),
       m_cachedScene(0)
 {

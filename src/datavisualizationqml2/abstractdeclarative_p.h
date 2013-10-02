@@ -42,7 +42,7 @@ class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelTransparency labelTransparency READ labelTransparency WRITE setLabelTransparency)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
@@ -51,7 +51,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
     Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelTransparency)
+    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
     Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
     Q_ENUMS(QtDataVisualization::QDataVis::Theme)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
@@ -74,8 +74,8 @@ public:
     virtual void setFont(const QFont &font);
     virtual QFont font() const;
 
-    virtual void setLabelTransparency(QDataVis::LabelTransparency transparency);
-    virtual QDataVis::LabelTransparency labelTransparency() const;
+    virtual void setLabelStyle(QDataVis::LabelStyle style);
+    virtual QDataVis::LabelStyle labelStyle() const;
 
     virtual void setGridVisible(bool visible);
     virtual bool isGridVisible() const;

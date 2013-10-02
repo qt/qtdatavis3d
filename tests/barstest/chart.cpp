@@ -103,7 +103,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     m_chart->addAxis(m_genericRowAxis);
     m_chart->addAxis(m_genericColumnAxis);
 
-    m_chart->setShadowQuality(QDataVis::ShadowSoftMedium);
+    m_chart->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
@@ -461,14 +461,14 @@ void ChartModifier::changeTheme()
         theme = QDataVis::ThemeQt;
 }
 
-void ChartModifier::changeTransparency()
+void ChartModifier::changeLabelStyle()
 {
-    static int transparency = QDataVis::TransparencyNone;
+    static int style = QDataVis::LabelStyleOpaque;
 
-    m_chart->setLabelTransparency((QDataVis::LabelTransparency)transparency);
+    m_chart->setLabelStyle((QDataVis::LabelStyle)style);
 
-    if (++transparency > QDataVis::TransparencyNoBackground)
-        transparency = QDataVis::TransparencyNone;
+    if (++style > QDataVis::LabelStyleTransparent)
+        style = QDataVis::LabelStyleOpaque;
 }
 
 void ChartModifier::changeSelectionMode()
