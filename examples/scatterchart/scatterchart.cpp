@@ -29,13 +29,13 @@ const int numberOfItems = 10000;
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
       m_fontSize(40.0f),
-      m_style(QDataVis::Spheres),
+      m_style(QDataVis::MeshStyleSpheres),
       m_smooth(true)
 {
     QFont font = m_chart->font();
     font.setPointSize(m_fontSize);
     m_chart->setFont(font);
-    m_chart->setObjectType(QDataVis::Spheres, true);
+    m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_chart->setTheme(QDataVis::ThemeEbony);
     m_chart->setShadowQuality(QDataVis::ShadowQualityHigh);
     m_chart->setCameraPreset(QDataVis::CameraPresetFront);

@@ -178,7 +178,7 @@ void Q3DScatter::setHeight(const int height)
 
 /*!
  * Sets the item \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
- * \c QDataVis::Spheres by default. A \a smooth flag can be used to set shading to smooth.
+ * \c QDataVis::MeshStyleSpheres by default. A \a smooth flag can be used to set shading to smooth.
  * It is \c false by default.
  *
  * \sa setMeshFileName()

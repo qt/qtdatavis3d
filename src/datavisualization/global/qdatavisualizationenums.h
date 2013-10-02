@@ -37,22 +37,22 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
 
 public:
     enum InputState {
-        InputNone = 0,
-        InputOnScene,
-        InputOnOverview,
-        InputOnSlice,
-        InputRotating,
-        InputOnPinch
+        InputStateNone = 0,
+        InputStateOnScene,
+        InputStateOnOverview,
+        InputStateOnSlice,
+        InputStateRotating,
+        InputStateOnPinch
     };
 
     enum MeshStyle {
-        Bars = 0,
-        Pyramids,
-        Cones,
-        Cylinders,
-        BevelBars,
-        Spheres,
-        Dots
+        MeshStyleBars = 0,
+        MeshStylePyramids,
+        MeshStyleCones,
+        MeshStyleCylinders,
+        MeshStyleBevelBars,
+        MeshStyleSpheres,
+        MeshStyleDots
     };
 
     enum CameraPreset {

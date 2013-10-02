@@ -35,7 +35,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_selectedItemIndex(noSelectionIndex())
 {
     // Default object type; specific to scatter
-    setObjectType(QDataVis::Spheres, false);
+    setObjectType(QDataVis::MeshStyleSpheres, false);
 
     setActiveDataProxy(new QScatterDataProxy);
 
@@ -191,7 +191,7 @@ void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
 void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
 {
     QString objFile;
-    if (style == QDataVis::Spheres) {
+    if (style == QDataVis::MeshStyleSpheres) {
         if (smooth)
             objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else

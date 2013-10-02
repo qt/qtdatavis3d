@@ -57,7 +57,7 @@ RainfallChart::RainfallChart(Q3DBars *rainfall)
     m_chart->columnAxis()->setCategoryLabels(months);
 
     // Set bar type to cylinder
-    m_chart->setBarType(QDataVis::Cylinders, false);
+    m_chart->setBarType(QDataVis::MeshStyleCylinders, false);
 
     // Set shadows to medium
     m_chart->setShadowQuality(QDataVis::ShadowQualityMedium);

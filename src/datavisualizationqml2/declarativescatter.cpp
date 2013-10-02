@@ -127,9 +127,9 @@ QDataVis::MeshStyle DeclarativeScatter::objectType() const
 {
     QString objFile = m_shared->meshFileName();
     if (objFile.contains("/sphere"))
-        return QDataVis::Spheres;
+        return QDataVis::MeshStyleSpheres;
     else
-        return QDataVis::Dots;
+        return QDataVis::MeshStyleDots;
 }
 
 void DeclarativeScatter::setObjectSmoothingEnabled(bool enabled)

@@ -59,7 +59,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_scatter->setTheme(QDataVis::ThemeStoneMoss);
     m_scatter->setSelectionMode(QDataVis::SelectionModeNone);
     m_scatter->setGridVisible(false);
-    m_scatter->setObjectType(QDataVis::Dots, false);
+    m_scatter->setObjectType(QDataVis::MeshStyleDots, false);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->setCameraPosition(0.0, 85.0, 110);
     m_scatter->axisY()->setMin(-128);
@@ -73,7 +73,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_bars->setTheme(QDataVis::ThemeQt);
     m_bars->setSelectionMode(QDataVis::SelectionModeNone);
     m_bars->setGridVisible(false);
-    m_bars->setBarType(QDataVis::Bars, true);
+    m_bars->setBarType(QDataVis::MeshStyleBars, true);
 #if 1
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
 #else
@@ -98,7 +98,7 @@ SurfaceData::~SurfaceData()
         delete m_scatter;
         delete m_bars;
         delete m_surface;
-    } else if (m_mode == Bars) {
+    } else if (m_mode == MeshStyleBars) {
         delete m_scatter;
         delete m_surface;
         delete m_bars;
@@ -201,7 +201,7 @@ void SurfaceData::setResolution(int selection)
         m_scatter->axisZ()->setMax(m_resolution.height() / 2);
         m_scatterDataArray = new QScatterDataArray;
         m_scatterDataArray->resize(m_resolution.width() * m_resolution.height());
-    } else if (m_mode == Bars) {
+    } else if (m_mode == MeshStyleBars) {
         m_resize = true;
         m_resolution /= 4;
         m_barDataArray = new QBarDataArray;

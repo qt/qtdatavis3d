@@ -77,7 +77,7 @@ ChartDataGenerator::ChartDataGenerator(Q3DBars *barchart, QTableWidget *tableWid
     m_chart->setBarSpacing(QSizeF(0.2, 0.2));
 
     // Set bar type to flat pyramids
-    m_chart->setBarType(QDataVis::Pyramids, false);
+    m_chart->setBarType(QDataVis::MeshStylePyramids, false);
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide

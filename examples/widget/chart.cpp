@@ -39,7 +39,7 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
       m_yearAxis(new Q3DCategoryAxis),
       m_monthAxis(new Q3DCategoryAxis),
       m_temperatureData(new QBarDataProxy),
-      m_style(QDataVis::BevelBars),
+      m_style(QDataVis::MeshStyleBevelBars),
       m_smooth(false)
 {
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";

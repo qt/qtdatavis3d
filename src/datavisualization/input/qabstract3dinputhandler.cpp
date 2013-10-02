@@ -196,7 +196,7 @@ QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputH
     q_ptr(q),
     m_prevDistance(0),
     m_previousInputPos(QPoint(0,0)),
-    m_inputState(QDataVis::InputNone),
+    m_inputState(QDataVis::InputStateNone),
     m_inputPosition(QPoint(0,0)),
     m_scene(0)
 {

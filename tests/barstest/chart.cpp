@@ -406,34 +406,34 @@ void ChartModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(QDataVis::Cylinders, false);
+        m_chart->setBarType(QDataVis::MeshStyleCylinders, false);
         break;
     case 1:
-        m_chart->setBarType(QDataVis::Cylinders, true);
+        m_chart->setBarType(QDataVis::MeshStyleCylinders, true);
         break;
     case 2:
-        m_chart->setBarType(QDataVis::Cones, false);
+        m_chart->setBarType(QDataVis::MeshStyleCones, false);
         break;
     case 3:
-        m_chart->setBarType(QDataVis::Cones, true);
+        m_chart->setBarType(QDataVis::MeshStyleCones, true);
         break;
     case 4:
-        m_chart->setBarType(QDataVis::Bars, false);
+        m_chart->setBarType(QDataVis::MeshStyleBars, false);
         break;
     case 5:
-        m_chart->setBarType(QDataVis::Bars, true);
+        m_chart->setBarType(QDataVis::MeshStyleBars, true);
         break;
     case 6:
-        m_chart->setBarType(QDataVis::Pyramids, false);
+        m_chart->setBarType(QDataVis::MeshStylePyramids, false);
         break;
     case 7:
-        m_chart->setBarType(QDataVis::Pyramids, true);
+        m_chart->setBarType(QDataVis::MeshStylePyramids, true);
         break;
     case 8:
-        m_chart->setBarType(QDataVis::BevelBars, false);
+        m_chart->setBarType(QDataVis::MeshStyleBevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(QDataVis::BevelBars, true);
+        m_chart->setBarType(QDataVis::MeshStyleBevelBars, true);
         break;
     }
     model++;

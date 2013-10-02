@@ -34,7 +34,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QFont font = m_chart->font();
     font.setPointSize(m_fontSize);
     m_chart->setFont(font);
-    m_chart->setObjectType(QDataVis::Spheres, true);
+    m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_chart->setTheme(QDataVis::ThemeStoneMoss);
     m_chart->setShadowQuality(QDataVis::ShadowQualityHigh);
     m_chart->setCameraPreset(QDataVis::CameraPresetFront);
@@ -96,16 +96,16 @@ void ScatterDataModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setObjectType(QDataVis::Dots, false);
+        m_chart->setObjectType(QDataVis::MeshStyleDots, false);
         break;
     case 1:
-        m_chart->setObjectType(QDataVis::Dots, true);
+        m_chart->setObjectType(QDataVis::MeshStyleDots, true);
         break;
     case 2:
-        m_chart->setObjectType(QDataVis::Spheres, false);
+        m_chart->setObjectType(QDataVis::MeshStyleSpheres, false);
         break;
     case 3:
-        m_chart->setObjectType(QDataVis::Spheres, true);
+        m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
         break;
     }
     model++;

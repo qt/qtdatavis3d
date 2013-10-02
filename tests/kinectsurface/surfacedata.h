@@ -55,7 +55,7 @@ public:
     enum VisualizationMode {
         Surface = 0,
         Scatter,
-        Bars
+        MeshStyleBars
     };
 
 public slots:

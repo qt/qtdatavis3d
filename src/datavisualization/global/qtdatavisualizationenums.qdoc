@@ -27,17 +27,17 @@
 
     Predefined input states for mouse and touch based input handlers. All states are not valid with all input handlers.
 
-    \value InputNone
+    \value InputStateNone
            Default "no input received" state.
-    \value InputOnScene
+    \value InputStateOnScene
            Mouse or touch input received on the 3D scene.
-    \value InputOnOverview
+    \value InputStateOnOverview
            Mouse or touch input received on the overview area.
-    \value InputOnSlice
+    \value InputStateOnSlice
            Mouse or touch input received on the slice view area.
-    \value InputRotating
+    \value InputStateRotating
            Rotation of the 3D geometry ongoing.
-    \value InputOnPinch
+    \value InputStateOnPinch
            Pinch/punch multitouch input received.
 */
 
@@ -46,19 +46,19 @@
 
     Predefined mesh types. All styles are not usable with all visualization types.
 
-    \value Bars
+    \value MeshStyleBars
            Basic cubic bar.
-    \value Pyramids
+    \value MeshStylePyramids
            Four-sided pyramid.
-    \value Cones
+    \value MeshStyleCones
            Basic cone.
-    \value Cylinders
+    \value MeshStyleCylinders
            Basic cylinder.
-    \value BevelBars
+    \value MeshStyleBevelBars
            Slightly beveled (rounded) cubic bar.
-    \value Spheres
+    \value MeshStyleSpheres
            Sphere. Not usable in Q3DBars.
-    \value Dots
+    \value MeshStyleDots
            Triangular pyramid. Usable only with Q3DScatter.
 */
 

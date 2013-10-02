@@ -438,7 +438,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (QDataVis::InputOnScene == m_controller->inputState()) {
+        if (QDataVis::InputStateOnScene == m_controller->inputState()) {
             m_selection = Utils::getSelection(m_controller->inputPosition(),
                                               m_cachedBoundingRect.height());
         }

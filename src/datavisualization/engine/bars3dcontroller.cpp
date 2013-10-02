@@ -39,7 +39,7 @@ Bars3DController::Bars3DController(QRect boundRect)
       m_renderer(0)
 {
     // Default bar type; specific to bars
-    setBarType(QDataVis::BevelBars, false);
+    setBarType(QDataVis::MeshStyleBevelBars, false);
 
     setActiveDataProxy(0);
 
@@ -311,15 +311,15 @@ bool Bars3DController::isBarSpecRelative()
 void Bars3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
 {
     QString objFile;
-    if (style == QDataVis::Bars)
+    if (style == QDataVis::MeshStyleBars)
         objFile = QStringLiteral(":/defaultMeshes/bar");
-    else if (style == QDataVis::Pyramids)
+    else if (style == QDataVis::MeshStylePyramids)
         objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    else if (style == QDataVis::Cones)
+    else if (style == QDataVis::MeshStyleCones)
         objFile = QStringLiteral(":/defaultMeshes/cone");
-    else if (style == QDataVis::Cylinders)
+    else if (style == QDataVis::MeshStyleCylinders)
         objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    else if (style == QDataVis::BevelBars)
+    else if (style == QDataVis::MeshStyleBevelBars)
         objFile = QStringLiteral(":/defaultMeshes/bevelbar");
 
     if (smooth)

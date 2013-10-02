@@ -712,7 +712,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (QDataVis::InputOnScene == m_controller->inputState()) {
+        if (QDataVis::InputStateOnScene == m_controller->inputState()) {
             m_selection = Utils::getSelection(m_controller->inputPosition(),
                                               m_cachedBoundingRect.height());
         }
@@ -749,7 +749,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     bool selectionDirty = (m_selection != m_previousSelection
             || (m_selection != selectionSkipColor
-            && QDataVis::InputOnScene == m_controller->inputState()
+            && QDataVis::InputStateOnScene == m_controller->inputState()
             && !m_cachedIsSlicingActivated));
     if (selectionDirty) {
         m_previousSelection = m_selection;
@@ -1388,7 +1388,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectedBar = NULL;
         if (m_cachedIsSlicingActivated
                 && (m_selection == selectionSkipColor
-                    || QDataVis::InputOnOverview == m_controller->inputState())) {
+                    || QDataVis::InputStateOnOverview == m_controller->inputState())) {
             m_cachedScene->setSlicingActive(false);
         }
     } else if (m_cachedSelectionMode >= QDataVis::SelectionModeSliceRow && selectionDirty) {

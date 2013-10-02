@@ -919,7 +919,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputOnScene
+    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputStateOnScene
             && m_surfaceObj && m_cachedSelectionMode > QDataVis::SelectionModeNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -1649,7 +1649,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         m_selectionModeChanged = false;
     }
-    if (m_controller->inputState() == QDataVis::InputOnOverview) {
+    if (m_controller->inputState() == QDataVis::InputStateOnOverview) {
         if (m_cachedIsSlicingActivated) {
             m_cachedScene->setSlicingActive(false);
             m_selectionActive = false;

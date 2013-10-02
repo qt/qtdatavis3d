@@ -238,7 +238,7 @@ bool Q3DBars::isBarSpacingRelative()
 
 /*!
  * Sets the bar \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
- * \c QDataVis::Bars by default. A \a smooth flag can be used to set shading to smooth.
+ * \c QDataVis::MeshStyleBars by default. A \a smooth flag can be used to set shading to smooth.
  * It is \c false by default.
  *
  * \sa setMeshFileName()
