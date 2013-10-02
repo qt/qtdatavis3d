@@ -48,8 +48,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                                const QColor &txtColor, QDataVis::LabelStyle style,
                                bool borders, int maxLabelWidth)
 {
-    GLuint paddingWidth = 15;
-    GLuint paddingHeight = 15;
+    GLuint paddingWidth = 20;
+    GLuint paddingHeight = 20;
     // Calculate text dimensions
     QFont valueFont = font;
     valueFont.setPointSize(textureFontSize);
@@ -58,6 +58,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     if (maxLabelWidth && QDataVis::LabelStyleTransparent != style)
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
+    valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
     QSize labelSize;
 
 #if defined(Q_OS_ANDROID)
@@ -66,7 +67,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     GLuint prePadding = 5;
     // Android needs to use this always (when given) because of the power of 2 -issue.
     if (maxLabelWidth)
-        valueStrWidth = maxLabelWidth;
+        valueStrWidth = maxLabelWidth + paddingWidth / 2;
     labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
     //qDebug() << "label size before padding" << text << labelSize;
     labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
