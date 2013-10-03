@@ -23,7 +23,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QItemModelBarDataMapping
  * \inmodule QtDataVisualization
- * \brief Data model mapping for Q3DBars.
+ * \brief Item model mapping for Q3DBars.
  * \since 1.0.0
  *
  * QItemModelBarDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
@@ -50,12 +50,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  *    \snippet doc_src_qtdatavisualization.cpp 3
  *
- * \sa QItemModelBarDataProxy
+ * \sa QItemModelBarDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype BarDataMapping
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QItemModelBarDataMapping
+ * \brief Item model mapping for Bars3D.
  *
  * This type is used to map roles of AbstractItemModel to rows, columns, and values of Bars3D. For
  * more complete description, see QItemModelBarDataMapping.
@@ -64,7 +68,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_qmldatavisualization.cpp 4
  *
- * \sa ItemModelBarDataProxy
+ * \sa ItemModelBarDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!

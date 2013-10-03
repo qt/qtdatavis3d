@@ -49,8 +49,6 @@ public:
 
 signals:
     void arrayReset();
-    void valueRangeRowsChanged(int min, int max);
-    void valueRangeColumnsChanged(int min, int max);
 
 protected:
     explicit QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *parent = 0);

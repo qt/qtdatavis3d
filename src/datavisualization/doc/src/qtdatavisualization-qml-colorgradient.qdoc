@@ -18,6 +18,10 @@
 
 /*!
     \qmltype ColorGradientStop
+    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \since com.digia.QtDataVisualization 1.0
+    \ingroup datavisualization_qml
+    \brief Defines the color at a position in ColorGradient.
 
     Defines the color at a position in a ColorGradient.
 
@@ -46,6 +50,10 @@
 
 /*!
     \qmltype ColorGradient
+    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \since com.digia.QtDataVisualization 1.0
+    \ingroup datavisualization_qml
+    \brief Defines a color gradient.
 
     A gradient is defined by two or more colors, which will be blended seamlessly.
 

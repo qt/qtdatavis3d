@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
- * \brief Proxy class for Q3DSurface.
+ * \brief Base proxy class for Q3DSurface.
  * \since 1.0.0
  *
  * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the data
@@ -61,14 +61,26 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
  * \endtable
  *
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype SurfaceDataProxy
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QSurfaceDataProxy
  * \inherits AbstractDataProxy
+ * \brief Base proxy class for Surface3D.
  *
- * DOCUMENTATION GOES HERE TOO
+ * This type handles surface data items. The data is arranged into rows and columns, and all rows must have
+ * the same number of columns.
+ *
+ * This type is uncreatable, but contains properties that are exposed via subtypes.
+ *
+ * For more complete description, see QSurfaceDataProxy.
+ *
+ * \sa ItemModelSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!

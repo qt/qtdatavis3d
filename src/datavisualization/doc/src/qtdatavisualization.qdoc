@@ -24,3 +24,52 @@
     \brief The QtDataVisualization module provides functionality for 3D visualization.
 */
 
+/*!
+    \group datavisualization_qml
+    \title Qt Data Visualization QML Types
+
+    \brief QML types for the Qt Data Visualization API.
+
+    Qt Data Visualization functionality can be accessed via these QML types.
+
+    \section1 QML Types
+*/
+
+/*!
+    \page qtdatavisualization_getting_started.html
+    \title Qt Data Visualization Getting Started
+
+    \section1 Building Qt Data Visualization
+
+    TODO
+
+    \section1 Creating a simple application
+
+    TODO
+*/
+
+/*!
+    \page qtdatavisualization_data_handling.html
+    \title Qt Data Visualization Data Handling
+
+    \section1 Data proxies
+
+    TODO
+
+    \section1 Item models and data mapping
+
+    TODO
+*/
+
+/*!
+    \page qtdatavisualization_interacting_with_data.html
+    \title Qt Data Visualization Interacting with Data
+
+    \section1 View manipulation
+
+    TODO
+
+    \section1 Highlighting data
+
+    TODO
+*/

@@ -27,17 +27,23 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QItemModelSurfaceDataProxy
  * \inmodule QtDataVisualization
- * \brief Proxy class for Q3DSurface data model mapping.
+ * \brief Proxy class for presenting data in item models with Q3DSurface.
  * \since 1.0.0
  *
  * QItemModelSurfaceDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DSurface. It maps roles defined in QItemModelSurfaceDataMapping to roles in the model.
+ *
+ * /sa {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype ItemModelSurfaceDataProxy
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QItemModelSurfaceDataProxy
  * \inherits SurfaceDataProxy
+ * \brief Proxy class for presenting data in item models with Surface3D.
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Surface3D.
  *
@@ -45,7 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_qmldatavisualization.cpp 9
  *
- * \sa SurfaceDataProxy, SurfaceDataMapping
+ * \sa SurfaceDataProxy, SurfaceDataMapping, {Qt Data Visualization Data Handling}
  */
 
 /*!

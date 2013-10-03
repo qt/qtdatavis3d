@@ -38,8 +38,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ValueAxis3D
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates Q3DValueAxis
  * \inherits AbstractAxis3D
+ * \brief The ValueAxis3D type is used for manipulating an axis of a graph.
  *
  * This type provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.

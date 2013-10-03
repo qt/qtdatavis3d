@@ -40,7 +40,6 @@ public:
     int subSegmentCount() const;
     QString labelFormat() const;
 
-public slots:
     void setSegmentCount(int count);
     void setSubSegmentCount(int count);
     void setLabelFormat(const QString &format);

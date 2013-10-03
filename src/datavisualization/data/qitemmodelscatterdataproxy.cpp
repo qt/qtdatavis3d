@@ -25,17 +25,23 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QItemModelScatterDataProxy
  * \inmodule QtDataVisualization
- * \brief Proxy class for Q3DScatter data model mapping.
+ * \brief Proxy class for presenting data in item models with Q3DScatter.
  * \since 1.0.0
  *
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DScatter. It maps roles defined in QItemModelScatterDataMapping to roles in the model.
+ *
+ * /sa {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype ItemModelScatterDataProxy
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QItemModelScatterDataProxy
  * \inherits ScatterDataProxy
+ * \brief Proxy class for presenting data in item models with Scatter3D.
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Scatter3D.
  *
@@ -43,7 +49,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_qmldatavisualization.cpp 8
  *
- * \sa ScatterDataProxy, ScatterDataMapping
+ * \sa ScatterDataProxy, ScatterDataMapping, {Qt Data Visualization Data Handling}
  */
 
 /*!

@@ -38,8 +38,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype CategoryAxis3D
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates Q3DCategoryAxis
  * \inherits AbstractAxis3D
+ * \brief The CategoryAxis3D type is used for manipulating an axis of a graph.
  *
  * This type provides an axis that can be given labels.
  */

@@ -19,7 +19,10 @@
 /*!
  * \qmltype Bars3D
  * \inherits AbstractGraph3D
- * \inmodule QtDataVisualization
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
+ * \brief 3D bar graph.
  *
  * This type enables developers to render bar graphs in 3D with Qt Quick 2.
  *

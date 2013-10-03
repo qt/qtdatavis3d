@@ -18,9 +18,12 @@
 
 /*!
   \qmltype AbstractGraph3D
-  \inmodule QtDataVisualization
+  \inqmlmodule com.digia.QtDataVisualization 1.0
+  \since com.digia.QtDataVisualization 1.0
+  \ingroup datavisualization_qml
+  \brief Base type for 3D visualizations.
 
-  This type is the base class for all 3D visualizations in Qt Quick 2.
+  This type is the base type for all 3D visualizations in QtDataVisualization.
 
   It resides in the data visualization module that can be imported like this:
 
@@ -28,7 +31,6 @@
 
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
-
 
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */

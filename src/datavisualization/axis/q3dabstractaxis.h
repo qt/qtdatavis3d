@@ -73,7 +73,6 @@ public:
     qreal max() const;
     bool isAutoAdjustRange() const;
 
-public slots:
     void setTitle(QString title);
     void setRange(qreal min, qreal max);
     void setMin(qreal min);

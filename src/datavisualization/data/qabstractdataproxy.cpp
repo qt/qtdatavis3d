@@ -28,12 +28,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since 1.0.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
- * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy
+ * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype AbstractDataProxy
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QAbstractDataProxy
+ * \brief Base type for all QtDataVisualization data proxies.
+ *
+ * This type is uncreatable, but contains properties that are exposed via subtypes.
+ * \sa BarDataProxy, ScatterDataProxy, SurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!

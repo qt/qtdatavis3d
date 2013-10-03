@@ -94,6 +94,36 @@ QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
  */
 
 /*!
+ * \fn void QSurfaceDataItem::setX(float value)
+ * Sets the X component of the item position to the \a value.
+ */
+
+/*!
+ * \fn void QSurfaceDataItem::setY(float value)
+ * Sets the Y component of the item position to the \a value.
+ */
+
+/*!
+ * \fn void QSurfaceDataItem::setZ(float value)
+ * Sets the Z component of the item position to the \a value.
+ */
+
+/*!
+ * \fn float QSurfaceDataItem::x() const
+ * \return the X component of the position of this data item.
+ */
+
+/*!
+ * \fn float QSurfaceDataItem::y() const
+ * \return the Y component of the position of this data item.
+ */
+
+/*!
+ * \fn float QSurfaceDataItem::z() const
+ * \return the Z component of the position of this data item.
+ */
+
+/*!
  * \internal
  */
 void QSurfaceDataItem::createExtraData()

@@ -93,6 +93,36 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  * \return position of this data item.
  */
 
+/*!
+ * \fn void QScatterDataItem::setX(float value)
+ * Sets the X component of the item position to the \a value.
+ */
+
+/*!
+ * \fn void QScatterDataItem::setY(float value)
+ * Sets the Y component of the item position to the \a value.
+ */
+
+/*!
+ * \fn void QScatterDataItem::setZ(float value)
+ * Sets the Z component of the item position to the \a value.
+ */
+
+/*!
+ * \fn float QScatterDataItem::x() const
+ * \return the X component of the position of this data item.
+ */
+
+/*!
+ * \fn float QScatterDataItem::y() const
+ * \return the Y component of the position of this data item.
+ */
+
+/*!
+ * \fn float QScatterDataItem::z() const
+ * \return the Z component of the position of this data item.
+ */
+
 //void QScatterDataItem::setSize(qreal size)
 //{
 //    m_size = size;

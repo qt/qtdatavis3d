@@ -27,7 +27,7 @@ const float defaultMaxValue = 10.0f;
 /*!
  * \class QHeightMapSurfaceDataProxy
  * \inmodule QtDataVisualization
- * \brief Proxy class for Q3DSurface.
+ * \brief Base proxy class for Q3DSurface.
  * \since 1.0.0
  *
  * QHeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
@@ -38,16 +38,24 @@ const float defaultMaxValue = 10.0f;
  * to image horizontal direction and Z-value to the vertical. Setting any of these
  * properties triggers asynchronous re-resolving of any existing height map.
  *
- * \sa QSurfaceDataProxy
+ * \sa QSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype HeightMapSurfaceDataProxy
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy
+ * \brief Base proxy type for Surface3D.
  *
  * HeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
  * way for giving the surface plot a height map to be visualized.
+ *
+ * For more complete description, see QHeightMapSurfaceDataProxy.
+ *
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!

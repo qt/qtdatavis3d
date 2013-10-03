@@ -23,7 +23,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QItemModelSurfaceDataMapping
  * \inmodule QtDataVisualization
- * \brief Data model mapping for Q3DSurface.
+ * \brief Item model mapping for Q3DSurface.
  * \since 1.0.0
  *
  * QItemModelSurfaceDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
@@ -51,12 +51,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  *    \snippet doc_src_qtdatavisualization.cpp 5
  *
- * \sa QItemModelSurfaceDataProxy
+ * \sa QItemModelSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmltype SurfaceDataMapping
+ * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \since com.digia.QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
  * \instantiates QItemModelSurfaceDataMapping
+ * \brief Item model mapping for Surface3D.
  *
  * This type is used to map roles of AbstractItemModel to rows, columns, and values of Surface3D.
  * For more complete description, see QItemModelSurfaceDataMapping.
@@ -65,7 +69,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_qmldatavisualization.cpp 6
  *
- * \sa ItemModelSurfaceDataProxy
+ * \sa ItemModelSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
