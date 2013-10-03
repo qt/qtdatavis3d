@@ -964,7 +964,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->release();
 
         // Put the RGBA value back to uint
+#if defined (Q_OS_ANDROID)
+        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
+#else
         selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+#endif
 
         selectionDirty = true;
     }
@@ -1688,9 +1692,17 @@ void Surface3DRenderer::updateSelectionTexture()
 {
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
-    // TODO: power of two thing for ES
     int idImageWidth = (m_sampleSpace.width() - 1) * 4;
     int idImageHeight = (m_sampleSpace.height() - 1) * 4;
+
+#if defined(Q_OS_ANDROID)
+    // Android requires power-of-two textures
+    GLuint temp;
+    idImageWidth = Utils::getNearestPowerOfTwo(idImageWidth, temp);
+    idImageHeight = Utils::getNearestPowerOfTwo(idImageHeight, temp);
+    // TODO: This is not enough, the selection texture itself needs to be modified for Android (colors?, scaling)
+#endif
+
     int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
 
     uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
@@ -1897,6 +1909,10 @@ void Surface3DRenderer::surfacePointSelected(int id)
 {
     int column = (id - 1) % m_sampleSpace.width();
     int row = (id - 1) / m_sampleSpace.width();
+
+    if (row < 0 || column < 0 || m_dataArray.size() < row || m_dataArray.at(row)->size() < column)
+        return;
+
     qreal value = qreal(m_dataArray.at(row)->at(column).y());
 
     if (!m_selectionPointer)

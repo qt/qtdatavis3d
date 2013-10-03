@@ -242,8 +242,13 @@ void SelectionPointer::initShaders()
     // The shader for the small point ball
     if (m_pointShader)
         delete m_pointShader;
+#if defined (Q_OS_ANDROID)
+    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexES2"),
+                                     QStringLiteral(":/shaders/fragmentES2"));
+#else
     m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragment"));
+#endif
     m_pointShader->initialize();
 
 }
