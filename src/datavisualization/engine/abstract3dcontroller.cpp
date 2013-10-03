@@ -1015,7 +1015,7 @@ Q3DAbstractAxis *Abstract3DController::createDefaultAxis(Q3DAbstractAxis::AxisOr
 {
     Q_UNUSED(orientation)
 
-    // The default default axis is a value axis. If the chart type has a different default axis
+    // The default default axis is a value axis. If the graph type has a different default axis
     // for some orientation, this function needs to be overridden.
     Q3DAbstractAxis *defaultAxis = createDefaultValueAxis();
     return defaultAxis;

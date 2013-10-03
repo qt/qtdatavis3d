@@ -16,7 +16,7 @@
 **
 ****************************************************************************/
 
-#include "graphmodifier.h"
+#include "scatterdatamodifier.h"
 
 #include <QApplication>
 #include <QWidget>
@@ -24,7 +24,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QSlider>
+#include <QComboBox>
 #include <QFontComboBox>
 #include <QLabel>
 #include <QScreen>
@@ -38,16 +38,16 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
 
-    Q3DBars *widgetgraph = new Q3DBars();
-    QSize screenSize = widgetgraph->screen()->size();
+    Q3DScatter *graph = new Q3DScatter();
+    QSize screenSize = graph->screen()->size();
 
-    QWidget *container = QWidget::createWindowContainer(widgetgraph);
+    QWidget *container = QWidget::createWindowContainer(graph);
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    widget->setWindowTitle(QStringLiteral("values of some things in something"));
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
@@ -61,63 +61,30 @@ int main(int argc, char **argv)
     themeList->addItem(QStringLiteral("Retro"));
     themeList->addItem(QStringLiteral("Ebony"));
     themeList->addItem(QStringLiteral("Isabelle"));
-    themeList->setCurrentIndex(0);
+    themeList->setCurrentIndex(6);
 
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
     QCheckBox *smoothCheckBox = new QCheckBox(widget);
-    smoothCheckBox->setText(QStringLiteral("Smooth bars"));
-    smoothCheckBox->setChecked(false);
+    smoothCheckBox->setText(QStringLiteral("Smooth dots"));
+    smoothCheckBox->setChecked(true);
 
     QComboBox *barStyleList = new QComboBox(widget);
-    barStyleList->addItem(QStringLiteral("Bars"));
-    barStyleList->addItem(QStringLiteral("Pyramids"));
-    barStyleList->addItem(QStringLiteral("Cones"));
-    barStyleList->addItem(QStringLiteral("Cylinders"));
-    barStyleList->addItem(QStringLiteral("Beveled Bars"));
-    barStyleList->setCurrentIndex(4);
+    barStyleList->addItem(QStringLiteral("Sphere"));
+    barStyleList->addItem(QStringLiteral("Tetrahedron"));
+    barStyleList->setCurrentIndex(0);
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
-    QComboBox *selectionModeList = new QComboBox(widget);
-    selectionModeList->addItem(QStringLiteral("None"));
-    selectionModeList->addItem(QStringLiteral("Bar"));
-    selectionModeList->addItem(QStringLiteral("Bar and Row"));
-    selectionModeList->addItem(QStringLiteral("Bar and Column"));
-    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"));
-    selectionModeList->addItem(QStringLiteral("Slice into Row"));
-    selectionModeList->addItem(QStringLiteral("Slice into Column"));
-    selectionModeList->setCurrentIndex(1);
-
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
-    backgroundCheckBox->setChecked(false);
+    backgroundCheckBox->setChecked(true);
 
     QCheckBox *gridCheckBox = new QCheckBox(widget);
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
-
-    QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
-    rotationSliderX->setTickInterval(1);
-    rotationSliderX->setMinimum(-180);
-    rotationSliderX->setValue(0);
-    rotationSliderX->setMaximum(180);
-    QSlider *rotationSliderY = new QSlider(Qt::Horizontal, widget);
-    rotationSliderY->setTickInterval(1);
-    rotationSliderY->setMinimum(-90);
-    rotationSliderY->setValue(0);
-    rotationSliderY->setMaximum(90);
-
-    QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
-    fontSizeSlider->setTickInterval(1);
-    fontSizeSlider->setMinimum(1);
-    fontSizeSlider->setValue(20);
-    fontSizeSlider->setMaximum(100);
-
-    QFontComboBox *fontList = new QFontComboBox(widget);
-    fontList->setCurrentFont(QFont("Arial"));
 
     QComboBox *shadowQuality = new QComboBox(widget);
     shadowQuality->addItem(QStringLiteral("None"));
@@ -127,54 +94,43 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low Soft"));
     shadowQuality->addItem(QStringLiteral("Medium Soft"));
     shadowQuality->addItem(QStringLiteral("High Soft"));
-    shadowQuality->setCurrentIndex(5);
+    shadowQuality->setCurrentIndex(3);
 
-    vLayout->addWidget(new QLabel(QStringLiteral("Rotate horizontally")));
-    vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Rotate vertically")));
-    vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
+    QFontComboBox *fontList = new QFontComboBox(widget);
+    fontList->setCurrentFont(QFont("Arial"));
+
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
+    vLayout->addWidget(new QLabel(QStringLiteral("Change dot style")));
     vLayout->addWidget(barStyleList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
-    vLayout->addWidget(selectionModeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-    vLayout->addWidget(fontList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(fontList, 1, Qt::AlignTop);
 
     widget->show();
 
-    GraphModifier *modifier = new GraphModifier(widgetgraph);
+    ScatterDataModifier *modifier = new ScatterDataModifier(graph);
 
-    QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &GraphModifier::rotateX);
-    QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &GraphModifier::rotateY);
-
-    QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::changeLabelStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::changePresetCamera);
+                     &ScatterDataModifier::changePresetCamera);
+    QObject::connect(labelButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::changeLabelStyle);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
-                     &GraphModifier::setBackgroundEnabled);
+                     &ScatterDataModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
-                     &GraphModifier::setGridEnabled);
+                     &ScatterDataModifier::setGridEnabled);
     QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
-                     &GraphModifier::setSmoothBars);
+                     &ScatterDataModifier::setSmoothDots);
 
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));
-
-    QObject::connect(selectionModeList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeSelectionMode(int)));
 
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeTheme(int)));
@@ -182,15 +138,13 @@ int main(int argc, char **argv)
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
 
-    QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
+    QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(widgetgraph, &Q3DBars::shadowQualityChanged, modifier,
-                     &GraphModifier::shadowQualityUpdatedByVisual);
+    QObject::connect(graph, &Q3DScatter::shadowQualityChanged, modifier,
+                     &ScatterDataModifier::shadowQualityUpdatedByVisual);
 
-    QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
-                     &GraphModifier::changeFontSize);
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
-                     &GraphModifier::changeFont);
+                     &ScatterDataModifier::changeFont);
 
     modifier->start();
 

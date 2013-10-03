@@ -3,13 +3,13 @@
 }
 
 SOURCES += main.cpp \
-    rainfallchart.cpp \
+    rainfallgraph.cpp \
     variantdataset.cpp \
     variantbardataproxy.cpp \
     variantbardatamapping.cpp \
 
 HEADERS += \
-    rainfallchart.h \
+    rainfallgraph.h \
     variantdataset.h \
     variantbardataproxy.h \
     variantbardatamapping.h
@@ -19,5 +19,7 @@ INSTALLS += target
 RESOURCES += \
     rainfall.qrc
 
-OTHER_FILES += data/raindata.txt
+OTHER_FILES += data/raindata.txt \
+               doc/src/* \
+               doc/images/*
 

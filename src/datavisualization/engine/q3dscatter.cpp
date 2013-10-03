@@ -51,7 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Methods are provided for changing item styles, themes, item selection modes and so on. See the
  * methods for more detailed descriptions.
  *
- * \section1 How to construct a minimal Q3DScatter chart
+ * \section1 How to construct a minimal Q3DScatter graph
  *
  * First, construct Q3DScatter:
  *
@@ -65,7 +65,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dscatter_construction.cpp 2
  *
- * The complete code needed to create and display this chart is:
+ * The complete code needed to create and display this graph is:
  *
  * \snippet doc_src_q3dscatter_construction.cpp 3
  *
@@ -75,7 +75,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
  * code example. You can learn more by familiarizing yourself with the examples provided, like
- * the \l{Scatter Chart Example}.
+ * the \l{Scatter Example}.
  *
  * \sa Q3DBars, Q3DSurface, {Qt Data Visualization C++ Classes}
  */

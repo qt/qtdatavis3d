@@ -20,7 +20,7 @@
     \example rainfall
     \title Rainfall Example
 
-    The barchart example shows how to make a simple 3D bar chart using Q3DBars.
+    The bars example shows how to make a simple 3D bar graph using Q3DBars.
 
     \image rainfall-example.png
 

@@ -9,6 +9,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += barstest \
            scattertest \
-           kinectsurface
+           kinectsurface \
+           surfacetest
 
 qtHaveModule(multimedia):!android: SUBDIRS += spectrum

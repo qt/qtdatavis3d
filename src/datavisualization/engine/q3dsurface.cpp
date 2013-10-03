@@ -55,7 +55,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
  * added to it is destroyed.
  *
- * \section1 How to construct a minimal Q3DSurface chart
+ * \section1 How to construct a minimal Q3DSurface graph
  *
  * First, construct Q3DSurface:
  *
@@ -77,7 +77,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dsurface_construction.cpp 4
  *
- * The complete code needed to create and display this chart is:
+ * The complete code needed to create and display this graph is:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 5
  *

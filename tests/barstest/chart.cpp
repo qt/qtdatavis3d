@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_USE_NAMESPACE
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
-ChartModifier::ChartModifier(Q3DBars *barchart)
+GraphModifier::GraphModifier(Q3DBars *barchart)
     : m_chart(barchart),
       m_columnCount(21),
       m_rowCount(21),
@@ -117,17 +117,17 @@ ChartModifier::ChartModifier(Q3DBars *barchart)
     resetTemperatureData();
 }
 
-ChartModifier::~ChartModifier()
+GraphModifier::~GraphModifier()
 {
     delete m_chart;
 }
 
-void ChartModifier::start()
+void GraphModifier::start()
 {
     restart(false);
 }
 
-void ChartModifier::restart(bool dynamicData)
+void GraphModifier::restart(bool dynamicData)
 {
     m_static = !dynamicData;
 
@@ -154,7 +154,7 @@ void ChartModifier::restart(bool dynamicData)
     }
 }
 
-void ChartModifier::selectBar()
+void GraphModifier::selectBar()
 {
     QPoint targetBar(5, 5);
     QPoint noSelection(-1, -1);
@@ -164,7 +164,7 @@ void ChartModifier::selectBar()
         m_chart->setSelectedBarPos(noSelection);
 }
 
-void ChartModifier::swapAxis()
+void GraphModifier::swapAxis()
 {
     static int counter = 0;
     int state = ++counter % 3;
@@ -183,7 +183,7 @@ void ChartModifier::swapAxis()
     m_chart->setValueAxis(m_currentAxis);
 }
 
-void ChartModifier::releaseAxes()
+void GraphModifier::releaseAxes()
 {
     // Releases all axes - results in default axes for all dimensions.
     // Axes reset when the graph is switched as set*Axis calls are made, which
@@ -197,7 +197,7 @@ void ChartModifier::releaseAxes()
     m_chart->releaseAxis(m_genericColumnAxis);
 }
 
-void ChartModifier::releaseProxies()
+void GraphModifier::releaseProxies()
 {
     // Releases all proxies - results in default proxy.
     // Proxies will get readded back when graph is switched as setDataProxy call is made.
@@ -205,7 +205,7 @@ void ChartModifier::releaseProxies()
     m_chart->releaseDataProxy(m_genericData);
 }
 
-void ChartModifier::createMassiveArray()
+void GraphModifier::createMassiveArray()
 {
     const int arrayDimension = 1000;
     QTime timer;
@@ -241,7 +241,7 @@ void ChartModifier::createMassiveArray()
     qDebug() << "Created Massive Array (" << arrayDimension << "), time:" << timer.elapsed();
 }
 
-void ChartModifier::resetTemperatureData()
+void GraphModifier::resetTemperatureData()
 {
 
     // Set up data
@@ -281,7 +281,7 @@ static int addCounter = 0;
 static int insertCounter = 0;
 static int changeCounter = 0;
 
-void ChartModifier::addRow()
+void GraphModifier::addRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
     for (qreal i = 0; i < m_columnCount; i++)
@@ -292,7 +292,7 @@ void ChartModifier::addRow()
     m_chart->activeDataProxy()->addRow(dataRow, label);
 }
 
-void ChartModifier::addRows()
+void GraphModifier::addRows()
 {
     QBarDataArray dataArray;
     QStringList labels;
@@ -308,7 +308,7 @@ void ChartModifier::addRows()
     m_chart->activeDataProxy()->addRows(dataArray, labels);
 }
 
-void ChartModifier::insertRow()
+void GraphModifier::insertRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
     for (qreal i = 0; i < m_columnCount; i++)
@@ -320,7 +320,7 @@ void ChartModifier::insertRow()
     m_chart->activeDataProxy()->insertRow(row, dataRow, label);
 }
 
-void ChartModifier::insertRows()
+void GraphModifier::insertRows()
 {
     QTime timer;
     timer.start();
@@ -340,7 +340,7 @@ void ChartModifier::insertRows()
     qDebug() << "Inserted" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
-void ChartModifier::changeItem()
+void GraphModifier::changeItem()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBarPos.x();
@@ -351,7 +351,7 @@ void ChartModifier::changeItem()
     }
 }
 
-void ChartModifier::changeRow()
+void GraphModifier::changeRow()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBarPos.x();
@@ -364,7 +364,7 @@ void ChartModifier::changeRow()
     }
 }
 
-void ChartModifier::changeRows()
+void GraphModifier::changeRows()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBarPos.x();
@@ -383,7 +383,7 @@ void ChartModifier::changeRows()
     }
 }
 
-void ChartModifier::removeRow()
+void GraphModifier::removeRow()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBarPos.x();
@@ -391,7 +391,7 @@ void ChartModifier::removeRow()
         m_chart->activeDataProxy()->removeRows(row, 1);
 }
 
-void ChartModifier::removeRows()
+void GraphModifier::removeRows()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBarPos.x();
@@ -401,7 +401,7 @@ void ChartModifier::removeRows()
     }
 }
 
-void ChartModifier::changeStyle()
+void GraphModifier::changeStyle()
 {
     static int model = 0;
     switch (model) {
@@ -441,7 +441,7 @@ void ChartModifier::changeStyle()
         model = 0;
 }
 
-void ChartModifier::changePresetCamera()
+void GraphModifier::changePresetCamera()
 {
     static int preset = QDataVis::CameraPresetFrontLow;
 
@@ -451,7 +451,7 @@ void ChartModifier::changePresetCamera()
         preset = QDataVis::CameraPresetFrontLow;
 }
 
-void ChartModifier::changeTheme()
+void GraphModifier::changeTheme()
 {
     static int theme = QDataVis::ThemeQt;
 
@@ -461,7 +461,7 @@ void ChartModifier::changeTheme()
         theme = QDataVis::ThemeQt;
 }
 
-void ChartModifier::changeLabelStyle()
+void GraphModifier::changeLabelStyle()
 {
     static int style = QDataVis::LabelStyleOpaque;
 
@@ -471,7 +471,7 @@ void ChartModifier::changeLabelStyle()
         style = QDataVis::LabelStyleOpaque;
 }
 
-void ChartModifier::changeSelectionMode()
+void GraphModifier::changeSelectionMode()
 {
     static int selectionMode = m_chart->selectionMode();
 
@@ -481,14 +481,14 @@ void ChartModifier::changeSelectionMode()
     m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
 }
 
-void ChartModifier::changeFont(const QFont &font)
+void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
     m_chart->setFont(newFont);
 }
 
-void ChartModifier::changeFontSize(int fontsize)
+void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
     QFont font = m_chart->font();
@@ -496,83 +496,83 @@ void ChartModifier::changeFontSize(int fontsize)
     m_chart->setFont(font);
 }
 
-void ChartModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
     emit shadowQualityChanged(quality);
 }
 
-void ChartModifier::handleSelectionChange(const QPoint &position)
+void GraphModifier::handleSelectionChange(const QPoint &position)
 {
     m_selectedBarPos = position;
     qDebug() << "Selected bar position:" << position;
 }
 
-void ChartModifier::changeShadowQuality(int quality)
+void GraphModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
     m_chart->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
 
-void ChartModifier::setBackgroundEnabled(int enabled)
+void GraphModifier::setBackgroundEnabled(int enabled)
 {
     m_chart->setBackgroundVisible((bool)enabled);
 }
 
-void ChartModifier::setGridEnabled(int enabled)
+void GraphModifier::setGridEnabled(int enabled)
 {
     m_chart->setGridVisible((bool)enabled);
 }
 
-void ChartModifier::rotateX(int rotation)
+void GraphModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;
     m_chart->setCameraPosition(m_xRotation, m_yRotation);
 }
 
-void ChartModifier::rotateY(int rotation)
+void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
     m_chart->setCameraPosition(m_xRotation, m_yRotation);
 }
 
-void ChartModifier::setSpecsRatio(int barwidth)
+void GraphModifier::setSpecsRatio(int barwidth)
 {
     m_chart->setBarThickness((qreal)barwidth / 30.0);
 }
 
-void ChartModifier::setSpacingSpecsX(int spacing)
+void GraphModifier::setSpacingSpecsX(int spacing)
 {
     m_barSpacingX = (qreal)spacing / 100.0;
     m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
-void ChartModifier::setSpacingSpecsZ(int spacing)
+void GraphModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (qreal)spacing / 100.0;
     m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
-void ChartModifier::setSampleCountX(int samples)
+void GraphModifier::setSampleCountX(int samples)
 {
     m_columnCount = samples;
     m_genericColumnAxis->setRange(m_genericRowAxis->min(), m_genericRowAxis->min() + samples - 1);
 }
 
-void ChartModifier::setSampleCountZ(int samples)
+void GraphModifier::setSampleCountZ(int samples)
 {
     m_rowCount = samples;
     m_genericRowAxis->setRange(m_genericColumnAxis->min(), m_genericColumnAxis->min() + samples - 1);
 }
 
-void ChartModifier::setMinX(int min)
+void GraphModifier::setMinX(int min)
 {
     m_genericRowAxis->setRange(min, min + m_rowCount - 1);
 }
 
-void ChartModifier::setMinZ(int min)
+void GraphModifier::setMinZ(int min)
 {
     m_genericColumnAxis->setRange(min, min + m_rowCount - 1);
 }

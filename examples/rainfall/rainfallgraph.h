@@ -16,22 +16,36 @@
 **
 ****************************************************************************/
 
-#include "rainfallgraph.h"
-#include <QGuiApplication>
+#ifndef RAINFALLGRAPH_H
+#define RAINFALLGRAPH_H
+
+#include "variantbardataproxy.h"
+#include <QtDataVisualization/q3dbars.h>
 
 using namespace QtDataVisualization;
 
-int main(int argc, char **argv)
+class RainfallGraph : public QObject
 {
-    QGuiApplication app(argc, argv);
+    Q_OBJECT
+public:
+    explicit RainfallGraph(Q3DBars *rainfall);
+    ~RainfallGraph();
 
-    Q3DBars *rainfall = new Q3DBars;
-    rainfall->resize(1280, 800);
-    rainfall->setPosition(QPoint(10, 30));
-    rainfall->show();
+    void addDataSet();
+    void start();
 
-    RainfallGraph rainfallgraph(rainfall);
-    rainfallgraph.start();
+private:
 
-    return app.exec();
-}
+    void updateYearsList(int start, int end);
+    Q3DBars *m_graph;
+    int m_columnCount;
+    int m_rowCount;
+    QStringList m_years;
+    QStringList m_numericMonths;
+    VariantBarDataProxy *m_proxy;
+    VariantBarDataMapping *m_mapping;
+    VariantDataSet *m_dataSet;
+};
+
+
+#endif

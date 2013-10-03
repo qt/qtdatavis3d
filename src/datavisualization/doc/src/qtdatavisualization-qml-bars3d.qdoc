@@ -34,7 +34,7 @@
  *
  * \snippet doc_src_qmldatavisualization.cpp 1
  *
- * See \l{Qt Quick 2 Barchart Example} for more thorough usage example.
+ * See \l{Qt Quick 2 Bars Example} for more thorough usage example.
  *
  * \sa ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */

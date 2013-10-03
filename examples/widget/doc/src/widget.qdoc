@@ -20,7 +20,7 @@
     \example widget
     \title Widget Example
 
-    The widget example shows how to make a 3D bar chart using Q3DBars and combining the use of
+    The widget example shows how to make a 3D bar graph using Q3DBars and combining the use of
     widgets for adjusting several adjustable qualities.
 
     \image widget-example.png

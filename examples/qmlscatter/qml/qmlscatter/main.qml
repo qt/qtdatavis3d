@@ -25,7 +25,7 @@ Item {
     visible: true
 
     Data {
-        id: chartData
+        id: graphData
     }
 
     Item {
@@ -40,7 +40,7 @@ Item {
             height: dataView.height
             font.family: "Lucida Handwriting"
             font.pointSize: 40
-            dataProxy: chartData.proxy
+            dataProxy: graphData.proxy
             theme: Scatter3D.ThemeIsabelle
             shadowQuality: Scatter3D.ShadowQualitySoftLow
             selectionMode: Scatter3D.SelectionModeItem

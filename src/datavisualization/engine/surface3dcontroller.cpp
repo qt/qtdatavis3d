@@ -39,7 +39,7 @@ Surface3DController::Surface3DController(QRect rect)
 {
     setActiveDataProxy(0);
 
-    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);

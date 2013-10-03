@@ -27,10 +27,10 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
-AudioLevels::AudioLevels(Q3DBars *chart, QObject *parent)
+AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     : QObject(parent),
       m_device(0),
-      m_graph(chart),
+      m_graph(graph),
       m_audioInput(0)
 {
     // Set up the graph

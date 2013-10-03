@@ -20,3 +20,6 @@ include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
 RESOURCES += qmlsurface.qrc
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

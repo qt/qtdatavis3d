@@ -16,22 +16,14 @@
 **
 ****************************************************************************/
 
-#include "rainfallgraph.h"
-#include <QGuiApplication>
+/*!
+    \example qmlbars
+    \title Qt Quick 2 Bars Example
 
-using namespace QtDataVisualization;
+    The Qt Quick 2 bars example shows how to make a simple 3D bar graph using Q3DBars and Qt
+    Quick 2.
 
-int main(int argc, char **argv)
-{
-    QGuiApplication app(argc, argv);
+    \image qmlbars-example.png
 
-    Q3DBars *rainfall = new Q3DBars;
-    rainfall->resize(1280, 800);
-    rainfall->setPosition(QPoint(10, 30));
-    rainfall->show();
-
-    RainfallGraph rainfallgraph(rainfall);
-    rainfallgraph.start();
-
-    return app.exec();
-}
+    TODO
+*/

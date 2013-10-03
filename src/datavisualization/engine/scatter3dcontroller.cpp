@@ -39,7 +39,7 @@ Scatter3DController::Scatter3DController(QRect boundRect)
 
     setActiveDataProxy(new QScatterDataProxy);
 
-    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);

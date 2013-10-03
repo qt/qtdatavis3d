@@ -31,7 +31,7 @@ class AudioLevels : public QObject
     Q_OBJECT
 
 public:
-    AudioLevels(Q3DBars *chart, QObject *parent = 0);
+    AudioLevels(Q3DBars *graph, QObject *parent = 0);
     ~AudioLevels();
 
 private:

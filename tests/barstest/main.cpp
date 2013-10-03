@@ -260,73 +260,73 @@ int main(int argc, char **argv)
 
     widget->show();
 
-    ChartModifier *modifier = new ChartModifier(widgetchart);
+    GraphModifier *modifier = new GraphModifier(widgetchart);
 
-    QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &ChartModifier::rotateX);
-    QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &ChartModifier::rotateY);
+    QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &GraphModifier::rotateX);
+    QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &GraphModifier::rotateY);
 
-    QObject::connect(ratioSlider, &QSlider::valueChanged, modifier, &ChartModifier::setSpecsRatio);
+    QObject::connect(ratioSlider, &QSlider::valueChanged, modifier, &GraphModifier::setSpecsRatio);
 
     QObject::connect(spacingSliderX, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setSpacingSpecsX);
+                     &GraphModifier::setSpacingSpecsX);
     QObject::connect(spacingSliderZ, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setSpacingSpecsZ);
+                     &GraphModifier::setSpacingSpecsZ);
 
     QObject::connect(sampleSliderX, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setSampleCountX);
+                     &GraphModifier::setSampleCountX);
     QObject::connect(sampleSliderZ, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setSampleCountZ);
+                     &GraphModifier::setSampleCountZ);
     QObject::connect(minSliderX, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setMinX);
+                     &GraphModifier::setMinX);
     QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
-                     &ChartModifier::setMinZ);
+                     &GraphModifier::setMinZ);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
-    QObject::connect(modifier, &ChartModifier::shadowQualityChanged, shadowQuality,
+    QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
     QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,
-                     &ChartModifier::shadowQualityUpdatedByVisual);
+                     &GraphModifier::shadowQualityUpdatedByVisual);
     QObject::connect(widgetchart, &Q3DBars::selectedBarPosChanged, modifier,
-                     &ChartModifier::handleSelectionChange);
+                     &GraphModifier::handleSelectionChange);
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
-                     &ChartModifier::changeFontSize);
+                     &GraphModifier::changeFontSize);
 
-    QObject::connect(styleButton, &QPushButton::clicked, modifier, &ChartModifier::changeStyle);
+    QObject::connect(styleButton, &QPushButton::clicked, modifier, &GraphModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::changePresetCamera);
-    QObject::connect(themeButton, &QPushButton::clicked, modifier, &ChartModifier::changeTheme);
+                     &GraphModifier::changePresetCamera);
+    QObject::connect(themeButton, &QPushButton::clicked, modifier, &GraphModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::changeStyle);
-    QObject::connect(addDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRow);
-    QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &ChartModifier::addRows);
-    QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &ChartModifier::insertRow);
-    QObject::connect(insertMultiDataButton, &QPushButton::clicked, modifier, &ChartModifier::insertRows);
-    QObject::connect(changeSingleDataButton, &QPushButton::clicked, modifier, &ChartModifier::changeItem);
-    QObject::connect(changeRowButton, &QPushButton::clicked, modifier, &ChartModifier::changeRow);
-    QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::changeRows);
-    QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &ChartModifier::removeRow);
-    QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &ChartModifier::removeRows);
-    QObject::connect(massiveArrayButton, &QPushButton::clicked, modifier, &ChartModifier::createMassiveArray);
+                     &GraphModifier::changeStyle);
+    QObject::connect(addDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRow);
+    QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRows);
+    QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRow);
+    QObject::connect(insertMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRows);
+    QObject::connect(changeSingleDataButton, &QPushButton::clicked, modifier, &GraphModifier::changeItem);
+    QObject::connect(changeRowButton, &QPushButton::clicked, modifier, &GraphModifier::changeRow);
+    QObject::connect(changeRowsButton, &QPushButton::clicked, modifier, &GraphModifier::changeRows);
+    QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &GraphModifier::removeRow);
+    QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &GraphModifier::removeRows);
+    QObject::connect(massiveArrayButton, &QPushButton::clicked, modifier, &GraphModifier::createMassiveArray);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::changeSelectionMode);
+                     &GraphModifier::changeSelectionMode);
     QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::selectBar);
+                     &GraphModifier::selectBar);
     QObject::connect(swapAxisButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::swapAxis);
+                     &GraphModifier::swapAxis);
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::releaseAxes);
+                     &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
-                     &ChartModifier::releaseProxies);
+                     &GraphModifier::releaseProxies);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
-                     &ChartModifier::changeFont);
+                     &GraphModifier::changeFont);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
-                     &ChartModifier::setBackgroundEnabled);
+                     &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
-                     &ChartModifier::setGridEnabled);
+                     &GraphModifier::setGridEnabled);
 
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);
-    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &ChartModifier::restart);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &GraphModifier::restart);
 
     modifier->start();
 

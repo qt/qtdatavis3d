@@ -52,7 +52,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Methods are provided for changing bar types, themes, bar selection modes and so on. See the
  * methods for more detailed descriptions.
  *
- * \section1 How to construct a minimal Q3DBars chart
+ * \section1 How to construct a minimal Q3DBars graph
  *
  * After constructing Q3DBars, you can set the data window by changing the range on the row and
  * column axes. It is not mandatory, as data window will default to showing all of the data in
@@ -73,7 +73,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dbars_construction.cpp 2
  *
- * The complete code needed to create and display this chart is:
+ * The complete code needed to create and display this graph is:
  *
  * \snippet doc_src_q3dbars_construction.cpp 3
  *

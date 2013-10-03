@@ -2,8 +2,8 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
-SOURCES += main.cpp graphmodifier.cpp
-HEADERS += graphmodifier.h
+SOURCES += main.cpp scatterdatamodifier.cpp
+HEADERS += scatterdatamodifier.h
 
 QT += widgets
 
@@ -11,4 +11,3 @@ INSTALLS += target
 
 OTHER_FILES += doc/src/* \
                doc/images/*
-

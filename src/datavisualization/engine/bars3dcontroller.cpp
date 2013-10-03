@@ -43,7 +43,7 @@ Bars3DController::Bars3DController(QRect boundRect)
 
     setActiveDataProxy(0);
 
-    // Setting a null axis creates a new default axis according to orientation and chart type.
+    // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);
@@ -399,7 +399,7 @@ void Bars3DController::adjustAxisRanges()
                                                                     categoryAxisZ->min(),
                                                                     categoryAxisZ->max());
         if (limits.first < 0) {
-            // TODO: Currently we only support symmetric y-axis for bar chart if there are negative values
+            // TODO: Currently we only support symmetric y-axis for bar graph if there are negative values
             qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));
             // Call private implementation to avoid unsetting auto adjust flag
             valueAxis->dptr()->setRange(-maxAbs, maxAbs);

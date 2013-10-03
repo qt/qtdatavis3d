@@ -16,22 +16,13 @@
 **
 ****************************************************************************/
 
-#include "rainfallgraph.h"
-#include <QGuiApplication>
+/*!
+    \example bars
+    \title Bars Example
 
-using namespace QtDataVisualization;
+    The bars example shows how to make a simple 3D bar graph using Q3DBars.
 
-int main(int argc, char **argv)
-{
-    QGuiApplication app(argc, argv);
+    \image bars-example.png
 
-    Q3DBars *rainfall = new Q3DBars;
-    rainfall->resize(1280, 800);
-    rainfall->setPosition(QPoint(10, 30));
-    rainfall->show();
-
-    RainfallGraph rainfallgraph(rainfall);
-    rainfallgraph.start();
-
-    return app.exec();
-}
+    TODO
+*/

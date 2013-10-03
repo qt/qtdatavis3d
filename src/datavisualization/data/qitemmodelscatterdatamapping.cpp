@@ -35,7 +35,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * For example, assume that you have a custom QAbstractItemModel for storing various measurements
  * done on material samples, providing data for roles such as "density", "hardness" and
- * "conductivity". You could visualize these properties on a scatter chart:
+ * "conductivity". You could visualize these properties on a scatter graph:
  *
  * \snippet doc_src_qtdatavisualization.cpp 4
  *

@@ -14,3 +14,7 @@ HEADERS += audiolevels.h \
            audiolevelsiodevice.h
 
 INSTALLS += target
+
+OTHER_FILES += doc/src/* \
+               doc/images/*
+

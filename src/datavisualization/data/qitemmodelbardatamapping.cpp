@@ -46,7 +46,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *    For example, assume that you have a custom QAbstractItemModel for storing various monthly values
  *    related to a business.
  *    Each item in the model has roles "year", "month", "income", and "expenses".
- *    You could do the following to display the data in a bar chart:
+ *    You could do the following to display the data in a bar graph:
  *
  *    \snippet doc_src_qtdatavisualization.cpp 3
  *

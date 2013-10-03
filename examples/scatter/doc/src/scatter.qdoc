@@ -16,22 +16,14 @@
 **
 ****************************************************************************/
 
-#include "rainfallgraph.h"
-#include <QGuiApplication>
+/*!
+    \example scatter
+    \title Scatter Example
 
-using namespace QtDataVisualization;
+    The scatter example shows how to make a simple 3D scatter graph using Q3DScatter and
+    combining the use of widgets for adjusting several adjustable qualities.
 
-int main(int argc, char **argv)
-{
-    QGuiApplication app(argc, argv);
+    \image scatter-example.png
 
-    Q3DBars *rainfall = new Q3DBars;
-    rainfall->resize(1280, 800);
-    rainfall->setPosition(QPoint(10, 30));
-    rainfall->show();
-
-    RainfallGraph rainfallgraph(rainfall);
-    rainfallgraph.start();
-
-    return app.exec();
-}
+    TODO
+*/

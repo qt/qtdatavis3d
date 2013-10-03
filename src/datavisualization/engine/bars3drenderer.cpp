@@ -1526,9 +1526,11 @@ void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientatio
             emit needRender();
         }
 
-        // TODO Currently barchart only supports zero centered or zero minimum ranges
-        if (min > 0.0 || (min != 0.0 && (qFabs(min) != qFabs(max))))
-            qWarning() << __FUNCTION__ << "Bar chart currently properly supports only zero-centered and zero minimum ranges for Y-axis.";
+        // TODO Currently bargraph only supports zero centered or zero minimum ranges
+        if (min > 0.0 || (min != 0.0 && (qFabs(min) != qFabs(max)))) {
+            qWarning() << __FUNCTION__ << "Bar graph currently properly supports only "
+                          "zero-centered and zero minimum ranges for Y-axis.";
+        }
     }
 }
 
