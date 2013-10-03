@@ -34,62 +34,45 @@ TextureHelper::~TextureHelper()
 {
 }
 
-GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering, bool convert)
+GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,
+                                      bool convert, bool smoothScale)
 {
     if (image.isNull())
         return 0;
 
-    QImage texImage;
+    QImage texImage = image;
 
 #if defined(Q_OS_ANDROID)
     GLuint temp;
     //qDebug() << "old size" << image.size();
     GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
-    //qDebug() << "new width" << imageWidth << "padding" << temp;
     GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
-    //qDebug() << "new height" << imageHeight << "padding" << temp;
-    texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio,
-                            Qt::SmoothTransformation);
+    if (smoothScale) {
+        texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
+    } else {
+        texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio);
+    }
     //qDebug() << "new size" << texImage.size();
-#else
-    texImage = image;
 #endif
 
     GLuint textureId;
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
-    if (convert) {
-        QImage glTexture = convertToGLFormat(texImage);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glTexture.width(), glTexture.height(),
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
-    } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texImage.width(), texImage.height(),
-                     0, GL_RGBA, GL_UNSIGNED_BYTE, texImage.bits());
-    }
-    if (useTrilinearFiltering) {
+    if (convert)
+        texImage = convertToGLFormat(texImage);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texImage.width(), texImage.height(),
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, texImage.bits());
+    if (smoothScale)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    else
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if (useTrilinearFiltering) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return textureId;
-}
-
-GLuint TextureHelper::create2DTexture(const uchar *image, int width, int height)
-{
-    GLuint textureId;
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_2D, textureId);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;
 }
@@ -105,13 +88,12 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
     QImage glTexture = convertToGLFormat(image);
     glTexImage2D(GL_TEXTURE_CUBE_MAP, 0, GL_RGBA, glTexture.width(), glTexture.height(),
                  0, GL_RGBA, GL_UNSIGNED_BYTE, glTexture.bits());
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     if (useTrilinearFiltering) {
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     } else {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;

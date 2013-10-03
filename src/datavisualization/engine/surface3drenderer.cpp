@@ -484,7 +484,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     GLfloat scaleX;
     GLfloat scaleXBackground;
-    GLfloat offset;
+    GLfloat offset = 0.0f;
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         scaleX = m_surfaceScaleX;
         scaleXBackground = m_scaleXWithBackground;
@@ -1694,15 +1694,6 @@ void Surface3DRenderer::updateSelectionTexture()
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
     int idImageWidth = (m_sampleSpace.width() - 1) * 4;
     int idImageHeight = (m_sampleSpace.height() - 1) * 4;
-
-#if defined(Q_OS_ANDROID)
-    // Android requires power-of-two textures
-    GLuint temp;
-    idImageWidth = Utils::getNearestPowerOfTwo(idImageWidth, temp);
-    idImageHeight = Utils::getNearestPowerOfTwo(idImageHeight, temp);
-    // TODO: This is not enough, the selection texture itself needs to be modified for Android (colors?, scaling)
-#endif
-
     int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
 
     uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
@@ -1735,7 +1726,8 @@ void Surface3DRenderer::updateSelectionTexture()
     }
 
     // Move the ID image (bits) to the texture
-    m_selectionTexture = m_textureHelper->create2DTexture(bits, idImageWidth, idImageHeight);
+    QImage image = QImage(bits, idImageWidth, idImageHeight, QImage::Format_RGB32);
+    m_selectionTexture = m_textureHelper->create2DTexture(image, false, false, false);
 
     // Release the temp bits allocation
     delete[] bits;
