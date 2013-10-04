@@ -6,7 +6,8 @@ SUBDIRS += qmlbars \
     SUBDIRS += bars \
                rainfall \
                widget \
-               scatter
+               scatter \
+               surface
 }
 
 qtHaveModule(multimedia):!android: SUBDIRS += audiolevels
