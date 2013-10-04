@@ -25,7 +25,6 @@
 #include "qsurfacedataproxy_p.h"
 
 #include <QMatrix4x4>
-#include <QMouseEvent>
 
 #include <QDebug>
 

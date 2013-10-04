@@ -413,7 +413,6 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
     scene->setSecondarySubViewport(m_sliceViewPort);
     scene->setPrimarySubViewport(m_mainViewPort);
-    scene->setUnderSideCameraEnabled(false);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
@@ -442,16 +441,22 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
-    // If slice selection is on, draw the sliced scene
-    if (m_cachedIsSlicingActivated)
+    // In slice mode; draw slice and render selection ball
+    if (m_cachedIsSlicingActivated && m_selectionPointer && m_selectionActive) {
         drawSlicedScene();
+        m_selectionPointer->render(defaultFboHandle);
+    }
 
     // Draw the surface scene
     drawScene(defaultFboHandle);
 
-    // If selection pointer is active, pass the render request for it also
-    if (m_selectionPointer && m_selectionActive)
+    // Render selection ball if not in slice mode
+    if (!m_cachedIsSlicingActivated && m_selectionPointer && m_selectionActive)
         m_selectionPointer->render(defaultFboHandle);
+
+    // If slicing has been activated by this render pass, we need another render
+    if (slicingActivated != m_cachedScene->isSlicingActive())
+        emit needRender();
 }
 
 void Surface3DRenderer::drawSlicedScene()

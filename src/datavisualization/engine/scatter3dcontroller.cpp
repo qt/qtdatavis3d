@@ -24,7 +24,6 @@
 #include "qscatterdataproxy_p.h"
 
 #include <QMatrix4x4>
-#include <QMouseEvent>
 #include <qmath.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
