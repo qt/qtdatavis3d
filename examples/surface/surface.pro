@@ -12,3 +12,6 @@ QT += widgets
 INSTALLS += target
 
 RESOURCES += surface.qrc
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

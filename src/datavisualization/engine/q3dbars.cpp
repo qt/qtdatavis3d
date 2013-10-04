@@ -54,6 +54,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \section1 How to construct a minimal Q3DBars graph
  *
+ * First, construct an instance of Q3DBars:
+ *
+ * \snippet doc_src_q3dbars_construction.cpp 4
+ *
  * After constructing Q3DBars, you can set the data window by changing the range on the row and
  * column axes. It is not mandatory, as data window will default to showing all of the data in
  * the data proxy. If the amount of data is large, it is usually preferable to show just a
@@ -66,7 +70,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
  *
- * \note We set the sample space to 5 x 5, but we are inserting only one row of data. This is ok,
+ * \note We set the data window to 5 x 5, but we are inserting only one row of data. This is ok,
  * the rest of the rows will just be blank.
  *
  * Finally you will need to set it visible:

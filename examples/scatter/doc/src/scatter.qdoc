@@ -19,6 +19,8 @@
 /*!
     \example scatter
     \title Scatter Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Q3DScatter in a widget application.
 
     The scatter example shows how to make a simple 3D scatter graph using Q3DScatter and
     combining the use of widgets for adjusting several adjustable qualities.

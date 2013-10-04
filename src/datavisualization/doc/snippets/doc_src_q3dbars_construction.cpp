@@ -25,8 +25,10 @@ int main(int argc, char **argv)
 {
     QGuiApplication app(argc, argv);
 
-    //! [0]
+    //! [4]
     Q3DBars *bars = new Q3DBars();
+    //! [4]
+    //! [0]
     bars->rowAxis()->setRange(0, 4);
     bars->columnAxis()->setRange(0, 4);
     //! [0]

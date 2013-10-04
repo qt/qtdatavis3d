@@ -19,6 +19,8 @@
 /*!
     \example bars
     \title Bars Example
+    \ingroup qtdatavisualization_examples
+    \brief Using an item model as data source for Q3DBars.
 
     The bars example shows how to make a simple 3D bar graph using Q3DBars.
 

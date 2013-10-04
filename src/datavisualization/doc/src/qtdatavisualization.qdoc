@@ -41,11 +41,55 @@
 
     \section1 Building Qt Data Visualization
 
-    TODO
+    To build Qt Data Visualization module, set up a command prompt with an environment for
+    building Qt applications, navigate to the directory containing \c qtdatavisualization.pro,
+    and give the following commands:
+
+    \snippet doc_src_qtdatavisualization.cpp 6
+
+    \note The \c make tool name may vary depending on your target platform.
+    E.g. make/nmake/mingw32-make/...
+
+    To build a statically linked version of the Qt Data Visualization module, give the following
+    commands:
+
+    \snippet doc_src_qtdatavisualization.cpp 7
+
+    \section1 Running examples
+
+    Qt Data Visualization examples are found under \c examples subdirectory. To build and run a
+    single example, e.g. the qmlsurface example, navigate to the example directory and give the
+    following commands:
+
+    \snippet doc_src_qtdatavisualization.cpp 8
+
+    \note On some platforms, such as Windows, the executable can be generated under debug or
+    release folders, depending on your build.
 
     \section1 Creating a simple application
 
-    TODO
+    To create a simple application, start by creating a new Qt Gui Application project in Qt
+    Creator and add this line to the \c .pro file of the project:
+
+    \snippet doc_src_qtdatavisualization.pro 0
+
+    In the \c main.cpp file, include the module headers and declare namespace usage:
+
+    \snippet doc_src_qtdatavisualization.cpp 0
+
+    Then, add the sample code found in one of the following pages, depending on what kind of
+    visualization you are interested in: \l{How to construct a minimal Q3DBars graph},
+    \l{How to construct a minimal Q3DScatter graph}, or
+    \l{How to construct a minimal Q3DSurface graph}.
+
+    To use Qt Data Visualization graphs in widget based applications, you can use
+    QWidget::createWindowContainer() function to wrap the graph into a widget:
+
+    \snippet doc_src_qtdatavisualization.cpp 9
+
+    For further code examples, see one of the Qt Data Visualization examples:
+
+    \annotatedlist qtdatavisualization_examples
 */
 
 /*!

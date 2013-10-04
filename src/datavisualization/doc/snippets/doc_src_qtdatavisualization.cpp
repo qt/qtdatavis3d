@@ -18,6 +18,8 @@
 
 //! [0]
 #include <QtDataVisualization>
+
+using namespace QtDataVisualization;
 //! [0]
 
 //! [1]
@@ -76,3 +78,24 @@ QItemModelSurfaceDataMapping *mapping = new QItemModelSurfaceDataMapping(QString
 
 QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel, mapping);
 //! [5]
+
+//! [6]
+qmake
+make
+//! [6]
+
+//! [7]
+qmake CONFIG+=static
+make
+//! [7]
+
+//! [8]
+qmake
+make
+./qmlsurface
+//! [8]
+
+//! [9]
+Q3DBars *graph = new Q3DBars();
+QWidget *container = QWidget::createWindowContainer(graph);
+//! [9]

@@ -19,6 +19,8 @@
 /*!
     \example qmlbars
     \title Qt Quick 2 Bars Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Bars3D in a QML application.
 
     The Qt Quick 2 bars example shows how to make a simple 3D bar graph using Q3DBars and Qt
     Quick 2.

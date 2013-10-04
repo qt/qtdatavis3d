@@ -46,7 +46,7 @@
     \snippet doc_src_qmldatavisualization.cpp 0
 
     If you intend to use Qt Data Visualization C++ classes in your application, use the
-    following directive:
+    following include and using directives:
 
     \snippet doc_src_qtdatavisualization.cpp 0
 
@@ -74,15 +74,5 @@
 
     Qt Data Visualization comes with the following examples:
 
-    \list
-        \li \l{Bars Example}
-        \li \l{Qt Quick 2 Bars Example}
-        \li \l{Qt Quick 2 Scatter Example}
-        \li \l{Qt Quick 2 Surface Example}
-        \li \l{Rainfall Example}
-        \li \l{Scatter Example}
-        \li \l{Surface Example}
-        \li \l{Audiolevels Example}
-        \li \l{Widget Example}
-    \endlist
+    \annotatedlist qtdatavisualization_examples
 */

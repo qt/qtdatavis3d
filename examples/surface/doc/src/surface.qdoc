@@ -17,14 +17,15 @@
 ****************************************************************************/
 
 /*!
-    \example audiolevels
-    \title Audiolevels Example
+    \example surface
+    \title Surface Example
     \ingroup qtdatavisualization_examples
-    \brief Simple application showing real time audio data.
+    \brief Using Q3DSurface in a widget application.
 
-    The audiolevels example shows how feed dynamic data to a graph using Q3DBars.
+    The surface example shows how to make a simple 3D surface graph using Q3DSurface and
+    combining the use of widgets for adjusting several adjustable qualities.
 
-    \image audiolevels-example.png
+    \image surface-example.png
 
     TODO
 */

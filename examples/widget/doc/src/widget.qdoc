@@ -19,6 +19,8 @@
 /*!
     \example widget
     \title Widget Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Q3DBars in a widget application.
 
     The widget example shows how to make a 3D bar graph using Q3DBars and combining the use of
     widgets for adjusting several adjustable qualities.
