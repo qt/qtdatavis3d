@@ -49,6 +49,7 @@ Item {
             height: surfaceView.height
             theme: Surface3D.ThemeStoneMoss
             shadowQuality: Surface3D.ShadowQualityMedium
+            selectionMode: Bars3D.SelectionModeSliceRow
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"
