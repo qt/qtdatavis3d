@@ -151,7 +151,7 @@ void GraphDataGenerator::setupModel()
     // Add labels
     m_graph->rowAxis()->setTitle("Week of year");
     m_graph->columnAxis()->setTitle("Day of week");
-    m_graph->valueAxis()->setTitle("Hours playing banjo");
+    m_graph->valueAxis()->setTitle("Hours spent on the Internet");
     m_graph->valueAxis()->setSegmentCount(5);
     m_graph->valueAxis()->setLabelFormat("%.1f h");
 
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget.setWindowTitle(QStringLiteral("Hours playing banjo"));
+    widget.setWindowTitle(QStringLiteral("Hours spent on the Internet"));
 
     QTableWidget *tableWidget = new QTableWidget(&widget);
     tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
