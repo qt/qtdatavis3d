@@ -271,16 +271,18 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
     m_sliceDataArray.reserve(2);
     QSurfaceDataRow *sliceRow;
 
+    qreal adjust = (0.025 * m_heightNormalizer) / 2.0;
+    qreal stepDown = 2.0 * adjust;
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         QSurfaceDataRow *src = m_dataArray.at(row);
         sliceRow = new QSurfaceDataRow(src->size());
         for (int i = 0; i < sliceRow->size(); i++)
-            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y(), -1.0));
+            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0));
     } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
         sliceRow = new QSurfaceDataRow(m_sampleSpace.height());
         for (int i = 0; i < m_sampleSpace.height(); i++) {
             (*sliceRow)[i].setPosition(QVector3D(m_dataArray.at(i)->at(column).z(),
-                                                 m_dataArray.at(i)->at(column).y(),
+                                                 m_dataArray.at(i)->at(column).y() + adjust,
                                                  -1.0));
         }
     }
@@ -290,7 +292,7 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
     // Make a duplicate, so that we get a little bit depth
     QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
     for (int i = 0; i < sliceRow->size(); i++)
-        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y(), 1.0));
+        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown, 1.0));
 
     m_sliceDataArray << duplicateRow;
 
@@ -469,8 +471,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_sliceViewPort.width()
-                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.ortho(-3.0f, 3.0, -3.0, 3.0, 0.1f, 100.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
@@ -576,6 +577,10 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
+        // Set shadowless shader bindings, no shadows on slice view
+        lineShader->setUniformValue(lineShader->lightS(),
+                                    m_cachedTheme.m_lightStrength * 0.5f);
+
         // Back wall
         GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
         GLfloat linePos = -1.0f;
@@ -598,10 +603,6 @@ void Surface3DRenderer::drawSlicedScene()
             lineShader->setUniformValue(lineShader->nModel(),
                                         itModelMatrix.inverted().transposed());
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
-
-            // Set shadowless shader bindings, no shadows on slice view
-            lineShader->setUniformValue(lineShader->lightS(),
-                                        m_cachedTheme.m_lightStrength);
 
             // Draw the object
             m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -645,10 +646,6 @@ void Surface3DRenderer::drawSlicedScene()
                                     itModelMatrix.inverted().transposed());
         lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-        // Set shadowless shader bindings
-        lineShader->setUniformValue(lineShader->lightS(),
-                                    m_cachedTheme.m_lightStrength);
-
         // Draw the object
         m_drawer->drawObject(lineShader, m_gridLineObj);
 
@@ -676,10 +673,6 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->nModel(),
                                     itModelMatrix.inverted().transposed());
         lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
-
-        // Set shadowless shader bindings
-        lineShader->setUniformValue(lineShader->lightS(),
-                                    m_cachedTheme.m_lightStrength);
 
         // Draw the object
         m_drawer->drawObject(lineShader, m_gridLineObj);

@@ -100,13 +100,17 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 
     // Get view matrix
     QMatrix4x4 viewMatrix;
+    QMatrix4x4 projectionMatrix;
     if (m_cachedIsSlicingActivated) {
         GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment + zComp;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced),
                           QVector3D(0.0f, 0.0f, zComp),
                           QVector3D(0.0f, 1.0f, 0.0f));
+        projectionMatrix.ortho(-3.0f, 3.0, -3.0, 3.0, 0.1f, 100.0f);
     } else {
         viewMatrix = camera->viewMatrix();
+        projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
+                                     / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
     }
 
     // Calculate scale factor to get uniform font size
@@ -114,9 +118,9 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Set up projection matrix
-    QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
-                                 / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
+//    QMatrix4x4 projectionMatrix;
+//    projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
+//                                 / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
