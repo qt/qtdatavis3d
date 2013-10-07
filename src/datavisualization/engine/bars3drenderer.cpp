@@ -223,13 +223,12 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
     scene->setLightPositionRelativeToCamera(defaultLightPos);
 
     Abstract3DRenderer::updateScene(scene);
+
+    updateSlicingActive(scene->isSlicingActive());
 }
 
 void Bars3DRenderer::render(GLuint defaultFboHandle)
 {
-    bool slicingActivated = m_cachedScene->isSlicingActive();
-    updateSlicingActive(slicingActivated);
-
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -241,7 +240,7 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     drawScene(defaultFboHandle);
 
     // If slicing has been activated by this render pass, we need another render
-    if (slicingActivated != m_cachedScene->isSlicingActive())
+    if (m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive())
         emit needRender();
 }
 
@@ -1482,10 +1481,11 @@ void Bars3DRenderer::handleResize()
                                m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / 5,
                                m_cachedBoundingRect.width() / 5,
                                m_cachedBoundingRect.height() / 5);
+        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
     } else {
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+        m_sliceViewPort = QRect(0, 0, 0, 0);
     }
-    m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
 
     Abstract3DRenderer::handleResize();
 }
@@ -1724,6 +1724,7 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
     if (isSlicing) {
         m_mainViewPort = QRect(0, m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / 5,
                                m_cachedBoundingRect.width() / 5, m_cachedBoundingRect.height() / 5);
+        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
         if (m_depthTexture) {
             m_textureHelper->deleteTexture(&m_depthTexture);
             m_depthTexture = 0;
@@ -1731,6 +1732,7 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
     } else {
         m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
                                this->m_cachedBoundingRect.height());
+        m_sliceViewPort = QRect(0, 0, 0, 0);
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
 #if !defined(QT_OPENGL_ES_2)
         updateDepthBuffer(); // Re-init depth buffer as well

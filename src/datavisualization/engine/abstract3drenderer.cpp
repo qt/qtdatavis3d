@@ -108,6 +108,11 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
         glDisable(GL_BLEND); // For QtQuick2 blending is enabled by default, but we don't want it to be
     }
 
+    glViewport(m_cachedScene->viewport().x(),
+               m_cachedScene->viewport().y(),
+               m_cachedScene->viewport().width(),
+               m_cachedScene->viewport().height());
+
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
