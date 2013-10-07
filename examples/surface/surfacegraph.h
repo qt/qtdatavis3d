@@ -36,10 +36,12 @@ public:
     void enableHeightMapModel();
     void enableSqrtSinModel();
 
+    //! [0]
     void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionModeNone); }
     void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionModeItem); }
     void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow); }
     void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn); }
+    //! [0]
 
     void setBlackToYellowGradient();
     void setGreenToRedGradient();

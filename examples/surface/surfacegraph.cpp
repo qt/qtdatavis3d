@@ -37,14 +37,18 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     m_graph->setAxisZ(new Q3DValueAxis);
     m_graph->setLabelStyle(QDataVis::LabelStyleFromTheme);
 
+    //! [0]
+    sqrtSinProxy = new QSurfaceDataProxy();
+    //! [0]
+    fillSqrtSinProxy();
+
+    //! [2]
     QImage heightMapImage(":/maps/map");
     m_heightMapProxy = new QHeightMapSurfaceDataProxy(heightMapImage);
     m_heightMapProxy->setValueRanges(34.0, 40.0, 18.0, 24.0);
+    //! [2]
     m_heightMapWidth = heightMapImage.width();
     m_heightMapHeight = heightMapImage.height();
-
-    sqrtSinProxy = new QSurfaceDataProxy();
-    fillSqrtSinProxy();
 }
 
 SurfaceGraph::~SurfaceGraph()
@@ -52,6 +56,7 @@ SurfaceGraph::~SurfaceGraph()
     delete m_graph;
 }
 
+//! [1]
 void SurfaceGraph::fillSqrtSinProxy()
 {
     qreal stepX = 16.0 / qreal(sampleCountX);
@@ -72,9 +77,41 @@ void SurfaceGraph::fillSqrtSinProxy()
 
     sqrtSinProxy->resetArray(dataArray);
 }
+//! [1]
+
+void SurfaceGraph::enableSqrtSinModel()
+{
+    //! [3]
+    m_graph->setSurfaceGridEnabled(true);
+    m_graph->setSmoothSurfaceEnabled(false);
+
+    m_graph->axisX()->setLabelFormat("%.2f");
+    m_graph->axisZ()->setLabelFormat("%.2f");
+    m_graph->axisX()->setRange(-8.0, 8.0);
+    m_graph->axisY()->setRange(0.0, 2.0);
+    m_graph->axisZ()->setRange(-8.0, 8.0);
+
+    m_graph->setActiveDataProxy(sqrtSinProxy);
+    //! [3]
+
+    // Reset range sliders for Sqrt&Sin
+    m_rangeMinX = -8.0;
+    m_rangeMinZ = -8.0;
+    m_stepX = 16.0 / qreal(sampleCountX - 1);
+    m_stepZ = 16.0 / qreal(sampleCountZ - 1);
+    m_axisMinSliderX->setMaximum(sampleCountX - 3);
+    m_axisMinSliderX->setValue(0);
+    m_axisMaxSliderX->setMaximum(sampleCountX - 1);
+    m_axisMaxSliderX->setValue(sampleCountX - 1);
+    m_axisMinSliderZ->setMaximum(sampleCountZ - 3);
+    m_axisMinSliderZ->setValue(0);
+    m_axisMaxSliderZ->setMaximum(sampleCountZ - 1);
+    m_axisMaxSliderZ->setValue(sampleCountZ - 1);
+}
 
 void SurfaceGraph::enableHeightMapModel()
 {
+    //! [4]
     m_graph->setSurfaceGridEnabled(false);
     m_graph->setSmoothSurfaceEnabled(true);
 
@@ -85,6 +122,7 @@ void SurfaceGraph::enableHeightMapModel()
     m_graph->axisZ()->setRange(18.0, 24.0);
 
     m_graph->setActiveDataProxy(m_heightMapProxy);
+    //! [4]
 
     // Reset range sliders for height map
     int mapGridCountX = m_heightMapWidth / heightMapGridStepX;
@@ -101,34 +139,6 @@ void SurfaceGraph::enableHeightMapModel()
     m_axisMinSliderZ->setValue(0);
     m_axisMaxSliderZ->setMaximum(mapGridCountZ - 1);
     m_axisMaxSliderZ->setValue(mapGridCountZ - 1);
-}
-
-void SurfaceGraph::enableSqrtSinModel()
-{
-    m_graph->setSurfaceGridEnabled(true);
-    m_graph->setSmoothSurfaceEnabled(false);
-
-    m_graph->axisX()->setLabelFormat("%.2f");
-    m_graph->axisZ()->setLabelFormat("%.2f");
-    m_graph->axisX()->setRange(-8.0, 8.0);
-    m_graph->axisY()->setRange(0.0, 2.0);
-    m_graph->axisZ()->setRange(-8.0, 8.0);
-
-    m_graph->setActiveDataProxy(sqrtSinProxy);
-
-    // Reset range sliders for Sqrt&Sin
-    m_rangeMinX = -8.0;
-    m_rangeMinZ = -8.0;
-    m_stepX = 16.0 / qreal(sampleCountX - 1);
-    m_stepZ = 16.0 / qreal(sampleCountZ - 1);
-    m_axisMinSliderX->setMaximum(sampleCountX - 3);
-    m_axisMinSliderX->setValue(0);
-    m_axisMaxSliderX->setMaximum(sampleCountX - 1);
-    m_axisMaxSliderX->setValue(sampleCountX - 1);
-    m_axisMinSliderZ->setMaximum(sampleCountZ - 3);
-    m_axisMinSliderZ->setValue(0);
-    m_axisMaxSliderZ->setMaximum(sampleCountZ - 1);
-    m_axisMaxSliderZ->setValue(sampleCountZ - 1);
 }
 
 void SurfaceGraph::adjustXMin(int min)
@@ -187,6 +197,7 @@ void SurfaceGraph::adjustZMax(int max)
     setAxisZRange(minX, maxX);
 }
 
+//! [5]
 void SurfaceGraph::setAxisXRange(qreal min, qreal max)
 {
     m_graph->axisX()->setRange(min, max);
@@ -196,9 +207,18 @@ void SurfaceGraph::setAxisZRange(qreal min, qreal max)
 {
     m_graph->axisZ()->setRange(min, max);
 }
+//! [5]
+
+//! [6]
+void SurfaceGraph::changeTheme(int theme)
+{
+    m_graph->setTheme((QDataVis::Theme)theme);
+}
+//! [6]
 
 void SurfaceGraph::setBlackToYellowGradient()
 {
+    //! [7]
     QLinearGradient gr;
     gr.setColorAt(0.0, Qt::black);
     gr.setColorAt(0.33, Qt::blue);
@@ -206,6 +226,7 @@ void SurfaceGraph::setBlackToYellowGradient()
     gr.setColorAt(1.0, Qt::yellow);
 
     m_graph->setGradient(gr);
+    //! [7]
 }
 
 void SurfaceGraph::setGreenToRedGradient()
@@ -219,7 +240,3 @@ void SurfaceGraph::setGreenToRedGradient()
     m_graph->setGradient(gr);
 }
 
-void SurfaceGraph::changeTheme(int theme)
-{
-    m_graph->setTheme((QDataVis::Theme)theme);
-}
