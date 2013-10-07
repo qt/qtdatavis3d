@@ -43,7 +43,7 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     fillSqrtSinProxy();
 
     //! [2]
-    QImage heightMapImage(":/maps/map");
+    QImage heightMapImage(":/maps/mountain");
     m_heightMapProxy = new QHeightMapSurfaceDataProxy(heightMapImage);
     m_heightMapProxy->setValueRanges(34.0, 40.0, 18.0, 24.0);
     //! [2]

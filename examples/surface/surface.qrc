@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/maps">
-        <file alias="map">Heightmap.png</file>
+        <file alias="mountain">mountain.png</file>
     </qresource>
 </RCC>
