@@ -32,6 +32,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * for Q3DBars. It uses QItemModelBarDataMapping instance to map data from the model to Q3DBars
  * graph.
  *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
+ *
  * \sa QItemModelBarDataMapping, {Qt Data Visualization Data Handling}
  */
 
@@ -45,6 +48,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Proxy class for presenting data in item models with Bars3D.
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Bars3D.
+ *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * Usage example:
  *

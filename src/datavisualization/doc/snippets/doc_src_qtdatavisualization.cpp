@@ -99,3 +99,20 @@ make
 Q3DBars *graph = new Q3DBars();
 QWidget *container = QWidget::createWindowContainer(graph);
 //! [9]
+
+//! [10]
+Q3DBars graph;
+QBarDataProxy *newProxy = new QBarDataProxy;
+
+QBarDataArray *dataArray = new QBarDataArray;
+dataArray->reserve(10);
+for (int i = 0; i < 10; i++) {
+    QBarDataRow *dataRow = new QBarDataRow(5);
+    for (int j = 0; j < 5; j++)
+        (*dataRow)[j].setValue(myData->getValue(i, j));
+    dataArray->append(dataRow);
+}
+
+newProxy->resetArray(dataArray);
+graph->setActiveDataProxy(newProxy);
+//! [10]

@@ -33,6 +33,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QItemModelSurfaceDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DSurface. It maps roles defined in QItemModelSurfaceDataMapping to roles in the model.
  *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
+ *
  * /sa {Qt Data Visualization Data Handling}
  */
 
@@ -46,6 +49,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Proxy class for presenting data in item models with Surface3D.
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Surface3D.
+ *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * Usage example:
  *

@@ -89,12 +89,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty list SurfaceDataMapping::rowCategories
- * The row categories of the mapping.
+ * The row categories of the mapping. Only items with row roles that are found in this list are
+ * included when data is resolved. The rows are ordered in the same order as they are in this list.
  */
 
 /*!
  * \qmlproperty list SurfaceDataMapping::columnCategories
- * The column categories of the mapping.
+ * The column categories of the mapping. Only items with column roles that are found in this list are
+ * included when data is resolved. The columns are ordered in the same order as they are in this list.
  */
 
 /*!

@@ -31,6 +31,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DScatter. It maps roles defined in QItemModelScatterDataMapping to roles in the model.
  *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
+ *
  * /sa {Qt Data Visualization Data Handling}
  */
 
@@ -44,6 +47,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Proxy class for presenting data in item models with Scatter3D.
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Scatter3D.
+ *
+ * Data is resolved asynchronously whenever the mapping or the model changes.
+ * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * Usage example:
  *

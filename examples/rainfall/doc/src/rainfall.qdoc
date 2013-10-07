@@ -20,9 +20,9 @@
     \example rainfall
     \title Rainfall Example
     \ingroup qtdatavisualization_examples
-    \brief Using Q3DBars in an application.
+    \brief Using Q3DBars with a custom proxy.
 
-    The bars example shows how to make a simple 3D bar graph using Q3DBars.
+    The rainfall example shows how to create a custom proxy to use with Q3DBars.
 
     \image rainfall-example.png
 
