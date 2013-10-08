@@ -109,9 +109,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_yFlipped(false),
       m_sampleSpace(QRect(0, 0, 0, 0)),
       m_shadowQualityMultiplier(3),
-      m_hasHeightAdjustmentChanged(true),
       m_cachedSelectionId(0),
-      m_selectionModeChanged(false)
+      m_selectionModeChanged(false),
+      m_hasHeightAdjustmentChanged(true)
 {
 #if !defined(QT_OPENGL_ES_2)
     // Check if flat feature is supported
@@ -488,8 +488,8 @@ void Surface3DRenderer::drawSlicedScene()
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    GLfloat scaleX;
-    GLfloat scaleXBackground;
+    GLfloat scaleX = 0.0f;
+    GLfloat scaleXBackground = 0.0f;
     GLfloat offset = 0.0f;
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         scaleX = m_surfaceScaleX;

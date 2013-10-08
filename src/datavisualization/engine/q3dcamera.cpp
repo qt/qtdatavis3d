@@ -582,7 +582,7 @@ void Q3DCamera::setWrapYRotation(bool isEnabled)
  */
 void Q3DCamera::setCameraPosition(qreal horizontal, qreal vertical, qreal zoom)
 {
-    setZoomLevel(qBound(10.0, distance, 500.0));
+    setZoomLevel(qBound(10.0, zoom, 500.0));
     setXRotation(horizontal);
     setYRotation(vertical);
 }

@@ -126,7 +126,6 @@ private:
     QSizeF m_areaSize;
     uint m_cachedSelectionId;
     bool m_selectionModeChanged;
-
     bool m_hasHeightAdjustmentChanged;
 
 public:
