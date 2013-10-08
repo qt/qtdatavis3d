@@ -181,11 +181,29 @@
     \page qtdatavisualization_interacting_with_data.html
     \title Qt Data Visualization Interacting with Data
 
-    \section1 View manipulation
+    \section1 Interacting with data
 
-    TODO
+    You can interact with the rendered graph with either mouse or touch to rotate, zoom, or select
+    data. For the mouse controls, see Q3DInputHandler documentation, and for the touch controls,
+    see QTouch3DInputHandler documentation.
 
-    \section1 Highlighting data
+    \note In the technology preview version, default input handlers cannot be replaced or even accessed
+    via public API. This feature is planned for the final release.
 
-    TODO
+    \section1 Data selection modes
+
+    All visualization types support selecting single data item - a bar, a scatter item, or a surface
+    vertex - using mouse, touch, and programmatically via the graph APIs. The selected item is highlighted
+    in the rendered graph, and selecting causes emission of a graph specific signal for this purpose,
+    e.g. Q3DBars::selectedBarPosChanged(), which the application can handle.
+
+    \note Surface graph doesn't have fully implemented selection API yet, it only supports
+    selection with mouse and touch in the technology preview version.
+
+    Bar and surface graphs support slice selection modes, where the selected row or column is drawn
+    in a separate viewport as a pseudo-2D graph. This makes it easier to see the actual values of
+    single row or column.
+
+    Bar graph additionally supports simply highlighting the whole row and/or column of the selected bar
+    without opening the slice view.
 */
