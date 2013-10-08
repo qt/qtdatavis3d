@@ -32,26 +32,29 @@
 
 int main(int argc, char **argv)
 {
+    //! [0]
     QApplication app(argc, argv);
-
-    QWidget *widget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(widget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
-
     Q3DScatter *graph = new Q3DScatter();
-    QSize screenSize = graph->screen()->size();
-
     QWidget *container = QWidget::createWindowContainer(graph);
+    //! [0]
+
+    QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("values of some things in something"));
-
+    //! [1]
+    QWidget *widget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    //! [1]
 
+    widget->setWindowTitle(QStringLiteral("A Cosine Wave"));
+
+    //! [4]
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
@@ -98,7 +101,9 @@ int main(int argc, char **argv)
 
     QFontComboBox *fontList = new QFontComboBox(widget);
     fontList->setCurrentFont(QFont("Arial"));
+    //! [4]
 
+    //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
@@ -112,11 +117,13 @@ int main(int argc, char **argv)
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList, 1, Qt::AlignTop);
+    //! [5]
 
-    widget->show();
-
+    //! [2]
     ScatterDataModifier *modifier = new ScatterDataModifier(graph);
+    //! [2]
 
+    //! [6]
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
@@ -145,8 +152,11 @@ int main(int argc, char **argv)
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
+    //! [6]
 
+    //! [3]
+    widget->show();
     modifier->start();
-
     return app.exec();
+    //! [3]
 }

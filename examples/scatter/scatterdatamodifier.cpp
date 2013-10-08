@@ -34,6 +34,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_style(QDataVis::MeshStyleSpheres),
       m_smooth(true)
 {
+    //! [0]
     QFont font = m_graph->font();
     font.setPointSize(m_fontSize);
     m_graph->setFont(font);
@@ -41,13 +42,19 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->setTheme(QDataVis::ThemeEbony);
     m_graph->setShadowQuality(QDataVis::ShadowQualityHigh);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    //! [0]
+
+    //! [1]
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
+    //! [1]
 
+    //! [2]
     QScatterDataProxy *proxy = new QScatterDataProxy;
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
     m_graph->setActiveDataProxy(proxy);
+    //! [2]
 
     changeLabelStyle();
 }
@@ -57,13 +64,16 @@ ScatterDataModifier::~ScatterDataModifier()
     delete m_graph;
 }
 
+//! [3]
 void ScatterDataModifier::start()
 {
     addData();
 }
+//! [3]
 
 void ScatterDataModifier::addData()
 {
+    //! [4]
     // Add labels
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
@@ -71,10 +81,13 @@ void ScatterDataModifier::addData()
     m_graph->axisX()->setRange(-50.0, 50.0);
     m_graph->axisY()->setRange(-1.0, 1.0);
     m_graph->axisZ()->setRange(-50.0, 50.0);
+    //! [4]
 
+    //! [5]
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
+    //! [5]
 
 #ifdef RANDOM_SCATTER
     for (int i = 0; i < numberOfItems; i++) {
@@ -82,6 +95,7 @@ void ScatterDataModifier::addData()
         ptrToDataArray++;
     }
 #else
+    //! [6]
     float limit = qSqrt(numberOfItems) / 2.0f;
     for (float i = -limit; i < limit; i++) {
         for (float j = -limit; j < limit; j++) {
@@ -89,11 +103,15 @@ void ScatterDataModifier::addData()
             ptrToDataArray++;
         }
     }
+    //! [6]
 #endif
 
-    static_cast<QScatterDataProxy *>(m_graph->activeDataProxy())->resetArray(dataArray);
+    //! [7]
+    m_graph->activeDataProxy()->resetArray(dataArray);
+    //! [7]
 }
 
+//! [8]
 void ScatterDataModifier::changeStyle(int style)
 {
     m_style = QDataVis::MeshStyle(style + 5); // skip unsupported mesh types
@@ -117,7 +135,7 @@ void ScatterDataModifier::changePresetCamera()
 
     m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
 
-    if (++preset > QDataVis::CameraPresetDirectlyAboveCCW45)
+    if (++preset > QDataVis::CameraPresetDirectlyBelow)
         preset = QDataVis::CameraPresetFrontLow;
 }
 
@@ -141,15 +159,13 @@ void ScatterDataModifier::changeFont(const QFont &font)
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 {
     int quality = int(sq);
-    // Updates the UI component to show correct shadow quality
-    emit shadowQualityChanged(quality);
+    emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
-    emit shadowQualityChanged(quality);
 }
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
@@ -161,6 +177,7 @@ void ScatterDataModifier::setGridEnabled(int enabled)
 {
     m_graph->setGridVisible((bool)enabled);
 }
+//! [8]
 
 QVector3D ScatterDataModifier::randVector()
 {
