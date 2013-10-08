@@ -71,13 +71,16 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
       m_rowCount(50),
       m_tableWidget(tableWidget)
 {
+    //! [5]
     // Set up bar specifications; make the bars as wide as they are deep,
-    // and add a small space between the bars
+    // and add a small space between them
     m_graph->setBarThickness(1.0);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
 
     // Set bar type to flat pyramids
     m_graph->setBarType(QDataVis::MeshStylePyramids, false);
+
+    //! [5]
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
@@ -93,16 +96,25 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 
     m_graph->activeDataProxy()->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
-    // Set selection mode to zoom row
+    //! [6]
+
+    // Set selection mode to slice row
     m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow);
+
+    // Set font
     m_graph->setFont(QFont("Impact", 20));
+
+    //! [6]
 #endif
+
+    //! [7]
 
     // Set theme
     m_graph->setTheme(QDataVis::ThemeDigia);
 
     // Set preset camera position
     m_graph->setCameraPreset(QDataVis::CameraPresetFront);
+    //! [7]
 }
 
 GraphDataGenerator::~GraphDataGenerator()
@@ -123,6 +135,7 @@ void GraphDataGenerator::start()
     m_dataTimer->start(0);
     m_tableWidget->setFixedWidth(m_graph->width());
 #else
+    //! [8]
     setupModel();
     // Table needs to be shown before the size of its headers can be accurately obtained,
     // so we postpone it a bit
@@ -130,11 +143,13 @@ void GraphDataGenerator::start()
     m_dataTimer->setSingleShot(true);
     QObject::connect(m_dataTimer, &QTimer::timeout, this, &GraphDataGenerator::fixTableSize);
     m_dataTimer->start(0);
+    //! [8]
 #endif
 }
 
 void GraphDataGenerator::setupModel()
 {
+    //! [9]
     // Set up row and column names
     QStringList days;
     days << "Monday" << "Tuesday" << "Wednesday" << "Thursday" << "Friday" << "Saturday" << "Sunday";
@@ -142,19 +157,23 @@ void GraphDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 10.0f},     // week 1
-                         {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
-                         {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
-                         {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
-                         {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
+    float hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 10.0},     // week 1
+                         {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
+                         {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
+                         {0.0, 1.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
+                         {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
+    //! [9]
 
     // Add labels
+    //! [10]
     m_graph->rowAxis()->setTitle("Week of year");
     m_graph->columnAxis()->setTitle("Day of week");
     m_graph->valueAxis()->setTitle("Hours spent on the Internet");
     m_graph->valueAxis()->setSegmentCount(5);
     m_graph->valueAxis()->setLabelFormat("%.1f h");
+    //! [10]
 
+    //! [11]
     m_tableWidget->setRowCount(5);
     m_tableWidget->setColumnCount(7);
     m_tableWidget->setHorizontalHeaderLabels(days);
@@ -162,13 +181,16 @@ void GraphDataGenerator::setupModel()
     m_tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_tableWidget->setCurrentCell(-1, -1);
+    //! [11]
 
+    //! [12]
     for (int week = 0; week < weeks.size(); week++) {
         for (int day = 0; day < days.size(); day++) {
             QModelIndex index = m_tableWidget->model()->index(week, day);
             m_tableWidget->model()->setData(index, hours[week][day]);
         }
     }
+    //! [12]
 }
 
 void GraphDataGenerator::addRow()
@@ -184,12 +206,15 @@ void GraphDataGenerator::addRow()
     m_tableWidget->resizeColumnsToContents();
 }
 
+//! [13]
 void GraphDataGenerator::selectFromTable(const QPoint &selection)
 {
     m_tableWidget->setFocus();
     m_tableWidget->setCurrentCell(selection.x(), selection.y());
 }
+//! [13]
 
+//! [14]
 void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
                                            int previousRow, int previousColumn)
 {
@@ -197,6 +222,7 @@ void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
     Q_UNUSED(previousColumn)
     m_graph->setSelectedBarPos(QPoint(currentRow, currentColumn));
 }
+//! [14]
 
 void GraphDataGenerator::fixTableSize()
 {
@@ -210,45 +236,50 @@ void GraphDataGenerator::fixTableSize()
 
 int main(int argc, char **argv)
 {
+    //! [0]
     QApplication app(argc, argv);
-
-    QWidget widget;
-    QVBoxLayout *layout = new QVBoxLayout(&widget);
-
     Q3DBars *graph = new Q3DBars();
-    QSize screenSize = graph->screen()->size();
-
     QWidget *container = QWidget::createWindowContainer(graph);
+    //! [0]
+
+    QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget.setWindowTitle(QStringLiteral("Hours spent on the Internet"));
-
+    //! [1]
+    QWidget widget;
+    QVBoxLayout *layout = new QVBoxLayout(&widget);
     QTableWidget *tableWidget = new QTableWidget(&widget);
-    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    tableWidget->setAlternatingRowColors(true);
-
     layout->addWidget(container, 1);
     layout->addWidget(tableWidget, 1, Qt::AlignHCenter);
+    //! [1]
 
+    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    tableWidget->setAlternatingRowColors(true);
+    widget.setWindowTitle(QStringLiteral("Hours spent on the Internet"));
+
+    //! [2]
     // Since we are dealing with QTableWidget, the model will already have data sorted properly
-    // in rows and columns, so create a custom mapping to utilize this.
+    // in rows and columns, so create a mapping to utilize this.
     QItemModelBarDataMapping *mapping = new QItemModelBarDataMapping;
     mapping->setUseModelCategories(true);
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), mapping);
     graph->setActiveDataProxy(proxy);
+    //! [2]
 
+    //! [3]
     GraphDataGenerator generator(graph, tableWidget);
-
     QObject::connect(graph, &Q3DBars::selectedBarPosChanged, &generator,
                      &GraphDataGenerator::selectFromTable);
     QObject::connect(tableWidget, &QTableWidget::currentCellChanged, &generator,
                      &GraphDataGenerator::selectedFromTable);
+    //! [3]
 
+    //! [4]
     widget.show();
     generator.start();
-
     return app.exec();
+    //! [4]
 }
