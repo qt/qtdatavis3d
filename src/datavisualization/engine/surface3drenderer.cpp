@@ -55,6 +55,7 @@ const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat surfaceGridYOffsetValue = 0.001f;
+const GLfloat sliceUnits = 2.5f;
 const int subViewDivider = 5;
 // The second offset to opposite direction is double because same matrix is translated twice
 const GLfloat surfaceGridYOffset[2] = {-surfaceGridYOffsetValue, 2.0f * surfaceGridYOffsetValue};
@@ -471,15 +472,14 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.ortho(-3.0f, 3.0, -3.0, 3.0, 0.1f, 100.0f);
+
+    GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
+                           -sliceUnits, sliceUnits, -1.0f, 14.0f); // 14.0 because of zComp
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
-
-    // Adjust scaling (zoom rate based on aspect ratio)
-    GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment + zComp;
-
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced),
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, zComp + 1.0f),
                       QVector3D(0.0f, 0.0f, zComp),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
@@ -504,9 +504,6 @@ void Surface3DRenderer::drawSlicedScene()
     if (m_surfaceObj) {
         ShaderHelper *surfaceShader = m_shader;
         surfaceShader->bind();
-
-        // For surface we can see climpses from underneath
-        glDisable(GL_CULL_FACE);
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
@@ -539,8 +536,6 @@ void Surface3DRenderer::drawSlicedScene()
         m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
 
         surfaceShader->release();
-
-        glEnable(GL_CULL_FACE);
 
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {

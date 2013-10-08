@@ -34,6 +34,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+const GLfloat sliceUnits = 2.5;
+
 SelectionPointer::SelectionPointer(Drawer *drawer)
     : QObject(0),
       m_labelShader(0),
@@ -102,11 +104,12 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
     if (m_cachedIsSlicingActivated) {
-        GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment + zComp;
-        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced),
+        GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, zComp + 1.0),
                           QVector3D(0.0f, 0.0f, zComp),
                           QVector3D(0.0f, 1.0f, 0.0f));
-        projectionMatrix.ortho(-3.0f, 3.0, -3.0, 3.0, 0.1f, 100.0f);
+        projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
+                               -sliceUnits, sliceUnits, -1.0f, 14.0f);
     } else {
         viewMatrix = camera->viewMatrix();
         projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
@@ -116,11 +119,6 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Calculate scale factor to get uniform font size
     GLfloat scaledFontSize = 0.05f + m_drawer->font().pointSizeF() / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
-
-    // Set up projection matrix
-//    QMatrix4x4 projectionMatrix;
-//    projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
-//                                 / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
