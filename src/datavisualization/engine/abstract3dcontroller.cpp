@@ -64,6 +64,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     setActiveInputHandler(inputHandler);
     connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
             &Abstract3DController::emitNeedRender);
+    connect(m_scene, &Q3DScene::needRender, this,
+            &Abstract3DController::emitNeedRender);
 }
 
 Abstract3DController::~Abstract3DController()

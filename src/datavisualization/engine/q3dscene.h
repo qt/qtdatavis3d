@@ -72,6 +72,8 @@ public:
     void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
                                           qreal fixedRotation = 0.0,
                                           qreal distanceModifier = 0.0);
+private:
+    void emitNeedRender();
 
 signals:
     void viewportChanged(QRect viewport);
@@ -81,6 +83,7 @@ signals:
     void activeCameraChanged(const Q3DCamera *camera);
     void activeLightChanged(const Q3DLight *light);
     void devicePixelRatioChanged(qreal pixelRatio);
+    void needRender();
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;

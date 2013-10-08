@@ -217,10 +217,31 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
         camera->setParent(this);
 
     if (camera != d_ptr->m_camera) {
+        if (d_ptr->m_camera) {
+            disconnect(d_ptr->m_camera, &Q3DCamera::xRotationChanged, this,
+                    &Q3DScene::emitNeedRender);
+            disconnect(d_ptr->m_camera, &Q3DCamera::yRotationChanged, this,
+                    &Q3DScene::emitNeedRender);
+        }
+
         d_ptr->m_camera = camera;
         d_ptr->m_changeTracker.cameraChanged = true;
+
+        if (camera) {
+            connect(camera, &Q3DCamera::xRotationChanged, this,
+                    &Q3DScene::emitNeedRender);
+            connect(camera, &Q3DCamera::yRotationChanged, this,
+                    &Q3DScene::emitNeedRender);
+        }
+
         emit activeCameraChanged(camera);
+        emitNeedRender();
     }
+}
+
+void Q3DScene::emitNeedRender()
+{
+    emit needRender();
 }
 
 /*!
