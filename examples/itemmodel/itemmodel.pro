@@ -2,13 +2,11 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
-SOURCES += main.cpp graphmodifier.cpp
-HEADERS += graphmodifier.h
-
-QT += widgets
+SOURCES += main.cpp
 
 INSTALLS += target
 
+QT += widgets
+
 OTHER_FILES += doc/src/* \
                doc/images/*
-

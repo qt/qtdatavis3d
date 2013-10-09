@@ -143,9 +143,9 @@
     QHeightMapSurfaceDataProxy is a specialized proxy for generating a surface graph from a
     heightmap image. See QHeightMapSurfaceDataProxy documentation for more information.
 
-    The \l{Rainfall Example}{Rainfall} example shows how a custom proxy can be created. It defines
-    a custom data set based on variant lists and an extension of the basic proxy to resolve that
-    data with an associated mapper.
+    The \l{Custom Proxy Example}{Custom Proxy} example shows how a custom proxy can be created. It
+    defines a custom data set based on variant lists and an extension of the basic proxy to resolve
+    that data with an associated mapper.
 
     \section1 Dealing with real-time data
 

@@ -4,8 +4,8 @@ SUBDIRS += qmlbars \
            qmlsurface
 !android: {
     SUBDIRS += bars \
-               rainfall \
-               widget \
+               customproxy \
+               itemmodel \
                scatter \
                surface
 }

@@ -16,8 +16,7 @@ HEADERS += \
 
 INSTALLS += target
 
-RESOURCES += \
-    rainfall.qrc
+RESOURCES += customproxy.qrc
 
 OTHER_FILES += data/raindata.txt \
                doc/src/* \

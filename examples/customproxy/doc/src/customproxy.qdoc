@@ -17,14 +17,14 @@
 ****************************************************************************/
 
 /*!
-    \example rainfall
-    \title Rainfall Example
+    \example customproxy
+    \title Custom Proxy Example
     \ingroup qtdatavisualization_examples
     \brief Using Q3DBars with a custom proxy.
 
-    The rainfall example shows how to create a custom proxy to use with Q3DBars.
+    The custom proxy example shows how to create a custom proxy to use with Q3DBars.
 
-    \image rainfall-example.png
+    \image customproxy-example.png
 
     TODO
 */
