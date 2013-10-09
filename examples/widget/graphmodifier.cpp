@@ -28,27 +28,36 @@ QT_DATAVISUALIZATION_USE_NAMESPACE
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
+//! [0]
 GraphModifier::GraphModifier(Q3DBars *bargraph)
     : m_graph(bargraph),
       m_xRotation(0.0),
       m_yRotation(0.0),
-      m_fontSize(20),
+      m_fontSize(30),
       m_segments(4),
       m_subSegments(3),
-      m_minval(-20.0), // TODO Bargraph Y-axis currently only properly supports zero-centered ranges
+      m_minval(-20.0),
       m_maxval(20.0),
+      //! [1]
       m_temperatureAxis(new Q3DValueAxis),
       m_yearAxis(new Q3DCategoryAxis),
       m_monthAxis(new Q3DCategoryAxis),
       m_temperatureData(new QBarDataProxy),
+      //! [1]
       m_style(QDataVis::MeshStyleBevelBars),
       m_smooth(false)
 {
+    //! [2]
+    m_graph->setBackgroundVisible(false);
+    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    m_graph->setFont(QFont("Times New Roman", m_fontSize));
+    m_graph->setLabelStyle(QDataVis::LabelStyleFromTheme);
+    //! [2]
+
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     m_years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 
-    m_graph->setBackgroundVisible(false);
-
+    //! [3]
     m_temperatureAxis->setTitle("Average temperature");
     m_temperatureAxis->setSegmentCount(m_segments);
     m_temperatureAxis->setSubSegmentCount(m_subSegments);
@@ -56,26 +65,22 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%d ") + celsiusString));
 
     m_yearAxis->setTitle("Year");
-
     m_monthAxis->setTitle("Month");
 
     m_graph->addAxis(m_temperatureAxis);
     m_graph->addAxis(m_yearAxis);
     m_graph->addAxis(m_monthAxis);
-
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    //! [3]
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
 
+    //! [4]
     m_graph->addDataProxy(m_temperatureData);
-
-    m_graph->setFont(QFont("Times Roman", 20));
-
-    m_graph->setSelectionMode(QDataVis::SelectionModeItem);
+    //! [4]
 
     resetTemperatureData();
-    changeLabelStyle();
 }
+//! [0]
 
 GraphModifier::~GraphModifier()
 {
@@ -84,17 +89,18 @@ GraphModifier::~GraphModifier()
 
 void GraphModifier::start()
 {
+    //! [6]
     m_graph->setActiveDataProxy(m_temperatureData);
-
-    m_graph->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     m_graph->setValueAxis(m_temperatureAxis);
     m_graph->setRowAxis(m_yearAxis);
     m_graph->setColumnAxis(m_monthAxis);
+    //! [6]
 }
 
 void GraphModifier::resetTemperatureData()
 {
+    //! [5]
     // Set up data
     static const qreal temp[7][12] = {
         {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2006
@@ -106,24 +112,25 @@ void GraphModifier::resetTemperatureData()
         {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
     };
 
-    // Create data rows
+    // Create data array
     QBarDataArray *dataSet = new QBarDataArray;
     QBarDataRow *dataRow;
 
     dataSet->reserve(m_years.size());
     for (int year = 0; year < m_years.size(); year++) {
+        // Create a data row
         dataRow = new QBarDataRow(m_months.size());
-        // Create data items
         for (int month = 0; month < m_months.size(); month++) {
-            // Add data to rows
+            // Add data to the row
             (*dataRow)[month].setValue(temp[year][month]);
         }
-        // Add row to set
+        // Add the row to the set
         dataSet->append(dataRow);
     }
 
-    // Add data to the graph (the graph assumes ownership)
+    // Add data to the graph (the graph assumes ownership of it)
     m_temperatureData->resetArray(dataSet, m_years, m_months);
+    //! [5]
 }
 
 void GraphModifier::changeStyle(int style)
@@ -191,6 +198,7 @@ void GraphModifier::changeShadowQuality(int quality)
     emit shadowQualityChanged(quality);
 }
 
+//! [7]
 void GraphModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;
@@ -202,6 +210,7 @@ void GraphModifier::rotateY(int rotation)
     m_yRotation = rotation;
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
+//! [7]
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {

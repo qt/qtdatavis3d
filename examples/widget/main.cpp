@@ -32,25 +32,27 @@
 
 int main(int argc, char **argv)
 {
+    //! [0]
     QApplication app(argc, argv);
-
-    QWidget *widget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(widget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
-
     Q3DBars *widgetgraph = new Q3DBars();
-    QSize screenSize = widgetgraph->screen()->size();
-
     QWidget *container = QWidget::createWindowContainer(widgetgraph);
+    //! [0]
+
+    QSize screenSize = widgetgraph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
-
+    //! [1]
+    QWidget *widget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    //! [1]
+
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
@@ -99,25 +101,30 @@ int main(int argc, char **argv)
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
 
+    //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
-    rotationSliderX->setTickInterval(1);
+    rotationSliderX->setTickInterval(30);
+    rotationSliderX->setTickPosition(QSlider::TicksBelow);
     rotationSliderX->setMinimum(-180);
     rotationSliderX->setValue(0);
     rotationSliderX->setMaximum(180);
     QSlider *rotationSliderY = new QSlider(Qt::Horizontal, widget);
-    rotationSliderY->setTickInterval(1);
+    rotationSliderY->setTickInterval(15);
+    rotationSliderY->setTickPosition(QSlider::TicksAbove);
     rotationSliderY->setMinimum(-90);
     rotationSliderY->setValue(0);
     rotationSliderY->setMaximum(90);
+    //! [4]
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
-    fontSizeSlider->setTickInterval(1);
+    fontSizeSlider->setTickInterval(10);
+    fontSizeSlider->setTickPosition(QSlider::TicksBelow);
     fontSizeSlider->setMinimum(1);
-    fontSizeSlider->setValue(20);
+    fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(100);
 
     QFontComboBox *fontList = new QFontComboBox(widget);
-    fontList->setCurrentFont(QFont("Arial"));
+    fontList->setCurrentFont(QFont("Times New Roman"));
 
     QComboBox *shadowQuality = new QComboBox(widget);
     shadowQuality->addItem(QStringLiteral("None"));
@@ -129,10 +136,12 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
+    //! [5]
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate horizontally")));
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate vertically")));
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
+    //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
@@ -151,12 +160,14 @@ int main(int argc, char **argv)
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
 
-    widget->show();
-
+    //! [2]
     GraphModifier *modifier = new GraphModifier(widgetgraph);
+    //! [2]
 
+    //! [6]
     QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &GraphModifier::rotateX);
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &GraphModifier::rotateY);
+    //! [6]
 
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changeLabelStyle);
@@ -192,7 +203,9 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
 
+    //! [3]
+    widget->show();
     modifier->start();
-
     return app.exec();
+    //! [3]
 }
