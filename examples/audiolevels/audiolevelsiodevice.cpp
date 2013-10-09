@@ -21,10 +21,26 @@
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
+//! [1]
+static const int resolution = 8;
+static const int rowSize = 800;
+static const int rowCount = 7; // Must be odd number
+static const int middleRow = rowCount / 2;
+//! [1]
+
 AudioLevelsIODevice::AudioLevelsIODevice(QBarDataProxy *proxy, QObject *parent)
     : QIODevice(parent),
-      m_proxy(proxy)
+      m_proxy(proxy),
+      m_array(new QBarDataArray)
 {
+    // We reuse the existing array for maximum performance, so construct the array here
+    //! [0]
+    m_array->reserve(rowCount);
+    for (int i = 0; i < rowCount; i++)
+        m_array->append(new QBarDataRow(rowSize));
+    //! [0]
+
+    qDebug() << "Total of" << (rowSize * rowCount) << "items in the array.";
 }
 
 // Implementation required for this pure virtual function
@@ -35,32 +51,52 @@ qint64 AudioLevelsIODevice::readData(char *data, qint64 maxSize)
     return -1;
 }
 
+//! [2]
 qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
 {
-    static const int resolution = 8;
-    static const int maxRowSize = 1000;
-
+    // The amount of new data available.
     int newDataSize = maxSize / resolution;
 
-    const QBarDataRow *oldRow = m_proxy->rowAt(0);
+    // If we get more data than array size, we need to adjust the start index for new data.
+    int newDataStartIndex = qMax(0, (newDataSize - rowSize));
 
-    int rowSize = qMin((newDataSize + oldRow->size()), maxRowSize);
+    // Move the old data ahead in the rows (only do first half of rows + middle one now).
+    // If the amount of new data was larger than row size, skip copying.
+    if (!newDataStartIndex) {
+        for (int i = 0; i <= middleRow; i++) {
+            QBarDataItem *srcPos = m_array->at(i)->data();
+            QBarDataItem *dstPos = srcPos + newDataSize;
+            memmove(dstPos, srcPos, (rowSize - newDataSize) * sizeof(QBarDataItem));
+        }
+    }
 
-    QBarDataRow *row = new QBarDataRow(rowSize);
-    int bottom = qMax(0, (newDataSize - rowSize));
-
-    // Insert data in reverse order, so that newest data is always at the front of the row
+    // Insert data in reverse order, so that newest data is always at the front of the row.
     int index = 0;
-    for (int i = newDataSize - 1; i >= bottom; i--)
-        (*row)[index++].setValue(((quint8)data[resolution * i] - 128) / 2.0);
+    for (int i = newDataSize - 1; i >= newDataStartIndex; i--) {
+        // Add 0.01 to the value to avoid gaps in the graph (i.e. zero height bars).
+        qreal value = qreal(quint8(data[resolution * i]) - 128) / 2.0 + 0.01;
+        (*m_array->at(middleRow))[index].setValue(value);
+        // Insert a fractional value into front half of the rows.
+        for (int j = 1; j <= middleRow; j++) {
+            qreal fractionalValue = value / qreal(j + 1);
+            (*m_array->at(middleRow - j))[index].setValue(fractionalValue);
+        }
+        index++;
+    }
 
-    // Append old data to new row
-    for (int i = newDataSize; i < rowSize; i++)
-        (*row)[i].setValue(oldRow->at(i - newDataSize).value());
+    // Copy the front half of rows to the back half for symmetry.
+    index = 0;
+    for (int i = rowCount - 1; i > middleRow; i--) {
+        QBarDataItem *srcPos = m_array->at(index++)->data();
+        QBarDataItem *dstPos = m_array->at(i)->data();
+        memcpy(dstPos, srcPos, rowSize * sizeof(QBarDataItem));
+    }
 
-    m_proxy->setRow(0, row);
+    // Reset the proxy array now that data has been updated to trigger a redraw.
+    m_proxy->resetArray(m_array);
 
     return maxSize;
 }
+//! [2]
 
 

@@ -35,9 +35,11 @@ public:
     ~AudioLevels();
 
 private:
-    AudioLevelsIODevice *m_device;
+    //! [0]
     Q3DBars *m_graph;
+    AudioLevelsIODevice *m_device;
     QAudioInput *m_audioInput;
+    //! [0]
 };
 
 #endif

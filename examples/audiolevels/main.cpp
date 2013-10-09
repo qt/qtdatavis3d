@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
     Q3DBars window;
     window.resize(1024, 768);
-    window.setTitle("QtDataVisualization microphone audio levels visualizer");
+    window.setTitle("Qt Data Visualization - Microphone audio levels visualizer");
     window.show();
 
     AudioLevels audioLevels(&window);

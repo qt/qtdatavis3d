@@ -31,22 +31,22 @@ QT_DATAVISUALIZATION_USE_NAMESPACE
 
 AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     : QObject(parent),
-      m_device(0),
       m_graph(graph),
+      m_device(0),
       m_audioInput(0)
 {
     // Set up the graph
-    QBarDataRow *row = new QBarDataRow;
-    m_graph->activeDataProxy()->addRow(row);
-    m_graph->setBarThickness(0.04);
-    m_graph->setBarSpacing(QSizeF(0.0, 0.0));
+    m_graph->setBarThickness(0.5);
+    m_graph->setBarSpacing(QSizeF(0.0, 1.0));
     m_graph->setGridVisible(false);
     m_graph->setBackgroundVisible(false);
-    m_graph->valueAxis()->setRange(0.0, 1.0);
+    m_graph->valueAxis()->setRange(0.0, 2.0);
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->scene()->activeCamera()->setCameraPosition(-20.0, 10.0, 10);
+    m_graph->scene()->activeCamera()->setCameraPosition(-20.0, 10.0, 20);
     m_graph->setTheme(QDataVis::ThemeIsabelle);
+    m_graph->setBarType(QDataVis::MeshStyleBars);
 
+    //! [0]
     QAudioFormat formatAudio;
     formatAudio.setSampleRate(8000);
     formatAudio.setChannelCount(1);
@@ -56,12 +56,13 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     formatAudio.setSampleType(QAudioFormat::UnSignedInt);
 
     QAudioDeviceInfo inputDevices = QAudioDeviceInfo::defaultInputDevice();
-    m_audioInput = new QAudioInput(inputDevices,formatAudio, this);
+    m_audioInput = new QAudioInput(inputDevices, formatAudio, this);
 
     m_device = new AudioLevelsIODevice(m_graph->activeDataProxy(), this);
     m_device->open(QIODevice::WriteOnly);
 
     m_audioInput->start(m_device);
+    //! [0]
 }
 
 AudioLevels::~AudioLevels()

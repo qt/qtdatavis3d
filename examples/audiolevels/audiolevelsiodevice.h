@@ -35,8 +35,10 @@ protected:
     qint64 writeData(const char *data, qint64 maxSize);
 
 private:
+    //! [0]
     QBarDataProxy *m_proxy;
-    int m_visibleCount;
+    QBarDataArray *m_array;
+    //! [0]
 };
 
 #endif
