@@ -16,34 +16,49 @@
 **
 ****************************************************************************/
 
+//! [0]
 import QtQuick 2.1
 import com.digia.QtDataVisualization 1.0
 import "."
+//! [0]
 
+//! [1]
 Item {
-    id: mainview
+    id: mainView
     visible: true
+    //! [1]
 
+    //! [4]
     Data {
         id: graphData
     }
+    //! [4]
 
+    //! [8]
+    //! [9]
     Item {
         id: dataView
-        width: parent.width
-        height: parent.height - shadowToggle.height
         anchors.bottom: parent.bottom
+        //! [9]
+        height: parent.height - shadowToggle.height
+        //! [8]
 
+        //! [2]
         Scatter3D {
-            id: testscatter
+            id: scatterGraph
             width: dataView.width
             height: dataView.height
+            //! [2]
+            //! [3]
             font.family: "Lucida Handwriting"
             font.pointSize: 40
-            dataProxy: graphData.proxy
             theme: Scatter3D.ThemeIsabelle
             shadowQuality: Scatter3D.ShadowQualitySoftLow
-            selectionMode: Scatter3D.SelectionModeItem
+            //! [3]
+            //! [5]
+            dataProxy: graphData.proxy
+            //! [5]
+            //! [6]
             itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             axisX.segmentCount: 3
             axisX.subSegmentCount: 2
@@ -54,23 +69,26 @@ Item {
             axisY.segmentCount: 2
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
+            //! [6]
         }
     }
 
+    //! [7]
     NewButton {
         id: shadowToggle
-        width: parent.width / 6
+        width: parent.width / 6 // We're adding 6 buttons and want to divide them equally
         text: "Hide Shadows"
         onClicked: {
-            if (testscatter.shadowQuality === Scatter3D.ShadowQualityNone) {
-                testscatter.shadowQuality = Scatter3D.ShadowQualitySoftLow;
+            if (scatterGraph.shadowQuality === Scatter3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = Scatter3D.ShadowQualitySoftLow;
                 text = "Hide Shadows";
             } else {
-                testscatter.shadowQuality = Scatter3D.ShadowQualityNone;
+                scatterGraph.shadowQuality = Scatter3D.ShadowQualityNone;
                 text = "Show Shadows";
             }
         }
     }
+    //! [7]
 
     NewButton {
         id: smoothToggle
@@ -78,12 +96,12 @@ Item {
         text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
         onClicked: {
-            if (testscatter.objectSmoothingEnabled === false) {
+            if (scatterGraph.objectSmoothingEnabled === false) {
                 text = "Use Flat Dots";
-                testscatter.objectSmoothingEnabled = true;
+                scatterGraph.objectSmoothingEnabled = true;
             } else {
                 text = "Use Smooth Dots"
-                testscatter.objectSmoothingEnabled = false;
+                scatterGraph.objectSmoothingEnabled = false;
             }
         }
     }
@@ -94,10 +112,10 @@ Item {
         text: "Change Camera Placement"
         anchors.left: smoothToggle.right
         onClicked: {
-            if (testscatter.cameraPreset === Scatter3D.CameraPresetFront) {
-                testscatter.cameraPreset = Scatter3D.CameraPresetIsometricRightHigh;
+            if (scatterGraph.scene.activeCamera.cameraPreset === Scatter3D.CameraPresetFront) {
+                scatterGraph.scene.activeCamera.cameraPreset = Scatter3D.CameraPresetIsometricRightHigh;
             } else {
-                testscatter.cameraPreset = Scatter3D.CameraPresetFront;
+                scatterGraph.scene.activeCamera.cameraPreset = Scatter3D.CameraPresetFront;
             }
         }
     }
@@ -108,10 +126,10 @@ Item {
         text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
-            if (testscatter.theme === Scatter3D.ThemeArmyBlue) {
-                testscatter.theme = Scatter3D.ThemeIsabelle;
+            if (scatterGraph.theme === Scatter3D.ThemeArmyBlue) {
+                scatterGraph.theme = Scatter3D.ThemeIsabelle;
             } else {
-                testscatter.theme = Scatter3D.ThemeArmyBlue;
+                scatterGraph.theme = Scatter3D.ThemeArmyBlue;
             }
         }
     }
@@ -122,11 +140,11 @@ Item {
         text: "Hide Background"
         anchors.left: themeToggle.right
         onClicked: {
-            if (testscatter.backgroundVisible === true) {
-                testscatter.backgroundVisible = false;
+            if (scatterGraph.backgroundVisible === true) {
+                scatterGraph.backgroundVisible = false;
                 text = "Show Background";
             } else {
-                testscatter.backgroundVisible = true;
+                scatterGraph.backgroundVisible = true;
                 text = "Hide Background";
             }
         }

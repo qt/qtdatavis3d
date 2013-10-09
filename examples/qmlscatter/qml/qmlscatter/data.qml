@@ -20,26 +20,32 @@ import QtQuick 2.1
 import com.digia.QtDataVisualization 1.0
 
 Item {
-    property alias mapping: scatterMapping
-    property alias model: dataModel
+    //! [3]
     property alias proxy: modelProxy
+    //! [3]
 
+    //! [1]
     ScatterDataMapping {
         id: scatterMapping
         xPosRole: "xPos"
         yPosRole: "yPos"
         zPosRole: "zPos"
     }
+    //! [1]
 
+    //! [2]
     ItemModelScatterDataProxy {
         id: modelProxy
         activeMapping: scatterMapping
         itemModel: dataModel
     }
+    //! [2]
 
+    //! [0]
     ListModel {
         id: dataModel
         ListElement{ xPos: -10.0; yPos: 5.0; zPos: -5.0 }
+        //! [0]
         ListElement{ xPos: -9.0; yPos: 3.0; zPos: -4.5 }
         ListElement{ xPos: -8.5; yPos: 4.1; zPos: -4.0 }
         ListElement{ xPos: -8.0; yPos: 4.75; zPos: -3.9 }
