@@ -66,7 +66,6 @@ private:
     int m_surfaceType;
     int m_columns;
     int m_rows;
-    GLfloat m_yRange;
     GLuint m_gridElementbuffer;
     GLuint m_gridIndexCount;
     QVector<QVector3D> m_vertices;

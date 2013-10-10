@@ -130,8 +130,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         labelColor.setAlphaF(1.0);
         painter.setBrush(QBrush(labelColor));
         if (borders) {
-            painter.setPen(QPen(QBrush(txtColor), 7.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-            painter.drawRect(7.5, 7.5, labelSize.width() - 15, labelSize.height() - 15);
+            painter.setPen(QPen(QBrush(txtColor), 7, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+            painter.drawRect(7, 7, labelSize.width() - 14, labelSize.height() - 14);
         } else {
             painter.setPen(labelColor);
             painter.drawRect(0, 0, labelSize.width(), labelSize.height());

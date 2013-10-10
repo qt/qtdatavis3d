@@ -279,7 +279,7 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
         sliceRow = new QSurfaceDataRow(src->size());
         for (int i = 0; i < sliceRow->size(); i++)
             (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0));
-    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
+    } else {
         sliceRow = new QSurfaceDataRow(m_sampleSpace.height());
         for (int i = 0; i < m_sampleSpace.height(); i++) {
             (*sliceRow)[i].setPosition(QVector3D(m_dataArray.at(i)->at(column).z(),
