@@ -54,7 +54,7 @@ Item {
             surfaceGridEnabled: false
             font.family: "STCaiyun"
             font.pointSize: 35
-            cameraPreset: Surface3D.CameraPresetIsometricLeft
+            scene.activeCamera.cameraPreset: Surface3D.CameraPresetIsometricLeft
             dataProxy: surfaceData.heightProxy
             axisY.min: 0.0
             axisY.max: 250.0

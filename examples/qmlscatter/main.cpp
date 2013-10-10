@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     //! [0]
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     //! [1]
-    viewer.showFullScreen();
+    viewer.showMaximized();
     //! [1]
 
     return app.exec();

@@ -40,6 +40,7 @@ Item {
         id: dataView
         anchors.bottom: parent.bottom
         //! [9]
+        width: parent.width
         height: parent.height - shadowToggle.height
         //! [8]
 

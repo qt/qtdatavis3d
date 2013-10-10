@@ -43,7 +43,7 @@
     \snippet ../examples/qmlscatter/main.cpp 0
 
     This will help us when deploying the application to Android. We'll also change the application
-    to be shown fullscreen by replacing
+    to be shown maximized by replacing
 
     \code viewer.showExpanded(); \endcode
 
