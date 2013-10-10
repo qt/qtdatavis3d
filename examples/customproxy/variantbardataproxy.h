@@ -28,7 +28,9 @@
 
 using namespace QtDataVisualization;
 
+//! [0]
 class VariantBarDataProxy : public QBarDataProxy
+//! [0]
 {
     Q_OBJECT
 
@@ -37,6 +39,7 @@ public:
     explicit VariantBarDataProxy(VariantDataSet *newSet, VariantBarDataMapping *mapping);
     virtual ~VariantBarDataProxy();
 
+    //! [1]
     // Doesn't gain ownership of the dataset, but does connect to it to listen for data changes.
     void setDataSet(VariantDataSet *newSet);
     VariantDataSet *dataSet();
@@ -46,6 +49,7 @@ public:
     // Modifying mapping that is set to proxy will trigger dataset re-resolving.
     void setMapping(VariantBarDataMapping *mapping);
     VariantBarDataMapping *mapping();
+    //! [1]
 
 public slots:
     void handleItemsAdded(int index, int count);

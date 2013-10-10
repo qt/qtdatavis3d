@@ -28,6 +28,8 @@
     in a bar graph. To increase the load for demonstration purposes, and to make the
     graph little fancier, slightly modified data is used to fill multiple rows.
 
+    \image audiolevels-example.png
+
     The interesting stuff happens in AudioLevels and AudioLevelsIODevice classes, so we
     concentrate on those and skip explaining the basic Q3DBars functionality - for that see
     \l{Bars Example}.
@@ -80,6 +82,4 @@
     it does allocate some memory to store other optional bar properties besides the value.
     In use cases where those optional properties are used, using memmove and memcpy would lead to
     memory leaks, so use them with care.
-
-    \image audiolevels-example.png
 */

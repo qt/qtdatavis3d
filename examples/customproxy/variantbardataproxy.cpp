@@ -85,7 +85,7 @@ void VariantBarDataProxy::handleItemsAdded(int index, int count)
     Q_UNUSED(count)
 
     // Resolve new items
-    resolveDataSet(); // TODO Resolving entire dataset is inefficient
+    resolveDataSet();
 }
 
 void VariantBarDataProxy::handleDataCleared()
@@ -100,8 +100,10 @@ void VariantBarDataProxy::handleMappingChanged()
 }
 
 // Resolve entire dataset into QBarDataArray.
+//! [0]
 void VariantBarDataProxy::resolveDataSet()
 {
+    // If we have no data or mapping, or the categories are not defined, simply clear the array
     if (m_dataSet.isNull() || m_mapping.isNull() || !m_mapping->rowCategories().size()
             || !m_mapping->columnCategories().size()) {
         resetArray(0);
@@ -123,7 +125,7 @@ void VariantBarDataProxy::resolveDataSet()
                 = item->at(valueIndex).toReal();
     }
 
-    // Create new data array from itemValueMap
+    // Create a new data array in format the parent class understands
     QBarDataArray *newProxyArray = new QBarDataArray;
     foreach (QString rowKey, rowList) {
         QBarDataRow *newProxyRow = new QBarDataRow(columnList.size());
@@ -132,5 +134,7 @@ void VariantBarDataProxy::resolveDataSet()
         newProxyArray->append(newProxyRow);
     }
 
+    // Finally, reset the data array in the parent class
     resetArray(newProxyArray);
 }
+//! [0]

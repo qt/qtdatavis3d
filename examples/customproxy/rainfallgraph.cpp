@@ -55,6 +55,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->columnAxis()->setTitle("Month");
     m_graph->valueAxis()->setTitle("rainfall");
     m_graph->valueAxis()->setLabelFormat("%d mm");
+    m_graph->valueAxis()->setSegmentCount(5);
     m_graph->rowAxis()->setCategoryLabels(m_years);
     m_graph->columnAxis()->setCategoryLabels(months);
 
@@ -73,11 +74,9 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     // Set theme
     m_graph->setTheme(QDataVis::ThemeArmyBlue);
 
-    // Set preset camera position
+    // Set camera position and zoom
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
-
-    // Disable grid
-    m_graph->setGridVisible(false);
+    m_graph->scene()->activeCamera()->setZoomLevel(75);
 
     // Set window title
     m_graph->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));
@@ -104,23 +103,30 @@ void RainfallGraph::updateYearsList(int start, int end)
     m_rowCount = m_years.size();
 }
 
+//! [0]
 void RainfallGraph::addDataSet()
 {
+    // Create a new variant data set and data item list
     m_dataSet =  new VariantDataSet;
     VariantDataItemList *itemList = new VariantDataItemList;
+
+    // Read data from a data file into the data item list
     QTextStream stream;
     QFile dataFile(":/data/raindata.txt");
     if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         stream.setDevice(&dataFile);
         while (!stream.atEnd()) {
             QString line = stream.readLine();
-            if (line.startsWith("#"))
+            if (line.startsWith("#")) // Ignore comments
                 continue;
             QStringList strList = line.split(",", QString::SkipEmptyParts);
+            // Each line has three data items: Year, month, and rainfall value
             if (strList.size() < 3) {
                 qWarning() << "Invalid row read from data:" << line;
                 continue;
             }
+            // Store year and month as strings, and rainfall value as double
+            // into a variant data item and add the item to the item list.
             VariantDataItem *newItem = new VariantDataItem;
             for (int i = 0; i < 2; i++)
                 newItem->append(strList.at(i).trimmed());
@@ -131,10 +137,14 @@ void RainfallGraph::addDataSet()
         qWarning() << "Unable to open data file:" << dataFile.fileName();
     }
 
+    //! [1]
+    // Add items to the data set and set it to the proxy
     m_dataSet->addItems(itemList);
-
     m_proxy->setDataSet(m_dataSet);
 
+    // Create new mapping for the data and set it to the proxy
     m_mapping =  new VariantBarDataMapping(0, 1, 2, m_years, m_numericMonths);
     m_proxy->setMapping(m_mapping);
+    //! [1]
 }
+//! [0]

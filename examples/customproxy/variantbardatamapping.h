@@ -27,17 +27,21 @@ using namespace QtDataVisualization;
 class VariantBarDataMapping : public QObject
 {
     Q_OBJECT
+    //! [0]
     Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex)
     Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex)
     Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex)
     Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
+    //! [0]
 public:
     explicit VariantBarDataMapping();
     VariantBarDataMapping(const VariantBarDataMapping &other);
+    //! [1]
     VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
                            const QStringList &rowCategories,
                            const QStringList &columnCategories);
+    //! [1]
     virtual ~VariantBarDataMapping();
 
     VariantBarDataMapping &operator=(const VariantBarDataMapping &other);
@@ -54,11 +58,15 @@ public:
     void setColumnCategories(const QStringList &categories);
     const QStringList &columnCategories() const;
 
+    //! [2]
     void remap(int rowIndex, int columnIndex, int valueIndex,
                const QStringList &rowCategories,
                const QStringList &columnCategories);
+    //! [2]
 signals:
+    //! [3]
     void mappingChanged();
+    //! [3]
 
 private:
     // Indexes of the mapped items in the VariantDataItem

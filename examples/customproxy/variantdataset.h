@@ -25,8 +25,10 @@
 
 using namespace QtDataVisualization;
 
+//! [1]
 typedef QVariantList VariantDataItem;
 typedef QList<VariantDataItem *> VariantDataItemList;
+//! [1]
 
 class VariantDataSet : public QObject
 {
@@ -36,6 +38,7 @@ public:
     explicit VariantDataSet();
     ~VariantDataSet();
 
+    //! [0]
     void clear();
 
     int addItem(VariantDataItem *item);
@@ -46,6 +49,7 @@ public:
 signals:
     void itemsAdded(int index, int count);
     void dataCleared();
+    //! [0]
 
 private:
     VariantDataItemList m_variantData;
