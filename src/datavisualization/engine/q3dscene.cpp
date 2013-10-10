@@ -304,6 +304,11 @@ void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePositio
                                                                    distanceModifier));
 }
 
+/*!
+ * \fn Q3DScene::needRender()
+ * \internal
+ */
+
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     q_ptr(q),
     m_devicePixelRatio(1.f),
