@@ -22,10 +22,62 @@
     \ingroup qtdatavisualization_examples
     \brief Using Bars3D in a QML application.
 
-    The Qt Quick 2 bars example shows how to make a simple 3D bar graph using Q3DBars and Qt
+    The Qt Quick 2 bars example shows how to make a simple 3D bar graph using Bars3D and Qt
     Quick 2.
 
     \image qmlbars-example.png
 
-    TODO
+    The interesting thing about this example is remapping the data, so we concentrate on that
+    and skip explaining the basic Bars3D functionality - for more detailed QML example documentation,
+    see \l{Qt Quick 2 Scatter Example}.
+
+    \section1 Data
+
+    The example data is monthly income and expenses of a fictional company over several years.
+    The data is defined in a list model in \c data.qml like this:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 0
+    \dots 4
+
+    Each data item has four roles: year, month, income, and expenses. Years and months are natural to
+    map to rows and columns of a bar chart, but we can only show either income or expenses as the value.
+    We choose to default to showing expenses when we initialize the mapping item:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 1
+
+    Final piece we need for handling data is the proxy to bring the model and mapping together:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 2
+
+    \section1 Custom axis labels
+
+    One interesting tidbit about axes is that we redefine the category labels for column axis in
+    \c axes.qml. This is done because the data contains abbreviated month names, which we don't want
+    to use for our column labels:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/axes.qml 0
+
+    \section1 Using mapping
+
+    In the \c main.qml, we set up the graph and various UI elements. There are three interesting
+    mapping related code blocks we want to highlight here. The first one shows how to change the
+    visualized data from expenses to income, and vice versa, by simply changing the value role on the
+    BarDataMapping item:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 0
+
+    The axis change is done because income and expenses have different label format. The same could have
+    been achieved using a single axis and just changing the label format.
+
+    The second interesting block is where we filter some of the rows away from the visualized data:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 1
+
+    The filtering is done by setting \c autoRowCategories to false on the BarDataMapping item and defining
+    the row categories explicitly. This way, only the items in specified rows are visualized.
+
+    The third interesting block shows how to get the row and column index of an item if you know the
+    row and column values by using BarDataMapping methods \c rowCategoryIndex() and \c columnCategoryIndex():
+
+    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 2
 */

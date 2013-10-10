@@ -24,24 +24,28 @@ Item {
     property alias model: dataModel
     property alias proxy: modelProxy
 
+    //! [1]
     BarDataMapping {
         id: valueMapping
         rowRole: "year"
         columnRole: "month"
         valueRole: "expenses"
     }
-
+    //! [1]
+    //! [2]
     ItemModelBarDataProxy {
         id: modelProxy
         activeMapping: valueMapping
         itemModel: dataModel
     }
-
+    //! [2]
+    //! [0]
     ListModel {
         id: dataModel
         ListElement{ year: "2006"; month: "Jan"; expenses: "4";  income: "5" }
         ListElement{ year: "2006"; month: "Feb"; expenses: "5";  income: "6" }
         ListElement{ year: "2006"; month: "Mar"; expenses: "7";  income: "4" }
+        //! [0]
         ListElement{ year: "2006"; month: "Apr"; expenses: "3";  income: "2" }
         ListElement{ year: "2006"; month: "May"; expenses: "4";  income: "1" }
         ListElement{ year: "2006"; month: "Jun"; expenses: "2";  income: "2" }

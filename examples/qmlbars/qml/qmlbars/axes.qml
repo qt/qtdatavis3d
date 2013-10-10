@@ -28,11 +28,13 @@ Item {
     // suffices for rows.
 
     // Custom labels for columns, since the data contains abbreviated month names.
+    //! [0]
     CategoryAxis3D {
         id: columnAxis
         categoryLabels: ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"]
     }
+    //! [0]
     ValueAxis3D {
         id: incomeAxis
         min: 0

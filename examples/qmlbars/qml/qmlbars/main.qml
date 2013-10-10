@@ -86,6 +86,7 @@ Item {
         width: tableView.width
         height: 60
         text: "Show Income"
+        //! [0]
         onClicked: {
             if (graphData.mapping.valueRole === "expenses") {
                 graphData.mapping.valueRole = "income"
@@ -97,6 +98,7 @@ Item {
                 testGraph.valueAxis = graphAxes.expenses
             }
         }
+        //! [0]
     }
 
     Button {
@@ -122,6 +124,7 @@ Item {
         width: tableView.width
         height: 60
         text: "Show 2010 - 2012"
+        //! [1]
         onClicked: {
             if (testGraph.rowAxis.max !== 6) {
                 text = "Show 2010 - 2012"
@@ -134,6 +137,7 @@ Item {
                 graphData.mapping.rowCategories = ["2010", "2011", "2012"]
             }
         }
+        //! [1]
     }
 
     TableView {
@@ -148,10 +152,12 @@ Item {
         TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
         model: graphData.model
 
+        //! [2]
         onCurrentRowChanged: {
             var rowIndex = graphData.proxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
             var colIndex = graphData.proxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
             testGraph.selectedBarPos = Qt.point(rowIndex, colIndex)
         }
+        //! [2]
     }
 }
