@@ -194,6 +194,7 @@ void Q3DScene::setSlicingActive(bool isSlicing)
         d_ptr->m_isSlicingActive = isSlicing;
         d_ptr->m_changeTracker.slicingActivatedChanged = true;
         emit slicingActiveChanged(isSlicing);
+        emitNeedRender();
     }
 }
 

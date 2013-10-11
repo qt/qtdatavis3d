@@ -87,6 +87,7 @@ public:
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisRangeChangedBySender(QObject *sender);
 
 public slots:
     void handleArrayReset();

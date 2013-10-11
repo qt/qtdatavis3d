@@ -102,6 +102,12 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
     adjustValueAxisRange();
 }
 
+void Surface3DController::handleAxisRangeChangedBySender(QObject *sender)
+{
+    scene()->setSlicingActive(false);
+    Abstract3DController::handleAxisRangeChangedBySender(sender);
+}
+
 void Surface3DController::setSmoothSurface(bool enable)
 {
     m_isSmoothSurfaceEnabled = enable;
