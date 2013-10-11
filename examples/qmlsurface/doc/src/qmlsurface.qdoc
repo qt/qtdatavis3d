@@ -77,7 +77,7 @@
     \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 2
 
     Third and fourth buttons are for controlling background features. The last button is for switching
-    between HeightMapSurfaceDataProxy and ItemModelSurfaceDataProxy, for which use the following
+    between HeightMapSurfaceDataProxy and ItemModelSurfaceDataProxy, for which we use the following
     code. We also set the maximum value to 500 in model proxy to make the surface flatter and
     250 on height map proxy to show exaggerated height. At the same time the color position
     on the gradient is modified.
