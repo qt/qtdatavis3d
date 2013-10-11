@@ -529,9 +529,9 @@ void Surface3DRenderer::drawSlicedScene()
         surfaceShader->setUniformValue(surfaceShader->nModel(), itModelMatrix.inverted().transposed());
         surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
         surfaceShader->setUniformValue(surfaceShader->color(), color);
-        surfaceShader->setUniformValue(surfaceShader->ambientS(), m_cachedTheme.m_ambientStrength);
-        surfaceShader->setUniformValue(surfaceShader->lightS(),
-                                       m_cachedTheme.m_lightStrength * 2.0f);
+        surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
+        surfaceShader->setUniformValue(surfaceShader->ambientS(),
+                                       m_cachedTheme.m_ambientStrength * 2.0f);
 
         m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
 
@@ -570,11 +570,8 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
-
-        // Set shadowless shader bindings, no shadows on slice view
-        lineShader->setUniformValue(lineShader->lightS(),
-                                    m_cachedTheme.m_lightStrength * 0.5f);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
+        lineShader->setUniformValue(lineShader->lightS(), 0.25f);
 
         // Back wall
         GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
