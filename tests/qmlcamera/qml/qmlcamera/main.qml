@@ -82,7 +82,7 @@ Item {
         height: 298
         minXValue: testChart.scene.activeCamera.minXRotation
         minYValue: testChart.scene.activeCamera.minYRotation
-        maxXValue: testChart.scene.activeCamera.maxYRotation
+        maxXValue: testChart.scene.activeCamera.maxXRotation
         maxYValue: testChart.scene.activeCamera.maxYRotation
     }
 
