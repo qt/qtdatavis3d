@@ -240,14 +240,12 @@ void Abstract3DRenderer::handleResize()
 {
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
-    qDebug() << __FUNCTION__ << m_cachedBoundingRect.width() << "x" << m_cachedBoundingRect.height();
     // Calculate zoom level based on aspect ratio
     GLfloat div;
     GLfloat zoomAdjustment;
     div = qMin(m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
     zoomAdjustment = defaultRatio * ((m_cachedBoundingRect.width() / div)
                                      / (m_cachedBoundingRect.height() / div));
-    //qDebug() << "zoom adjustment" << zoomAdjustment;
     m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 
     // Re-init selection buffer

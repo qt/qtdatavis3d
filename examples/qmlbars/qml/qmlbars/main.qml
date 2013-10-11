@@ -45,16 +45,16 @@ Item {
             id: testGraph
             width: dataView.width
             height: dataView.height
-            shadowQuality: Bars3D.ShadowQualityMedium
-            selectionMode: Bars3D.SelectionModeItem
+            shadowQuality: AbstractGraph3D.ShadowQualityMedium
+            selectionMode: AbstractGraph3D.SelectionModeItem
             font.pointSize: 35
-            theme: Bars3D.ThemeRetro
-            labelStyle: Bars3D.LabelStyleFromTheme
+            theme: AbstractGraph3D.ThemeRetro
+            labelStyle: AbstractGraph3D.LabelStyleFromTheme
             dataProxy: graphData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
-            scene.activeCamera.cameraPreset: Bars3D.CameraPresetRight
+            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetRight
             columnAxis: graphAxes.column
             valueAxis: graphAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
@@ -108,11 +108,11 @@ Item {
         height: 60
         text: "Hide Shadows"
         onClicked: {
-            if (testGraph.shadowQuality == Bars3D.ShadowQualityNone) {
-                testGraph.shadowQuality = Bars3D.ShadowQualityMedium;
+            if (testGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
+                testGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
                 text = "Hide Shadows"
             } else {
-                testGraph.shadowQuality = Bars3D.ShadowQualityNone;
+                testGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                 text = "Show Shadows"
             }
         }

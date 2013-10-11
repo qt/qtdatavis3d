@@ -53,8 +53,8 @@ Item {
             //! [3]
             font.family: "Lucida Handwriting"
             font.pointSize: 40
-            theme: Scatter3D.ThemeIsabelle
-            shadowQuality: Scatter3D.ShadowQualitySoftLow
+            theme: AbstractGraph3D.ThemeIsabelle
+            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [5]
             dataProxy: graphData.proxy
@@ -80,11 +80,11 @@ Item {
         width: parent.width / 6 // We're adding 6 buttons and want to divide them equally
         text: "Hide Shadows"
         onClicked: {
-            if (scatterGraph.shadowQuality === Scatter3D.ShadowQualityNone) {
-                scatterGraph.shadowQuality = Scatter3D.ShadowQualitySoftLow;
+            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
                 text = "Hide Shadows";
             } else {
-                scatterGraph.shadowQuality = Scatter3D.ShadowQualityNone;
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                 text = "Show Shadows";
             }
         }
@@ -113,10 +113,10 @@ Item {
         text: "Change Camera Placement"
         anchors.left: smoothToggle.right
         onClicked: {
-            if (scatterGraph.scene.activeCamera.cameraPreset === Scatter3D.CameraPresetFront) {
-                scatterGraph.scene.activeCamera.cameraPreset = Scatter3D.CameraPresetIsometricRightHigh;
+            if (scatterGraph.scene.activeCamera.cameraPreset === AbstractGraph3D.CameraPresetFront) {
+                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetIsometricRightHigh;
             } else {
-                scatterGraph.scene.activeCamera.cameraPreset = Scatter3D.CameraPresetFront;
+                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetFront;
             }
         }
     }
@@ -127,10 +127,10 @@ Item {
         text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
-            if (scatterGraph.theme === Scatter3D.ThemeArmyBlue) {
-                scatterGraph.theme = Scatter3D.ThemeIsabelle;
+            if (scatterGraph.theme === AbstractGraph3D.ThemeArmyBlue) {
+                scatterGraph.theme = AbstractGraph3D.ThemeIsabelle;
             } else {
-                scatterGraph.theme = Scatter3D.ThemeArmyBlue;
+                scatterGraph.theme = AbstractGraph3D.ThemeArmyBlue;
             }
         }
     }

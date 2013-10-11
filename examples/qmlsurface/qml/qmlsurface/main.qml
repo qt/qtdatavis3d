@@ -47,14 +47,14 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
-            theme: Surface3D.ThemeStoneMoss
-            shadowQuality: Surface3D.ShadowQualityMedium
-            selectionMode: Bars3D.SelectionModeSliceRow
+            theme: AbstractGraph3D.ThemeStoneMoss
+            shadowQuality: AbstractGraph3D.ShadowQualityMedium
+            selectionMode: AbstractGraph3D.SelectionModeSliceRow
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"
             font.pointSize: 35
-            scene.activeCamera.cameraPreset: Surface3D.CameraPresetIsometricLeft
+            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
             dataProxy: surfaceData.heightProxy
             axisY.min: 0.0
             axisY.max: 250.0
