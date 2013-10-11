@@ -125,6 +125,7 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, this,
                      &Bars3DController::handleDataColumnLabelsChanged);
 
+    scene()->setSlicingActive(false);
     adjustAxisRanges();
 
     // Always clear selection on proxy change
@@ -132,6 +133,8 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
     handleDataRowLabelsChanged();
     handleDataColumnLabelsChanged();
+    m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Bars3DController::handleArrayReset()

@@ -439,6 +439,8 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     bool slicingActivated = m_cachedScene->isSlicingActive();
+    bool slicingChanged = m_cachedIsSlicingActivated != slicingActivated;
+
     updateSlicingActive(slicingActivated);
 
     // Handle GL state setup for FBO buffers and clearing of the render surface
@@ -458,7 +460,9 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
         m_selectionPointer->render(defaultFboHandle);
 
     // If slicing has been activated by this render pass, we need another render
-    if (slicingActivated != m_cachedScene->isSlicingActive())
+    // Also trigger another render always when slicing changes in general to ensure
+    // final draw is correct.
+    if (slicingActivated != m_cachedScene->isSlicingActive() || slicingChanged)
         emit needRender();
 }
 

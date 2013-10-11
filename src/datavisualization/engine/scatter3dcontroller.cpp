@@ -117,6 +117,9 @@ void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
     adjustValueAxisRange();
     setSelectedItemIndex(noSelectionIndex());
+    setSlicingActive(false);
+    m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Scatter3DController::handleArrayReset()

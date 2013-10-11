@@ -178,11 +178,15 @@ void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
                      this, &Surface3DController::handleArrayReset);
 
+    scene()->setSlicingActive(false);
     adjustValueAxisRange();
+    m_isDataDirty = true;
+    emitNeedRender();
 }
 
 void Surface3DController::handleArrayReset()
 {
+    scene()->setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
     emitNeedRender();
