@@ -32,26 +32,28 @@
 
 int main(int argc, char **argv)
 {
+    //! [0]
     QApplication app(argc, argv);
-
-    QWidget *widget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(widget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
-    vLayout->setAlignment(Qt::AlignTop);
-
     Q3DSurface *graph = new Q3DSurface();
-    QSize screenSize = graph->screen()->size();
-
     QWidget *container = QWidget::createWindowContainer(graph);
+    //! [0]
+
+    QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.6));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    widget->setWindowTitle(QStringLiteral("Example of using axis range and selection"));
-
+    //! [1]
+    QWidget *widget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(widget);
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    vLayout->setAlignment(Qt::AlignTop);
+    //! [1]
+
+    widget->setWindowTitle(QStringLiteral("Surface example"));
 
     QGroupBox *modelGroupBox = new QGroupBox(QStringLiteral("Model"));
 

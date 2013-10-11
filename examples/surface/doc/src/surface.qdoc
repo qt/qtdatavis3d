@@ -36,7 +36,28 @@
     \endlist
     \image surface-example.png
 
-    \section1 Setting up proxies and setting the data
+    \section1 Creating the application
+
+    First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface and a window container
+    for it:
+
+    \snippet ../examples/surface/main.cpp 0
+
+    The call to QWidget::createWindowContainer is required, as all data visualization types
+    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
+    as a widget any other way.
+
+    Then we'll create horizontal and vertical layouts. We'll add the graph with the container and
+    the vertical layout into the horizontal one:
+
+    \snippet ../examples/surface/main.cpp 1
+
+    The rest of the code in \c main.cpp is creating control widgets for features in Q3DSurface. We
+    have separated code for changing these features into \c surfacegraph.cpp and only connect
+    signals from widgets into methods in \c surfacegraph.cpp. Next chapter explains more
+    about using Q3DSurface.
+
+    \section1 Setting up proxies and data
 
     First we instantiate a new QSurfaceDataProxy:
 
