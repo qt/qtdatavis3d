@@ -18,24 +18,27 @@
 
 #include <QtGui/QGuiApplication>
 #include "qtquick2applicationviewer.h"
+
 #ifdef Q_OS_ANDROID
 #include <QDir>
 #include <QQmlEngine>
 #endif
-#include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
     QtQuick2ApplicationViewer viewer;
+
 #ifdef Q_OS_ANDROID
     viewer.addImportPath(QString::fromLatin1("assets:/qml"));
     viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),
                                                                        QString::fromLatin1("lib")));
 #endif
-    viewer.setTitle(QStringLiteral("Tycho crater on the Moon (height exaggerated)"));
+
     viewer.setSource(QUrl("qrc:/qml/main.qml"));
+
+    viewer.setTitle(QStringLiteral("Tycho crater on the Moon (height exaggerated)"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

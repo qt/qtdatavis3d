@@ -25,6 +25,7 @@ Item {
     property alias proxy: modelProxy
     property alias heightProxy: heightMapProxy
 
+    //! [0]
     HeightMapSurfaceDataProxy {
         id: heightMapProxy
         heightMapFile: ":/heightmaps/image"
@@ -34,25 +35,32 @@ Item {
         minXValue: 67
         maxXValue: 97
     }
+    //! [0]
 
+    //! [2]
     SurfaceDataMapping {
         id: surfaceMapping
         rowRole: "longitude"
         columnRole: "latitude"
         valueRole: "height"
     }
+    //! [2]
 
+    //! [3]
     ItemModelSurfaceDataProxy {
         id: modelProxy
         activeMapping: surfaceMapping
         itemModel: dataModel
     }
+    //! [3]
 
+    //! [1]
     ListModel {
         id: dataModel
         ListElement{ longitude: "0"; latitude: "0"; height: "124"; }
         ListElement{ longitude: "0"; latitude: "1"; height: "125"; }
         ListElement{ longitude: "0"; latitude: "2"; height: "124"; }
+        //! [1]
         ListElement{ longitude: "0"; latitude: "3"; height: "118"; }
         ListElement{ longitude: "0"; latitude: "4"; height: "112"; }
         ListElement{ longitude: "0"; latitude: "5"; height: "111"; }

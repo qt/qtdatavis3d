@@ -36,12 +36,14 @@ Item {
         height: mainview.height
         anchors.right: mainview.right;
 
+        //! [0]
         ColorGradient {
             id: surfaceGradient
             ColorGradientStop { position: 0.0; color: "darkslategray" }
             ColorGradientStop { id: middleGradient; position: 0.55; color: "peru" }
             ColorGradientStop { position: 1.0; color: "red" }
         }
+        //! [0]
 
         Surface3D {
             id: surfaceplot
@@ -77,6 +79,7 @@ Item {
         anchors.left: parent.left
         width: 200
         text: "Show Surface Grid"
+        //! [1]
         onClicked: {
             if (surfaceplot.surfaceGridEnabled == false) {
                 surfaceplot.surfaceGridEnabled = true;
@@ -86,6 +89,7 @@ Item {
                 text = "Show Surface Grid"
             }
         }
+        //! [1]
     }
 
     NewButton {
@@ -93,6 +97,7 @@ Item {
         anchors.top: surfaceGridToggle.bottom
         width: surfaceGridToggle.width
         text: "Show Flat"
+        //! [2]
         onClicked: {
             if (surfaceplot.smoothSurfaceEnabled == true) {
                 surfaceplot.smoothSurfaceEnabled = false;
@@ -102,6 +107,7 @@ Item {
                 text = "Show Flat"
             }
         }
+        //! [2]
     }
 
     NewButton {
@@ -141,6 +147,7 @@ Item {
         anchors.top: gridToggle.bottom
         width: gridToggle.width
         text: "Switch to Item Model Proxy"
+        //! [3]
         onClicked: {
             if (surfaceplot.dataProxy === surfaceData.heightProxy) {
                 surfaceplot.axisY.max = 500.0
@@ -154,5 +161,6 @@ Item {
                 text = "Switch to Item Model Proxy"
             }
         }
+        //! [3]
     }
 }
