@@ -33,10 +33,9 @@ int main(int argc, char *argv[])
     viewer.addImportPath(QString::fromLatin1("assets:/qml"));
     viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),
                                                                        QString::fromLatin1("lib")));
-#else
-    viewer.addImportPath(QString::fromLatin1("%1/%2").arg(QCoreApplication::applicationDirPath(),
-                                                          QString::fromLatin1("qml")));
 #endif
+    viewer.setTitle(QStringLiteral("Monthly income/expenses"));
+
     viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
