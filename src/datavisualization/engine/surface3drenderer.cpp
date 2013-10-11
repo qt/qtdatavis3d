@@ -256,6 +256,10 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
     }
 
     m_selectionActive = false;
+    m_cachedSelectionId = 0;
+    for (int i = 0; i < m_sliceDataArray.size(); i++)
+        delete m_sliceDataArray.at(i);
+    m_sliceDataArray.clear();
 
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
