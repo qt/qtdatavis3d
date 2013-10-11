@@ -350,9 +350,13 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
             m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
             m_barShader->setUniformValue(m_barShader->ambientS(),
                                          m_cachedTheme.m_ambientStrength * 2.0f);
-
             // Draw the object
+#if defined (Q_OS_MAC)
+            // Mac slice issue hack fix. TODO: Fix correctly
+            m_drawer->drawObject(m_barShader, m_barObj, 0, -1);
+#else
             m_drawer->drawObject(m_barShader, m_barObj);
+#endif
         }
     }
 
@@ -897,7 +901,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone
+                        && !m_cachedIsSlicingActivated) {
                     // Set shadow shader bindings
                     m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
                     m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
@@ -912,7 +917,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
 
                     // Draw the object
+#if defined (Q_OS_MAC)
+                    // Mac slice issue hack fix. TODO: Fix correctly
+                    m_drawer->drawObject(m_barShader, m_barObj, 0, -1);
+#else
                     m_drawer->drawObject(m_barShader, m_barObj);
+#endif
                 }
             }
         }
