@@ -561,36 +561,79 @@ void Surface3DRenderer::drawSlicedScene()
     // Disable textures
     glDisable(GL_TEXTURE_2D);
 
-    ShaderHelper *lineShader = m_backgroundShader;
-    // Bind line shader
-    lineShader->bind();
-
     // lines to the back
-    if (m_axisCacheY.segmentCount() > 0) {
-        QVector3D gridLineScaleX(scaleXBackground, gridLineWidth, gridLineWidth);
+    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+        ShaderHelper *lineShader = m_backgroundShader;
+        // Bind line shader
+        lineShader->bind();
 
-        // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
-        lineShader->setUniformValue(lineShader->lightP(), lightPos);
-        lineShader->setUniformValue(lineShader->view(), viewMatrix);
-        lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
-        lineShader->setUniformValue(lineShader->lightS(), 0.25f);
+        if (m_axisCacheY.segmentCount() > 0) {
+            QVector3D gridLineScaleX(scaleXBackground, gridLineWidth, gridLineWidth);
 
-        // Back wall
-        GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
-        GLfloat linePos = -1.0f;
-        int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
+            // Set unchanging shader bindings
+            QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+            lineShader->setUniformValue(lineShader->lightP(), lightPos);
+            lineShader->setUniformValue(lineShader->view(), viewMatrix);
+            lineShader->setUniformValue(lineShader->color(), lineColor);
+            lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
+            lineShader->setUniformValue(lineShader->lightS(), 0.25f);
+
+            // Back wall
+            GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
+            GLfloat linePos = -1.0f;
+            int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
+
+            for (int segment = 0; segment <= lastSegment; segment++) {
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+                QMatrix4x4 itModelMatrix;
+
+                modelMatrix.translate(0.0f, linePos, zComp - sliceZScale);
+
+                modelMatrix.scale(gridLineScaleX);
+                itModelMatrix.scale(gridLineScaleX);
+
+                MVPMatrix = projectionViewMatrix * modelMatrix;
+
+                // Set the rest of the shader bindings
+                lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                lineShader->setUniformValue(lineShader->nModel(),
+                                            itModelMatrix.inverted().transposed());
+                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+                // Draw the object
+                m_drawer->drawObject(lineShader, m_gridLineObj);
+
+                linePos += lineStep;
+            }
+        }
+
+        // Floor lines
+        QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, sliceZScale);
+        QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
+
+        int lastSegment;
+        GLfloat lineStep;
+        GLfloat linePos;
+        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
+            lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
+            lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
+            linePos = m_scaleX;
+        } else {
+            lineStep = -2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
+            lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
+            linePos = m_scaleZ;
+        }
 
         for (int segment = 0; segment <= lastSegment; segment++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            modelMatrix.translate(0.0f, linePos, zComp - sliceZScale);
+            modelMatrix.translate(linePos, -backgroundMargin, zComp);
 
-            modelMatrix.scale(gridLineScaleX);
-            itModelMatrix.scale(gridLineScaleX);
+            modelMatrix.scale(gridLineScaleZ);
+            itModelMatrix.scale(gridLineScaleZ);
 
             MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -605,79 +648,38 @@ void Surface3DRenderer::drawSlicedScene()
 
             linePos += lineStep;
         }
+
+        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
+            linePos = m_scaleX;
+        else
+            linePos = m_scaleZ;
+
+        for (int segment = 0; segment <= lastSegment; segment++) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
+
+            modelMatrix.translate(linePos, 0.0f, zComp - sliceZScale);
+            modelMatrix.scale(gridLineScaleY);
+            itModelMatrix.scale(gridLineScaleY);
+
+            MVPMatrix = projectionViewMatrix * modelMatrix;
+
+            // Set the rest of the shader bindings
+            lineShader->setUniformValue(lineShader->model(), modelMatrix);
+            lineShader->setUniformValue(lineShader->nModel(),
+                                        itModelMatrix.inverted().transposed());
+            lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+            // Draw the object
+            m_drawer->drawObject(lineShader, m_gridLineObj);
+
+            linePos += lineStep;
+        }
+
+        // Release line shader
+        lineShader->release();
     }
-
-    // Floor lines
-    QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, sliceZScale);
-    QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
-
-    int lastSegment;
-    GLfloat lineStep;
-    GLfloat linePos;
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
-        lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
-        lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
-        linePos = m_scaleX;
-    } else {
-        lineStep = -2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
-        lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
-        linePos = m_scaleZ;
-    }
-
-    for (int segment = 0; segment <= lastSegment; segment++) {
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
-        QMatrix4x4 itModelMatrix;
-
-        modelMatrix.translate(linePos, -backgroundMargin, zComp);
-
-        modelMatrix.scale(gridLineScaleZ);
-        itModelMatrix.scale(gridLineScaleZ);
-
-        MVPMatrix = projectionViewMatrix * modelMatrix;
-
-        // Set the rest of the shader bindings
-        lineShader->setUniformValue(lineShader->model(), modelMatrix);
-        lineShader->setUniformValue(lineShader->nModel(),
-                                    itModelMatrix.inverted().transposed());
-        lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
-
-        // Draw the object
-        m_drawer->drawObject(lineShader, m_gridLineObj);
-
-        linePos += lineStep;
-    }
-
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
-        linePos = m_scaleX;
-    else
-        linePos = m_scaleZ;
-
-    for (int segment = 0; segment <= lastSegment; segment++) {
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
-        QMatrix4x4 itModelMatrix;
-
-        modelMatrix.translate(linePos, 0.0f, zComp - sliceZScale);
-        modelMatrix.scale(gridLineScaleY);
-        itModelMatrix.scale(gridLineScaleY);
-
-        MVPMatrix = projectionViewMatrix * modelMatrix;
-
-        // Set the rest of the shader bindings
-        lineShader->setUniformValue(lineShader->model(), modelMatrix);
-        lineShader->setUniformValue(lineShader->nModel(),
-                                    itModelMatrix.inverted().transposed());
-        lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
-
-        // Draw the object
-        m_drawer->drawObject(lineShader, m_gridLineObj);
-
-        linePos += lineStep;
-    }
-
-    // Release line shader
-    lineShader->release();
 
     // Draw axis labels
     m_labelShader->bind();
@@ -715,6 +717,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     // X Labels to ground
     int countLabelItems;
+    int lastSegment;
     if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
         posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
         labelPos = -m_scaleX;
