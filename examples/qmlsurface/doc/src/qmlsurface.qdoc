@@ -1,0 +1,88 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example qmlsurface
+    \title Qt Quick 2 Surface Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Surface3D in a QML application.
+
+    The Qt Quick 2 surface example shows how to make a simple 3D surface plot using Surface3D with
+    Qt Quick 2.
+
+    \image qmlsurface-example.png
+
+    The focus in this example is on generating a surface graph from height data, so in this section
+    we skip explaining application creation. For more detailed QML example documentation,
+    see \l{Qt Quick 2 Scatter Example}.
+
+    \section1 Adding data to the graph
+
+    This example shows two method to set data to surface graph, using the HeightMapSurfaceDataProxy
+    and ItemModelSurfaceDataProxy. First we go through setting the data using height map specific
+    data proxy. It is done with the code snippet below. The \c heightMapFile property specifies the image
+    file containing the height data. The value properties defines the minimum and maximum values for
+    surface area width and depth. This example shows the terrain around Tycho crater at imaginary
+    position from 67 to 97 and from 30 to 60. Note that on the graph the scale on the Y dimension
+    exaggerates the height.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 0
+
+    The other method to set surface data used in this example is with model mapping. We do that by first
+    defining a ListModel containing the data for the surface:
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 1
+    \dots 4
+
+    Then we set up a SurfaceDataMapping which maps the roles for columns, rows and values. In this
+    example the row holds values for longitude, column for latitude and the value is for height.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 2
+
+    The ItemModelSurfaceDataProxy is created to tie the model and the mapping together.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 3
+
+    \section1 Showing data
+
+    In the \c main.qml, we set up the Surface3D element to show the data and various UI elements
+    to illustrate few interesting features. First is the surface gradient, which can be defined
+    as seen in this code snippet. With the \c ColorGradient we set example colors from position 0.0 to
+    1.0. This element is set for \c gradient property in Surface3D.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 0
+
+    Other interesting features can be controlled with buttons. The first button is to toggle on and off
+    the surface grid, for which use the following code.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 1
+
+    Second button is for surface smooth status, which is controlled with this code.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 2
+
+    Third and fourth buttons are for controlling background features. The last button is for switching
+    between HeightMapSurfaceDataProxy and ItemModelSurfaceDataProxy, for which we use the following
+    code. We also set the maximum value to 500 in model proxy to make the surface flatter and
+    250 on height map proxy to show exaggerated height. At the same time the color position
+    on the gradient is modified.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 3
+
+    \section1 Example contents
+*/

@@ -1,0 +1,102 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+#include "audiolevelsiodevice.h"
+#include <QDebug>
+
+QT_DATAVISUALIZATION_USE_NAMESPACE
+
+//! [1]
+static const int resolution = 8;
+static const int rowSize = 800;
+static const int rowCount = 7; // Must be odd number
+static const int middleRow = rowCount / 2;
+//! [1]
+
+AudioLevelsIODevice::AudioLevelsIODevice(QBarDataProxy *proxy, QObject *parent)
+    : QIODevice(parent),
+      m_proxy(proxy),
+      m_array(new QBarDataArray)
+{
+    // We reuse the existing array for maximum performance, so construct the array here
+    //! [0]
+    m_array->reserve(rowCount);
+    for (int i = 0; i < rowCount; i++)
+        m_array->append(new QBarDataRow(rowSize));
+    //! [0]
+
+    qDebug() << "Total of" << (rowSize * rowCount) << "items in the array.";
+}
+
+// Implementation required for this pure virtual function
+qint64 AudioLevelsIODevice::readData(char *data, qint64 maxSize)
+{
+    Q_UNUSED(data)
+    Q_UNUSED(maxSize)
+    return -1;
+}
+
+//! [2]
+qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
+{
+    // The amount of new data available.
+    int newDataSize = maxSize / resolution;
+
+    // If we get more data than array size, we need to adjust the start index for new data.
+    int newDataStartIndex = qMax(0, (newDataSize - rowSize));
+
+    // Move the old data ahead in the rows (only do first half of rows + middle one now).
+    // If the amount of new data was larger than row size, skip copying.
+    if (!newDataStartIndex) {
+        for (int i = 0; i <= middleRow; i++) {
+            QBarDataItem *srcPos = m_array->at(i)->data();
+            QBarDataItem *dstPos = srcPos + newDataSize;
+            memmove(dstPos, srcPos, (rowSize - newDataSize) * sizeof(QBarDataItem));
+        }
+    }
+
+    // Insert data in reverse order, so that newest data is always at the front of the row.
+    int index = 0;
+    for (int i = newDataSize - 1; i >= newDataStartIndex; i--) {
+        // Add 0.01 to the value to avoid gaps in the graph (i.e. zero height bars).
+        qreal value = qreal(quint8(data[resolution * i]) - 128) / 2.0 + 0.01;
+        (*m_array->at(middleRow))[index].setValue(value);
+        // Insert a fractional value into front half of the rows.
+        for (int j = 1; j <= middleRow; j++) {
+            qreal fractionalValue = value / qreal(j + 1);
+            (*m_array->at(middleRow - j))[index].setValue(fractionalValue);
+        }
+        index++;
+    }
+
+    // Copy the front half of rows to the back half for symmetry.
+    index = 0;
+    for (int i = rowCount - 1; i > middleRow; i--) {
+        QBarDataItem *srcPos = m_array->at(index++)->data();
+        QBarDataItem *dstPos = m_array->at(i)->data();
+        memcpy(dstPos, srcPos, rowSize * sizeof(QBarDataItem));
+    }
+
+    // Reset the proxy array now that data has been updated to trigger a redraw.
+    m_proxy->resetArray(m_array);
+
+    return maxSize;
+}
+//! [2]
+
+

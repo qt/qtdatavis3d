@@ -1,3 +1,4 @@
 TEMPLATE = subdirs
-SUBDIRS += datavis3d \
-           datavis3dqml2
+CONFIG += ordered
+SUBDIRS += datavisualization \
+           datavisualizationqml2

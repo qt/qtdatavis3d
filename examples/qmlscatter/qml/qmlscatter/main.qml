@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -16,194 +16,146 @@
 **
 ****************************************************************************/
 
+//! [0]
 import QtQuick 2.1
-import QtQuick.Controls 1.0
-import com.digia.QtDataVis3D 1.0
+import com.digia.QtDataVisualization 1.0
+import "."
+//! [0]
 
+//! [1]
 Item {
-    id: mainview
-    width: 800
-    height: 700
+    id: mainView
     visible: true
+    //! [1]
 
+    //! [4]
+    Data {
+        id: graphData
+    }
+    //! [4]
+
+    //! [8]
+    //! [9]
     Item {
         id: dataView
+        anchors.bottom: parent.bottom
+        //! [9]
         width: parent.width
         height: parent.height - shadowToggle.height
-        anchors.bottom: parent.bottom
+        //! [8]
 
-        ScatterDataMapping {
-            id: scatterMapping
-            xPosRole: "xPos"
-            yPosRole: "yPos"
-            zPosRole: "zPos"
-        }
-
-        ListModel {
-            id: dataModel
-            ListElement{ xPos: -10.0; yPos: 4.9; zPos: -5.0 }
-            ListElement{ xPos: 10.0; yPos: 4.9; zPos: -5.0 }
-            ListElement{ xPos: -10.0; yPos: 4.9; zPos: 5.0 }
-            ListElement{ xPos: 10.0; yPos: 4.9; zPos: 5.0 }
-            ListElement{ xPos: -10.0; yPos: -4.9; zPos: -5.0 }
-            ListElement{ xPos: 10.0; yPos: -4.9; zPos: -5.0 }
-            ListElement{ xPos: -10.0; yPos: -4.9; zPos: 5.0 }
-            ListElement{ xPos: 10.0; yPos: -4.9; zPos: 5.0 }
-
-            ListElement{ xPos: -1.0; yPos: 0.3; zPos: -0.5 }
-            ListElement{ xPos: 1.0; yPos: 2.105; zPos: 0.5 }
-            ListElement{ xPos: 0.5; yPos: -0.65; zPos: -0.5 }
-            ListElement{ xPos: -0.5; yPos: 1.225; zPos: 0.5 }
-            ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0 }
-            ListElement{ xPos: 0.0; yPos: 2.0; zPos: 0.0 }
-            ListElement{ xPos: 0.0; yPos: -0.5; zPos: 0.0 }
-
-            ListElement{ xPos: 6.0; yPos: 0.0; zPos: 4.0 }
-            ListElement{ xPos: 5.8; yPos: 0.2; zPos: 5.0 }
-            ListElement{ xPos: 5.6; yPos: 0.4; zPos: 4.5 }
-            ListElement{ xPos: 5.4; yPos: 0.6; zPos: 3.8 }
-            ListElement{ xPos: 5.2; yPos: 0.8; zPos: 4.8 }
-            ListElement{ xPos: 5.0; yPos: 0.3; zPos: 4.1 }
-            ListElement{ xPos: 4.9; yPos: -0.3; zPos: 4.9 }
-            ListElement{ xPos: 4.7; yPos: -0.5; zPos: 3.5 }
-            ListElement{ xPos: 4.5; yPos: -0.7; zPos: 3.3 }
-            ListElement{ xPos: 4.3; yPos: -0.4; zPos: 3.7 }
-        }
-
+        //! [2]
         Scatter3D {
-            id: testscatter
+            id: scatterGraph
             width: dataView.width
             height: dataView.height
-            fontSize: 30.0
-            mapping: scatterMapping
-            shadowQuality: Scatter3D.ShadowNone
-            selectionMode: Scatter3D.ModeItem
-            labelTransparency: Scatter3D.TransparencyNoBackground
-
-            Component.onCompleted: {
-                console.log("testscatter complete");
-                data = dataModel
-            }
+            //! [2]
+            //! [3]
+            font.family: "Lucida Handwriting"
+            font.pointSize: 40
+            theme: AbstractGraph3D.ThemeIsabelle
+            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
+            //! [3]
+            //! [5]
+            dataProxy: graphData.proxy
+            //! [5]
+            //! [6]
+            itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+            axisX.segmentCount: 3
+            axisX.subSegmentCount: 2
+            axisX.labelFormat: "%.2f"
+            axisZ.segmentCount: 2
+            axisZ.subSegmentCount: 2
+            axisZ.labelFormat: "%.2f"
+            axisY.segmentCount: 2
+            axisY.subSegmentCount: 2
+            axisY.labelFormat: "%.2f"
+            //! [6]
         }
     }
 
-    Rectangle {
+    //! [7]
+    NewButton {
         id: shadowToggle
-        width: 120
-        height: 30
-
-        TextArea {
-            id: shadowText
-            text: "Toggle Shadows On"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.shadowQuality === Scatter3D.ShadowNone) {
-                    testscatter.shadowQuality = Scatter3D.ShadowMedium;
-                    shadowText.text = "Toggle Shadows Off";
-                } else {
-                    testscatter.shadowQuality = Scatter3D.ShadowNone;
-                    shadowText.text = "Toggle Shadows On";
-                }
+        width: parent.width / 6 // We're adding 6 buttons and want to divide them equally
+        text: "Hide Shadows"
+        onClicked: {
+            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
+                text = "Hide Shadows";
+            } else {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                text = "Show Shadows";
             }
         }
     }
-    Rectangle {
+    //! [7]
+
+    NewButton {
         id: smoothToggle
-        width: 140
-        height: 30
+        width: parent.width / 6
+        text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
-
-        TextArea {
-            id: smoothText
-            text: "Toggle Smooth Objects On"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.objectSmooth === false) {
-                    smoothText.text = "Toggle Smooth Objects Off"
-                    testscatter.objectSmooth = true;
-                } else {
-                    smoothText.text = "Toggle Smooth Objects On"
-                    testscatter.objectSmooth = false;
-                }
+        onClicked: {
+            if (scatterGraph.objectSmoothingEnabled === false) {
+                text = "Use Flat Dots";
+                scatterGraph.objectSmoothingEnabled = true;
+            } else {
+                text = "Use Smooth Dots"
+                scatterGraph.objectSmoothingEnabled = false;
             }
         }
     }
-    Rectangle {
+
+    NewButton {
         id: cameraToggle
-        width: 130
-        height: 30
+        width: parent.width / 6
+        text: "Change Camera Placement"
         anchors.left: smoothToggle.right
-
-        TextArea {
-            text: "Toggle Camera Preset"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.cameraPreset === Scatter3D.PresetFront) {
-                    testscatter.cameraPreset = Scatter3D.PresetIsometricRightHigh;
-                } else {
-                    testscatter.cameraPreset = Scatter3D.PresetFront;
-                }
+        onClicked: {
+            if (scatterGraph.scene.activeCamera.cameraPreset === AbstractGraph3D.CameraPresetFront) {
+                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetIsometricRightHigh;
+            } else {
+                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetFront;
             }
         }
     }
-    Rectangle {
+
+    NewButton {
         id: themeToggle
-        width: 120
-        height: 30
+        width: parent.width / 6
+        text: "Change Theme"
         anchors.left: cameraToggle.right
-
-        TextArea {
-            text: "Toggle Theme"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.theme === Scatter3D.ThemeBlueCerulean) {
-                    testscatter.theme = Scatter3D.ThemeSystem;
-                } else {
-                    testscatter.theme = Scatter3D.ThemeBlueCerulean;
-                }
+        onClicked: {
+            if (scatterGraph.theme === AbstractGraph3D.ThemeArmyBlue) {
+                scatterGraph.theme = AbstractGraph3D.ThemeIsabelle;
+            } else {
+                scatterGraph.theme = AbstractGraph3D.ThemeArmyBlue;
             }
         }
     }
-    Rectangle {
+
+    NewButton {
         id: backgroundToggle
-        width: 130
-        height: 30
+        width: parent.width / 6
+        text: "Hide Background"
         anchors.left: themeToggle.right
-
-        TextArea {
-            id: backgroundText
-            text: "Toggle Background Off"
-            anchors.fill: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (testscatter.backgroundVisible === true) {
-                    testscatter.backgroundVisible = false;
-                    backgroundText.text = "Toggle Background On";
-                } else {
-                    testscatter.backgroundVisible = true;
-                    backgroundText.text = "Toggle Background Off";
-                }
+        onClicked: {
+            if (scatterGraph.backgroundVisible === true) {
+                scatterGraph.backgroundVisible = false;
+                text = "Show Background";
+            } else {
+                scatterGraph.backgroundVisible = true;
+                text = "Hide Background";
             }
         }
     }
 
+    NewButton {
+        id: exitButton
+        width: parent.width / 6
+        text: "Quit"
+        anchors.left: backgroundToggle.right
+        onClicked: Qt.quit(0);
+    }
 }

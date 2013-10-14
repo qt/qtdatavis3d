@@ -4,7 +4,7 @@
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
-** This file is part of the QtDataVis3D module.
+** This file is part of the QtDataVisualization module.
 **
 ** Licensees holding valid Qt Enterprise licenses may use this file in
 ** accordance with the Qt Enterprise License Agreement provided with the
@@ -19,11 +19,150 @@
 /*!
     \example qmlscatter
     \title Qt Quick 2 Scatter Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Scatter3D in a QML application.
 
-    The Qt Quick 2 scatter example shows how to make a simple scatter chart visualization using
-    Q3DScatter using Qt Quick 2.
+    The Qt Quick 2 scatter example shows how to make a simple scatter graph visualization using
+    Scatter3D and Qt Quick 2.
 
     \image qmlscatter-example.png
 
-    TODO
+    \section1 Creating the application
+
+    The application main is created by creating a new Qt Quick 2 Application project in QtCreator:
+
+    \image qmlscatter-newproject.png
+
+    We'll modify the generated \c main.cpp a bit, as we want to add our \c main.qml file as a
+    resource. We do it by replacing
+
+    \code viewer.setMainQmlFile(QStringLiteral("qml/qmlscatter/main.qml")); \endcode
+
+    with
+
+    \snippet ../examples/qmlscatter/main.cpp 0
+
+    This will help us when deploying the application to Android. We'll also change the application
+    to be shown maximized by replacing
+
+    \code viewer.showExpanded(); \endcode
+
+    with
+
+    \snippet ../examples/qmlscatter/main.cpp 1
+
+    We won't look into that any closer, as we'll change nothing in the generated
+    \c qtquick2applicationviewer files.
+
+    Next we'll create new qml files for data (\c data.qml) and a QtQuick.Controls button
+    we want to modify a bit (\c newbutton.qml), and add them to the resource file, in addition to
+    main.qml:
+
+    \code
+    <RCC>
+        <qresource prefix="/qml">
+            <file alias="main.qml">qml/qmlscatter/main.qml</file>
+            <file alias="Data.qml">qml/qmlscatter/data.qml</file>
+            <file alias="NewButton.qml">qml/qmlscatter/newbutton.qml</file>
+        </qresource>
+    </RCC>
+    \endcode
+
+    Now the base for our application is done, and we can start setting up the graph.
+
+    \section1 Setting up the graph
+
+    Let's start modifying the generated \c {main.qml}. We can remove all previous content from it,
+    as it has nothing we need.
+
+    First we'll import all the QML modules we need:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 0
+
+    The last \c import just imports all the qml files in the same directory as our \c {main.qml},
+    because that's where \c newbutton.qml and \c data.qml are.
+
+    Then we create our main \c Item, call it \c mainView and set it visible:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 1
+
+    Then we'll add another \c Item inside it, and call it \c dataView. This will be the item to hold
+    the \c Scatter3D graph. We'll anchor it to the parent bottom:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 9
+
+    Next we're ready to add the \c Scatter3D graph itself. We'll add it inside the \c dataView and
+    name it \c {scatterGraph}. Let's make it fill the \c {dataView}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 2
+
+    Now the graph is ready to use, but has no data. It also has the default proxy, axes and visual
+    properties.
+
+    Let's modify some visual properties first by adding the following inside \c {scatterGraph}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 3
+
+    We changed the font, theme and shadow quality. We're happy with the other visual properties,
+    so we won't change them.
+
+    Then it's time to start feeding the graph some data.
+
+    \section1 Adding data to the graph
+
+    Let's create a \c Data item inside the \c mainView and name it \c {graphData}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 4
+
+    This is the component that holds our data in \c {data.qml}. It has an \c Item as the main
+    component.
+
+    In the main component we'll add the data itself in a \c ListModel and name it
+    \c {dataModel}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 0
+    \dots
+
+    That itself doesn't do us much good, so we'll create a \c ScatterDataMapping and name it
+    \c {scatterMapping}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 1
+
+    In \c scatterMapping we need to define axis roles to match the roles in the \c ListElement
+    items of the \c {dataModel}.
+
+    We'll still need a data proxy, so we'll create a \c ItemModelScatterDataProxy and call it
+    \c {modelProxy}:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 2
+
+    We set \c scatterMapping as the active mapping and \c dataModel as the item model.
+
+    We still need to expose the proxy to be usable from \c {main.qml}. We do this by defining it as
+    an alias in the main data component:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 3
+
+    Now we can use the data from \c data.qml with \c scatterGraph in \c {main.qml}. We'll just set
+    \c proxy as the \c dataProxy for the graph:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 5
+
+    We'll set up selection label format and the axes in \c scatterGraph as well:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 6
+
+    After that we'll add a few buttons to the \c mainView to control the graph. We'll only show one
+    as an example:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 7
+
+    Then we'll modify \c dataView to make room for the buttons at the top:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 8
+    \dots
+
+    And we're done!
+
+    \section1 Example contents
 */

@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="main.qml">qml/qmlscatter/main.qml</file>
+        <file alias="Data.qml">qml/qmlscatter/data.qml</file>
+        <file alias="NewButton.qml">qml/qmlscatter/newbutton.qml</file>
     </qresource>
 </RCC>

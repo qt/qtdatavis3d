@@ -1,0 +1,81 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \qmltype ColorGradientStop
+    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \since com.digia.QtDataVisualization 1.0
+    \ingroup datavisualization_qml
+    \brief Defines the color at a position in ColorGradient.
+
+    Defines the color at a position in a ColorGradient.
+
+    \sa ColorGradient
+*/
+
+/*!
+    \qmlproperty real ColorGradientStop::position
+
+    The position property describes the position of this gradient stop.
+
+    The default position is 0.0.
+
+    \sa ColorGradient
+*/
+
+/*!
+    \qmlproperty color ColorGradientStop::color
+
+    The color property describes the color color of this gradient stop.
+
+    The default color is black.
+
+    \sa ColorGradient
+*/
+
+/*!
+    \qmltype ColorGradient
+    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \since com.digia.QtDataVisualization 1.0
+    \ingroup datavisualization_qml
+    \brief Defines a color gradient.
+
+    A gradient is defined by two or more colors, which will be blended seamlessly.
+
+    The colors are specified as a set of ColorGradientStop child items, each of
+    which defines a position on the gradient from 0.0 to 1.0 and a color.
+    The position of each ColorGradientStop is defined by setting its
+    \l{ColorGradientStop::}{position} property; its color is defined using its
+    \l{ColorGradientStop::}{color} property.
+
+    A gradient without any gradient stops falls back to QLinearGradient default,
+    which is black at 0.0 and white at 1.0.
+
+    \sa ColorGradientStop
+*/
+
+/*!
+    \qmlproperty list<ColorGradientStop> ColorGradient::stops
+    \default
+
+    This property holds the gradient stops describing the gradient.
+
+    By default, this property contains an empty list.
+
+    To set the gradient stops, define them as children of the ColorGradient.
+*/

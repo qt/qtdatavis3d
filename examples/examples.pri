@@ -1,7 +1,7 @@
 android {
     target.path = /libs/$$ANDROID_TARGET_ARCH
 } else {
-    target.path = $$[QT_INSTALL_EXAMPLES]/datavis3d/$$TARGET
+    target.path = $$[QT_INSTALL_EXAMPLES]/datavisualization/$$TARGET
 }
 
 win32 {
@@ -13,11 +13,13 @@ win32 {
 
 LIBS += -L$$OUT_PWD/../../lib
 
-QT += datavis3d
+TEMPLATE = app
+
+QT += datavisualization
 
 contains(TARGET, qml.*) {
-    uri = com.digia.QtDataVis3D
-    lib_name = datavis3dqml2
+    uri = com.digia.QtDataVisualization
+    lib_name = datavisualizationqml2
 
     uri_replaced = $$replace(uri, \\., $$QMAKE_DIR_SEP)
     make_qmldir_path = $$DESTDIR/$$uri_replaced
@@ -25,11 +27,12 @@ contains(TARGET, qml.*) {
         make_qmldir_target = \"$$replace(make_qmldir_path, /, $$QMAKE_DIR_SEP)\"
         system($$QMAKE_MKDIR $$make_qmldir_target)
     }
-    copy_qmldir_examples.target = $$make_qmldir_path/qmldir
-    copy_qmldir_examples.depends = $$_PRO_FILE_PWD_/../../src/$$lib_name/qmldir
-    copy_qmldir_examples.commands = $(COPY_FILE) \"$$replace(copy_qmldir_examples.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_qmldir_examples.target, /, $$QMAKE_DIR_SEP)\"
-    QMAKE_EXTRA_TARGETS += copy_qmldir_examples
-    PRE_TARGETDEPS += $$copy_qmldir_examples.target
+    copy_qmldir.target = $$make_qmldir_path/qmldir
+    copy_qmldir.depends = $$_PRO_FILE_PWD_/../../src/$$lib_name/qmldir
+    copy_qmldir_formatted = \"$$replace(copy_qmldir.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_qmldir.target, /, $$QMAKE_DIR_SEP)\"
+    copy_qmldir.commands = $(COPY_FILE) $$copy_qmldir_formatted
+    QMAKE_EXTRA_TARGETS += copy_qmldir
+    PRE_TARGETDEPS += $$copy_qmldir.target
 
     win32 {
         CONFIG(debug, release|debug) {
@@ -56,13 +59,16 @@ contains(TARGET, qml.*) {
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib
     copy_lib.depends = $$OUT_PWD/../../src/$$lib_name/$$src_dir/$$src_lib
-    copy_lib.commands = $(COPY_FILE) \"$$replace(copy_lib.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_lib.target, /, $$QMAKE_DIR_SEP)\"
+    copy_lib_formatted = \"$$replace(copy_lib.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_lib.target, /, $$QMAKE_DIR_SEP)\"
+    copy_lib.commands = $(COPY_FILE) $$copy_lib_formatted
     QMAKE_EXTRA_TARGETS += copy_lib
     PRE_TARGETDEPS += $$copy_lib.target
 
     android {
-        android_qmldir.files = $$copy_qmldir_examples.target
-        android_qmldir.path = /assets/imports/$$make_qmldir_target
+        system($$QMAKE_COPY $$copy_qmldir_formatted)
+        system($$QMAKE_COPY $$copy_lib_formatted)
+        android_qmldir.files = $$copy_qmldir.target
+        android_qmldir.path = /assets/qml/$$uri_replaced
         android_qmlplugin.files = $$copy_lib.target
         android_qmlplugin.path = $$target.path
         INSTALLS += android_qmldir android_qmlplugin

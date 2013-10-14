@@ -1,0 +1,159 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example bars
+    \title Bars Example
+    \ingroup qtdatavisualization_examples
+    \brief Using Q3DBars in a widget application.
+
+    The bars example shows how to make a 3D bar graph using Q3DBars and combining the use of
+    widgets for adjusting several adjustable qualities. The example shows how to:
+
+    \list
+        \li Create an application with Q3DBars and some widgets
+        \li Use QBarDataProxy to set data to the graph
+        \li Adjust some graph properties using widget controls
+    \endlist
+
+    It also demonstrates how having negative bar values affects the graph.
+
+    \image bars-example.png
+
+    \section1 Creating the application
+
+    First, in main.cpp, we create a QApplication, instantiate Q3DBars and a window container
+    for it:
+
+    \snippet ../examples/bars/main.cpp 0
+
+    The call to QWidget::createWindowContainer is required, as all data visualization types
+    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
+    as a widget any other way.
+
+    Then we'll create horizontal and vertical layouts. We'll add the graph and the vertical
+    layout into the horizontal one:
+
+    \snippet ../examples/bars/main.cpp 1
+
+    We're not using the vertical layout for anything yet, but we'll get back to it in
+    \l {Using widgets to control the graph}
+
+    Next, let's create another class to handle the data addition and other interaction with the
+    graph. Let's call it GraphModifier (See \l {Setting up the graph} and
+    \l {Adding data to the graph} for details):
+
+    \snippet ../examples/bars/main.cpp 2
+
+    The application main is done and we can show the graph and start the event loop:
+
+    \snippet ../examples/bars/main.cpp 3
+
+    \section1 Setting up the graph
+
+    Let's set up the graph in the constructor of the GraphModifier class we instantiated in the
+    application main:
+
+    \snippet ../examples/bars/graphmodifier.cpp 0
+
+    Let's take a closer look at parts of the code.
+
+    First we're creating the axes and the proxy into member variables to support changing them
+    easily later on, if we want to:
+
+    \snippet ../examples/bars/graphmodifier.cpp 1
+
+    Then we're setting some of the visual qualities for the graph:
+
+    \snippet ../examples/bars/graphmodifier.cpp 2
+
+    We're also setting up the axes and adding them to the graph. Notice that we're not setting them
+    active yet:
+
+    \snippet ../examples/bars/graphmodifier.cpp 3
+
+    And add the proxy. Note that we're not setting it active yet, but just adding it:
+
+    \snippet ../examples/bars/graphmodifier.cpp 4
+
+    That concludes setting up the graph.
+
+    \section1 Adding data to the graph
+
+    At the end of the constructor there's a call:
+
+    \code resetTemperatureData(); \endcode
+
+    The method is used to add data to the proxy:
+
+    \snippet ../examples/bars/graphmodifier.cpp 5
+
+    Now the data is in the proxy, but not in the graph. We have not set the proxy active yet.
+
+    In application main, we called \c {modifier->start()} after constructing all the necessary
+    objects. This is what is done in it:
+
+    \snippet ../examples/bars/graphmodifier.cpp 6
+
+    Finally we set the proxy and the axes active. Now our graph has the data and is ready to be
+    used.
+
+    \section1 Using widgets to control the graph
+
+    There isn't much interaction yet, so let's continue by adding some widgets back in the
+    application main. Let's just focus on two:
+
+    \snippet ../examples/bars/main.cpp 4
+
+    We can use these to rotate the graph using slider widgets instead of just using the mouse or
+    touch.
+
+    Let's add them to the vertical layout we created earlier:
+
+    \snippet ../examples/bars/main.cpp 5
+
+    Then we'll connect them to methods in GraphModifier:
+
+    \snippet ../examples/bars/main.cpp 6
+
+    Here are the methods in GraphModifier the signals were connected to:
+
+    \snippet ../examples/bars/graphmodifier.cpp 7
+
+    Now these two sliders can be used to rotate the graph.
+
+    And so we have an application in which we can control:
+
+    \list
+        \li Graph rotation
+        \li Label style
+        \li Camera preset
+        \li Background visibility
+        \li Grid visibility
+        \li Bar shading smoothness
+        \li Bar style
+        \li Selection mode
+        \li Theme
+        \li Shadow quality
+        \li Font
+        \li Font size
+    \endlist
+
+    \section1 Example contents
+
+*/

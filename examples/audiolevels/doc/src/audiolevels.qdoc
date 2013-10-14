@@ -1,0 +1,85 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example audiolevels
+    \title Audiolevels Example
+    \ingroup qtdatavisualization_examples
+    \brief Simple application showing real time audio data.
+
+    The audiolevels example shows how feed real-time dynamic data to a graph using Q3DBars.
+
+    This example reads the audio levels from a microphone and displays those levels
+    in a bar graph. To increase the load for demonstration purposes, and to make the
+    graph little fancier, slightly modified data is used to fill multiple rows.
+
+    \image audiolevels-example.png
+
+    The interesting stuff happens in AudioLevels and AudioLevelsIODevice classes, so we
+    concentrate on those and skip explaining the basic Q3DBars functionality - for that see
+    \l{Bars Example}.
+
+    AudioLevelsIODevice subclasses QIODevice and is given as input device for QAudioInput
+    class, so it receives microphone data.
+
+    In the header file for QAudioInput class we declare necessary members:
+
+    \snippet ../examples/audiolevels/audiolevels.h 0
+
+    And initialize the microphone listening in the source:
+
+    \snippet ../examples/audiolevels/audiolevels.cpp 0
+
+    In the header file for AudioLevelsIODevice class we store pointers to the data proxy and
+    also the data array we give to the proxy, because we reuse the same array to keep memory
+    reallocations to the minimum:
+
+    \snippet ../examples/audiolevels/audiolevelsiodevice.h 0
+
+    In the source file we define some static constants to define size of the data array and
+    the middle row index, as well as the resolution of the visualization. You may need to adjust
+    these values to get decent performance in low-end devices:
+
+    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 1
+
+    The \c resolution constant indicates the sample rate, e.g. value 8 means every eighth
+    byte from audio input is visualized. This is necessary to make the data readable, as it would
+    otherwise make the graph scroll too fast.
+
+    In the AudioLevelsIODevice class constructor we initialize the data array:
+
+    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 0
+
+    The AudioLevelsIODevice::writeData function is called whenever there is new audio data
+    available to be visualized. There we move the old data along the rows and insert new
+    data in the beginning of the rows:
+
+    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 2
+
+    We use a couple of techniques here to improve performance. First off, we reuse
+    the existing data array, as this allows us to avoid any extra memory allocations in our
+    application code. This also means the data array dimensions do not change, which further
+    improves efficiency in the bar graph renderer.
+    Secondly, since the rows are QVectors of QBarDataItems, which do not allocate any data that needs
+    deletion, we can utilize memmove and memcpy functions to quickly move and copy data around.
+
+    \note In the future versions of Qt Data Visualization, QBarDataItem might get extended so that
+    it does allocate some memory to store other optional bar properties besides the value.
+    In use cases where those optional properties are used, using memmove and memcpy would lead to
+    memory leaks, so use them with care.
+*/

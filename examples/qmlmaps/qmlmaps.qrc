@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/images">
-        <file>floorplan.jpg</file>
-    </qresource>
-    <qresource prefix="/qml">
-        <file alias="main.qml">qml/qmlmaps/main.qml</file>
-    </qresource>
-</RCC>

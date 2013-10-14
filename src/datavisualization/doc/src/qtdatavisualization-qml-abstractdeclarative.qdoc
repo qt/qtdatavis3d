@@ -1,0 +1,81 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+  \qmltype AbstractGraph3D
+  \inqmlmodule com.digia.QtDataVisualization 1.0
+  \since com.digia.QtDataVisualization 1.0
+  \ingroup datavisualization_qml
+  \brief Base type for 3D visualizations.
+
+  This type is the base type for all 3D visualizations in QtDataVisualization.
+
+  It resides in the data visualization module that can be imported like this:
+
+  \snippet doc_src_qmldatavisualization.cpp 0
+
+  Note that this type is uncreatable, but contains properties that are shared between
+  the 3D visualizations.
+
+  \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ */
+
+/*!
+  \qmlproperty AbstractGraph3D.SelectionMode AbstractGraph3D::selectionMode
+  Active selection mode in the visualization.
+ */
+/*!
+  \qmlproperty AbstractGraph3D.LabelStyle AbstractGraph3D::labelStyle
+  Label style.
+ */
+
+/*!
+  \qmlproperty AbstractGraph3D.ShadowQuality AbstractGraph3D::shadowQuality
+  Shadow quality.
+ */
+
+/*!
+  \qmlproperty AbstractGraph3D.CameraPreset AbstractGraph3D::cameraPreset
+  Camera preset.
+ */
+
+/*!
+  \qmlproperty AbstractGraph3D.Theme AbstractGraph3D::theme
+  Theme of the graph. Theme affects visualization colors, label colors, text color, background color, window
+  color and grid color. Lighting is also adjusted by themes.
+ */
+
+/*!
+  \qmlproperty font AbstractGraph3D::font
+  Font used for labels.
+ */
+
+/*!
+  \qmlproperty bool AbstractGraph3D::gridVisible
+  Grid visibility. If false, grid lines are not drawn.
+ */
+
+/*!
+  \qmlproperty bool AbstractGraph3D::backgroundVisible
+  Background visibility. If false, background is not drawn.
+ */
+
+/*!
+  \qmlproperty string AbstractGraph3D::itemLabelFormat
+  Label format of single item labels, e.g. a selected datapoint.
+ */

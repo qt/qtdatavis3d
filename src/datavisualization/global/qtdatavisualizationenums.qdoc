@@ -1,0 +1,176 @@
+/****************************************************************************
+**
+** Copyright (C) 2013 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \namespace QtDataVisualization
+    \inmodule QtDataVisualization
+    \target QtDataVisualization Enums
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::InputState
+
+    Predefined input states for mouse and touch based input handlers. All states are not valid with all input handlers.
+
+    \value InputStateNone
+           Default "no input received" state.
+    \value InputStateOnScene
+           Mouse or touch input received on the 3D scene.
+    \value InputStateOnOverview
+           Mouse or touch input received on the overview area.
+    \value InputStateOnSlice
+           Mouse or touch input received on the slice view area.
+    \value InputStateRotating
+           Rotation of the 3D geometry ongoing.
+    \value InputStateOnPinch
+           Pinch/punch multitouch input received.
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::MeshStyle
+
+    Predefined mesh types. All styles are not usable with all visualization types.
+
+    \value MeshStyleBars
+           Basic cubic bar.
+    \value MeshStylePyramids
+           Four-sided pyramid.
+    \value MeshStyleCones
+           Basic cone.
+    \value MeshStyleCylinders
+           Basic cylinder.
+    \value MeshStyleBevelBars
+           Slightly beveled (rounded) cubic bar.
+    \value MeshStyleSpheres
+           Sphere. Not usable in Q3DBars.
+    \value MeshStyleDots
+           Triangular pyramid. Usable only with Q3DScatter.
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::CameraPreset
+
+    Predefined positions for camera.
+
+    \value CameraPresetNone
+           Used to indicate a preset has not been set, or the scene has been rotated freely.
+    \value CameraPresetFrontLow
+    \value CameraPresetFront
+    \value CameraPresetFrontHigh
+    \value CameraPresetLeftLow
+    \value CameraPresetLeft
+    \value CameraPresetLeftHigh
+    \value CameraPresetRightLow
+    \value CameraPresetRight
+    \value CameraPresetRightHigh
+    \value CameraPresetBehindLow
+    \value CameraPresetBehind
+    \value CameraPresetBehindHigh
+    \value CameraPresetIsometricLeft
+    \value CameraPresetIsometricLeftHigh
+    \value CameraPresetIsometricRight
+    \value CameraPresetIsometricRightHigh
+    \value CameraPresetDirectlyAbove
+    \value CameraPresetDirectlyAboveCW45
+    \value CameraPresetDirectlyAboveCCW45
+    \value CameraPresetFrontBelow
+           In Q3DBars from CameraPresetFrontBelow onward these only work for graphs including negative
+           values. They act as Preset...Low for positive-only values.
+    \value CameraPresetLeftBelow
+    \value CameraPresetRightBelow
+    \value CameraPresetBehindBelow
+    \value CameraPresetDirectlyBelow
+           Acts as CameraPresetFrontLow for positive -only bars.
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::Theme
+
+    Predefined themes.
+
+    \value ThemeDefault
+           Used only in QML to indicate a theme has not been set.
+    \value ThemeQt
+    \value ThemePrimaryColors
+    \value ThemeDigia
+    \value ThemeStoneMoss
+    \value ThemeArmyBlue
+    \value ThemeRetro
+    \value ThemeEbony
+    \value ThemeIsabelle
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::SelectionMode
+
+    Item selection modes.
+
+    \value SelectionModeNone
+           Selection mode disabled.
+    \value SelectionModeItem
+           Selection selects a single item.
+    \value SelectionModeItemAndRow
+           Selection selects a single item and highlights the row it is on. In Q3DBars only.
+    \value SelectionModeItemAndColumn
+           Selection selects a single item and highlights the column it is on. In Q3DBars only.
+    \value SelectionModeItemRowAndColumn
+           Selection selects a single item and highlights the row and the column it is on. In
+           Q3DBars only.
+    \value SelectionModeSliceRow
+           Selection selects a single item and displays the row it is on in a separate view. The
+           original view is shrunk into upper left corner. Original view is restored by clicking
+           on it. In Q3DBars only.
+    \value SelectionModeSliceColumn
+           Selection selects a single item and displays the column it is on in a separate view. The
+           original view is shrunk into upper left corner. Original view is restored by clicking
+           on it. In Q3DBars only.
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::ShadowQuality
+
+    Quality of shadows.
+
+    \value ShadowQualityNone
+           Shadows are disabled.
+    \value ShadowQualityLow
+           Shadows are rendered in low quality.
+    \value ShadowQualityMedium
+           Shadows are rendered in medium quality.
+    \value ShadowQualityHigh
+           Shadows are rendered in high quality.
+    \value ShadowQualitySoftLow
+           Shadows are rendered in low quality with softened edges.
+    \value ShadowQualitySoftMedium
+           Shadows are rendered in medium quality with softened edges.
+    \value ShadowQualitySoftHigh
+           Shadows are rendered in high quality with softened edges.
+*/
+
+/*!
+    \enum QtDataVisualization::QDataVis::LabelStyle
+
+    Label styles.
+
+    \value LabelStyleOpaque
+           Fully opaque background, using colors and borders from theme.
+    \value LabelStyleFromTheme
+           Use transparencies, colors and borders from theme.
+    \value LabelStyleTransparent
+           Fully transparent background, using text color from theme.
+*/
