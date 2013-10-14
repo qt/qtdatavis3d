@@ -1,7 +1,10 @@
-TARGET = QtDataVisualization
-QT = core gui
+# Target can't start with 'Qt' as it gets major version number inserted into it in that case,
+# which we don't want.
+TARGET = DataVisualization
 
+QT = core gui
 DEFINES += QT_DATAVISUALIZATION_LIBRARY
+MODULE_INCNAME = QtDataVisualization
 
 QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
 
