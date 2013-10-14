@@ -82,11 +82,13 @@ QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel, 
 //! [6]
 qmake
 make
+make install
 //! [6]
 
 //! [7]
 qmake CONFIG+=static
 make
+make install
 //! [7]
 
 //! [8]

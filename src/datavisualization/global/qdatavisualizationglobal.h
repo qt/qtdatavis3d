@@ -21,13 +21,13 @@
 
 #include <qglobal.h>
 
-#define QT_DATAVISUALIZATION_VERSION_STR   "0.0.1"
+#define QT_DATAVISUALIZATION_VERSION_STR   "0.1.0"
 /*
    QT_DATAVISUALIZATION_VERSION is (major << 16) + (minor << 8) + patch.
 */
-#define QT_DATAVISUALIZATION_VERSION       0x000001
+#define QT_DATAVISUALIZATION_VERSION       0x000100
 /*
-   can be used like #if (QT_DATAVISUALIZATION_VERSION >= QT_DATAVISUALIZATION_VERSION_CHECK(1, 1, 0))
+   can be used like #if (QT_DATAVISUALIZATION_VERSION >= QT_DATAVISUALIZATION_VERSION_CHECK(1, 0, 0))
 */
 #define QT_DATAVISUALIZATION_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
 

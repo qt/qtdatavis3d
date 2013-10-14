@@ -93,12 +93,6 @@ void Drawer::setStyle(QDataVis::LabelStyle style)
 void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
                         GLuint depthTextureId)
 {
-    // Store the GL state before changing
-    GLint oldActiveTex[1];
-    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
-    GLint oldTexId[1];
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
-
     if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
@@ -147,8 +141,8 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glDisableVertexAttribArray(shader->posAtt());
 
     // Restore the GL state
-    glActiveTexture(*oldActiveTex);
-    glBindTexture(GL_TEXTURE_2D, *oldTexId);
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)

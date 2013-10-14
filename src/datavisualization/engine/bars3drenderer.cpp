@@ -43,6 +43,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
+const int smallerVPSize = 5;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
@@ -356,7 +357,6 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                          m_cachedTheme.m_ambientStrength * 2.0f);
             // Draw the object
 #if defined (Q_OS_MAC)
-            // Mac slice issue hack fix. TODO: Fix correctly
             m_drawer->drawObject(m_barShader, m_barObj, 0, -1);
 #else
             m_drawer->drawObject(m_barShader, m_barObj);
@@ -481,7 +481,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->viewMatrix();
 
     // Calculate drawing order
-    // Draw order is reversed to optimize amount of drawing (ie. draw front objects first, depth test handles not needing to draw objects behind them)
+    // Draw order is reversed to optimize amount of drawing (ie. draw front objects first,
+    // depth test handles not needing to draw objects behind them)
     if (viewMatrix.row(0).x() > 0) {
         startRow = 0;
         stopRow = m_cachedRowCount;
@@ -530,7 +531,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && !m_cachedIsSlicingActivated) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -540,7 +541,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_depthShader->bind();
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+        // Depth viewport must always start from 0, 0, as it is rendered into a texture, not screen
+        glViewport(0, 0,
                    m_mainViewPort.width() * m_shadowQualityMultiplier,
                    m_mainViewPort.height() * m_shadowQualityMultiplier);
 
@@ -688,8 +690,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-                // TODO: Save position to qdataitem, so that we don't need to calculate it each time?
-
                 //#if !defined(QT_OPENGL_ES_2)
                 //                QVector3D barColor = QVector3D((GLdouble)row / 32767.0,
                 //                                               (GLdouble)bar / 32767.0,
@@ -812,7 +812,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
 #if 0
             QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
-            QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.height();
+            QVector3D heightColor = Utils::vectorFromColor(m_cachedTheme.m_heightColor)
+                    * item.height();
             QVector3D depthColor = Utils::vectorFromColor(m_cachedTheme.m_depthColor)
                     * (float(row) / GLfloat(m_cachedRowCount));
 
@@ -902,11 +903,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                              itModelMatrix.transposed().inverted());
                 m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
                 m_barShader->setUniformValue(m_barShader->color(), barColor);
-                m_barShader->setUniformValue(m_barShader->ambientS(), m_cachedTheme.m_ambientStrength);
+                m_barShader->setUniformValue(m_barShader->ambientS(),
+                                             m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone
-                        && !m_cachedIsSlicingActivated) {
+                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
                     m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
@@ -921,12 +922,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
 
                     // Draw the object
-#if defined (Q_OS_MAC)
-                    // Mac slice issue hack fix. TODO: Fix correctly
-                    m_drawer->drawObject(m_barShader, m_barObj, 0, -1);
-#else
                     m_drawer->drawObject(m_barShader, m_barObj);
-#endif
                 }
             }
         }
@@ -1286,8 +1282,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
-                                alignment);
+                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                true, true, Drawer::LabelMid, alignment);
         }
     }
     for (int column = 0; column != m_cachedColumnCount; column += 1) {
@@ -1324,8 +1320,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
-                                alignment);
+                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                true, true, Drawer::LabelMid, alignment);
         }
     }
 
@@ -1373,8 +1369,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
-                                alignment);
+                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                true, true, Drawer::LabelMid, alignment);
 
             // Side wall
             if (m_xFlipped)
@@ -1394,8 +1390,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 QVector3D(0.0f, m_yAdjustment, zComp),
                                 QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
-                                alignment);
+                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                true, true, Drawer::LabelMid, alignment);
         }
         labelNbr++;
         labelPos += heightStep;
@@ -1498,9 +1494,10 @@ void Bars3DRenderer::handleResize()
     // Set view port
     if (m_cachedIsSlicingActivated) {
         m_mainViewPort = QRect(0,
-                               m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / 5,
-                               m_cachedBoundingRect.width() / 5,
-                               m_cachedBoundingRect.height() / 5);
+                               m_cachedBoundingRect.height()
+                               - (m_cachedBoundingRect.height() / smallerVPSize),
+                               m_cachedBoundingRect.width() / smallerVPSize,
+                               m_cachedBoundingRect.height() / smallerVPSize);
         m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
     } else {
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
@@ -1722,14 +1719,16 @@ Bars3DController::SelectionType Bars3DRenderer::isSelected(GLint row, GLint bar)
     if (current == m_selection) {
         isSelectedType = Bars3DController::SelectionItem;
     }
-    else if (current.y() == m_selection.y() && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndColumn
-                                                || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn)) {
+    else if (current.y() == m_selection.y()
+             && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndColumn
+                 || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
+                 || m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn)) {
         isSelectedType = Bars3DController::SelectionColumn;
     }
-    else if (current.x() == m_selection.x() && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndRow
-                                                || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
-                                                || m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)) {
+    else if (current.x() == m_selection.x()
+             && (m_cachedSelectionMode == QDataVis::SelectionModeItemAndRow
+                 || m_cachedSelectionMode == QDataVis::SelectionModeItemRowAndColumn
+                 || m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)) {
         isSelectedType = Bars3DController::SelectionRow;
     }
     return isSelectedType;
@@ -1742,22 +1741,20 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
     if (isSlicing) {
-        m_mainViewPort = QRect(0, m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / 5,
-                               m_cachedBoundingRect.width() / 5, m_cachedBoundingRect.height() / 5);
+        m_mainViewPort = QRect(0,
+                               m_cachedBoundingRect.height()
+                               - (m_cachedBoundingRect.height() / smallerVPSize),
+                               m_cachedBoundingRect.width() / smallerVPSize,
+                               m_cachedBoundingRect.height() / smallerVPSize);
         m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-        if (m_depthTexture) {
-            m_textureHelper->deleteTexture(&m_depthTexture);
-            m_depthTexture = 0;
-        }
     } else {
-        m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
-                               this->m_cachedBoundingRect.height());
+        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
         m_sliceViewPort = QRect(0, 0, 0, 0);
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
-#if !defined(QT_OPENGL_ES_2)
-        updateDepthBuffer(); // Re-init depth buffer as well
-#endif
     }
+#if !defined(QT_OPENGL_ES_2)
+    updateDepthBuffer(); // Re-init depth buffer as well
+#endif
 }
 
 QRect Bars3DRenderer::mainViewPort()
@@ -1807,9 +1804,6 @@ void Bars3DRenderer::initDepthShader()
 
 void Bars3DRenderer::updateDepthBuffer()
 {
-    if (m_cachedIsSlicingActivated)
-        return;
-
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
