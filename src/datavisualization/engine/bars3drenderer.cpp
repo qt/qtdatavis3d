@@ -758,6 +758,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Bind bar shader
     m_barShader->bind();
 
+    // Set common bar shader bindings
+    m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
+    m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
+    m_barShader->setUniformValue(m_barShader->ambientS(),
+                                 m_cachedTheme.m_ambientStrength);
+
     bool selectionDirty = (m_selection != m_previousSelection
             || (m_selection != selectionSkipColor
             && QDataVis::InputStateOnScene == m_controller->inputState()
@@ -894,15 +900,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             // Skip drawing of 0 -height bars
             if (item.height() != 0) {
                 // Set shader bindings
-                m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-                m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
                 m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
                 m_barShader->setUniformValue(m_barShader->nModel(),
                                              itModelMatrix.transposed().inverted());
                 m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
                 m_barShader->setUniformValue(m_barShader->color(), barColor);
-                m_barShader->setUniformValue(m_barShader->ambientS(),
-                                             m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
