@@ -295,6 +295,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     // Bind bar shader
     m_barShader->bind();
 
+    // Set common bar shader bindings
+    m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
+    m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
+    m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
+    m_barShader->setUniformValue(m_barShader->ambientS(),
+                                 m_cachedTheme.m_ambientStrength * 2.0f);
     // Draw bars
     // Draw the selected row / column
     for (int bar = startBar; bar != stopBar; bar += stepBar) {
@@ -345,22 +351,14 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
         if (item->height() != 0) {
             // Set shader bindings
-            m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-            m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
             m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
             m_barShader->setUniformValue(m_barShader->nModel(),
                                          itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
             m_barShader->setUniformValue(m_barShader->color(), barColor);
-            m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
-            m_barShader->setUniformValue(m_barShader->ambientS(),
-                                         m_cachedTheme.m_ambientStrength * 2.0f);
+
             // Draw the object
-#if defined (Q_OS_MAC)
-            m_drawer->drawObject(m_barShader, m_barObj, 0, -1);
-#else
             m_drawer->drawObject(m_barShader, m_barObj);
-#endif
         }
     }
 
@@ -412,7 +410,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                         m_labelObj, m_cachedScene->activeCamera(), false, false, Drawer::LabelLeft);
 
     // Draw labels for bars
-    for (int col = 0; col < m_sliceSelection->size(); col++) {
+    for (int col = 0; col < stopBar; col++) {
         BarRenderItem *item = m_sliceSelection->at(col);
         // Draw values
         if (negativesComp == 1.0f) {
@@ -760,6 +758,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Bind bar shader
     m_barShader->bind();
 
+    // Set common bar shader bindings
+    m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
+    m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
+    m_barShader->setUniformValue(m_barShader->ambientS(),
+                                 m_cachedTheme.m_ambientStrength);
+
     bool selectionDirty = (m_selection != m_previousSelection
             || (m_selection != selectionSkipColor
             && QDataVis::InputStateOnScene == m_controller->inputState()
@@ -896,15 +900,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             // Skip drawing of 0 -height bars
             if (item.height() != 0) {
                 // Set shader bindings
-                m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-                m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
                 m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
                 m_barShader->setUniformValue(m_barShader->nModel(),
                                              itModelMatrix.transposed().inverted());
                 m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
                 m_barShader->setUniformValue(m_barShader->color(), barColor);
-                m_barShader->setUniformValue(m_barShader->ambientS(),
-                                             m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
