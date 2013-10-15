@@ -93,9 +93,7 @@ public slots:
     void handleArrayReset();
 
 signals:
-    void smoothStatusChanged(bool enable);
-    void surfaceGridChanged(bool enable);
-    void segmentCountChanged(GLint segmentCount, GLfloat step, GLfloat minimum);
+    void smoothSurfaceEnabledChanged(bool enable);
 
 private:
     void adjustValueAxisRange();

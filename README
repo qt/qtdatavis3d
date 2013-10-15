@@ -59,3 +59,4 @@ others may be only partially implemented. Here are some known issues:
 - Android doesn't support both widgets and OpenGL simulataneously, so only
   the Qt Quick 2 API is usable in practice in Android.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
+- Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).

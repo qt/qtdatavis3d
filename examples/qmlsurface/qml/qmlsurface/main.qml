@@ -70,6 +70,17 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
             gradient: surfaceGradient
+
+            // Since flat is not supported on all platforms, and changes back to smooth
+            // asynchronously on those platforms, handle button text on changed
+            // signal handler rather than when we set the value.
+            onSmoothSurfaceEnabledChanged: {
+                if (enabled === true) {
+                    smoothSurfaceToggle.text = "Show Flat"
+                } else {
+                    smoothSurfaceToggle.text = "Show Smooth"
+                }
+            }
         }
     }
 
@@ -81,7 +92,7 @@ Item {
         text: "Show Surface Grid"
         //! [1]
         onClicked: {
-            if (surfaceplot.surfaceGridEnabled == false) {
+            if (surfaceplot.surfaceGridEnabled === false) {
                 surfaceplot.surfaceGridEnabled = true;
                 text = "Hide Surface Grid"
             } else {
@@ -99,12 +110,10 @@ Item {
         text: "Show Flat"
         //! [2]
         onClicked: {
-            if (surfaceplot.smoothSurfaceEnabled == true) {
+            if (surfaceplot.smoothSurfaceEnabled === true) {
                 surfaceplot.smoothSurfaceEnabled = false;
-                text = "Show Smooth"
             } else {
                 surfaceplot.smoothSurfaceEnabled = true;
-                text = "Show Flat"
             }
         }
         //! [2]
@@ -116,7 +125,7 @@ Item {
         width: smoothSurfaceToggle.width
         text: "Hide Background"
         onClicked: {
-            if (surfaceplot.backgroundVisible == true) {
+            if (surfaceplot.backgroundVisible === true) {
                 surfaceplot.backgroundVisible = false;
                 text = "Show Background"
             } else {
@@ -132,7 +141,7 @@ Item {
         width: backgroundToggle.width
         text: "Hide Grid"
         onClicked: {
-            if (surfaceplot.gridVisible == true) {
+            if (surfaceplot.gridVisible === true) {
                 surfaceplot.gridVisible = false;
                 text = "Show Grid"
             } else {

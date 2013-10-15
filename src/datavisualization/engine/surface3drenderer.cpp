@@ -114,7 +114,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionModeChanged(false),
       m_hasHeightAdjustmentChanged(true)
 {
-#if !defined(QT_OPENGL_ES_2)
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
@@ -122,7 +121,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
         m_flatSupported = false;
         m_controller->setSmoothSurface(true);
     }
-#endif
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();
     updateSurfaceGridStatus(m_controller->surfaceGrid());
@@ -815,13 +813,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
-    GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
 
     QVector3D surfaceScaler(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);
     QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ + zComp);
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
+    GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
@@ -966,10 +964,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->release();
 
         // Put the RGBA value back to uint
-#if defined (Q_OS_ANDROID)
-        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
-#else
+#if !defined(QT_OPENGL_ES_2)
         selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+#else
+        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
 
         selectionDirty = true;

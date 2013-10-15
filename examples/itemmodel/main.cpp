@@ -159,7 +159,7 @@ void GraphDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 10.0},     // week 1
+    qreal hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 10.0},     // week 1
                          {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
                          {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
                          {0.0, 1.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
