@@ -149,6 +149,7 @@ public slots:
     void updateSelectionMode(QDataVis::SelectionMode mode);
 
 private:
+    void setViewPorts();
     void updateSliceDataModel(int selectionId);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();

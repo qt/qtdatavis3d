@@ -534,7 +534,8 @@ void Surface3DRenderer::drawSlicedScene()
         surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
         surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
         surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
-        surfaceShader->setUniformValue(surfaceShader->nModel(), itModelMatrix.inverted().transposed());
+        surfaceShader->setUniformValue(surfaceShader->nModel(),
+                                       itModelMatrix.inverted().transposed());
         surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
         surfaceShader->setUniformValue(surfaceShader->color(), color);
         surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
@@ -571,16 +572,16 @@ void Surface3DRenderer::drawSlicedScene()
         // Bind line shader
         lineShader->bind();
 
+        // Set unchanging shader bindings
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        lineShader->setUniformValue(lineShader->lightP(), lightPos);
+        lineShader->setUniformValue(lineShader->view(), viewMatrix);
+        lineShader->setUniformValue(lineShader->color(), lineColor);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
+        lineShader->setUniformValue(lineShader->lightS(), 0.25f);
+
         if (m_axisCacheY.segmentCount() > 0) {
             QVector3D gridLineScaleX(scaleXBackground, gridLineWidth, gridLineWidth);
-
-            // Set unchanging shader bindings
-            QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
-            lineShader->setUniformValue(lineShader->lightP(), lightPos);
-            lineShader->setUniformValue(lineShader->view(), viewMatrix);
-            lineShader->setUniformValue(lineShader->color(), lineColor);
-            lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
-            lineShader->setUniformValue(lineShader->lightS(), 0.25f);
 
             // Back wall
             GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
@@ -831,7 +832,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_depthShader->bind();
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+        glViewport(0, 0,
                    m_mainViewPort.width() * m_shadowQualityMultiplier,
                    m_mainViewPort.height() * m_shadowQualityMultiplier);
 
@@ -1877,23 +1878,7 @@ void Surface3DRenderer::handleResize()
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
 
-    // Set view port
-    if (m_cachedIsSlicingActivated) {
-        m_mainViewPort = QRect(0,
-                               m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / subViewDivider,
-                               m_cachedBoundingRect.width() / subViewDivider,
-                               m_cachedBoundingRect.height() / subViewDivider);
-    } else {
-        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    }
-    m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-
-    if (m_selectionPointer) {
-        if (m_cachedIsSlicingActivated)
-            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
-        else
-            m_selectionPointer->updateBoundingRect(m_mainViewPort);
-    }
+    setViewPorts();
 
     Abstract3DRenderer::handleResize();
 }
@@ -1983,7 +1968,8 @@ QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row
 
 void Surface3DRenderer::loadMeshFile()
 {
-    qDebug() << __FUNCTION__ << "should we do something";
+    // Do nothing, not yet supported by this renderer
+    // TODO: To be used for overriding the selection ball mesh after technology preview
 }
 
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
@@ -2028,24 +2014,38 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 
 void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 {
-    if (isSlicing == m_cachedIsSlicingActivated)
+    if (m_cachedIsSlicingActivated == isSlicing)
         return;
 
     m_cachedIsSlicingActivated = isSlicing;
-    if (isSlicing) {
-        m_mainViewPort = QRect(0, m_cachedBoundingRect.height() - m_cachedBoundingRect.height() / subViewDivider,
-                               m_cachedBoundingRect.width() / subViewDivider, m_cachedBoundingRect.height() / subViewDivider);
-        if (m_depthTexture) {
-            m_textureHelper->deleteTexture(&m_depthTexture);
-            m_depthTexture = 0;
-        }
-    } else {
-        m_mainViewPort = QRect(0, 0, this->m_cachedBoundingRect.width(),
-                               this->m_cachedBoundingRect.height());
+
+    setViewPorts();
+
+    if (!m_cachedIsSlicingActivated)
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+
 #if !defined(QT_OPENGL_ES_2)
-        updateDepthBuffer(); // Re-init depth buffer as well
+    updateDepthBuffer(); // Re-init depth buffer as well
 #endif
+}
+
+void Surface3DRenderer::setViewPorts()
+{
+    // Update view ports
+    if (m_cachedIsSlicingActivated) {
+        m_mainViewPort = QRect(0,
+                               m_cachedBoundingRect.height()
+                               - (m_cachedBoundingRect.height() / subViewDivider),
+                               m_cachedBoundingRect.width() / subViewDivider,
+                               m_cachedBoundingRect.height() / subViewDivider);
+        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+        if (m_selectionPointer)
+            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+    } else {
+        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
+        m_sliceViewPort = QRect(0, 0, 0, 0);
+        if (m_selectionPointer)
+            m_selectionPointer->updateBoundingRect(m_mainViewPort);
     }
 }
 

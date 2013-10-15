@@ -144,6 +144,7 @@ private:
     void drawScene(GLuint defaultFboHandle);
     void handleResize();
 
+    void setViewPorts();
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
