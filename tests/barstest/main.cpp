@@ -298,7 +298,7 @@ int main(int argc, char **argv)
                      &GraphModifier::changePresetCamera);
     QObject::connect(themeButton, &QPushButton::clicked, modifier, &GraphModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::changeStyle);
+                     &GraphModifier::changeLabelStyle);
     QObject::connect(addDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRow);
     QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRows);
     QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRow);

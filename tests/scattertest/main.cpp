@@ -184,7 +184,7 @@ int main(int argc, char **argv)
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &ScatterDataModifier::changeStyle);
+                     &ScatterDataModifier::changeLabelStyle);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
