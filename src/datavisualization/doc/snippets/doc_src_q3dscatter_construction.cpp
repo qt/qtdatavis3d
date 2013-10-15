@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     //! [0]
     //! [1]
     QScatterDataArray data;
-    data << QVector3D(1.0f, 0.5f, 1.0f) << QVector3D(-1.0f, -0.5f, -1.0f) << QVector3D(0.5f, 0.0f, 0.0f);
+    data << QVector3D(0.5f, 0.5f, 0.5f) << QVector3D(-0.3f, -0.5f, -0.4f) << QVector3D(0.0f, -0.3f, 0.2f);
     scatter->activeDataProxy()->addItems(data);
     //! [1]
     //! [2]

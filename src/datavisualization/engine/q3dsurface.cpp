@@ -66,7 +66,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dsurface_construction.cpp 1
  *
- * First feed the data to the row element and then add it's pointer to the data element:
+ * First feed the data to the row elements and then add their pointers to the data element:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 2
  *
