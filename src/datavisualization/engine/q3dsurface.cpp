@@ -207,7 +207,7 @@ bool Q3DSurface::isBackgroundVisible() const
  * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
- * \warning This property is subject to change.
+ * \preliminary
  */
 void Q3DSurface::setTheme(QDataVis::Theme theme)
 {

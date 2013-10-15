@@ -23,6 +23,8 @@
 
     QtDataVisualization namespace holds all the classes and enumerations in the QtDataVisualization
     module.
+
+    \generatelist{classesbymodule QtDataVisualization}
 */
 
 /*!
