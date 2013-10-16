@@ -25,7 +25,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \inmodule QtDataVisualization
  * \brief The QScatterDataItem class provides a container for resolved data to be added to scatter
  * graphs.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * A QScatterDataItem holds data for a single rendered item in a scatter graph.
  * Scatter data proxies parse data into QScatterDataItem instances for visualizing.

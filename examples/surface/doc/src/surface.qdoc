@@ -34,6 +34,9 @@
         \li Theme usage on the surface graph.
         \li How to set a custom surface gradient.
     \endlist
+
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image surface-example.png
 
     \section1 Creating the application

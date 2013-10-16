@@ -18,7 +18,7 @@
 
 /*!
     \qmltype ColorGradientStop
-    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \inqmlmodule com.digia.QtDataVisualization
     \since com.digia.QtDataVisualization 1.0
     \ingroup datavisualization_qml
     \brief Defines the color at a position in ColorGradient.
@@ -50,7 +50,7 @@
 
 /*!
     \qmltype ColorGradient
-    \inqmlmodule com.digia.QtDataVisualization 1.0
+    \inqmlmodule com.digia.QtDataVisualization
     \since com.digia.QtDataVisualization 1.0
     \ingroup datavisualization_qml
     \brief Defines a color gradient.

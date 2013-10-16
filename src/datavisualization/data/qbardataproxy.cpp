@@ -25,7 +25,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DBars.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QBarDataProxy handles adding, inserting, changing and removing rows of data.
  *
@@ -74,7 +74,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype BarDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QBarDataProxy

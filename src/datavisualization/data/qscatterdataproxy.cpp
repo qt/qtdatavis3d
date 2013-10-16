@@ -25,7 +25,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DScatter.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QScatterDataProxy handles adding, inserting, changing and removing data items.
  *
@@ -58,7 +58,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QScatterDataProxy

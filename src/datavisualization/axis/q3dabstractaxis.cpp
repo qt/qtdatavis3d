@@ -25,7 +25,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DAbstractAxis
  * \inmodule QtDataVisualization
  * \brief Q3DAbstractAxis is base class for axes of a graph.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
@@ -34,7 +34,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype AbstractAxis3D
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates Q3DAbstractAxis

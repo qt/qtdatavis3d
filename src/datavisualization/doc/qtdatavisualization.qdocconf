@@ -41,7 +41,7 @@ qhp.qtdatavisualization.subprojects.classes.selectors           = class
 qhp.qtdatavisualization.subprojects.classes.sortPages           = true
 qhp.qtdatavisualization.subprojects.types.title                 = QML Types
 qhp.qtdatavisualization.subprojects.types.indexTitle            = Qt Data Visualization QML Types
-qhp.qtdatavisualization.subprojects.types.selectors             = class
+qhp.qtdatavisualization.subprojects.types.selectors             = fake:qmlclass
 qhp.qtdatavisualization.subprojects.types.sortPages             = true
 
 HTML.footer = \

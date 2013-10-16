@@ -28,7 +28,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DSurface.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelSurfaceDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DSurface. It maps roles defined in QItemModelSurfaceDataMapping to roles in the model.
@@ -41,7 +41,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ItemModelSurfaceDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelSurfaceDataProxy

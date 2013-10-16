@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelBarDataMapping
  * \inmodule QtDataVisualization
  * \brief Item model mapping for Q3DBars.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelBarDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
  * of Q3DBars. There are three ways to use QItemModelBarDataMapping:
@@ -55,7 +55,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype BarDataMapping
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelBarDataMapping

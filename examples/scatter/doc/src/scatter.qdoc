@@ -32,6 +32,8 @@
         \li Adjust some graph properties using widget controls
     \endlist
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image scatter-example.png
 
     \section1 Creating the application

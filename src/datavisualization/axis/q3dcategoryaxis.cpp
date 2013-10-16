@@ -27,7 +27,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DCategoryAxis
  * \inmodule QtDataVisualization
  * \brief The Q3DCategoryAxis class is used for manipulating an axis of a graph.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * Q3DCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
  * categories based on the data window size defined by setting the axis range.
@@ -38,7 +38,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype CategoryAxis3D
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates Q3DCategoryAxis

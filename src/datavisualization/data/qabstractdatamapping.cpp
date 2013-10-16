@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QAbstractDataMapping
  * \inmodule QtDataVisualization
  * \brief Abstract base class for QtDataVisualization data mapping classes.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * Data mapping classes provide a way to map data from an external data source to one of
  * QtDataVisualization data proxies.

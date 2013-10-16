@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelScatterDataMapping
  * \inmodule QtDataVisualization
  * \brief Item model mapping for Q3DScatter.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelScatterDataMapping is used to map roles of QAbstractItemModel to the XYZ-values
  * of Q3DScatter points.
@@ -44,7 +44,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataMapping
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelScatterDataMapping

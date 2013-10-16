@@ -31,6 +31,8 @@
         \li How to use a table widget to modify the data in the graph
     \endlist
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image itemmodel-example-2.png
 
     \section1 Creating the application

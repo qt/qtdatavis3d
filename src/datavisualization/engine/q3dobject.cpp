@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
    \class Q3DObject
    \inmodule QtDataVisualization
    \brief Simple baseclass for all the objects in the 3D scene.
-   \since 1.0.0
+   \since Qt Data Visualization 1.0
 
     Q3DObject is a baseclass that contains only position information for an object in 3D scene.
     The object is considered to be a single point in the coordinate space without dimensions.

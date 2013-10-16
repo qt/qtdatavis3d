@@ -30,7 +30,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DScene
  * \inmodule QtDataVisualization
  * \brief Q3DScene class provides description of the 3D scene being visualized.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * The 3D scene contains a single active camera and a single active light source.
  * Visualized data is assumed to be at a fixed location.

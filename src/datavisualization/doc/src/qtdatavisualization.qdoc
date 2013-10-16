@@ -27,8 +27,9 @@
 */
 
 /*!
-    \group datavisualization_qml
+    \qmlmodule com.digia.QtDataVisualization 1.0
     \title Qt Data Visualization QML Types
+    \ingroup qmlmodules
 
     \brief QML types for the Qt Data Visualization API.
 

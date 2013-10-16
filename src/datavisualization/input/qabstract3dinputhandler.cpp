@@ -23,7 +23,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
    \class QAbstract3DInputHandler
    \inmodule QtDataVisualization
    \brief Baseclass for implementations of input handlers.
-   \since 1.0.0
+   \since Qt Data Visualization 1.0
 
     QAbstract3DInputHandler is a baseclass that is subclassed by different input handling implementations
     that take input events and translate those to camera and light movements. Input handlers also translate

@@ -32,7 +32,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
    \class Q3DCamera
    \inmodule QtDataVisualization
    \brief Representation of a camera in 3D space.
-   \since 1.0.0
+   \since Qt Data Visualization 1.0
 
     Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the data visualization.
     The class offers simple methods for setting the orbit point in rotations, but allows also setting the 4x4 viewmatrix
