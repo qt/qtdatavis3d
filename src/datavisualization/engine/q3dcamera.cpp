@@ -167,7 +167,7 @@ qreal Q3DCamera::minXRotation() const
  */
 void Q3DCamera::setMinXRotation(qreal minRotation)
 {
-    minRotation = qBound(-180.0, minRotation, 180.0);
+    minRotation = qBound(qreal(-180.0), minRotation, qreal(180.0));
     if (minRotation > d_ptr->m_maxXRotation)
         minRotation = d_ptr->m_maxXRotation;
 
@@ -199,7 +199,7 @@ qreal Q3DCamera::minYRotation() const
  */
 void Q3DCamera::setMinYRotation(qreal minRotation)
 {
-    minRotation = qBound(-90.0, minRotation, 90.0);
+    minRotation = qBound(qreal(-90.0), minRotation, qreal(90.0));
     if (minRotation > d_ptr->m_maxYRotation)
         minRotation = d_ptr->m_maxYRotation;
 
@@ -231,7 +231,7 @@ qreal Q3DCamera::maxXRotation() const
  */
 void Q3DCamera::setMaxXRotation(qreal maxRotation)
 {
-    maxRotation = qBound(-180.0, maxRotation, 180.0);
+    maxRotation = qBound(qreal(-180.0), maxRotation, qreal(180.0));
 
     if (maxRotation < d_ptr->m_minXRotation)
         maxRotation = d_ptr->m_minXRotation;
@@ -264,7 +264,7 @@ qreal Q3DCamera::maxYRotation() const
  */
 void Q3DCamera::setMaxYRotation(qreal maxRotation)
 {
-    maxRotation = qBound(-90.0, maxRotation, 90.0);
+    maxRotation = qBound(qreal(-90.0), maxRotation, qreal(90.0));
 
     if (maxRotation < d_ptr->m_minYRotation)
         maxRotation = d_ptr->m_minYRotation;
@@ -582,7 +582,7 @@ void Q3DCamera::setWrapYRotation(bool isEnabled)
  */
 void Q3DCamera::setCameraPosition(qreal horizontal, qreal vertical, qreal zoom)
 {
-    setZoomLevel(qBound(10.0, zoom, 500.0));
+    setZoomLevel(qBound(qreal(10.0), zoom, qreal(500.0)));
     setXRotation(horizontal);
     setYRotation(vertical);
 }
