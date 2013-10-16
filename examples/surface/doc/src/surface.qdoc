@@ -100,9 +100,9 @@
 
     \section1 Selection modes
 
-    Q3Dsurface supports three different selection modes and these are demonstrated on the
-    example with radio buttons which the user can use to activate suitable selection mode.
-    Following inline methods are connected to radio buttons to activate the selected mode.
+    Q3Dsurface supports three different selection modes. These are demonstrated in the
+    example with radio buttons, which the user can use to activate a suitable selection mode.
+    The following inline methods are connected to radio buttons to activate the selected mode.
 
     \snippet ../examples/surface/surfacegraph.h 0
 
@@ -110,17 +110,15 @@
 
     The example has four slider controls for adjusting the min and max values for X and Z
     axis. When selecting the proxy these sliders are adjusted so that one step on the slider
-    moves the range by one segment step.
-
-    Finally the ranges are set for the graph like this:
+    moves the range by one segment step. Finally the ranges are set for the graph like this:
 
     \snippet ../examples/surface/surfacegraph.cpp 5
 
     \section1 Themes
 
     Q3Dsurface supports all the themes QtDatavisualization has. The example has a pull
-    down menu for selecting the theme and the following code snippet is connected to the menu to
-    activate the selected theme.
+    down menu for selecting the theme. The following code snippet is connected to the
+    menu to activate the selected theme.
 
     \snippet ../examples/surface/surfacegraph.cpp 6
 

@@ -22,11 +22,11 @@
   \inqmlmodule com.digia.QtDataVisualization
   \since com.digia.QtDataVisualization 1.0
   \ingroup datavisualization_qml
-  \brief 3D surface graph.
+  \brief Describes the usage of the 3D surface graph.
 
   This type enables developers to render surface plots in 3D with Qt Quick 2.
 
-  You will need to import data visualization module to use this type:
+  You will need to import the data visualization module to use this type:
 
   \snippet doc_src_qmldatavisualization.cpp 0
 
@@ -53,7 +53,7 @@
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
@@ -62,7 +62,7 @@
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
@@ -71,17 +71,17 @@
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
   \qmlproperty bool Surface3D::smoothSurfaceEnabled
-  Smoothing of surface. If false, shading of the surface is flat.
+  The smoothing of surface. If false, the shading of the surface is flat.
  */
 
 /*!
   \qmlproperty bool Surface3D::surfaceGridEnabled
-  Surface grid visibility. If false, no surface grid is drawn.
+  The surface grid visibility. If false, no surface grid is drawn.
  */
 
 /*!

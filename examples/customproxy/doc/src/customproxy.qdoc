@@ -32,7 +32,7 @@
 
     This example defines a simple flexible data set \c VariantDataSet where each data item is a
     a variant list. Each item can have multiple different values, identified by their index in
-    the list. In this example, the data set is storing monthly rainfall data, where value in
+    the list. In this example, the data set is storing monthly rainfall data, where the value in
     index one is the year, index two contains the month, and the third value has the amount
     of rainfall in that month.
 
@@ -95,7 +95,7 @@
     \snippet ../examples/customproxy/variantbardatamapping.h 3
 
     The primary way to use a \c VariantBarDataMapping object is to give the mappings already at the
-    constructor, though they can be set later individually or all together with \c remap() method.
+    constructor, though they can be set later individually or all together with the \c remap() method.
     A signal is emitted if mapping changes. It is basically a simplified version of
     QItemModelBarDataMapping adapted to work with variant lists instead of item models.
 
@@ -106,7 +106,7 @@
 
     \snippet ../examples/customproxy/rainfallgraph.cpp 0
 
-    Bulk of that method is used for populating the variant data set. Once the set is populated,
+    The bulk of that method is used for populating the variant data set. Once the set is populated,
     visualizing the data is trivial with the help of our custom proxy:
 
     \snippet ../examples/customproxy/rainfallgraph.cpp 1

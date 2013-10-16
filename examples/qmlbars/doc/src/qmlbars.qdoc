@@ -66,7 +66,7 @@
 
     \snippet ../examples/qmlbars/qml/qmlbars/main.qml 0
 
-    The axis change is done because income and expenses have different label format. The same could have
+    The axis change is done because income and expenses have a different label format. The same could have
     been achieved using a single axis and just changing the label format.
 
     The second interesting block is where we filter some of the rows away from the visualized data:
