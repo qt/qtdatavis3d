@@ -18,7 +18,7 @@ depends += qtcore \
 qhp.projects                            = qtdatavisualization
 
 qhp.qtdatavisualization.file            = qtdatavisualization.qhp
-qhp.qtdatavisualization.namespace       = org.qt-project.qtdatavisualization.0.1.0
+qhp.qtdatavisualization.namespace       = com.digia.qtdatavisualization.010
 qhp.qtdatavisualization.virtualFolder   = qtdatavisualization
 qhp.qtdatavisualization.indexTitle      = Qt Data Visualization
 qhp.qtdatavisualization.indexRoot       =
@@ -59,3 +59,10 @@ HTML.footer = \
     "      between you and Digia.\n" \
     "    </p>\n" \
     "</div>\n"
+
+navigation.homepage = Qt Enterprise:
+navigation.landingpage = Qt Data Visualization
+navigation.cppclassespage = Qt Data Visualization C++ Classes
+navigation.qmltypespage = Qt Data Visualization QML Types
+
+buildversion = Qt Data Visualization $QT_VERSION Reference Documentation
