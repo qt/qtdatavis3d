@@ -13,11 +13,31 @@ System Requirements
 
 Building
 ========
-Configure project with qmake and build project with make:
+Configure the project with qmake:
+    qmake
+
+After running qmake, build the project with make:
     (Linux) make
     (Windows with MinGw) mingw32-make
     (Visual Studio) nmake
     (OSX) make
+
+The above generates the default makefiles for your configuration, which is typically
+the release build if you are using precompiled binary Qt distribution. To build both
+debug and release, or one specifically, use one of the following qmake lines instead.
+
+For debug builds:
+    qmake CONFIG+=debug; make
+    or
+    qmake CONFIG+=debug_and_release; make debug
+
+For release builds:
+    qmake CONFIG+=release ; make
+    or
+    qmake CONFIG+=debug_and_release; make release
+
+For both builds
+    qmake CONFIG+="debug_and_release build_all"; make
 
 If you want to install the module to your Qt directory use:
     make install
