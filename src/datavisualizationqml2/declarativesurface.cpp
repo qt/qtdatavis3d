@@ -41,6 +41,9 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     m_shared = new Surface3DController(boundingRect().toRect());
     setSharedController(m_shared);
 
+    QObject::connect(m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
+                     &DeclarativeSurface::smoothSurfaceEnabledChanged);
+
     QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy;
     m_shared->setActiveDataProxy(proxy);
 }

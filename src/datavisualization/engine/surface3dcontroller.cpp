@@ -79,8 +79,11 @@ void Surface3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.smoothStatusChanged) {
+        bool oldSmoothStatus = m_isSmoothSurfaceEnabled;
         m_isSmoothSurfaceEnabled = m_renderer->updateSmoothStatus(m_isSmoothSurfaceEnabled);
         m_changeTracker.smoothStatusChanged = false;
+        if (oldSmoothStatus != m_isSmoothSurfaceEnabled)
+            emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
     }
 
     if (m_changeTracker.surfaceGridChanged) {
@@ -110,9 +113,13 @@ void Surface3DController::handleAxisRangeChangedBySender(QObject *sender)
 
 void Surface3DController::setSmoothSurface(bool enable)
 {
+    bool changed = m_isSmoothSurfaceEnabled != enable;
     m_isSmoothSurfaceEnabled = enable;
     m_changeTracker.smoothStatusChanged = true;
     emitNeedRender();
+
+    if (changed)
+        emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
 }
 
 bool Surface3DController::smoothSurface()

@@ -195,7 +195,7 @@ void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
  *
  * \sa setObjectColor()
  *
- * \warning This method is subject to change.
+ * \preliminary
  */
 void Q3DScatter::setTheme(QDataVis::Theme theme)
 {
@@ -211,7 +211,7 @@ void Q3DScatter::setTheme(QDataVis::Theme theme)
  *
  * \sa setTheme()
  *
- * \warning This method is subject to change.
+ * \preliminary
  */
 void Q3DScatter::setObjectColor(const QColor &baseColor, bool uniform)
 {

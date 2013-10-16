@@ -66,7 +66,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dsurface_construction.cpp 1
  *
- * First feed the data to the row element and then add it's pointer to the data element:
+ * First feed the data to the row elements and then add their pointers to the data element:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 2
  *
@@ -207,7 +207,7 @@ bool Q3DSurface::isBackgroundVisible() const
  * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
- * \warning This property is subject to change.
+ * \preliminary
  */
 void Q3DSurface::setTheme(QDataVis::Theme theme)
 {

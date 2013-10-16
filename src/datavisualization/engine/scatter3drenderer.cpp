@@ -472,6 +472,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Bind dot shader
     m_dotShader->bind();
 
+    // Set unchanging shader bindings
+    m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
+    m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
+    m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
+
     // Enable texture
     glEnable(GL_TEXTURE_2D);
 
@@ -546,14 +551,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
 
         // Set shader bindings
-        m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
-        m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
         m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
         m_dotShader->setUniformValue(m_dotShader->nModel(),
                                      itModelMatrix.inverted().transposed());
         m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
         m_dotShader->setUniformValue(m_dotShader->color(), dotColor);
-        m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {

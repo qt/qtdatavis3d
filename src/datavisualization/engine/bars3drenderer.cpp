@@ -1491,18 +1491,7 @@ void Bars3DRenderer::handleResize()
     if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
         return;
 
-    // Set view port
-    if (m_cachedIsSlicingActivated) {
-        m_mainViewPort = QRect(0,
-                               m_cachedBoundingRect.height()
-                               - (m_cachedBoundingRect.height() / smallerVPSize),
-                               m_cachedBoundingRect.width() / smallerVPSize,
-                               m_cachedBoundingRect.height() / smallerVPSize);
-        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    } else {
-        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-        m_sliceViewPort = QRect(0, 0, 0, 0);
-    }
+    setViewPorts();
 
     Abstract3DRenderer::handleResize();
 }
@@ -1740,7 +1729,21 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
         return;
 
     m_cachedIsSlicingActivated = isSlicing;
-    if (isSlicing) {
+
+    setViewPorts();
+
+    if (!m_cachedIsSlicingActivated)
+        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+
+#if !defined(QT_OPENGL_ES_2)
+    updateDepthBuffer(); // Re-init depth buffer as well
+#endif
+}
+
+void Bars3DRenderer::setViewPorts()
+{
+    // Update view ports
+    if (m_cachedIsSlicingActivated) {
         m_mainViewPort = QRect(0,
                                m_cachedBoundingRect.height()
                                - (m_cachedBoundingRect.height() / smallerVPSize),
@@ -1750,11 +1753,7 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
     } else {
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
         m_sliceViewPort = QRect(0, 0, 0, 0);
-        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
     }
-#if !defined(QT_OPENGL_ES_2)
-    updateDepthBuffer(); // Re-init depth buffer as well
-#endif
 }
 
 QRect Bars3DRenderer::mainViewPort()

@@ -51,7 +51,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
+    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
 
@@ -77,6 +77,9 @@ public:
 
     void setGradient(ColorGradient *gradient);
     ColorGradient *gradient() const;
+
+signals:
+    void smoothSurfaceEnabledChanged(bool enabled);
 
 protected:
     void handleGradientUpdate();

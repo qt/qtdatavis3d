@@ -260,7 +260,7 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
  *
  * \sa setBarColor()
  *
- * \warning This method is subject to change.
+ * \preliminary
  */
 void Q3DBars::setTheme(QDataVis::Theme theme)
 {
@@ -276,7 +276,7 @@ void Q3DBars::setTheme(QDataVis::Theme theme)
  *
  * \sa setTheme()
  *
- * \warning This method is subject to change.
+ * \preliminary
  */
 void Q3DBars::setBarColor(const QColor &baseColor, bool uniform)
 {
