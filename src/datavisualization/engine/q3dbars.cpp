@@ -71,7 +71,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
  *
- * \note We set the data window to 5 x 5, but we are inserting only one row of data. This is ok,
+ * \note We set the data window to 5 x 5, but we are adding only one row of data. This is ok,
  * the rest of the rows will just be blank.
  *
  * Finally you will need to set it visible:
