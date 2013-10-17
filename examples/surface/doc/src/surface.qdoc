@@ -110,9 +110,9 @@
 
     The example has four slider controls for adjusting the min and max values for X and Z
     axis. When selecting the proxy these sliders are adjusted so that one step on the slider
-    moves the range by one segment step. The example has some code to keep the sliders on
-    valid positions, like when the X axis minimum exceeds the maximum the maximum is increased
-    and so on. Finally the ranges are set for the graph like this:
+    moves the range by one segment step.
+
+    Finally the ranges are set for the graph like this:
 
     \snippet ../examples/surface/surfacegraph.cpp 5
 
