@@ -241,12 +241,12 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
+    // Draw bars scene
+    drawScene(defaultFboHandle);
+
     // If slice selection is on, draw the sliced scene
     if (m_cachedIsSlicingActivated)
         drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
-
-    // Draw bars scene
-    drawScene(defaultFboHandle);
 
     // If slicing has been activated by this render pass, we need another render
     // Also trigger another render always when slicing changes in general to ensure

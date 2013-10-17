@@ -448,17 +448,15 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
-    // In slice mode; draw slice and render selection ball
-    if (m_cachedIsSlicingActivated && m_selectionPointer && m_selectionActive) {
-        drawSlicedScene();
-        m_selectionPointer->render(defaultFboHandle);
-    }
-
     // Draw the surface scene
     drawScene(defaultFboHandle);
 
+    // In slice mode; draw slice and render selection ball
+    if (m_cachedIsSlicingActivated)
+        drawSlicedScene();
+
     // Render selection ball if not in slice mode
-    if (!m_cachedIsSlicingActivated && m_selectionPointer && m_selectionActive)
+    if (m_selectionPointer && m_selectionActive)
         m_selectionPointer->render(defaultFboHandle);
 
     // If slicing has been activated by this render pass, we need another render
