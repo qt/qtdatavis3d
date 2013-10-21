@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     axisMinSliderX->setTickInterval(1);
     axisMinSliderX->setEnabled(true);
     QSlider *axisMaxSliderX = new QSlider(Qt::Horizontal, widget);
-    axisMaxSliderX->setMinimum(2);
+    axisMaxSliderX->setMinimum(1);
     axisMaxSliderX->setTickInterval(1);
     axisMaxSliderX->setEnabled(true);
     QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal, widget);
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     axisMinSliderZ->setTickInterval(1);
     axisMinSliderZ->setEnabled(true);
     QSlider *axisMaxSliderZ = new QSlider(Qt::Horizontal, widget);
-    axisMaxSliderZ->setMinimum(2);
+    axisMaxSliderZ->setMinimum(1);
     axisMaxSliderZ->setTickInterval(1);
     axisMaxSliderZ->setEnabled(true);
 
