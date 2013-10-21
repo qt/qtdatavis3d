@@ -422,9 +422,8 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance),
-                                                  QVector3D(0.0f, 0.0f, 0.0f),
-                                                  QVector3D(0.0f, 1.0f, 0.0f));
+        scene->activeCamera()->setBaseOrientation(cameraDistanceVector,
+                                                  zeroVector, upVector);
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
     }
@@ -484,8 +483,8 @@ void Surface3DRenderer::drawSlicedScene()
     // Set view matrix
     QMatrix4x4 viewMatrix;
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f),
-                      QVector3D(0.0f, 0.0f, 0.0f),
-                      QVector3D(0.0f, 1.0f, 0.0f));
+                      zeroVector,
+                      upVector);
 
     // Set light position
     lightPos = m_cachedScene->activeLight()->position();
@@ -781,7 +780,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
-
     QVector3D surfaceScaler(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);
     QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
 
@@ -805,9 +803,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
-                    QVector3D(0.0f, 0.0f, 0.0f), 0.0f, 3.5f / m_autoScaleAdjustment);
-        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, 0.0f),
-                               QVector3D(0.0f, 1.0f, 0.0f));
+                    zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
         // That causes the scene to be not drawn from above -> must be fixed
@@ -876,9 +873,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             glEnable(GL_TEXTURE_2D);
             QMatrix4x4 modelMatrix;
             QMatrix4x4 viewmatrix;
-            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f),
-                              QVector3D(0.0f, 0.0f, 0.0f),
-                              QVector3D(0.0f, 1.0f, 0.0f));
+            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f), zeroVector, upVector);
             QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
             m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
             m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);

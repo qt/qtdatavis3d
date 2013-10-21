@@ -105,9 +105,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 projectionMatrix;
     if (m_cachedIsSlicingActivated) {
         GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
-        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f),
-                          QVector3D(0.0f, 0.0f, 0.0f),
-                          QVector3D(0.0f, 1.0f, 0.0f));
+        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
         projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
                                -sliceUnits, sliceUnits, -1.0f, 4.0f);
     } else {
@@ -124,7 +122,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 MVPMatrix;
 
     // Position the pointer ball
-    modelMatrix.translate(m_position + QVector3D(0.0f, 0.0f, 0.0f));
+    modelMatrix.translate(m_position + zeroVector);
 
     // Scale the point with fixed values (at this point)
     modelMatrix.scale(QVector3D(0.05f, 0.05f, 0.05f));
@@ -161,7 +159,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 
     // Position label
     QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
-    modelMatrixLabel.translate(m_position + labelAlign + QVector3D(0.0f, 0.0f, 0.0f));
+    modelMatrixLabel.translate(m_position + labelAlign + zeroVector);
 
     // Position the label towards the camera
     qreal camRotationsX = camera->xRotation();
