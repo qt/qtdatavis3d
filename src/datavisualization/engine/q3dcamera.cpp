@@ -518,7 +518,7 @@ QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relative
                                                        qreal distanceModifier) const
 {
     // Move the position with camera
-    GLfloat radiusFactor = relativePosition.z() * (1.5f + distanceModifier);
+    GLfloat radiusFactor = cameraDistance * (1.5f + distanceModifier);
     GLfloat xAngle;
     GLfloat yAngle;
     if (!fixedRotation) {
@@ -532,6 +532,7 @@ QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relative
     GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
     GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
     GLfloat yPos = (radiusFactor + relativePosition.y()) * qSin(yAngle);
+
     // Keep in the set position in relation to camera
     return QVector3D(-xPos + relativePosition.x(),
                      yPos + relativePosition.y(),

@@ -182,8 +182,8 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
-                                                  QVector3D(0.0f, 0.0f, zComp),
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance),
+                                                  QVector3D(0.0f, 0.0f, 0.0f),
                                                   QVector3D(0.0f, 1.0f, 0.0f));
         m_hasHeightAdjustmentChanged = false;
     }
@@ -269,7 +269,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_depthShader->bind();
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+        glViewport(0, 0,
                    m_mainViewPort.width() * m_shadowQualityMultiplier,
                    m_mainViewPort.height() * m_shadowQualityMultiplier);
 
@@ -283,8 +283,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
-                    defaultLightPos, 0.0f, 1.0f / m_autoScaleAdjustment);
-        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
+                    QVector3D(0.0f, 0.0f, 0.0f), 0.0f, 2.5f / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, 0.0f),
                                QVector3D(0.0f, 1.0f, 0.0f));
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
         // That causes the scene to be not drawn from above -> must be fixed
@@ -364,10 +364,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_TEXTURE_2D);
         QMatrix4x4 modelMatrix;
         QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
-                          QVector3D(0.0f, 0.0f, zComp),
+        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f),
+                          QVector3D(0.0f, 0.0f, 0.0f),
                           QVector3D(0.0f, 1.0f, 0.0f));
-        modelMatrix.translate(0.0, 0.0, zComp);
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj,
@@ -456,10 +455,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_TEXTURE_2D);
         QMatrix4x4 modelMatrix;
         QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.0f + zComp),
-                          QVector3D(0.0f, 0.0f, zComp),
+        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.0f),
+                          QVector3D(0.0f, 0.0f, 0.0f),
                           QVector3D(0.0f, 1.0f, 0.0f));
-        modelMatrix.translate(0.0, 0.0, zComp);
         QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj,
@@ -601,7 +599,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                           backgroundMargin,
                           (aspectRatio * backgroundMargin));
 #endif
-        modelMatrix.translate(0.0f, 0.0f, zComp);
         modelMatrix.scale(bgScale);
         itModelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
@@ -702,9 +699,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
-                    modelMatrix.translate(0.0f, backgroundMargin, linePos / m_scaleFactor + zComp);
+                    modelMatrix.translate(0.0f, backgroundMargin, linePos / m_scaleFactor);
                 else
-                    modelMatrix.translate(0.0f, -backgroundMargin, linePos / m_scaleFactor + zComp);
+                    modelMatrix.translate(0.0f, -backgroundMargin, linePos / m_scaleFactor);
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -775,7 +772,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(lineXTrans, 0.0f, linePos / m_scaleFactor + zComp);
+                modelMatrix.translate(lineXTrans, 0.0f, linePos / m_scaleFactor);
                 modelMatrix.scale(QVector3D(gridLineWidth, backgroundMargin, gridLineWidth));
                 itModelMatrix.scale(QVector3D(gridLineWidth, backgroundMargin, gridLineWidth));
 
@@ -832,9 +829,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
-                    modelMatrix.translate(linePos / m_scaleFactor, backgroundMargin, zComp);
+                    modelMatrix.translate(linePos / m_scaleFactor, backgroundMargin, 0.0f);
                 else
-                    modelMatrix.translate(linePos / m_scaleFactor, -backgroundMargin, zComp);
+                    modelMatrix.translate(linePos / m_scaleFactor, -backgroundMargin, 0.0f);
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -904,7 +901,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(linePos / m_scaleFactor, 0.0f, lineZTrans + zComp);
+                modelMatrix.translate(linePos / m_scaleFactor, 0.0f, lineZTrans);
                 modelMatrix.scale(QVector3D(gridLineWidth, backgroundMargin, gridLineWidth));
                 itModelMatrix.scale(QVector3D(gridLineWidth, backgroundMargin, gridLineWidth));
 
@@ -963,7 +960,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, linePos / m_heightNormalizer, lineZTrans + zComp);
+                modelMatrix.translate(0.0f, linePos / m_heightNormalizer, lineZTrans);
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -1029,7 +1026,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(lineXTrans, linePos / m_heightNormalizer, zComp);
+                modelMatrix.translate(lineXTrans, linePos / m_heightNormalizer, 0.0f);
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
                 modelMatrix.scale(
                             QVector3D(
@@ -1133,7 +1130,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
                 QVector3D labelTrans = QVector3D(labelXTrans,
                                                  labelYTrans,
-                                                 labelPos / m_scaleFactor + zComp);
+                                                 labelPos / m_scaleFactor);
 
 
                 // Draw the label here
@@ -1145,7 +1142,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    QVector3D(0.0f, 0.0f, zComp),
+                                    QVector3D(0.0f, 0.0f, 0.0f),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
@@ -1194,7 +1191,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
                 QVector3D labelTrans = QVector3D(labelPos / m_scaleFactor,
                                                  labelYTrans,
-                                                 labelZTrans + zComp);
+                                                 labelZTrans);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1205,7 +1202,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    QVector3D(0.0f, 0.0f, zComp),
+                                    QVector3D(0.0f, 0.0f, 0.0f),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
@@ -1253,12 +1250,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 // Back wall
                 QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans,
-                                                 labelZTrans + labelMarginZTrans + zComp);
+                                                 labelZTrans + labelMarginZTrans);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    QVector3D(0.0f, 0.0f, zComp),
+                                    QVector3D(0.0f, 0.0f, 0.0f),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
@@ -1275,12 +1272,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     rotLabelY = 0.0f;
 
                 labelTrans = QVector3D(-labelXTrans - labelMarginXTrans, labelYTrans,
-                                       -labelZTrans + zComp);
+                                       -labelZTrans);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    QVector3D(0.0f, 0.0f, zComp),
+                                    QVector3D(0.0f, 0.0f, 0.0f),
                                     QVector3D(rotLabelX, rotLabelY, rotLabelZ),
                                     0, m_cachedSelectionMode,
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(), true, true, Drawer::LabelMid,
@@ -1348,7 +1345,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
 
         m_drawer->drawLabel(*selectedItem, labelItem, viewMatrix, projectionMatrix,
-                            QVector3D(0.0f, 0.0f, zComp),
+                            QVector3D(0.0f, 0.0f, 0.0f),
                             QVector3D(0.0f, 0.0f, 0.0f), 0,
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, m_cachedScene->activeCamera(), true, false,
@@ -1489,7 +1486,7 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
     GLfloat xTrans = (aspectRatio * item.position().x()) / m_scaleFactor;
     GLfloat zTrans = -(aspectRatio * item.position().z()) / m_scaleFactor;
     GLfloat yTrans = item.position().y() / m_heightNormalizer;
-    item.setTranslation(QVector3D(xTrans, yTrans, zTrans + zComp));
+    item.setTranslation(QVector3D(xTrans, yTrans, zTrans));
     //qDebug() << item.translation();
 }
 

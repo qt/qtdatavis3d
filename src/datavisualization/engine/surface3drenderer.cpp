@@ -422,8 +422,8 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance + zComp),
-                                                  QVector3D(0.0f, 0.0f, zComp),
+        scene->activeCamera()->setBaseOrientation(QVector3D(0.0f, 0.0f, cameraDistance),
+                                                  QVector3D(0.0f, 0.0f, 0.0f),
                                                   QVector3D(0.0f, 1.0f, 0.0f));
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
@@ -479,12 +479,12 @@ void Surface3DRenderer::drawSlicedScene()
 
     GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
     projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
-                           -sliceUnits, sliceUnits, -1.0f, 14.0f); // 14.0 because of zComp
+                           -sliceUnits, sliceUnits, -1.0f, 4.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, zComp + 1.0f),
-                      QVector3D(0.0f, 0.0f, zComp),
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f),
+                      QVector3D(0.0f, 0.0f, 0.0f),
                       QVector3D(0.0f, 1.0f, 0.0f));
 
     // Set light position
@@ -513,7 +513,7 @@ void Surface3DRenderer::drawSlicedScene()
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(offset, 0.0f, zComp);
+        modelMatrix.translate(offset, 0.0f, 0.0f);
         QVector3D scaling(scaleX, 1.0f, sliceZScale);
         modelMatrix.scale(scaling);
         itModelMatrix.scale(scaling);
@@ -589,7 +589,7 @@ void Surface3DRenderer::drawSlicedScene()
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, linePos, zComp - sliceZScale);
+                modelMatrix.translate(0.0f, linePos, -sliceZScale);
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
@@ -630,7 +630,7 @@ void Surface3DRenderer::drawSlicedScene()
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            modelMatrix.translate(linePos, 0.0f, zComp - sliceZScale);
+            modelMatrix.translate(linePos, 0.0f, -sliceZScale);
             modelMatrix.scale(gridLineScaleY);
             itModelMatrix.scale(gridLineScaleY);
 
@@ -667,9 +667,9 @@ void Surface3DRenderer::drawSlicedScene()
     GLfloat labelPos = -1.0f;
     int labelNbr = 0;
 
-    QVector3D positionComp(0.0f, 0.0f, zComp);
+    QVector3D positionComp(0.0f, 0.0f, 0.0f);
     QVector3D rotation(0.0f, 0.0f, 0.0f);
-    QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, labelPos, zComp);
+    QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, labelPos, 0.0f);
     for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
         if (m_axisCacheY.labelItems().size() > labelNbr) {
             labelTrans.setY(labelPos);
@@ -783,7 +783,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
 
     QVector3D surfaceScaler(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);
-    QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ + zComp);
+    QVector3D surfaceOffset(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
@@ -805,8 +805,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
-                    QVector3D(0.0f, 0.0f, zComp), 0.0f, 1.5f / m_autoScaleAdjustment);
-        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, zComp),
+                    QVector3D(0.0f, 0.0f, 0.0f), 0.0f, 3.5f / m_autoScaleAdjustment);
+        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, 0.0f, 0.0f),
                                QVector3D(0.0f, 1.0f, 0.0f));
 
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
@@ -876,10 +876,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             glEnable(GL_TEXTURE_2D);
             QMatrix4x4 modelMatrix;
             QMatrix4x4 viewmatrix;
-            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f + zComp),
-                              QVector3D(0.0f, 0.0f, zComp),
+            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f),
+                              QVector3D(0.0f, 0.0f, 0.0f),
                               QVector3D(0.0f, 1.0f, 0.0f));
-            modelMatrix.translate(0.0, 0.0, zComp);
             QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
             m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
             m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
@@ -1026,7 +1025,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        modelMatrix.translate(0.0f, 0.0f, zComp);
         QVector3D bgScale(m_scaleXWithBackground, backgroundMargin, m_scaleZWithBackground);
         modelMatrix.scale(bgScale);
         itModelMatrix.scale(bgScale);
@@ -1106,7 +1104,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
             GLfloat lineStep = 2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
-            GLfloat linePos = m_scaleZ + zComp; // Start line
+            GLfloat linePos = m_scaleZ; // Start line
             int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
 
             for (int segment = 0; segment <= lastSegment; segment++) {
@@ -1160,7 +1158,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
             // Side wall lines
             GLfloat lineXTrans = m_scaleXWithBackground;
-            linePos = m_scaleZ + zComp; // Start line
+            linePos = m_scaleZ; // Start line
 
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -1222,9 +1220,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
-                    modelMatrix.translate(linePos, backgroundMargin, zComp);
+                    modelMatrix.translate(linePos, backgroundMargin, 0.0f);
                 else
-                    modelMatrix.translate(linePos, -backgroundMargin, zComp);
+                    modelMatrix.translate(linePos, -backgroundMargin, 0.0f);
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
@@ -1265,11 +1263,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
 
             // Back wall lines
-            GLfloat lineZTrans = m_scaleZWithBackground + zComp;
+            GLfloat lineZTrans = m_scaleZWithBackground;
             linePos = m_scaleX;
 
             if (!m_zFlipped)
-                lineZTrans = -lineZTrans + zComp + zComp;
+                lineZTrans = -lineZTrans;
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -1320,10 +1318,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             GLfloat linePos = -1.0f;
             int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 
-            GLfloat lineZTrans = m_scaleZWithBackground + zComp;
+            GLfloat lineZTrans = m_scaleZWithBackground;
 
             if (!m_zFlipped)
-                lineZTrans = -lineZTrans + zComp + zComp;
+                lineZTrans = -lineZTrans;
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -1381,7 +1379,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(lineXTrans, linePos, zComp);
+                modelMatrix.translate(lineXTrans, linePos, 0.0f);
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
@@ -1429,10 +1427,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Z Labels
-    QVector3D positionZComp(0.0f, 0.0f, zComp);
+    QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
         GLfloat posStep = 2.0f * aspectRatio * m_axisCacheZ.segmentStep() / m_scaleFactor;
-        GLfloat labelPos = m_scaleZ + zComp;
+        GLfloat labelPos = m_scaleZ;
         int lastSegment = m_axisCacheZ.segmentCount();
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
@@ -1500,7 +1498,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
         QVector3D labelTrans = QVector3D(labelPos,
                                          labelYTrans,
-                                         labelZTrans + zComp);
+                                         labelZTrans);
         QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
 
         for (int segment = 0; segment <= lastSegment; segment++) {
@@ -1553,7 +1551,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 // Side wall
                 QVector3D labelTrans = QVector3D(labelXTrans, labelPos,
-                                                 labelZTrans + labelMarginZTrans + zComp);
+                                                 labelZTrans + labelMarginZTrans);
                 if (m_xFlipped)
                     rotation.setY(-90.0f);
                 else
@@ -1581,7 +1579,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     rotation.setY(0.0f);
 
                 labelTrans = QVector3D(-labelXTrans - labelMarginXTrans, labelPos,
-                                       -labelZTrans + zComp);
+                                       -labelZTrans);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
