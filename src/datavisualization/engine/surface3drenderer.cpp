@@ -1027,7 +1027,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         QVector3D bgScale(m_scaleXWithBackground, backgroundMargin, m_scaleZWithBackground);
         modelMatrix.scale(bgScale);
-        itModelMatrix.scale(bgScale);
 
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
@@ -1036,6 +1035,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         } else {
             modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
         }
+
+        itModelMatrix = modelMatrix; // Only scaling and rotations, can be used directly
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionViewMatrix * modelMatrix;

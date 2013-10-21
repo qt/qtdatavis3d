@@ -960,6 +960,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor,
                                       1.0f,
                                       m_columnDepth / m_scaleFactor));
+        itModelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;

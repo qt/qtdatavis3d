@@ -600,7 +600,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                           (aspectRatio * backgroundMargin));
 #endif
         modelMatrix.scale(bgScale);
-        itModelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
             modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
@@ -608,6 +607,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         } else {
             modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
         }
+        itModelMatrix = modelMatrix; // Only scaling and rotations, can be used directly
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
         MVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
