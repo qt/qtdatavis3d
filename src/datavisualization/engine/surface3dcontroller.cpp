@@ -142,7 +142,7 @@ bool Surface3DController::surfaceGrid()
 void Surface3DController::setGradient(const QLinearGradient &gradient)
 {
     m_userDefinedGradient = gradient;
-    m_userDefinedGradient.setStart(1, 1000);
+    m_userDefinedGradient.setStart(2, 1024);
     m_userDefinedGradient.setFinalStop(0, 0);
     m_changeTracker.gradientColorChanged = true;
     emitNeedRender();

@@ -37,7 +37,7 @@ Theme::Theme()
       m_highlightBarColor(QColor(Qt::red)),
       m_highlightRowColor(QColor(Qt::darkRed)),
       m_highlightColumnColor(QColor(Qt::darkMagenta)),
-      m_surfaceGradient(QLinearGradient(1, 1000, 0, 0)),
+      m_surfaceGradient(QLinearGradient(2, 1024, 0, 0)),
       m_lightStrength(4.0f),
       m_ambientStrength(0.3f),
       m_highlightLightStrength(8.0f),

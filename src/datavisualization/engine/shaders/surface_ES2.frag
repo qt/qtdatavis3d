@@ -11,7 +11,7 @@ uniform highp float lightStrength;
 uniform highp float ambientStrength;
 
 void main() {
-    highp vec2 gradientUV = vec2(0.5, (coords_mdl.y + 1.0) / 2.0);
+    highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.001) / 2.0); // ~1000 pixel texture, we need a margin for 1/1000 rounding error
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);

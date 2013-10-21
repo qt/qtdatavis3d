@@ -1644,11 +1644,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
 void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
 {
-    QImage image(QSize(1, 1000), QImage::Format_RGB32);
+    QImage image(QSize(2, 1024), QImage::Format_RGB32);
     QPainter pmp(&image);
     pmp.setBrush(QBrush(gradient));
     pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 1, 1000);
+    pmp.drawRect(0, 0, 2, 1024);
 
     if (m_gradientTexture) {
         m_textureHelper->deleteTexture(&m_gradientTexture);

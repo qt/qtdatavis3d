@@ -29,7 +29,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
-#define MIN_POWER 32
+#define MIN_POWER 2
 
 GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
 {
