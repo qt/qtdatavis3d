@@ -213,7 +213,7 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, size.width() * textureSize,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
                  size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 

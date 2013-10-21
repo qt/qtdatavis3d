@@ -51,7 +51,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 {
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
-    surfaceFormat.setDepthBufferSize(16);
+    surfaceFormat.setDepthBufferSize(24);
 #if !defined(QT_OPENGL_ES_2)
     surfaceFormat.setSamples(8);
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
