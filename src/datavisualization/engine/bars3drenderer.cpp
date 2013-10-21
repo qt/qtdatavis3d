@@ -1045,8 +1045,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             itModelMatrix.scale(QVector3D(m_rowWidth / m_scaleFactor, gridLineWidth,
                                           gridLineWidth));
             // If we're viewing from below, grid line object must be flipped
-            if (m_yFlipped)
+            if (m_yFlipped) {
                 modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+            }
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -1094,8 +1096,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                           m_columnDepth / m_scaleFactor));
 
             // If we're viewing from below, grid line object must be flipped
-            if (m_yFlipped)
+            if (m_yFlipped) {
                 modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+            }
 
             MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
             depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;

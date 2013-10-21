@@ -719,8 +719,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
                 // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped)
+                if (m_yFlipped) {
                     modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
@@ -849,8 +851,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
                 // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped)
+                if (m_yFlipped) {
                     modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
                 depthMVPMatrix = depthProjectionMatrix * depthViewMatrix * modelMatrix;
