@@ -941,7 +941,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
-        QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(surfaceOffset);
@@ -953,8 +952,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-
         // Set shader bindings
         m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
         m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
@@ -968,6 +965,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadow shader bindings
+            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
             m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
             m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
@@ -1014,7 +1012,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
-        QMatrix4x4 depthMVPMatrix;
         QMatrix4x4 itModelMatrix;
 
         QVector3D bgScale(m_scaleXWithBackground, backgroundMargin, m_scaleZWithBackground);
@@ -1035,7 +1032,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
         QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
 
@@ -1053,6 +1049,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadow shader bindings
+            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
                                                 m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
@@ -1116,7 +1113,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
@@ -1134,7 +1130,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1145,6 +1140,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1167,7 +1163,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(lineXTrans, 0.0f, linePos);
@@ -1175,7 +1170,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleY);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1186,6 +1180,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1209,7 +1204,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
@@ -1227,7 +1221,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1238,6 +1231,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1260,7 +1254,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(linePos, 0.0f, lineZTrans);
@@ -1268,7 +1261,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleY);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1279,6 +1271,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1307,7 +1300,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(0.0f, linePos, lineZTrans);
@@ -1316,7 +1308,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleX);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1327,6 +1318,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1350,7 +1342,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(lineXTrans, linePos, 0.0f);
@@ -1359,7 +1350,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleZ);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -1370,6 +1360,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
@@ -1492,12 +1483,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         GLfloat labelXTrans = m_scaleXWithBackground;
         GLfloat labelZTrans = m_scaleZWithBackground;
 
+        // Back wall init
         GLfloat labelMarginXTrans = labelMargin;
         GLfloat labelMarginZTrans = labelMargin;
         GLfloat rotLabelX = 0.0f;
         GLfloat rotLabelY = -90.0f;
         GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignment = Qt::AlignLeft;
+        Qt::AlignmentFlag alignmentBack = Qt::AlignLeft;
         if (!m_xFlipped) {
             labelXTrans = -labelXTrans;
             labelMarginXTrans = -labelMargin;
@@ -1506,54 +1498,44 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         if (m_zFlipped) {
             labelZTrans = -labelZTrans;
             labelMarginZTrans = -labelMargin;
-            alignment = Qt::AlignRight;
+            alignmentBack = Qt::AlignRight;
         }
+        QVector3D labelRotateVectorBack(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
 
-        // Back wall
-        QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
+        // Side wall init
+        Qt::AlignmentFlag alignmentSide = Qt::AlignLeft;
+        if (m_xFlipped)
+            alignmentSide = Qt::AlignLeft;
+        else
+            alignmentSide = Qt::AlignRight;
+        if (m_zFlipped)
+            rotLabelY = 180.0f;
+        else
+            rotLabelY = 0.0f;
+
+        QVector3D labelRotateVectorSide(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
         for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
             if (m_axisCacheY.labelItems().size() > labelNbr) {
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
-                // Side wall
-                QVector3D labelTrans = QVector3D(labelXTrans, labelPos,
-                                                 labelZTrans + labelMarginZTrans);
-                if (m_xFlipped)
-                    rotation.setY(-90.0f);
-                else
-                    rotation.setY(90.0f);
-                if (m_zFlipped)
-                    alignment = Qt::AlignRight;
-                else
-                    alignment = Qt::AlignLeft;
-
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
-                                    true, true, Drawer::LabelMid, alignment);
-
                 // Back wall
-                if (m_xFlipped)
-                    alignment = Qt::AlignLeft;
-                else
-                    alignment = Qt::AlignRight;
-                if (m_zFlipped)
-                    rotation.setY(180.0f);
-                else
-                    rotation.setY(0.0f);
-
-                labelTrans = QVector3D(-labelXTrans - labelMarginXTrans, labelPos,
-                                       -labelZTrans);
-
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
+                labelTransBack.setY(labelPos);
+                m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, rotation, 0, m_cachedSelectionMode,
+                                    positionZComp, labelRotateVectorBack, 0, m_cachedSelectionMode,
                                     m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
-                                    true, true, Drawer::LabelMid, alignment);
+                                    true, true, Drawer::LabelMid, alignmentBack);
+
+                // Side wall
+                labelTransSide.setY(labelPos);
+                m_dummyRenderItem.setTranslation(labelTransSide);
+                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                    positionZComp, labelRotateVectorSide, 0, m_cachedSelectionMode,
+                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    true, true, Drawer::LabelMid, alignmentSide);
             }
             labelNbr++;
             labelPos += posStep;
