@@ -422,8 +422,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->setBaseOrientation(cameraDistanceVector,
-                                                  zeroVector, upVector);
+        scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
     }
@@ -482,9 +481,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
-    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f),
-                      zeroVector,
-                      upVector);
+    viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
 
     // Set light position
     lightPos = m_cachedScene->activeLight()->position();

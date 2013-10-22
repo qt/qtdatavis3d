@@ -122,7 +122,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 MVPMatrix;
 
     // Position the pointer ball
-    modelMatrix.translate(m_position + zeroVector);
+    modelMatrix.translate(m_position);
 
     // Scale the point with fixed values (at this point)
     modelMatrix.scale(QVector3D(0.05f, 0.05f, 0.05f));
@@ -159,7 +159,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
 
     // Position label
     QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
-    modelMatrixLabel.translate(m_position + labelAlign + zeroVector);
+    modelMatrixLabel.translate(m_position + labelAlign);
 
     // Position the label towards the camera
     qreal camRotationsX = camera->xRotation();

@@ -182,8 +182,7 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(cameraDistanceVector,
-                                                  zeroVector, upVector);
+        scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         m_hasHeightAdjustmentChanged = false;
     }
 
