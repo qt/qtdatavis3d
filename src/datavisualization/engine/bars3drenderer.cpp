@@ -276,19 +276,19 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_sliceViewPort.width()
-                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(40.0f, (GLfloat)m_sliceViewPort.width()
+                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 10.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
 
     // Adjust scaling (zoom rate based on aspect ratio)
-    GLfloat camZPosSliced = 5.0f / m_autoScaleAdjustment;
+    GLfloat camZPosSliced = cameraDistance / m_autoScaleAdjustment;
 
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced), zeroVector, upVector);
 
     // Set light position
-    lightPos = QVector3D(0.0f, -m_yAdjustment, 0.0f);
+    lightPos = QVector3D(0.0f, -m_yAdjustment, camZPosSliced * 2.0f);
 
     // Bind bar shader
     m_barShader->bind();
@@ -1019,6 +1019,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw grid lines
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
+
         // Bind bar shader
         lineShader->bind();
 
@@ -1028,6 +1029,18 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), barColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            // Set shadowed shader bindings
+            lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme.m_lightStrength / 20.0f);
+        } else
+#endif
+        {
+            // Set shadowless shader bindings
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+        }
 
         QVector3D gridLineScaler(rowScaleFactor, gridLineWidth, gridLineWidth);
 
@@ -1060,18 +1073,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
-                // Set shadowless shader bindings
-                lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj);
             }
@@ -1108,18 +1115,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
             } else
 #endif
             {
-                // Set shadowless shader bindings
-                lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj);
             }
@@ -1164,18 +1165,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1213,18 +1208,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1349,7 +1338,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         sideLabelRotation.setY(180.f);
     }
     QVector3D backLabelTrans = QVector3D(labelXTrans, 0.0f,
-                                     labelZTrans + labelMarginZTrans);
+                                         labelZTrans + labelMarginZTrans);
     QVector3D sideLabelTrans = QVector3D(-labelXTrans - labelMarginXTrans,
                                          0.0f, -labelZTrans);
 

@@ -654,6 +654,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
+
         // Bind line shader
         lineShader->bind();
 
@@ -663,6 +664,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            // Set shadowed shader bindings
+            lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme.m_lightStrength / 20.0f);
+        } else
+#endif
+        {
+            // Set shadowless shader bindings
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+        }
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
@@ -689,7 +702,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
-                QMatrix4x4 depthMVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
                 if (m_yFlipped)
@@ -707,7 +719,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
-                depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
                 // Set the rest of the shader bindings
                 lineShader->setUniformValue(lineShader->model(), modelMatrix);
@@ -717,20 +728,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -771,19 +776,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -839,18 +837,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -892,19 +884,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -955,18 +940,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1012,19 +991,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }

@@ -484,7 +484,7 @@ void Surface3DRenderer::drawSlicedScene()
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
 
     // Set light position
-    lightPos = m_cachedScene->activeLight()->position();
+    lightPos = QVector3D(0.0f, 0.0f, 2.0f);
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
@@ -1083,6 +1083,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     if (m_cachedIsGridEnabled && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
+
         // Bind line shader
         lineShader->bind();
 
@@ -1092,6 +1093,18 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            // Set shadowed shader bindings
+            lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme.m_lightStrength / 20.0f);
+        } else
+#endif
+        {
+            // Set shadowless shader bindings
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+        }
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
@@ -1132,19 +1145,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1180,20 +1186,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1240,19 +1238,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1288,19 +1279,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1343,19 +1327,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
@@ -1393,19 +1370,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                     // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    lineShader->setUniformValue(lineShader->lightS(), adjustedLightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
                 } else
 #endif
                 {
-                    // Set shadowless shader bindings
-                    lineShader->setUniformValue(lineShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
-
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
