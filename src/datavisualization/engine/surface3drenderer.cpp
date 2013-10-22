@@ -54,11 +54,8 @@ const GLfloat labelMargin = 0.05f;
 const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
-const GLfloat surfaceGridYOffsetValue = 0.001f;
 const GLfloat sliceUnits = 2.5f;
 const int subViewDivider = 5;
-// The second offset to opposite direction is double because same matrix is translated twice
-const GLfloat surfaceGridYOffset[2] = {-surfaceGridYOffsetValue, 2.0f * surfaceGridYOffsetValue};
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
@@ -505,6 +502,11 @@ void Surface3DRenderer::drawSlicedScene()
         ShaderHelper *surfaceShader = m_shader;
         surfaceShader->bind();
 
+        if (m_cachedSurfaceGridOn) {
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.5f, 1.0f);
+        }
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
@@ -541,17 +543,13 @@ void Surface3DRenderer::drawSlicedScene()
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
             m_surfaceGridShader->bind();
-
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme.m_gridLine));
-            // Draw the grid twice, with slight offset on Y axis to each direction
-            for (int i = 0; i < 2; i++) {
-                MVPMatrix.translate(0.0f, surfaceGridYOffset[i], 0.0f);
-
-                m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
-                m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_sliceSurfaceObj);
-            }
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+            m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_sliceSurfaceObj);
             m_surfaceGridShader->release();
+
+            glDisable(GL_POLYGON_OFFSET_FILL);
         }
     }
 
@@ -938,6 +936,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // For surface we can see climpses from underneath
         glDisable(GL_CULL_FACE);
+        if (m_cachedSurfaceGridOn) {
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.5f, 1.0f);
+        }
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
@@ -990,17 +992,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
             m_surfaceGridShader->bind();
-
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme.m_gridLine));
-            // Draw the grid twice, with slight offset on Y axis to each direction
-            for (int i = 0; i < 2; i++) {
-                MVPMatrix.translate(0.0f, surfaceGridYOffset[i], 0.0f);
-
-                m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
-                m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
-            }
+            m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
+            m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
             m_surfaceGridShader->release();
+
+            glDisable(GL_POLYGON_OFFSET_FILL);
         }
     }
 
