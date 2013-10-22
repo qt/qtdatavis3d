@@ -1468,8 +1468,13 @@ void Scatter3DRenderer::initSelectionShader()
 
 void Scatter3DRenderer::initSelectionBuffer()
 {
-    if (m_selectionTexture)
+    if (m_selectionTexture) {
         m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_selectionTexture = 0;
+    }
+
+    if (m_mainViewPort.size().isEmpty())
+        return;
 
     m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
                                                                  m_selectionFrameBuffer,
@@ -1492,6 +1497,9 @@ void Scatter3DRenderer::updateDepthBuffer()
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
     }
+
+    if (m_mainViewPort.size().isEmpty())
+        return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),

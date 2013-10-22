@@ -2098,6 +2098,9 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
+    if (m_mainViewPort.size().isEmpty())
+        return;
+
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,

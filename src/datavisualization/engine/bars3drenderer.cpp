@@ -1760,11 +1760,13 @@ void Bars3DRenderer::initSelectionShader()
 
 void Bars3DRenderer::initSelectionBuffer()
 {
-    if (m_cachedIsSlicingActivated)
-        return;
-
-    if (m_selectionTexture)
+    if (m_selectionTexture) {
         m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_selectionTexture = 0;
+    }
+
+    if (m_cachedIsSlicingActivated || m_mainViewPort.size().isEmpty())
+        return;
 
     m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
                                                                  m_selectionFrameBuffer,
@@ -1787,6 +1789,9 @@ void Bars3DRenderer::updateDepthBuffer()
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
     }
+
+    if (m_mainViewPort.size().isEmpty())
+        return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
