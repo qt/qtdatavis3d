@@ -427,10 +427,10 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
     scene->setLightPositionRelativeToCamera(defaultLightPos);
 
-    if (m_selectionPointer)
-        m_selectionPointer->updateScene(scene);
-
     Abstract3DRenderer::updateScene(scene);
+
+    if (m_selectionPointer)
+        m_selectionPointer->updateScene(m_cachedScene);
 }
 
 void Surface3DRenderer::render(GLuint defaultFboHandle)
