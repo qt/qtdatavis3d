@@ -81,7 +81,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \inherits AbstractDataProxy
  * \brief Base proxy type for Bars3D.
  *
- * This type handles adding, inserting, changing and removing rows of data with Qt Quick 2.
+ * This type handles adding, inserting, changing, and removing rows of data with Qt Quick 2.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
@@ -141,8 +141,8 @@ void QBarDataProxy::resetArray()
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
- * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
+ * different from the existing array. If it's the same array, this just triggers arrayReset()
  * signal.
  * Passing null array deletes the old array and creates a new empty array.
  * Row and column labels are not affected.
@@ -154,10 +154,10 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray)
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
- * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
+ * different from the existing array. If it's the same array, this just triggers arrayReset()
  * signal.
- * Passing null array deletes the old array and creates a new empty array.
+ * Passing a null array deletes the old array and creates a new empty array.
  * The \a rowLabels and \a columnLabels lists specify the new labels for rows and columns.
  */
 void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLabels,
@@ -388,7 +388,7 @@ const QBarDataArray *QBarDataProxy::array() const
 }
 
 /*!
- * \return pointer to the row at \a rowIndex. It is guaranteed to be valid only until next call
+ * \return pointer to the row at \a rowIndex. It is guaranteed to be valid only until the next call
  * that modifies data.
  */
 const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
@@ -400,7 +400,7 @@ const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
 
 /*!
  * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
- * until next call that modifies data.
+ * until the next call that modifies data.
  */
 const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 {

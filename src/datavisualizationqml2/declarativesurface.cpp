@@ -75,7 +75,7 @@ QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     if (oldNode)
         delete oldNode;
 
-    // Create a new one and set it's bounding rectangle
+    // Create a new one and set its bounding rectangle
     DeclarativeSurfaceRenderer *node = new DeclarativeSurfaceRenderer(window(), m_shared);
     node->setRect(boundingRect());
     m_shared->setBoundingRect(boundingRect().toRect());

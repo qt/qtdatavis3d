@@ -27,7 +27,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Base proxy class for Q3DScatter.
  * \since Qt Data Visualization 1.0
  *
- * QScatterDataProxy handles adding, inserting, changing and removing data items.
+ * QScatterDataProxy handles adding, inserting, changing, and removing data items.
  *
  * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
  *
@@ -65,7 +65,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \inherits AbstractDataProxy
  * \brief Base proxy class for Scatter3D.
  *
- * This type handles adding, inserting, changing and removing data items.
+ * This type handles adding, inserting, changing, and removing data items.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
@@ -103,10 +103,10 @@ QScatterDataProxy::~QScatterDataProxy()
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
- * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
+ * different from the existing array. If it's the same array, this just triggers arrayReset()
  * signal.
- * Passing null array deletes the old array and creates a new empty array.
+ * Passing a null array deletes the old array and creates a new empty array.
  */
 void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
 {

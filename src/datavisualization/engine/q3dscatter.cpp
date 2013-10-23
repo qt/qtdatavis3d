@@ -40,11 +40,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * reset to default camera view by clicking mouse wheel. In touch devices rotation is done
  * by tap-and-move, selection by tap-and-hold and zoom by pinch.
  *
- * If no axes are explicitly set to Q3DScatter, temporary default axes with no labels are created.
- * These default axes can be modified via axis accessors, but as soon any axis is explicitly
- * set for the orientation, the default axis for that orientation is destroyed.
+ * If no axes are set explicitly to Q3DScatter, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
+ * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: If no data proxy is explicitly set, Q3DScatter creates a default
+ * Data proxies work similarly: if no data proxy is set explicitly, Q3DScatter creates a default
  * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
  * added to it is destroyed.
  *
@@ -374,7 +374,7 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -397,7 +397,7 @@ Q3DValueAxis *Q3DScatter::axisX() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -420,7 +420,7 @@ Q3DValueAxis *Q3DScatter::axisY() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -482,7 +482,7 @@ QList<Q3DValueAxis *> Q3DScatter::axes() const
  * the \a proxy to this graph.
  *
  * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is explicitly set active via this method.
+ * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
  *
  * \sa addDataProxy(), releaseDataProxy()
  */

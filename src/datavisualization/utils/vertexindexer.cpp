@@ -33,7 +33,7 @@ bool VertexIndexer::is_near(float v1, float v2)
     return qAbs(v1 - v2) < 0.01f;
 }
 
-// Searches through all already-exported vertices
+// Searches through all already exported vertices
 // for a similar one.
 // Similar = same position + same UVs + same normal
 bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex,

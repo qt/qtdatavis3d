@@ -163,7 +163,7 @@ void QAbstract3DInputHandler::setPrevDistance(int distance)
  * \property QAbstract3DInputHandler::scene
  *
  * The 3D scene this abstract input handler is controlling. Only one scene can
- * be controlled by one input handler. Setting a \a scene to a input handler doesn't
+ * be controlled by one input handler. Setting a \a scene to an input handler doesn't
  * transfer the ownership of the \a scene.
  */
 Q3DScene *QAbstract3DInputHandler::scene() const

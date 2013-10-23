@@ -33,7 +33,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * objects. See Q3DSurface documentation and basic sample code there how to feed the data for the
  * QSurfaceDataProxy.
  *
- * All rows must have same number of items.
+ * All rows must have the same number of items.
  *
  * When determining what rows and columns are visible, the first item in each row and the first item in
  * each column determine if the whole row or column is visible, even if other items in the row or column
@@ -78,7 +78,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For more complete description, see QSurfaceDataProxy.
+ * For a more complete description, see QSurfaceDataProxy.
  *
  * \sa ItemModelSurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
@@ -117,10 +117,10 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array and if the \a newArray is
- * different than the existing array. If it's the same array, this just triggers arrayReset()
+ * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
+ * different from the existing array. If it's the same array, this just triggers arrayReset()
  * signal.
- * Passing null array deletes the old array and creates a new empty array.
+ * Passing a null array deletes the old array and creates a new empty array.
  * All rows in \a newArray must be of same length.
  */
 void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
@@ -163,7 +163,7 @@ int QSurfaceDataProxy::columnCount() const
 }
 
 /*!
- * \return pointer to the item at \a index. It is guaranteed to be valid only until next call that
+ * \return pointer to the item at \a index. It is guaranteed to be valid only until the next call that
  * modifies data.
  */
 const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int index) const
@@ -190,7 +190,7 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
 /*!
  * \fn void QSurfaceDataProxy::arrayReset()
  *
- * Emitted when data array is reset.
+ * Emitted when the data array is reset.
  * If you change the whole array contents without calling resetArray(), you need to
  * emit this signal yourself or the graph won't get updated.
  */

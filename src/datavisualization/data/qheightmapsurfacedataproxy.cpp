@@ -168,7 +168,7 @@ QHeightMapSurfaceDataProxy::~QHeightMapSurfaceDataProxy()
  * QImage::Format_RGB32 in grayscale.
  *
  * The height of the image is read from the red component of the pixels if the image is in grayscale,
- * otherwise it is an average calculated from red, green and blue components of the pixels. Using
+ * otherwise it is an average calculated from red, green, and blue components of the pixels. Using
  * grayscale images may improve data conversion speed for large images.
  *
  * Not recommended formats: all mono formats (for example QImage::Format_Mono).

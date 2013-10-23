@@ -52,7 +52,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty string AbstractDataProxy::itemLabelFormat
  *
  * Label format for data items in this proxy. This format is used for single item labels,
- * e.g. when an item is selected. How the format is interpreted depends on proxy type. See
+ * for example, when an item is selected. How the format is interpreted depends on proxy type. See
  * each proxy class documentation for more information.
  */
 
@@ -101,7 +101,7 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
  * \property QAbstractDataProxy::itemLabelFormat
  *
  * Sets label \a format for data items in this proxy. This format is used for single item labels,
- * e.g. when an item is selected. How the format is interpreted depends on proxy type. See
+ * for example, when an item is selected. How the format is interpreted depends on proxy type. See
  * each proxy class documentation for more information.
  *
  * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy

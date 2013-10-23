@@ -32,7 +32,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * for Q3DBars. It uses QItemModelBarDataMapping instance to map data from the model to Q3DBars
  * graph.
  *
- * Data is resolved asynchronously whenever the mapping or the model changes.
+ * The data is resolved asynchronously whenever the mapping or the model changes.
  * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * \sa QItemModelBarDataMapping, {Qt Data Visualization Data Handling}

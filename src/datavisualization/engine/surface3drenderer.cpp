@@ -235,7 +235,7 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
                 if (!m_surfaceObj)
                     loadSurfaceObj();
 
-                // Note: Data setup can change samplespace (as min width/height is 1)
+                // Note: Data setup can change sample space (as min width/height is 1)
                 if (m_cachedSmoothSurface) {
                     m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
                                                   m_axisCacheY.min(), dimensionChanged);

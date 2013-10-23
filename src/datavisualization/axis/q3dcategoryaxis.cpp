@@ -51,7 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \qmlproperty list CategoryAxis3D::categoryLabels
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row and column labels.
  */
 
@@ -74,7 +74,7 @@ Q3DCategoryAxis::~Q3DCategoryAxis()
  * \property Q3DCategoryAxis::categoryLabels
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row and column labels.
  *
  * \note CategoryLabels actually reads/writes the Q3DAbstractAxis::labels property,
@@ -134,7 +134,7 @@ Q3DCategoryAxisPrivate::~Q3DCategoryAxisPrivate()
 /*!
  * \internal
  * Controller uses this function to set labels from data proxy as category labels.
- * If the labels have been explicitly set by user, data proxy labels are not used.
+ * If the labels have been set explicitly by the user, data proxy labels are not used.
  */
 void Q3DCategoryAxisPrivate::setDataLabels(const QStringList &labels)
 {

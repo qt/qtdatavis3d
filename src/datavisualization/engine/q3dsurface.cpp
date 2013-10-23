@@ -48,11 +48,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * To rotate the graph, hold down the right mouse button and move the mouse. Zooming is done using mouse
  * wheel. Both assume the default input handler is in use.
  *
- * If no axes are explicitly set to Q3DSurface, temporary default axes with no labels are created.
- * These default axes can be modified via axis accessors, but as soon any axis is explicitly
- * set for the orientation, the default axis for that orientation is destroyed.
+ * If no axes are set explicitly to Q3DSurface, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
+ * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: If no data proxy is explicitly set, Q3DSurface creates a default
+ * Data proxies work similarly: if no data proxy is set explicitly, Q3DSurface creates a default
  * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
  * added to it is destroyed.
  *
@@ -323,7 +323,7 @@ QFont Q3DSurface::font() const
 /*!
  * \property Q3DSurface::scene
  *
- * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
  */
 Q3DScene *Q3DSurface::scene() const
 {
@@ -352,7 +352,7 @@ QDataVis::LabelStyle Q3DSurface::labelStyle() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -375,7 +375,7 @@ Q3DValueAxis *Q3DSurface::axisX() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -398,7 +398,7 @@ Q3DValueAxis *Q3DSurface::axisY() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -460,7 +460,7 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
  * the \a proxy to this graph.
  *
  * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is explicitly set active via this method.
+ * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
  *
  * \sa addDataProxy(), releaseDataProxy()
  */

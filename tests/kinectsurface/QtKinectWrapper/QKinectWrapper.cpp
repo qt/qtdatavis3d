@@ -86,7 +86,7 @@ QImage QKinectWrapper::getDepth()
 
 /**
     \brief Returns if running
-    Runing comprises initializing and reading data (i.e. not running is idle or error)
+    Runing comprises initializing and reading data (not running is idle or error)
     We query the thread state to get this.
 **/
 bool QKinectWrapper::isRunning()
@@ -99,7 +99,7 @@ bool QKinectWrapper::isRunning()
 
 /**
     \brief Returns if stopped
-    Runing comprises initializing and reading data (i.e. not running is idle or error)
+    Runing comprises initializing and reading data (not running is idle or error)
     We query the thread state to get this.
 **/
 bool QKinectWrapper::isStopped()

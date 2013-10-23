@@ -42,11 +42,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * reset to default camera view by clicking mouse wheel. In touch devices rotation is done
  * by tap-and-move, selection by tap-and-hold and zoom by pinch.
  *
- * If no axes are explicitly set to Q3DBars, temporary default axes with no labels are created.
- * These default axes can be modified via axis accessors, but as soon any axis is explicitly
- * set for the orientation, the default axis for that orientation is destroyed.
+ * If no axes are set explicitly to Q3DBars, temporary default axes with no labels are created.
+ * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
+ * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: If no data proxy is explicitly set, Q3DBars creates a default
+ * Data proxies work similarly: If no data proxy is set explicitly, Q3DBars creates a default
  * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
  * added to it is destroyed.
  *
@@ -209,7 +209,7 @@ qreal Q3DBars::barThickness()
 /*!
  * \property Q3DBars::barSpacing
  *
- * Bar spacing, ie. the empty space between bars, in X and Z dimensions. It is preset to
+ * Bar spacing, which is the empty space between bars, in X and Z dimensions. It is preset to
  * \c {(1.0, 1.0)} by default. Spacing is affected by barSpacingRelative -property.
  *
  * \sa barSpacingRelative
@@ -439,7 +439,7 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  * the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -461,7 +461,7 @@ Q3DCategoryAxis *Q3DBars::rowAxis() const
  * the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -484,7 +484,7 @@ Q3DCategoryAxis *Q3DBars::columnAxis() const
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is explicitly set to same orientation.
+ * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -541,7 +541,7 @@ QList<Q3DAbstractAxis *> Q3DBars::axes() const
  * the \a proxy to this graph.
  *
  * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is explicitly set active via this method.
+ * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
  *
  * \sa addDataProxy(), releaseDataProxy()
  */

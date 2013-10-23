@@ -153,7 +153,7 @@ void Q3DCamera::setYRotation(qreal rotation)
  *
  * This property contains the current minimum X-rotation for the camera.
  * The full circle range is [-180,180] and the minimum value is limited to -180.
- * Also the value can't be higher than maximum, and is adjusted if necessary.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
  * \sa wrapXRotation, maxXRotation
  */
@@ -185,7 +185,7 @@ void Q3DCamera::setMinXRotation(qreal minRotation)
  *
  * This property contains the current minimum Y-rotation for the camera.
  * The full Y angle range is [-90,90] and the minimum value is limited to -90.
- * Also the value can't be higher than maximum, and is adjusted if necessary.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
  * \sa wrapYRotation, maxYRotation
  */
@@ -217,7 +217,7 @@ void Q3DCamera::setMinYRotation(qreal minRotation)
  *
  * This property contains the current maximum X-rotation for the camera.
  * The full circle range is [-180,180] and the maximum value is limited to 180.
- * Also the value can't be lower than minimum, and is adjusted if necessary.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
  * \sa wrapXRotation, minXRotation
  */
@@ -250,7 +250,7 @@ void Q3DCamera::setMaxXRotation(qreal maxRotation)
  *
  * This property contains the current maximum Y-rotation for the camera.
  * The full Y angle range is [-90,90] and the maximum value is limited to 90.
- * Also the value can't be lower than minimum, and is adjusted if necessary.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
  * \sa wrapYRotation, minYRotation
  */
@@ -301,8 +301,8 @@ void Q3DCamera::setBaseOrientation(const QVector3D &basePosition,
 /*!
  * \property Q3DCamera::viewMatrix
  *
- * This property contains the view matrix used in the 3D calculations. When the default orbiting camera behavior is sufficient
- * there is no need to touch this property. But if the default behavior is insufficient the view matrix can be set directly.
+ * This property contains the view matrix used in the 3D calculations. When the default orbiting camera behavior is sufficient,
+ * there is no need to touch this property. But if the default behavior is insufficient, the view matrix can be set directly.
  * When setting the view matrix directly remember to set Q3DCamera::viewMatrixAutoUpdateEnabled to false.
  */
 QMatrix4x4 Q3DCamera::viewMatrix() const
