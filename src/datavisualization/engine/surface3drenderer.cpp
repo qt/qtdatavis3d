@@ -1716,7 +1716,7 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
 {
     if (!enable && !m_flatSupported) {
         qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
-                      " Requires at least GLSL version 1.5.";
+                      " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
         enable = true;
     }
 

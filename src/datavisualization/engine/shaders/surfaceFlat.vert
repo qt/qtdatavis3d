@@ -1,4 +1,6 @@
-#version 150
+#version 120
+
+#extension GL_EXT_gpu_shader4 : require
 
 attribute highp vec3 vertexPosition_mdl;
 attribute highp vec3 vertexNormal_mdl;
@@ -10,7 +12,7 @@ uniform highp mat4 itM;
 uniform highp vec3 lightPosition_wrld;
 
 varying highp vec3 position_wrld;
-flat out highp vec3 normal_cmr;
+flat varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 varying highp vec3 coords_mdl;

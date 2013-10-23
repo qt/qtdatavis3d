@@ -1,8 +1,10 @@
-#version 150
+#version 120
+
+#extension GL_EXT_gpu_shader4 : require
 
 varying highp vec3 coords_mdl;
 varying highp vec3 position_wrld;
-flat in highp vec3 normal_cmr;
+flat varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
 
