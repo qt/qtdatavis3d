@@ -180,11 +180,12 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
     // Update cached data window
     int dataRowCount = dataProxy->rowCount();
     int dataRowIndex = minRow;
+    int updateSize = 0;
     for (int i = 0; i < newRows; i++) {
         int j = 0;
         if (dataRowIndex < dataRowCount) {
             const QBarDataRow *dataRow = dataProxy->rowAt(dataRowIndex);
-            int updateSize = qMin((dataRow->size() - minCol), m_renderItemArray[i].size());
+            updateSize = qMin((dataRow->size() - minCol), m_renderItemArray[i].size());
             if (dataRow) {
                 int dataColIndex = minCol;
                 for (; j < updateSize ; j++) {
@@ -201,6 +202,9 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
         }
         dataRowIndex++;
     }
+
+    m_renderColumns = updateSize;
+    m_renderRows = qMin((dataRowCount - minRow), m_renderItemArray.size());
 
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
@@ -874,7 +878,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     if (QDataVis::SelectionModeSliceRow == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         item.setPosition(QPoint(row, bar));
-                        if (selectionDirty)
+                        if (selectionDirty && bar < m_renderColumns)
                             m_sliceSelection->append(&item);
                     }
                     break;
@@ -887,7 +891,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     if (QDataVis::SelectionModeSliceColumn == m_cachedSelectionMode) {
                         item.setTranslation(modelMatrix.column(3).toVector3D());
                         item.setPosition(QPoint(row, bar));
-                        if (selectionDirty)
+                        if (selectionDirty && row < m_renderRows)
                             m_sliceSelection->append(&item);
                     }
                     break;

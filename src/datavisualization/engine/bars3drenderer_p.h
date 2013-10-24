@@ -100,6 +100,8 @@ private:
     GLfloat m_maxSceneSize;
     QVector3D m_selection;
     QVector3D m_previousSelection;
+    int m_renderRows;
+    int m_renderColumns;
 
     bool m_hasHeightAdjustmentChanged;
     BarRenderItem m_dummyBarRenderItem;
