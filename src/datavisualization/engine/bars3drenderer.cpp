@@ -84,7 +84,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleX(0),
       m_scaleZ(0),
       m_scaleFactor(0),
-      m_maxSceneSize(40.0),
+      m_maxSceneSize(40.0f),
       m_selection(selectionSkipColor),
       m_previousSelection(selectionSkipColor),
       m_hasHeightAdjustmentChanged(true)
@@ -169,10 +169,11 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
             m_sliceSelection->clear();
 
         m_cachedColumnCount = newColumns;
-        m_cachedRowCount    = newRows;
-        // TODO: Invent foolproof max scene size formula
-        // This seems to work ok if spacing is not negative (and row/column or column/row ratio is not too high)
-        m_maxSceneSize = 2 * qSqrt(newColumns * newRows);
+        m_cachedRowCount = newRows;
+        // Calculate max scene size
+        GLfloat sceneRatio = qMin(GLfloat(newColumns) / GLfloat(newRows),
+                                  GLfloat(newRows) / GLfloat(newColumns));
+        m_maxSceneSize = 2.0f * qSqrt(sceneRatio * newColumns * newRows);
         // Calculate here and at setting bar specs
         calculateSceneScalingFactors();
     }

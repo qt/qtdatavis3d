@@ -608,7 +608,6 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
-    qDebug() << "Destroying Q3DBarsPrivate";
     delete m_shared;
 }
 
