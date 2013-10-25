@@ -117,6 +117,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     if (!tester.testCompile()) {
         m_flatSupported = false;
         m_controller->setSmoothSurface(true);
+        qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
+                      " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
     }
 
     m_cachedSmoothSurface =  m_controller->smoothSurface();

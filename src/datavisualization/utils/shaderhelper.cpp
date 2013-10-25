@@ -22,6 +22,14 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    Q_UNUSED(type)
+    Q_UNUSED(context)
+    Q_UNUSED(msg)
+    // Used to discard warnings generated during shader test compilation
+}
+
 ShaderHelper::ShaderHelper(QObject *parent,
                            const QString &vertexShader,
                            const QString &fragmentShader,
@@ -88,14 +96,19 @@ void ShaderHelper::initialize()
 
 bool ShaderHelper::testCompile()
 {
+    bool result = true;
+    // Discard warnings, we only need the result
+    QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
     if (m_program)
         delete m_program;
     m_program = new QOpenGLShaderProgram(m_caller);
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, m_vertexShaderFile))
-        return false;
+        result = false;
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
-        return false;
-    return true;
+        result = false;
+    // Restore actual message handler
+    qInstallMessageHandler(handler);
+    return result;
 }
 
 void ShaderHelper::bind()
