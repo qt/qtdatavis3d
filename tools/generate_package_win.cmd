@@ -14,7 +14,7 @@ if "%1"=="" (
 )
 
 if "%2"=="" (
-    set DATAVIS_BRANCH=master
+    set DATAVIS_BRANCH=origin/master
 ) else (
     set DATAVIS_BRANCH=%2
 )
@@ -30,6 +30,7 @@ set DATAVIS_FINAL_ZIP=..\qtdatavisualization_%DATAVIS_VERSION%.zip
 echo Exporting %DATAVIS_BRANCH% to %DATAVIS_TEMP_ZIP_FULL%...
 rmdir /q /s %DATAVIS_TEMP_DIR_FULL% 2> NUL
 md %DATAVIS_TEMP_DIR_FULL% 2> NUL
+call git fetch
 call git archive --format zip --output ../%DATAVIS_TEMP_DIR%/%DATAVIS_TEMP_ZIP% %DATAVIS_BRANCH%
 
 echo Unzipping %DATAVIS_TEMP_ZIP_FULL% to %DATAVIS_PACKAGE_UNZIP_DIR% and %DATAVIS_BUILD_DIR%...
@@ -37,6 +38,11 @@ md %DATAVIS_PACKAGE_UNZIP_DIR% 2> NUL
 md %DATAVIS_BUILD_DIR% 2> NUL
 call 7z x -y -o%DATAVIS_PACKAGE_UNZIP_DIR% %DATAVIS_TEMP_ZIP_FULL%  > NUL
 call 7z x -y -o%DATAVIS_BUILD_DIR% %DATAVIS_TEMP_ZIP_FULL%  > NUL
+::Workaround for git archive bug
+rmdir /q /s %DATAVIS_PACKAGE_UNZIP_DIR%\tests 2> NUL
+rmdir /q /s %DATAVIS_PACKAGE_UNZIP_DIR%\tools 2> NUL
+rmdir /q /s %DATAVIS_BUILD_DIR%\tests 2> NUL
+rmdir /q /s %DATAVIS_BUILD_DIR%\tools 2> NUL
 
 echo Generating includes, mkspecs, and docs in %DATAVIS_BUILD_DIR%...
 pushd %DATAVIS_BUILD_DIR%
