@@ -32,7 +32,7 @@ For debug builds:
     qmake CONFIG+=debug_and_release; make debug
 
 For release builds:
-    qmake CONFIG+=release ; make
+    qmake CONFIG+=release; make
     or
     qmake CONFIG+=debug_and_release; make release
 
