@@ -100,17 +100,17 @@
     qmake CONFIG+=debug_and_release; make release
     \endcode
 
-    For both builds
+    For both builds:
     \code
     qmake CONFIG+="debug_and_release build_all"; make
     \endcode
 
-    If you want to install the module to your Qt directory use:
+    After building, install the module to your Qt directory:
     \code
     make install
     \endcode
 
-    If you want to uninstall the module
+    If you want to uninstall the module:
     \code
     make uninstall
     \endcode
