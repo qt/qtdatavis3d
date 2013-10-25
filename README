@@ -36,13 +36,13 @@ For release builds:
     or
     qmake CONFIG+=debug_and_release; make release
 
-For both builds
+For both builds:
     qmake CONFIG+="debug_and_release build_all"; make
 
-If you want to install the module to your Qt directory use:
+After building, install the module to your Qt directory:
     make install
 
-If you want to uninstall the module
+If you want to uninstall the module:
     make uninstall
 
 Building as a statically linked library
