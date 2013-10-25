@@ -13,7 +13,7 @@ fi
 
 if [ "$2" = "" ]
 then
-    DATAVIS_BRANCH=master
+    DATAVIS_BRANCH=origin/master
 else
     DATAVIS_BRANCH=$2
 fi
@@ -30,6 +30,7 @@ DATAVIS_FINAL_TAR=$DATAVIS_CURRENT_DIR/../qtdatavisualization_$DATAVIS_VERSION.t
 echo Exporting $DATAVIS_BRANCH to $DATAVIS_TEMP_TAR_FULL...
 rm -r -f $DATAVIS_TEMP_DIR_FULL 2> /dev/null
 mkdir -p $DATAVIS_TEMP_DIR_FULL 2> /dev/null
+git fetch
 git archive --format tar --output $DATAVIS_TEMP_TAR_FULL $DATAVIS_BRANCH
 
 echo Unpacking $DATAVIS_TEMP_TAR_FULL to $DATAVIS_PACKAGE_UNTAR_DIR and $DATAVIS_BUILD_DIR...
@@ -37,6 +38,11 @@ mkdir -p $DATAVIS_PACKAGE_UNTAR_DIR 2> /dev/null
 mkdir -p $DATAVIS_BUILD_DIR 2> /dev/null
 tar -xvf $DATAVIS_TEMP_TAR_FULL -C $DATAVIS_PACKAGE_UNTAR_DIR > /dev/null
 tar -xvf $DATAVIS_TEMP_TAR_FULL -C $DATAVIS_BUILD_DIR > /dev/null
+#Workaround for git archive bug
+rm -r -f $DATAVIS_PACKAGE_UNTAR_DIR/tools
+rm -r -f $DATAVIS_PACKAGE_UNTAR_DIR/tests
+rm -r -f $DATAVIS_BUILD_DIR/tools
+rm -r -f $DATAVIS_BUILD_DIR/tests
 
 echo Generating includes, mkspecs, and docs in $DATAVIS_BUILD_DIR...
 cd $DATAVIS_BUILD_DIR
