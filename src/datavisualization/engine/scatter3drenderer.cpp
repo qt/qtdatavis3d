@@ -568,8 +568,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     glCullFace(GL_BACK);
 
-    GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
-
     // Draw background
     if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
@@ -621,7 +619,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                adjustedLightStrength);
+                                                m_cachedTheme.m_lightStrength / 10.0f);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
