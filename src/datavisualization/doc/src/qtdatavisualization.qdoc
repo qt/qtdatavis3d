@@ -93,7 +93,7 @@
 
     For release builds:
     \code
-    qmake CONFIG+=release ; make
+    qmake CONFIG+=release; make
     \endcode
     or
     \code

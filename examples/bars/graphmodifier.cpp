@@ -78,6 +78,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_graph->addDataProxy(m_temperatureData);
     //! [4]
 
+    changePresetCamera();
     resetTemperatureData();
 }
 //! [0]
@@ -141,7 +142,7 @@ void GraphModifier::changeStyle(int style)
 
 void GraphModifier::changePresetCamera()
 {
-    static int preset = QDataVis::CameraPresetFrontLow;
+    static int preset = QDataVis::CameraPresetFront;
 
     m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
 
