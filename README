@@ -76,7 +76,7 @@ others may be only partially implemented. Here are some known issues:
 - Mac: Graphs drawn half the size on Retina displays.
 - Using multiple graphs in one application crashes on application shutdown
   unless the last graph to have active context is deleted last.
-- Android doesn't support both widgets and OpenGL simulataneously, so only
+- Android doesn't support both widgets and OpenGL simultaneously, so only
   the Qt Quick 2 API is usable in practice in Android.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
