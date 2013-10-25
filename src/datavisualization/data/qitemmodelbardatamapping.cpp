@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelBarDataMapping
  * \inmodule QtDataVisualization
  * \brief Item model mapping for Q3DBars.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelBarDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
  * of Q3DBars. There are three ways to use QItemModelBarDataMapping:
@@ -45,7 +45,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  *    For example, assume that you have a custom QAbstractItemModel for storing various monthly values
  *    related to a business.
- *    Each item in the model has roles "year", "month", "income", and "expenses".
+ *    Each item in the model has the roles "year", "month", "income", and "expenses".
  *    You could do the following to display the data in a bar graph:
  *
  *    \snippet doc_src_qtdatavisualization.cpp 3
@@ -55,14 +55,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype BarDataMapping
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelBarDataMapping
  * \brief Item model mapping for Bars3D.
  *
  * This type is used to map roles of AbstractItemModel to rows, columns, and values of Bars3D. For
- * more complete description, see QItemModelBarDataMapping.
+ * a more complete description, see QItemModelBarDataMapping.
  *
  * Usage example:
  *
@@ -89,13 +89,13 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \qmlproperty list BarDataMapping::rowCategories
  * The row categories of the mapping. Only items with row roles that are found in this list are
- * included when data is resolved. The rows are ordered in the same order as they are in this list.
+ * included when the data is resolved. The rows are ordered in the same order as they are in this list.
  */
 
 /*!
  * \qmlproperty list BarDataMapping::columnCategories
  * The column categories of the mapping. Only items with column roles that are found in this list are
- * included when data is resolved. The columns are ordered in the same order as they are in this list.
+ * included when the data is resolved. The columns are ordered in the same order as they are in this list.
  */
 
 /*!
@@ -108,7 +108,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty list BarDataMapping::autoRowCategories
  * When set to true, the mapping ignores any explicitly set row categories
  * and overwrites them with automatically generated ones whenever the
- * data from model is resolved. Defaults to true.
+ * data from the model is resolved. Defaults to true.
  */
 
 /*!
@@ -354,7 +354,7 @@ void QItemModelBarDataMapping::remap(const QString &rowRole,
  * /return index of the specified \a category in row categories list.
  * If the row categories list is empty, -1 is returned.
  * \note If the automatic row categories generation is in use, this method will
- * not return valid index before the data in the model is resolved for the first time.
+ * not return a valid index before the data in the model is resolved for the first time.
  */
 int QItemModelBarDataMapping::rowCategoryIndex(const QString &category)
 {
@@ -365,7 +365,7 @@ int QItemModelBarDataMapping::rowCategoryIndex(const QString &category)
  * /return index of the specified \a category in column categories list.
  * If the category is not found, -1 is returned.
  * \note If the automatic column categories generation is in use, this method will
- * not return valid index before the data in the model is resolved for the first time.
+ * not return a valid index before the data in the model is resolved for the first time.
  */
 int QItemModelBarDataMapping::columnCategoryIndex(const QString &category)
 {

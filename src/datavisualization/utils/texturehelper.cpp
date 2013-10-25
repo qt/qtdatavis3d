@@ -99,53 +99,6 @@ GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinea
     return textureId;
 }
 
-GLuint TextureHelper::createSelectionBuffer(const QSize &size, GLuint &texture,
-                                            GLuint &depthTexture)
-{
-    GLuint framebuffer;
-
-    // Create frame buffer
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    // Create texture for the selection buffer
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//#if !defined(QT_OPENGL_ES_2)
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGB,
-//                 GL_UNSIGNED_BYTE, NULL);
-//#else
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, NULL);
-//#endif
-
-    // Create texture object for the depth buffer
-    glGenTextures(1, &depthTexture);
-    glBindTexture(GL_TEXTURE_2D, depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width(), size.height(),
-                 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Attach texture to color attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
-    // Attach texture to depth attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
-
-    // Verify that the frame buffer is complete
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return 0;
-    }
-
-    // Restore the default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    return framebuffer;
-}
-
 GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuffer,
                                              GLuint &depthBuffer)
 {
@@ -213,7 +166,7 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, size.width() * textureSize,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
                  size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 

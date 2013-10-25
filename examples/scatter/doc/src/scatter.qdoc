@@ -32,6 +32,8 @@
         \li Adjust some graph properties using widget controls
     \endlist
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image scatter-example.png
 
     \section1 Creating the application
@@ -59,7 +61,7 @@
 
     \snippet ../examples/scatter/main.cpp 2
 
-    The application main is done and we can show the graph and start the event loop:
+    The application main is done. We can show the graph and start the event loop:
 
     \snippet ../examples/scatter/main.cpp 3
 
@@ -107,7 +109,7 @@
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 5
 
-    And populate it:
+    and populate it:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 6
 

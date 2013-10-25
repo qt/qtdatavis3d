@@ -19,7 +19,7 @@
 /*!
     \title Qt Data Visualization
     \page qtdatavisualization-index.html
-    \brief QtDataVisualization module provides functionality for 3D visualization.
+    \brief Provides functionality for 3D visualization.
 
     Qt Data Visualization module provides a way to visualize data in 3D.
 
@@ -28,7 +28,7 @@
     \list
         \li Multiple data visualization options: 3D Bars, 3D Scatter, and 3D Surface
         \li 2D slice views of the 3D data
-        \li Interactive data: Rotate, zoom, and highlight data using mouse or touch
+        \li Interactive data: rotate, zoom, and highlight data using mouse or touch
         \li Uses OpenGL for rendering the data
         \li QML2 support
         \li Customizable axes for data - control viewable data window with axis ranges
@@ -50,14 +50,14 @@
 
     \snippet doc_src_qtdatavisualization.cpp 0
 
-    \note If you are using a few classes from this module, we recommend including those specific
-    classes only instead of the whole module.
+    \note If you are only using a few classes from this module, we recommend including only those
+    specific classes instead of the whole module.
 
-    To link against Qt Data Visualization module, add this line to your \c qmake project file:
+    To link against the Qt Data Visualization module, add this line to your \c qmake project file:
 
     \snippet doc_src_qtdatavisualization.pro 0
 
-    See \l{Qt Data Visualization Getting Started}{Getting started} page for further information
+    See the \l{Qt Data Visualization Getting Started}{Getting started} page for further information on
     how to use Qt Data Visualization in your application.
 
     \section1 Articles

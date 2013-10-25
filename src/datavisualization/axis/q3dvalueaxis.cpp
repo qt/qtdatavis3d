@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DValueAxis
  * \inmodule QtDataVisualization
  * \brief The Q3DValueAxis class is used for manipulating an axis of a graph.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * Q3DValueAxis provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
@@ -38,7 +38,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ValueAxis3D
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates Q3DValueAxis

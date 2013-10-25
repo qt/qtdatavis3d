@@ -38,23 +38,26 @@ const float rotationSpeed      = 100.0f;
  * \class Q3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic wheel mouse based input handler.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * Q3DInputHandler is the basic input handler for wheel mouse type of input devices.
  *
  * Default input handler has the following functionalty:
  * \table
  *   \header
- *     \li Mouse action                 \li Action
+ *     \li Mouse action                   \li Action
  *   \row
- *     \li Right button pressed         \li Rotate graph within limits set for Q3DCamera
+ *     \li Drag with right button pressed \li Rotate graph within limits set for Q3DCamera.
  *   \row
- *     \li Left click                   \li Select item under cursor or remove selection if none
+ *     \li Left click                     \li Select item under cursor or remove selection if none.
+ *                                            May open the secondary view depending on the
+ *                                            selection mode.
  *   \row
- *     \li Mouse wheel                  \li Zoom in/out within default range (10...500%)
+ *     \li Mouse wheel                    \li Zoom in/out within default range (10...500%).
  *   \row
- *     \li Left click on secodanry view \li Return to primary view when in slice mode
- *                                      \note Slice mode is available in Q3DBars and Q3DSurface only
+ *     \li Left click on the primary view when the secondary view is visible
+ *                                        \li Closes the secondary view.
+ *                                            \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
  */
 

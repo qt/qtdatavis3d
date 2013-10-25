@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelSurfaceDataMapping
  * \inmodule QtDataVisualization
  * \brief Item model mapping for Q3DSurface.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelSurfaceDataMapping is used to map roles of QAbstractItemModel to rows, columns, and values
  * of Q3DSurface. There are three ways to use QItemModelSurfaceDataMapping:
@@ -44,7 +44,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *    columns.
  *
  *    For example, assume that you have a custom QAbstractItemModel storing surface topography data.
- *    Each item in the model has roles "longitude", "latitude" and "height". The item model already
+ *    Each item in the model has the roles "longitude", "latitude", and "height". The item model already
  *    contains the data properly sorted so that longitudes and latitudes are first encountered in
  *    correct order, which enables us to utilize the row and column category autogeneration.
  *    You could do the following to display the data in a surface graph:
@@ -56,14 +56,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype SurfaceDataMapping
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelSurfaceDataMapping
  * \brief Item model mapping for Surface3D.
  *
  * This type is used to map roles of AbstractItemModel to rows, columns, and values of Surface3D.
- * For more complete description, see QItemModelSurfaceDataMapping.
+ * For a more complete description, see QItemModelSurfaceDataMapping.
  *
  * Usage example:
  *
@@ -142,7 +142,7 @@ QItemModelSurfaceDataMapping::QItemModelSurfaceDataMapping(const QString &valueR
 }
 
 /*!
- * Constructs QItemModelSurfaceDataMapping with \a rowRole, \a columnRole, \a valueRole
+ * Constructs QItemModelSurfaceDataMapping with \a rowRole, \a columnRole, \a valueRole,
  * and the given \a parent.
  */
 QItemModelSurfaceDataMapping::QItemModelSurfaceDataMapping(const QString &rowRole,
@@ -158,7 +158,7 @@ QItemModelSurfaceDataMapping::QItemModelSurfaceDataMapping(const QString &rowRol
 
 /*!
  * Constructs QItemModelSurfaceDataMapping with \a rowRole, \a columnRole, \a valueRole,
- * \a rowCategories, \a columnCategories and the given \a parent. This constructor
+ * \a rowCategories, \a columnCategories, and the given \a parent. This constructor
  * also sets autoRowCategories and autoColumnCategories to false.
  */
 QItemModelSurfaceDataMapping::QItemModelSurfaceDataMapping(const QString &rowRole,
@@ -359,7 +359,7 @@ void QItemModelSurfaceDataMapping::remap(const QString &rowRole,
  * /return index of the specified \a category in row categories list.
  * If the row categories list is empty, -1 is returned.
  * \note If the automatic row categories generation is in use, this method will
- * not return valid index before the data in the model is resolved for the first time.
+ * not return a valid index before the data in the model is resolved for the first time.
  */
 int QItemModelSurfaceDataMapping::rowCategoryIndex(const QString &category)
 {
@@ -369,7 +369,7 @@ int QItemModelSurfaceDataMapping::rowCategoryIndex(const QString &category)
 /*!
  * /return index of the specified \a category in column categories list.
  * \note If the automatic column categories generation is in use, this method will
- * not return valid index before the data in the model is resolved for the first time.
+ * not return a valid index before the data in the model is resolved for the first time.
  */
 int QItemModelSurfaceDataMapping::columnCategoryIndex(const QString &category)
 {

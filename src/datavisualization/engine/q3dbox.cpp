@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
     \class Q3DBox
     \inmodule QtDataVisualization
     \brief The Q3DBox class represents an axis-aligned box in 3D space.
-    \since 1.0.0
+    \since Qt Data Visualization 1.0
 
     Q3DBox can be used to represent the bounding box of objects in a 3D
     scene so that they can be easily culled if they are out of view.

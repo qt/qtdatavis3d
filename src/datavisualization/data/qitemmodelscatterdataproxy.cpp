@@ -26,12 +26,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DScatter.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DScatter. It maps roles defined in QItemModelScatterDataMapping to roles in the model.
  *
- * Data is resolved asynchronously whenever the mapping or the model changes.
+ * The data is resolved asynchronously whenever the mapping or the model changes.
  * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * /sa {Qt Data Visualization Data Handling}
@@ -39,7 +39,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ItemModelScatterDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelScatterDataProxy
@@ -48,7 +48,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * This type allows you to use AbstractItemModel derived models as a data source for Scatter3D.
  *
- * Data is resolved asynchronously whenever the mapping or the model changes.
+ * The data is resolved asynchronously whenever the mapping or the model changes.
  * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * Usage example:
@@ -99,7 +99,7 @@ QItemModelScatterDataProxy::~QItemModelScatterDataProxy()
 /*!
  * \property QItemModelScatterDataProxy::itemModel
  *
- * Defines item model. Does not take ownership of the model, but does connect to it to listen for
+ * Defines the item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
 void QItemModelScatterDataProxy::setItemModel(const QAbstractItemModel *itemModel)
@@ -115,7 +115,7 @@ const QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 /*!
  * \property QItemModelScatterDataProxy::activeMapping
  *
- * Defines data mapping. Proxy takes ownership of the \a mapping.
+ * Defines the data mapping. The proxy takes ownership of the \a mapping.
  * Modifying a mapping that is set to the proxy will trigger data set re-resolving.
  */
 void QItemModelScatterDataProxy::setActiveMapping(QItemModelScatterDataMapping *mapping)

@@ -58,7 +58,7 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
 
     m_surfaceType = SurfaceSmooth;
 
-    // Create/populate vertice table
+    // Create/populate vertix table
     if (changeGeometry)
         m_vertices.resize(totalSize);
 
@@ -174,7 +174,7 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
 
     m_surfaceType = SurfaceFlat;
 
-    // Create vertice table
+    // Create vertix table
     if (changeGeometry)
         m_vertices.resize(totalSize);
 

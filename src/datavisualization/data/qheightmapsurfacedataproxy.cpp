@@ -28,7 +28,7 @@ const float defaultMaxValue = 10.0f;
  * \class QHeightMapSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QHeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
  * way for giving the surface plot a height map to be visualized.
@@ -43,7 +43,7 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \qmltype HeightMapSurfaceDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QHeightMapSurfaceDataProxy
@@ -168,7 +168,7 @@ QHeightMapSurfaceDataProxy::~QHeightMapSurfaceDataProxy()
  * QImage::Format_RGB32 in grayscale.
  *
  * The height of the image is read from the red component of the pixels if the image is in grayscale,
- * otherwise it is an average calculated from red, green and blue components of the pixels. Using
+ * otherwise it is an average calculated from red, green, and blue components of the pixels. Using
  * grayscale images may improve data conversion speed for large images.
  *
  * Not recommended formats: all mono formats (for example QImage::Format_Mono).

@@ -26,19 +26,19 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     //! [4]
-    Q3DBars *bars = new Q3DBars();
+    Q3DBars bars;
     //! [4]
     //! [0]
-    bars->rowAxis()->setRange(0, 4);
-    bars->columnAxis()->setRange(0, 4);
+    bars.rowAxis()->setRange(0, 4);
+    bars.columnAxis()->setRange(0, 4);
     //! [0]
     //! [1]
-    QBarDataRow data;
-    data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
-    bars->activeDataProxy()->addRow(&data);
+    QBarDataRow *data = new QBarDataRow;
+    *data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
+    bars.activeDataProxy()->addRow(data);
     //! [1]
     //! [2]
-    bars->show();
+    bars.show();
     //! [2]
 
     return app.exec();

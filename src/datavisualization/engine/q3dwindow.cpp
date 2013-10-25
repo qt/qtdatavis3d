@@ -33,7 +33,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DWindow
  * \inmodule QtDataVisualization
  * \brief The Q3DWindow class provides a window and render loop.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * This class creates a QWindow and provides render loop for visualization types inheriting it.
  * \warning This class is not intended to be used directly by developers.
@@ -51,7 +51,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
 {
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
-    surfaceFormat.setDepthBufferSize(16);
+    surfaceFormat.setDepthBufferSize(24);
 #if !defined(QT_OPENGL_ES_2)
     surfaceFormat.setSamples(8);
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);

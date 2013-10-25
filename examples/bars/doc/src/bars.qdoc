@@ -33,6 +33,8 @@
 
     It also demonstrates how having negative bar values affects the graph.
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image bars-example.png
 
     \section1 Creating the application

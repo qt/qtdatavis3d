@@ -31,6 +31,8 @@
         \li How to use a table widget to modify the data in the graph
     \endlist
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image itemmodel-example-2.png
 
     \section1 Creating the application
@@ -55,7 +57,7 @@
 
     \snippet ../examples/itemmodel/main.cpp 2
 
-    Here we tell the mapping object to directly map model's rows and columns into proxy's rows and
+    Here we tell the mapping object to directly map the model's rows and columns into the proxy's rows and
     columns instead of defining row and column roles to map for them. Then we give the model from
     the table widget and the mapping object to the proxy. Finally we set the proxy as the active
     data proxy for the graph.
@@ -63,7 +65,7 @@
     Next, let's create another class to handle the data addition and other interaction with the
     graph. Let's call it GraphDataGenerator (See \l {Setting up the graph} and
     \l {Adding data to the graph} for details) and connect some signals between Q3DBars,
-    GraphDataGenerator and QTableWidget (See \l {Interacting with the data} for a closer look):
+    GraphDataGenerator, and QTableWidget (See \l {Interacting with the data} for a closer look):
 
     \snippet ../examples/itemmodel/main.cpp 3
 
@@ -90,7 +92,7 @@
     displayed separately.
 
     Next line sets the font to \c Impact. If your system doesn't have it, it will be replaced by
-    system default.
+    the system default.
 
     And finally, we set theme to \c Digia and camera position to \c {Preset Front}. Now the initial
     graph settings are done.

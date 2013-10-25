@@ -26,13 +26,13 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DBars.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelBarDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DBars. It uses QItemModelBarDataMapping instance to map data from the model to Q3DBars
  * graph.
  *
- * Data is resolved asynchronously whenever the mapping or the model changes.
+ * The data is resolved asynchronously whenever the mapping or the model changes.
  * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * \sa QItemModelBarDataMapping, {Qt Data Visualization Data Handling}
@@ -40,7 +40,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ItemModelBarDataProxy
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelBarDataProxy

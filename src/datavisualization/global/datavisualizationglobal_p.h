@@ -38,16 +38,17 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 // Constants used in several files
-// Compensation for z position; move all objects to positive z, as shader can't handle negative values correctly
-const GLfloat zComp = 10.0f;
 // Distance from camera to origin
 const GLfloat cameraDistance = 6.0f;
 // Size of font to be used in label texture rendering. Doesn't affect the actual font size.
 const int textureFontSize = 50;
+const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 // Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
 // y position is added to the minimum height (or can be thought to be that much above or below the camera)
-const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, zComp);
-const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
+const QVector3D defaultLightPos(0.0f, 0.5f, 0.0f);
+const QVector3D zeroVector(0.0f, 0.0f, 0.0f);
+const QVector3D upVector(0.0f, 1.0f, 0.0f);
+const QVector3D cameraDistanceVector(0.0f, 0.0f, cameraDistance);
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 

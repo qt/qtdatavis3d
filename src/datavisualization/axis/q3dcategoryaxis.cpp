@@ -27,7 +27,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class Q3DCategoryAxis
  * \inmodule QtDataVisualization
  * \brief The Q3DCategoryAxis class is used for manipulating an axis of a graph.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * Q3DCategoryAxis provides an axis that can be given labels. The axis is divided into equal-sized
  * categories based on the data window size defined by setting the axis range.
@@ -38,7 +38,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype CategoryAxis3D
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates Q3DCategoryAxis
@@ -51,7 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \qmlproperty list CategoryAxis3D::categoryLabels
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row and column labels.
  */
 
@@ -74,7 +74,7 @@ Q3DCategoryAxis::~Q3DCategoryAxis()
  * \property Q3DCategoryAxis::categoryLabels
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label. If category labels are not explicitly defined, labels are
+ * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row and column labels.
  *
  * \note CategoryLabels actually reads/writes the Q3DAbstractAxis::labels property,
@@ -134,7 +134,7 @@ Q3DCategoryAxisPrivate::~Q3DCategoryAxisPrivate()
 /*!
  * \internal
  * Controller uses this function to set labels from data proxy as category labels.
- * If the labels have been explicitly set by user, data proxy labels are not used.
+ * If the labels have been set explicitly by the user, data proxy labels are not used.
  */
 void Q3DCategoryAxisPrivate::setDataLabels(const QStringList &labels)
 {

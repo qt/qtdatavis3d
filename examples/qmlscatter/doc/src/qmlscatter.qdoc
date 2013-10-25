@@ -25,6 +25,8 @@
     The Qt Quick 2 scatter example shows how to make a simple scatter graph visualization using
     Scatter3D and Qt Quick 2.
 
+    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+
     \image qmlscatter-example.png
 
     \section1 Creating the application
@@ -96,14 +98,14 @@
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 2
 
-    Now the graph is ready to use, but has no data. It also has the default proxy, axes and visual
+    Now the graph is ready for use, but has no data. It also has the default proxy, axes, and visual
     properties.
 
     Let's modify some visual properties first by adding the following inside \c {scatterGraph}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 3
 
-    We changed the font, theme and shadow quality. We're happy with the other visual properties,
+    We changed the font, theme, and shadow quality. We're happy with the other visual properties,
     so we won't change them.
 
     Then it's time to start feeding the graph some data.

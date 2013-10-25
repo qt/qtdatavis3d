@@ -43,7 +43,7 @@ Bars3DController::Bars3DController(QRect boundRect)
     setActiveDataProxy(0);
 
     // Setting a null axis creates a new default axis according to orientation and graph type.
-    // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
+    // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);
     setAxisY(0);

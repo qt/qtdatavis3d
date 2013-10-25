@@ -28,13 +28,13 @@
     \image qmlsurface-example.png
 
     The focus in this example is on generating a surface graph from height data, so in this section
-    we skip explaining application creation. For more detailed QML example documentation,
+    we skip explaining the application creation. For more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.
 
     \section1 Adding data to the graph
 
-    This example shows two method to set data to surface graph, using the HeightMapSurfaceDataProxy
-    and ItemModelSurfaceDataProxy. First we go through setting the data using height map specific
+    This example shows two methods to set data to surface graph, using the HeightMapSurfaceDataProxy
+    and ItemModelSurfaceDataProxy. First we go through setting the data using the height map specific
     data proxy. It is done with the code snippet below. The \c heightMapFile property specifies the image
     file containing the height data. The value properties defines the minimum and maximum values for
     surface area width and depth. This example shows the terrain around Tycho crater at imaginary

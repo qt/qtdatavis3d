@@ -39,7 +39,7 @@ const int maxZoomLevel = 500;
  * \class QTouch3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic touch display based input handler.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QTouch3DInputHandler is the basic input handler for touch screen devices.
  *
@@ -50,14 +50,17 @@ const int maxZoomLevel = 500;
  *   \row
  *     \li Touch-And-Move           \li Rotate graph within limits set for Q3DCamera
  *   \row
- *     \li Tap                      \li Select item under pointer or remove selection if none
+ *     \li Tap                      \li Select the item tapped or remove selection if none.
+ *                                      May open the secondary view depending on the
+ *                                      selection mode.
  *   \row
- *     \li Tap-And-Hold             \li Select item under pointer or remove selection if none
+ *     \li Tap-And-Hold             \li Same as tap.
  *   \row
- *     \li Pinch                    \li Zoom in/out within default range (10...500%)
+ *     \li Pinch                    \li Zoom in/out within default range (10...500%).
  *   \row
- *     \li Tap on secondary view    \li Return to primary view when in slice mode
- *                                  \note Slice mode is available in Q3DBars and Q3DSurface only
+ *     \li Tap on the primary view when the secondary view is visible
+ *                                  \li Closes the secondary view.
+ *                                      \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
  */
 

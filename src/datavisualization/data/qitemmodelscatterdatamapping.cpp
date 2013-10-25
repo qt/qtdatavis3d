@@ -24,7 +24,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \class QItemModelScatterDataMapping
  * \inmodule QtDataVisualization
  * \brief Item model mapping for Q3DScatter.
- * \since 1.0.0
+ * \since Qt Data Visualization 1.0
  *
  * QItemModelScatterDataMapping is used to map roles of QAbstractItemModel to the XYZ-values
  * of Q3DScatter points.
@@ -34,7 +34,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * that can be mapped to X, Y, and Z-values for the scatter points.
  *
  * For example, assume that you have a custom QAbstractItemModel for storing various measurements
- * done on material samples, providing data for roles such as "density", "hardness" and
+ * done on material samples, providing data for roles such as "density", "hardness", and
  * "conductivity". You could visualize these properties on a scatter graph:
  *
  * \snippet doc_src_qtdatavisualization.cpp 4
@@ -44,14 +44,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataMapping
- * \inqmlmodule com.digia.QtDataVisualization 1.0
+ * \inqmlmodule com.digia.QtDataVisualization
  * \since com.digia.QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelScatterDataMapping
  * \brief Item model mapping for Scatter3D.
  *
  * This type is used to map roles of AbstractItemModel to the XYZ-values of Scatter3D points. For
- * more complete description, see QItemModelScatterDataMapping.
+ * a more complete description, see QItemModelScatterDataMapping.
  *
  * Usage example:
  *

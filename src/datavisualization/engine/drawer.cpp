@@ -143,12 +143,6 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
 
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 {
-    // Store the GL state before changing
-    GLint oldActiveTex[1];
-    glGetIntegerv(GL_ACTIVE_TEXTURE, oldActiveTex);
-    GLint oldTexId[1];
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, oldTexId);
-
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(shader->posAtt());
     glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
@@ -165,10 +159,6 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glDisableVertexAttribArray(shader->posAtt());
-
-    // Restore the GL state
-    glActiveTexture(*oldActiveTex);
-    glBindTexture(GL_TEXTURE_2D, *oldTexId);
 }
 
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,

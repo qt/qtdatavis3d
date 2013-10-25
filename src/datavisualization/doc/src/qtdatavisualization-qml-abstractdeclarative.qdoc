@@ -18,16 +18,12 @@
 
 /*!
   \qmltype AbstractGraph3D
-  \inqmlmodule com.digia.QtDataVisualization 1.0
+  \inqmlmodule com.digia.QtDataVisualization
   \since com.digia.QtDataVisualization 1.0
   \ingroup datavisualization_qml
   \brief Base type for 3D visualizations.
 
   This type is the base type for all 3D visualizations in QtDataVisualization.
-
-  It resides in the data visualization module that can be imported like this:
-
-  \snippet doc_src_qmldatavisualization.cpp 0
 
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.

@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     Q3DBars window;
-    window.resize(1024, 768);
+    window.resize(900, 1000);
     window.setTitle("Qt Data Visualization - Microphone audio levels visualizer");
     window.show();
 

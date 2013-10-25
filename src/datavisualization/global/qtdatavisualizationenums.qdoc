@@ -28,6 +28,15 @@
 */
 
 /*!
+ * \class QtDataVisualization::QDataVis
+ * \inmodule QtDataVisualization
+ * \brief Container class for Qt Data Visualization enums.
+ * \since Qt Data Visualization 1.0
+ *
+ * QDataVis acts as a container for Qt Data Visualization enums. It has no other functionality.
+ */
+
+/*!
     \enum QtDataVisualization::QDataVis::InputState
 
     Predefined input states for mouse and touch based input handlers. All states are not valid with all input handlers.

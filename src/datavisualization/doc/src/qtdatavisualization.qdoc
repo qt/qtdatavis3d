@@ -23,16 +23,17 @@
 
     \brief C++ classes for the Qt Data Visualization API.
 
-    Qt Data Visualization functionality can be accessed via these C++ classes.
+    The Qt Data Visualization functionality can be accessed via these C++ classes.
 */
 
 /*!
-    \group datavisualization_qml
+    \qmlmodule com.digia.QtDataVisualization 1.0
     \title Qt Data Visualization QML Types
+    \ingroup qmlmodules
 
     \brief QML types for the Qt Data Visualization API.
 
-    Qt Data Visualization functionality can be accessed via these QML types.
+    The Qt Data Visualization functionality can be accessed via these QML types.
 
     \section1 QML Types
 */
@@ -51,12 +52,12 @@
 */
 
 /*!
-    \page qtdatavisualization_getting_started.html
+    \group qtdatavisualization_getting_started
     \title Qt Data Visualization Getting Started
 
     \section1 Building Qt Data Visualization
 
-    To build Qt Data Visualization module, set up a command prompt with an environment for
+    To build the Qt Data Visualization module, set up a command prompt with an environment for
     building Qt applications, navigate to the directory containing \c qtdatavisualization.pro, and
     configure the project with qmake:
     \code
@@ -121,8 +122,8 @@
 
     \section1 Running examples
 
-    Qt Data Visualization examples are found under \c examples subdirectory. To build and run a
-    single example, e.g. the qmlsurface example, navigate to the example directory and give the
+    Qt Data Visualization examples are found under the \c examples subdirectory. To build and run a
+    single example, for example, the qmlsurface example, navigate to the example directory and enter the
     following commands:
 
     \snippet doc_src_qtdatavisualization.cpp 8
@@ -142,12 +143,13 @@
     \snippet doc_src_qtdatavisualization.cpp 0
 
     Then, add the sample code found in one of the following pages, depending on what kind of
-    visualization you are interested in: \l{How to construct a minimal Q3DBars graph},
+    visualization you are interested in:
+    \l{How to construct a minimal Q3DBars graph},
     \l{How to construct a minimal Q3DScatter graph}, or
     \l{How to construct a minimal Q3DSurface graph}.
 
     To use Qt Data Visualization graphs in widget based applications, you can use
-    QWidget::createWindowContainer() function to wrap the graph into a widget:
+    the QWidget::createWindowContainer() function to wrap the graph into a widget:
 
     \snippet doc_src_qtdatavisualization.cpp 9
 
@@ -162,8 +164,8 @@
 
     \section1 Data proxies
 
-    The data users wish to visualize comes in many formats, all of which cannot obviously be
-    directly supported. Therefore Qt Data Visualization implements data proxies into which
+    The data that users wish to visualize comes in many formats, all of which cannot obviously be
+    directly supported. Therefore, Qt Data Visualization implements data proxies into which
     user can feed their data in a known format. Each visualization type has a basic proxy type,
     which takes data in a format suitable for that visualization.
     For example, the basic proxy for Q3DBars is QBarDataProxy, which stores rows of QBarDataItem
@@ -177,7 +179,7 @@
 
     \note The graph objects can own more than one data proxy, but only one proxy can be
     active at a time. If you need to switch back and forth between two different sets of data,
-    it may be more efficient to store each set in different proxy and just change the active
+    it may be more efficient to store each set in a different proxy and just change the active
     proxy, rather than reset the data in one proxy every time you need to switch.
 
     \section1 Item models and data mapping
@@ -185,8 +187,8 @@
     For common use cases, Qt Data Visualization offers specialized proxies. One such case is having
     data in an item model (QAbstractItemModel subclass), which is a common way to store data in
     Qt applications. Each of the visualization types offers a special proxy and a corresponding mapping
-    class for this purpose, e.g. QItemModelBarDataProxy and QItemModelBarDataMapping for Q3DBars.
-    These proxies are simple to use - just give them a pointer to the item model containing the
+    class for this purpose, for example, QItemModelBarDataProxy and QItemModelBarDataMapping for Q3DBars.
+    These proxies are simple to use: just give them a pointer to the item model containing the
     data and the mapping object containing rules how to map the data into format the basic proxy can
     digest.
 
@@ -196,16 +198,16 @@
     and which role specifies the value of the item. When the proxy resolves the data from the model,
     it uses these mappings to generate the rows and columns of the bar graph.
 
-    Depending on the visualization type, mapping classes may support other functionality as well,
+    Depending on the visualization type, mapping classes may support other functionalities as well,
     such as QItemModelBarDataMapping optionally mapping QAbstractItemModel rows and columns directly
     into bar graph rows and columns. See individual mapping classes for more information and examples
-    how to use them: QItemModelBarDataMapping, QItemModelScatterDataMapping, and
+    about how to use them: QItemModelBarDataMapping, QItemModelScatterDataMapping, and
     QItemModelSurfaceDataMapping.
 
     \section1 Other custom proxies
 
     QHeightMapSurfaceDataProxy is a specialized proxy for generating a surface graph from a
-    heightmap image. See QHeightMapSurfaceDataProxy documentation for more information.
+    heightmap image. See the QHeightMapSurfaceDataProxy documentation for more information.
 
     The \l{Custom Proxy Example}{Custom Proxy} example shows how a custom proxy can be created. It
     defines a custom data set based on variant lists and an extension of the basic proxy to resolve
@@ -217,13 +219,13 @@
     ensure good performance. Since memory allocation is a costly operation, always use
     QList::reserve() and QVector::resize() where possible to avoid reallocations when constructing
     the array to give to the proxy. If you need to change the entire data set for each frame,
-    it is in most cases best to re-use the existing array - especially if the array dimensions do not
+    it is in most cases best to reuse the existing array - especially if the array dimensions do not
     change. If you need to add, insert, remove, or change several rows or items for each frame, it
     is always more efficient to do it with one method call instead of multiple calls affecting
     a single row or item each. For example, adding ten rows with a single QBarDataProxy::addRows() call
     is much more efficient than ten separate QBarDataProxy::addRow() calls.
 
-    Bars renderer is optimized to access only data that is within data window and thus should not
+    Bars renderer is optimized to access only data that is within the data window and thus should not
     suffer noticeable slowdown even if more data is continually added to the proxy.
 
     Due to the unsorted nature of the scatter data, any change in the data window ranges requires
@@ -231,9 +233,9 @@
     continually added to the proxy.
 
     Surface data, while on item level similar to scatter data, is already assigned into rows and
-    columns, so the surface renderer can do some optimization by making assumption that the data in
+    columns, so the surface renderer can do some optimization by making the assumption that the data in
     rows and columns is sorted along their respective axes, but it is nowhere near as efficient
-    as in bars case. Surface rendering can suffer significant slowdown if the data size grows unchecked.
+    as in the bars case. Surface rendering can suffer significant slowdown if the data size grows unchecked.
 
     For the best performance with the scatter and surface graphs, only keep the data you need in the
     proxy.
@@ -252,21 +254,21 @@
     see QTouch3DInputHandler documentation.
 
     \note In the technology preview version, default input handlers cannot be replaced or even accessed
-    via public API. This feature is planned for the final release.
+    via the public API. This feature is planned for the final release.
 
     \section1 Data selection modes
 
-    All visualization types support selecting single data item - a bar, a scatter item, or a surface
+    All visualization types support selecting a single data item - a bar, a scatter item, or a surface
     vertex - using mouse, touch, and programmatically via the graph APIs. The selected item is highlighted
     in the rendered graph, and selecting causes emission of a graph specific signal for this purpose,
-    e.g. Q3DBars::selectedBarPosChanged(), which the application can handle.
+    for example, Q3DBars::selectedBarPosChanged(), which the application can handle.
 
-    \note Surface graph doesn't have fully implemented selection API yet, it only supports
+    \note The surface graph doesn't have a fully implemented selection API yet. It only supports
     selection with mouse and touch in the technology preview version.
 
     Bar and surface graphs support slice selection modes, where the selected row or column is drawn
     in a separate viewport as a pseudo-2D graph. This makes it easier to see the actual values of
-    single row or column.
+    a single row or column.
 
     Bar graph additionally supports simply highlighting the whole row and/or column of the selected bar
     without opening the slice view.

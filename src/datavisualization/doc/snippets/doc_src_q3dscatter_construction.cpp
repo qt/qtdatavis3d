@@ -26,15 +26,15 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     //! [0]
-    Q3DScatter *scatter = new Q3DScatter();
+    Q3DScatter scatter;
     //! [0]
     //! [1]
     QScatterDataArray data;
     data << QVector3D(0.5f, 0.5f, 0.5f) << QVector3D(-0.3f, -0.5f, -0.4f) << QVector3D(0.0f, -0.3f, 0.2f);
-    scatter->activeDataProxy()->addItems(data);
+    scatter.activeDataProxy()->addItems(data);
     //! [1]
     //! [2]
-    scatter->show();
+    scatter.show();
     //! [2]
 
     return app.exec();

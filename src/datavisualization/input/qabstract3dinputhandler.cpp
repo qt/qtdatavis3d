@@ -22,16 +22,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
    \class QAbstract3DInputHandler
    \inmodule QtDataVisualization
-   \brief Baseclass for implementations of input handlers.
-   \since 1.0.0
+   \brief The base class for implementations of input handlers.
+   \since Qt Data Visualization 1.0
 
-    QAbstract3DInputHandler is a baseclass that is subclassed by different input handling implementations
+    QAbstract3DInputHandler is the base class that is subclassed by different input handling implementations
     that take input events and translate those to camera and light movements. Input handlers also translate
     raw input events to slicing and selection events in the scene.
 */
 
 /*!
- * Constructs the baseclass. An optional \a parent parameter can be given
+ * Constructs the base class. An optional \a parent parameter can be given
  * and is then passed to QObject constructor.
  */
 QAbstract3DInputHandler::QAbstract3DInputHandler(QObject *parent) :
@@ -41,7 +41,7 @@ QAbstract3DInputHandler::QAbstract3DInputHandler(QObject *parent) :
 }
 
 /*!
- *  Destroys the baseclass.
+ *  Destroys the base class.
  */
 QAbstract3DInputHandler::~QAbstract3DInputHandler()
 {
@@ -162,7 +162,9 @@ void QAbstract3DInputHandler::setPrevDistance(int distance)
 /*!
  * \property QAbstract3DInputHandler::scene
  *
- * The 3D scene this abstract inputhandler is controlling. Only one scene can be controlled by one input handler.
+ * The 3D scene this abstract input handler is controlling. Only one scene can
+ * be controlled by one input handler. Setting a \a scene to an input handler doesn't
+ * transfer the ownership of the \a scene.
  */
 Q3DScene *QAbstract3DInputHandler::scene() const
 {

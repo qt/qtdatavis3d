@@ -39,7 +39,7 @@ Surface3DController::Surface3DController(QRect rect)
     setActiveDataProxy(0);
 
     // Setting a null axis creates a new default axis according to orientation and graph type.
-    // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
+    // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);
     setAxisY(0);
@@ -142,7 +142,7 @@ bool Surface3DController::surfaceGrid()
 void Surface3DController::setGradient(const QLinearGradient &gradient)
 {
     m_userDefinedGradient = gradient;
-    m_userDefinedGradient.setStart(1, 1000);
+    m_userDefinedGradient.setStart(2, 1024);
     m_userDefinedGradient.setFinalStop(0, 0);
     m_changeTracker.gradientColorChanged = true;
     emitNeedRender();
