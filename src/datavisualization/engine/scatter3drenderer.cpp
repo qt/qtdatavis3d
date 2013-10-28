@@ -1264,7 +1264,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         m_drawer->drawLabel(*selectedItem, labelItem, viewMatrix, projectionMatrix,
                             zeroVector, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, true, false, Drawer::LabelMid);
+                            m_labelObj, activeCamera, true, false, Drawer::LabelOver);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;
