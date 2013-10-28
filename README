@@ -48,7 +48,7 @@ If you want to uninstall the module:
 Building as a statically linked library
 =======================================
 
-The same as above applies you will just have to add static to the CONFIG:
+The same as above applies, you will just have to add static to the CONFIG:
     qmake CONFIG+=static
 
 Documentation
