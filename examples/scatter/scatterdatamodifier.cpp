@@ -26,7 +26,7 @@ using namespace QtDataVisualization;
 
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
 
-const int numberOfItems = 10000;
+const int numberOfItems = 3600;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
@@ -40,7 +40,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->setFont(font);
     m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_graph->setTheme(QDataVis::ThemeEbony);
-    m_graph->setShadowQuality(QDataVis::ShadowQualityHigh);
+    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     //! [0]
 
@@ -78,9 +78,9 @@ void ScatterDataModifier::addData()
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
-    m_graph->axisX()->setRange(-50.0, 50.0);
+    m_graph->axisX()->setRange(-30.0, 30.0);
     m_graph->axisY()->setRange(-1.0, 1.0);
-    m_graph->axisZ()->setRange(-50.0, 50.0);
+    m_graph->axisZ()->setRange(-30.0, 30.0);
     //! [4]
 
     //! [5]
@@ -99,7 +99,7 @@ void ScatterDataModifier::addData()
     float limit = qSqrt(numberOfItems) / 2.0f;
     for (float i = -limit; i < limit; i++) {
         for (float j = -limit; j < limit; j++) {
-            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 7.5)), j));
+            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0)), j));
             ptrToDataArray++;
         }
     }
