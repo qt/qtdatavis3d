@@ -72,8 +72,11 @@ Item {
                         var currentColRole = graphData.model.get(i).month
                         if (currentRowRole === rowRole && currentColRole === colRole) {
                             tableView.currentRow = i
-                            tableView.selection.clear()
-                            tableView.selection.select(i)
+                            // Workaround to 5.2 row selection issue
+                            if (typeof tableView.selection != "undefined") {
+                                tableView.selection.clear()
+                                tableView.selection.select(i)
+                            }
                             break
                         }
                     }
