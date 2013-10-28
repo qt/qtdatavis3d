@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low Soft"));
     shadowQuality->addItem(QStringLiteral("Medium Soft"));
     shadowQuality->addItem(QStringLiteral("High Soft"));
-    shadowQuality->setCurrentIndex(3);
+    shadowQuality->setCurrentIndex(4);
 
     QFontComboBox *fontList = new QFontComboBox(widget);
     fontList->setCurrentFont(QFont("Arial"));
