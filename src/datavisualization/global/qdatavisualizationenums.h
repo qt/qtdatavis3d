@@ -31,9 +31,9 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
     Q_ENUMS(MeshStyle)
     Q_ENUMS(CameraPreset)
     Q_ENUMS(Theme)
-    Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelStyle)
+    Q_FLAGS(SelectionFlag SelectionFlags)
 
 public:
     enum InputState {
@@ -95,15 +95,18 @@ public:
         ThemeIsabelle
     };
 
-    enum SelectionMode {
-        SelectionModeNone = 0,
-        SelectionModeItem,
-        SelectionModeItemAndRow,
-        SelectionModeItemAndColumn,
-        SelectionModeItemRowAndColumn,
-        SelectionModeSliceRow,
-        SelectionModeSliceColumn
+    enum SelectionFlag {
+        SelectionNone              = 0,
+        SelectionItem              = 1,
+        SelectionRow               = 2,
+        SelectionItemAndRow        = SelectionItem | SelectionRow,
+        SelectionColumn            = 4,
+        SelectionItemAndColumn     = SelectionItem | SelectionColumn,
+        SelectionRowAndColumn      = SelectionRow | SelectionColumn,
+        SelectionItemRowAndColumn  = SelectionItem | SelectionRow | SelectionColumn,
+        SelectionSlice             = 8
     };
+    Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
 
     enum ShadowQuality {
         ShadowQualityNone = 0,
@@ -121,6 +124,8 @@ public:
         LabelStyleTransparent
     };
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QDataVis::SelectionFlags)
 }
 
 #endif

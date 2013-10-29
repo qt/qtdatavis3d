@@ -51,7 +51,7 @@ Item {
             height: surfaceView.height
             theme: AbstractGraph3D.ThemeStoneMoss
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionModeSliceRow
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
             font.family: "STCaiyun"

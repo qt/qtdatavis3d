@@ -46,7 +46,7 @@ Item {
             width: dataView.width
             height: dataView.height
             shadowQuality: Bars3D.ShadowQualityMedium
-            selectionMode: Bars3D.SelectionModeItem
+            selectionMode: Bars3D.SelectionItem
             font.pointSize: 35
             theme: Bars3D.ThemeRetro
             labelStyle: Bars3D.LabelStyleFromTheme
@@ -59,7 +59,7 @@ Item {
             valueAxis: chartAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
 
-            onSelectedBarPosChanged: {
+            onSelectedBarChanged: {
                 // Set camControlArea current row to selected bar
                 var rowRole = chartData.proxy.rowLabels[position.x];
                 var colRole = chartData.proxy.columnLabels[position.y];

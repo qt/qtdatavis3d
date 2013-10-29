@@ -80,11 +80,10 @@ public:
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   QDataVis::SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
-                   const Q3DCamera *camera,
-                   bool useDepth = false, bool rotateAlong = false,
+                   QDataVis::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
+                   const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
+                   Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
 
     void generateSelectionLabelTexture(AbstractRenderItem *item);
     void generateLabelItem(LabelItem &item, const QString &text, int widestLabel = 0);

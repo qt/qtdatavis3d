@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QTime>
+#include <QComboBox>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
@@ -167,7 +168,11 @@ void GraphModifier::changeLabelStyle()
 
 void GraphModifier::changeSelectionMode(int selectionMode)
 {
-    m_graph->setSelectionMode((QDataVis::SelectionMode)selectionMode);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        int flags = comboBox->itemData(selectionMode).toInt();
+        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+    }
 }
 
 void GraphModifier::changeFont(const QFont &font)

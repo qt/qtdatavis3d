@@ -130,29 +130,31 @@
 */
 
 /*!
-    \enum QtDataVisualization::QDataVis::SelectionMode
+    \enum QtDataVisualization::QDataVis::SelectionFlag
 
-    Item selection modes.
+    Item selection modes. Values of this enumeration can be combined with OR operator.
 
-    \value SelectionModeNone
+    \value SelectionNone
            Selection mode disabled.
-    \value SelectionModeItem
-           Selection selects a single item.
-    \value SelectionModeItemAndRow
-           Selection selects a single item and highlights the row it is on. In Q3DBars only.
-    \value SelectionModeItemAndColumn
-           Selection selects a single item and highlights the column it is on. In Q3DBars only.
-    \value SelectionModeItemRowAndColumn
-           Selection selects a single item and highlights the row and the column it is on. In
-           Q3DBars only.
-    \value SelectionModeSliceRow
-           Selection selects a single item and displays the row it is on in a separate view. The
-           original view is shrunk into upper left corner. Original view is restored by clicking
-           on it. In Q3DBars only.
-    \value SelectionModeSliceColumn
-           Selection selects a single item and displays the column it is on in a separate view. The
-           original view is shrunk into upper left corner. Original view is restored by clicking
-           on it. In Q3DBars only.
+    \value SelectionItem
+           Selection highlights a single item.
+    \value SelectionRow
+           Selection highlights a single row.
+    \value SelectionItemAndRow
+           Combination flag for highlighting both item and row with different colors.
+    \value SelectionColumn
+           Selection highlights a single column.
+    \value SelectionItemAndColumn
+           Combination flag for highlighting both item and column with different colors.
+    \value SelectionRowAndColumn
+           Combination flag for highlighting both row and column.
+    \value SelectionItemRowAndColumn
+           Combination flag for highlighting item, row, and column.
+    \value SelectionSlice
+           Setting this mode flag indicates that the graph should take care of the slice view handling
+           automatically. If you wish to control the slice view yourself via Q3DScene, do not set this
+           flag. When setting this mode flag, either \c SelectionRow or \c SelectionColumn must also
+           be set, but not both. Slicing is supported by Q3DBars and Q3DSurface only.
 */
 
 /*!

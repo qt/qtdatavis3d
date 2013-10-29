@@ -42,7 +42,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
       m_subSegments(3),
       m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
       m_maxval(20.0),
-      m_selectedBarPos(-1, -1),
+      m_selectedBar(-1, -1),
       m_autoAdjustingAxis(new Q3DValueAxis),
       m_fixedRangeAxis(new Q3DValueAxis),
       m_temperatureAxis(new Q3DValueAxis),
@@ -142,7 +142,7 @@ void GraphModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_yearAxis);
         m_chart->setColumnAxis(m_monthAxis);
 
-        m_chart->setSelectionMode(QDataVis::SelectionModeItem);
+        m_chart->setSelectionMode(QDataVis::SelectionItem);
     } else {
         m_chart->setActiveDataProxy(m_genericData);
 
@@ -152,7 +152,7 @@ void GraphModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_genericRowAxis);
         m_chart->setColumnAxis(m_genericColumnAxis);
 
-        m_chart->setSelectionMode(QDataVis::SelectionModeItem);
+        m_chart->setSelectionMode(QDataVis::SelectionItem);
     }
 }
 
@@ -160,10 +160,10 @@ void GraphModifier::selectBar()
 {
     QPoint targetBar(5, 5);
     QPoint noSelection(-1, -1);
-    if (m_selectedBarPos != targetBar)
-        m_chart->setSelectedBarPos(targetBar);
+    if (m_selectedBar != targetBar)
+        m_chart->setSelectedBar(targetBar);
     else
-        m_chart->setSelectedBarPos(noSelection);
+        m_chart->setSelectedBar(noSelection);
 }
 
 void GraphModifier::swapAxis()
@@ -317,7 +317,7 @@ void GraphModifier::insertRow()
         (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % 100));
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = qMax(m_selectedBarPos.x(), 0);
+    int row = qMax(m_selectedBar.x(), 0);
     QString label = QStringLiteral("Insert %1").arg(insertCounter++);
     m_chart->activeDataProxy()->insertRow(row, dataRow, label);
 }
@@ -337,7 +337,7 @@ void GraphModifier::insertRows()
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = qMax(m_selectedBarPos.x(), 0);
+    int row = qMax(m_selectedBar.x(), 0);
     m_chart->activeDataProxy()->insertRows(row, dataArray, labels);
     qDebug() << "Inserted" << m_rowCount << "rows, time:" << timer.elapsed();
 }
@@ -345,8 +345,8 @@ void GraphModifier::insertRows()
 void GraphModifier::changeItem()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = m_selectedBarPos.x();
-    int column = m_selectedBarPos.y();
+    int row = m_selectedBar.x();
+    int column = m_selectedBar.y();
     if (row >= 0 && column >= 0) {
         QBarDataItem item(qreal(rand() % 100));
         m_chart->activeDataProxy()->setItem(row, column, item);
@@ -356,7 +356,7 @@ void GraphModifier::changeItem()
 void GraphModifier::changeRow()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = m_selectedBarPos.x();
+    int row = m_selectedBar.x();
     if (row >= 0) {
         QBarDataRow *newRow = new QBarDataRow(m_chart->activeDataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
@@ -369,7 +369,7 @@ void GraphModifier::changeRow()
 void GraphModifier::changeRows()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = m_selectedBarPos.x();
+    int row = m_selectedBar.x();
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
         QBarDataArray newArray;
@@ -388,7 +388,7 @@ void GraphModifier::changeRows()
 void GraphModifier::removeRow()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = m_selectedBarPos.x();
+    int row = m_selectedBar.x();
     if (row >= 0)
         m_chart->activeDataProxy()->removeRows(row, 1);
 }
@@ -396,7 +396,7 @@ void GraphModifier::removeRow()
 void GraphModifier::removeRows()
 {
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    int row = m_selectedBarPos.x();
+    int row = m_selectedBar.x();
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
         m_chart->activeDataProxy()->removeRows(startRow, 3);
@@ -477,10 +477,10 @@ void GraphModifier::changeSelectionMode()
 {
     static int selectionMode = m_chart->selectionMode();
 
-    if (++selectionMode > QDataVis::SelectionModeSliceColumn)
-        selectionMode = QDataVis::SelectionModeNone;
+    if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice))
+        selectionMode = QDataVis::SelectionNone;
 
-    m_chart->setSelectionMode((QDataVis::SelectionMode)selectionMode);
+    m_chart->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
 }
 
 void GraphModifier::changeFont(const QFont &font)
@@ -507,7 +507,7 @@ void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 
 void GraphModifier::handleSelectionChange(const QPoint &position)
 {
-    m_selectedBarPos = position;
+    m_selectedBar = position;
     qDebug() << "Selected bar position:" << position;
 }
 

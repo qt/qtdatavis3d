@@ -90,7 +90,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_graph->setSelectionMode(QDataVis::SelectionModeItemRowAndColumn);
+    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
     m_graph->rowAxis()->setCategoryLabels(QStringList(QString()));
@@ -101,7 +101,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [6]
 
     // Set selection mode to slice row
-    m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow);
+    m_graph->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
 
     // Set font
     m_graph->setFont(QFont("Impact", 20));
@@ -222,7 +222,7 @@ void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
 {
     Q_UNUSED(previousRow)
     Q_UNUSED(previousColumn)
-    m_graph->setSelectedBarPos(QPoint(currentRow, currentColumn));
+    m_graph->setSelectedBar(QPoint(currentRow, currentColumn));
 }
 //! [14]
 
@@ -273,7 +273,7 @@ int main(int argc, char **argv)
 
     //! [3]
     GraphDataGenerator generator(graph, tableWidget);
-    QObject::connect(graph, &Q3DBars::selectedBarPosChanged, &generator,
+    QObject::connect(graph, &Q3DBars::selectedBarChanged, &generator,
                      &GraphDataGenerator::selectFromTable);
     QObject::connect(tableWidget, &QTableWidget::currentCellChanged, &generator,
                      &GraphDataGenerator::selectedFromTable);

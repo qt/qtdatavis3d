@@ -23,6 +23,7 @@
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QSlider>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -61,6 +62,9 @@ public:
     void gradientPressed();
     void changeFont(const QFont &font);
     void changeStyle();
+    void selectButtonClicked();
+    void setSelectionInfoLabel(QLabel *label) {m_selectionInfoLabel = label; }
+    void selectedPointChanged(const QPoint &point);
 
 public slots:
     void changeShadowQuality(int quality);
@@ -90,6 +94,7 @@ private:
     qreal m_minZ;
     QTimer m_timer;
     QSurfaceDataArray *m_planeArray;
+    QLabel *m_selectionInfoLabel;
 };
 
 #endif

@@ -37,7 +37,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
     m_theme(),
     m_font(QFont(QStringLiteral("Arial"))),
-    m_selectionMode(QDataVis::SelectionModeItem),
+    m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
     m_labelStyle(QDataVis::LabelStyleTransparent),
     m_isBackgroundEnabled(true),
@@ -63,7 +63,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
     connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
-            &Abstract3DController::emitNeedRender);
+            &Abstract3DController::handleInputStateChanged);
     connect(m_scene, &Q3DScene::needRender, this,
             &Abstract3DController::emitNeedRender);
 }
@@ -705,14 +705,16 @@ QFont Abstract3DController::font()
     return m_font;
 }
 
-void Abstract3DController::setSelectionMode(QDataVis::SelectionMode mode)
+void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    m_selectionMode = mode;
-    m_changeTracker.selectionModeChanged = true;
-    emitNeedRender();
+    if (mode != m_selectionMode) {
+        m_selectionMode = mode;
+        m_changeTracker.selectionModeChanged = true;
+        emitNeedRender();
+    }
 }
 
-QDataVis::SelectionMode Abstract3DController::selectionMode()
+QDataVis::SelectionFlags Abstract3DController::selectionMode()
 {
     return m_selectionMode;
 }
@@ -925,6 +927,16 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
 {
     Q_UNUSED(format)
     handleAxisLabelFormatChangedBySender(sender());
+}
+
+void Abstract3DController::handleInputStateChanged(QDataVis::InputState state)
+{
+    // When in automatic slicing mode, input state change to overview disables slice mode
+    if (m_selectionMode.testFlag(QDataVis::SelectionSlice)
+            && state == QDataVis::InputStateOnOverview) {
+        setSlicingActive(false);
+    }
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)

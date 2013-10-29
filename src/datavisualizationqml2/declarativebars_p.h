@@ -57,7 +57,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
     Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QPointF selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
+    Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_ENUMS(QtDataVisualization::QDataVis::MeshStyle)
 
 public:
@@ -94,11 +94,11 @@ public:
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 
-    void setSelectedBarPos(const QPointF &position);
-    QPointF selectedBarPos() const;
+    void setSelectedBar(const QPointF &position);
+    QPointF selectedBar() const;
 
 signals:
-    void selectedBarPosChanged(const QPointF &position);
+    void selectedBarChanged(const QPointF &position);
 
 protected:
     QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);

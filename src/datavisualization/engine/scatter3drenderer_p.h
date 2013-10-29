@@ -84,8 +84,8 @@ private:
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
-    QVector3D m_selection;
-    QVector3D m_previousSelection;
+    QVector3D m_clickedColor;
+    int m_selectedItemIndex;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
 
@@ -93,6 +93,8 @@ private:
     ScatterRenderItem m_dummyRenderItem;
 
     ScatterRenderItemArray m_renderItemArray;
+
+    QDataVis::InputState m_cachedInputState;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
@@ -143,11 +145,11 @@ public slots:
     void updateSelectedItemIndex(int index);
 
 signals:
-    void selectionUpdated(QVector3D selection);
-    void selectedItemIndexChanged(int index);
+    void itemClicked(int index);
 
 private:
     QVector3D indexToSelectionColor(GLint index);
+    int selectionColorToIndex(const QVector3D &color);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

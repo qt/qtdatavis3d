@@ -130,7 +130,7 @@
  */
 
 /*!
- * \qmlproperty point Bars3D::selectedBarPos
+ * \qmlproperty point Bars3D::selectedBar
  * Position of the selected bar in data window. Only one bar can be selected at a time.
  * To clear selection, specify an illegal position, e.g. Qt.point(-1.0, -1.0).
  */

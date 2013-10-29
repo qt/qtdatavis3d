@@ -56,6 +56,7 @@ const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
 const int subViewDivider = 5;
+const uint invalidSelectionId = uint(-1);
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
@@ -63,6 +64,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_labelStyle(QDataVis::LabelStyleFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
+      m_cachedIsSlicingActivated(false),
+      m_cachedInputState(QDataVis::InputStateNone),
       m_shader(0),
       m_depthShader(0),
       m_backgroundShader(0),
@@ -107,9 +110,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_yFlipped(false),
       m_sampleSpace(QRect(0, 0, 0, 0)),
       m_shadowQualityMultiplier(3),
-      m_cachedSelectionId(0),
-      m_selectionModeChanged(false),
-      m_hasHeightAdjustmentChanged(true)
+      m_clickedPointId(invalidSelectionId),
+      m_hasHeightAdjustmentChanged(true),
+      m_selectedPoint(Surface3DController::noSelectionPoint())
 {
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -252,19 +255,19 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
         }
     }
 
-    m_selectionActive = false;
-    m_cachedSelectionId = 0;
     for (int i = 0; i < m_sliceDataArray.size(); i++)
         delete m_sliceDataArray.at(i);
     m_sliceDataArray.clear();
 
+    m_selectionDirty = true;
+
     Abstract3DRenderer::updateDataModel(dataProxy);
 }
 
-void Surface3DRenderer::updateSliceDataModel(int selectionId)
+void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 {
-    int column = (selectionId - 1) % m_sampleSpace.width();
-    int row = (selectionId - 1) / m_sampleSpace.width();
+    int column = point.y();
+    int row = point.x();
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
         delete m_sliceDataArray.at(i);
@@ -275,7 +278,7 @@ void Surface3DRenderer::updateSliceDataModel(int selectionId)
 
     qreal adjust = (0.025 * m_heightNormalizer) / 2.0;
     qreal stepDown = 2.0 * adjust;
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
+    if (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow)) {
         QSurfaceDataRow *src = m_dataArray.at(row);
         sliceRow = new QSurfaceDataRow(src->size());
         for (int i = 0; i < sliceRow->size(); i++)
@@ -433,14 +436,22 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
     if (m_selectionPointer)
         m_selectionPointer->updateScene(m_cachedScene);
+
+    updateSlicingActive(scene->isSlicingActive());
 }
 
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
-    bool slicingActivated = m_cachedScene->isSlicingActive();
-    bool slicingChanged = m_cachedIsSlicingActivated != slicingActivated;
+    bool slicingChanged = m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive();
 
-    updateSlicingActive(slicingActivated);
+    // TODO: Can't call back to controller here! (QTRD-2216)
+    // TODO: Needs to be added to synchronization
+    QDataVis::InputState currentInputState = m_controller->inputState();
+    if (currentInputState != m_cachedInputState) {
+        if (currentInputState == QDataVis::InputStateOnScene)
+            m_clickedPointId = invalidSelectionId;
+        m_cachedInputState = currentInputState;
+    }
 
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
@@ -448,18 +459,19 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
     // Draw the surface scene
     drawScene(defaultFboHandle);
 
-    // In slice mode; draw slice and render selection ball
-    if (m_cachedIsSlicingActivated)
+    // In slice mode; draw slice
+    if (m_cachedIsSlicingActivated && m_selectionActive)
         drawSlicedScene();
 
-    // Render selection ball if not in slice mode
-    if (m_selectionPointer && m_selectionActive)
+    // Render selection ball
+    if (m_selectionPointer && m_selectionActive
+            && m_cachedSelectionMode.testFlag(QDataVis::SelectionItem)) {
         m_selectionPointer->render(defaultFboHandle);
+    }
 
-    // If slicing has been activated by this render pass, we need another render
-    // Also trigger another render always when slicing changes in general to ensure
+    // Trigger another render always when slicing changes in general to ensure
     // final draw is correct.
-    if (slicingActivated != m_cachedScene->isSlicingActive() || slicingChanged)
+    if (slicingChanged)
         emit needRender();
 }
 
@@ -487,14 +499,16 @@ void Surface3DRenderer::drawSlicedScene()
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
+    bool rowMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionRow);
+
     GLfloat scaleX = 0.0f;
     GLfloat scaleXBackground = 0.0f;
     GLfloat offset = 0.0f;
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
+    if (rowMode) {
         scaleX = m_surfaceScaleX;
         scaleXBackground = m_scaleXWithBackground;
         offset = m_surfaceOffsetX;
-    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
+    } else {
         scaleX = m_surfaceScaleZ;
         scaleXBackground = m_scaleZWithBackground;
         offset = -m_surfaceOffsetZ;
@@ -521,7 +535,7 @@ void Surface3DRenderer::drawSlicedScene()
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
         QVector3D color;
-        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
+        if (rowMode)
             color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
         else
             color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
@@ -611,7 +625,7 @@ void Surface3DRenderer::drawSlicedScene()
         int lastSegment;
         GLfloat lineStep;
         GLfloat linePos;
-        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
+        if (rowMode) {
             lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
             lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
             linePos = m_scaleX;
@@ -676,7 +690,7 @@ void Surface3DRenderer::drawSlicedScene()
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, rotation, 0, m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, m_cachedScene->activeCamera(),
-                                true, true, Drawer::LabelMid, Qt::AlignRight);
+                                true, true, Drawer::LabelMid, Qt::AlignRight, true);
         }
         labelNbr++;
         labelPos += posStep;
@@ -685,7 +699,7 @@ void Surface3DRenderer::drawSlicedScene()
     // X Labels to ground
     int countLabelItems;
     int lastSegment;
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
+    if (rowMode) {
         posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
         labelPos = -m_scaleX;
         lastSegment = m_axisCacheX.segmentCount();
@@ -709,15 +723,15 @@ void Surface3DRenderer::drawSlicedScene()
             m_dummyRenderItem.setTranslation(labelTrans);
 
             LabelItem *axisLabelItem;
-            if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow)
+            if (rowMode)
                 axisLabelItem = m_axisCacheX.labelItems().at(labelNbr);
             else
                 axisLabelItem = m_axisCacheZ.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, rotation, 0, QDataVis::SelectionModeSliceRow,
+                                positionComp, rotation, 0, QDataVis::SelectionRow,
                                 m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
-                                false, false, Drawer::LabelBelow, Qt::AlignTop);
+                                false, false, Drawer::LabelBelow, Qt::AlignTop, true);
         }
         labelNbr++;
         labelPos += posStep;
@@ -735,7 +749,6 @@ void Surface3DRenderer::drawSlicedScene()
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
-    uint selectionId = 0;
 
     // Specify viewport
     glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
@@ -880,15 +893,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #endif
     }
 #endif
-
-    bool selectionDirty = false;
-
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_controller->inputState() == QDataVis::InputStateOnScene
-            && m_surfaceObj && m_cachedSelectionMode > QDataVis::SelectionModeNone) {
+    if (!m_cachedIsSlicingActivated && m_surfaceObj && m_cachedInputState == QDataVis::InputStateOnScene
+            && m_cachedSelectionMode > QDataVis::SelectionNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -924,12 +934,16 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Put the RGBA value back to uint
 #if !defined(QT_OPENGL_ES_2)
-        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
 #else
-        selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
+        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
 
-        selectionDirty = true;
+        if (m_clickedPointId == invalidSelectionId) {
+            m_clickedPointId = selectionId;
+            QPoint newPoint = selectionIdToSurfacePoint(m_clickedPointId);
+            emit pointClicked(newPoint);
+        }
     }
 
     // Draw the surface
@@ -1578,39 +1592,30 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     m_labelShader->release();
 
     // Selection handling
-    if (m_selectionModeChanged || selectionDirty) {
-        if (selectionDirty)
-            m_cachedSelectionId = selectionId;
-        if (m_cachedSelectionMode == QDataVis::SelectionModeNone) {
-            m_cachedSelectionId = 0;
-            m_selectionActive = false;
-        }
-        if (m_cachedSelectionMode == QDataVis::SelectionModeItem) {
-            if (m_cachedSelectionId)
-                surfacePointSelected(m_cachedSelectionId);
-            else
-                m_selectionActive = false;
-        }
-        if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow
-                || m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
-            if (m_cachedSelectionId) {
-                updateSliceDataModel(m_cachedSelectionId);
-                m_cachedScene->setSlicingActive(true);
-
-                surfacePointSelected(m_cachedSelectionId);
-
-                emit needRender();
+    if (m_selectionDirty) {
+        QPoint visiblePoint = Surface3DController::noSelectionPoint();
+        if (m_selectedPoint != Surface3DController::noSelectionPoint()) {
+            int x = m_selectedPoint.x() - m_sampleSpace.y();
+            int y = m_selectedPoint.y() - m_sampleSpace.x();
+            if (x >= 0 && y >= 0 && x < m_sampleSpace.height() && y < m_sampleSpace.width()
+                    && m_dataArray.size()) {
+                visiblePoint = QPoint(x, y);
             }
         }
 
-        m_selectionModeChanged = false;
-    }
-    if (m_controller->inputState() == QDataVis::InputStateOnOverview) {
-        if (m_cachedIsSlicingActivated) {
-            m_cachedScene->setSlicingActive(false);
+        if (m_cachedSelectionMode == QDataVis::SelectionNone
+                || visiblePoint == Surface3DController::noSelectionPoint()) {
             m_selectionActive = false;
-            m_cachedSelectionId = 0;
+        } else {
+            // TODO: Need separate selection ball for slice and main surface view QTRD-2515
+            if (m_cachedIsSlicingActivated)
+                updateSliceDataModel(visiblePoint);
+            if (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))
+                surfacePointSelected(visiblePoint);
+            m_selectionActive = true;
         }
+
+        m_selectionDirty = false;
     }
 }
 
@@ -1771,12 +1776,10 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     return m_cachedSmoothSurface;
 }
 
-void Surface3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
+void Surface3DRenderer::updateSelectedPoint(const QPoint &position)
 {
-    if (mode != m_cachedSelectionMode)
-        m_selectionModeChanged = true;
-
-    Abstract3DRenderer::updateSelectionMode(mode);
+    m_selectedPoint = position;
+    m_selectionDirty = true;
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)
@@ -1824,13 +1827,10 @@ void Surface3DRenderer::handleResize()
     Abstract3DRenderer::handleResize();
 }
 
-void Surface3DRenderer::surfacePointSelected(int id)
+void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
-    int column = (id - 1) % m_sampleSpace.width();
-    int row = (id - 1) / m_sampleSpace.width();
-
-    if (row < 0 || column < 0 || m_dataArray.size() < row || m_dataArray.at(row)->size() < column)
-        return;
+    int row = point.x();
+    int column = point.y();
 
     qreal value = qreal(m_dataArray.at(row)->at(column).y());
 
@@ -1838,18 +1838,20 @@ void Surface3DRenderer::surfacePointSelected(int id)
         m_selectionPointer = new SelectionPointer(m_drawer);
 
     QVector3D pos;
-    if (m_cachedSelectionMode == QDataVis::SelectionModeSliceRow) {
-        pos = m_sliceSurfaceObj->vertexAt(column, 0);
-        pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
-        pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
-        m_selectionPointer->updateBoundingRect(m_sliceViewPort);
-        m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
-    } else if (m_cachedSelectionMode == QDataVis::SelectionModeSliceColumn) {
-        pos = m_sliceSurfaceObj->vertexAt(row, 0);
-        pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
-        pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
-        m_selectionPointer->updateBoundingRect(m_sliceViewPort);
-        m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
+    if (m_cachedIsSlicingActivated) {
+        if (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow)) {
+            pos = m_sliceSurfaceObj->vertexAt(column, 0);
+            pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
+            pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
+            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+            m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
+        } else if (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn)) {
+            pos = m_sliceSurfaceObj->vertexAt(row, 0);
+            pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
+            pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
+            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+            m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
+        }
     } else {
         pos = m_surfaceObj->vertexAt(column, row);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);;
@@ -1861,9 +1863,14 @@ void Surface3DRenderer::surfacePointSelected(int id)
     m_selectionPointer->setPosition(pos);
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
     m_selectionPointer->updateScene(m_cachedScene);
+}
 
-    //Put the selection pointer flag active
-    m_selectionActive = true;
+// Maps selection Id to surface point in data array
+QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
+{
+    int column = ((id - 1) % m_sampleSpace.width()) + m_sampleSpace.x();
+    int row = ((id - 1) / m_sampleSpace.width()) +  m_sampleSpace.y();
+    return QPoint(row, column);
 }
 
 QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row)
@@ -1968,6 +1975,8 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 #if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer(); // Re-init depth buffer as well
 #endif
+
+    m_selectionDirty = true;
 }
 
 void Surface3DRenderer::setViewPorts()

@@ -31,7 +31,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Bars3DController::Bars3DController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_selectedBarPos(noSelectionPoint()),
+      m_selectedBar(noSelectionPoint()),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
@@ -65,8 +65,8 @@ void Bars3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Bars3DRenderer::selectedBarPosChanged, this,
-                     &Bars3DController::handleSelectedBarPosChanged, Qt::QueuedConnection);
+    QObject::connect(m_renderer, &Bars3DRenderer::barClicked, this,
+                     &Bars3DController::handleBarClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -83,9 +83,9 @@ void Bars3DController::synchDataToRenderer()
         m_changeTracker.barSpecsChanged = false;
     }
 
-    if (m_changeTracker.selectedBarPosChanged) {
-        m_renderer->updateSelectedBarPos(m_selectedBarPos);
-        m_changeTracker.selectedBarPosChanged = false;
+    if (m_changeTracker.selectedBarChanged) {
+        m_renderer->updateSelectedBar(m_selectedBar);
+        m_changeTracker.selectedBarChanged = false;
     }
 
     if (m_isDataDirty) {
@@ -125,11 +125,10 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, this,
                      &Bars3DController::handleDataColumnLabelsChanged);
 
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
 
     // Always clear selection on proxy change
-    setSelectedBarPos(noSelectionPoint());
+    setSelectedBar(noSelectionPoint());
 
     handleDataRowLabelsChanged();
     handleDataColumnLabelsChanged();
@@ -139,11 +138,10 @@ void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
 void Bars3DController::handleArrayReset()
 {
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     // Clear selection unless still valid
-    setSelectedBarPos(m_selectedBarPos);
+    setSelectedBar(m_selectedBar);
     emitNeedRender();
 }
 
@@ -151,8 +149,6 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should update slice instead of deactivating?
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -162,8 +158,6 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should update slice instead of deactivating?
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -173,13 +167,11 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should update slice instead of deactivating?
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
 
     // Clear selection unless still valid
-    setSelectedBarPos(m_selectedBarPos);
+    setSelectedBar(m_selectedBar);
 
     emitNeedRender();
 }
@@ -188,8 +180,6 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should update slice instead of deactivating?
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -199,8 +189,6 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     Q_UNUSED(rowIndex)
     Q_UNUSED(columnIndex)
-    // TODO should update slice instead of deactivating?
-    scene()->setSlicingActive(false);
     adjustAxisRanges();
     m_isDataDirty = true;
     emitNeedRender();
@@ -228,16 +216,11 @@ void Bars3DController::handleDataColumnLabelsChanged()
     }
 }
 
-void Bars3DController::handleSelectedBarPosChanged(const QPoint &position)
+void Bars3DController::handleBarClicked(const QPoint &position)
 {
-    QPoint pos = position;
-    if (pos == QPoint(255, 255))
-        pos = noSelectionPoint();
-    if (pos != m_selectedBarPos) {
-        m_selectedBarPos = pos;
-        emit selectedBarPosChanged(pos);
-        emitNeedRender();
-    }
+    setSelectedBar(position);
+    // TODO: pass clicked to parent. (QTRD-2517)
+    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -270,12 +253,6 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
 {
     // Data window changed
     if (sender == m_axisX || sender == m_axisZ) {
-        // Disable zoom mode if we're in it (causes crash if not, as zoom selection is deleted)
-        scene()->setSlicingActive(false);
-
-        // Clear selection unless still valid
-        setSelectedBarPos(m_selectedBarPos);
-
         if (sender == m_axisX)
             handleDataRowLabelsChanged();
         if (sender == m_axisZ)
@@ -283,6 +260,9 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
     }
 
     Abstract3DController::handleAxisRangeChangedBySender(sender);
+
+    // Update selected bar - may be moved offscreen
+    setSelectedBar(m_selectedBar);
 }
 
 void Bars3DController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)
@@ -330,43 +310,62 @@ void Bars3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
     Abstract3DController::setMeshFileName(objFile);
 }
 
-void Bars3DController::setSelectionMode(QDataVis::SelectionMode mode)
+void Bars3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    // Disable zoom if selection mode changes
-    scene()->setSlicingActive(false);
-    Abstract3DController::setSelectionMode(mode);
+    if (mode.testFlag(QDataVis::SelectionSlice)
+            && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+        qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
+    } else {
+        // When setting selection mode to a new slicing mode, activate slicing
+        if (mode != selectionMode()) {
+            bool isSlicing = mode.testFlag(QDataVis::SelectionSlice);
+            if (isSlicing && m_selectedBar != noSelectionPoint())
+                scene()->setSlicingActive(true);
+            else
+                scene()->setSlicingActive(false);
+        }
+
+        Abstract3DController::setSelectionMode(mode);
+    }
 }
 
-void Bars3DController::setSelectedBarPos(const QPoint &position)
+void Bars3DController::setSelectedBar(const QPoint &position)
 {
-    // If the selection is outside data window or targets non-existent
-    // bar, clear selection instead.
+    // If the selection targets non-existent bar, clear selection instead.
     QPoint pos = position;
 
     if (pos != noSelectionPoint()) {
-        int minRow = int(m_axisX->min());
-        int maxRow = int(m_axisX->max());
-        int minCol = int(m_axisZ->min());
-        int maxCol = int(m_axisZ->max());
+        const QBarDataProxy *proxy = static_cast<const QBarDataProxy *>(m_data);
+        int maxRow = proxy->rowCount() - 1;
+        int maxCol = (pos.x() <= maxRow && pos.x() >= 0 && proxy->rowAt(pos.x()))
+                ? proxy->rowAt(pos.x())->size() - 1 : -1;
 
-        if (pos.x() < minRow || pos.x() > maxRow || pos.y() < minCol || pos.y() > maxCol
-                || pos.x() + minRow >= static_cast<QBarDataProxy *>(m_data)->rowCount()
-                || pos.y() + minCol >= static_cast<QBarDataProxy *>(m_data)->rowAt(pos.x())->size()) {
+        if (pos.x() < 0 || pos.x() > maxRow || pos.y() < 0 || pos.y() > maxCol)
             pos = noSelectionPoint();
-        }
     }
 
-    if (pos != m_selectedBarPos) {
-        m_selectedBarPos = pos;
-        m_changeTracker.selectedBarPosChanged = true;
-        emit selectedBarPosChanged(pos);
+    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+        // If the selected bar is outside data window, or there is no selected bar, disable slicing
+        if (pos.x() < m_axisX->min() || pos.x() > m_axisX->max()
+                || pos.y() < m_axisZ->min() || pos.y() > m_axisZ->max()) {
+            scene()->setSlicingActive(false);
+        } else {
+            scene()->setSlicingActive(true);
+        }
+        emitNeedRender();
+    }
+
+    if (pos != m_selectedBar) {
+        m_selectedBar = pos;
+        m_changeTracker.selectedBarChanged = true;
+        emit selectedBarChanged(pos);
         emitNeedRender();
     }
 }
 
-QPoint Bars3DController::selectedBarPos() const
+QPoint Bars3DController::selectedBar() const
 {
-    return m_selectedBarPos;
+    return m_selectedBar;
 }
 
 void Bars3DController::adjustAxisRanges()

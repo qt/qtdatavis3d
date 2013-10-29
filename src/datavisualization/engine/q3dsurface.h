@@ -34,7 +34,7 @@ class QSurfaceDataProxy;
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
@@ -45,10 +45,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
+    Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
+
 
 public:
     explicit Q3DSurface();
@@ -69,8 +67,8 @@ public:
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode() const;
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    QDataVis::SelectionFlags selectionMode() const;
     void setSurfaceGridEnabled(bool enabled);
     bool isSurfaceGridEnabled() const;
 
@@ -101,8 +99,14 @@ public:
 
     Q3DScene *scene() const;
 
+    void setSelectedPoint(const QPoint &position);
+    QPoint selectedPoint() const;
+
     void setLabelStyle(QDataVis::LabelStyle style);
     QDataVis::LabelStyle labelStyle() const;
+
+signals:
+    void selectedPointChanged(QPoint position);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

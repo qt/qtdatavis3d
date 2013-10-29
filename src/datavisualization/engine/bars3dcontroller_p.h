@@ -42,12 +42,12 @@ class QBarDataProxy;
 struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
     bool barSpecsChanged          : 1;
-    bool selectedBarPosChanged    : 1;
+    bool selectedBarChanged       : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
         barSpecsChanged(true),
-        selectedBarPosChanged(true)
+        selectedBarChanged(true)
     {
     }
 };
@@ -60,7 +60,7 @@ private:
     Bars3DChangeBitField m_changeTracker;
 
     // Interaction
-    QPoint m_selectedBarPos;     // Points to row & column in data window.
+    QPoint m_selectedBar;     // Points to row & column in data window.
 
     // Look'n'feel
     bool m_isBarSpecRelative;
@@ -86,15 +86,11 @@ public:
     GLfloat barThickness();
     QSizeF barSpacing();
     bool isBarSpecRelative();
-
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
-    // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(QDataVis::SelectionMode mode);
-
-    void setSelectedBarPos(const QPoint &position);
-    QPoint selectedBarPos() const;
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectedBar(const QPoint &position);
+    QPoint selectedBar() const;
 
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
@@ -116,11 +112,10 @@ public slots:
     void handleItemChanged(int rowIndex, int columnIndex);
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
-
-    void handleSelectedBarPosChanged(const QPoint &position);
+    void handleBarClicked(const QPoint &position);
 
 signals:
-    void selectedBarPosChanged(QPoint position);
+    void selectedBarChanged(QPoint position);
 
 protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);

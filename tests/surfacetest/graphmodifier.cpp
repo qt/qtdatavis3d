@@ -23,11 +23,12 @@
 #include <qmath.h>
 #include <QLinearGradient>
 #include <QDebug>
+#include <QComboBox>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
 //#define JITTER_PLANE
-//#define WONKY_PLANE
+#define WONKY_PLANE
 
 GraphModifier::GraphModifier(Q3DSurface *graph)
     : m_graph(graph),
@@ -55,6 +56,7 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     changeStyle();
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
+    connect(m_graph, &Q3DSurface::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
 }
 
 GraphModifier::~GraphModifier()
@@ -137,6 +139,7 @@ void GraphModifier::togglePlane(bool enable)
         float halfZ = m_zCount / 2;
         float wonkyFactor = 0.01f;
         float maxStepX = 0.0f;
+        float add = 0.0f;
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             if (i < halfZ) {
@@ -145,15 +148,17 @@ void GraphModifier::togglePlane(bool enable)
             } else {
                 stepX -= wonkyFactor;
             }
+            add = 0.0f;
             for (float j = 0; j < m_xCount; j++) {
                 (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f,
-                                                   i * stepZ + minZ));
+                                                   i * stepZ + minZ + add));
+                add += 0.5f;
 
             }
             *m_planeArray << newRow;
         }
 
-        resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, m_xCount * maxStepX + minZ);
+        resetArrayAndSliders(m_planeArray, minZ, maxZ + add, minX, m_xCount * maxStepX + minX);
 #else
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
@@ -303,6 +308,20 @@ void GraphModifier::changeStyle()
         style = QDataVis::LabelStyleOpaque;
 }
 
+void GraphModifier::selectButtonClicked()
+{
+    int row = rand() % m_graph->activeDataProxy()->rowCount();
+    int col = rand() % m_graph->activeDataProxy()->columnCount();
+
+    m_graph->setSelectedPoint(QPoint(row, col));
+}
+
+void GraphModifier::selectedPointChanged(const QPoint &point)
+{
+    QString labelText = QStringLiteral("Selected row: %1, column: %2").arg(point.x()).arg(point.y());
+    m_selectionInfoLabel->setText(labelText);
+}
+
 void GraphModifier::changeTheme(int theme)
 {
     m_graph->setTheme((QDataVis::Theme)theme);
@@ -347,26 +366,10 @@ void GraphModifier::changeShadowQuality(int quality)
 
 void GraphModifier::changeSelectionMode(int mode)
 {
-    switch (mode) {
-    case 0:
-        qDebug() << "QDataVis::SelectionModeNone";
-        m_graph->setSelectionMode(QDataVis::SelectionModeNone);
-        break;
-    case 1:
-        qDebug() << "QDataVis::SelectionModeItem";
-        m_graph->setSelectionMode(QDataVis::SelectionModeItem);
-        break;
-    case 2:
-        qDebug() << "QDataVis::SelectionModeSliceRow";
-        m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow);
-        break;
-    case 3:
-        qDebug() << "QDataVis::SelectionModeSliceColumn";
-        m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn);
-        break;
-    default:
-        qDebug() << __FUNCTION__ << " Unsupported selection mode.";
-        break;
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        int flags = comboBox->itemData(mode).toInt();
+        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
     }
 }
 

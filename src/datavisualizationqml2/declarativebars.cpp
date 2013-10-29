@@ -41,8 +41,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3DController(boundingRect().toRect());
     AbstractDeclarative::setSharedController(m_shared);
-    QObject::connect(m_shared, &Bars3DController::selectedBarPosChanged, this,
-                     &DeclarativeBars::selectedBarPosChanged);
+    QObject::connect(m_shared, &Bars3DController::selectedBarChanged, this,
+                     &DeclarativeBars::selectedBarChanged);
 
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
     m_shared->setActiveDataProxy(proxy);
@@ -201,14 +201,14 @@ QString DeclarativeBars::meshFileName() const
     return m_shared->meshFileName();
 }
 
-void DeclarativeBars::setSelectedBarPos(const QPointF &position)
+void DeclarativeBars::setSelectedBar(const QPointF &position)
 {
-    m_shared->setSelectedBarPos(position.toPoint());
+    m_shared->setSelectedBar(position.toPoint());
 }
 
-QPointF DeclarativeBars::selectedBarPos() const
+QPointF DeclarativeBars::selectedBar() const
 {
-    return QPointF(m_shared->selectedBarPos());
+    return QPointF(m_shared->selectedBar());
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

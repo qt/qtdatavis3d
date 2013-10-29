@@ -37,10 +37,11 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedBoundingRect(QRect(0,0,0,0)),
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedSelectionMode(QDataVis::SelectionModeNone),
+      m_cachedSelectionMode(QDataVis::SelectionNone),
       m_cachedIsGridEnabled(false),
       m_cachedIsBackgroundEnabled(false),
-      m_cachedScene(new Q3DScene())
+      m_cachedScene(new Q3DScene()),
+      m_selectionDirty(true)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -221,9 +222,10 @@ void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)
     }
 }
 
-void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionMode mode)
+void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
 {
     m_cachedSelectionMode = mode;
+    m_selectionDirty = true;
 }
 
 void Abstract3DRenderer::updateGridEnabled(bool enable)

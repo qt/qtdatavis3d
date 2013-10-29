@@ -37,10 +37,12 @@ public:
     void enableSqrtSinModel();
 
     //! [0]
-    void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionModeNone); }
-    void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionModeItem); }
-    void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow); }
-    void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn); }
+    void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionNone); }
+    void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionItem); }
+    void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionItemAndRow
+                                                          | QDataVis::SelectionSlice); }
+    void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn
+                                                             | QDataVis::SelectionSlice); }
     //! [0]
 
     void setBlackToYellowGradient();

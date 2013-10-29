@@ -35,7 +35,7 @@ class Q3DScene;
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
@@ -45,13 +45,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QFont font READ font WRITE setFont)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(QPoint selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
+    Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
     explicit Q3DBars();
@@ -76,8 +71,8 @@ public:
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode() const;
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    QDataVis::SelectionFlags selectionMode() const;
 
     void setFont(const QFont &font);
     QFont font() const;
@@ -96,8 +91,8 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
-    void setSelectedBarPos(const QPoint &position);
-    QPoint selectedBarPos() const;
+    void setSelectedBar(const QPoint &position);
+    QPoint selectedBar() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
@@ -120,7 +115,7 @@ public:
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void selectedBarPosChanged(QPoint position);
+    void selectedBarChanged(QPoint position);
 
 protected:
 

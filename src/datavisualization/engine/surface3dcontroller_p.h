@@ -42,11 +42,13 @@ struct Surface3DChangeBitField {
     bool gradientColorChanged     : 1;
     bool smoothStatusChanged      : 1;
     bool surfaceGridChanged       : 1;
+    bool selectedPointChanged     : 1;
 
     Surface3DChangeBitField() :
         gradientColorChanged(true),
         smoothStatusChanged(true),
-        surfaceGridChanged(true)
+        surfaceGridChanged(true),
+        selectedPointChanged(true)
     {
     }
 };
@@ -57,12 +59,11 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DControl
 
 private:
     Surface3DChangeBitField m_changeTracker;
-
-    // Rendering
     Surface3DRenderer *m_renderer;
     bool m_isSmoothSurfaceEnabled;
     bool m_isSurfaceGridEnabled;
     QLinearGradient m_userDefinedGradient;
+    QPoint m_selectedPoint;
 
 public:
     explicit Surface3DController(QRect rect);
@@ -82,18 +83,25 @@ public:
 
     void setGradientColorAt(qreal pos, const QColor &color);
 
-    void setSelectionMode(QDataVis::SelectionMode mode);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+
+    void setSelectedPoint(const QPoint &position);
+    QPoint selectedPoint() const;
 
     virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
 
+    static QPoint noSelectionPoint();
+
 public slots:
     void handleArrayReset();
+    void handlePointClicked(const QPoint &position);
 
 signals:
     void smoothSurfaceEnabledChanged(bool enable);
+    void selectedPointChanged(QPoint position);
 
 private:
     void adjustValueAxisRange();

@@ -46,7 +46,7 @@ Item {
             width: dataView.width
             height: dataView.height
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionModeItem
+            selectionMode: AbstractGraph3D.SelectionItem
             font.pointSize: 35
             theme: AbstractGraph3D.ThemeRetro
             labelStyle: AbstractGraph3D.LabelStyleFromTheme
@@ -59,7 +59,7 @@ Item {
             valueAxis: graphAxes.expenses
             itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
 
-            onSelectedBarPosChanged: {
+            onSelectedBarChanged: {
                 // Set tableView current row to selected bar
                 var rowRole = graphData.proxy.rowLabels[position.x];
                 var colRole = graphData.proxy.columnLabels[position.y];
@@ -161,7 +161,7 @@ Item {
         onCurrentRowChanged: {
             var rowIndex = graphData.proxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
             var colIndex = graphData.proxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
-            testGraph.selectedBarPos = Qt.point(rowIndex, colIndex)
+            testGraph.selectedBar = Qt.point(rowIndex, colIndex)
         }
         //! [2]
     }

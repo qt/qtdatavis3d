@@ -164,11 +164,10 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat itemHeight, QDataVis::SelectionMode mode,
+                       GLfloat itemHeight, QDataVis::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
-                       const Q3DCamera *camera,
-                       bool useDepth, bool rotateAlong,
-                       LabelPosition position, Qt::AlignmentFlag alignment)
+                       const Q3DCamera *camera, bool useDepth, bool rotateAlong,
+                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
 {
     // Draw label
     if (!labelItem.textureId())
@@ -275,7 +274,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (QDataVis::SelectionModeSliceColumn == mode)
+        else if (mode.testFlag(QDataVis::SelectionColumn) && isSlicing)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 

@@ -99,7 +99,7 @@ MainApp::MainApp(Q3DBars *window)
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::red), false);
     // Disable selection
-    m_chart->setSelectionMode(QDataVis::SelectionModeNone);
+    m_chart->setSelectionMode(QDataVis::SelectionNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);

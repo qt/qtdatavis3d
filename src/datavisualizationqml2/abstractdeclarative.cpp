@@ -47,12 +47,12 @@ QDataVis::Theme AbstractDeclarative::theme() const
     return m_controller->theme().theme();
 }
 
-void AbstractDeclarative::setSelectionMode(QDataVis::SelectionMode mode)
+void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)
 {
     m_controller->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode AbstractDeclarative::selectionMode() const
+QDataVis::SelectionFlags AbstractDeclarative::selectionMode() const
 {
     return m_controller->selectionMode();
 }

@@ -101,6 +101,8 @@ Q3DSurface::Q3DSurface()
 {
     setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Surface3DController::selectedPointChanged, this,
+                     &Q3DSurface::selectedPointChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -260,15 +262,16 @@ bool Q3DSurface::isSmoothSurfaceEnabled() const
 /*!
  * \property Q3DSurface::selectionMode
  *
- * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports SelectionModeItem,
- * SelectionModeSliceRow and SelectionModeSliceColumn. It is preset to \c QDataVis::SelectionModeItem by default.
+ * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports
+ * \c SelectionItem and \c SelectionSlice with either \c SelectionRow or \c SelectionColumn.
+ * It is preset to \c SelectionItem by default.
  */
-void Q3DSurface::setSelectionMode(QDataVis::SelectionMode mode)
+void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode Q3DSurface::selectionMode() const
+QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -328,6 +331,24 @@ QFont Q3DSurface::font() const
 Q3DScene *Q3DSurface::scene() const
 {
     return d_ptr->m_shared->scene();
+}
+
+/*!
+ * \property Q3DSurface::selectedPoint
+ *
+ * Selects a surface grid point in a \a position. The position is the (row, column) position in
+ * the data array of the active data proxy.
+ * Only one point can be selected at a time.
+ * To clear selection, specify an illegal \a position, e.g. (-1, -1).
+ */
+void Q3DSurface::setSelectedPoint(const QPoint &position)
+{
+    d_ptr->m_shared->setSelectedPoint(position);
+}
+
+QPoint Q3DSurface::selectedPoint() const
+{
+    return d_ptr->m_shared->selectedPoint();
 }
 
 /*!

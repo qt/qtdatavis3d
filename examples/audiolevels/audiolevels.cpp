@@ -44,7 +44,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->valueAxis()->setSegmentCount(20);
     m_graph->valueAxis()->setLabelFormat(QStringLiteral("%d%%"));
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->setSelectionMode(QDataVis::SelectionModeNone);
+    m_graph->setSelectionMode(QDataVis::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0, 10.0, 190.0);
     m_graph->setTheme(QDataVis::ThemeIsabelle);
     m_graph->setBarType(QDataVis::MeshStyleBars);

@@ -60,6 +60,7 @@ private:
     bool m_cachedIsSlicingActivated;
     int m_cachedRowCount;
     int m_cachedColumnCount;
+    QDataVis::InputState m_cachedInputState;
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
@@ -98,14 +99,13 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
-    QVector3D m_selection;
-    QVector3D m_previousSelection;
+    QPoint m_visualSelectedBarPos; // The selection id color
     int m_renderRows;
     int m_renderColumns;
-
+    QVector3D m_clickedBarColor;
+    QPoint m_selectedBarPos;
     bool m_hasHeightAdjustmentChanged;
     BarRenderItem m_dummyBarRenderItem;
-
     BarRenderItemArray m_renderItemArray;
 
 public:
@@ -126,16 +126,15 @@ public slots:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
-    void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
     void updateBackgroundEnabled(bool enable);
-    void updateSelectedBarPos(const QPoint &position);
+    void updateSelectedBar(const QPoint &position);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
 signals:
-    void selectedBarPosChanged(QPoint position);
+    void barClicked(QPoint position);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -161,6 +160,7 @@ private:
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(GLint row, GLint bar);
+    QPoint selectionColorToArrayPosition(const QVector3D &selectionColor);
 
     Q_DISABLE_COPY(Bars3DRenderer)
 

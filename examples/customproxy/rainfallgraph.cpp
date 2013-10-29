@@ -69,7 +69,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->setFont(QFont("Century Gothic", 30));
 
     // Set selection mode to bar and column
-    m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn);
+    m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
 
     // Set theme
     m_graph->setTheme(QDataVis::ThemeArmyBlue);

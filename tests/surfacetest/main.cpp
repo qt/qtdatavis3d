@@ -167,11 +167,36 @@ int main(int argc, char *argv[])
 //    shadowQuality->addItem(QStringLiteral("High Soft"));
 //    shadowQuality->setCurrentIndex(3);
     QComboBox *selectionMode = new QComboBox(widget);
-    selectionMode->addItem(QStringLiteral("SelectionModeNone"));
-    selectionMode->addItem(QStringLiteral("SelectionModeItem"));
-    selectionMode->addItem(QStringLiteral("SelectionModeSliceRow"));
-    selectionMode->addItem(QStringLiteral("SelectionModeSliceColumn"));
+    selectionMode->addItem(QStringLiteral("None"),
+                               int(QDataVis::SelectionNone));
+    selectionMode->addItem(QStringLiteral("Item"),
+                               int(QDataVis::SelectionItem));
+    selectionMode->addItem(QStringLiteral("Row"),
+                               int(QDataVis::SelectionRow));
+    selectionMode->addItem(QStringLiteral("Item and Row"),
+                               int(QDataVis::SelectionItemAndRow));
+    selectionMode->addItem(QStringLiteral("Column"),
+                               int(QDataVis::SelectionColumn));
+    selectionMode->addItem(QStringLiteral("Item and Column"),
+                               int(QDataVis::SelectionItemAndColumn));
+    selectionMode->addItem(QStringLiteral("Row and Column"),
+                               int(QDataVis::SelectionRowAndColumn));
+    selectionMode->addItem(QStringLiteral("Item, Row and Column"),
+                               int(QDataVis::SelectionItemRowAndColumn));
+    selectionMode->addItem(QStringLiteral("Slice into Row"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionRow));
+    selectionMode->addItem(QStringLiteral("Slice into Row and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow));
+    selectionMode->addItem(QStringLiteral("Slice into Column"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
+    selectionMode->addItem(QStringLiteral("Slice into Column and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
     selectionMode->setCurrentIndex(1);
+
+    QPushButton *selectButton = new QPushButton(widget);
+    selectButton->setText(QStringLiteral("Select random point"));
+
+    QLabel *selectionInfoLabel = new QLabel(widget);
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
@@ -200,6 +225,8 @@ int main(int argc, char *argv[])
 //    vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
     vLayout->addWidget(selectionMode);
+    vLayout->addWidget(selectButton);
+    vLayout->addWidget(selectionInfoLabel);
 
     widget->show();
 
@@ -242,6 +269,8 @@ int main(int argc, char *argv[])
 //                     modifier, SLOT(changeShadowQuality(int)));
     QObject::connect(selectionMode, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeSelectionMode(int)));
+    QObject::connect(selectButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::selectButtonClicked);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
@@ -250,6 +279,7 @@ int main(int argc, char *argv[])
     modifier->setAxisMinSliderX(axisMinSliderX);
     modifier->setAxisMinSliderZ(axisMinSliderZ);
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
+    modifier->setSelectionInfoLabel(selectionInfoLabel);
     sqrtSinCB->setChecked(true);
 
     return app.exec();

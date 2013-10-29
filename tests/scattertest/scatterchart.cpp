@@ -48,6 +48,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
     m_chart->setActiveDataProxy(proxy);
 
+    m_chart->setSelectionMode(QDataVis::SelectionItemAndColumn);
+
     connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
 }
 

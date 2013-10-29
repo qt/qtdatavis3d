@@ -42,6 +42,9 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f); // Selection texture's background color
+static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
+
 class TextureHelper;
 class Theme;
 class Drawer;
@@ -65,7 +68,7 @@ protected:
 
     QString m_cachedItemLabelFormat;
     QString m_cachedObjFile;
-    QDataVis::SelectionMode m_cachedSelectionMode;
+    QDataVis::SelectionFlags m_cachedSelectionMode;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
 
@@ -76,6 +79,7 @@ protected:
     Q3DBox m_boundingBox;
 
     Q3DScene *m_cachedScene;
+    bool m_selectionDirty;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -98,7 +102,7 @@ public:
     virtual void updateTheme(Theme theme);
     virtual void updateFont(const QFont &font);
     virtual void updateLabelStyle(QDataVis::LabelStyle style);
-    virtual void updateSelectionMode(QDataVis::SelectionMode newMode);
+    virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
     virtual void updateGridEnabled(bool enable);
     virtual void updateBackgroundEnabled(bool enable);
     virtual void updateMeshFileName(const QString &objFileName);

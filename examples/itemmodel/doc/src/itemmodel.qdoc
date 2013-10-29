@@ -164,7 +164,7 @@
     Now we'll find out what these were for.
 
     The first one connects a signal from Q3DBars to the GraphDataGenerator. Signal
-    Q3DBars::selectedBarPosChanged() is emitted when a bar is selected from the graph. We connect
+    Q3DBars::selectedBarChanged() is emitted when a bar is selected from the graph. We connect
     that to a method in the data generator that selects the same data item in the table widget:
 
     \snippet ../examples/itemmodel/main.cpp 13

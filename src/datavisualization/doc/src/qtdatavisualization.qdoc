@@ -261,7 +261,7 @@
     All visualization types support selecting a single data item - a bar, a scatter item, or a surface
     vertex - using mouse, touch, and programmatically via the graph APIs. The selected item is highlighted
     in the rendered graph, and selecting causes emission of a graph specific signal for this purpose,
-    for example, Q3DBars::selectedBarPosChanged(), which the application can handle.
+    for example, Q3DBars::selectedBarChanged(), which the application can handle.
 
     \note The surface graph doesn't have a fully implemented selection API yet. It only supports
     selection with mouse and touch in the technology preview version.

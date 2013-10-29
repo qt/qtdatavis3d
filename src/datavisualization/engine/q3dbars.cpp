@@ -102,8 +102,8 @@ Q3DBars::Q3DBars()
 {
     setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarPosChanged, this,
-                     &Q3DBars::selectedBarPosChanged);
+    QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarChanged, this,
+                     &Q3DBars::selectedBarChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -297,12 +297,12 @@ QColor Q3DBars::barColor() const
  * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
  * \c QDataVis::SelectionModeItem by default.
  */
-void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
+void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode Q3DBars::selectionMode() const
+QDataVis::SelectionFlags Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }
@@ -398,20 +398,21 @@ bool Q3DBars::isBackgroundVisible() const
 }
 
 /*!
- * \property Q3DBars::selectedBarPos
+ * \property Q3DBars::selectedBar
  *
- * Selects a bar in a \a position. The position is the position in data window.
+ * Selects a bar in a \a position. The position is the (row, column) position in
+ * the data array of the active data proxy.
  * Only one bar can be selected at a time.
  * To clear selection, specify an illegal \a position, e.g. (-1, -1).
  */
-void Q3DBars::setSelectedBarPos(const QPoint &position)
+void Q3DBars::setSelectedBar(const QPoint &position)
 {
-    d_ptr->m_shared->setSelectedBarPos(position);
+    d_ptr->m_shared->setSelectedBar(position);
 }
 
-QPoint Q3DBars::selectedBarPos() const
+QPoint Q3DBars::selectedBar() const
 {
-    return d_ptr->m_shared->selectedBarPos();
+    return d_ptr->m_shared->selectedBar();
 }
 
 /*!

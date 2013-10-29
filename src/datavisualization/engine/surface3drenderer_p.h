@@ -70,6 +70,7 @@ public:
 
 private:
     bool m_cachedIsSlicingActivated;
+    QDataVis::InputState m_cachedInputState;
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
@@ -124,9 +125,9 @@ private:
     QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
-    uint m_cachedSelectionId;
-    bool m_selectionModeChanged;
+    uint m_clickedPointId;
     bool m_hasHeightAdjustmentChanged;
+    QPoint m_selectedPoint;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -146,11 +147,14 @@ public slots:
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);
-    void updateSelectionMode(QDataVis::SelectionMode mode);
+    void updateSelectedPoint(const QPoint &position);
+
+signals:
+    void pointClicked(QPoint position);
 
 private:
     void setViewPorts();
-    void updateSliceDataModel(int selectionId);
+    void updateSliceDataModel(const QPoint &point);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -172,11 +176,13 @@ private:
     void updateSelectionTexture();
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
-    void surfacePointSelected(int id);
+    void surfacePointSelected(const QPoint &point);
+    QPoint selectionIdToSurfacePoint(uint id);
     QString createSelectionLabel(qreal value, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif
+    void emitSelectedPointChanged(QPoint position);
 
     Q_DISABLE_COPY(Surface3DRenderer)
 };

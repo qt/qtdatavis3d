@@ -232,12 +232,12 @@ QColor Q3DScatter::objectColor() const
  * Sets item selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
  * \c QDataVis::SelectionModeItem by default.
  */
-void Q3DScatter::setSelectionMode(QDataVis::SelectionMode mode)
+void Q3DScatter::setSelectionMode(QDataVis::SelectionFlags mode)
 {
     d_ptr->m_shared->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode Q3DScatter::selectionMode() const
+QDataVis::SelectionFlags Q3DScatter::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
 }

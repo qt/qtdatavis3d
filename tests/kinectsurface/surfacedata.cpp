@@ -45,7 +45,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setSelectionMode(QDataVis::SelectionModeNone);
+    m_surface->setSelectionMode(QDataVis::SelectionNone);
     m_surface->setGridVisible(false);
     m_surface->setGradient(gradient);
     m_surface->axisY()->setMax(255);
@@ -57,7 +57,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 
     // Initialize scatter
     m_scatter->setTheme(QDataVis::ThemeStoneMoss);
-    m_scatter->setSelectionMode(QDataVis::SelectionModeNone);
+    m_scatter->setSelectionMode(QDataVis::SelectionNone);
     m_scatter->setGridVisible(false);
     m_scatter->setObjectType(QDataVis::MeshStyleDots, false);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);

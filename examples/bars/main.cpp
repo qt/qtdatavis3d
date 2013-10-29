@@ -84,13 +84,30 @@ int main(int argc, char **argv)
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
     QComboBox *selectionModeList = new QComboBox(widget);
-    selectionModeList->addItem(QStringLiteral("None"));
-    selectionModeList->addItem(QStringLiteral("Bar"));
-    selectionModeList->addItem(QStringLiteral("Bar and Row"));
-    selectionModeList->addItem(QStringLiteral("Bar and Column"));
-    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"));
-    selectionModeList->addItem(QStringLiteral("Slice into Row"));
-    selectionModeList->addItem(QStringLiteral("Slice into Column"));
+    selectionModeList->addItem(QStringLiteral("None"),
+                               int(QDataVis::SelectionNone));
+    selectionModeList->addItem(QStringLiteral("Bar"),
+                               int(QDataVis::SelectionItem));
+    selectionModeList->addItem(QStringLiteral("Row"),
+                               int(QDataVis::SelectionRow));
+    selectionModeList->addItem(QStringLiteral("Bar and Row"),
+                               int(QDataVis::SelectionItemAndRow));
+    selectionModeList->addItem(QStringLiteral("Column"),
+                               int(QDataVis::SelectionColumn));
+    selectionModeList->addItem(QStringLiteral("Bar and Column"),
+                               int(QDataVis::SelectionItemAndColumn));
+    selectionModeList->addItem(QStringLiteral("Row and Column"),
+                               int(QDataVis::SelectionRowAndColumn));
+    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"),
+                               int(QDataVis::SelectionItemRowAndColumn));
+    selectionModeList->addItem(QStringLiteral("Slice into Row"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionRow));
+    selectionModeList->addItem(QStringLiteral("Slice into Row and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow));
+    selectionModeList->addItem(QStringLiteral("Slice into Column"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
+    selectionModeList->addItem(QStringLiteral("Slice into Column and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
     selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);

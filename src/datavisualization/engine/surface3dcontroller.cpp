@@ -34,7 +34,8 @@ Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
       m_isSmoothSurfaceEnabled(false),
-      m_isSurfaceGridEnabled(true)
+      m_isSurfaceGridEnabled(true),
+      m_selectedPoint(noSelectionPoint())
 {
     setActiveDataProxy(0);
 
@@ -62,6 +63,8 @@ void Surface3DController::initializeOpenGL()
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
+    QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
+                     &Surface3DController::handlePointClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -91,6 +94,11 @@ void Surface3DController::synchDataToRenderer()
         m_changeTracker.surfaceGridChanged = false;
     }
 
+    if (m_changeTracker.selectedPointChanged) {
+        m_renderer->updateSelectedPoint(m_selectedPoint);
+        m_changeTracker.selectedPointChanged = false;
+    }
+
     if (m_isDataDirty) {
         m_renderer->updateDataModel(static_cast<QSurfaceDataProxy *>(m_data));
         m_isDataDirty = false;
@@ -107,8 +115,16 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
 
 void Surface3DController::handleAxisRangeChangedBySender(QObject *sender)
 {
-    scene()->setSlicingActive(false);
     Abstract3DController::handleAxisRangeChangedBySender(sender);
+
+    // Update selected point - may be moved offscreen
+    setSelectedPoint(m_selectedPoint);
+}
+
+QPoint Surface3DController::noSelectionPoint()
+{
+    static QPoint noSelectionPoint(-1, -1);
+    return noSelectionPoint;
 }
 
 void Surface3DController::setSmoothSurface(bool enable)
@@ -160,19 +176,88 @@ void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
     emitNeedRender();
 }
 
-void Surface3DController::setSelectionMode(QDataVis::SelectionMode mode)
+void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    if (!(mode == QDataVis::SelectionModeNone || mode == QDataVis::SelectionModeItem
-          || mode == QDataVis::SelectionModeSliceRow
-          || mode == QDataVis::SelectionModeSliceColumn)) {
+    // Currently surface only supports row and column modes when also slicing
+    if ((mode.testFlag(QDataVis::SelectionRow) || mode.testFlag(QDataVis::SelectionColumn))
+            && !mode.testFlag(QDataVis::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
+    } else if (mode.testFlag(QDataVis::SelectionSlice)
+            && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+        qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
+    } else {
+        // When setting selection mode to a new slicing mode, activate slicing
+        if (mode != selectionMode()) {
+            bool isSlicing = mode.testFlag(QDataVis::SelectionSlice);
+            if (isSlicing && m_selectedPoint != noSelectionPoint())
+                scene()->setSlicingActive(true);
+            else
+                scene()->setSlicingActive(false);
+        }
+
+        Abstract3DController::setSelectionMode(mode);
     }
-    // Disable zoom if selection mode changes
-    setSlicingActive(false);
-    Abstract3DController::setSelectionMode(mode);
 }
 
+void Surface3DController::setSelectedPoint(const QPoint &position)
+{
+    // If the selection targets non-existent point, clear selection instead.
+    QPoint pos = position;
+
+    const QSurfaceDataProxy *proxy = static_cast<const QSurfaceDataProxy *>(m_data);
+    if (pos != noSelectionPoint()) {
+        int maxRow = proxy->rowCount() - 1;
+        int maxCol = proxy->columnCount() - 1;
+
+        if (pos.x() < 0 || pos.x() > maxRow || pos.y() < 0 || pos.y() > maxCol)
+            pos = noSelectionPoint();
+    }
+
+    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+        if (pos == noSelectionPoint()) {
+            scene()->setSlicingActive(false);
+        } else {
+            // If the selected point is outside data window, or there is no selected point, disable slicing
+            // TODO: (QTRD-2351) This logic doesn't match the renderer logic for non straight surfaces,
+            // but that logic needs to change anyway, so this is good for now.
+            float axisMinX = float(m_axisX->min());
+            float axisMaxX = float(m_axisX->max());
+            float axisMinZ = float(m_axisZ->min());
+            float axisMaxZ = float(m_axisZ->max());
+
+            // Comparisons between float and double are not accurate, so fudge our comparison values
+            //a little to get all rows and columns into view that need to be visible.
+            const float fudgeFactor = 0.00001f;
+            float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
+            float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
+            axisMinX -= fudgedAxisXRange;
+            axisMinZ -= fudgedAxisZRange;
+            axisMaxX += fudgedAxisXRange;
+            axisMaxZ += fudgedAxisZRange;
+            QSurfaceDataItem item = proxy->array()->at(pos.x())->at(pos.y());
+            if (item.x() < axisMinX || item.x() > axisMaxX
+                    || item.z() < axisMinZ || item.z() > axisMaxZ) {
+                scene()->setSlicingActive(false);
+            } else {
+                scene()->setSlicingActive(true);
+            }
+        }
+        emitNeedRender();
+    }
+
+    if (pos != m_selectedPoint) {
+        m_selectedPoint = pos;
+        m_changeTracker.selectedPointChanged = true;
+        emit selectedPointChanged(pos);
+        emitNeedRender();
+    }
+}
+
+QPoint Surface3DController::selectedPoint() const
+{
+    return m_selectedPoint;
+}
 
 void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
@@ -191,18 +276,29 @@ void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
     QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
                      this, &Surface3DController::handleArrayReset);
 
-    scene()->setSlicingActive(false);
     adjustValueAxisRange();
+
+    // Always clear selection on proxy change
+    setSelectedPoint(noSelectionPoint());
+
     m_isDataDirty = true;
     emitNeedRender();
 }
 
 void Surface3DController::handleArrayReset()
 {
-    scene()->setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    // Clear selection unless still valid
+    setSelectedPoint(m_selectedPoint);
     emitNeedRender();
+}
+
+void Surface3DController::handlePointClicked(const QPoint &position)
+{
+    setSelectedPoint(position);
+    // TODO: pass clicked to parent. (QTRD-2517)
+    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Surface3DController::adjustValueAxisRange()

@@ -71,7 +71,7 @@ public:
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
     // Change selection mode
-    void setSelectionMode(QDataVis::SelectionMode mode);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
 
     void setSelectedItemIndex(int index);
     int selectedItemIndex() const;
@@ -82,6 +82,7 @@ public:
     void synchDataToRenderer();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisRangeChangedBySender(QObject *sender);
 
 public slots:
     void handleArrayReset();
@@ -89,7 +90,7 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
-    void handleSelectedItemIndexChanged(int index);
+    void handleItemClicked(int index);
 
 signals:
     void selectedItemIndexChanged(int index);

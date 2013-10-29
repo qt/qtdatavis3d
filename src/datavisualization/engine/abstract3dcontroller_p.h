@@ -148,7 +148,7 @@ private:
     GLfloat m_verticalRotation;
     Theme m_theme;
     QFont m_font;
-    QDataVis::SelectionMode m_selectionMode;
+    QDataVis::SelectionFlags m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
     QDataVis::LabelStyle m_labelStyle;
     bool m_isBackgroundEnabled;
@@ -254,8 +254,8 @@ public:
     virtual QFont font();
 
     // Selection mode
-    virtual void setSelectionMode(QDataVis::SelectionMode mode);
-    virtual QDataVis::SelectionMode selectionMode();
+    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
+    virtual QDataVis::SelectionFlags selectionMode();
 
     // Adjust shadow quality
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
@@ -312,6 +312,7 @@ public slots:
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
+    void handleInputStateChanged(QDataVis::InputState state);
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);

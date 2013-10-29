@@ -42,7 +42,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
     Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
@@ -52,11 +52,6 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
-    Q_ENUMS(QtDataVisualization::QDataVis::Theme)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -70,8 +65,8 @@ public:
     virtual void setTheme(QDataVis::Theme theme);
     virtual QDataVis::Theme theme() const;
 
-    virtual void setSelectionMode(QDataVis::SelectionMode mode);
-    virtual QDataVis::SelectionMode selectionMode() const;
+    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
+    virtual QDataVis::SelectionFlags selectionMode() const;
 
     virtual void setFont(const QFont &font);
     virtual QFont font() const;

@@ -96,7 +96,7 @@ private:
     qreal m_maxval;
     QStringList m_months;
     QStringList m_years;
-    QPoint m_selectedBarPos;
+    QPoint m_selectedBar;
     Q3DValueAxis *m_autoAdjustingAxis;
     Q3DValueAxis *m_fixedRangeAxis;
     Q3DValueAxis *m_temperatureAxis;

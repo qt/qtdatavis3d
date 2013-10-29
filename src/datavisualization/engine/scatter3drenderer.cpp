@@ -49,7 +49,6 @@ const GLfloat labelMargin = 0.05f;
 // TODO: Make margin modifiable?
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat gridLineWidth = 0.005f;
-static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : Abstract3DRenderer(controller),
@@ -78,11 +77,11 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
-      m_selection(selectionSkipColor),
-      m_previousSelection(selectionSkipColor),
+      m_clickedColor(invalidColorVector),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
-      m_hasHeightAdjustmentChanged(true)
+      m_hasHeightAdjustmentChanged(true),
+      m_cachedInputState(QDataVis::InputStateNone)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -195,6 +194,15 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 
 void Scatter3DRenderer::render(GLuint defaultFboHandle)
 {
+    // TODO: Can't call back to controller here! (QTRD-2216)
+    // TODO: Needs to be added to synchronization
+    QDataVis::InputState currentInputState = m_controller->inputState();
+    if (currentInputState != m_cachedInputState) {
+        if (currentInputState == QDataVis::InputStateOnScene)
+            m_clickedColor = invalidColorVector;
+        m_cachedInputState = currentInputState;
+    }
+
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -376,7 +384,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
     // Skip selection mode drawing if we have no selection mode
-    if (m_cachedSelectionMode > QDataVis::SelectionModeNone) {
+    // TODO: Can't call back to controller here! (QTRD-2216)
+    if (m_cachedSelectionMode > QDataVis::SelectionNone
+            && QDataVis::InputStateOnScene == m_controller->inputState()) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -433,9 +443,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (QDataVis::InputStateOnScene == m_controller->inputState()) {
-            m_selection = Utils::getSelection(m_controller->inputPosition(),
-                                              m_cachedBoundingRect.height());
+        // TODO: Can't call back to controller here! (QTRD-2216)
+        QVector3D clickedColor = Utils::getSelection(m_controller->inputPosition(),
+                                                     m_cachedBoundingRect.height());
+        if (m_clickedColor == invalidColorVector) {
+            m_clickedColor = clickedColor;
+            emit itemClicked(selectionColorToIndex(m_clickedColor));
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -471,20 +484,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Draw dots
     bool dotSelectionFound = false;
-    int selectedIndex;
-    if (m_selection == selectionSkipColor) {
-        selectedIndex = Scatter3DController::noSelectionIndex();
-    } else {
-        selectedIndex = int(m_selection.x())
-                + (int(m_selection.y()) << 8)
-                + (int(m_selection.z()) << 16);
-    }
-
-    if (m_selection != m_previousSelection) {
-        emit selectedItemIndexChanged(selectedIndex);
-        m_previousSelection = m_selection;
-    }
-
     ScatterRenderItem *selectedItem(0);
 
     QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
@@ -524,7 +523,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-        if (m_cachedSelectionMode > QDataVis::SelectionModeNone && (selectedIndex == dot)) {
+        if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemIndex == dot)) {
             dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
             lightStrength = m_cachedTheme.m_highlightLightStrength;
             // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
@@ -1312,10 +1311,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
 void Scatter3DRenderer::updateSelectedItemIndex(int index)
 {
-    if (index == Scatter3DController::noSelectionIndex())
-        m_selection = selectionSkipColor;
-    else
-        m_selection = indexToSelectionColor(index);
+    m_selectionDirty = true;
+    m_selectedItemIndex = index;
 }
 
 void Scatter3DRenderer::handleResize()
@@ -1572,6 +1569,19 @@ QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
     GLubyte dotIdxBlue = (index & 0xff0000) >> 16;
 
     return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
+}
+
+int Scatter3DRenderer::selectionColorToIndex(const QVector3D &color)
+{
+    int selectedIndex;
+    if (color == selectionSkipColor) {
+        selectedIndex = Scatter3DController::noSelectionIndex();
+    } else {
+        selectedIndex = int(color.x())
+                + (int(color.y()) << 8)
+                + (int(color.z()) << 16);
+    }
+    return selectedIndex;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

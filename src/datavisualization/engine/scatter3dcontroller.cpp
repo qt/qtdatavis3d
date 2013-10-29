@@ -60,8 +60,8 @@ void Scatter3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Scatter3DRenderer::selectedItemIndexChanged, this,
-                     &Scatter3DController::handleSelectedItemIndexChanged, Qt::QueuedConnection);
+    QObject::connect(m_renderer, &Scatter3DRenderer::itemClicked, this,
+                     &Scatter3DController::handleItemClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -117,17 +117,15 @@ void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 
     adjustValueAxisRange();
     setSelectedItemIndex(noSelectionIndex());
-    setSlicingActive(false);
     m_isDataDirty = true;
     emitNeedRender();
 }
 
 void Scatter3DController::handleArrayReset()
 {
-    setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
-    setSelectedItemIndex(noSelectionIndex());
+    setSelectedItemIndex(m_selectedItemIndex);
     emitNeedRender();
 }
 
@@ -173,13 +171,11 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     emitNeedRender();
 }
 
-void Scatter3DController::handleSelectedItemIndexChanged(int index)
+void Scatter3DController::handleItemClicked(int index)
 {
-    if (index != m_selectedItemIndex) {
-        m_selectedItemIndex = index;
-        emit selectedItemIndexChanged(index);
-        emitNeedRender();
-    }
+    setSelectedItemIndex(index);
+    // TODO: pass clicked to parent. (QTRD-2517)
+    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -188,6 +184,14 @@ void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
     adjustValueAxisRange();
+}
+
+void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
+{
+    Abstract3DController::handleAxisRangeChangedBySender(sender);
+
+    // Update selected index - may be moved offscreen
+    setSelectedItemIndex(m_selectedItemIndex);
 }
 
 void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
@@ -207,21 +211,18 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
     Abstract3DController::setMeshFileName(objFile);
 }
 
-void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
+void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    if (mode > QDataVis::SelectionModeItem) {
-        qWarning("Unsupported selection mode.");
+    // We only support single item selection mode
+    if (int(mode ^ QDataVis::SelectionItem) != 0) {
+        qWarning("Unsupported selection mode - only item selection mode is supported.");
         return;
     }
-    // Disable zoom if selection mode changes
-    setSlicingActive(false);
     Abstract3DController::setSelectionMode(mode);
 }
 
 void Scatter3DController::setSelectedItemIndex(int index)
 {
-    // TODO If items not within axis ranges are culled from drawing, should they be
-    // TODO unselectable as well?
     if (index < 0 || index >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
         index = noSelectionIndex();
 
