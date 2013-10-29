@@ -675,6 +675,23 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
         }
 
+        QQuaternion lineYRotation = QQuaternion();
+        QQuaternion lineXRotation = QQuaternion();
+
+        if (m_xFlipped)
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+        else
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+
+        if (m_yFlipped)
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+        else
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+
+        GLfloat yFloorLinePosition = -backgroundMargin + gridLineOffset;
+        if (m_yFlipped)
+            yFloorLinePosition = -yFloorLinePosition;
+
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
@@ -702,19 +719,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(0.0f, backgroundMargin, linePos / m_scaleFactor);
-                else
-                    modelMatrix.translate(0.0f, -backgroundMargin, linePos / m_scaleFactor);
+                modelMatrix.translate(0.0f, yFloorLinePosition, linePos / m_scaleFactor);
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -744,10 +755,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             gridLineScaler = QVector3D(gridLineWidth, backgroundMargin, gridLineWidth);
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                    / m_scaleFactor;
+                    / m_scaleFactor - gridLineOffset;
             linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
 #else
-            GLfloat lineXTrans = aspectRatio * backgroundMargin;
+            GLfloat lineXTrans = aspectRatio * backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor; // Start line
 #endif
             if (!m_xFlipped)
@@ -759,8 +770,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(lineXTrans, 0.0f, linePos / m_scaleFactor);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -810,18 +825,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(linePos / m_scaleFactor, backgroundMargin, 0.0f);
-                else
-                    modelMatrix.translate(linePos / m_scaleFactor, -backgroundMargin, 0.0f);
+                modelMatrix.translate(linePos / m_scaleFactor, yFloorLinePosition, 0.0f);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -850,10 +860,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Back wall lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                    / m_scaleFactor;
+                    / m_scaleFactor - gridLineOffset;
             linePos = aspectRatio * m_axisCacheX.min();
 #else
-            GLfloat lineZTrans = aspectRatio * backgroundMargin;
+            GLfloat lineZTrans = aspectRatio * backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor;
 #endif
             if (!m_zFlipped)
@@ -867,8 +877,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(linePos / m_scaleFactor, 0.0f, lineZTrans);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -904,12 +920,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                    / m_scaleFactor;
+                    / m_scaleFactor - gridLineOffset;
             QVector3D gridLineScaler(
                         (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
                         gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineZTrans = aspectRatio * backgroundMargin;
+            GLfloat lineZTrans = aspectRatio * backgroundMargin - gridLineOffset;
             QVector3D gridLineScaler((aspectRatio * backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
@@ -925,6 +941,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -955,12 +976,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                    / m_scaleFactor;
+                    / m_scaleFactor - gridLineOffset;
             gridLineScaler = QVector3D(
                         gridLineWidth, gridLineWidth,
                         (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineXTrans = aspectRatio * backgroundMargin;
+            GLfloat lineXTrans = aspectRatio * backgroundMargin - gridLineOffset;
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth,
                                        aspectRatio * backgroundMargin);
 #endif
@@ -976,6 +997,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1015,6 +1039,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POLYGON_OFFSET_FILL);
 
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
@@ -1056,6 +1081,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (axisCacheMax->labelItems().size() > labelNbr) {
 #endif
                 labelTrans.setZ(labelPos / m_scaleFactor);
+
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1114,6 +1141,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (axisCacheMax->labelItems().size() > labelNbr) {
 #endif
                 labelTrans.setX(labelPos / m_scaleFactor);
+
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
 
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1185,6 +1214,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
                 const GLfloat labelYTrans = labelPos / m_heightNormalizer;
 
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+
                 // Back wall
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
@@ -1205,6 +1236,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             labelPos += posStep;
         }
     }
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Handle selection clearing and selection label drawing
     if (!dotSelectionFound) {
@@ -1368,7 +1400,7 @@ void Scatter3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
+    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
     m_gridLineObj->load();
 }
 

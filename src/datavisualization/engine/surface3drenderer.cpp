@@ -1103,6 +1103,23 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
         }
 
+        QQuaternion lineYRotation = QQuaternion();
+        QQuaternion lineXRotation = QQuaternion();
+
+        if (m_xFlipped)
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+        else
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+
+        if (m_yFlipped)
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+        else
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+
+        GLfloat yFloorLinePosition = -backgroundMargin + gridLineOffset;
+        if (m_yFlipped)
+            yFloorLinePosition = -yFloorLinePosition;
+
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
@@ -1115,19 +1132,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(0.0f, backgroundMargin, linePos);
-                else
-                    modelMatrix.translate(0.0f, -backgroundMargin, linePos);
+                modelMatrix.translate(0.0f, yFloorLinePosition, linePos);
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1154,7 +1165,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
 
             // Side wall lines
-            GLfloat lineXTrans = m_scaleXWithBackground;
+            GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
             linePos = m_scaleZ; // Start line
 
             if (!m_xFlipped)
@@ -1166,8 +1177,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(lineXTrans, 0.0f, linePos);
+
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1206,19 +1221,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(linePos, backgroundMargin, 0.0f);
-                else
-                    modelMatrix.translate(linePos, -backgroundMargin, 0.0f);
+                modelMatrix.translate(linePos, yFloorLinePosition, 0.0f);
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1245,7 +1254,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
 
             // Back wall lines
-            GLfloat lineZTrans = m_scaleZWithBackground;
+            GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
             linePos = m_scaleX;
 
             if (!m_zFlipped)
@@ -1257,8 +1266,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(linePos, 0.0f, lineZTrans);
+
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1292,7 +1307,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             GLfloat linePos = -1.0f;
             int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 
-            GLfloat lineZTrans = m_scaleZWithBackground;
+            GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
 
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
@@ -1306,6 +1321,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1334,7 +1354,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             // Side wall
             linePos = -1.0f;
             lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
-            GLfloat lineXTrans = m_scaleXWithBackground;
+            GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
 
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -1348,6 +1368,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1383,6 +1406,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POLYGON_OFFSET_FILL);
 
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
@@ -1415,9 +1439,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         for (int segment = 0; segment <= lastSegment; segment++) {
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
-                labelTrans.setZ(labelPos);
-
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
                 // Draw the label here
+                labelTrans.setZ(labelPos);
                 m_dummyRenderItem.setTranslation(labelTrans);
                 const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
 
@@ -1461,6 +1485,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         for (int segment = 0; segment <= lastSegment; segment++) {
             if (m_axisCacheX.labelItems().size() > labelNbr) {
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
                 // Draw the label here
                 labelTrans.setX(labelPos);
                 m_dummyRenderItem.setTranslation(labelTrans);
@@ -1521,6 +1546,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_axisCacheY.labelItems().size() > labelNbr) {
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+
                 // Back wall
                 labelTransBack.setY(labelPos);
                 m_dummyRenderItem.setTranslation(labelTransBack);
@@ -1541,6 +1568,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             labelPos += posStep;
         }
     }
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     glDisable(GL_TEXTURE_2D);
 
@@ -1782,7 +1810,7 @@ void Surface3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
+    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
     m_gridLineObj->load();
 }
 
