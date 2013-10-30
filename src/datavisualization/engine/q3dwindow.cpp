@@ -67,7 +67,6 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     d_ptr->m_context->create();
     d_ptr->m_context->makeCurrent(this);
 
-    qDebug() << "initializeOpenGLFunctions()";
     initializeOpenGLFunctions();
 
     const GLubyte *version = glGetString(GL_VERSION);

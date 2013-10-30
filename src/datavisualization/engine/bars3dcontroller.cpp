@@ -396,16 +396,15 @@ void Bars3DController::adjustAxisRanges()
     Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
     if (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange() && proxy) {
         QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisX->min(),
-                                                                    categoryAxisX->max(),
-                                                                    categoryAxisZ->min(),
-                                                                    categoryAxisZ->max());
+                                                                     categoryAxisX->max(),
+                                                                     categoryAxisZ->min(),
+                                                                     categoryAxisZ->max());
         if (limits.first < 0) {
-            // TODO: Currently we only support symmetric y-axis for bar graph if there are negative values
-            qreal maxAbs = qMax(qFabs(limits.first), qFabs(limits.second));
             // Call private implementation to avoid unsetting auto adjust flag
-            valueAxis->dptr()->setRange(-maxAbs, maxAbs);
+            valueAxis->dptr()->setRange(limits.first, limits.second);
         } else if (limits.second == 0.0) {
-            valueAxis->dptr()->setRange(0.0, 1.0); // Only zero value values in data set, set range to something.
+            // Only zero value values in data set, set range to something.
+            valueAxis->dptr()->setRange(0.0, 1.0);
         } else {
             valueAxis->dptr()->setRange(0.0, limits.second);
         }

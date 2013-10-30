@@ -258,7 +258,7 @@ void SelectionPointer::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_labelObj->load();
 }
 

@@ -282,15 +282,11 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     modelMatrix.translate(xPosition + xAlignment, yPosition + yAlignment, zPosition + zAlignment);
 
     // Rotate
-    // TODO: We should convert rotations to use quaternions to avoid rotation order problems
-    //QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-    //QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-    //QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-    //QQuaternion rotQuaternion = rotQuatX + rotQuatY + rotQuatZ;
-    //modelMatrix.rotate(rotQuaternion);
-    modelMatrix.rotate(rotation.y(), 0.0f, 1.0f, 0.0f);
-    modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
-    modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);
+    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
+    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
+    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
+    QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
+    modelMatrix.rotate(rotQuaternion);
 
     if (useDepth && !rotateAlong) {
         qreal yComp = qreal(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));

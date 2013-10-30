@@ -40,7 +40,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
       m_fontSize(20),
       m_segments(4),
       m_subSegments(3),
-      m_minval(-20.0), // TODO Barchart Y-axis currently only properly supports zero-centered ranges
+      m_minval(-15.0),
       m_maxval(20.0),
       m_selectedBar(-1, -1),
       m_autoAdjustingAxis(new Q3DValueAxis),

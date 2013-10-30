@@ -8,14 +8,12 @@
         <file alias="barSmooth">meshes/cubeSmooth.obj</file>
         <file alias="cylinder">meshes/cylinderFlat.obj</file>
         <file alias="cylinderSmooth">meshes/cylinderSmooth.obj</file>
-        <file alias="background">meshes/backgroudFlat.obj</file>
-        <file alias="backgroundSmooth">meshes/backgroudSmooth.obj</file>
-        <file alias="label">meshes/plane.obj</file>
+        <file alias="background">meshes/background.obj</file>
+        <file alias="plane">meshes/plane.obj</file>
         <file alias="sphere">meshes/sphere.obj</file>
         <file alias="sphereSmooth">meshes/sphereSmooth.obj</file>
         <file alias="bevelbar">meshes/barFlat.obj</file>
         <file alias="bevelbarSmooth">meshes/barSmooth.obj</file>
-        <file alias="negativeBackground">meshes/backgroudNegatives.obj</file>
         <file alias="coneFull">meshes/coneFilledFlat.obj</file>
         <file alias="coneSmoothFull">meshes/coneFilledSmooth.obj</file>
         <file alias="cylinderFull">meshes/cylinderFilledFlat.obj</file>
@@ -28,6 +26,7 @@
         <file alias="barSmoothFull">meshes/cubeFilledSmooth.obj</file>
         <file alias="dotSmooth">meshes/scatterdot.obj</file>
         <file alias="dot">meshes/scatterdotFlat.obj</file>
+        <file alias="negativeBackground">meshes/backgroundNegatives.obj</file>
     </qresource>
     <qresource prefix="/shaders">
         <file alias="fragment">shaders/default.frag</file>

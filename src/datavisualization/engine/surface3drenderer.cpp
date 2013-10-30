@@ -1813,7 +1813,7 @@ void Surface3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_gridLineObj->load();
 }
 
@@ -2003,7 +2003,7 @@ void Surface3DRenderer::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_labelObj->load();
 }
 
