@@ -53,7 +53,7 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
-    Q_ENUMS(QtDataVisualization::QDataVis::MeshStyle)
+    Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
 
 public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
@@ -79,6 +79,12 @@ public:
 
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
+
+    void setSelectedItemIndex(int index);
+    int selectedItemIndex() const;
+
+signals:
+    void selectedItemIndexChanged(int index);
 
 protected:
     Scatter3DController *m_shared;

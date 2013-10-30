@@ -58,7 +58,6 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
-    Q_ENUMS(QtDataVisualization::QDataVis::MeshStyle)
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);

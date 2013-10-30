@@ -88,3 +88,12 @@
   \qmlproperty ColorGradient Surface3D::gradient
   The current surface gradient. Setting this property replaces the previous gradient.
  */
+
+/*!
+  \qmlproperty point Surface3D::selectedPoint
+
+  Selects a surface grid point in a \a position. The position is the (row, column) position in
+  the data array of the active data proxy.
+  Only one point can be selected at a time.
+  To clear selection, specify an illegal \a position, e.g. (-1, -1).
+ */

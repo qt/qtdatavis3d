@@ -54,6 +54,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
+    Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
@@ -78,8 +79,12 @@ public:
     void setGradient(ColorGradient *gradient);
     ColorGradient *gradient() const;
 
+    void setSelectedPoint(const QPointF &position);
+    QPointF selectedPoint() const;
+
 signals:
     void smoothSurfaceEnabledChanged(bool enabled);
+    void selectedPointChanged(QPoint position);
 
 protected:
     void handleGradientUpdate();

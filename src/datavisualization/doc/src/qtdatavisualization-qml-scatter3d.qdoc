@@ -103,3 +103,9 @@
   \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
   It also needs to be in triangles.
  */
+
+/*!
+  \qmlproperty int Scatter3D::selectedItemIndex
+  Selects an item in the \a index. Only one item can be selected at a time.
+  To clear selection, specify an illegal \a index, e.g. -1.
+ */

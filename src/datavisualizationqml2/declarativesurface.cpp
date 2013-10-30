@@ -46,6 +46,9 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
     QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy;
     m_shared->setActiveDataProxy(proxy);
+
+    QObject::connect(m_shared, &Surface3DController::selectedPointChanged, this,
+                     &DeclarativeSurface::selectedPointChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -165,6 +168,16 @@ ColorGradient *DeclarativeSurface::gradient() const
 {
 
     return m_gradient;
+}
+
+void DeclarativeSurface::setSelectedPoint(const QPointF &position)
+{
+    m_shared->setSelectedPoint(position.toPoint());
+}
+
+QPointF DeclarativeSurface::selectedPoint() const
+{
+    return QPointF(m_shared->selectedPoint());
 }
 
 void DeclarativeSurface::setControllerGradient(const ColorGradient &gradient)

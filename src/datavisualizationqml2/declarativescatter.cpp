@@ -41,6 +41,9 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     m_shared = new Scatter3DController(boundingRect().toRect());
     setSharedController(m_shared);
     m_shared->setActiveDataProxy(new QItemModelScatterDataProxy);
+
+    QObject::connect(m_shared, &Scatter3DController::selectedItemIndexChanged, this,
+                     &DeclarativeScatter::selectedItemIndexChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -163,6 +166,16 @@ void DeclarativeScatter::setMeshFileName(const QString &objFileName)
 QString DeclarativeScatter::meshFileName() const
 {
     return m_shared->meshFileName();
+}
+
+void DeclarativeScatter::setSelectedItemIndex(int index)
+{
+    m_shared->setSelectedItemIndex(index);
+}
+
+int DeclarativeScatter::selectedItemIndex() const
+{
+    return m_shared->selectedItemIndex();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE
