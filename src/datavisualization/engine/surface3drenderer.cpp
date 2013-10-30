@@ -65,7 +65,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_cachedIsSlicingActivated(false),
-      m_cachedInputState(QDataVis::InputStateNone),
       m_shader(0),
       m_depthShader(0),
       m_backgroundShader(0),
@@ -440,18 +439,20 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     updateSlicingActive(scene->isSlicingActive());
 }
 
+void Surface3DRenderer::updateInputState(QDataVis::InputState state)
+{
+    QDataVis::InputState oldInputState = m_inputState;
+
+    Abstract3DRenderer::updateInputState(state);
+
+    // Clear clicked color on input state change
+    if (oldInputState != m_inputState && m_inputState == QDataVis::InputStateOnScene)
+        m_clickedPointId = invalidSelectionId;
+}
+
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     bool slicingChanged = m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive();
-
-    // TODO: Can't call back to controller here! (QTRD-2216)
-    // TODO: Needs to be added to synchronization
-    QDataVis::InputState currentInputState = m_controller->inputState();
-    if (currentInputState != m_cachedInputState) {
-        if (currentInputState == QDataVis::InputStateOnScene)
-            m_clickedPointId = invalidSelectionId;
-        m_cachedInputState = currentInputState;
-    }
 
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
@@ -897,7 +898,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_surfaceObj && m_cachedInputState == QDataVis::InputStateOnScene
+    if (!m_cachedIsSlicingActivated && m_surfaceObj && m_inputState == QDataVis::InputStateOnScene
             && m_cachedSelectionMode > QDataVis::SelectionNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -922,10 +923,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glEnable(GL_DITHER);
 
-        QPoint point = m_controller->inputPosition();
         GLubyte pixel[4] = {0};
-        glReadPixels(point.x(), m_cachedBoundingRect.height() - point.y(), 1, 1,
-                     GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+        glReadPixels(m_inputPosition.x(), m_cachedBoundingRect.height() - m_inputPosition.y(),
+                     1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 

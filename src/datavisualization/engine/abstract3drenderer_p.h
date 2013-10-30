@@ -80,6 +80,8 @@ protected:
 
     Q3DScene *m_cachedScene;
     bool m_selectionDirty;
+    QDataVis::InputState m_inputState;
+    QPoint m_inputPosition;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -110,6 +112,8 @@ public:
     virtual QString itemLabelFormat() const;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
+    virtual void updateInputState(QDataVis::InputState state);
+    virtual void updateInputPosition(const QPoint &position);
 
 #if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;

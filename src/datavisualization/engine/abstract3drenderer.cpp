@@ -41,7 +41,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedIsGridEnabled(false),
       m_cachedIsBackgroundEnabled(false),
       m_cachedScene(new Q3DScene()),
-      m_selectionDirty(true)
+      m_selectionDirty(true),
+      m_inputState(QDataVis::InputStateNone)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -135,6 +136,16 @@ void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
 QString Abstract3DRenderer::itemLabelFormat() const
 {
     return m_cachedItemLabelFormat;
+}
+
+void Abstract3DRenderer::updateInputState(QDataVis::InputState state)
+{
+    m_inputState = state;
+}
+
+void Abstract3DRenderer::updateInputPosition(const QPoint &position)
+{
+    m_inputPosition = position;
 }
 
 void Abstract3DRenderer::updateBoundingRect(const QRect &boundingRect)

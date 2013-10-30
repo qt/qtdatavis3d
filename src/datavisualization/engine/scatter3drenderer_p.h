@@ -91,10 +91,7 @@ private:
 
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-
     ScatterRenderItemArray m_renderItemArray;
-
-    QDataVis::InputState m_cachedInputState;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
@@ -102,6 +99,8 @@ public:
 
     void updateDataModel(QScatterDataProxy *dataProxy);
     void updateScene(Q3DScene *scene);
+    void updateInputState(QDataVis::InputState state);
+
     void render(GLuint defaultFboHandle);
 
     QRect mainViewPort();

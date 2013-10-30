@@ -58,7 +58,7 @@ public:
     void setScene(Q3DScene *scene);
 
 signals:
-    void positionChanged(const QPoint &position);
+    void positionChanged(QPoint position);
     void inputStateChanged(QDataVis::InputState state);
     void sceneChanged(const Q3DScene *scene);
 

@@ -50,7 +50,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_cachedIsSlicingActivated(false),
       m_cachedRowCount(0),
       m_cachedColumnCount(0),
-      m_cachedInputState(QDataVis::InputStateNone),
       m_selectedBar(0),
       m_sliceSelection(0),
       m_sliceCache(0),
@@ -247,15 +246,6 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
 {
     bool slicingChanged = m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive();
 
-    // TODO: Can't call back to controller here! (QTRD-2216)
-    // TODO: Needs to be added to synchronization
-    QDataVis::InputState currentInputState = m_controller->inputState();
-    if (currentInputState != m_cachedInputState) {
-        if (currentInputState == QDataVis::InputStateOnScene)
-            m_clickedBarColor = invalidColorVector;
-        m_cachedInputState = currentInputState;
-    }
-
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -355,7 +345,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         if (m_visualSelectedBarPos.x() == item->position().x()
                 && m_visualSelectedBarPos.y() == item->position().y()) {
             baseColor = barHighlightColor;
-        } else if (QDataVis::SelectionSliceRow == m_cachedSelectionMode) {
+        } else if (rowMode) {
             baseColor = rowHighlightColor;
         } else {
             baseColor = columnHighlightColor;
@@ -679,7 +669,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // TODO: Selection must be enabled currently to support clicked signal. (QTRD-2517)
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::SelectionNone
-            && m_cachedInputState == QDataVis::InputStateOnScene) {
+            && m_inputState == QDataVis::InputStateOnScene) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -748,8 +738,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        // TODO: Can't call back to controller here! (QTRD-2216)
-        QVector3D clickedColor = Utils::getSelection(m_controller->inputPosition(),
+        QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
         if (m_clickedBarColor == invalidColorVector) {
             m_clickedBarColor = clickedColor;
@@ -1607,6 +1596,17 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position)
         m_visualSelectedBarPos = QPoint(adjustedX, adjustedZ);
     }
     m_selectionDirty = true;
+}
+
+void Bars3DRenderer::updateInputState(QDataVis::InputState state)
+{
+    QDataVis::InputState oldInputState = m_inputState;
+
+    Abstract3DRenderer::updateInputState(state);
+
+    // Clear clicked color on input state change
+    if (oldInputState != m_inputState && m_inputState == QDataVis::InputStateOnScene)
+        m_clickedBarColor = invalidColorVector;
 }
 
 void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)

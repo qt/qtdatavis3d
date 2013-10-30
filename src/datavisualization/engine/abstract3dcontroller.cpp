@@ -64,6 +64,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     setActiveInputHandler(inputHandler);
     connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
             &Abstract3DController::handleInputStateChanged);
+    connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
+            &Abstract3DController::handleInputPositionChanged);
     connect(m_scene, &Q3DScene::needRender, this,
             &Abstract3DController::emitNeedRender);
 }
@@ -101,6 +103,16 @@ void Abstract3DController::synchDataToRenderer()
     }
 
     m_renderer->updateScene(m_scene);
+
+    if (m_changeTracker.inputPositionChanged) {
+        m_renderer->updateInputPosition(inputPosition());
+        m_changeTracker.inputPositionChanged = false;
+    }
+
+    if (m_changeTracker.inputStateChanged) {
+        m_renderer->updateInputState(inputState());
+        m_changeTracker.inputStateChanged = false;
+    }
 
     if (m_changeTracker.themeChanged) {
         m_renderer->updateTheme(m_theme);
@@ -794,7 +806,7 @@ QPoint Abstract3DController::inputPosition()
     if (m_activeInputHandler)
         return m_activeInputHandler->inputPosition();
     else
-        return QPoint(0,0);
+        return QPoint(0, 0);
 }
 
 void Abstract3DController::setMeshFileName(const QString &fileName)
@@ -936,6 +948,16 @@ void Abstract3DController::handleInputStateChanged(QDataVis::InputState state)
             && state == QDataVis::InputStateOnOverview) {
         setSlicingActive(false);
     }
+
+    m_changeTracker.inputStateChanged = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::handleInputPositionChanged(const QPoint &position)
+{
+    Q_UNUSED(position)
+
+    m_changeTracker.inputPositionChanged = true;
     emitNeedRender();
 }
 

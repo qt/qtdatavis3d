@@ -60,7 +60,6 @@ private:
     bool m_cachedIsSlicingActivated;
     int m_cachedRowCount;
     int m_cachedColumnCount;
-    QDataVis::InputState m_cachedInputState;
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
@@ -129,6 +128,7 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateBackgroundEnabled(bool enable);
     void updateSelectedBar(const QPoint &position);
+    void updateInputState(QDataVis::InputState state);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);

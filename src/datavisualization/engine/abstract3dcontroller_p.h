@@ -81,6 +81,8 @@ struct Abstract3DChangeBitField {
     bool axisXLabelFormatChanged     : 1;
     bool axisYLabelFormatChanged     : 1;
     bool axisZLabelFormatChanged     : 1;
+    bool inputStateChanged           : 1;
+    bool inputPositionChanged        : 1;
 
     Abstract3DChangeBitField() :
         positionChanged(true),
@@ -115,7 +117,9 @@ struct Abstract3DChangeBitField {
         axisZSubSegmentCountChanged(true),
         axisXLabelFormatChanged(true),
         axisYLabelFormatChanged(true),
-        axisZLabelFormatChanged(true)
+        axisZLabelFormatChanged(true),
+        inputStateChanged(true),
+        inputPositionChanged(true)
     {
     }
 };
@@ -154,7 +158,6 @@ private:
     bool m_isBackgroundEnabled;
     bool m_isGridEnabled;
     QString m_objFile;
-
     Q3DScene *m_scene;
 
 protected:
@@ -281,7 +284,6 @@ public:
     bool isSlicingActive();
     void setSlicingActive(bool isSlicing);
 
-
     // override bar type with own mesh
     virtual void setMeshFileName(const QString &fileName);
     virtual QString meshFileName();
@@ -313,6 +315,7 @@ public slots:
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
     void handleInputStateChanged(QDataVis::InputState state);
+    void handleInputPositionChanged(const QPoint &position);
 
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);

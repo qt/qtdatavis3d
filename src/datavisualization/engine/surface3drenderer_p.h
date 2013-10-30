@@ -70,7 +70,6 @@ public:
 
 private:
     bool m_cachedIsSlicingActivated;
-    QDataVis::InputState m_cachedInputState;
 
     // Internal attributes purely related to how the scene is drawn with GL.
     QRect m_mainViewPort;
@@ -135,6 +134,13 @@ public:
 
     void updateDataModel(QSurfaceDataProxy *dataProxy);
     void updateScene(Q3DScene *scene);
+    void updateInputState(QDataVis::InputState state);
+    bool updateSmoothStatus(bool enable);
+    void updateSurfaceGridStatus(bool enable);
+    void updateSurfaceGradient(const QLinearGradient &gradient);
+    void updateSlicingActive(bool isSlicing);
+    void updateSelectedPoint(const QPoint &position);
+
     void drawSlicedScene();
     void render(GLuint defaultFboHandle = 0);
 
@@ -142,22 +148,15 @@ protected:
     void initializeOpenGL();
     virtual void loadMeshFile();
 
-public slots:
-    bool updateSmoothStatus(bool enable);
-    void updateSurfaceGridStatus(bool enable);
-    void updateSurfaceGradient(const QLinearGradient &gradient);
-    void updateSlicingActive(bool isSlicing);
-    void updateSelectedPoint(const QPoint &position);
-
 signals:
     void pointClicked(QPoint position);
 
 private:
     void setViewPorts();
     void updateSliceDataModel(const QPoint &point);
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
-    virtual void updateTextures();
-    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    void updateShadowQuality(QDataVis::ShadowQuality quality);
+    void updateTextures();
+    void initShaders(const QString &vertexShader, const QString &fragmentShader);
     QRect calculateSampleRect(const QSurfaceDataArray &array);
     void loadBackgroundMesh();
     void loadGridLineMesh();
