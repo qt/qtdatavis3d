@@ -102,10 +102,11 @@ private:
     int m_renderRows;
     int m_renderColumns;
     QVector3D m_clickedBarColor;
-    QPoint m_selectedBarPos;
     bool m_hasHeightAdjustmentChanged;
+    QPoint m_selectedBarPos;
     BarRenderItem m_dummyBarRenderItem;
     BarRenderItemArray m_renderItemArray;
+    bool m_noZeroInRange;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);

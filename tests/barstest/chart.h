@@ -64,6 +64,8 @@ public:
     void setSampleCountZ(int samples);
     void setMinX(int min);
     void setMinZ(int min);
+    void setMinY(int min);
+    void setMaxY(int max);
     void start();
     void restart(bool dynamicData);
     void selectBar();
@@ -107,6 +109,7 @@ private:
     QBarDataProxy *m_temperatureData;
     QBarDataProxy *m_genericData;
     Q3DValueAxis *m_currentAxis;
+    bool m_negativeValuesOn;
 };
 
 #endif

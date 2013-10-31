@@ -183,17 +183,33 @@ int main(int argc, char **argv)
     sampleSliderZ->setEnabled(false);
 
     QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
-    minSliderX->setTickInterval(1);
+    minSliderX->setTickInterval(10);
+    minSliderX->setTickPosition(QSlider::TicksBelow);
     minSliderX->setMinimum(0);
     minSliderX->setValue(0);
     minSliderX->setMaximum(200);
     minSliderX->setEnabled(false);
     QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
-    minSliderZ->setTickInterval(1);
+    minSliderZ->setTickInterval(10);
+    minSliderZ->setTickPosition(QSlider::TicksAbove);
     minSliderZ->setMinimum(0);
     minSliderZ->setValue(0);
     minSliderZ->setMaximum(200);
     minSliderZ->setEnabled(false);
+    QSlider *minSliderY = new QSlider(Qt::Horizontal, widget);
+    minSliderY->setTickInterval(10);
+    minSliderY->setTickPosition(QSlider::TicksBelow);
+    minSliderY->setMinimum(-100);
+    minSliderY->setValue(0);
+    minSliderY->setMaximum(100);
+    minSliderY->setEnabled(false);
+    QSlider *maxSliderY = new QSlider(Qt::Horizontal, widget);
+    maxSliderY->setTickInterval(10);
+    maxSliderY->setTickPosition(QSlider::TicksAbove);
+    maxSliderY->setMinimum(-50);
+    maxSliderY->setValue(100);
+    maxSliderY->setMaximum(200);
+    maxSliderY->setEnabled(false);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
@@ -248,6 +264,8 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window minimums")), 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -280,6 +298,10 @@ int main(int argc, char **argv)
                      &GraphModifier::setMinX);
     QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
                      &GraphModifier::setMinZ);
+    QObject::connect(minSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setMinY);
+    QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setMaxY);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
@@ -364,6 +386,10 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderX,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderZ,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderY,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, maxSliderY,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);

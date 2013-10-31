@@ -52,7 +52,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
       m_genericColumnAxis(new Q3DCategoryAxis),
       m_temperatureData(new QBarDataProxy),
       m_genericData(new QBarDataProxy),
-      m_currentAxis(m_fixedRangeAxis)
+      m_currentAxis(m_fixedRangeAxis),
+      m_negativeValuesOn(false)
 {
     // Generate generic labels
     QStringList genericColumnLabels;
@@ -105,6 +106,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
     m_chart->addAxis(m_genericRowAxis);
     m_chart->addAxis(m_genericColumnAxis);
 
+    m_chart->setTheme(QDataVis::ThemeStoneMoss);
     m_chart->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
@@ -142,17 +144,19 @@ void GraphModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_yearAxis);
         m_chart->setColumnAxis(m_monthAxis);
 
-        m_chart->setSelectionMode(QDataVis::SelectionItem);
+        m_chart->setSelectionMode(QDataVis::SelectionRow | QDataVis::SelectionSlice);
     } else {
         m_chart->setActiveDataProxy(m_genericData);
 
         m_chart->setTitle(QStringLiteral("Generic data"));
 
+        m_minval = m_fixedRangeAxis->min();
+        m_maxval = m_fixedRangeAxis->max();
         m_chart->setValueAxis(m_currentAxis);
         m_chart->setRowAxis(m_genericRowAxis);
         m_chart->setColumnAxis(m_genericColumnAxis);
 
-        m_chart->setSelectionMode(QDataVis::SelectionItem);
+        m_chart->setSelectionMode(QDataVis::SelectionRow | QDataVis::SelectionSlice);
     }
 }
 
@@ -233,8 +237,13 @@ void GraphModifier::createMassiveArray()
     dataArray->reserve(arrayDimension);
     for (int i = 0; i < arrayDimension; i++) {
         QBarDataRow *dataRow = new QBarDataRow(arrayDimension);
-        for (int j = 0; j < arrayDimension; j++)
-            (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % 100));
+        for (int j = 0; j < arrayDimension; j++) {
+            if (!m_negativeValuesOn)
+                (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % int(m_maxval)));
+            else
+                (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % int(m_maxval))
+                                       + m_minval);
+        }
         dataArray->append(dataRow);
     }
 
@@ -286,8 +295,13 @@ static int changeCounter = 0;
 void GraphModifier::addRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (qreal i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % 100));
+    for (qreal i = 0; i < m_columnCount; i++) {
+        if (!m_negativeValuesOn)
+            (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval)));
+        else
+            (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval))
+                                   + m_minval);
+    }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     QString label = QStringLiteral("Add %1").arg(addCounter++);
@@ -301,7 +315,7 @@ void GraphModifier::addRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()));
+            (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Add %1").arg(addCounter++));
     }
@@ -314,7 +328,8 @@ void GraphModifier::insertRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
     for (qreal i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % 100));
+        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval))
+                               + m_minval);
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBar.x(), 0);
@@ -331,7 +346,7 @@ void GraphModifier::insertRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()));
+            (*dataRow)[j].setValue(qreal(j + i + m_chart->activeDataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Insert %1").arg(insertCounter++));
     }
@@ -360,7 +375,7 @@ void GraphModifier::changeRow()
     if (row >= 0) {
         QBarDataRow *newRow = new QBarDataRow(m_chart->activeDataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
-            (*newRow)[i].setValue(qreal(rand() % 100));
+            (*newRow)[i].setValue(qreal(rand() % int(m_maxval)) + m_minval);
         QString label = QStringLiteral("Change %1").arg(changeCounter++);
         m_chart->activeDataProxy()->setRow(row, newRow, label);
     }
@@ -377,7 +392,7 @@ void GraphModifier::changeRows()
         for (int i = startRow; i <= row; i++ ) {
             QBarDataRow *newRow = new QBarDataRow(m_chart->activeDataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
-                (*newRow)[j].setValue(qreal(rand() % 100));
+                (*newRow)[j].setValue(qreal(rand() % int(m_maxval)) + m_minval);
             newArray.append(newRow);
             labels.append(QStringLiteral("Change %1").arg(changeCounter++));
         }
@@ -577,4 +592,17 @@ void GraphModifier::setMinX(int min)
 void GraphModifier::setMinZ(int min)
 {
     m_genericColumnAxis->setRange(min, min + m_rowCount - 1);
+}
+
+void GraphModifier::setMinY(int min)
+{
+    m_fixedRangeAxis->setMin(min);
+    m_negativeValuesOn = (min < 0) ? true : false;
+    m_minval = min;
+}
+
+void GraphModifier::setMaxY(int max)
+{
+    m_fixedRangeAxis->setMax(max);
+    m_maxval = max;
 }

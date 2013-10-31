@@ -87,7 +87,8 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_visualSelectedBarPos(Bars3DController::noSelectionPoint()),
       m_clickedBarColor(invalidColorVector),
       m_hasHeightAdjustmentChanged(true),
-      m_selectedBarPos(Bars3DController::noSelectionPoint())
+      m_selectedBarPos(Bars3DController::noSelectionPoint()),
+      m_noZeroInRange(false)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -182,6 +183,7 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
     int dataRowCount = dataProxy->rowCount();
     int dataRowIndex = minRow;
     int updateSize = 0;
+    GLfloat heightValue = 0.0f;
     for (int i = 0; i < newRows; i++) {
         int j = 0;
         if (dataRowIndex < dataRowCount) {
@@ -191,8 +193,22 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
                 int dataColIndex = minCol;
                 for (; j < updateSize ; j++) {
                     qreal value = dataRow->at(dataColIndex).value();
+                    if (!m_noZeroInRange) {
+                        heightValue = GLfloat(value);
+                    } else {
+                        // Adjust height to range
+                        if (!m_hasNegativeValues) {
+                            heightValue = value - m_axisCacheY.min();
+                            if (heightValue < 0.0f)
+                                heightValue = 0.0f;
+                        } else if (m_axisCacheY.max() < 0.0) {
+                            heightValue = value - m_axisCacheY.max();
+                            if (heightValue > 0.0f)
+                                heightValue = 0.0f;
+                        }
+                    }
                     m_renderItemArray[i][j].setValue(value);
-                    m_renderItemArray[i][j].setHeight(GLfloat(value) / m_heightNormalizer);
+                    m_renderItemArray[i][j].setHeight(heightValue / m_heightNormalizer);
                     dataColIndex++;
                 }
             }
@@ -304,8 +320,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
     // Draw the selected row / column
     GLfloat barPosYAdjustment = 0.2f; // Add a bit of space for labels
-    if (m_hasNegativeValues)
-        barPosYAdjustment += m_yAdjustment / 2.0f;
+    if (m_hasNegativeValues) {
+        if (m_noZeroInRange)
+            barPosYAdjustment += 1.0f;
+        else
+            barPosYAdjustment += m_yAdjustment / 2.0f;
+    }
     QVector3D modelMatrixScaler(m_scaleX, 0.0f, m_scaleZ);
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
     QVector3D barHighlightColor(Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor));
@@ -396,8 +416,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
     // Draw labels for bars
     QVector3D valuePositionComp = zeroVector;
-    if (m_hasNegativeValues)
-        valuePositionComp.setY(-barPosYAdjustment);
+    if (m_hasNegativeValues) {
+        if (m_noZeroInRange)
+            valuePositionComp.setY(-2.0f);
+        else
+            valuePositionComp.setY(-barPosYAdjustment);
+    }
     QVector3D sliceValueRotation(0.0f, 0.0f, 90.0f);
     QVector3D sliceLabelRotation(0.0f, 0.0f, -45.0f);
 
@@ -407,10 +431,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     for (int col = 0; col < stopBar; col++) {
         BarRenderItem *item = m_sliceSelection->at(col);
         // Draw values
-        m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
-                            valuePositionComp, sliceValueRotation, item->height(),
-                            m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
-                            false, false, Drawer::LabelOver, Qt::AlignTop, true);
+        if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0)) {
+            m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
+                                valuePositionComp, sliceValueRotation, item->height(),
+                                m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
+                                false, false, Drawer::LabelOver, Qt::AlignTop, true);
+        }
 
         // Draw labels
         if (m_sliceCache->labelItems().size() > col) {
@@ -1193,8 +1219,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_zFlipped)
                 zWallLinePosition = -zWallLinePosition;
 
-            if (m_hasNegativeValues)
-                startLine = m_axisCacheY.min();
+            if (m_hasNegativeValues) {
+                if (m_noZeroInRange)
+                    startLine = m_axisCacheY.min() - m_axisCacheY.max();
+                else
+                    startLine = m_axisCacheY.min();
+            }
 
             GLfloat lineHeight = startLine;
             gridLineScaler = QVector3D(rowScaleFactor, gridLineWidth, gridLineWidth);
@@ -1386,8 +1416,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat heightStep = m_axisCacheY.segmentStep();
     GLfloat startLine = 0.0f;
     int labelCount = m_axisCacheY.labels().size();
-    if (m_hasNegativeValues)
-        startLine = m_axisCacheY.min();
+    if (m_hasNegativeValues) {
+        if (m_noZeroInRange)
+            startLine = m_axisCacheY.min() - m_axisCacheY.max();
+        else
+            startLine = m_axisCacheY.min();
+    }
     GLfloat labelPos = startLine;
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
@@ -1710,10 +1744,22 @@ void Bars3DRenderer::calculateSceneScalingFactors()
 
 void Bars3DRenderer::calculateHeightAdjustment()
 {
-    m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) + qFabs(m_axisCacheY.max()));
+    GLfloat newAdjustment = 0.0f;
     GLfloat maxAbs = qFabs(m_axisCacheY.max());
 
-    GLfloat newAdjustment = maxAbs / m_heightNormalizer;
+    if (m_axisCacheY.max() < 0.0)
+        m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) - qFabs(m_axisCacheY.max()));
+    else
+        m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
+
+    if (m_axisCacheY.max() < 0.0 || m_axisCacheY.min() > 0.0)
+        m_noZeroInRange = true;
+    else
+        m_noZeroInRange = false;
+
+    if (m_axisCacheY.max() >= 0.0)
+        newAdjustment = qMin((maxAbs / m_heightNormalizer), 1.0f); // m_yAdjustment never needs to be over 1.0
+
     if (newAdjustment != m_yAdjustment) {
         m_hasHeightAdjustmentChanged = true;
         m_yAdjustment = newAdjustment;
@@ -1728,10 +1774,10 @@ Bars3DController::SelectionType Bars3DRenderer::isSelected(GLint row, GLint bar)
             && (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))) {
         isSelectedType = Bars3DController::SelectionItem;
     } else if (row == m_visualSelectedBarPos.x()
-             && (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow))) {
+               && (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow))) {
         isSelectedType = Bars3DController::SelectionRow;
     } else if (bar == m_visualSelectedBarPos.y()
-             && (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn))) {
+               && (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn))) {
         isSelectedType = Bars3DController::SelectionColumn;
     }
     return isSelectedType;
