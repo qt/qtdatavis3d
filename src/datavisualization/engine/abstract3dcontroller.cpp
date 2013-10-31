@@ -961,6 +961,11 @@ void Abstract3DController::handleInputPositionChanged(const QPoint &position)
     emitNeedRender();
 }
 
+void Abstract3DController::handleRequestShadowQuality(QDataVis::ShadowQuality quality)
+{
+    setShadowQuality(quality);
+}
+
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
 {
     // Label format changing needs to dirty the data so that labels are reset.

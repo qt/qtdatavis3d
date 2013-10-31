@@ -26,9 +26,10 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+Q_DECLARE_METATYPE(QDataVis::ShadowQuality)
+
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
-      m_controller(controller),
       m_hasNegativeValues(false),
       m_cachedTheme(),
       m_cachedFont(QFont(QStringLiteral("Arial"))),
@@ -50,8 +51,10 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
-    QObject::connect(this, &Abstract3DRenderer::needRender, m_controller,
+    QObject::connect(this, &Abstract3DRenderer::needRender, controller,
                      &Abstract3DController::needRender, Qt::QueuedConnection);
+    QObject::connect(this, &Abstract3DRenderer::requestShadowQuality, controller,
+                     &Abstract3DController::handleRequestShadowQuality, Qt::QueuedConnection);
 }
 
 Abstract3DRenderer::~Abstract3DRenderer()
@@ -320,6 +323,44 @@ AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::Ax
         qFatal("Abstract3DRenderer::axisCacheForOrientation");
         return m_axisCacheX;
     }
+}
+
+void Abstract3DRenderer::lowerShadowQuality()
+{
+    QDataVis::ShadowQuality newQuality = QDataVis::ShadowQualityNone;
+
+    switch (m_cachedShadowQuality) {
+    case QDataVis::ShadowQualityHigh:
+        qWarning("Creating high quality shadows failed. Changing to medium quality.");
+        newQuality = QDataVis::ShadowQualityMedium;
+        break;
+    case QDataVis::ShadowQualityMedium:
+        qWarning("Creating medium quality shadows failed. Changing to low quality.");
+        newQuality = QDataVis::ShadowQualityLow;
+        break;
+    case QDataVis::ShadowQualityLow:
+        qWarning("Creating low quality shadows failed. Switching shadows off.");
+        newQuality = QDataVis::ShadowQualityNone;
+        break;
+    case QDataVis::ShadowQualitySoftHigh:
+        qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
+        newQuality = QDataVis::ShadowQualitySoftMedium;
+        break;
+    case QDataVis::ShadowQualitySoftMedium:
+        qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
+        newQuality = QDataVis::ShadowQualitySoftLow;
+        break;
+    case QDataVis::ShadowQualitySoftLow:
+        qWarning("Creating soft low quality shadows failed. Switching shadows off.");
+        newQuality = QDataVis::ShadowQualityNone;
+        break;
+    default:
+        // You'll never get here
+        break;
+    }
+
+    emit requestShadowQuality(newQuality);
+    updateShadowQuality(newQuality);
 }
 
 

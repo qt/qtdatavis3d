@@ -90,6 +90,8 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
+
+    // Renderer callback handlers
     void handleItemClicked(int index);
 
 signals:

@@ -65,6 +65,8 @@ void Surface3DController::initializeOpenGL()
     synchDataToRenderer();
     QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
                      &Surface3DController::handlePointClicked, Qt::QueuedConnection);
+    QObject::connect(m_renderer, &Surface3DRenderer::requestSmoothSurface, this,
+                     &Surface3DController::handleRequestSmoothSurface, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -299,6 +301,12 @@ void Surface3DController::handlePointClicked(const QPoint &position)
     setSelectedPoint(position);
     // TODO: pass clicked to parent. (QTRD-2517)
     // TODO: Also hover needed? (QTRD-2131)
+}
+
+void Surface3DController::handleRequestSmoothSurface(bool enable)
+{
+    setSmoothSurface(enable);
+    emitNeedRender();
 }
 
 void Surface3DController::adjustValueAxisRange()

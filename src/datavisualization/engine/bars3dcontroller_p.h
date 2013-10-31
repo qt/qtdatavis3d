@@ -112,6 +112,8 @@ public slots:
     void handleItemChanged(int rowIndex, int columnIndex);
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
+
+    // Renderer callback handlers
     void handleBarClicked(const QPoint &position);
 
 signals:

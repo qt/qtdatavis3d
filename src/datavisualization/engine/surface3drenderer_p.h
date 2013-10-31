@@ -60,8 +60,6 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
     Q_OBJECT
 
 public:
-    Surface3DController *m_controller;
-
     // Visual parameters
     QRect m_boundingRect;
     QDataVis::LabelStyle m_labelStyle;
@@ -150,6 +148,7 @@ protected:
 
 signals:
     void pointClicked(QPoint position);
+    void requestSmoothSurface(bool enable);
 
 private:
     void setViewPorts();

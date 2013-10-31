@@ -97,7 +97,10 @@ public:
 
 public slots:
     void handleArrayReset();
+
+    // Renderer callback handlers
     void handlePointClicked(const QPoint &position);
+    void handleRequestSmoothSurface(bool enable);
 
 signals:
     void smoothSurfaceEnabledChanged(bool enable);

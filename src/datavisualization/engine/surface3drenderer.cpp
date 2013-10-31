@@ -60,7 +60,6 @@ const uint invalidSelectionId = uint(-1);
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
-      m_controller(controller),
       m_labelStyle(QDataVis::LabelStyleFromTheme),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
@@ -101,6 +100,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionTexture(0),
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
+      m_cachedSmoothSurface(true),
       m_flatSupported(true),
       m_selectionPointer(0),
       m_selectionActive(false),
@@ -118,13 +118,10 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
     if (!tester.testCompile()) {
         m_flatSupported = false;
-        m_controller->setSmoothSurface(true);
+        emit requestSmoothSurface(true);
         qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
                       " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
     }
-
-    m_cachedSmoothSurface =  m_controller->smoothSurface();
-    updateSurfaceGridStatus(m_controller->surfaceGrid());
 
     // Shadows are disabled for Q3DSurface in Tech Preview
     updateShadowQuality(QDataVis::ShadowQualityNone);
@@ -2094,43 +2091,8 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                              m_depthFrameBuffer,
                                                              m_shadowQualityMultiplier);
-        if (!m_depthTexture) {
-            switch (m_cachedShadowQuality) {
-            case QDataVis::ShadowQualityHigh:
-                qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityMedium);
-                updateShadowQuality(QDataVis::ShadowQualityMedium);
-                break;
-            case QDataVis::ShadowQualityMedium:
-                qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityLow);
-                updateShadowQuality(QDataVis::ShadowQualityLow);
-                break;
-            case QDataVis::ShadowQualityLow:
-                qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
-                updateShadowQuality(QDataVis::ShadowQualityNone);
-                break;
-            case QDataVis::ShadowQualitySoftHigh:
-                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
-                updateShadowQuality(QDataVis::ShadowQualitySoftMedium);
-                break;
-            case QDataVis::ShadowQualitySoftMedium:
-                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftLow);
-                updateShadowQuality(QDataVis::ShadowQualitySoftLow);
-                break;
-            case QDataVis::ShadowQualitySoftLow:
-                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
-                updateShadowQuality(QDataVis::ShadowQualityNone);
-                break;
-            default:
-                // You'll never get here
-                break;
-            }
-        }
+        if (!m_depthTexture)
+            lowerShadowQuality();
     }
 }
 #endif

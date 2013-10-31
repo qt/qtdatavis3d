@@ -51,9 +51,6 @@ class QT_DATAVISUALIZATION_EXPORT Bars3DRenderer : public Abstract3DRenderer
     Q_OBJECT
 
 private:
-    // TODO: Filter to the set of attributes to be moved to the model object.
-    Bars3DController *m_controller;
-
     // Cached state based on emitted signals from the controller
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;

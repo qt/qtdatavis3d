@@ -53,9 +53,6 @@ class Abstract3DRenderer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-private:
-    Abstract3DController *m_controller;
-
 protected:
     bool m_hasNegativeValues;
     Theme m_cachedTheme;
@@ -131,6 +128,7 @@ public:
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
+    void requestShadowQuality(QDataVis::ShadowQuality quality); // For automatic quality adjustments
 
 protected:
     Abstract3DRenderer(Abstract3DController *controller);
@@ -142,6 +140,8 @@ protected:
     virtual void loadMeshFile() = 0;
 
     AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
+
+    virtual void lowerShadowQuality();
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

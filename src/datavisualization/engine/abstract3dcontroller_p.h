@@ -317,6 +317,9 @@ public slots:
     void handleInputStateChanged(QDataVis::InputState state);
     void handleInputPositionChanged(const QPoint &position);
 
+    // Renderer callback handlers
+    void handleRequestShadowQuality(QDataVis::ShadowQuality quality);
+
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);

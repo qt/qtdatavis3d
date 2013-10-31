@@ -52,12 +52,6 @@ class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
     Q_OBJECT
 
 private:
-    // TODO: Filter to the set of attributes to be moved to the model object.
-    // * All GL rendering only related attribs should be moved out of this public set.
-    // * All attribs that are modifiable from QML need to e in this set.
-
-    Scatter3DController *m_controller;
-
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     bool m_xFlipped;
