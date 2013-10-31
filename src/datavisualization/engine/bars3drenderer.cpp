@@ -75,7 +75,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_shadowQualityToShader(100.0f),
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
-      m_yAdjustment(0.0f),
+      m_negativeBackgroundAdjustment(0.0f),
       m_rowWidth(0),
       m_columnDepth(0),
       m_maxDimension(0),
@@ -243,7 +243,7 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
         scene->activeCamera()->setBaseOrientation(cameraDistanceVector,
-                                                  QVector3D(0.0f, -m_yAdjustment, 0.0f),
+                                                  zeroVector,
                                                   upVector);
         m_hasHeightAdjustmentChanged = false;
     }
@@ -305,7 +305,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     viewMatrix.lookAt(QVector3D(0.0f, 0.0f, camZPosSliced), zeroVector, upVector);
 
     // Set light position
-    lightPos = QVector3D(0.0f, -m_yAdjustment, camZPosSliced * 2.0f);
+    lightPos = QVector3D(0.0f, 0.0f, camZPosSliced * 2.0f);
 
     // Bind bar shader
     m_barShader->bind();
@@ -318,12 +318,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                  m_cachedTheme.m_ambientStrength * 2.0f);
 
     // Draw the selected row / column
-    GLfloat barPosYAdjustment = 0.2f; // Add a bit of space for labels
+    GLfloat barPosYAdjustment = -0.8f; // Positives only -> translate to -1.0 + 0.2 for row/column labels
     if (m_hasNegativeValues) {
         if (m_noZeroInRange)
-            barPosYAdjustment += 1.0f;
+            barPosYAdjustment = 1.2f; // Negatives only -> translate to 1.0 + 0.2 for row/column labels
         else
-            barPosYAdjustment += m_yAdjustment / 2.0f;
+            barPosYAdjustment = 0.2f; // Both -> translate to 0.0 + 0.2 for row/column labels
     }
     QVector3D modelMatrixScaler(m_scaleX, 0.0f, m_scaleZ);
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
@@ -415,12 +415,10 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
 
     // Draw labels for bars
     QVector3D valuePositionComp = zeroVector;
-    if (m_hasNegativeValues) {
-        if (m_noZeroInRange)
-            valuePositionComp.setY(-2.0f);
-        else
-            valuePositionComp.setY(-barPosYAdjustment);
-    }
+    if (!m_hasNegativeValues)
+        valuePositionComp.setY(2.0f);
+    else if (m_noZeroInRange)
+        valuePositionComp.setY(-2.0f);
     QVector3D sliceValueRotation(0.0f, 0.0f, 90.0f);
     QVector3D sliceLabelRotation(0.0f, 0.0f, -45.0f);
 
@@ -589,8 +587,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         QVector3D depthLightPos = activeCamera->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
-        depthViewMatrix.lookAt(depthLightPos, QVector3D(0.0f, -m_yAdjustment, 0.0f),
-                               upVector);
+        depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
         // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
         // That causes the scene to be not drawn from above -> must be fixed
@@ -631,7 +628,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 // Draw shadows for bars "on the other side" a bit off ground to avoid seeing
                 // shadows through the ground
                 modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                      item.height() - m_yAdjustment + shadowOffset,
+                                      item.height() + shadowOffset,
                                       (m_columnDepth - rowPos) / m_scaleFactor);
                 // Scale the bars down in X and Z to reduce self-shadowing issues
                 shadowScaler.setY(item.height());
@@ -722,7 +719,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
                 modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                      item.height() - m_yAdjustment,
+                                      item.height(),
                                       (m_columnDepth - rowPos) / m_scaleFactor);
                 modelMatrix.scale(QVector3D(m_scaleX, item.height(), m_scaleZ));
 
@@ -850,7 +847,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
             modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                  item.height() - m_yAdjustment,
+                                  item.height(),
                                   (m_columnDepth - rowPos) / m_scaleFactor);
             modelScaler.setY(item.height());
             modelMatrix.scale(modelScaler);
@@ -993,9 +990,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         QVector3D backgroundScaler(rowScaleFactor, 1.0f, columnScaleFactor);
         if (m_hasNegativeValues) {
             backgroundScaler.setY(0.5f);
-            modelMatrix.translate(0.0f, m_yAdjustment - 0.5f, 0.0f);
+            modelMatrix.translate(0.0f, m_negativeBackgroundAdjustment, 0.0f);
         } else {
-            modelMatrix.translate(0.0f, 1.0f - m_yAdjustment, 0.0f);
+            modelMatrix.translate(0.0f, 1.0f, 0.0f);
         }
         modelMatrix.scale(backgroundScaler);
         itModelMatrix.scale(backgroundScaler);
@@ -1048,17 +1045,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             modelMatrix = QMatrix4x4();
             itModelMatrix = QMatrix4x4();
 
-            modelMatrix.translate(0.0f, -m_yAdjustment, 0.0f);
             modelMatrix.scale(backgroundScaler);
-            itModelMatrix.scale(backgroundScaler);
 
-            if (m_yFlipped) {
+            if (m_yFlipped)
                 modelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
-                itModelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
-            } else {
+            else
                 modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
-                itModelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
-            }
+
+            itModelMatrix = modelMatrix;
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1120,7 +1114,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
         }
 
-        GLfloat yFloorLinePosition = -m_yAdjustment;
+        GLfloat yFloorLinePosition = 0.0f;
         if (m_yFlipped)
             yFloorLinePosition -= gridLineOffset;
         else
@@ -1233,7 +1227,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(0.0f,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                      2.0f * lineHeight / m_heightNormalizer,
                                       zWallLinePosition);
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
@@ -1284,7 +1278,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(xWallLinePosition,
-                                      2.0f * lineHeight / m_heightNormalizer - m_yAdjustment,
+                                      2.0f * lineHeight / m_heightNormalizer,
                                       0.0f);
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
@@ -1328,12 +1322,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_POLYGON_OFFSET_FILL);
 
     // Calculate the positions for row and column labels and store them
-    GLfloat labelYAdjustment = -m_yAdjustment + 0.005f;
+    GLfloat labelYAdjustment = 0.005f;
     GLfloat scaledRowWidth = rowScaleFactor;
     GLfloat scaledColumnDepth = columnScaleFactor;
     GLfloat colPosValue = scaledRowWidth + labelMargin;
     GLfloat rowPosValue = scaledColumnDepth + labelMargin;
-    QVector3D positionComp(0.0f, m_yAdjustment, 0.0f);
     QVector3D labelRotation(-90.0f, 0.0f, 0.0f);
     if (m_zFlipped)
         labelRotation.setY(180.0f);
@@ -1367,7 +1360,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_axisCacheX.labels().at(row);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, labelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, labelRotation, 0, m_cachedSelectionMode,
                                 m_labelShader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment, m_cachedIsSlicingActivated);
         }
@@ -1404,7 +1397,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(column);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, labelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, labelRotation, 0, m_cachedSelectionMode,
                                 m_labelShader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment);
         }
@@ -1449,7 +1442,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     for (int i = 0; i < labelCount; i++) {
         if (m_axisCacheY.labelItems().size() > labelNbr) {
-            backLabelTrans.setY(2.0f * labelPos / m_heightNormalizer - m_yAdjustment);
+            backLabelTrans.setY(2.0f * labelPos / m_heightNormalizer);
             sideLabelTrans.setY(backLabelTrans.y());
 
             glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
@@ -1459,14 +1452,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             // Back wall
             m_dummyBarRenderItem.setTranslation(backLabelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, backLabelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, backLabelRotation, 0, m_cachedSelectionMode,
                                 m_labelShader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, backAlignment);
 
             // Side wall
             m_dummyBarRenderItem.setTranslation(sideLabelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, sideLabelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, sideLabelRotation, 0, m_cachedSelectionMode,
                                 m_labelShader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, sideAlignment);
         }
@@ -1535,7 +1528,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            positionComp, zeroVector, selectedBar->height(),
+                            zeroVector, zeroVector, selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, true, false);
 
@@ -1746,22 +1739,24 @@ void Bars3DRenderer::calculateHeightAdjustment()
     GLfloat newAdjustment = 0.0f;
     GLfloat maxAbs = qFabs(m_axisCacheY.max());
 
-    if (m_axisCacheY.max() < 0.0)
+    if (m_axisCacheY.max() < 0.0) {
         m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) - qFabs(m_axisCacheY.max()));
-    else
+        maxAbs = qFabs(m_axisCacheY.max()) - qFabs(m_axisCacheY.min());
+    } else {
         m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
+    }
 
     if (m_axisCacheY.max() < 0.0 || m_axisCacheY.min() > 0.0)
         m_noZeroInRange = true;
     else
         m_noZeroInRange = false;
 
-    if (m_axisCacheY.max() >= 0.0)
-        newAdjustment = qMin((maxAbs / m_heightNormalizer), 1.0f); // m_yAdjustment never needs to be over 1.0
+    // Calculate translation adjustment for negative background
+    newAdjustment = qBound(0.0f, (maxAbs / m_heightNormalizer), 1.0f) * 2.0f - 0.5f;
 
-    if (newAdjustment != m_yAdjustment) {
+    if (newAdjustment != m_negativeBackgroundAdjustment) {
         m_hasHeightAdjustmentChanged = true;
-        m_yAdjustment = newAdjustment;
+        m_negativeBackgroundAdjustment = newAdjustment;
     }
 }
 

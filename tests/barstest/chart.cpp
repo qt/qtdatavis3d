@@ -300,7 +300,7 @@ void GraphModifier::addRow()
             (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval)));
         else
             (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval))
-                                   + m_minval);
+                                   - (qreal)(rand() % int(m_minval)));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.

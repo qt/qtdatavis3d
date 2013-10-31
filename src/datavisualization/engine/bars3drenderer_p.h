@@ -87,7 +87,7 @@ private:
     GLfloat m_shadowQualityToShader;
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
+    GLfloat m_negativeBackgroundAdjustment;
     GLfloat m_rowWidth;
     GLfloat m_columnDepth;
     GLfloat m_maxDimension;
