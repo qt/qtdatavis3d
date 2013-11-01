@@ -175,6 +175,23 @@ void ScatterDataModifier::clear()
     qDebug() << m_loopCounter << "Cleared array";
 }
 
+void ScatterDataModifier::resetAxes()
+{
+    m_chart->releaseAxis(m_chart->axisX());
+    m_chart->releaseAxis(m_chart->axisY());
+    m_chart->releaseAxis(m_chart->axisZ());
+
+    m_chart->setAxisX(new Q3DValueAxis);
+    m_chart->setAxisY(new Q3DValueAxis);
+    m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->axisX()->setSegmentCount(5);
+    m_chart->axisY()->setSegmentCount(5);
+    m_chart->axisZ()->setSegmentCount(5);
+    m_chart->axisX()->setTitle("X");
+    m_chart->axisY()->setTitle("Y");
+    m_chart->axisZ()->setTitle("Z");
+}
+
 void ScatterDataModifier::addOne()
 {
     QScatterDataItem item(randVector());

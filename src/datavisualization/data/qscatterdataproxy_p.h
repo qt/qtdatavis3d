@@ -51,7 +51,7 @@ public:
     void insertItems(int index, const QScatterDataArray &items);
     void removeItems(int index, int removeCount);
 
-    QVector3D limitValues();
+    void limitValues(QVector3D &minValues, QVector3D &maxValues);
 
 private:
     QScatterDataArray *m_dataArray;

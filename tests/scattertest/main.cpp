@@ -68,6 +68,9 @@ int main(int argc, char **argv)
     QPushButton *clearButton = new QPushButton(widget);
     clearButton->setText(QStringLiteral("Clear chart"));
 
+    QPushButton *resetButton = new QPushButton(widget);
+    resetButton->setText(QStringLiteral("Reset axes"));
+
     QPushButton *addOneButton = new QPushButton(widget);
     addOneButton->setText(QStringLiteral("Add item"));
 
@@ -129,6 +132,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(clearButton, 0, Qt::AlignTop);
+    vLayout->addWidget(resetButton, 0, Qt::AlignTop);
     vLayout->addWidget(addOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(addBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(insertOneButton, 0, Qt::AlignTop);
@@ -161,6 +165,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(clearButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::clear);
+    QObject::connect(resetButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::resetAxes);
     QObject::connect(addOneButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::addOne);
     QObject::connect(addBunchButton, &QPushButton::clicked, modifier,

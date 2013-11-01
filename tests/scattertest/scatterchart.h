@@ -49,6 +49,7 @@ public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void clear();
+    void resetAxes();
     void addOne();
     void addBunch();
     void insertOne();

@@ -346,22 +346,51 @@ void QScatterDataProxyPrivate::removeItems(int index, int removeCount)
     m_dataArray->remove(index, removeCount);
 }
 
-QVector3D QScatterDataProxyPrivate::limitValues()
+void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues)
 {
-    QVector3D limits;
-    for (int i = 0; i < m_dataArray->size(); i++) {
-        const QScatterDataItem &item = m_dataArray->at(i);
-        float xValue = qAbs(item.position().x());
-        if (limits.x() < xValue)
-            limits.setX(xValue);
-        float yValue = qAbs(item.position().y());
-        if (limits.y() < yValue)
-            limits.setY(yValue);
-        float zValue = qAbs(item.position().z());
-        if (limits.z() < zValue)
-            limits.setZ(zValue);
+    if (m_dataArray->isEmpty())
+        return;
+
+    const QVector3D &firstPos = m_dataArray->at(0).position();
+
+    float minX = firstPos.x();
+    float maxX = minX;
+    float minY = firstPos.y();
+    float maxY = minY;
+    float minZ = firstPos.z();
+    float maxZ = minZ;
+
+    if (m_dataArray->size() > 1) {
+        for (int i = 1; i < m_dataArray->size(); i++) {
+            const QVector3D &pos = m_dataArray->at(i).position();
+
+            float value = pos.x();
+            if (minX > value)
+                minX = value;
+            if (maxX < value)
+                maxX = value;
+
+            value = pos.y();
+            if (minY > value)
+                minY = value;
+            if (maxY < value)
+                maxY = value;
+
+            value = pos.z();
+            if (minZ > value)
+                minZ = value;
+            if (maxZ < value)
+                maxZ = value;
+        }
     }
-    return limits;
+
+    minValues.setX(minX);
+    minValues.setY(minY);
+    minValues.setZ(minZ);
+
+    maxValues.setX(maxX);
+    maxValues.setY(maxY);
+    maxValues.setZ(maxZ);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

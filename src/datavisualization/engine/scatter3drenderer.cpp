@@ -696,7 +696,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheZ.subSegmentStep();
-            GLfloat linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
+            GLfloat linePos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z()); // Start line
             int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
 #else
             GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
@@ -755,7 +755,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                     / m_scaleFactor - gridLineOffset;
-            linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
+            linePos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z()); // Start line
 #else
             GLfloat lineXTrans = aspectRatio * backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor; // Start line
@@ -806,7 +806,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheX.subSegmentStep();
-            GLfloat linePos = aspectRatio * m_axisCacheX.min();
+            GLfloat linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
             int lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
             QVector3D gridLineScaler(
                         gridLineWidth, gridLineWidth,
@@ -860,7 +860,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                     / m_scaleFactor - gridLineOffset;
-            linePos = aspectRatio * m_axisCacheX.min();
+            linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
 #else
             GLfloat lineZTrans = aspectRatio * backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor;
@@ -914,7 +914,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         if (m_axisCacheY.segmentCount() > 0) {
             // Back wall
             GLfloat lineStep = m_axisCacheY.subSegmentStep();
-            GLfloat linePos = m_axisCacheY.min();
+            GLfloat linePos = m_axisCacheY.min() - m_translationOffset.y();
             int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
@@ -971,7 +971,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
 
             // Side wall
-            linePos = m_axisCacheY.min();
+            linePos = m_axisCacheY.min() - m_translationOffset.y();
             lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
             GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
@@ -1044,7 +1044,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     if (m_axisCacheZ.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
-        GLfloat labelPos = -aspectRatio * m_axisCacheZ.min();
+        GLfloat labelPos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z());
         int lastSegment = m_axisCacheZ.segmentCount();
         GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
                 / m_scaleFactor + labelMargin;
@@ -1104,7 +1104,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     if (m_axisCacheX.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheX.segmentStep();
-        GLfloat labelPos = aspectRatio * m_axisCacheX.min();
+        GLfloat labelPos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
         int lastSegment = m_axisCacheX.segmentCount();
         GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
                 / m_scaleFactor + labelMargin;
@@ -1163,7 +1163,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
         GLfloat posStep = m_axisCacheY.segmentStep();
-        GLfloat labelPos = m_axisCacheY.min();
+        GLfloat labelPos = m_axisCacheY.min() - m_translationOffset.y();
         int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
         GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
@@ -1423,24 +1423,26 @@ void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orienta
 
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
-    // Origin should be in the center of scene, ie. both positive and negative values are drawn
-    // above background
-
     // We need to normalize translations
-    GLfloat xTrans = (aspectRatio * item.position().x()) / m_scaleFactor;
-    GLfloat zTrans = -(aspectRatio * item.position().z()) / m_scaleFactor;
-    GLfloat yTrans = item.position().y() / m_heightNormalizer;
+    GLfloat xTrans = (aspectRatio * (item.position().x() - m_translationOffset.x()))
+            / m_scaleFactor;
+    GLfloat zTrans = -(aspectRatio * (item.position().z() - m_translationOffset.z()))
+            / m_scaleFactor;
+    GLfloat yTrans = (item.position().y() - m_translationOffset.y()) / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans));
-    //qDebug() << item.translation();
 }
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
-    m_heightNormalizer = (GLfloat)qMax(qAbs(m_axisCacheY.max()), qAbs(m_axisCacheY.min()));
-    m_areaSize.setHeight(qMax(qAbs(m_axisCacheZ.max()), qAbs(m_axisCacheZ.min())));
-    m_areaSize.setWidth(qMax(qAbs(m_axisCacheX.max()), qAbs(m_axisCacheX.min())));
+    m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
+    m_areaSize.setHeight((m_axisCacheZ.max() - m_axisCacheZ.min()) / 2.0f);
+    m_areaSize.setWidth((m_axisCacheX.max() - m_axisCacheX.min()) / 2.0f);
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_axisCacheY.max() << m_axisCacheX.max() << m_axisCacheZ.max();
+
+    // Calculate translation offsets
+    m_translationOffset = QVector3D((m_axisCacheX.max() + m_axisCacheX.min()) / 2.0f,
+                                    (m_axisCacheY.max() + m_axisCacheY.min()) / 2.0f,
+                                    (m_axisCacheZ.max() + m_axisCacheZ.min()) / 2.0f);
 }
 
 QRect Scatter3DRenderer::mainViewPort()

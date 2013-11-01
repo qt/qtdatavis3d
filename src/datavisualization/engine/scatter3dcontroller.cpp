@@ -241,30 +241,32 @@ int Scatter3DController::selectedItemIndex() const
 
 void Scatter3DController::adjustValueAxisRange()
 {
+    QVector3D minLimits;
+    QVector3D maxLimits;
     if (m_data) {
-        QVector3D limits = static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues();
+        static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues(minLimits, maxLimits);
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.x() > 0)
-                valueAxis->dptr()->setRange(-limits.x(), limits.x());
+            if (minLimits.x() != maxLimits.x())
+                valueAxis->dptr()->setRange(minLimits.x(), maxLimits.x());
             else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+                valueAxis->dptr()->setRange(minLimits.x() - 1.0f, minLimits.x() + 1.0f); // Default to a valid range
         }
 
         valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.y() > 0)
-                valueAxis->dptr()->setRange(-limits.y(), limits.y());
+            if (minLimits.y() != maxLimits.y())
+                valueAxis->dptr()->setRange(minLimits.y(), maxLimits.y());
             else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+                valueAxis->dptr()->setRange(minLimits.y() - 1.0f, minLimits.y() + 1.0f); // Default to a valid range
         }
 
         valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.z() > 0)
-                valueAxis->dptr()->setRange(-limits.z(), limits.z());
+            if (minLimits.z() != maxLimits.z())
+                valueAxis->dptr()->setRange(minLimits.z(), maxLimits.z());
             else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+                valueAxis->dptr()->setRange(minLimits.z() - 1.0f, minLimits.z() + 1.0f); // Default to a valid range
         }
     }
 }

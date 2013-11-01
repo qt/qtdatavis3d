@@ -82,6 +82,7 @@ private:
     int m_selectedItemIndex;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
+    QVector3D m_translationOffset;
 
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
