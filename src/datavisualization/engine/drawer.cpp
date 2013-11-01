@@ -136,8 +136,10 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
 
-    // Restore the GL state
-    glActiveTexture(0);
+    // Release textures
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
