@@ -19,8 +19,8 @@
 /*!
  * \qmltype Bars3D
  * \inherits AbstractGraph3D
- * \inqmlmodule com.digia.QtDataVisualization
- * \since com.digia.QtDataVisualization 1.0
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \brief 3D bar graph.
  *

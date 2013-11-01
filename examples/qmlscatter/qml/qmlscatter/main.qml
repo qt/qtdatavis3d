@@ -18,7 +18,7 @@
 
 //! [0]
 import QtQuick 2.1
-import com.digia.QtDataVisualization 1.0
+import QtDataVisualization 1.0
 import "."
 //! [0]
 

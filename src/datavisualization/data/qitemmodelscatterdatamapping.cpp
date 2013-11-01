@@ -44,8 +44,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataMapping
- * \inqmlmodule com.digia.QtDataVisualization
- * \since com.digia.QtDataVisualization 1.0
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QItemModelScatterDataMapping
  * \brief Item model mapping for Scatter3D.

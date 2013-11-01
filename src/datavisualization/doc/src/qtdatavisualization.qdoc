@@ -27,7 +27,7 @@
 */
 
 /*!
-    \qmlmodule com.digia.QtDataVisualization 1.0
+    \qmlmodule QtDataVisualization 1.0
     \title Qt Data Visualization QML Types
     \ingroup qmlmodules
 

@@ -18,7 +18,7 @@ TEMPLATE = app
 QT += datavisualization
 
 contains(TARGET, qml.*) {
-    uri = com.digia.QtDataVisualization
+    uri = QtDataVisualization
     lib_name = datavisualizationqml2
 
     uri_replaced = $$replace(uri, \\., $$QMAKE_DIR_SEP)

@@ -58,8 +58,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataProxy
- * \inqmlmodule com.digia.QtDataVisualization
- * \since com.digia.QtDataVisualization 1.0
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QScatterDataProxy
  * \inherits AbstractDataProxy
