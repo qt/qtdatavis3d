@@ -18,7 +18,7 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
-import com.digia.QtDataVisualization 1.0
+import QtDataVisualization 1.0
 import "."
 
 Item {

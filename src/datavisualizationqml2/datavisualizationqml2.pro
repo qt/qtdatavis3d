@@ -4,7 +4,7 @@ QT += qml quick datavisualization
 CONFIG += qt plugin
 
 TARGET = $$qtLibraryTarget($$TARGET)
-uri = com.digia.QtDataVisualization
+uri = QtDataVisualization
 
 static {
     DEFINES += QT_DATAVISUALIZATION_STATICLIB

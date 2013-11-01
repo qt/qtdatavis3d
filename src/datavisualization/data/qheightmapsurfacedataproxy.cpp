@@ -43,8 +43,8 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \qmltype HeightMapSurfaceDataProxy
- * \inqmlmodule com.digia.QtDataVisualization
- * \since com.digia.QtDataVisualization 1.0
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy

@@ -33,8 +33,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
  * \qmltype AbstractDataProxy
- * \inqmlmodule com.digia.QtDataVisualization
- * \since com.digia.QtDataVisualization 1.0
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QAbstractDataProxy
  * \brief Base type for all QtDataVisualization data proxies.

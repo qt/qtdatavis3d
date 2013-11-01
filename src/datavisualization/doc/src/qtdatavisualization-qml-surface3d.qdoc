@@ -19,8 +19,8 @@
 /*!
   \qmltype Surface3D
   \inherits AbstractGraph3D
-  \inqmlmodule com.digia.QtDataVisualization
-  \since com.digia.QtDataVisualization 1.0
+  \inqmlmodule QtDataVisualization
+  \since QtDataVisualization 1.0
   \ingroup datavisualization_qml
   \brief Describes the usage of the 3D surface graph.
 
