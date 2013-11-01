@@ -24,9 +24,9 @@
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
 
-Q_DECLARE_METATYPE(QDataVis::ShadowQuality)
+QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
