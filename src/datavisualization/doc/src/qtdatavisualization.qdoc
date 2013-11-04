@@ -84,25 +84,30 @@
 
     For debug builds:
     \code
-    qmake CONFIG+=debug; make
+    qmake CONFIG+=debug
+    make
     \endcode
     or
     \code
-    qmake CONFIG+=debug_and_release; make debug
+    qmake CONFIG+=debug_and_release
+    make debug
     \endcode
 
     For release builds:
     \code
-    qmake CONFIG+=release; make
+    qmake CONFIG+=release
+    make
     \endcode
     or
     \code
-    qmake CONFIG+=debug_and_release; make release
+    qmake CONFIG+=debug_and_release
+    make release
     \endcode
 
-    For both builds:
+    For both builds (Windows/Mac only):
     \code
-    qmake CONFIG+="debug_and_release build_all"; make
+    qmake CONFIG+="debug_and_release build_all"
+    make
     \endcode
 
     After building, install the module to your Qt directory:
