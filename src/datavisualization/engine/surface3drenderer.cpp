@@ -449,8 +449,6 @@ void Surface3DRenderer::updateInputState(QDataVis::InputState state)
 
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
-    bool slicingChanged = m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive();
-
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -466,11 +464,6 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
             && m_cachedSelectionMode.testFlag(QDataVis::SelectionItem)) {
         m_selectionPointer->render(defaultFboHandle);
     }
-
-    // Trigger another render always when slicing changes in general to ensure
-    // final draw is correct.
-    if (slicingChanged)
-        emit needRender();
 }
 
 void Surface3DRenderer::drawSlicedScene()

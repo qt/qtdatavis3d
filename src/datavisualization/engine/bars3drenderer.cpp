@@ -259,8 +259,6 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
 
 void Bars3DRenderer::render(GLuint defaultFboHandle)
 {
-    bool slicingChanged = m_cachedIsSlicingActivated != m_cachedScene->isSlicingActive();
-
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
@@ -270,11 +268,6 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     // If slice selection is on, draw the sliced scene
     if (m_cachedIsSlicingActivated)
         drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
-
-    // Trigger another render always when slicing changes in general to ensure
-    // final draw is correct.
-    if (slicingChanged)
-        emit needRender();
 }
 
 void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
