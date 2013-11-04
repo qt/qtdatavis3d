@@ -11,8 +11,9 @@ static {
     CONFIG -= static staticlib
 }
 
-# Input
-INCLUDEPATH += ../datavisualization/engine \
+INCLUDEPATH += ../../include \
+               ../../include/QtDataVisualization \
+               ../datavisualization/engine \
                ../datavisualization/global \
                ../datavisualization/data
 
