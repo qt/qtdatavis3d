@@ -38,6 +38,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
+    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
@@ -51,6 +52,9 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 public:
     explicit Q3DSurface();
     ~Q3DSurface();
+
+    void setSurfaceVisible(bool visible);
+    bool isSurfaceVisible() const;
 
     void setGridVisible(bool visible);
     bool isGridVisible() const;

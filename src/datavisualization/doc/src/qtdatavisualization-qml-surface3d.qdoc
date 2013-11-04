@@ -80,6 +80,12 @@
  */
 
 /*!
+ * \qmlproperty bool Surface3D::surfaceVisible
+ * The surface visibility. If false, no surface is drawn. If surface grid is enabled, it is still
+ * drawn.
+ */
+
+/*!
   \qmlproperty bool Surface3D::surfaceGridEnabled
   The surface grid visibility. If false, no surface grid is drawn.
  */

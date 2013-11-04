@@ -104,9 +104,25 @@ Item {
     }
 
     NewButton {
-        id: smoothSurfaceToggle
+        id: surfaceToggle
         anchors.top: surfaceGridToggle.bottom
         width: surfaceGridToggle.width
+        text: "Hide Surface"
+        onClicked: {
+            if (surfaceplot.surfaceVisible === true) {
+                surfaceplot.surfaceVisible = false;
+                text = "Show Surface"
+            } else {
+                surfaceplot.surfaceVisible = true;
+                text = "Hide Surface"
+            }
+        }
+    }
+
+    NewButton {
+        id: smoothSurfaceToggle
+        anchors.top: surfaceToggle.bottom
+        width: surfaceToggle.width
         text: "Show Flat"
         //! [2]
         onClicked: {

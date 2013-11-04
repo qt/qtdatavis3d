@@ -76,6 +76,12 @@ void GraphModifier::toggleSurfaceGrid(bool enable)
     m_graph->setSurfaceGridEnabled(enable);
 }
 
+void GraphModifier::toggleSurface(bool enable)
+{
+    qDebug() << "GraphModifier::toggleSurface" << enable;
+    m_graph->setSurfaceVisible(enable);
+}
+
 void GraphModifier::toggleSqrtSin(bool enable)
 {
     if (enable) {

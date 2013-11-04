@@ -276,6 +276,20 @@ QDataVis::SelectionFlags Q3DSurface::selectionMode() const
     return d_ptr->m_shared->selectionMode();
 }
 
+/*!
+ * \property Q3DSurface::surfaceVisible
+ *
+ * Sets surface to \a visible. It is preset to \c true by default.
+ */
+void Q3DSurface::setSurfaceVisible(bool visible)
+{
+    d_ptr->m_shared->setSurfaceVisible(visible);
+}
+
+bool Q3DSurface::isSurfaceVisible() const
+{
+    return d_ptr->m_shared->surfaceVisible();
+}
 
 /*!
  * \property Q3DSurface::surfaceGridEnabled

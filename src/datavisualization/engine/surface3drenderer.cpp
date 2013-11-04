@@ -102,6 +102,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQualityToShader(33.3f),
       m_cachedSmoothSurface(true),
       m_flatSupported(true),
+      m_cachedSurfaceOn(true),
+      m_cachedSurfaceGridOn(true),
       m_selectionPointer(0),
       m_selectionActive(false),
       m_xFlipped(false),
@@ -506,16 +508,8 @@ void Surface3DRenderer::drawSlicedScene()
     }
 
     if (m_surfaceObj) {
-        ShaderHelper *surfaceShader = m_shader;
-        surfaceShader->bind();
-
-        if (m_cachedSurfaceGridOn) {
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(0.5f, 1.0f);
-        }
-
-        QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
+        QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
 
         modelMatrix.translate(offset, 0.0f, 0.0f);
@@ -525,27 +519,37 @@ void Surface3DRenderer::drawSlicedScene()
 
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
-        QVector3D color;
-        if (rowMode)
-            color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
-        else
-            color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
+        if (m_cachedSurfaceOn) {
+            if (m_cachedSurfaceGridOn) {
+                glEnable(GL_POLYGON_OFFSET_FILL);
+                glPolygonOffset(0.5f, 1.0f);
+            }
 
-        // Set shader bindings
-        surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
-        surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
-        surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
-        surfaceShader->setUniformValue(surfaceShader->nModel(),
-                                       itModelMatrix.inverted().transposed());
-        surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
-        surfaceShader->setUniformValue(surfaceShader->color(), color);
-        surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
-        surfaceShader->setUniformValue(surfaceShader->ambientS(),
-                                       m_cachedTheme.m_ambientStrength * 2.0f);
+            ShaderHelper *surfaceShader = m_shader;
+            surfaceShader->bind();
 
-        m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
+            QVector3D color;
+            if (rowMode)
+                color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
+            else
+                color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
 
-        surfaceShader->release();
+            // Set shader bindings
+            surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
+            surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
+            surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
+            surfaceShader->setUniformValue(surfaceShader->nModel(),
+                                           itModelMatrix.inverted().transposed());
+            surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
+            surfaceShader->setUniformValue(surfaceShader->color(), color);
+            surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
+            surfaceShader->setUniformValue(surfaceShader->ambientS(),
+                                           m_cachedTheme.m_ambientStrength * 2.0f);
+
+            m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
+
+            surfaceShader->release();
+        }
 
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
@@ -787,7 +791,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
     GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceOn) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -939,7 +943,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw the surface
     if (m_surfaceObj && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         m_surfaceShader->bind();
-
         // For surface we can see climpses from underneath
         glDisable(GL_CULL_FACE);
         if (m_cachedSurfaceGridOn) {
@@ -960,40 +963,43 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        // Set shader bindings
-        m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
-        m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-        m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
-        m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
-                                         m_cachedTheme.m_ambientStrength);
+
+        if (m_cachedSurfaceOn) {
+            // Set shader bindings
+            m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
+            m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
+            m_surfaceShader->setUniformValue(m_surfaceShader->model(), modelMatrix);
+            m_surfaceShader->setUniformValue(m_surfaceShader->nModel(),
+                                             itModelMatrix.inverted().transposed());
+            m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
+            m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
+                                             m_cachedTheme.m_ambientStrength);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-            // Set shadow shader bindings
-            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-            m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
-            m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
-            m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
+            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                // Set shadow shader bindings
+                QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
+                m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
+                m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
 
-            // Draw the object
-            m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
-        } else
+                // Draw the object
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
+            } else
 #endif
-        {
-            // Set shadowless shader bindings
-            m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
-                                             m_cachedTheme.m_lightStrength);
+            {
+                // Set shadowless shader bindings
+                m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
+                                                 m_cachedTheme.m_lightStrength);
 
-            // Draw the object
-            m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture);
+                // Draw the object
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture);
+            }
+
+            m_surfaceShader->release();
+
+            glEnable(GL_CULL_FACE);
         }
-
-        m_surfaceShader->release();
-
-        glEnable(GL_CULL_FACE);
 
         // Draw surface grid
         if (m_cachedSurfaceGridOn) {
@@ -1770,6 +1776,11 @@ void Surface3DRenderer::updateSelectedPoint(const QPoint &position)
 {
     m_selectedPoint = position;
     m_selectionDirty = true;
+}
+
+void Surface3DRenderer::updateSurfaceVisibilityStatus(bool visible)
+{
+    m_cachedSurfaceOn = visible;
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)

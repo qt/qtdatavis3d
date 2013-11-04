@@ -51,9 +51,10 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
+    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible NOTIFY surfaceVisibleChanged)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
-    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
+    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
+    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient NOTIFY gradientChanged)
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
 public:
@@ -70,6 +71,9 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
+    void setSurfaceVisible(bool visible);
+    bool isSurfaceVisible() const;
+
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
 
@@ -83,7 +87,10 @@ public:
     QPointF selectedPoint() const;
 
 signals:
+    void surfaceVisibleChanged(bool visible);
     void smoothSurfaceEnabledChanged(bool enabled);
+    void surfaceGridEnabledChanged(bool visible);
+    void gradientChanged(ColorGradient *gradient);
     void selectedPointChanged(QPoint position);
 
 protected:

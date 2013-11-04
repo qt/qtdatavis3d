@@ -110,6 +110,7 @@ private:
     GLfloat m_shadowQualityToShader;
     bool m_cachedSmoothSurface;
     bool m_flatSupported;
+    bool m_cachedSurfaceOn;
     bool m_cachedSurfaceGridOn;
     SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
@@ -134,6 +135,7 @@ public:
     void updateScene(Q3DScene *scene);
     void updateInputState(QDataVis::InputState state);
     bool updateSmoothStatus(bool enable);
+    void updateSurfaceVisibilityStatus(bool visible);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);

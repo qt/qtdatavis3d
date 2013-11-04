@@ -41,12 +41,14 @@ class Surface3DRenderer;
 struct Surface3DChangeBitField {
     bool gradientColorChanged     : 1;
     bool smoothStatusChanged      : 1;
+    bool surfaceVisibilityChanged : 1;
     bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
 
     Surface3DChangeBitField() :
         gradientColorChanged(true),
         smoothStatusChanged(true),
+        surfaceVisibilityChanged(true),
         surfaceGridChanged(true),
         selectedPointChanged(true)
     {
@@ -61,6 +63,7 @@ private:
     Surface3DChangeBitField m_changeTracker;
     Surface3DRenderer *m_renderer;
     bool m_isSmoothSurfaceEnabled;
+    bool m_isSurfaceEnabled;
     bool m_isSurfaceGridEnabled;
     QLinearGradient m_userDefinedGradient;
     QPoint m_selectedPoint;
@@ -71,6 +74,9 @@ public:
 
     void initializeOpenGL();
     virtual void synchDataToRenderer();
+
+    void setSurfaceVisible(bool visible);
+    bool surfaceVisible() const;
 
     void setSmoothSurface(bool enable);
     bool smoothSurface();

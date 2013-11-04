@@ -135,6 +135,16 @@ bool DeclarativeSurface::isSmoothSurfaceEnabled() const
     return m_shared->smoothSurface();
 }
 
+void DeclarativeSurface::setSurfaceVisible(bool visible)
+{
+    m_shared->setSurfaceVisible(visible);
+}
+
+bool DeclarativeSurface::isSurfaceVisible() const
+{
+    return m_shared->surfaceVisible();
+}
+
 void DeclarativeSurface::setSurfaceGridEnabled(bool enabled)
 {
     m_shared->setSurfaceGrid(enabled);

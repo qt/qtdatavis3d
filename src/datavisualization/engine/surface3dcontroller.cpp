@@ -34,6 +34,7 @@ Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
       m_isSmoothSurfaceEnabled(false),
+      m_isSurfaceEnabled(true),
       m_isSurfaceGridEnabled(true),
       m_selectedPoint(noSelectionPoint())
 {
@@ -91,6 +92,11 @@ void Surface3DController::synchDataToRenderer()
             emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
     }
 
+    if (m_changeTracker.surfaceVisibilityChanged) {
+        m_renderer->updateSurfaceVisibilityStatus(m_isSurfaceEnabled);
+        m_changeTracker.surfaceVisibilityChanged = false;
+    }
+
     if (m_changeTracker.surfaceGridChanged) {
         m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
         m_changeTracker.surfaceGridChanged = false;
@@ -143,6 +149,18 @@ void Surface3DController::setSmoothSurface(bool enable)
 bool Surface3DController::smoothSurface()
 {
     return m_isSmoothSurfaceEnabled;
+}
+
+void Surface3DController::setSurfaceVisible(bool visible)
+{
+    m_isSurfaceEnabled = visible;
+    m_changeTracker.surfaceVisibilityChanged = true;
+    emitNeedRender();
+}
+
+bool Surface3DController::surfaceVisible() const
+{
+    return m_isSurfaceEnabled;
 }
 
 void Surface3DController::setSurfaceGrid(bool enable)

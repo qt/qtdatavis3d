@@ -70,6 +70,10 @@ int main(int argc, char *argv[])
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));
     surfaceGridCB->setChecked(true);
 
+    QCheckBox *surfaceCB = new QCheckBox(widget);
+    surfaceCB->setText(QStringLiteral("Surface Visible"));
+    surfaceCB->setChecked(true);
+
     //QCheckBox *sqrtSinCB = new QCheckBox(widget);
     QRadioButton *sqrtSinCB = new QRadioButton(widget);
     sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
@@ -201,6 +205,7 @@ int main(int argc, char *argv[])
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
+    vLayout->addWidget(surfaceCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
     vLayout->addWidget(planeCB);
@@ -237,6 +242,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleSmooth);
     QObject::connect(surfaceGridCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleSurfaceGrid);
+    QObject::connect(surfaceCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurface);
     QObject::connect(sqrtSinCB, &QRadioButton::toggled,
                      modifier, &GraphModifier::toggleSqrtSin);
     QObject::connect(planeCB, &QCheckBox::toggled,
