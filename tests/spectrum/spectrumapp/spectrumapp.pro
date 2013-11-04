@@ -31,6 +31,7 @@ HEADERS  += engine.h \
 fftreal_dir = ../3rdparty/fftreal
 
 INCLUDEPATH += $${fftreal_dir}
+INCLUDEPATH += ../../../include
 
 RESOURCES = spectrum.qrc
 
