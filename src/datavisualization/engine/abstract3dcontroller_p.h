@@ -323,6 +323,13 @@ public slots:
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
+    void themeChanged(QDataVis::Theme theme);
+    void fontChanged(QFont font);
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void labelStyleChanged(QDataVis::LabelStyle style);
+    void backgroundVisibleChanged(bool visible);
+    void gridVisibleChanged(bool visible);
+    void meshFileNameChanged(QString filename);
     void needRender();
 
 protected:

@@ -42,16 +42,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
+    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
+    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -96,14 +96,17 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
 
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    virtual void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
-    virtual void handleInputHandlerUpdate(QAbstract3DInputHandler *inputHandler);
 signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
+    void themeChanged(QDataVis::Theme theme);
+    void fontChanged(QFont font);
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void labelStyleChanged(QDataVis::LabelStyle style);
+    void backgroundVisibleChanged(bool visible);
+    void gridVisibleChanged(bool visible);
+    void itemLabelFormatChanged(QString format);
 
 private:
     Abstract3DController *m_controller;

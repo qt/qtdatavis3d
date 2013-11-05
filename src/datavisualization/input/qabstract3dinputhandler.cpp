@@ -173,7 +173,10 @@ Q3DScene *QAbstract3DInputHandler::scene() const
 
 void QAbstract3DInputHandler::setScene(Q3DScene *scene)
 {
-    d_ptr->m_scene = scene;
+    if (scene != d_ptr->m_scene) {
+        d_ptr->m_scene = scene;
+        emit sceneChanged(scene);
+    }
 }
 
 /*!

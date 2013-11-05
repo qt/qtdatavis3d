@@ -693,10 +693,12 @@ QColor Abstract3DController::objectColor() const
 
 void Abstract3DController::setTheme(QDataVis::Theme theme)
 {
-    m_theme.useTheme(theme);
-
-    m_changeTracker.themeChanged = true;
-    emitNeedRender();
+    if (theme != m_theme.theme()) {
+        m_theme.useTheme(theme);
+        m_changeTracker.themeChanged = true;
+        emit themeChanged(theme);
+        emitNeedRender();
+    }
 }
 
 Theme Abstract3DController::theme()
@@ -706,10 +708,12 @@ Theme Abstract3DController::theme()
 
 void Abstract3DController::setFont(const QFont &font)
 {
-    m_font = font;
-
-    m_changeTracker.fontChanged = true;
-    emitNeedRender();
+    if (font != m_font) {
+        m_font = font;
+        m_changeTracker.fontChanged = true;
+        emit fontChanged(font);
+        emitNeedRender();
+    }
 }
 
 QFont Abstract3DController::font()
@@ -722,6 +726,7 @@ void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
     if (mode != m_selectionMode) {
         m_selectionMode = mode;
         m_changeTracker.selectionModeChanged = true;
+        emit selectionModeChanged(mode);
         emitNeedRender();
     }
 }
@@ -733,11 +738,12 @@ QDataVis::SelectionFlags Abstract3DController::selectionMode()
 
 void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_shadowQuality = quality;
-
-    m_changeTracker.shadowQualityChanged = true;
-    emit shadowQualityChanged(m_shadowQuality);
-    emitNeedRender();
+    if (quality != m_shadowQuality) {
+        m_shadowQuality = quality;
+        m_changeTracker.shadowQualityChanged = true;
+        emit shadowQualityChanged(m_shadowQuality);
+        emitNeedRender();
+    }
 }
 
 QDataVis::ShadowQuality Abstract3DController::shadowQuality()
@@ -747,10 +753,12 @@ QDataVis::ShadowQuality Abstract3DController::shadowQuality()
 
 void Abstract3DController::setLabelStyle(QDataVis::LabelStyle style)
 {
-    m_labelStyle = style;
-
-    m_changeTracker.labelStyleChanged = true;
-    emitNeedRender();
+    if (style != m_labelStyle) {
+        m_labelStyle = style;
+        m_changeTracker.labelStyleChanged = true;
+        emit labelStyleChanged(style);
+        emitNeedRender();
+    }
 }
 
 QDataVis::LabelStyle Abstract3DController::labelStyle()
@@ -760,9 +768,12 @@ QDataVis::LabelStyle Abstract3DController::labelStyle()
 
 void Abstract3DController::setBackgroundEnabled(bool enable)
 {
-    m_isBackgroundEnabled = enable;
-    m_changeTracker.backgroundEnabledChanged = true;
-    emitNeedRender();
+    if (enable != m_isBackgroundEnabled) {
+        m_isBackgroundEnabled = enable;
+        m_changeTracker.backgroundEnabledChanged = true;
+        emit backgroundVisibleChanged(enable);
+        emitNeedRender();
+    }
 }
 
 bool Abstract3DController::backgroundEnabled()
@@ -772,9 +783,12 @@ bool Abstract3DController::backgroundEnabled()
 
 void Abstract3DController::setGridEnabled(bool enable)
 {
-    m_isGridEnabled = enable;
-    m_changeTracker.gridEnabledChanged = true;
-    emitNeedRender();
+    if (enable != m_isGridEnabled) {
+        m_isGridEnabled = enable;
+        m_changeTracker.gridEnabledChanged = true;
+        emit gridVisibleChanged(enable);
+        emitNeedRender();
+    }
 }
 
 bool Abstract3DController::gridEnabled()
@@ -811,9 +825,12 @@ QPoint Abstract3DController::inputPosition()
 
 void Abstract3DController::setMeshFileName(const QString &fileName)
 {
-    m_objFile = fileName;
-    m_changeTracker.objFileChanged = true;
-    emitNeedRender();
+    if (fileName != m_objFile) {
+        m_objFile = fileName;
+        m_changeTracker.objFileChanged = true;
+        emit meshFileNameChanged(fileName);
+        emitNeedRender();
+    }
 }
 
 QString Abstract3DController::meshFileName()

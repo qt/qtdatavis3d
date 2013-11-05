@@ -122,11 +122,23 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     Q_ASSERT(controller);
     m_controller = controller;
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
-                     &AbstractDeclarative::handleShadowQualityUpdate);
-    emit sceneChanged(m_controller->scene());
+                     &AbstractDeclarative::shadowQualityChanged);
     QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
-                     &AbstractDeclarative::handleInputHandlerUpdate);
-    emit inputHandlerChanged(m_controller->activeInputHandler());
+                     &AbstractDeclarative::inputHandlerChanged);
+    QObject::connect(m_controller, &Abstract3DController::themeChanged, this,
+                     &AbstractDeclarative::themeChanged);
+    QObject::connect(m_controller, &Abstract3DController::fontChanged, this,
+                     &AbstractDeclarative::fontChanged);
+    QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
+                     &AbstractDeclarative::selectionModeChanged);
+    QObject::connect(m_controller, &Abstract3DController::labelStyleChanged, this,
+                     &AbstractDeclarative::labelStyleChanged);
+    QObject::connect(m_controller, &Abstract3DController::backgroundVisibleChanged, this,
+                     &AbstractDeclarative::backgroundVisibleChanged);
+    QObject::connect(m_controller, &Abstract3DController::gridVisibleChanged, this,
+                     &AbstractDeclarative::gridVisibleChanged);
+    QObject::connect(m_controller->activeDataProxy(), &QAbstractDataProxy::itemLabelFormatChanged, this,
+                     &AbstractDeclarative::itemLabelFormatChanged);
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const
@@ -174,16 +186,6 @@ void AbstractDeclarative::mouseMoveEvent(QMouseEvent *event)
 void AbstractDeclarative::wheelEvent(QWheelEvent *event)
 {
     m_controller->wheelEvent(event);
-}
-
-void AbstractDeclarative::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit shadowQualityChanged(quality);
-}
-
-void AbstractDeclarative::handleInputHandlerUpdate(QAbstract3DInputHandler *inputHandler)
-{
-    emit inputHandlerChanged(inputHandler);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

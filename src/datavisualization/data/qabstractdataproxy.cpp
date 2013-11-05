@@ -108,8 +108,10 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
  */
 void QAbstractDataProxy::setItemLabelFormat(const QString &format)
 {
-    d_ptr->setItemLabelFormat(format);
-    emit itemLabelFormatChanged();
+    if (format != itemLabelFormat()) {
+        d_ptr->setItemLabelFormat(format);
+        emit itemLabelFormatChanged(format);
+    }
 }
 
 /*!
@@ -121,7 +123,7 @@ QString QAbstractDataProxy::itemLabelFormat() const
 }
 
 /*!
- * \fn void QAbstractDataProxy::itemLabelFormatChanged()
+ * \fn void QAbstractDataProxy::itemLabelFormatChanged(QString format)
  *
  * Emitted when label format changes.
  */

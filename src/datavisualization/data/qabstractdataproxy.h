@@ -54,7 +54,7 @@ public:
     QString itemLabelFormat() const;
 
 signals:
-    void itemLabelFormatChanged();
+    void itemLabelFormatChanged(QString format);
 
 protected:
     QScopedPointer<QAbstractDataProxyPrivate> d_ptr;

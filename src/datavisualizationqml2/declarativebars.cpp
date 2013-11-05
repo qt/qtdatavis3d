@@ -43,6 +43,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     AbstractDeclarative::setSharedController(m_shared);
     QObject::connect(m_shared, &Bars3DController::selectedBarChanged, this,
                      &DeclarativeBars::selectedBarChanged);
+    QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
+                     &DeclarativeBars::meshFileNameChanged);
 
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
     m_shared->setActiveDataProxy(proxy);
@@ -52,7 +54,6 @@ DeclarativeBars::~DeclarativeBars()
 {
     delete m_shared;
 }
-
 
 QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {

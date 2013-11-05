@@ -44,6 +44,8 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 
     QObject::connect(m_shared, &Scatter3DController::selectedItemIndexChanged, this,
                      &DeclarativeScatter::selectedItemIndexChanged);
+    QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
+                     &DeclarativeScatter::meshFileNameChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
