@@ -167,8 +167,9 @@ void Abstract3DRenderer::updateTheme(Theme theme)
     m_cachedTheme.setFromTheme(theme);
 
     m_drawer->setTheme(m_cachedTheme);
+
     // Re-initialize shaders
-    handleShadowQualityChange();
+    reInitShaders();
 }
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
@@ -179,7 +180,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     m_cachedScene->d_ptr->sync(*scene->d_ptr);
 }
 
-void Abstract3DRenderer::handleShadowQualityChange()
+void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -213,6 +214,19 @@ void Abstract3DRenderer::handleShadowQualityChange()
     }
     initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
                           QStringLiteral(":/shaders/fragmentES2"));
+#endif
+}
+
+void Abstract3DRenderer::handleShadowQualityChange()
+{
+    reInitShaders();
+
+#if defined(QT_OPENGL_ES_2)
+    if (m_cachedShadowQuality != QDataVis::ShadowQualityNone) {
+        emit requestShadowQuality(QDataVis::ShadowQualityNone);
+        qWarning("Shadows are not yet supported for OpenGL ES2");
+        m_cachedShadowQuality = QDataVis::ShadowQualityNone;
+    }
 #endif
 }
 

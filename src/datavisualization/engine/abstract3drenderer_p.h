@@ -135,6 +135,7 @@ protected:
 
     virtual void initializeOpenGL();
 
+    void reInitShaders();
     virtual void handleShadowQualityChange();
     virtual void handleResize();
     virtual void loadMeshFile() = 0;
