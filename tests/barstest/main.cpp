@@ -29,6 +29,8 @@
 #include <QLabel>
 #include <QScreen>
 #include <QFontDatabase>
+#include <QLinearGradient>
+#include <QPainter>
 
 int main(int argc, char **argv)
 {
@@ -127,6 +129,20 @@ int main(int argc, char **argv)
     QPushButton *flipViewsButton = new QPushButton(widget);
     flipViewsButton->setText(QStringLiteral("Flip views"));
     flipViewsButton->setEnabled(true);
+
+    QLinearGradient grBtoY(0, 0, 100, 0);
+    grBtoY.setColorAt(1.0, Qt::black);
+    grBtoY.setColorAt(0.67, Qt::blue);
+    grBtoY.setColorAt(0.33, Qt::red);
+    grBtoY.setColorAt(0.0, Qt::yellow);
+    QPixmap pm(100, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grBtoY));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 100, 24);
+    QPushButton *gradientBtoYPB = new QPushButton(widget);
+    gradientBtoYPB->setIcon(QIcon(pm));
+    gradientBtoYPB->setIconSize(QSize(100, 24));
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -252,7 +268,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
-    vLayout->addWidget(flipViewsButton, 1, Qt::AlignTop);
+    vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -349,6 +366,8 @@ int main(int argc, char **argv)
 
     QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
                      &GraphModifier::flipViews);
+    QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
+                     &GraphModifier::setGradient);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);

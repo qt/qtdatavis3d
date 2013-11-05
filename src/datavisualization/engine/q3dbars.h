@@ -22,6 +22,7 @@
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
 #include <QFont>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -48,11 +49,19 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
+    Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
+    Q_PROPERTY(QLinearGradient barGradient READ barGradient WRITE setBarGradient NOTIFY barGradientChanged)
+    Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
+    Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
+    Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
+    Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
 
 public:
     explicit Q3DBars();
     ~Q3DBars();
 
+    // TODO: Move to dataset object once that is done QTRD-2121
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     void setTheme(QDataVis::Theme theme);
@@ -67,9 +76,7 @@ public:
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative();
 
-    void setBarColor(const QColor &baseColor, bool uniform = true);
-    QColor barColor() const;
-
+    // TODO: Move to dataset object once that is done QTRD-2121
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 
@@ -99,6 +106,22 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
+    // TODO: Move to dataset object once that is done QTRD-2121
+    void setColorStyle(QDataVis::ColorStyle style);
+    QDataVis::ColorStyle colorStyle() const;
+    void setBarColor(const QColor &color);
+    QColor barColor() const;
+    void setBarGradient(const QLinearGradient &gradient);
+    QLinearGradient barGradient() const;
+    void setSingleHighlightColor(const QColor &color);
+    QColor singleHighlightColor() const;
+    void setSingleHighlightGradient(const QLinearGradient &gradient);
+    QLinearGradient singleHighlightGradient() const;
+    void setMultiHighlightColor(const QColor &color);
+    QColor multiHighlightColor() const;
+    void setMultiHighlightGradient(const QLinearGradient &gradient);
+    QLinearGradient multiHighlightGradient() const;
+
     void setRowAxis(Q3DCategoryAxis *axis);
     Q3DCategoryAxis *rowAxis() const;
     void setColumnAxis(Q3DCategoryAxis *axis);
@@ -109,6 +132,7 @@ public:
     void releaseAxis(Q3DAbstractAxis *axis);
     QList<Q3DAbstractAxis *> axes() const;
 
+    // TODO: Move to dataset object once that is done QTRD-2121
     void setActiveDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *activeDataProxy() const;
     void addDataProxy(QBarDataProxy *proxy);
@@ -128,6 +152,13 @@ signals:
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
     void selectedBarChanged(QPoint position);
+    void colorStyleChanged(QDataVis::ColorStyle style);
+    void barColorChanged(QColor color);
+    void barGradientChanged(QLinearGradient gradient);
+    void singleHighlightColorChanged(QColor color);
+    void singleHighlightGradientChanged(QLinearGradient gradient);
+    void multiHighlightColorChanged(QColor color);
+    void multiHighlightGradientChanged(QLinearGradient gradient);
 
 protected:
 

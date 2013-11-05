@@ -20,6 +20,7 @@
 #include "utils_p.h"
 
 #include <QImage>
+#include <QPainter>
 
 #include <QDebug>
 
@@ -150,6 +151,18 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return textureid;
+}
+
+GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
+{
+    QImage image(QSize(int(gradientTextureWidth), int(gradientTextureHeight)),
+                 QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(gradient));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, int(gradientTextureWidth), int(gradientTextureHeight));
+
+    return create2DTexture(image, false, true);
 }
 
 #if !defined(QT_OPENGL_ES_2)

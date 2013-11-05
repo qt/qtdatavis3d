@@ -76,6 +76,7 @@ public:
 
 public slots:
     void flipViews();
+    void setGradient();
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);

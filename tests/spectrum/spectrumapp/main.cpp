@@ -97,7 +97,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75);
 #endif
     // Set color scheme
-    m_chart->setBarColor(QColor(Qt::red), false);
+    m_chart->setBarColor(QColor(Qt::red));
     // Disable selection
     m_chart->setSelectionMode(QDataVis::SelectionNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);

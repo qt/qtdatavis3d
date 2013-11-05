@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -45,6 +46,13 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
+    Q_PROPERTY(QColor itemColor READ itemColor WRITE setItemColor NOTIFY itemColorChanged)
+    Q_PROPERTY(QLinearGradient itemGradient READ itemGradient WRITE setItemGradient NOTIFY itemGradientChanged)
+    Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
+    Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
+    Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
+    Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
 
 public:
     explicit Q3DScatter();
@@ -87,6 +95,22 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
+    // TODO: Move to dataset object once that is done QTRD-2121
+    void setColorStyle(QDataVis::ColorStyle style);
+    QDataVis::ColorStyle colorStyle() const;
+    void setItemColor(const QColor &color);
+    QColor itemColor() const;
+    void setItemGradient(const QLinearGradient &gradient);
+    QLinearGradient itemGradient() const;
+    void setSingleHighlightColor(const QColor &color);
+    QColor singleHighlightColor() const;
+    void setSingleHighlightGradient(const QLinearGradient &gradient);
+    QLinearGradient singleHighlightGradient() const;
+    void setMultiHighlightColor(const QColor &color);
+    QColor multiHighlightColor() const;
+    void setMultiHighlightGradient(const QLinearGradient &gradient);
+    QLinearGradient multiHighlightGradient() const;
+
     void setAxisX(Q3DValueAxis *axis);
     Q3DValueAxis *axisX() const;
     void setAxisY(Q3DValueAxis *axis);
@@ -113,6 +137,13 @@ signals:
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
     void selectedItemIndexChanged(int index);
+    void colorStyleChanged(QDataVis::ColorStyle style);
+    void itemColorChanged(QColor color);
+    void itemGradientChanged(QLinearGradient gradient);
+    void singleHighlightColorChanged(QColor color);
+    void singleHighlightGradientChanged(QLinearGradient gradient);
+    void multiHighlightColorChanged(QColor color);
+    void multiHighlightGradientChanged(QLinearGradient gradient);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

@@ -78,7 +78,7 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
 
 void DeclarativeScatter::setObjectColor(const QColor &baseColor, bool uniform)
 {
-    m_shared->setObjectColor(baseColor, uniform);
+    m_shared->setObjectColor(baseColor); //TODO
 }
 
 QScatterDataProxy *DeclarativeScatter::dataProxy() const

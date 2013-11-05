@@ -35,7 +35,6 @@
 #include <qmath.h>
 
 #include <QLinearGradient>
-#include <QPainter>
 
 #include <QDebug>
 
@@ -1625,18 +1624,16 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
 void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
 {
-    QImage image(QSize(2, 1024), QImage::Format_RGB32);
-    QPainter pmp(&image);
-    pmp.setBrush(QBrush(gradient));
-    pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 2, 1024);
-
     if (m_gradientTexture) {
         m_textureHelper->deleteTexture(&m_gradientTexture);
         m_gradientTexture = 0;
     }
 
-    m_gradientTexture = m_textureHelper->create2DTexture(image, false, true);
+    QLinearGradient adjustedGradient = gradient;
+    adjustedGradient.setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
+    adjustedGradient.setFinalStop(0.0, 0.0);
+
+    m_gradientTexture = m_textureHelper->createGradientTexture(adjustedGradient);
 }
 
 // This one needs to be called when the data size changes

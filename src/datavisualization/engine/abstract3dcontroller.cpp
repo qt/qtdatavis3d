@@ -50,7 +50,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_renderer(0),
     m_isDataDirty(true),
     m_data(0),
-    m_renderPending(false)
+    m_renderPending(false),
+    m_colorStyle(QDataVis::ColorStyleUniform)
 {
     m_theme.useTheme(QDataVis::ThemeQt);
 
@@ -114,9 +115,45 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.inputStateChanged = false;
     }
 
+    // TODO: Renderer doesn't need to know the theme, so remove this bit entirely (QTRD-2538)
     if (m_changeTracker.themeChanged) {
         m_renderer->updateTheme(m_theme);
         m_changeTracker.themeChanged = false;
+    }
+
+    if (m_changeTracker.colorStyleChanged) {
+        m_renderer->updateColorStyle(m_colorStyle);
+        m_changeTracker.colorStyleChanged = false;
+    }
+
+    if (m_changeTracker.objectColorChanged) {
+        m_renderer->updateObjectColor(m_objectColor);
+        m_changeTracker.objectColorChanged = false;
+    }
+
+    if (m_changeTracker.objectGradientChanged) {
+        m_renderer->updateObjectGradient(m_objectGradient);
+        m_changeTracker.objectGradientChanged = false;
+    }
+
+    if (m_changeTracker.singleHighlightColorChanged) {
+        m_renderer->updateSingleHighlightColor(m_singleHighlightColor);
+        m_changeTracker.singleHighlightColorChanged = false;
+    }
+
+    if (m_changeTracker.singleHighlightGradientChanged) {
+        m_renderer->updateSingleHighlightGradient(m_singleHighlightGradient);
+        m_changeTracker.singleHighlightGradientChanged = false;
+    }
+
+    if (m_changeTracker.multiHighlightColorChanged) {
+        m_renderer->updateMultiHighlightColor(m_multiHighlightColor);
+        m_changeTracker.multiHighlightColorChanged = false;
+    }
+
+    if (m_changeTracker.multiHighlightGradientChanged) {
+        m_renderer->updateMultiHighlightGradient(m_multiHighlightGradient);
+        m_changeTracker.multiHighlightGradientChanged = false;
     }
 
     if (m_changeTracker.fontChanged) {
@@ -677,18 +714,109 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emitNeedRender();
 }
 
-void Abstract3DController::setObjectColor(const QColor &baseColor, bool uniform)
+void Abstract3DController::setColorStyle(QDataVis::ColorStyle style)
 {
-    m_theme.m_baseColor = baseColor;
-    m_theme.m_uniformColor = uniform;
+    if (style != m_colorStyle) {
+        m_colorStyle = style;
+        m_changeTracker.colorStyleChanged = true;
+        emitNeedRender();
+        emit colorStyleChanged(style);
+    }
+}
 
-    m_changeTracker.themeChanged = true;
-    emitNeedRender();
+QDataVis::ColorStyle Abstract3DController::colorStyle() const
+{
+    return m_colorStyle;
+}
+
+void Abstract3DController::setObjectColor(const QColor &color)
+{
+    if (color != m_objectColor) {
+        m_objectColor = color;
+        m_changeTracker.objectColorChanged = true;
+        emitNeedRender();
+        emit objectColorChanged(color);
+    }
 }
 
 QColor Abstract3DController::objectColor() const
 {
-    return m_theme.m_baseColor;
+    return m_objectColor;
+}
+
+void Abstract3DController::setObjectGradient(const QLinearGradient &gradient)
+{
+    if (gradient != m_objectGradient) {
+        m_objectGradient = gradient;
+        m_changeTracker.objectGradientChanged = true;
+        emitNeedRender();
+        emit objectGradientChanged(gradient);
+    }
+}
+
+QLinearGradient Abstract3DController::objectGradient() const
+{
+    return m_objectGradient;
+}
+
+void Abstract3DController::setSingleHighlightColor(const QColor &color)
+{
+    if (color != m_singleHighlightColor) {
+        m_singleHighlightColor = color;
+        m_changeTracker.singleHighlightColorChanged = true;
+        emitNeedRender();
+        emit singleHighlightColorChanged(color);
+    }
+}
+
+QColor Abstract3DController::singleHighlightColor() const
+{
+    return m_singleHighlightColor;
+}
+
+void Abstract3DController::setSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    if (gradient != m_singleHighlightGradient) {
+        m_singleHighlightGradient = gradient;
+        m_changeTracker.singleHighlightGradientChanged = true;
+        emitNeedRender();
+        emit singleHighlightGradientChanged(gradient);
+    }
+}
+
+QLinearGradient Abstract3DController::singleHighlightGradient() const
+{
+    return m_singleHighlightGradient;
+}
+
+void Abstract3DController::setMultiHighlightColor(const QColor &color)
+{
+    if (color != m_multiHighlightColor) {
+        m_multiHighlightColor = color;
+        m_changeTracker.multiHighlightColorChanged = true;
+        emitNeedRender();
+        emit multiHighlightColorChanged(color);
+    }
+}
+
+QColor Abstract3DController::multiHighlightColor() const
+{
+    return m_multiHighlightColor;
+}
+
+void Abstract3DController::setMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    if (gradient != m_multiHighlightGradient) {
+        m_multiHighlightGradient = gradient;
+        m_changeTracker.multiHighlightGradientChanged = true;
+        emitNeedRender();
+        emit multiHighlightGradientChanged(gradient);
+    }
+}
+
+QLinearGradient Abstract3DController::multiHighlightGradient() const
+{
+    return m_multiHighlightGradient;
 }
 
 void Abstract3DController::setTheme(QDataVis::Theme theme)
@@ -696,6 +824,11 @@ void Abstract3DController::setTheme(QDataVis::Theme theme)
     if (theme != m_theme.theme()) {
         m_theme.useTheme(theme);
         m_changeTracker.themeChanged = true;
+        // TODO: set all colors/styles here (QTRD-2538)
+        setColorStyle(QDataVis::ColorStyleUniform);
+        setObjectColor(m_theme.m_baseColor);
+        setSingleHighlightColor(m_theme.m_highlightBarColor);
+        setMultiHighlightColor(m_theme.m_highlightRowColor);
         emit themeChanged(theme);
         emitNeedRender();
     }

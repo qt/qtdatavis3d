@@ -41,6 +41,11 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedSelectionMode(QDataVis::SelectionNone),
       m_cachedIsGridEnabled(false),
       m_cachedIsBackgroundEnabled(false),
+      m_cachedColorStyle(QDataVis::ColorStyleUniform),
+      m_objectGradientTexture(0),
+      m_singleHighlightGradientTexture(0),
+      m_multiHighlightGradientTexture(0),
+      m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
       m_inputState(QDataVis::InputStateNone)
@@ -59,6 +64,12 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 Abstract3DRenderer::~Abstract3DRenderer()
 {
+    if (m_textureHelper) {
+        m_textureHelper->deleteTexture(&m_objectGradientTexture);
+        m_textureHelper->deleteTexture(&m_singleHighlightGradientTexture);
+        m_textureHelper->deleteTexture(&m_multiHighlightGradientTexture);
+    }
+
     delete m_drawer;
     delete m_textureHelper;
     delete m_cachedScene;
@@ -184,7 +195,7 @@ void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        if (!m_cachedTheme.m_uniformColor) {
+        if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
                         QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
@@ -194,7 +205,7 @@ void Abstract3DRenderer::reInitShaders()
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
     } else {
-        if (!m_cachedTheme.m_uniformColor) {
+        if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
             initShaders(QStringLiteral(":/shaders/vertex"),
                         QStringLiteral(":/shaders/fragmentColorOnY"));
         } else {
@@ -205,7 +216,7 @@ void Abstract3DRenderer::reInitShaders()
                               QStringLiteral(":/shaders/fragment"));
     }
 #else
-    if (!m_cachedTheme.m_uniformColor) {
+    if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
         initShaders(QStringLiteral(":/shaders/vertexES2"),
                     QStringLiteral(":/shaders/fragmentColorOnYES2"));
     } else {
@@ -324,6 +335,49 @@ void Abstract3DRenderer::updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation 
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
 
+void Abstract3DRenderer::updateColorStyle(QDataVis::ColorStyle style)
+{
+    bool changed = (m_cachedColorStyle != style);
+
+    m_cachedColorStyle = style;
+
+    if (changed)
+        reInitShaders();
+}
+
+void Abstract3DRenderer::updateObjectColor(const QColor &color)
+{
+    m_cachedObjectColor = color;
+}
+
+void Abstract3DRenderer::updateObjectGradient(const QLinearGradient &gradient)
+{
+    m_cachedObjectGradient = gradient;
+    fixGradient(&m_cachedObjectGradient, &m_objectGradientTexture);
+}
+
+void Abstract3DRenderer::updateSingleHighlightColor(const QColor &color)
+{
+    m_cachedSingleHighlightColor = color;
+}
+
+void Abstract3DRenderer::updateSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    m_cachedSingleHighlightGradient = gradient;
+    fixGradient(&m_cachedSingleHighlightGradient, &m_singleHighlightGradientTexture);
+}
+
+void Abstract3DRenderer::updateMultiHighlightColor(const QColor &color)
+{
+    m_cachedMultiHighlightColor = color;
+}
+
+void Abstract3DRenderer::updateMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    m_cachedMultiHighlightGradient = gradient;
+    fixGradient(&m_cachedMultiHighlightGradient, &m_multiHighlightGradientTexture);
+}
+
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation)
 {
     switch (orientation) {
@@ -377,5 +431,18 @@ void Abstract3DRenderer::lowerShadowQuality()
     updateShadowQuality(newQuality);
 }
 
+void Abstract3DRenderer::fixGradient(QLinearGradient *gradient, GLuint *gradientTexture)
+{
+    // Readjust start/stop to match gradient texture size
+    gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
+    gradient->setFinalStop(0.0, 0.0);
+
+    if (*gradientTexture) {
+        m_textureHelper->deleteTexture(gradientTexture);
+        *gradientTexture = 0;
+    }
+
+    *gradientTexture = m_textureHelper->createGradientTexture(*gradient);
+}
 
 QT_DATAVISUALIZATION_END_NAMESPACE

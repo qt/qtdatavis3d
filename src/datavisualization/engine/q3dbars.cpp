@@ -120,6 +120,20 @@ Q3DBars::Q3DBars()
                      &Q3DBars::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarChanged, this,
                      &Q3DBars::selectedBarChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
+                     &Q3DBars::colorStyleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
+                     &Q3DBars::barColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::objectGradientChanged, this,
+                     &Q3DBars::barGradientChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::singleHighlightColorChanged, this,
+                     &Q3DBars::singleHighlightColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::singleHighlightGradientChanged, this,
+                     &Q3DBars::singleHighlightGradientChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::multiHighlightColorChanged, this,
+                     &Q3DBars::multiHighlightColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::multiHighlightGradientChanged, this,
+                     &Q3DBars::multiHighlightGradientChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -301,30 +315,6 @@ QDataVis::Theme Q3DBars::theme() const
 }
 
 /*!
- * Set bar color using your own color. \a baseColor sets the base color of a bar. The \a uniform
- * -flag is used to define if color needs to be uniform throughout bar's length, or will the colors
- * be applied by height, starting with dark at the bottom. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa setTheme()
- *
- * \preliminary
- */
-void Q3DBars::setBarColor(const QColor &baseColor, bool uniform)
-{
-    d_ptr->m_shared->setObjectColor(baseColor, uniform);
-}
-
-/*!
- * \return bar color in use.
- */
-QColor Q3DBars::barColor() const
-{
-    return d_ptr->m_shared->objectColor();
-}
-
-/*!
  * \property Q3DBars::selectionMode
  *
  * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
@@ -466,6 +456,135 @@ void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
+}
+
+/*!
+ * \property Q3DBars::colorStyle
+ *
+ * Sets the color \a style used to render bars.
+ * Defaults to true.
+ *
+ * \sa barColor, barGradient
+ */
+void Q3DBars::setColorStyle(QDataVis::ColorStyle style)
+{
+    d_ptr->m_shared->setColorStyle(style);
+}
+
+QDataVis::ColorStyle Q3DBars::colorStyle() const
+{
+    return d_ptr->m_shared->colorStyle();
+}
+
+/*!
+ * \property Q3DBars::barColor
+ *
+ * Set bar color to the \a color for this set. Overrides any previously set bar gradient for this
+ * set, as well as any bar gradient or color from the theme.
+ *
+ * \sa theme, barGradient
+ */
+void Q3DBars::setBarColor(const QColor &color)
+{
+    d_ptr->m_shared->setObjectColor(color);
+}
+
+QColor Q3DBars::barColor() const
+{
+    return d_ptr->m_shared->objectColor();
+}
+
+/*!
+ * \property Q3DBars::barGradient
+ *
+ * Set bar gradient to the \a gradient for this set. Overrides any previously set bar color for this
+ * set, as well as any bar gradient or color from the theme.
+ *
+ * \sa theme, barColor, colorStyle
+ */
+void Q3DBars::setBarGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setObjectGradient(gradient);
+}
+
+QLinearGradient Q3DBars::barGradient() const
+{
+    return d_ptr->m_shared->objectGradient();
+}
+
+/*!
+ * \property Q3DBars::singleHighlightColor
+ *
+ * Set single bar highlight color to the \a color for this set. Overrides any previously set single
+ * bar highlight gradient for this set, as well as any single bar highlight gradient or color from the theme.
+ *
+ * \sa theme, singleHighlightGradient
+ */
+void Q3DBars::setSingleHighlightColor(const QColor &color)
+{
+    d_ptr->m_shared->setSingleHighlightColor(color);
+}
+
+QColor Q3DBars::singleHighlightColor() const
+{
+    return d_ptr->m_shared->singleHighlightColor();
+}
+
+/*!
+ * \property Q3DBars::singleHighlightGradient
+ *
+ * Set single bar highlight gradient to the \a gradient for this set.
+ * Overrides any previously set single bar highlight color for this
+ * set, as well as any single bar highlight gradient or color from the theme.
+ *
+ * \sa theme, singleHighlightColor, colorStyle
+ */
+void Q3DBars::setSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setSingleHighlightGradient(gradient);
+}
+
+QLinearGradient Q3DBars::singleHighlightGradient() const
+{
+    return d_ptr->m_shared->singleHighlightGradient();
+}
+
+/*!
+ * \property Q3DBars::multiHighlightColor
+ *
+ * Set multiple bar highlight (e.g. row/column highlight) color to the \a color for this set.
+ * Overrides any previously set multiple bar highlight gradient for this set, as well as any
+ * multiple bar highlight gradient or color from the theme.
+ *
+ * \sa theme, multiHighlightGradient
+ */
+void Q3DBars::setMultiHighlightColor(const QColor &color)
+{
+    d_ptr->m_shared->setMultiHighlightColor(color);
+}
+
+QColor Q3DBars::multiHighlightColor() const
+{
+    return d_ptr->m_shared->multiHighlightColor();
+}
+
+/*!
+ * \property Q3DBars::multiHighlightGradient
+ *
+ * Set multiple bar highlight (e.g. row/column highlight) gradient to the \a gradient for this set.
+ * Overrides any previously set multiple bar highlight color for this
+ * set, as well as any multiple bar highlight gradient or color from the theme.
+ *
+ * \sa theme, multiHighlightColor, colorStyle
+ */
+void Q3DBars::setMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setMultiHighlightGradient(gradient);
+}
+
+QLinearGradient Q3DBars::multiHighlightGradient() const
+{
+    return d_ptr->m_shared->multiHighlightGradient();
 }
 
 /*!

@@ -80,7 +80,7 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 
 void DeclarativeBars::setBarColor(const QColor &baseColor, bool uniform)
 {
-    m_shared->setObjectColor(baseColor, uniform);
+    m_shared->setObjectColor(baseColor); // TODO
 }
 
 void DeclarativeBars::setDataProxy(QBarDataProxy *dataProxy)

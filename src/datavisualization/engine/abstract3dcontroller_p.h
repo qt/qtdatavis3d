@@ -39,6 +39,7 @@
 #include "q3dbox.h"
 
 #include <QObject>
+#include <QLinearGradient>
 
 class QFont;
 
@@ -48,41 +49,48 @@ class CameraHelper;
 class Abstract3DRenderer;
 
 struct Abstract3DChangeBitField {
-    bool positionChanged             : 1;
-    bool zoomLevelChanged            : 1;
-    bool themeChanged                : 1;
-    bool fontChanged                 : 1;
-    bool labelStyleChanged           : 1;
-    bool boundingRectChanged         : 1;
-    bool sizeChanged                 : 1;
-    bool shadowQualityChanged        : 1;
-    bool selectionModeChanged        : 1;
-    bool objFileChanged              : 1;
-    bool gridEnabledChanged          : 1;
-    bool backgroundEnabledChanged    : 1;
-    bool axisXTypeChanged            : 1;
-    bool axisYTypeChanged            : 1;
-    bool axisZTypeChanged            : 1;
-    bool axisXTitleChanged           : 1;
-    bool axisYTitleChanged           : 1;
-    bool axisZTitleChanged           : 1;
-    bool axisXLabelsChanged          : 1;
-    bool axisYLabelsChanged          : 1;
-    bool axisZLabelsChanged          : 1;
-    bool axisXRangeChanged           : 1;
-    bool axisYRangeChanged           : 1;
-    bool axisZRangeChanged           : 1;
-    bool axisXSegmentCountChanged    : 1;
-    bool axisYSegmentCountChanged    : 1;
-    bool axisZSegmentCountChanged    : 1;
-    bool axisXSubSegmentCountChanged : 1;
-    bool axisYSubSegmentCountChanged : 1;
-    bool axisZSubSegmentCountChanged : 1;
-    bool axisXLabelFormatChanged     : 1;
-    bool axisYLabelFormatChanged     : 1;
-    bool axisZLabelFormatChanged     : 1;
-    bool inputStateChanged           : 1;
-    bool inputPositionChanged        : 1;
+    bool positionChanged               : 1;
+    bool zoomLevelChanged              : 1;
+    bool themeChanged                  : 1;
+    bool fontChanged                   : 1;
+    bool labelStyleChanged             : 1;
+    bool boundingRectChanged           : 1;
+    bool sizeChanged                   : 1;
+    bool shadowQualityChanged          : 1;
+    bool selectionModeChanged          : 1;
+    bool objFileChanged                : 1;
+    bool gridEnabledChanged            : 1;
+    bool backgroundEnabledChanged      : 1;
+    bool axisXTypeChanged              : 1;
+    bool axisYTypeChanged              : 1;
+    bool axisZTypeChanged              : 1;
+    bool axisXTitleChanged             : 1;
+    bool axisYTitleChanged             : 1;
+    bool axisZTitleChanged             : 1;
+    bool axisXLabelsChanged            : 1;
+    bool axisYLabelsChanged            : 1;
+    bool axisZLabelsChanged            : 1;
+    bool axisXRangeChanged             : 1;
+    bool axisYRangeChanged             : 1;
+    bool axisZRangeChanged             : 1;
+    bool axisXSegmentCountChanged      : 1;
+    bool axisYSegmentCountChanged      : 1;
+    bool axisZSegmentCountChanged      : 1;
+    bool axisXSubSegmentCountChanged   : 1;
+    bool axisYSubSegmentCountChanged   : 1;
+    bool axisZSubSegmentCountChanged   : 1;
+    bool axisXLabelFormatChanged       : 1;
+    bool axisYLabelFormatChanged       : 1;
+    bool axisZLabelFormatChanged       : 1;
+    bool inputStateChanged             : 1;
+    bool inputPositionChanged          : 1;
+    bool colorStyleChanged             : 1;
+    bool objectColorChanged            : 1;
+    bool objectGradientChanged         : 1;
+    bool singleHighlightColorChanged   : 1;
+    bool singleHighlightGradientChanged: 1;
+    bool multiHighlightColorChanged    : 1;
+    bool multiHighlightGradientChanged : 1;
 
     Abstract3DChangeBitField() :
         positionChanged(true),
@@ -119,7 +127,15 @@ struct Abstract3DChangeBitField {
         axisYLabelFormatChanged(true),
         axisZLabelFormatChanged(true),
         inputStateChanged(true),
-        inputPositionChanged(true)
+        inputPositionChanged(true),
+        // Items that override values from theme default to false since we default to theme
+        colorStyleChanged(false),
+        objectColorChanged(false),
+        objectGradientChanged(false),
+        singleHighlightColorChanged(false),
+        singleHighlightGradientChanged(false),
+        multiHighlightColorChanged(false),
+        multiHighlightGradientChanged(false)
     {
     }
 };
@@ -159,6 +175,13 @@ private:
     bool m_isGridEnabled;
     QString m_objFile;
     Q3DScene *m_scene;
+    QDataVis::ColorStyle m_colorStyle;
+    QColor m_objectColor;
+    QLinearGradient m_objectGradient;
+    QColor m_singleHighlightColor;
+    QLinearGradient m_singleHighlightGradient;
+    QColor m_multiHighlightColor;
+    QLinearGradient m_multiHighlightGradient;
 
 protected:
     QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
@@ -243,9 +266,20 @@ public:
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
 
-    // Set color if you don't want to use themes.
-    virtual void setObjectColor(const QColor &baseColor, bool uniform = true);
+    virtual void setColorStyle(QDataVis::ColorStyle style);
+    virtual QDataVis::ColorStyle colorStyle() const;
+    virtual void setObjectColor(const QColor &color);
     virtual QColor objectColor() const;
+    virtual void setObjectGradient(const QLinearGradient &gradient);
+    virtual QLinearGradient objectGradient() const;
+    virtual void setSingleHighlightColor(const QColor &color);
+    virtual QColor singleHighlightColor() const;
+    virtual void setSingleHighlightGradient(const QLinearGradient &gradient);
+    virtual QLinearGradient singleHighlightGradient() const;
+    virtual void setMultiHighlightColor(const QColor &color);
+    virtual QColor multiHighlightColor() const;
+    virtual void setMultiHighlightGradient(const QLinearGradient &gradient);
+    virtual QLinearGradient multiHighlightGradient() const;
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
@@ -331,6 +365,13 @@ signals:
     void gridVisibleChanged(bool visible);
     void meshFileNameChanged(QString filename);
     void needRender();
+    void colorStyleChanged(QDataVis::ColorStyle style);
+    void objectColorChanged(QColor color);
+    void objectGradientChanged(QLinearGradient gradient);
+    void singleHighlightColorChanged(QColor color);
+    void singleHighlightGradientChanged(QLinearGradient gradient);
+    void multiHighlightColorChanged(QColor color);
+    void multiHighlightGradientChanged(QLinearGradient gradient);
 
 protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);

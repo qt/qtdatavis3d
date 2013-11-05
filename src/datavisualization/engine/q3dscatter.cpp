@@ -106,6 +106,20 @@ Q3DScatter::Q3DScatter()
                      &Q3DScatter::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
                      &Q3DScatter::selectedItemIndexChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
+                     &Q3DScatter::colorStyleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
+                     &Q3DScatter::itemColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::objectGradientChanged, this,
+                     &Q3DScatter::itemGradientChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::singleHighlightColorChanged, this,
+                     &Q3DScatter::singleHighlightColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::singleHighlightGradientChanged, this,
+                     &Q3DScatter::singleHighlightGradientChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::multiHighlightColorChanged, this,
+                     &Q3DScatter::multiHighlightColorChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::multiHighlightGradientChanged, this,
+                     &Q3DScatter::multiHighlightGradientChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -236,7 +250,8 @@ QDataVis::Theme Q3DScatter::theme() const
  */
 void Q3DScatter::setObjectColor(const QColor &baseColor, bool uniform)
 {
-    d_ptr->m_shared->setObjectColor(baseColor, uniform);
+    //TODO
+    d_ptr->m_shared->setObjectColor(baseColor);
 }
 
 /*!
@@ -389,6 +404,135 @@ void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
 QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
 {
     return d_ptr->m_shared->shadowQuality();
+}
+
+/*!
+ * \property Q3DScatter::colorStyle
+ *
+ * Sets the color \a style used to render items.
+ * Defaults to true.
+ *
+ * \sa itemColor, itemGradient
+ */
+void Q3DScatter::setColorStyle(QDataVis::ColorStyle style)
+{
+    d_ptr->m_shared->setColorStyle(style);
+}
+
+QDataVis::ColorStyle Q3DScatter::colorStyle() const
+{
+    return d_ptr->m_shared->colorStyle();
+}
+
+/*!
+ * \property Q3DScatter::itemColor
+ *
+ * Set item color to the \a color for this set. Overrides any previously set item gradient for this
+ * set, as well as any item gradient or color from the theme.
+ *
+ * \sa theme, itemGradient
+ */
+void Q3DScatter::setItemColor(const QColor &color)
+{
+    d_ptr->m_shared->setObjectColor(color);
+}
+
+QColor Q3DScatter::itemColor() const
+{
+    return d_ptr->m_shared->objectColor();
+}
+
+/*!
+ * \property Q3DScatter::itemGradient
+ *
+ * Set item gradient to the \a gradient for this set. Overrides any previously set item color for this
+ * set, as well as any item gradient or color from the theme.
+ *
+ * \sa theme, itemColor, colorStyle
+ */
+void Q3DScatter::setItemGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setObjectGradient(gradient);
+}
+
+QLinearGradient Q3DScatter::itemGradient() const
+{
+    return d_ptr->m_shared->objectGradient();
+}
+
+/*!
+ * \property Q3DScatter::singleHighlightColor
+ *
+ * Set single item highlight color to the \a color for this set. Overrides any previously set single
+ * item highlight gradient for this set, as well as any single item highlight gradient or color from the theme.
+ *
+ * \sa theme, singleHighlightGradient
+ */
+void Q3DScatter::setSingleHighlightColor(const QColor &color)
+{
+    d_ptr->m_shared->setSingleHighlightColor(color);
+}
+
+QColor Q3DScatter::singleHighlightColor() const
+{
+    return d_ptr->m_shared->singleHighlightColor();
+}
+
+/*!
+ * \property Q3DScatter::singleHighlightGradient
+ *
+ * Set single item highlight gradient to the \a gradient for this set.
+ * Overrides any previously set single item highlight color for this
+ * set, as well as any single item highlight gradient or color from the theme.
+ *
+ * \sa theme, singleHighlightColor, colorStyle
+ */
+void Q3DScatter::setSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setSingleHighlightGradient(gradient);
+}
+
+QLinearGradient Q3DScatter::singleHighlightGradient() const
+{
+    return d_ptr->m_shared->singleHighlightGradient();
+}
+
+/*!
+ * \property Q3DScatter::multiHighlightColor
+ *
+ * Set multiple item highlight (e.g. row/column highlight) color to the \a color for this set.
+ * Overrides any previously set multiple item highlight gradient for this set, as well as any
+ * multiple item highlight gradient or color from the theme.
+ *
+ * \sa theme, multiHighlightGradient
+ */
+void Q3DScatter::setMultiHighlightColor(const QColor &color)
+{
+    d_ptr->m_shared->setMultiHighlightColor(color);
+}
+
+QColor Q3DScatter::multiHighlightColor() const
+{
+    return d_ptr->m_shared->multiHighlightColor();
+}
+
+/*!
+ * \property Q3DScatter::multiHighlightGradient
+ *
+ * Set multiple item highlight (e.g. row/column highlight) gradient to the \a gradient for this set.
+ * Overrides any previously set multiple item highlight color for this
+ * set, as well as any multiple item highlight gradient or color from the theme.
+ *
+ * \sa theme, multiHighlightColor, colorStyle
+ */
+void Q3DScatter::setMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    d_ptr->m_shared->setMultiHighlightGradient(gradient);
+}
+
+QLinearGradient Q3DScatter::multiHighlightGradient() const
+{
+    return d_ptr->m_shared->multiHighlightGradient();
 }
 
 /*!

@@ -42,9 +42,6 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f); // Selection texture's background color
-static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
-
 class TextureHelper;
 class Theme;
 class Drawer;
@@ -68,6 +65,17 @@ protected:
     QDataVis::SelectionFlags m_cachedSelectionMode;
     bool m_cachedIsGridEnabled;
     bool m_cachedIsBackgroundEnabled;
+
+    QDataVis::ColorStyle m_cachedColorStyle;
+    QColor m_cachedObjectColor;
+    QLinearGradient m_cachedObjectGradient;
+    GLuint m_objectGradientTexture;
+    QColor m_cachedSingleHighlightColor;
+    QLinearGradient m_cachedSingleHighlightGradient;
+    GLuint m_singleHighlightGradientTexture;
+    QColor m_cachedMultiHighlightColor;
+    QLinearGradient m_cachedMultiHighlightGradient;
+    GLuint m_multiHighlightGradientTexture;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -125,6 +133,13 @@ public:
     virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateColorStyle(QDataVis::ColorStyle style);
+    virtual void updateObjectColor(const QColor &color);
+    virtual void updateObjectGradient(const QLinearGradient &gradient);
+    virtual void updateSingleHighlightColor(const QColor &color);
+    virtual void updateSingleHighlightGradient(const QLinearGradient &gradient);
+    virtual void updateMultiHighlightColor(const QColor &color);
+    virtual void updateMultiHighlightGradient(const QLinearGradient &gradient);
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
@@ -143,6 +158,8 @@ protected:
     AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
 
     virtual void lowerShadowQuality();
+
+    void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

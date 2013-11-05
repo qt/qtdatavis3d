@@ -192,3 +192,18 @@
     \value LabelStyleTransparent
            Fully transparent background, using text color from theme.
 */
+
+/*!
+    \enum QtDataVisualization::QDataVis::ColorStyle
+
+    Color styles.
+
+    \value ColorStyleUniform
+           Objects are rendered in a single color.
+    \value ColorStyleObjectGradient
+           Objects are colored using a full gradient for each object regardless
+           of object height.
+    \value ColorStyleRangeGradient
+           Objects are colored using a portion of the full gradient determined by
+           the object's height and its position on the Y-axis.
+*/

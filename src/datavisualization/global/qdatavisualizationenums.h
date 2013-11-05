@@ -34,6 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(LabelStyle)
     Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_ENUMS(ColorStyle)
 
 public:
     enum InputState {
@@ -123,6 +124,12 @@ public:
         LabelStyleOpaque = 0,
         LabelStyleFromTheme,
         LabelStyleTransparent
+    };
+
+    enum ColorStyle {
+        ColorStyleUniform = 0,
+        ColorStyleObjectGradient,
+        ColorStyleRangeGradient
     };
 };
 
