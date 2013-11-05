@@ -124,6 +124,10 @@ int main(int argc, char **argv)
     releaseProxiesButton->setText(QStringLiteral("Release all proxies"));
     releaseProxiesButton->setEnabled(true);
 
+    QPushButton *flipViewsButton = new QPushButton(widget);
+    flipViewsButton->setText(QStringLiteral("Flip views"));
+    flipViewsButton->setEnabled(true);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -248,6 +252,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
+    vLayout->addWidget(flipViewsButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -341,6 +346,9 @@ int main(int argc, char **argv)
                      &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseProxies);
+
+    QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::flipViews);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);

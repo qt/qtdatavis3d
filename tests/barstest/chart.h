@@ -75,6 +75,7 @@ public:
     void createMassiveArray();
 
 public slots:
+    void flipViews();
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);

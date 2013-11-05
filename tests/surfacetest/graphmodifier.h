@@ -70,6 +70,7 @@ public:
 public slots:
     void changeShadowQuality(int quality);
     void changeTheme(int theme);
+    void flipViews();
     void changeSelectionMode(int mode);
     void timeout();
 

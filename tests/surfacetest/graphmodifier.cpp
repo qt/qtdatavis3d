@@ -333,6 +333,12 @@ void GraphModifier::changeTheme(int theme)
     m_graph->setTheme((QDataVis::Theme)theme);
 }
 
+
+void GraphModifier::flipViews()
+{
+    m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
+}
+
 void GraphModifier::timeout()
 {
     int rows = m_planeArray->size();

@@ -36,6 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(QRect viewport READ viewport WRITE setViewport NOTIFY viewportChanged)
     Q_PROPERTY(QRect primarySubViewport READ primarySubViewport WRITE setPrimarySubViewport NOTIFY primarySubViewportChanged)
     Q_PROPERTY(QRect secondarySubViewport READ secondarySubViewport WRITE setSecondarySubViewport NOTIFY secondarySubViewportChanged)
+    Q_PROPERTY(bool secondarySubviewOnTop READ isSecondarySubviewOnTop  WRITE setSecondarySubviewOnTop  NOTIFY secondarySubviewOnTopChanged)
     Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive NOTIFY slicingActiveChanged)
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
     Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight NOTIFY activeLightChanged)
@@ -60,6 +61,9 @@ public:
     void setSlicingActive(bool isSlicing);
     bool isSlicingActive() const;
 
+    void setSecondarySubviewOnTop(bool isSecondaryOnTop);
+    bool isSecondarySubviewOnTop() const;
+
     Q3DCamera *activeCamera() const;
     void setActiveCamera(Q3DCamera *camera);
 
@@ -79,6 +83,7 @@ signals:
     void viewportChanged(QRect viewport);
     void primarySubViewportChanged(QRect subViewport);
     void secondarySubViewportChanged(QRect subViewport);
+    void secondarySubviewOnTopChanged(bool isSecondaryOnTop);
     void slicingActiveChanged(bool isSlicingActive);
     void activeCameraChanged(const Q3DCamera *camera);
     void activeLightChanged(const Q3DLight *light);

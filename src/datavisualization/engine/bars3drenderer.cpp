@@ -262,12 +262,15 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
-    // Draw bars scene
-    drawScene(defaultFboHandle);
-
-    // If slice selection is on, draw the sliced scene
-    if (m_cachedIsSlicingActivated)
-        drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
+    if (m_cachedScene->isSecondarySubviewOnTop()) {
+        drawScene(defaultFboHandle);
+        if (m_cachedIsSlicingActivated)
+            drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
+    } else {
+        if (m_cachedIsSlicingActivated)
+            drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
+        drawScene(defaultFboHandle);
+    }
 }
 
 void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,

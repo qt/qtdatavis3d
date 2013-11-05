@@ -42,6 +42,7 @@ struct Q3DSceneChangeBitField {
     bool viewportChanged               : 1;
     bool primarySubViewportChanged     : 1;
     bool secondarySubViewportChanged   : 1;
+    bool subViewportOrderChanged       : 1;
     bool cameraChanged                 : 1;
     bool lightChanged                  : 1;
     bool slicingActivatedChanged       : 1;
@@ -51,6 +52,7 @@ struct Q3DSceneChangeBitField {
         : viewportChanged(true),
           primarySubViewportChanged(true),
           secondarySubViewportChanged(true),
+          subViewportOrderChanged(true),
           cameraChanged(true),
           lightChanged(true),
           slicingActivatedChanged(true),
@@ -73,6 +75,7 @@ public:
     QRect m_viewport;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
+    bool m_isSecondarySubviewOnTop;
     qreal m_devicePixelRatio;
     Q3DCamera *m_camera;
     Q3DLight *m_light;

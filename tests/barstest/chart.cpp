@@ -211,6 +211,11 @@ void GraphModifier::releaseProxies()
     m_chart->releaseDataProxy(m_genericData);
 }
 
+void GraphModifier::flipViews()
+{
+    m_chart->scene()->setSecondarySubviewOnTop(!m_chart->scene()->isSecondarySubviewOnTop());
+}
+
 void GraphModifier::createMassiveArray()
 {
     const int arrayDimension = 1000;

@@ -199,6 +199,26 @@ void Q3DScene::setSlicingActive(bool isSlicing)
 }
 
 /*!
+ * \property Q3DScene::secondarySubviewOnTop
+ *
+ * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is drawn on top.
+ */
+bool Q3DScene::isSecondarySubviewOnTop() const
+{
+    return d_ptr->m_isSecondarySubviewOnTop;
+}
+
+void Q3DScene::setSecondarySubviewOnTop(bool isSecondaryOnTop)
+{
+    if (d_ptr->m_isSecondarySubviewOnTop != isSecondaryOnTop) {
+        d_ptr->m_isSecondarySubviewOnTop = isSecondaryOnTop;
+        d_ptr->m_changeTracker.subViewportOrderChanged = true;
+        emit secondarySubviewOnTopChanged(isSecondaryOnTop);
+        emitNeedRender();
+    }
+}
+
+/*!
  * \property Q3DScene::activeCamera
  *
  * This property contains the currently active camera in the 3D scene.
@@ -312,6 +332,7 @@ void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePositio
 
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     q_ptr(q),
+    m_isSecondarySubviewOnTop(true),
     m_devicePixelRatio(1.f),
     m_camera(),
     m_light(),
@@ -334,6 +355,11 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
         other.q_ptr->setViewport(q_ptr->viewport());
         m_changeTracker.viewportChanged = false;
         other.m_changeTracker.viewportChanged = false;
+    }
+    if (m_changeTracker.subViewportOrderChanged) {
+        other.q_ptr->setSecondarySubviewOnTop(q_ptr->isSecondarySubviewOnTop());
+        m_changeTracker.subViewportOrderChanged = false;
+        other.m_changeTracker.subViewportOrderChanged = false;
     }
     if (m_changeTracker.primarySubViewportChanged) {
         other.q_ptr->setPrimarySubViewport(q_ptr->primarySubViewport());

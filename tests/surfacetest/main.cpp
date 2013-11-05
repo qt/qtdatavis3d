@@ -200,6 +200,9 @@ int main(int argc, char *argv[])
     QPushButton *selectButton = new QPushButton(widget);
     selectButton->setText(QStringLiteral("Select random point"));
 
+    QPushButton *flipViewsButton = new QPushButton(widget);
+    flipViewsButton->setText(QStringLiteral("Flip Views"));
+
     QLabel *selectionInfoLabel = new QLabel(widget);
 
     // Add controls to the layout
@@ -232,6 +235,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(selectionMode);
     vLayout->addWidget(selectButton);
     vLayout->addWidget(selectionInfoLabel);
+    vLayout->addWidget(flipViewsButton);
 
     widget->show();
 
@@ -278,6 +282,8 @@ int main(int argc, char *argv[])
                      modifier, SLOT(changeSelectionMode(int)));
     QObject::connect(selectButton, &QPushButton::clicked,
                      modifier, &GraphModifier::selectButtonClicked);
+    QObject::connect(flipViewsButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::flipViews);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
