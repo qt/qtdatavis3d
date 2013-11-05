@@ -34,17 +34,17 @@ class QSurfaceDataProxy;
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible NOTIFY surfaceVisibleChanged)
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
+    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
+    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
@@ -110,6 +110,16 @@ public:
     QDataVis::LabelStyle labelStyle() const;
 
 signals:
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void labelStyleChanged(QDataVis::LabelStyle style);
+    void themeChanged(QDataVis::Theme theme);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void surfaceVisibleChanged(bool visible);
+    void gridVisibleChanged(bool visible);
+    void backgroundVisibleChanged(bool visible);
+    void smoothSurfaceEnabledChanged(bool enabled);
+    void surfaceGridEnabledChanged(bool visible);
+    void fontChanged(QFont font);
     void selectedPointChanged(QPoint position);
 
 protected:

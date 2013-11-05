@@ -88,6 +88,22 @@ Q3DScatter::Q3DScatter()
 {
     setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DScatter::selectionModeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
+                     &Q3DScatter::labelStyleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DScatter::shadowQualityChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::meshFileNameChanged, this,
+                     &Q3DScatter::meshFileNameChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
+                     &Q3DScatter::fontChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DScatter::themeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
+                     &Q3DScatter::gridVisibleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
+                     &Q3DScatter::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
                      &Q3DScatter::selectedItemIndexChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
@@ -189,17 +205,22 @@ void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects bar colors, label colors, text color, background color, window color and
- * grid color. Lighting is also adjusted by themes.
+ * \property Q3DScatter::theme
  *
- * \sa setObjectColor()
+ * A predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
+ * default. Theme affects label colors, text color, background color, window color and
+ * grid color. Lighting is also adjusted by themes.
  *
  * \preliminary
  */
 void Q3DScatter::setTheme(QDataVis::Theme theme)
 {
     d_ptr->m_shared->setTheme(theme);
+}
+
+QDataVis::Theme Q3DScatter::theme() const
+{
+    return d_ptr->m_shared->theme().theme();
 }
 
 /*!

@@ -111,6 +111,8 @@ public slots:
 signals:
     void smoothSurfaceEnabledChanged(bool enable);
     void selectedPointChanged(QPoint position);
+    void surfaceVisibleChanged(bool visible);
+    void surfaceGridEnabledChanged(bool enable);
 
 private:
     void adjustValueAxisRange();

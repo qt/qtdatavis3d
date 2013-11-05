@@ -51,11 +51,11 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
     Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
     Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle barType READ barType WRITE setBarType)
-    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
-    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
-    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
-    Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled)
+    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle barType READ barType WRITE setBarType NOTIFY meshFileNameChanged)
+    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
+    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
+    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
+    Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
 
@@ -98,6 +98,9 @@ public:
 
 signals:
     void selectedBarChanged(const QPointF &position);
+    void barThicknessChanged(qreal thicknessRatio);
+    void barSpacingChanged(QSizeF spacing);
+    void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);
 
 protected:

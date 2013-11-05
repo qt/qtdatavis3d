@@ -54,7 +54,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible NOTIFY surfaceVisibleChanged)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
-    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient NOTIFY gradientChanged)
+    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
 public:
@@ -90,7 +90,6 @@ signals:
     void surfaceVisibleChanged(bool visible);
     void smoothSurfaceEnabledChanged(bool enabled);
     void surfaceGridEnabledChanged(bool visible);
-    void gradientChanged(ColorGradient *gradient);
     void selectedPointChanged(QPoint position);
 
 protected:

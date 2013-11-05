@@ -49,8 +49,8 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType)
-    Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled)
+    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType NOTIFY meshFileNameChanged)
+    Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
 

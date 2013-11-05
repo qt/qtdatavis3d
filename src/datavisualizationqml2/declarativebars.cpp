@@ -125,7 +125,10 @@ void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
 
 void DeclarativeBars::setBarThickness(qreal thicknessRatio)
 {
-    m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+    if (thicknessRatio != barThickness()) {
+        m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        emit barThicknessChanged(thicknessRatio);
+    }
 }
 
 qreal DeclarativeBars::barThickness() const
@@ -135,7 +138,10 @@ qreal DeclarativeBars::barThickness() const
 
 void DeclarativeBars::setBarSpacing(QSizeF spacing)
 {
-    m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+    if (spacing != barSpacing()) {
+        m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+        emit barSpacingChanged(spacing);
+    }
 }
 
 QSizeF DeclarativeBars::barSpacing() const
@@ -145,7 +151,10 @@ QSizeF DeclarativeBars::barSpacing() const
 
 void DeclarativeBars::setBarSpacingRelative(bool relative)
 {
-    m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+    if (relative != isBarSpacingRelative()) {
+        m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+        emit barSpacingRelativeChanged(relative);
+    }
 }
 
 bool DeclarativeBars::isBarSpacingRelative() const

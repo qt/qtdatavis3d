@@ -101,6 +101,26 @@ Q3DSurface::Q3DSurface()
 {
     setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DSurface::selectionModeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
+                     &Q3DSurface::labelStyleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DSurface::themeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DSurface::shadowQualityChanged);
+    QObject::connect(d_ptr->m_shared, &Surface3DController::surfaceVisibleChanged, this,
+                     &Q3DSurface::surfaceVisibleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
+                     &Q3DSurface::gridVisibleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
+                     &Q3DSurface::backgroundVisibleChanged);
+    QObject::connect(d_ptr->m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
+                     &Q3DSurface::smoothSurfaceEnabledChanged);
+    QObject::connect(d_ptr->m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
+                     &Q3DSurface::surfaceGridEnabledChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
+                     &Q3DSurface::fontChanged);
     QObject::connect(d_ptr->m_shared, &Surface3DController::selectedPointChanged, this,
                      &Q3DSurface::selectedPointChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,

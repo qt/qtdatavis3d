@@ -102,6 +102,22 @@ Q3DBars::Q3DBars()
 {
     setVisualController(d_ptr->m_shared);
     d_ptr->m_shared->initializeOpenGL();
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DBars::selectionModeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
+                     &Q3DBars::labelStyleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DBars::shadowQualityChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::meshFileNameChanged, this,
+                     &Q3DBars::meshFileNameChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
+                     &Q3DBars::fontChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DBars::themeChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
+                     &Q3DBars::gridVisibleChanged);
+    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
+                     &Q3DBars::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarChanged, this,
                      &Q3DBars::selectedBarChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
@@ -198,7 +214,10 @@ void Q3DBars::setHeight(const int height)
  */
 void Q3DBars::setBarThickness(qreal thicknessRatio)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+    if (thicknessRatio != barThickness()) {
+        d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        emit barThicknessChanged(thicknessRatio);
+    }
 }
 
 qreal Q3DBars::barThickness()
@@ -216,7 +235,10 @@ qreal Q3DBars::barThickness()
  */
 void Q3DBars::setBarSpacing(QSizeF spacing)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+    if (spacing != barSpacing()) {
+        d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+        emit barSpacingChanged(spacing);
+    }
 }
 
 QSizeF Q3DBars::barSpacing()
@@ -233,7 +255,10 @@ QSizeF Q3DBars::barSpacing()
  */
 void Q3DBars::setBarSpacingRelative(bool relative)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+    if (relative != isBarSpacingRelative()) {
+        d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+        emit barSpacingRelativeChanged(relative);
+    }
 }
 
 bool Q3DBars::isBarSpacingRelative()
@@ -254,17 +279,25 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 }
 
 /*!
- * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects bar colors, label colors, text color, background color, window color and
+ * \property Q3DBars::theme
+ *
+ * A predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
+ * default. Theme affects label colors, text color, background color, window color and
  * grid color. Lighting is also adjusted by themes.
  *
  * \sa setBarColor()
  *
  * \preliminary
  */
+
 void Q3DBars::setTheme(QDataVis::Theme theme)
 {
     d_ptr->m_shared->setTheme(theme);
+}
+
+QDataVis::Theme Q3DBars::theme() const
+{
+    return d_ptr->m_shared->theme().theme();
 }
 
 /*!

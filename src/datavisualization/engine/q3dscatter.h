@@ -35,13 +35,14 @@ class QScatterDataProxy;
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
+    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
@@ -52,6 +53,7 @@ public:
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
     void setTheme(QDataVis::Theme theme);
+    QDataVis::Theme theme() const;
 
     void setObjectColor(const QColor &baseColor, bool uniform = true);
     QColor objectColor() const;
@@ -102,7 +104,14 @@ public:
     QList<QScatterDataProxy *> dataProxies() const;
 
 signals:
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void labelStyleChanged(QDataVis::LabelStyle style);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void meshFileNameChanged(QString filename);
+    void fontChanged(QFont font);
+    void themeChanged(QDataVis::Theme theme);
+    void gridVisibleChanged(bool visible);
+    void backgroundVisibleChanged(bool visible);
     void selectedItemIndexChanged(int index);
 
 protected:

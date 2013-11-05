@@ -137,13 +137,12 @@ QPoint Surface3DController::noSelectionPoint()
 
 void Surface3DController::setSmoothSurface(bool enable)
 {
-    bool changed = m_isSmoothSurfaceEnabled != enable;
-    m_isSmoothSurfaceEnabled = enable;
-    m_changeTracker.smoothStatusChanged = true;
-    emitNeedRender();
-
-    if (changed)
-        emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
+    if (enable != m_isSmoothSurfaceEnabled) {
+        m_isSmoothSurfaceEnabled = enable;
+        m_changeTracker.smoothStatusChanged = true;
+        emit smoothSurfaceEnabledChanged(enable);
+        emitNeedRender();
+    }
 }
 
 bool Surface3DController::smoothSurface()
@@ -153,9 +152,12 @@ bool Surface3DController::smoothSurface()
 
 void Surface3DController::setSurfaceVisible(bool visible)
 {
-    m_isSurfaceEnabled = visible;
-    m_changeTracker.surfaceVisibilityChanged = true;
-    emitNeedRender();
+    if (visible != m_isSurfaceEnabled) {
+        m_isSurfaceEnabled = visible;
+        m_changeTracker.surfaceVisibilityChanged = true;
+        emit surfaceVisibleChanged(visible);
+        emitNeedRender();
+    }
 }
 
 bool Surface3DController::surfaceVisible() const
@@ -165,9 +167,12 @@ bool Surface3DController::surfaceVisible() const
 
 void Surface3DController::setSurfaceGrid(bool enable)
 {
-    m_isSurfaceGridEnabled = enable;
-    m_changeTracker.surfaceGridChanged = true;
-    emitNeedRender();
+    if (enable != m_isSurfaceGridEnabled) {
+        m_isSurfaceGridEnabled = enable;
+        m_changeTracker.surfaceGridChanged = true;
+        emit surfaceGridEnabledChanged(enable);
+        emitNeedRender();
+    }
 }
 
 bool Surface3DController::surfaceGrid()
@@ -177,11 +182,13 @@ bool Surface3DController::surfaceGrid()
 
 void Surface3DController::setGradient(const QLinearGradient &gradient)
 {
-    m_userDefinedGradient = gradient;
-    m_userDefinedGradient.setStart(2, 1024);
-    m_userDefinedGradient.setFinalStop(0, 0);
-    m_changeTracker.gradientColorChanged = true;
-    emitNeedRender();
+    if (gradient != m_userDefinedGradient) {
+        m_userDefinedGradient = gradient;
+        m_userDefinedGradient.setStart(2, 1024);
+        m_userDefinedGradient.setFinalStop(0, 0);
+        m_changeTracker.gradientColorChanged = true;
+        emitNeedRender();
+    }
 }
 
 QLinearGradient Surface3DController::gradient() const
@@ -204,7 +211,7 @@ void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
         qWarning("Unsupported selection mode.");
         return;
     } else if (mode.testFlag(QDataVis::SelectionSlice)
-            && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+               && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
         // When setting selection mode to a new slicing mode, activate slicing
