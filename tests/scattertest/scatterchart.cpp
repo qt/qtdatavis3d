@@ -48,7 +48,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
     m_chart->setActiveDataProxy(proxy);
 
-    m_chart->setSelectionMode(QDataVis::SelectionItemAndColumn);
+    m_chart->setSelectionMode(QDataVis::SelectionItem);
 
     connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
 }
@@ -111,9 +111,12 @@ void ScatterDataModifier::changeStyle()
     case 3:
         m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
         break;
+    case 4:
+        m_chart->setObjectType(QDataVis::MeshStylePoints);
+        break;
     }
     model++;
-    if (model > 3)
+    if (model > 4)
         model = 0;
 }
 

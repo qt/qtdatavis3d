@@ -52,7 +52,8 @@ public:
         MeshStyleCylinders,
         MeshStyleBevelBars,
         MeshStyleSpheres,
-        MeshStyleDots
+        MeshStyleDots,
+        MeshStylePoints
     };
 
     enum CameraPreset {

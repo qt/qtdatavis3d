@@ -61,19 +61,21 @@
     Predefined mesh types. All styles are not usable with all visualization types.
 
     \value MeshStyleBars
-           Basic cubic bar.
+           Basic cubic bar. Usable only with Q3DBars.
     \value MeshStylePyramids
-           Four-sided pyramid.
+           Four-sided pyramid. Usable only with Q3DBars.
     \value MeshStyleCones
-           Basic cone.
+           Basic cone. Usable only with Q3DBars.
     \value MeshStyleCylinders
-           Basic cylinder.
+           Basic cylinder. Usable only with Q3DBars.
     \value MeshStyleBevelBars
-           Slightly beveled (rounded) cubic bar.
+           Slightly beveled (rounded) cubic bar. Usable only with Q3DBars.
     \value MeshStyleSpheres
-           Sphere. Not usable in Q3DBars.
+           Sphere. Usable only with Q3DScatter.
     \value MeshStyleDots
            Triangular pyramid. Usable only with Q3DScatter.
+    \value MeshStylePoints
+           2D spots. Usable only with Q3DScatter. \b Note: Shadows do not affect this style.
 */
 
 /*!

@@ -73,11 +73,6 @@ void Scatter3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
-    if (m_changeTracker.slicingActiveChanged) {
-        // TODO: Add notification.
-        m_changeTracker.slicingActiveChanged = false;
-    }
-
     if (m_changeTracker.selectedItemIndexChanged) {
         m_renderer->updateSelectedItemIndex(m_selectedItemIndex);
         m_changeTracker.selectedItemIndexChanged = false;
@@ -88,7 +83,6 @@ void Scatter3DController::synchDataToRenderer()
         m_isDataDirty = false;
     }
 }
-
 
 void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
 {
@@ -202,20 +196,22 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
             objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
         else
             objFile = QStringLiteral(":/defaultMeshes/sphere");
-    } else {
+    } else if (style == QDataVis::MeshStyleDots) {
         if (smooth)
             objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
         else
             objFile = QStringLiteral(":/defaultMeshes/dot");
+    } else {
+        objFile = QString();
     }
     Abstract3DController::setMeshFileName(objFile);
 }
 
 void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    // We only support single item selection mode
-    if (int(mode ^ QDataVis::SelectionItem) != 0) {
-        qWarning("Unsupported selection mode - only item selection mode is supported.");
+    // We only support single item selection mode and no selection mode
+    if (mode != QDataVis::SelectionItem && mode != QDataVis::SelectionNone) {
+        qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }
     Abstract3DController::setSelectionMode(mode);

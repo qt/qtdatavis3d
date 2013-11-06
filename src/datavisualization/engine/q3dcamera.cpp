@@ -326,7 +326,7 @@ void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
  * rotations. If set to false, no automatic recalculation is done and the view matrix can be set using the
  * Q3DMatrix::viewMatrix property.
  */
-bool Q3DCamera::isViewMatrixAutoUpdateEnabled()
+bool Q3DCamera::isViewMatrixAutoUpdateEnabled() const
 {
     return d_ptr->m_isViewMatrixUpdateActive;
 }
@@ -345,7 +345,7 @@ void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
  * \note The base camera orientation set by setBaseOrientation() will affect
  * the presets as all calculations are based on those values.
  */
-QDataVis::CameraPreset Q3DCamera::cameraPreset()
+QDataVis::CameraPreset Q3DCamera::cameraPreset() const
 {
     return d_ptr->m_activePreset;
 }
@@ -491,7 +491,7 @@ void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
  * This property contains the the camera zoom level in percentages.
  * 100% means there is no zoom in or out set in the camera.
  */
-int Q3DCamera::zoomLevel()
+int Q3DCamera::zoomLevel() const
 {
     return d_ptr->m_zoomLevel;
 }

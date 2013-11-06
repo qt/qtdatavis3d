@@ -41,17 +41,22 @@ StaticLibInitializer staticLibInitializer;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+// Vertex array buffer for point
+const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
+
 Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style)
     : m_theme(theme),
       m_font(font),
       m_style(style),
-      m_textureHelper(0)
+      m_textureHelper(0),
+      m_pointbuffer(0)
 {
 }
 
 Drawer::~Drawer()
 {
     delete m_textureHelper;
+    glDeleteBuffers(1, &m_pointbuffer);
 }
 
 void Drawer::initializeOpenGL()
@@ -159,6 +164,29 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
+void Drawer::drawPoint(ShaderHelper *shader)
+{
+    // Generate vertex buffer for point if it does not exist
+    if (!m_pointbuffer) {
+        glGenBuffers(1, &m_pointbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(point_data), point_data, GL_STATIC_DRAW);
+    }
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the point
+    glDrawArrays(GL_POINTS, 0, 1);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDisableVertexAttribArray(shader->posAtt());
 }

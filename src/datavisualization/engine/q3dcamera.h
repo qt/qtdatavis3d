@@ -72,13 +72,13 @@ public:
     QMatrix4x4 viewMatrix() const;
     void setViewMatrix(const QMatrix4x4 &viewMatrix);
 
-    bool isViewMatrixAutoUpdateEnabled();
+    bool isViewMatrixAutoUpdateEnabled() const;
     void setViewMatrixAutoUpdateEnabled(bool isEnabled);
 
-    QDataVis::CameraPreset cameraPreset();
+    QDataVis::CameraPreset cameraPreset() const;
     void setCameraPreset(QDataVis::CameraPreset preset);
 
-    int zoomLevel();
+    int zoomLevel() const;
     void setZoomLevel(int zoomLevel);
 
     void setBaseOrientation(const QVector3D &defaultPosition,
