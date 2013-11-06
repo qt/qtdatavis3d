@@ -60,6 +60,9 @@ private:
     QRect m_mainViewPort;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
+#if defined(QT_OPENGL_ES_2)
+    ShaderHelper *m_pointShader;
+#endif
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
@@ -122,6 +125,8 @@ private:
 #if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
     void updateDepthBuffer();
+#else
+    void initPointShader();
 #endif
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();

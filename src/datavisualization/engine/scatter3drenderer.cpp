@@ -58,6 +58,9 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_yFlipped(false),
       m_updateLabels(false),
       m_dotShader(0),
+      #if defined(QT_OPENGL_ES_2)
+      m_pointShader(0),
+      #endif
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
@@ -115,6 +118,9 @@ void Scatter3DRenderer::initializeOpenGL()
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
     initDepthShader();
+#else
+    // Init point shader
+    initPointShader();
 #endif
 
     // Init selection shader
@@ -274,13 +280,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
+#if !defined(QT_OPENGL_ES_2)
     if (m_drawingPoints) {
         glEnable(GL_POINT_SMOOTH);
         glEnable(GL_PROGRAM_POINT_SIZE);
-        glPointSize(m_dotSizeScale * 100.0f); // Don't scale points based on zoom for shadows
+        // Scale points based on shadow quality for shadows, not by zoom level
+        glPointSize(m_dotSizeScale * 100.0f * m_shadowQualityMultiplier);
     }
 
-#if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
@@ -392,16 +399,24 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_labelShader->release();
 #endif
     }
-#endif
 
     if (m_drawingPoints)
         glPointSize(m_dotSizeScale * activeCamera->zoomLevel()); // Scale points based on zoom
+
+    ShaderHelper *selectionShader = m_selectionShader;
+#else
+    ShaderHelper *selectionShader;
+    if (m_drawingPoints)
+        selectionShader = m_pointShader;
+    else
+        selectionShader = m_selectionShader;
+#endif
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QDataVis::SelectionNone
             && QDataVis::InputStateOnScene == m_inputState) {
         // Bind selection shader
-        m_selectionShader->bind();
+        selectionShader->bind();
 
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -435,16 +450,16 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             QVector3D dotColor = indexToSelectionColor(dot);
             dotColor /= 255.0f;
 
-            m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
-            m_selectionShader->setUniformValue(m_selectionShader->color(), dotColor);
+            selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
+            selectionShader->setUniformValue(selectionShader->color(), dotColor);
 
             if (m_drawingPoints) {
-                m_drawer->drawPoint(m_selectionShader);
+                m_drawer->drawPoint(selectionShader);
             } else {
                 // 1st attribute buffer : vertices
-                glEnableVertexAttribArray(m_selectionShader->posAtt());
+                glEnableVertexAttribArray(selectionShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, m_dotObj->vertexBuf());
-                glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+                glVertexAttribPointer(selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
                 // Index buffer
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_dotObj->elementBuf());
@@ -456,7 +471,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-                glDisableVertexAttribArray(m_selectionShader->posAtt());
+                glDisableVertexAttribArray(selectionShader->posAtt());
             }
         }
         glEnable(GL_DITHER);
@@ -473,7 +488,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Release selection shader
-        m_selectionShader->release();
+        selectionShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         m_labelShader->bind();
@@ -507,7 +522,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_TEXTURE_2D);
     } else {
         // We can use selection shader for points
+#if !defined(QT_OPENGL_ES_2)
         dotShader = m_selectionShader;
+#else
+        dotShader = m_pointShader;
+#endif
         dotShader->bind();
     }
 
@@ -604,11 +623,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Release dot shader
     dotShader->release();
 
+#if !defined(QT_OPENGL_ES_2)
     if (m_drawingPoints) {
         glDisable(GL_POINT_SMOOTH);
         glDisable(GL_PROGRAM_POINT_SIZE);
         glEnable(GL_TEXTURE_2D); // Enable texturing for background
     }
+#endif
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1563,6 +1584,15 @@ void Scatter3DRenderer::updateDepthBuffer()
         if (!m_depthTexture)
             lowerShadowQuality();
     }
+}
+#else
+void Scatter3DRenderer::initPointShader()
+{
+    if (m_pointShader)
+        delete m_pointShader;
+    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPointES2"),
+                                     QStringLiteral(":/shaders/fragmentSelection"));
+    m_pointShader->initialize();
 }
 #endif
 

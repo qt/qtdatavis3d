@@ -203,6 +203,9 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
             objFile = QStringLiteral(":/defaultMeshes/dot");
     } else {
         objFile = QString();
+#if defined(QT_OPENGL_ES_2)
+        qWarning("MeshStylePoints is not fully supported on OpenGL ES2");
+#endif
     }
     Abstract3DController::setMeshFileName(objFile);
 }
