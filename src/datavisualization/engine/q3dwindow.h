@@ -31,6 +31,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DWindowPrivate;
 class Abstract3DController;
+class QAbstract3DInputHandler;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
@@ -39,6 +40,11 @@ class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLF
 public:
     explicit Q3DWindow(QWindow *parent = 0);
     virtual ~Q3DWindow();
+
+    void addInputHandler(QAbstract3DInputHandler *inputHandler);
+    void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
+    void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
+    QAbstract3DInputHandler *activeInputHandler();
 
 protected slots:
     void renderLater();

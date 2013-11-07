@@ -20,6 +20,7 @@
 #define CHARTMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
+#include <QtDataVisualization/qabstract3dinputhandler.h>
 
 #include <QFont>
 #include <QDebug>
@@ -80,6 +81,7 @@ public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);
+    void setUseNullInputHandler(bool useNull);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -112,6 +114,8 @@ private:
     QBarDataProxy *m_genericData;
     Q3DValueAxis *m_currentAxis;
     bool m_negativeValuesOn;
+    bool m_useNullInputHandler;
+    QAbstract3DInputHandler *m_defaultInputHandler;
 };
 
 #endif

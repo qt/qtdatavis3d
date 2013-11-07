@@ -19,6 +19,7 @@
 #include "q3dwindow.h"
 #include "q3dwindow_p.h"
 #include "abstract3dcontroller_p.h"
+#include "qabstract3dinputhandler_p.h"
 #include <QGuiApplication>
 
 #include <QOpenGLContext>
@@ -108,7 +109,52 @@ void Q3DWindow::handleDevicePixelRatioChange()
     // Device pixel ratio changed, resize accordingly and inform the scene
     d_ptr->m_devicePixelRatio = QWindow::devicePixelRatio();
     d_ptr->m_visualController->updateDevicePixelRatio(d_ptr->m_devicePixelRatio);
+}
 
+/*!
+ * Adds the given \a inputHandler to the graph. The input handlers added via addInputHandler
+ * are not taken in to use directly. Only the ownership of the a\ inputHandler is given to the graph.
+ * The \a inputHandler must not be null or already added to another graph.
+ *
+ * \sa releaseInputHandler(), setActiveInputHandler()
+ */
+void Q3DWindow::addInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    d_ptr->m_visualController->addInputHandler(inputHandler);
+}
+
+/*!
+ * Releases the ownership of the \a inputHandler back to the caller, if it was added to this graph.
+ * If the released \a inputHandler is in use there will be no input handler active after this call.
+ *
+ * If the default input handler is released and added back later, it behaves as any other input handler would.
+ *
+ * \sa addInputHandler(), setActiveInputHandler()
+ */
+void Q3DWindow::releaseInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    d_ptr->m_visualController->releaseInputHandler(inputHandler);
+}
+
+/*!
+ * Sets the active \a inputHandler. Implicitly calls addInputHandler() to transfer ownership of
+ * the \a inputHandler to this graph.
+ *
+ * If the \a inputHandler is null, no input handler will be active after this call.
+ *
+ * \sa addInputHandler(), releaseInputHandler()
+ */
+void Q3DWindow::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
+{
+    d_ptr->m_visualController->setActiveInputHandler(inputHandler);
+}
+
+/*!
+ * \return currently active input handler.
+ */
+QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
+{
+    return d_ptr->m_visualController->activeInputHandler();
 }
 
 /*!

@@ -53,7 +53,9 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
       m_temperatureData(new QBarDataProxy),
       m_genericData(new QBarDataProxy),
       m_currentAxis(m_fixedRangeAxis),
-      m_negativeValuesOn(false)
+      m_negativeValuesOn(false),
+      m_useNullInputHandler(false),
+      m_defaultInputHandler(0)
 {
     // Generate generic labels
     QStringList genericColumnLabels;
@@ -118,12 +120,18 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
 
     m_chart->setFont(QFont("Times Roman", 20));
 
+    // Release and store the default input handler.
+    m_defaultInputHandler = m_chart->activeInputHandler();
+    m_chart->releaseInputHandler(m_defaultInputHandler);
+    m_chart->setActiveInputHandler(m_defaultInputHandler);
+
     resetTemperatureData();
 }
 
 GraphModifier::~GraphModifier()
 {
     delete m_chart;
+    delete m_defaultInputHandler;
 }
 
 void GraphModifier::start()
@@ -530,6 +538,21 @@ void GraphModifier::handleSelectionChange(const QPoint &position)
     m_selectedBar = position;
     qDebug() << "Selected bar position:" << position;
 }
+
+void GraphModifier::setUseNullInputHandler(bool useNull)
+{
+    qDebug() << "setUseNullInputHandler" << useNull;
+    if (m_useNullInputHandler == useNull)
+        return;
+
+    m_useNullInputHandler = useNull;
+
+    if (useNull)
+        m_chart->setActiveInputHandler(0);
+    else
+        m_chart->setActiveInputHandler(m_defaultInputHandler);
+}
+
 
 void GraphModifier::changeShadowQuality(int quality)
 {

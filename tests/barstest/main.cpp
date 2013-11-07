@@ -377,6 +377,9 @@ int main(int argc, char **argv)
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setGridEnabled);
 
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setUseNullInputHandler);
+
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
