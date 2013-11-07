@@ -63,7 +63,7 @@ public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
-    Q_INVOKABLE void setBarColor(const QColor &baseColor, bool uniform = true);
+    Q_INVOKABLE void setBarColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
 
     QBarDataProxy *dataProxy() const;
     void setDataProxy(QBarDataProxy *dataProxy);

@@ -78,9 +78,9 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
     return node;
 }
 
-void DeclarativeBars::setBarColor(const QColor &baseColor, bool uniform)
+void DeclarativeBars::setBarColor(const QColor &baseColor)
 {
-    m_shared->setObjectColor(baseColor); // TODO
+    m_shared->setObjectColor(baseColor);
 }
 
 void DeclarativeBars::setDataProxy(QBarDataProxy *dataProxy)

@@ -56,8 +56,6 @@ static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);
 static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
-// Relative margin for avoiding gradient overflow
-static const GLfloat gradientMargin = 1.0f / gradientTextureHeight;
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 

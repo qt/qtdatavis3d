@@ -75,7 +75,8 @@
     \value MeshStyleDots
            Triangular pyramid. Usable only with Q3DScatter.
     \value MeshStylePoints
-           2D spots. Usable only with Q3DScatter. \b Note: Shadows do not affect this style.
+           2D spots. Usable only with Q3DScatter.
+           \b Note: Shadows and color gradients do not affect this style.
 */
 
 /*!

@@ -507,6 +507,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Bind dot shader
     ShaderHelper *dotShader = 0;
+    GLuint gradientTexture = 0;
 
     if (!m_drawingPoints) {
         // Set default shader
@@ -517,6 +518,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         dotShader->setUniformValue(dotShader->lightP(), lightPos);
         dotShader->setUniformValue(dotShader->view(), viewMatrix);
         dotShader->setUniformValue(dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        if (m_cachedColorStyle != QDataVis::ColorStyleUniform && !m_drawingPoints) {
+            if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient) {
+                // Round the gradient off a bit to avoid it looping over
+                dotShader->setUniformValue(dotShader->gradientMin(), 0.0f);
+                dotShader->setUniformValue(dotShader->gradientHeight(), 0.5f);
+            } else {
+                // Each ball is of uniform color according to its Y-coordinate
+                dotShader->setUniformValue(dotShader->gradientHeight(), 0.0f);
+            }
+            gradientTexture = m_objectGradientTexture;
+        }
 
         // Enable texture
         glEnable(GL_TEXTURE_2D);
@@ -534,7 +546,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     bool dotSelectionFound = false;
     ScatterRenderItem *selectedItem(0);
 
-    QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+    QVector3D baseColor = Utils::vectorFromColor(m_cachedObjectColor);
+    QVector3D dotColor = baseColor;
 
     for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
         ScatterRenderItem &item = m_renderItemArray[dot];
@@ -562,18 +575,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-#if 0
-        QVector3D heightColor =
-                Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.translation().y();
-
-        QVector3D dotColor = baseColor + heightColor;
-#else
-        QVector3D dotColor = baseColor;
-#endif
+        if (m_cachedColorStyle == QDataVis::ColorStyleUniform || m_drawingPoints)
+            dotColor = baseColor;
+        else
+            gradientTexture = m_objectGradientTexture;
 
         GLfloat lightStrength = m_cachedTheme.m_lightStrength;
         if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemIndex == dot)) {
-            dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
+            if (m_cachedColorStyle == QDataVis::ColorStyleUniform || m_drawingPoints)
+                dotColor = Utils::vectorFromColor(m_cachedSingleHighlightColor);
+            else
+                gradientTexture = m_singleHighlightGradientTexture;
             lightStrength = m_cachedTheme.m_highlightLightStrength;
             // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
             selectedItem = &item;
@@ -587,8 +599,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                        itModelMatrix.inverted().transposed());
         }
         dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
-        dotShader->setUniformValue(dotShader->color(), dotColor);
-
+        if (m_cachedColorStyle == QDataVis::ColorStyleUniform || m_drawingPoints) {
+            dotShader->setUniformValue(dotShader->color(), dotColor);
+        } else if (m_cachedColorStyle == QDataVis::ColorStyleRangeGradient) {
+            dotShader->setUniformValue(dotShader->gradientMin(),
+                                       (item.position().y() + 1.0f) / 2.0f);
+        }
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             if (!m_drawingPoints) {
@@ -599,7 +615,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
 
                 // Draw the object
-                m_drawer->drawObject(dotShader, m_dotObj, 0, m_depthTexture);
+                m_drawer->drawObject(dotShader, m_dotObj, gradientTexture, m_depthTexture);
             } else {
                 // Draw the object
                 m_drawer->drawPoint(dotShader);
@@ -612,7 +628,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 // Set shadowless shader bindings
                 dotShader->setUniformValue(dotShader->lightS(), lightStrength);
                 // Draw the object
-                m_drawer->drawObject(dotShader, m_dotObj);
+                m_drawer->drawObject(dotShader, m_dotObj, gradientTexture);
             } else {
                 // Draw the object
                 m_drawer->drawPoint(dotShader);

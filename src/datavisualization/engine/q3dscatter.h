@@ -63,9 +63,6 @@ public:
     void setTheme(QDataVis::Theme theme);
     QDataVis::Theme theme() const;
 
-    void setObjectColor(const QColor &baseColor, bool uniform = true);
-    QColor objectColor() const;
-
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 

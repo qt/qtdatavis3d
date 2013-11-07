@@ -36,7 +36,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Data is resolved asynchronously whenever the mapping or the model changes.
  * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
  *
- * /sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!

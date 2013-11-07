@@ -238,31 +238,6 @@ QDataVis::Theme Q3DScatter::theme() const
 }
 
 /*!
- * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
- * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
- * be applied by height. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa setTheme()
- *
- * \preliminary
- */
-void Q3DScatter::setObjectColor(const QColor &baseColor, bool uniform)
-{
-    //TODO
-    d_ptr->m_shared->setObjectColor(baseColor);
-}
-
-/*!
- * \return item color in use.
- */
-QColor Q3DScatter::objectColor() const
-{
-    return d_ptr->m_shared->objectColor();
-}
-
-/*!
  * \property Q3DScatter::selectionMode
  *
  * Sets item selection \a mode to one of \c QDataVis::SelectionMode. It is preset to

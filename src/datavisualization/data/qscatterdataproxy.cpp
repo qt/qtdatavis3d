@@ -53,7 +53,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * For example:
  * \snippet doc_src_qtdatavisualization.cpp 2
  *
- * /sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!

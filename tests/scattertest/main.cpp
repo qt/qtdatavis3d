@@ -30,6 +30,8 @@
 #include <QLabel>
 #include <QScreen>
 #include <QFontDatabase>
+#include <QLinearGradient>
+#include <QPainter>
 
 int main(int argc, char **argv)
 {
@@ -101,6 +103,20 @@ int main(int argc, char **argv)
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
+    QLinearGradient grBtoY(0, 0, 100, 0);
+    grBtoY.setColorAt(1.0, Qt::black);
+    grBtoY.setColorAt(0.67, Qt::blue);
+    grBtoY.setColorAt(0.33, Qt::red);
+    grBtoY.setColorAt(0.0, Qt::yellow);
+    QPixmap pm(100, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grBtoY));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 100, 24);
+    QPushButton *gradientBtoYPB = new QPushButton(widget);
+    gradientBtoYPB->setIcon(QIcon(pm));
+    gradientBtoYPB->setIconSize(QSize(100, 24));
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -143,6 +159,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -187,6 +204,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::selectItem);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
+    QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,

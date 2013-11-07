@@ -58,7 +58,7 @@ public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
     ~DeclarativeScatter();
 
-    Q_INVOKABLE void setObjectColor(const QColor &baseColor, bool uniform = true);
+    Q_INVOKABLE void setObjectColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
 
     QScatterDataProxy *dataProxy() const;
     void setDataProxy(QScatterDataProxy *dataProxy);

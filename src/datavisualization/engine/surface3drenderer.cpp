@@ -536,10 +536,7 @@ void Surface3DRenderer::drawSlicedScene()
             surfaceShader->bind();
 
             QVector3D color;
-            if (rowMode)
-                color = Utils::vectorFromColor(m_cachedTheme.m_highlightRowColor);
-            else
-                color = Utils::vectorFromColor(m_cachedTheme.m_highlightColumnColor);
+            color = Utils::vectorFromColor(m_cachedTheme.m_multiHighlightColor);
 
             // Set shader bindings
             surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);

@@ -66,9 +66,8 @@ private:
     QColor m_textColor;
     QColor m_textBackgroundColor;
     QColor m_gridLine;
-    QColor m_highlightBarColor;
-    QColor m_highlightRowColor;
-    QColor m_highlightColumnColor;
+    QColor m_singleHighlightColor;
+    QColor m_multiHighlightColor;
     QLinearGradient m_surfaceGradient;
     float m_lightStrength;
     float m_ambientStrength;

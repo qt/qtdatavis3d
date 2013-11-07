@@ -627,23 +627,17 @@ void GraphModifier::setGradient()
 
     QLinearGradient singleHighlightGradient(0, 0, 1, 100);
     singleHighlightGradient.setColorAt(1.0, Qt::white);
-    singleHighlightGradient.setColorAt(0.75001, Qt::white);
     singleHighlightGradient.setColorAt(0.75, Qt::lightGray);
-    singleHighlightGradient.setColorAt(0.50001, Qt::lightGray);
     singleHighlightGradient.setColorAt(0.50, Qt::gray);
-    singleHighlightGradient.setColorAt(0.25001, Qt::gray);
     singleHighlightGradient.setColorAt(0.25, Qt::darkGray);
-    singleHighlightGradient.setColorAt(0.0, Qt::darkGray);
+    singleHighlightGradient.setColorAt(0.0, Qt::black);
 
     QLinearGradient multiHighlightGradient(0, 0, 1, 100);
     multiHighlightGradient.setColorAt(1.0, Qt::black);
-    multiHighlightGradient.setColorAt(0.75001, Qt::black);
     multiHighlightGradient.setColorAt(0.75, Qt::darkBlue);
-    multiHighlightGradient.setColorAt(0.50001, Qt::darkBlue);
     multiHighlightGradient.setColorAt(0.50, Qt::darkRed);
-    multiHighlightGradient.setColorAt(0.25001, Qt::darkRed);
     multiHighlightGradient.setColorAt(0.25, Qt::darkYellow);
-    multiHighlightGradient.setColorAt(0.0, Qt::darkYellow);
+    multiHighlightGradient.setColorAt(0.0, Qt::darkGray);
 
     m_chart->setBarColor(Qt::green);
     m_chart->setSingleHighlightColor(Qt::white);

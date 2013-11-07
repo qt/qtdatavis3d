@@ -328,6 +328,40 @@ void ScatterDataModifier::handleSelectionChange(int index)
     qDebug() << "Selected item index:" << index;
 }
 
+void ScatterDataModifier::setGradient()
+{
+    QLinearGradient barGradient(0, 0, 1, 100);
+    barGradient.setColorAt(1.0, Qt::lightGray);
+    barGradient.setColorAt(0.75001, Qt::lightGray);
+    barGradient.setColorAt(0.75, Qt::blue);
+    barGradient.setColorAt(0.50001, Qt::blue);
+    barGradient.setColorAt(0.50, Qt::red);
+    barGradient.setColorAt(0.25001, Qt::red);
+    barGradient.setColorAt(0.25, Qt::yellow);
+    barGradient.setColorAt(0.0, Qt::yellow);
+
+    QLinearGradient singleHighlightGradient(0, 0, 1, 100);
+    singleHighlightGradient.setColorAt(1.0, Qt::lightGray);
+    singleHighlightGradient.setColorAt(0.75, Qt::blue);
+    singleHighlightGradient.setColorAt(0.50, Qt::red);
+    singleHighlightGradient.setColorAt(0.25, Qt::yellow);
+    singleHighlightGradient.setColorAt(0.0, Qt::white);
+
+    m_chart->setItemColor(Qt::green);
+    m_chart->setSingleHighlightColor(Qt::white);
+
+    m_chart->setItemGradient(barGradient);
+    m_chart->setSingleHighlightGradient(singleHighlightGradient);
+
+    QDataVis::ColorStyle oldStyle = m_chart->colorStyle();
+    if (oldStyle == QDataVis::ColorStyleUniform)
+        m_chart->setColorStyle(QDataVis::ColorStyleObjectGradient);
+    else if (oldStyle == QDataVis::ColorStyleObjectGradient)
+        m_chart->setColorStyle(QDataVis::ColorStyleRangeGradient);
+    if (oldStyle == QDataVis::ColorStyleRangeGradient)
+        m_chart->setColorStyle(QDataVis::ColorStyleUniform);
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);

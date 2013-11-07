@@ -62,6 +62,7 @@ public slots:
     void startStopTimer();
     void selectItem();
     void handleSelectionChange(int index);
+    void setGradient();
 
 signals:
     void shadowQualityChanged(int quality);

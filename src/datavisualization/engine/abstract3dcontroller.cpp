@@ -827,8 +827,9 @@ void Abstract3DController::setTheme(QDataVis::Theme theme)
         // TODO: set all colors/styles here (QTRD-2538)
         setColorStyle(QDataVis::ColorStyleUniform);
         setObjectColor(m_theme.m_baseColor);
-        setSingleHighlightColor(m_theme.m_highlightBarColor);
-        setMultiHighlightColor(m_theme.m_highlightRowColor);
+        setSingleHighlightColor(m_theme.m_singleHighlightColor);
+        setMultiHighlightColor(m_theme.m_multiHighlightColor);
+
         emit themeChanged(theme);
         emitNeedRender();
     }

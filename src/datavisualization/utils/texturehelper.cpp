@@ -36,7 +36,7 @@ TextureHelper::~TextureHelper()
 }
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,
-                                      bool convert, bool smoothScale)
+                                      bool convert, bool smoothScale, bool clampY)
 {
     if (image.isNull())
         return 0;
@@ -74,6 +74,8 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
+    if (clampY)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;
 }
@@ -162,7 +164,7 @@ GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
     pmp.setPen(Qt::NoPen);
     pmp.drawRect(0, 0, int(gradientTextureWidth), int(gradientTextureHeight));
 
-    return create2DTexture(image, false, true);
+    return create2DTexture(image, false, true, false, true);
 }
 
 #if !defined(QT_OPENGL_ES_2)
