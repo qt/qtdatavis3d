@@ -251,6 +251,11 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
                     updateSelectionTexture();
             }
         }
+    } else {
+        for (int i = 0; i < m_dataArray.size(); i++)
+            delete m_dataArray.at(i);
+        m_dataArray.clear();
+        m_sampleSpace = QRect();
     }
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
