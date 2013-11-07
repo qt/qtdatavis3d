@@ -10,7 +10,8 @@ TEMPLATE = subdirs
 SUBDIRS += barstest \
            scattertest \
            surfacetest \
-           qmlcamera
+           qmlcamera \
+           multigraphs
 
 #SUBDIRS += kinectsurface
 
