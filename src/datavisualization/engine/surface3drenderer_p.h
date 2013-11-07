@@ -101,6 +101,7 @@ private:
     SurfaceObject *m_surfaceObj;
     SurfaceObject *m_sliceSurfaceObj;
     GLuint m_depthTexture;
+    GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;

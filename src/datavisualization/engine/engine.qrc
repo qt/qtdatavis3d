@@ -50,13 +50,14 @@
         <file alias="vertexES2">shaders/default_ES2.vert</file>
         <file alias="fragmentTextureES2">shaders/texture_ES2.frag</file>
         <file alias="fragmentSurface">shaders/surface.frag</file>
-        <file alias="vertexSurface">shaders/surface.vert</file>
         <file alias="fragmentSurfaceGrid">shaders/surfaceGrid.frag</file>
         <file alias="vertexSurfaceGrid">shaders/surfaceGrid.vert</file>
         <file alias="vertexSurfaceFlat">shaders/surfaceFlat.vert</file>
         <file alias="fragmentSurfaceFlat">shaders/surfaceFlat.frag</file>
         <file alias="fragmentSurfaceES2">shaders/surface_ES2.frag</file>
         <file alias="vertexPointES2">shaders/point_ES2.vert</file>
+        <file alias="fragmentSurfaceShadowNoTex">shaders/surfaceShadowNoTex.frag</file>
+        <file alias="fragmentSurfaceShadowFlat">shaders/surfaceShadowFlat.frag</file>
+        <file alias="vertexSurfaceShadowFlat">shaders/surfaceShadowFlat.vert</file>
     </qresource>
-    <qresource prefix="/textures"/>
 </RCC>

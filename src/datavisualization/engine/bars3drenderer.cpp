@@ -2038,9 +2038,9 @@ void Bars3DRenderer::updateDepthBuffer()
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
-                                                             m_depthFrameBuffer,
-                                                             m_shadowQualityMultiplier);
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
+                                                                        m_depthFrameBuffer,
+                                                                        m_shadowQualityMultiplier);
         if (!m_depthTexture)
             lowerShadowQuality();
     }

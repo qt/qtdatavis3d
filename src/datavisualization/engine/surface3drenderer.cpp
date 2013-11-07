@@ -124,9 +124,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
                       " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
     }
 
-    // Shadows are disabled for Q3DSurface in Tech Preview
-    updateShadowQuality(QDataVis::ShadowQualityNone);
-
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -138,6 +135,7 @@ Surface3DRenderer::~Surface3DRenderer()
     m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
 
     m_textureHelper->deleteTexture(&m_depthTexture);
+    m_textureHelper->deleteTexture(&m_depthModelTexture);
     m_textureHelper->deleteTexture(&m_gradientTexture);
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->deleteTexture(&m_selectionResultTexture);
@@ -172,10 +170,7 @@ void Surface3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
-    handleShadowQualityChange();
-
     initSurfaceShaders();
-
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
 
@@ -799,6 +794,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
+        // Attach texture to depth attachment
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Bind depth shader
@@ -831,7 +828,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #endif
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
-        glCullFace(GL_FRONT);
+        glDisable(GL_CULL_FACE);
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
@@ -853,7 +850,17 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_surfaceObj->elementBuf());
 
         // Draw the triangles
-        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), GL_UNSIGNED_SHORT,
+        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), m_surfaceObj->indicesType(),
+                       (void *)0);
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthModelTexture, 0);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Draw the triangles
+        glDrawElements(GL_TRIANGLES, m_surfaceObj->indexCount(), m_surfaceObj->indicesType(),
                        (void *)0);
 
         // Free buffers
@@ -873,6 +880,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_mainViewPort.width(), m_mainViewPort.height());
 
         // Reset culling to normal
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
@@ -988,7 +996,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthTexture);
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthModelTexture);
             } else
 #endif
             {
@@ -1061,7 +1069,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_cachedSurfaceOn) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -1585,7 +1593,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     glDisable(GL_TEXTURE_2D);
-
     glDisable(GL_BLEND);
 
     // Release label shader
@@ -1925,8 +1932,8 @@ void Surface3DRenderer::loadMeshFile()
 
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
-    qWarning() << "Shadows have been disabled for Q3DSurface in technology preview";
-    m_cachedShadowQuality = QDataVis::ShadowQualityNone; //quality;
+    m_cachedShadowQuality = quality;
+
     switch (quality) {
     case QDataVis::ShadowQualityLow:
         m_shadowQualityToShader = 33.3f;
@@ -1957,6 +1964,8 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
         m_shadowQualityMultiplier = 1;
         break;
     }
+
+    handleShadowQualityChange();
 
 #if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer();
@@ -2016,6 +2025,33 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         delete m_shader;
     m_shader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_shader->initialize();
+
+    // draw the shader for the surface according to smooth status, shadow and uniform color
+    if (m_surfaceShader)
+        delete m_surfaceShader;
+#if !defined(QT_OPENGL_ES_2)
+    if (m_cachedSmoothSurface) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
+                                               QStringLiteral(":/shaders/fragmentSurfaceShadowNoTex"));
+        } else {
+            m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                               QStringLiteral(":/shaders/fragmentSurface"));
+        }
+    } else {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
+                                               QStringLiteral(":/shaders/fragmentSurfaceShadowFlat"));
+        } else {
+            m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                               QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+        }
+    }
+#else
+    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                       QStringLiteral(":/shaders/fragmentSurfaceES2"));
+#endif
+    m_surfaceShader->initialize();
 }
 
 void Surface3DRenderer::initBackgroundShaders(const QString &vertexShader,
@@ -2038,30 +2074,15 @@ void Surface3DRenderer::initSelectionShaders()
 
 void Surface3DRenderer::initSurfaceShaders()
 {
-    if (m_surfaceShader)
-        delete m_surfaceShader;
-
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedSmoothSurface) {
-        m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurface"),
-                                           QStringLiteral(":/shaders/fragmentSurface"));
-    } else {
-        m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
-                                           QStringLiteral(":/shaders/fragmentSurfaceFlat"));
-    }
-#else
-    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurface"),
-                                       QStringLiteral(":/shaders/fragmentSurfaceES2"));
-#endif
-    m_surfaceShader->initialize();
-
+    // Gridline shader
     if (m_surfaceGridShader)
         delete m_surfaceGridShader;
-
     m_surfaceGridShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceGrid"),
                                            QStringLiteral(":/shaders/fragmentSurfaceGrid"));
-
     m_surfaceGridShader->initialize();
+
+    // Triggers surface shader selection by shadow setting
+    handleShadowQualityChange();
 }
 
 void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -2075,7 +2096,6 @@ void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
 #if !defined(QT_OPENGL_ES_2)
 void Surface3DRenderer::initDepthShader()
 {
-    // TODO: Implement a depth shader for surface after technology preview
     if (m_depthShader)
         delete m_depthShader;
     m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
@@ -2094,10 +2114,12 @@ void Surface3DRenderer::updateDepthBuffer()
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
-                                                             m_depthFrameBuffer,
-                                                             m_shadowQualityMultiplier);
-        if (!m_depthTexture)
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
+                                                                        m_depthFrameBuffer,
+                                                                        m_shadowQualityMultiplier);
+        m_depthModelTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
+                                                                  m_shadowQualityMultiplier);
+        if (!m_depthTexture || !m_depthModelTexture)
             lowerShadowQuality();
     }
 }

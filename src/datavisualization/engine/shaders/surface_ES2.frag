@@ -1,5 +1,5 @@
 varying highp vec2 UV;
-varying highp vec3 coords_mdl;
+varying highp vec2 coords_mdl;
 varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;

@@ -161,15 +161,16 @@ int main(int argc, char *argv[])
     themeList->addItem(QStringLiteral("Isabelle"));
     themeList->setCurrentIndex(initialTheme);
 
-//    QComboBox *shadowQuality = new QComboBox(widget);
-//    shadowQuality->addItem(QStringLiteral("None"));
-//    shadowQuality->addItem(QStringLiteral("Low"));
-//    shadowQuality->addItem(QStringLiteral("Medium"));
-//    shadowQuality->addItem(QStringLiteral("High"));
-//    shadowQuality->addItem(QStringLiteral("Low Soft"));
-//    shadowQuality->addItem(QStringLiteral("Medium Soft"));
-//    shadowQuality->addItem(QStringLiteral("High Soft"));
-//    shadowQuality->setCurrentIndex(3);
+    QComboBox *shadowQuality = new QComboBox(widget);
+    shadowQuality->addItem(QStringLiteral("None"));
+    shadowQuality->addItem(QStringLiteral("Low"));
+    shadowQuality->addItem(QStringLiteral("Medium"));
+    shadowQuality->addItem(QStringLiteral("High"));
+    shadowQuality->addItem(QStringLiteral("Low Soft"));
+    shadowQuality->addItem(QStringLiteral("Medium Soft"));
+    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->setCurrentIndex(3);
+
     QComboBox *selectionMode = new QComboBox(widget);
     selectionMode->addItem(QStringLiteral("None"),
                                int(QDataVis::SelectionNone));
@@ -229,8 +230,8 @@ int main(int argc, char *argv[])
     vLayout->addWidget(labelButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-//    vLayout->addWidget(shadowQuality);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
     vLayout->addWidget(selectionMode);
     vLayout->addWidget(selectButton);
@@ -276,8 +277,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::changeStyle);
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeTheme(int)));
-//    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
-//                     modifier, SLOT(changeShadowQuality(int)));
+    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
+                     modifier, SLOT(changeShadowQuality(int)));
     QObject::connect(selectionMode, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeSelectionMode(int)));
     QObject::connect(selectButton, &QPushButton::clicked,
@@ -294,6 +295,7 @@ int main(int argc, char *argv[])
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
     modifier->setSelectionInfoLabel(selectionInfoLabel);
     sqrtSinCB->setChecked(true);
+    shadowQuality->setCurrentIndex(3);
 
     return app.exec();
 }

@@ -50,8 +50,9 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
     GLuint createGradientTexture(const QLinearGradient &gradient);
 #if !defined(QT_OPENGL_ES_2)
+    GLuint createDepthTexture(const QSize &size, GLuint textureSize);
     // Returns depth texture and inserts generated framebuffer to parameter
-    GLuint createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize = 1);
+    GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
 #endif
     void deleteTexture(const GLuint *texture);
 

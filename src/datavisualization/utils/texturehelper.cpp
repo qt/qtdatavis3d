@@ -168,7 +168,7 @@ GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
 }
 
 #if !defined(QT_OPENGL_ES_2)
-GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 {
     GLuint depthtextureid;
 
@@ -184,6 +184,15 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
                  size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    return depthtextureid;
+}
+#endif
+
+#if !defined(QT_OPENGL_ES_2)
+GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+{
+    GLuint depthtextureid = createDepthTexture(size, textureSize);
 
     // Create frame buffer
     if (!frameBuffer)

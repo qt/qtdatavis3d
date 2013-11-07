@@ -207,12 +207,15 @@ void Theme::useTheme(QDataVis::Theme theme)
     default:
         break;
     }
+
     if (m_uniformColor) {
         m_surfaceGradient.setColorAt(0.0, m_baseColor);
     } else {
-        m_surfaceGradient.setColorAt(0.0, QColor(m_baseColor.redF() * 0.7,
-                                                 m_baseColor.greenF() * 0.7,
-                                                 m_baseColor.blueF() * 0.7));
+        QColor color;
+        color.setRedF(m_baseColor.redF() * 0.7f);
+        color.setGreenF(m_baseColor.greenF() * 0.7f);
+        color.setBlueF(m_baseColor.blueF()  * 0.7f);
+        m_surfaceGradient.setColorAt(0.0, color);
     }
     m_surfaceGradient.setColorAt(1.0, m_baseColor);
 }
