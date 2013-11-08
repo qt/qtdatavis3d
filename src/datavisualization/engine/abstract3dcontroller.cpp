@@ -43,6 +43,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_isBackgroundEnabled(true),
     m_isGridEnabled(true),
     m_scene(new Q3DScene()),
+    m_colorStyle(QDataVis::ColorStyleUniform),
     m_activeInputHandler(0),
     m_axisX(0),
     m_axisY(0),
@@ -50,8 +51,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_renderer(0),
     m_isDataDirty(true),
     m_data(0),
-    m_renderPending(false),
-    m_colorStyle(QDataVis::ColorStyleUniform)
+    m_renderPending(false)
 {
     m_theme.useTheme(QDataVis::ThemeQt);
 
