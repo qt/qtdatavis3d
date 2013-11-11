@@ -18,6 +18,7 @@
 
 #include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
+#include "qbar3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -110,6 +111,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Bar3DSeries BarDataProxy::series
+ *
+ * The series this proxy is attached to.
+ */
+
+/*!
  * Constructs QBarDataProxy with the given \a parent.
  */
 QBarDataProxy::QBarDataProxy(QObject *parent) :
@@ -130,6 +137,16 @@ QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent) :
  */
 QBarDataProxy::~QBarDataProxy()
 {
+}
+
+/*!
+ * \property QBarDataProxy::series
+ *
+ *  The series this proxy is attached to.
+ */
+QBar3DSeries *QBarDataProxy::series()
+{
+    return static_cast<QBar3DSeries *>(d_ptr->series());
 }
 
 /*!
@@ -482,7 +499,6 @@ QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
       m_dataArray(new QBarDataArray)
 {
-    m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
 }
 
 QBarDataProxyPrivate::~QBarDataProxyPrivate()
@@ -702,6 +718,13 @@ QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endR
         }
     }
     return limits;
+}
+
+void QBarDataProxyPrivate::setSeries(QAbstract3DSeries *series)
+{
+    QAbstractDataProxyPrivate::setSeries(series);
+    QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(series);
+    emit qptr()->seriesChanged(barSeries);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

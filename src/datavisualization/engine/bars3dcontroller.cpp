@@ -23,6 +23,7 @@
 #include "q3dvalueaxis_p.h"
 #include "q3dcategoryaxis_p.h"
 #include "qbardataproxy_p.h"
+#include "qbar3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <qmath.h>
@@ -39,8 +40,6 @@ Bars3DController::Bars3DController(QRect boundRect)
 {
     // Default bar type; specific to bars
     setBarType(QDataVis::MeshStyleBevelBars, false);
-
-    setActiveDataProxy(0);
 
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -83,57 +82,11 @@ void Bars3DController::synchDataToRenderer()
         m_changeTracker.barSpecsChanged = false;
     }
 
+    // Needs to be done after data is set, as it needs to know the visual array.
     if (m_changeTracker.selectedBarChanged) {
         m_renderer->updateSelectedBar(m_selectedBar);
         m_changeTracker.selectedBarChanged = false;
     }
-
-    if (m_isDataDirty) {
-        m_renderer->updateDataModel(static_cast<QBarDataProxy *>(m_data));
-        m_isDataDirty = false;
-    }
-}
-
-void Bars3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
-{
-    // Setting null proxy indicates default proxy
-    if (!proxy) {
-        proxy = new QBarDataProxy;
-        proxy->d_ptr->setDefaultProxy(true);
-    }
-
-    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeBar);
-
-    Abstract3DController::setActiveDataProxy(proxy);
-
-    QBarDataProxy *barDataProxy = static_cast<QBarDataProxy *>(m_data);
-
-    QObject::connect(barDataProxy, &QBarDataProxy::arrayReset, this,
-                     &Bars3DController::handleArrayReset);
-    QObject::connect(barDataProxy, &QBarDataProxy::rowsAdded, this,
-                     &Bars3DController::handleRowsAdded);
-    QObject::connect(barDataProxy, &QBarDataProxy::rowsChanged, this,
-                     &Bars3DController::handleRowsChanged);
-    QObject::connect(barDataProxy, &QBarDataProxy::rowsRemoved, this,
-                     &Bars3DController::handleRowsRemoved);
-    QObject::connect(barDataProxy, &QBarDataProxy::rowsInserted, this,
-                     &Bars3DController::handleRowsInserted);
-    QObject::connect(barDataProxy, &QBarDataProxy::itemChanged, this,
-                     &Bars3DController::handleItemChanged);
-    QObject::connect(barDataProxy, &QBarDataProxy::rowLabelsChanged, this,
-                     &Bars3DController::handleDataRowLabelsChanged);
-    QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, this,
-                     &Bars3DController::handleDataColumnLabelsChanged);
-
-    adjustAxisRanges();
-
-    // Always clear selection on proxy change
-    setSelectedBar(noSelectionPoint());
-
-    handleDataRowLabelsChanged();
-    handleDataColumnLabelsChanged();
-    m_isDataDirty = true;
-    emitNeedRender();
 }
 
 void Bars3DController::handleArrayReset()
@@ -196,22 +149,29 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 
 void Bars3DController::handleDataRowLabelsChanged()
 {
-    if (m_axisX && m_data) {
+    QBar3DSeries *firstSeries = 0;
+    if (m_seriesList.size())
+        firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
+    if (m_axisX && firstSeries && firstSeries->dataProxy()) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
         int min = int(m_axisX->min());
         int count = int(m_axisX->max()) - min + 1;
-        QStringList subList = static_cast<QBarDataProxy *>(m_data)->rowLabels().mid(min, count);
+        QStringList subList = firstSeries->dataProxy()->rowLabels().mid(min, count);
         static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
     }
 }
 
 void Bars3DController::handleDataColumnLabelsChanged()
 {
-    if (m_axisZ && m_data) {
+    QBar3DSeries *firstSeries = 0;
+    if (m_seriesList.size())
+        firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
+    if (m_axisZ && firstSeries && firstSeries->dataProxy()) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
         int min = int(m_axisZ->min());
         int count = int(m_axisZ->max()) - min + 1;
-        QStringList subList = static_cast<QBarDataProxy *>(m_data)->columnLabels().mid(min, count);
+        QStringList subList = static_cast<QBarDataProxy *>(firstSeries->dataProxy())
+                ->columnLabels().mid(min, count);
         static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
     }
 }
@@ -247,6 +207,55 @@ void Bars3DController::setAxisZ(Q3DAbstractAxis *axis)
 {
     Abstract3DController::setAxisZ(axis);
     handleDataColumnLabelsChanged();
+}
+
+void Bars3DController::addSeries(QAbstract3DSeries *series)
+{
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeBar);
+
+    bool firstAdded = !m_seriesList.size();
+
+    Abstract3DController::addSeries(series);
+
+    if (firstAdded) {
+        adjustAxisRanges();
+
+        handleDataRowLabelsChanged();
+        handleDataColumnLabelsChanged();
+
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedBar(noSelectionPoint());
+    }
+}
+
+void Bars3DController::removeSeries(QAbstract3DSeries *series)
+{
+    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
+
+    Abstract3DController::removeSeries(series);
+
+    if (firstRemoved) {
+        adjustAxisRanges();
+
+        handleDataRowLabelsChanged();
+        handleDataColumnLabelsChanged();
+
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedBar(noSelectionPoint());
+    }
+}
+
+QList<QBar3DSeries *> Bars3DController::barSeriesList()
+{
+    QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
+    QList<QBar3DSeries *> barSeriesList;
+    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+        QBar3DSeries *barSeries = qobject_cast<QBar3DSeries *>(abstractSeries);
+        if (barSeries)
+            barSeriesList.append(barSeries);
+    }
+
+    return barSeriesList;
 }
 
 void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
@@ -334,8 +343,14 @@ void Bars3DController::setSelectedBar(const QPoint &position)
     // If the selection targets non-existent bar, clear selection instead.
     QPoint pos = position;
 
+    // TODO: Selection needs to be refactored to be handled by series
+    const QBarDataProxy *proxy = 0;
+    if (m_seriesList.size())
+        proxy = static_cast<QBar3DSeries *>(m_seriesList.at(0))->dataProxy();
+    else
+        return;
+
     if (pos != noSelectionPoint()) {
-        const QBarDataProxy *proxy = static_cast<const QBarDataProxy *>(m_data);
         int maxRow = proxy->rowCount() - 1;
         int maxCol = (pos.x() <= maxRow && pos.x() >= 0 && proxy->rowAt(pos.x()))
                 ? proxy->rowAt(pos.x())->size() - 1 : -1;
@@ -370,43 +385,45 @@ QPoint Bars3DController::selectedBar() const
 
 void Bars3DController::adjustAxisRanges()
 {
-    const QBarDataProxy *proxy = static_cast<QBarDataProxy *>(m_data);
-    const QBarDataArray *array = proxy->array();
+    if (m_seriesList.size()) {
+        const QBarDataProxy *proxy = static_cast<QBar3DSeries *>(m_seriesList.at(0))->dataProxy();
+        const QBarDataArray *array = proxy->array();
 
-    Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
-    if (categoryAxisX && categoryAxisX->isAutoAdjustRange() && proxy) {
-        int rowCount = proxy->rowCount();
-        if (rowCount)
-            rowCount--;
-        categoryAxisX->dptr()->setRange(0.0, qreal(rowCount));
-    }
-
-    Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
-    if (categoryAxisZ && categoryAxisZ->isAutoAdjustRange() && proxy) {
-        int columnCount = 0;
-        for (int i = 0; i < array->size(); i++) {
-            if (columnCount < array->at(i)->size())
-                columnCount = array->at(i)->size();
+        Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
+        if (categoryAxisX && categoryAxisX->isAutoAdjustRange() && proxy) {
+            int rowCount = proxy->rowCount();
+            if (rowCount)
+                rowCount--;
+            categoryAxisX->dptr()->setRange(0.0, qreal(rowCount));
         }
-        if (columnCount)
-            columnCount--;
-        categoryAxisZ->dptr()->setRange(0.0, qreal(columnCount));
-    }
 
-    Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
-    if (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange() && proxy) {
-        QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisX->min(),
-                                                                     categoryAxisX->max(),
-                                                                     categoryAxisZ->min(),
-                                                                     categoryAxisZ->max());
-        if (limits.first < 0) {
-            // Call private implementation to avoid unsetting auto adjust flag
-            valueAxis->dptr()->setRange(limits.first, limits.second);
-        } else if (limits.second == 0.0) {
-            // Only zero value values in data set, set range to something.
-            valueAxis->dptr()->setRange(0.0, 1.0);
-        } else {
-            valueAxis->dptr()->setRange(0.0, limits.second);
+        Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
+        if (categoryAxisZ && categoryAxisZ->isAutoAdjustRange() && proxy) {
+            int columnCount = 0;
+            for (int i = 0; i < array->size(); i++) {
+                if (columnCount < array->at(i)->size())
+                    columnCount = array->at(i)->size();
+            }
+            if (columnCount)
+                columnCount--;
+            categoryAxisZ->dptr()->setRange(0.0, qreal(columnCount));
+        }
+
+        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
+        if (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange() && proxy) {
+            QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisX->min(),
+                                                                         categoryAxisX->max(),
+                                                                         categoryAxisZ->min(),
+                                                                         categoryAxisZ->max());
+            if (limits.first < 0) {
+                // Call private implementation to avoid unsetting auto adjust flag
+                valueAxis->dptr()->setRange(limits.first, limits.second);
+            } else if (limits.second == 0.0) {
+                // Only zero value values in data set, set range to something.
+                valueAxis->dptr()->setRange(0.0, 1.0);
+            } else {
+                valueAxis->dptr()->setRange(0.0, limits.second);
+            }
         }
     }
 }

@@ -36,7 +36,7 @@
 
   See \l{Qt Quick 2 Scatter Example} for more thorough usage example.
 
-  \sa ItemModelScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
+  \sa Scatter3DSeries, ScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 
 /*!
@@ -50,14 +50,6 @@
  * \sa AbstractGraph3D::theme
  *
  * \warning This method is subject to change.
- */
-
-/*!
-  \qmlproperty ScatterDataProxy Scatter3D::dataProxy
-  The active data proxy.
-
-  If a proxy is not given, a temporary default proxy is created and activated.
-  This temporary proxy is destroyed if another proxy is explicitly set active via this property.
  */
 
 /*!
@@ -108,4 +100,21 @@
   \qmlproperty int Scatter3D::selectedItemIndex
   Selects an item in the \a index. Only one item can be selected at a time.
   To clear selection, specify an illegal \a index, e.g. -1.
+ */
+
+/*!
+ * \qmlproperty list<QScatter3DSeries> seriesList
+ * This property holds the series of the graph.
+ * By default, this property contains an empty list.
+ * To set the series, either use the addSeries() function or define them as children of the graph.
+ */
+
+/*!
+ * \qmlmethod void addSeries(QScatter3DSeries *series)
+ * Add the \a series to the graph.
+ */
+
+/*!
+ * \qmlmethod void removeSeries(QScatter3DSeries *series)
+ * Remove the \a series from the graph.
  */

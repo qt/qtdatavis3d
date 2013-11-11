@@ -28,6 +28,7 @@ typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
 class QSurfaceDataProxyPrivate;
+class QSurface3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
@@ -35,11 +36,13 @@ class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 
     Q_PROPERTY(int rowCount READ rowCount)
     Q_PROPERTY(int columnCount READ columnCount)
+    Q_PROPERTY(QSurface3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
     explicit QSurfaceDataProxy(QObject *parent = 0);
     virtual ~QSurfaceDataProxy();
 
+    QSurface3DSeries *series();
     int rowCount() const;
     int columnCount() const;
     const QSurfaceDataArray *array() const;
@@ -49,6 +52,7 @@ public:
 
 signals:
     void arrayReset();
+    void seriesChanged(QSurface3DSeries *series);
 
 protected:
     explicit QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *parent = 0);

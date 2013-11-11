@@ -27,6 +27,7 @@
 #include "drawer_p.h"
 #include "qbardataitem.h"
 #include "q3dlight.h"
+#include "qbar3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -45,12 +46,6 @@ const GLfloat gridLineWidth = 0.005f;
 const int smallerVPSize = 5;
 
 const bool sliceGridLabels = true; // TODO: Make this user controllable (QTRD-2546)
-
-// TODO: These will be based on sets (QTRD-2548)
-const int seriesCount = 1;
-const float seriesScale = 1.0f / float(seriesCount);
-const float seriesStep = 1.0f / float(seriesCount);
-const float seriesStart = -((float(seriesCount) - 1.0f) / 2.0f) * seriesStep;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
@@ -95,7 +90,11 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_clickedBarColor(invalidColorVector),
       m_hasHeightAdjustmentChanged(true),
       m_selectedBarPos(Bars3DController::noSelectionPoint()),
-      m_noZeroInRange(false)
+      m_noZeroInRange(false),
+      m_seriesCount(0),
+      m_seriesScale(0.0f),
+      m_seriesStep(0.0f),
+      m_seriesStart(0.0f)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -153,8 +152,15 @@ void Bars3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
+void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
 {
+    QList<QBar3DSeries *> visibleSeries;
+    foreach (QAbstract3DSeries *current, seriesList) {
+        if (current->isVisible())
+            visibleSeries.append(static_cast<QBar3DSeries *>(current));
+    }
+
+    int seriesCount = visibleSeries.size();
     int minRow = m_axisCacheX.min();
     int maxRow = m_axisCacheX.max();
     int minCol = m_axisCacheZ.min();
@@ -163,38 +169,43 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
     int newColumns = maxCol - minCol + 1;
     int updateSize = 0;
     int dataRowCount = 0;
-    // TODO: Dummy series, replace with actual after QTRD-2548
-    // TODO: Check if resize is needed
-    m_renderingArrays.clear();
-    m_renderingArrays.resize(seriesCount);
-    for (int series = 0; series < seriesCount; series++) {
+
+    if (m_seriesCount != seriesCount) {
+        m_seriesCount = seriesCount;
+        m_renderingArrays.resize(m_seriesCount);
+        m_seriesScale = 1.0f / float(m_seriesCount);
+        m_seriesStep = 1.0f / float(m_seriesCount);
+        m_seriesStart = -((float(m_seriesCount) - 1.0f) / 2.0f) * m_seriesStep;
+    }
+
+    if (m_cachedRowCount != newRows || m_cachedColumnCount != newColumns) {
+        // Force update for selection related items
+        m_sliceCache = 0;
+        m_sliceTitleItem = 0;
+        if (m_sliceSelection)
+            m_sliceSelection->clear();
+
+        m_cachedColumnCount = newColumns;
+        m_cachedRowCount = newRows;
+        // Calculate max scene size
+        GLfloat sceneRatio = qMin(GLfloat(newColumns) / GLfloat(newRows),
+                                  GLfloat(newRows) / GLfloat(newColumns));
+        m_maxSceneSize = 2.0f * qSqrt(sceneRatio * newColumns * newRows);
+        // Calculate here and at setting bar specs
+        calculateSceneScalingFactors();
+    }
+
+    for (int series = 0; series < m_seriesCount; series++) {
         if (newRows != m_renderingArrays.at(series).size()
                 || newColumns != m_renderingArrays.at(series).at(0).size()) {
             // Destroy old render items and reallocate new array
-            m_renderingArrays[series].clear();
             m_renderingArrays[series].resize(newRows);
             for (int i = 0; i < newRows; i++)
                 m_renderingArrays[series][i].resize(newColumns);
-
-            if (series == 0) {
-                // Force update for selection related items
-                m_sliceCache = 0;
-                m_sliceTitleItem = 0;
-                if (m_sliceSelection)
-                    m_sliceSelection->clear();
-
-                m_cachedColumnCount = newColumns;
-                m_cachedRowCount = newRows;
-                // Calculate max scene size
-                GLfloat sceneRatio = qMin(GLfloat(newColumns) / GLfloat(newRows),
-                                          GLfloat(newRows) / GLfloat(newColumns));
-                m_maxSceneSize = 2.0f * qSqrt(sceneRatio * newColumns * newRows);
-                // Calculate here and at setting bar specs
-                calculateSceneScalingFactors();
-            }
         }
 
         // Update cached data window
+        QBarDataProxy *dataProxy = visibleSeries.at(series)->dataProxy();
         dataRowCount = dataProxy->rowCount();
         int dataRowIndex = minRow;
         GLfloat heightValue = 0.0f;
@@ -222,9 +233,8 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
                                     heightValue = 0.0f;
                             }
                         }
-                        // TODO: Dummy values for replicated series, replace with actual after QTRD-2548
-                        m_renderingArrays[series][i][j].setValue(value * ((series + 1.0f) / float(seriesCount)));
-                        m_renderingArrays[series][i][j].setHeight((heightValue / m_heightNormalizer) * ((series + 1.0f) / float(seriesCount)));
+                        m_renderingArrays[series][i][j].setValue(value);
+                        m_renderingArrays[series][i][j].setHeight(heightValue / m_heightNormalizer);
                         dataColIndex++;
                     }
                 }
@@ -238,12 +248,15 @@ void Bars3DRenderer::updateDataModel(QBarDataProxy *dataProxy)
     }
 
     m_renderColumns = updateSize;
-    m_renderRows = qMin((dataRowCount - minRow), m_renderingArrays[0].size());
+    if (m_renderingArrays.size())
+        m_renderRows = qMin((dataRowCount - minRow), newRows);
+    else
+        m_renderRows = 0;
 
     // Reset selected bar to update selection
     updateSelectedBar(m_selectedBarPos);
 
-    Abstract3DRenderer::updateDataModel(dataProxy);
+    Abstract3DRenderer::updateSeriesData(seriesList);
 }
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
@@ -459,9 +472,9 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     GLuint gradientTexture = 0;
     QVector3D modelMatrixScaler(m_scaleX, 0.0f, m_scaleZ);
     if (rowMode)
-        modelMatrixScaler.setX(m_scaleX * seriesScale);
+        modelMatrixScaler.setX(m_scaleX * m_seriesScale);
     else
-        modelMatrixScaler.setZ(m_scaleZ * seriesScale);
+        modelMatrixScaler.setZ(m_scaleZ * m_seriesScale);
 
     // Set common bar shader bindings
     m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
@@ -596,7 +609,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     int labelCount = m_sliceCache->labelItems().size();
     for (int labelNo = 0; labelNo < labelCount; labelNo++) {
         // Get labels from first series only
-        BarRenderItem *item = m_sliceSelection->at(labelNo * seriesCount);
+        BarRenderItem *item = m_sliceSelection->at(labelNo * m_seriesCount);
         // TODO: Make user controllable (QTRD-2546)
         // Draw labels
         int labelIndex = flipped ? m_sliceCache->labelItems().size() - 1 - labelNo : labelNo;
@@ -760,12 +773,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw bars to depth buffer
-        QVector3D shadowScaler(m_scaleX * seriesScale * 0.9f, 0.0f, m_scaleZ * 0.9f);
+        QVector3D shadowScaler(m_scaleX * m_seriesScale * 0.9f, 0.0f, m_scaleZ * 0.9f);
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
                 GLfloat shadowOffset = 0.0f;
-                float seriesPos = seriesStart;
-                for (int series = 0; series < seriesCount; series++) {
+                float seriesPos = m_seriesStart;
+                for (int series = 0; series < m_seriesCount; series++) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value())
                         continue;
@@ -818,7 +831,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                     glDisableVertexAttribArray(m_depthShader->posAtt());
-                    seriesPos += seriesStep;
+                    seriesPos += m_seriesStep;
                 }
             }
         }
@@ -867,8 +880,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                float seriesPos = seriesStart;
-                for (int series = 0; series < seriesCount; series++) {
+                float seriesPos = m_seriesStart;
+                for (int series = 0; series < m_seriesCount; series++) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value())
                         continue;
@@ -887,7 +900,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                           item.height(),
                                           (m_columnDepth - rowPos) / m_scaleFactor);
-                    modelMatrix.scale(QVector3D(m_scaleX * seriesScale,
+                    modelMatrix.scale(QVector3D(m_scaleX * m_seriesScale,
                                                 item.height(),
                                                 m_scaleZ));
 
@@ -925,7 +938,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     glDisableVertexAttribArray(m_selectionShader->posAtt());
 
-                    seriesPos += seriesStep;
+                    seriesPos += m_seriesStep;
                 }
             }
         }
@@ -1008,12 +1021,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     bool barSelectionFound = false;
     BarRenderItem *selectedBar(0);
-    QVector3D modelScaler(m_scaleX * seriesScale, 0.0f, m_scaleZ);
+    QVector3D modelScaler(m_scaleX * m_seriesScale, 0.0f, m_scaleZ);
     bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::noSelectionPoint());
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            float seriesPos = seriesStart;
-            for (int series = 0; series < seriesCount; series++) {
+            float seriesPos = m_seriesStart;
+            for (int series = 0; series < m_seriesCount; series++) {
                 BarRenderItem &item = m_renderingArrays[series][row][bar];
 
                 if (item.height() < 0)
@@ -1072,7 +1085,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         if (m_selectionDirty && m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
                             if (m_cachedSelectionMode & QDataVis::SelectionColumn
-                                    && seriesCount > 1) {
+                                    && m_seriesCount > 1) {
                                 translation.setZ((m_columnDepth - ((row + 0.5f + seriesPos)
                                                                    * (m_cachedBarSpacing.height())))
                                                  / m_scaleFactor);
@@ -1115,7 +1128,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         shadowLightStrength = adjustedHighlightStrength;
                         if (m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
-                            if (seriesCount > 1) {
+                            if (m_seriesCount > 1) {
                                 translation.setZ((m_columnDepth - ((row + 0.5f + seriesPos)
                                                                    * (m_cachedBarSpacing.height())))
                                                  / m_scaleFactor);
@@ -1172,7 +1185,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         m_drawer->drawObject(m_barShader, m_barObj, gradientTexture);
                     }
                 }
-                seriesPos += seriesStep;
+                seriesPos += m_seriesStep;
             }
         }
     }

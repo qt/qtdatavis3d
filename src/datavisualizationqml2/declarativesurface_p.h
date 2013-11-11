@@ -36,6 +36,7 @@
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
 #include "colorgradient_p.h"
+#include "qsurface3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -47,22 +48,18 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeSurface : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible NOTIFY surfaceVisibleChanged)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
+    Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
     ~DeclarativeSurface();
-
-    QSurfaceDataProxy *dataProxy() const;
-    void setDataProxy(QSurfaceDataProxy *dataProxy);
 
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);
@@ -70,9 +67,6 @@ public:
     void setAxisY(Q3DValueAxis *axis);
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
-
-    void setSurfaceVisible(bool visible);
-    bool isSurfaceVisible() const;
 
     void setSmoothSurfaceEnabled(bool enabled);
     bool isSmoothSurfaceEnabled() const;
@@ -85,6 +79,14 @@ public:
 
     void setSelectedPoint(const QPointF &position);
     QPointF selectedPoint() const;
+
+    QQmlListProperty<QSurface3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
+    static QSurface3DSeries *atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
+    Q_INVOKABLE void addSeries(QSurface3DSeries *series);
+    Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
 signals:
     void surfaceVisibleChanged(bool visible);

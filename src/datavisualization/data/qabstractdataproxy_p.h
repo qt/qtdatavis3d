@@ -35,6 +35,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+class QAbstract3DSeries;
+
 class QAbstractDataProxyPrivate : public QObject
 {
     Q_OBJECT
@@ -42,16 +44,13 @@ public:
     QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type);
     virtual ~QAbstractDataProxyPrivate();
 
-    void setItemLabelFormat(const QString &format);
-
-    inline bool isDefaultProxy() { return m_isDefaultProxy; }
-    inline void setDefaultProxy(bool isDefault) { m_isDefaultProxy = isDefault; }
+    inline QAbstract3DSeries *series() { return m_series; }
+    virtual void setSeries(QAbstract3DSeries *series);
 
 protected:
     QAbstractDataProxy *q_ptr;
     QAbstractDataProxy::DataType m_type;
-    QString m_itemLabelFormat;
-    bool m_isDefaultProxy;
+    QAbstract3DSeries *m_series;
 
 private:
     friend class QAbstractDataProxy;

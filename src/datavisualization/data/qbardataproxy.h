@@ -30,6 +30,7 @@ typedef QVector<QBarDataItem> QBarDataRow;
 typedef QList<QBarDataRow *> QBarDataArray;
 
 class QBarDataProxyPrivate;
+class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
@@ -38,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
     Q_PROPERTY(int rowCount READ rowCount)
     Q_PROPERTY(QStringList rowLabels READ rowLabels WRITE setRowLabels NOTIFY rowLabelsChanged)
     Q_PROPERTY(QStringList columnLabels READ columnLabels WRITE setColumnLabels NOTIFY columnLabelsChanged)
+    Q_PROPERTY(QBar3DSeries *series READ series NOTIFY seriesChanged)
 public:
     explicit QBarDataProxy(QObject *parent = 0);
     virtual ~QBarDataProxy();
@@ -51,6 +53,7 @@ public:
     * individual bar requires allocating additional data object for the bar.
     */
 
+    QBar3DSeries *series();
     int rowCount() const;
 
     QStringList rowLabels() const;
@@ -113,6 +116,7 @@ signals:
 
     void rowLabelsChanged();
     void columnLabelsChanged();
+    void seriesChanged(QBar3DSeries *series);
 
 protected:
     explicit QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent = 0);

@@ -75,7 +75,10 @@ Q3DCategoryAxis::~Q3DCategoryAxis()
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
  * remaining ones do not have a label. If category labels are not defined explicitly, labels are
- * generated from the data row and column labels.
+ * generated from the data row (or column) labels.
+ *
+ * \note If the graph has multiple visible series and category labels are not defined explicitly,
+ * changing the rows (or columns) on any of the attached series will regenerate the labels.
  *
  * \note CategoryLabels actually reads/writes the Q3DAbstractAxis::labels property,
  * which is read only there. Since subclass cannot have property with same name,

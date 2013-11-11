@@ -21,6 +21,7 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>
@@ -39,7 +40,8 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_columnCount = m_numericMonths.size();
 
     m_proxy = new VariantBarDataProxy;
-    m_graph->setActiveDataProxy(m_proxy);
+    QBar3DSeries *series = new QBar3DSeries(m_proxy);
+    m_graph->addSeries(series);
 
     updateYearsList(2000, 2012);
 

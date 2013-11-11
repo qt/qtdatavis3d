@@ -51,9 +51,11 @@ public:
     void insertItems(int index, const QScatterDataArray &items);
     void removeItems(int index, int removeCount);
 
-    void limitValues(QVector3D &minValues, QVector3D &maxValues);
+    void limitValues(QVector3D &minValues, QVector3D &maxValues) const;
 
+    virtual void setSeries(QAbstract3DSeries *series);
 private:
+    QScatterDataProxy *qptr();
     QScatterDataArray *m_dataArray;
 
     friend class QScatterDataProxy;

@@ -18,6 +18,7 @@
 
 #include "qscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
+#include "qscatter3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -80,6 +81,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Scatter3DSeries ScatterDataProxy::series
+ *
+ * The series this proxy is attached to.
+ */
+
+/*!
  * Constructs QScatterDataProxy with the given \a parent.
  */
 QScatterDataProxy::QScatterDataProxy(QObject *parent) :
@@ -100,6 +107,16 @@ QScatterDataProxy::QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *paren
  */
 QScatterDataProxy::~QScatterDataProxy()
 {
+}
+
+/*!
+ * \property QScatterDataProxy::series
+ *
+ *  The series this proxy is attached to.
+ */
+QScatter3DSeries *QScatterDataProxy::series()
+{
+    return static_cast<QScatter3DSeries *>(d_ptr->series());
 }
 
 /*!
@@ -277,7 +294,6 @@ QScatterDataProxyPrivate::QScatterDataProxyPrivate(QScatterDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeScatter),
       m_dataArray(new QScatterDataArray)
 {
-    m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
 }
 
 QScatterDataProxyPrivate::~QScatterDataProxyPrivate()
@@ -346,7 +362,7 @@ void QScatterDataProxyPrivate::removeItems(int index, int removeCount)
     m_dataArray->remove(index, removeCount);
 }
 
-void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues)
+void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
 {
     if (m_dataArray->isEmpty())
         return;
@@ -391,6 +407,18 @@ void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
     maxValues.setX(maxX);
     maxValues.setY(maxY);
     maxValues.setZ(maxZ);
+}
+
+void QScatterDataProxyPrivate::setSeries(QAbstract3DSeries *series)
+{
+    QAbstractDataProxyPrivate::setSeries(series);
+    QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(series);
+    emit qptr()->seriesChanged(scatterSeries);
+}
+
+QScatterDataProxy *QScatterDataProxyPrivate::qptr()
+{
+    return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

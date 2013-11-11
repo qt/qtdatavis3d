@@ -23,6 +23,7 @@
 #include "q3dvalueaxis_p.h"
 #include "q3dcategoryaxis.h"
 #include "qsurfacedataproxy_p.h"
+#include "qsurface3dseries_p.h"
 
 #include <QMatrix4x4>
 
@@ -38,8 +39,6 @@ Surface3DController::Surface3DController(QRect rect)
       m_isSurfaceGridEnabled(true),
       m_selectedPoint(noSelectionPoint())
 {
-    setActiveDataProxy(0);
-
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
@@ -73,10 +72,15 @@ void Surface3DController::initializeOpenGL()
 
 void Surface3DController::synchDataToRenderer()
 {
-    Abstract3DController::synchDataToRenderer();
-
     if (!isInitialized())
         return;
+
+    if (m_changeTracker.surfaceGridChanged) {
+        m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
+        m_changeTracker.surfaceGridChanged = false;
+    }
+
+    Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
     if (m_changeTracker.gradientColorChanged) {
@@ -92,24 +96,9 @@ void Surface3DController::synchDataToRenderer()
             emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
     }
 
-    if (m_changeTracker.surfaceVisibilityChanged) {
-        m_renderer->updateSurfaceVisibilityStatus(m_isSurfaceEnabled);
-        m_changeTracker.surfaceVisibilityChanged = false;
-    }
-
-    if (m_changeTracker.surfaceGridChanged) {
-        m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
-        m_changeTracker.surfaceGridChanged = false;
-    }
-
     if (m_changeTracker.selectedPointChanged) {
         m_renderer->updateSelectedPoint(m_selectedPoint);
         m_changeTracker.selectedPointChanged = false;
-    }
-
-    if (m_isDataDirty) {
-        m_renderer->updateDataModel(static_cast<QSurfaceDataProxy *>(m_data));
-        m_isDataDirty = false;
     }
 }
 
@@ -135,6 +124,47 @@ QPoint Surface3DController::noSelectionPoint()
     return noSelectionPoint;
 }
 
+void Surface3DController::addSeries(QAbstract3DSeries *series)
+{
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeSurface);
+
+    if (!m_seriesList.size()) {
+        Abstract3DController::addSeries(series);
+
+        adjustValueAxisRange();
+
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedPoint(noSelectionPoint());
+    } else {
+        qWarning("Surface graph only supports a single series.");
+    }
+}
+
+void Surface3DController::removeSeries(QAbstract3DSeries *series)
+{
+    if (series && series->d_ptr->m_controller == this) {
+        Abstract3DController::removeSeries(series);
+
+        adjustValueAxisRange();
+
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedPoint(noSelectionPoint());
+    }
+}
+
+QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
+{
+    QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
+    QList<QSurface3DSeries *> surfaceSeriesList;
+    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+        QSurface3DSeries *surfaceSeries = qobject_cast<QSurface3DSeries *>(abstractSeries);
+        if (surfaceSeries)
+            surfaceSeriesList.append(surfaceSeries);
+    }
+
+    return surfaceSeriesList;
+}
+
 void Surface3DController::setSmoothSurface(bool enable)
 {
     if (enable != m_isSmoothSurfaceEnabled) {
@@ -150,21 +180,6 @@ bool Surface3DController::smoothSurface()
     return m_isSmoothSurfaceEnabled;
 }
 
-void Surface3DController::setSurfaceVisible(bool visible)
-{
-    if (visible != m_isSurfaceEnabled) {
-        m_isSurfaceEnabled = visible;
-        m_changeTracker.surfaceVisibilityChanged = true;
-        emit surfaceVisibleChanged(visible);
-        emitNeedRender();
-    }
-}
-
-bool Surface3DController::surfaceVisible() const
-{
-    return m_isSurfaceEnabled;
-}
-
 void Surface3DController::setSurfaceGrid(bool enable)
 {
     if (enable != m_isSurfaceGridEnabled) {
@@ -172,6 +187,7 @@ void Surface3DController::setSurfaceGrid(bool enable)
         m_changeTracker.surfaceGridChanged = true;
         emit surfaceGridEnabledChanged(enable);
         emitNeedRender();
+        m_isDataDirty = true;
     }
 }
 
@@ -230,7 +246,15 @@ void Surface3DController::setSelectedPoint(const QPoint &position)
     // If the selection targets non-existent point, clear selection instead.
     QPoint pos = position;
 
-    const QSurfaceDataProxy *proxy = static_cast<const QSurfaceDataProxy *>(m_data);
+    // TODO: Selection needs to be refactored to be handled by series
+    const QSurfaceDataProxy *proxy = 0;
+    if (m_seriesList.size()) {
+        QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_seriesList.at(0));
+        proxy = static_cast<QSurfaceDataProxy *>(series->dataProxy());
+    } else {
+        return;
+    }
+
     if (pos != noSelectionPoint()) {
         int maxRow = proxy->rowCount() - 1;
         int maxCol = proxy->columnCount() - 1;
@@ -284,32 +308,6 @@ QPoint Surface3DController::selectedPoint() const
     return m_selectedPoint;
 }
 
-void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
-{
-    // Setting null proxy indicates default proxy
-    if (!proxy) {
-        proxy = new QSurfaceDataProxy;
-        proxy->d_ptr->setDefaultProxy(true);
-    }
-
-    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeSurface);
-
-    Abstract3DController::setActiveDataProxy(proxy);
-
-    QSurfaceDataProxy *surfaceDataProxy = static_cast<QSurfaceDataProxy *>(m_data);
-
-    QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
-                     this, &Surface3DController::handleArrayReset);
-
-    adjustValueAxisRange();
-
-    // Always clear selection on proxy change
-    setSelectedPoint(noSelectionPoint());
-
-    m_isDataDirty = true;
-    emitNeedRender();
-}
-
 void Surface3DController::handleArrayReset()
 {
     adjustValueAxisRange();
@@ -334,10 +332,12 @@ void Surface3DController::handleRequestSmoothSurface(bool enable)
 
 void Surface3DController::adjustValueAxisRange()
 {
-    if (m_data) {
+    if (m_seriesList.size()) {
         QVector3D minLimits;
         QVector3D maxLimits;
-        static_cast<QSurfaceDataProxy *>(m_data)->dptr()->limitValues(minLimits, maxLimits);
+        QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_seriesList.at(0));
+        static_cast<QSurfaceDataProxy *>(series->dataProxy())->dptrc()->limitValues(minLimits,
+                                                                                   maxLimits);
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (minLimits.x() != maxLimits.x())

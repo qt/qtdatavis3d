@@ -21,8 +21,8 @@
 #include "bars3dcontroller_p.h"
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
-#include "qbardataproxy.h"
 #include "q3dcamera.h"
+#include "qbar3dseries_p.h"
 
 #include <QMouseEvent>
 
@@ -46,11 +46,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: If no data proxy is set explicitly, Q3DBars creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DBars supports more than one series visible at the same time, but all series added to the
+ * graph must have proxies with identical row and column counts for the graph to draw properly.
+ * Row and column labels are taken from the first added series, unless explicitly defined to
+ * row and column axes.
  *
- * Methods are provided for changing bar types, themes, bar selection modes and so on. See the
+ * Methods are provided for changing themes, bar selection modes and so on. See the
  * methods for more detailed descriptions.
  *
  * \section1 How to construct a minimal Q3DBars graph
@@ -61,7 +62,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * After constructing Q3DBars, you can set the data window by changing the range on the row and
  * column axes. It is not mandatory, as data window will default to showing all of the data in
- * the data proxy. If the amount of data is large, it is usually preferable to show just a
+ * the series. If the amount of data is large, it is usually preferable to show just a
  * portion of it. For the example, let's set the data window to show first five rows and columns:
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
@@ -139,10 +140,38 @@ Q3DBars::Q3DBars()
 }
 
 /*!
- *  Destroys the 3D bar window.
+ * Destroys the 3D bar window.
  */
 Q3DBars::~Q3DBars()
 {
+}
+
+/*!
+ * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
+ * so the rows and columns of all series must match for the visualized data to be meaningful.
+ * If the graph has multiple visible series, only the first one added will
+ * generate the row or column labels on the axes in cases where the labels are not explicitly set
+ * to the axes.
+ */
+void Q3DBars::addSeries(QBar3DSeries *series)
+{
+    d_ptr->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DBars::removeSeries(QBar3DSeries *series)
+{
+    d_ptr->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ */
+QList<QBar3DSeries *> Q3DBars::seriesList()
+{
+    return d_ptr->m_shared->barSeriesList();
 }
 
 /*!
@@ -424,7 +453,7 @@ bool Q3DBars::isBackgroundVisible() const
  * \property Q3DBars::selectedBar
  *
  * Selects a bar in a \a position. The position is the (row, column) position in
- * the data array of the active data proxy.
+ * the data array of the series.
  * Only one bar can be selected at a time.
  * To clear selection, specify an illegal \a position, e.g. (-1, -1).
  */
@@ -687,68 +716,6 @@ void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
 QList<Q3DAbstractAxis *> Q3DBars::axes() const
 {
     return d_ptr->m_shared->axes();
-}
-
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DBars::setActiveDataProxy(QBarDataProxy *proxy)
-{
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QBarDataProxy *Q3DBars::activeDataProxy() const
-{
-    return static_cast<QBarDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DBars::addDataProxy(QBarDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DBars::releaseDataProxy(QBarDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QBarDataProxy *> Q3DBars::dataProxies() const
-{
-    QList<QBarDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QBarDataProxy *>(proxy));
-
-    return retList;
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)

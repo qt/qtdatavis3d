@@ -31,7 +31,7 @@ class Q3DScatterPrivate;
 class LabelItem;
 class Q3DValueAxis;
 class Q3DCategoryAxis;
-class QScatterDataProxy;
+class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 {
@@ -57,6 +57,10 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 public:
     explicit Q3DScatter();
     ~Q3DScatter();
+
+    void addSeries(QScatter3DSeries *series);
+    void removeSeries(QScatter3DSeries *series);
+    QList<QScatter3DSeries *> seriesList();
 
     void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
 
@@ -117,12 +121,6 @@ public:
     void addAxis(Q3DValueAxis *axis);
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
-
-    void setActiveDataProxy(QScatterDataProxy *proxy);
-    QScatterDataProxy *activeDataProxy() const;
-    void addDataProxy(QScatterDataProxy *proxy);
-    void releaseDataProxy(QScatterDataProxy *proxy);
-    QList<QScatterDataProxy *> dataProxies() const;
 
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);

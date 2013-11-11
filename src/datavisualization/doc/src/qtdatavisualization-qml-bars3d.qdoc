@@ -36,7 +36,7 @@
  *
  * See \l{Qt Quick 2 Bars Example} for more thorough usage example.
  *
- * \sa ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ * \sa Bar3DSeries, ItemModelBarData, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 
 /*!
@@ -50,14 +50,6 @@
  * \sa AbstractGraph3D::theme
  *
  * \warning This method is subject to change.
- */
-
-/*!
- * \qmlproperty BarDataProxy Bars3D::dataProxy
- * The active data proxy.
- *
- * If a proxy is not given, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another proxy is explicitly set active via this property.
  */
 
 /*!
@@ -133,4 +125,21 @@
  * \qmlproperty point Bars3D::selectedBar
  * Position of the selected bar in data window. Only one bar can be selected at a time.
  * To clear selection, specify an illegal position, e.g. Qt.point(-1.0, -1.0).
+ */
+
+/*!
+ * \qmlproperty list<QBar3DSeries> seriesList
+ * This property holds the series of the graph.
+ * By default, this property contains an empty list.
+ * To set the series, either use the addSeries() function or define them as children of the graph.
+ */
+
+/*!
+ * \qmlmethod void addSeries(QBar3DSeries *series)
+ * Add the \a series to the graph.
+ */
+
+/*!
+ * \qmlmethod void removeSeries(QBar3DSeries *series)
+ * Remove the \a series from the graph.
  */

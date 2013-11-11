@@ -36,6 +36,7 @@
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
 #include "qbardataproxy.h"
+#include "qbar3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -47,7 +48,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeBars : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
     Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
     Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
@@ -58,15 +58,13 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
+    Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
     Q_INVOKABLE void setBarColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
-
-    QBarDataProxy *dataProxy() const;
-    void setDataProxy(QBarDataProxy *dataProxy);
 
     Q3DCategoryAxis *rowAxis() const;
     void setRowAxis(Q3DCategoryAxis *axis);
@@ -95,6 +93,14 @@ public:
 
     void setSelectedBar(const QPointF &position);
     QPointF selectedBar() const;
+
+    QQmlListProperty<QBar3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
+    static QBar3DSeries *atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
+    Q_INVOKABLE void addSeries(QBar3DSeries *series);
+    Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
 signals:
     void selectedBarChanged(const QPointF &position);

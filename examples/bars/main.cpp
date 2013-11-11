@@ -118,6 +118,10 @@ int main(int argc, char **argv)
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
 
+    QCheckBox *seriesCheckBox = new QCheckBox(widget);
+    seriesCheckBox->setText(QStringLiteral("Show second series"));
+    seriesCheckBox->setChecked(false);
+
     //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(30);
@@ -163,7 +167,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
-    vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
+    vLayout->addWidget(smoothCheckBox);
+    vLayout->addWidget(seriesCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
     vLayout->addWidget(barStyleList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
@@ -197,6 +202,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setGridEnabled);
     QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setSmoothBars);
+    QObject::connect(seriesCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setSeriesVisibility);
 
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));

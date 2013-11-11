@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/Q3DSurface>
 #include <QtDataVisualization/QSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
 #include <QSlider>
 #include <QTimer>
 #include <QLabel>
@@ -97,6 +98,7 @@ private:
     QTimer m_timer;
     QSurfaceDataArray *m_planeArray;
     QLabel *m_selectionInfoLabel;
+    QSurface3DSeries *m_theSeries;
 };
 
 #endif

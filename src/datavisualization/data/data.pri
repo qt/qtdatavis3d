@@ -36,7 +36,15 @@ HEADERS += \
     $$PWD/qitemmodelsurfacedataproxy_p.h \
     $$PWD/surfaceitemmodelhandler_p.h \
     $$PWD/qsurfacedataitem.h \
-    $$PWD/qsurfacedataitem_p.h
+    $$PWD/qsurfacedataitem_p.h \
+    $$PWD/qabstract3dseries.h \
+    $$PWD/qabstract3dseries_p.h \
+    $$PWD/qbar3dseries.h \
+    $$PWD/qbar3dseries_p.h \
+    $$PWD/qscatter3dseries.h \
+    $$PWD/qscatter3dseries_p.h \
+    $$PWD/qsurface3dseries.h \
+    $$PWD/qsurface3dseries_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -61,4 +69,8 @@ SOURCES += \
     $$PWD/qitemmodelsurfacedatamapping.cpp \
     $$PWD/qitemmodelsurfacedataproxy.cpp \
     $$PWD/surfaceitemmodelhandler.cpp \
-    $$PWD/qsurfacedataitem.cpp
+    $$PWD/qsurfacedataitem.cpp \
+    $$PWD/qabstract3dseries.cpp \
+    $$PWD/qbar3dseries.cpp \
+    $$PWD/qscatter3dseries.cpp \
+    $$PWD/qsurface3dseries.cpp

@@ -20,6 +20,7 @@
 #define GRAPHMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
+#include <QtDataVisualization/qbardataproxy.h>
 
 #include <QFont>
 #include <QDebug>
@@ -45,6 +46,7 @@ public:
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void setSmoothBars(int smooth);
+    void setSeriesVisibility(int enabled);
     void start();
 
 public slots:
@@ -71,7 +73,8 @@ private:
     Q3DValueAxis *m_temperatureAxis;
     Q3DCategoryAxis *m_yearAxis;
     Q3DCategoryAxis *m_monthAxis;
-    QBarDataProxy *m_temperatureData;
+    QBarDataProxy *m_primaryData;
+    QBarDataProxy *m_secondaryData;
     QDataVis::MeshStyle m_style;
     bool m_smooth;
 };

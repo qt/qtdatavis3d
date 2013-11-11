@@ -99,7 +99,7 @@ protected:
 public:
     virtual ~Abstract3DRenderer();
 
-    void updateDataModel(QAbstractDataProxy *dataProxy);
+    virtual void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
 
     virtual void render(GLuint defaultFboHandle);
 

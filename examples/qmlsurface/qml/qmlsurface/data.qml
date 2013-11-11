@@ -22,8 +22,8 @@ import QtDataVisualization 1.0
 Item {
     property alias mapping: surfaceMapping
     property alias model: dataModel
-    property alias proxy: modelProxy
-    property alias heightProxy: heightMapProxy
+    property alias series: surfaceSeries
+    property alias heightSeries: heightSeries
 
     //! [0]
     HeightMapSurfaceDataProxy {
@@ -53,6 +53,16 @@ Item {
         itemModel: dataModel
     }
     //! [3]
+
+    Surface3DSeries {
+        id: surfaceSeries
+        dataProxy: modelProxy
+    }
+
+    Surface3DSeries {
+        id: heightSeries
+        dataProxy: heightMapProxy
+    }
 
     //! [1]
     ListModel {

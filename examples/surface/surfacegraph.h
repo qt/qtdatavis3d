@@ -22,6 +22,7 @@
 #include <QtDataVisualization/Q3DSurface>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
 #include <QtWidgets/QSlider>
 
 using namespace QtDataVisualization;
@@ -33,8 +34,8 @@ public:
     explicit SurfaceGraph(Q3DSurface *surface);
     ~SurfaceGraph();
 
-    void enableHeightMapModel();
-    void enableSqrtSinModel();
+    void enableHeightMapModel(bool enable);
+    void enableSqrtSinModel(bool enable);
 
     //! [0]
     void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionNone); }
@@ -64,7 +65,9 @@ public slots:
 private:
     Q3DSurface *m_graph;
     QHeightMapSurfaceDataProxy *m_heightMapProxy;
-    QSurfaceDataProxy *sqrtSinProxy;
+    QSurfaceDataProxy *m_sqrtSinProxy;
+    QSurface3DSeries *m_heightMapSeries;
+    QSurface3DSeries *m_sqrtSinSeries;
 
     QSlider *m_axisMinSliderX;
     QSlider *m_axisMaxSliderX;

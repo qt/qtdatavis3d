@@ -105,12 +105,16 @@ private:
     BarRenderItem m_dummyBarRenderItem;
     QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
+    int m_seriesCount;
+    float m_seriesScale;
+    float m_seriesStep;
+    float m_seriesStart;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
-    void updateDataModel(QBarDataProxy *dataProxy);
+    void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 

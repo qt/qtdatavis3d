@@ -25,6 +25,7 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -141,15 +142,14 @@ void Scatter3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-//void Scatter3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
-void Scatter3DRenderer::updateSeriesData(QScatterDataProxy *dataProxy)
+void Scatter3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
 {
-    //QList<QScatter3DSeries *> visibleSeries;
-    //foreach (QAbstract3DSeries *current, seriesList) {
-    //    if (current->isVisible())
-    //        visibleSeries.append(static_cast<QScatter3DSeries *>(current));
-    //}
-    int seriesCount = 3;//visibleSeries.size(); // TODO: Use a number for testing until QTRD-2548 is done
+    QList<QScatter3DSeries *> visibleSeries;
+    foreach (QAbstract3DSeries *current, seriesList) {
+        if (current->isVisible())
+            visibleSeries.append(static_cast<QScatter3DSeries *>(current));
+    }
+    int seriesCount = visibleSeries.size();
     calculateSceneScalingFactors();
     float minX = float(m_axisCacheX.min());
     float maxX = float(m_axisCacheX.max());
@@ -165,7 +165,7 @@ void Scatter3DRenderer::updateSeriesData(QScatterDataProxy *dataProxy)
     }
 
     for (int series = 0; series < m_seriesCount; series++) {
-        //QScatterDataProxy *dataProxy = visibleSeries.at(series)->dataProxy();
+        QScatterDataProxy *dataProxy = visibleSeries.at(series)->dataProxy();
         const QScatterDataArray &dataArray = *dataProxy->array();
         int dataSize = dataArray.size();
         totalDataSize += dataSize;
@@ -179,9 +179,7 @@ void Scatter3DRenderer::updateSeriesData(QScatterDataProxy *dataProxy)
             if ((dotPos.x() >= minX && dotPos.x() <= maxX )
                     && (dotPos.y() >= minY && dotPos.y() <= maxY)
                     && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
-                //m_renderingArrays[series][i].setPosition(dotPos);
-                // TODO: Hack different values for sets until QTRD-2548
-                m_renderingArrays[series][i].setPosition(dotPos * (1.0f - (series * 0.25f)));
+                m_renderingArrays[series][i].setPosition(dotPos);
                 m_renderingArrays[series][i].setVisible(true);
                 calculateTranslation(m_renderingArrays[series][i]);
             } else {
@@ -192,8 +190,7 @@ void Scatter3DRenderer::updateSeriesData(QScatterDataProxy *dataProxy)
     m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)totalDataSize)), 0.1);
     m_selectedItem = 0;
 
-    Abstract3DRenderer::updateDataModel(dataProxy);
-    //Abstract3DRenderer::updateSeriesData(seriesList);
+    Abstract3DRenderer::updateSeriesData(seriesList);
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
@@ -514,7 +511,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        // TODO: Can't call back to controller here! (QTRD-2216)
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
         if (m_clickedColor == invalidColorVector) {
@@ -585,7 +581,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     int dotNo = 0;
 
     for (int series = 0; series < m_seriesCount; series++) {
-        // TODO: Color per series. Let's just hack it while testing with 2 series
+        // TODO: Color per series. Let's just hack it while testing with 2 series QTRD-2557
         QVector3D baseColor = Utils::vectorFromColor(m_cachedObjectColor) * (series + 0.25f);
         QVector3D dotColor = baseColor;
 

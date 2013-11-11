@@ -20,8 +20,8 @@
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
 #include "q3dvalueaxis.h"
-#include "qscatterdataproxy.h"
 #include "q3dcamera.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMouseEvent>
 #include <QDebug>
@@ -44,11 +44,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: if no data proxy is set explicitly, Q3DScatter creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DScatter supports more than one series visible at the same time.
  *
- * Methods are provided for changing item styles, themes, item selection modes and so on. See the
+ * Methods are provided for changing themes, item selection modes and so on. See the
  * methods for more detailed descriptions.
  *
  * \section1 How to construct a minimal Q3DScatter graph
@@ -125,10 +123,35 @@ Q3DScatter::Q3DScatter()
 }
 
 /*!
- *  Destroys the 3D scatter window.
+ * Destroys the 3D scatter window.
  */
 Q3DScatter::~Q3DScatter()
 {
+}
+
+/*!
+ * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
+ * axes.
+ */
+void Q3DScatter::addSeries(QScatter3DSeries *series)
+{
+    d_ptr->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DScatter::removeSeries(QScatter3DSeries *series)
+{
+    d_ptr->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ */
+QList<QScatter3DSeries *> Q3DScatter::seriesList()
+{
+    return d_ptr->m_shared->scatterSeriesList();
 }
 
 /*!
@@ -615,68 +638,6 @@ QList<Q3DValueAxis *> Q3DScatter::axes() const
     QList<Q3DValueAxis *> retList;
     foreach (Q3DAbstractAxis *axis, abstractAxes)
         retList.append(static_cast<Q3DValueAxis *>(axis));
-
-    return retList;
-}
-
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DScatter::setActiveDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QScatterDataProxy *Q3DScatter::activeDataProxy() const
-{
-    return static_cast<QScatterDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DScatter::addDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DScatter::releaseDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QScatterDataProxy *> Q3DScatter::dataProxies() const
-{
-    QList<QScatterDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QScatterDataProxy *>(proxy));
 
     return retList;
 }

@@ -20,9 +20,13 @@ import QtQuick 2.1
 import QtDataVisualization 1.0
 
 Item {
-    property alias mapping: valueMapping
     property alias model: dataModel
+    property alias mapping: valueMapping
     property alias proxy: modelProxy
+    property alias series: barSeries
+    property alias secondaryMapping: secondaryMapping
+    property alias secondaryProxy: secondaryProxy
+    property alias secondarySeries: secondarySeries
 
     //! [1]
     BarDataMapping {
@@ -39,6 +43,33 @@ Item {
         itemModel: dataModel
     }
     //! [2]
+
+    BarDataMapping {
+        id: secondaryMapping
+        rowRole: "year"
+        columnRole: "month"
+        valueRole: "income"
+    }
+
+    ItemModelBarDataProxy {
+        id: secondaryProxy
+        activeMapping: secondaryMapping
+        itemModel: dataModel
+    }
+
+    Bar3DSeries {
+        id: barSeries
+        dataProxy: modelProxy
+        itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+    }
+
+    Bar3DSeries {
+        id: secondarySeries
+        visible: false
+        dataProxy: secondaryProxy
+        itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+    }
+
     //! [0]
     ListModel {
         id: dataModel

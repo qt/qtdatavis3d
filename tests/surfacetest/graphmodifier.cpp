@@ -19,6 +19,7 @@
 #include "graphmodifier.h"
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QtDataVisualization/QSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
 
 #include <qmath.h>
 #include <QLinearGradient>
@@ -46,13 +47,15 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_rangeZ(16.0),
       m_minX(-8.0),
       m_minZ(-8.0),
-      m_planeArray(0)
+      m_planeArray(0),
+      m_theSeries(new QSurface3DSeries)
 {
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+    m_graph->addSeries(m_theSeries);
     changeStyle();
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
@@ -79,7 +82,7 @@ void GraphModifier::toggleSurfaceGrid(bool enable)
 void GraphModifier::toggleSurface(bool enable)
 {
     qDebug() << "GraphModifier::toggleSurface" << enable;
-    m_graph->setSurfaceVisible(enable);
+    m_theSeries->setVisible(enable);
 }
 
 void GraphModifier::toggleSqrtSin(bool enable)
@@ -316,8 +319,9 @@ void GraphModifier::changeStyle()
 
 void GraphModifier::selectButtonClicked()
 {
-    int row = rand() % m_graph->activeDataProxy()->rowCount();
-    int col = rand() % m_graph->activeDataProxy()->columnCount();
+    QSurfaceDataProxy *proxy = m_theSeries->dataProxy();
+    int row = rand() % proxy->rowCount();
+    int col = rand() % proxy->columnCount();
 
     m_graph->setSelectedPoint(QPoint(row, col));
 }
@@ -357,7 +361,7 @@ void GraphModifier::timeout()
     }
 
     // Reset same array to make it redraw
-    m_graph->activeDataProxy()->resetArray(m_planeArray);
+    m_theSeries->dataProxy()->resetArray(m_planeArray);
 }
 
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX, qreal maxX)
@@ -367,7 +371,7 @@ void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, q
     m_axisRangeSliderX->setValue(maxX - minX);
     m_axisRangeSliderZ->setValue(maxZ - minZ);
 
-    m_graph->activeDataProxy()->resetArray(array);
+    m_theSeries->dataProxy()->resetArray(array);
 }
 
 void GraphModifier::changeShadowQuality(int quality)

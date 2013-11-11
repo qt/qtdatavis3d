@@ -27,12 +27,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 typedef QVector<QScatterDataItem> QScatterDataArray;
 
 class QScatterDataProxyPrivate;
+class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
     Q_PROPERTY(int itemCount READ itemCount)
+    Q_PROPERTY(QScatter3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
     explicit QScatterDataProxy(QObject *parent = 0);
@@ -46,6 +48,7 @@ public:
     * added in the future such as color requires allocating additional data object for the bar.
     */
 
+    QScatter3DSeries *series();
     int itemCount() const;
     const QScatterDataArray *array() const;
     const QScatterDataItem *itemAt(int index) const;
@@ -69,6 +72,7 @@ signals:
     void itemsChanged(int startIndex, int count);
     void itemsRemoved(int startIndex, int count);
     void itemsInserted(int startIndex, int count);
+    void seriesChanged(QScatter3DSeries *series);
 
 protected:
     explicit QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent = 0);

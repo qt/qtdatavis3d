@@ -50,14 +50,13 @@ Item {
             font.pointSize: 35
             theme: AbstractGraph3D.ThemeRetro
             labelStyle: AbstractGraph3D.LabelStyleFromTheme
-            dataProxy: graphData.proxy
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
-            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetRight
+            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
             valueAxis: graphAxes.expenses
-            itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+            seriesList: [graphData.series, graphData.secondarySeries]
 
             onSelectedBarChanged: {
                 // Set tableView current row to selected bar
@@ -93,12 +92,19 @@ Item {
         text: "Show Income"
         //! [0]
         onClicked: {
-            if (graphData.mapping.valueRole === "expenses") {
+            if (graphData.mapping.valueRole === "expenses" && !graphData.secondarySeries.visible) {
+                // Change mapping to change series data
                 graphData.mapping.valueRole = "income"
+                text = "Show Both"
+                testGraph.valueAxis = graphAxes.income
+            } else if (graphData.mapping.valueRole === "income"){
+                // Show both data set in separate series
+                graphData.secondarySeries.visible = true
+                graphData.mapping.valueRole = "expenses"
                 text = "Show Expenses"
                 testGraph.valueAxis = graphAxes.income
             } else {
-                graphData.mapping.valueRole = "expenses"
+                graphData.secondarySeries.visible = false
                 text = "Show Income"
                 testGraph.valueAxis = graphAxes.expenses
             }
@@ -134,12 +140,15 @@ Item {
             if (testGraph.rowAxis.max !== 6) {
                 text = "Show 2010 - 2012"
                 graphData.mapping.autoRowCategories = true
+                graphData.secondaryMapping.autoRowCategories = true
             } else {
                 text = "Show all years"
                 // Explicitly defining row categories, since we do not want to show data for
                 // all years in the model, just for the selected ones.
                 graphData.mapping.autoRowCategories = false
+                graphData.secondaryMapping.autoRowCategories = false
                 graphData.mapping.rowCategories = ["2010", "2011", "2012"]
+                graphData.secondaryMapping.rowCategories = ["2010", "2011", "2012"]
             }
         }
         //! [1]

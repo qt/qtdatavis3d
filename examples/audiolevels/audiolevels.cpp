@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
 
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
@@ -48,6 +49,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0, 10.0, 190.0);
     m_graph->setTheme(QDataVis::ThemeIsabelle);
     m_graph->setBarType(QDataVis::MeshStyleBars);
+    m_graph->addSeries(new QBar3DSeries);
 
     //! [0]
     QAudioFormat formatAudio;
@@ -67,7 +69,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_audioInput->setBufferSize(1024);
 #endif
 
-    m_device = new AudioLevelsIODevice(m_graph->activeDataProxy(), this);
+    m_device = new AudioLevelsIODevice(m_graph->seriesList().at(0)->dataProxy(), this);
     m_device->open(QIODevice::WriteOnly);
 
     m_audioInput->start(m_device);

@@ -47,6 +47,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class CameraHelper;
 class Abstract3DRenderer;
+class QAbstract3DSeries;
 
 struct Abstract3DChangeBitField {
     bool positionChanged               : 1;
@@ -195,11 +196,9 @@ protected:
     QList<Q3DAbstractAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
-
-    QAbstractDataProxy *m_data;
-    QList<QAbstractDataProxy *> m_dataProxies;
-
     bool m_renderPending;
+
+    QList<QAbstract3DSeries *> m_seriesList;
 
     explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
     virtual ~Abstract3DController();
@@ -207,19 +206,13 @@ protected:
 public:
 
     inline bool isInitialized() { return (m_renderer != 0); }
-
-    /**
-     * @brief synchDataToRenderer Called on the render thread while main GUI thread is blocked before rendering.
-     */
     virtual void synchDataToRenderer();
-
     virtual void render(const GLuint defaultFboHandle = 0);
-
-    /**
-     * @brief setRenderer Sets the renderer to be used. isInitialized returns true from this point onwards.
-     * @param renderer Renderer to be used.
-     */
     void setRenderer(Abstract3DRenderer *renderer);
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    QList<QAbstract3DSeries *> seriesList();
 
     // Size
     virtual void setSize(const int width, const int height);
@@ -256,11 +249,6 @@ public:
     virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual QAbstract3DInputHandler *activeInputHandler();
 
-    virtual QAbstractDataProxy *activeDataProxy() const;
-    virtual void addDataProxy(QAbstractDataProxy *proxy);
-    virtual void releaseDataProxy(QAbstractDataProxy *proxy);
-    virtual QList<QAbstractDataProxy *> dataProxies() const;
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
     virtual void updateDevicePixelRatio(qreal ratio);
 
     virtual int zoomLevel();
@@ -324,6 +312,9 @@ public:
 
     Q3DScene *scene();
 
+    inline void setDataDirty() { m_isDataDirty = true; }
+    void emitNeedRender();
+
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void touchEvent(QTouchEvent *event);
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
@@ -339,6 +330,7 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
 public slots:
     void handleAxisTitleChanged(const QString &title);
@@ -350,6 +342,7 @@ public slots:
     void handleAxisLabelFormatChanged(const QString &format);
     void handleInputStateChanged(QDataVis::InputState state);
     void handleInputPositionChanged(const QPoint &position);
+    void handleSeriesVisibilityChanged(bool visible);
 
     // Renderer callback handlers
     void handleRequestShadowQuality(QDataVis::ShadowQuality quality);
@@ -377,7 +370,6 @@ protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
     Q3DValueAxis *createDefaultValueAxis();
     Q3DCategoryAxis *createDefaultCategoryAxis();
-    void emitNeedRender();
 
 private:
     void setAxisHelper(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis *axis,

@@ -25,6 +25,7 @@
 #include <QtDataVisualization/q3dcategoryaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -106,7 +107,7 @@ MainApp::MainApp(Q3DBars *window)
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
     QBarDataProxy *proxy = new QBarDataProxy;
-    m_chart->setActiveDataProxy(proxy);
+    m_chart->addSeries(new QBar3DSeries(proxy));
 }
 
 MainApp::~MainApp()
@@ -143,7 +144,7 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
             (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), qreal(e.amplitude)));
         }
     }
-    static_cast<QBarDataProxy *>(m_chart->activeDataProxy())->insertRow(0, data);
+    m_chart->seriesList().at(0)->dataProxy()->insertRow(0, data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)

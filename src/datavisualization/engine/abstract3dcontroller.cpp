@@ -27,6 +27,7 @@
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
+#include "qabstract3dseries_p.h"
 
 #include <QThread>
 
@@ -50,7 +51,6 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_data(0),
     m_renderPending(false)
 {
     // Set initial theme
@@ -82,11 +82,39 @@ Abstract3DController::~Abstract3DController()
     delete m_scene;
 }
 
+/**
+ * @brief setRenderer Sets the renderer to be used. isInitialized returns true from this point onwards.
+ * @param renderer Renderer to be used.
+ */
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
     m_renderer = renderer;
 }
 
+void Abstract3DController::addSeries(QAbstract3DSeries *series)
+{
+    if (series && !m_seriesList.contains(series)) {
+        m_seriesList.append(series);
+        series->d_ptr->setController(this);
+    }
+}
+
+void Abstract3DController::removeSeries(QAbstract3DSeries *series)
+{
+    if (series && series->d_ptr->m_controller == this) {
+        m_seriesList.removeAll(series);
+        series->d_ptr->setController(0);
+    }
+}
+
+QList<QAbstract3DSeries *> Abstract3DController::seriesList()
+{
+    return m_seriesList;
+}
+
+/**
+ * @brief synchDataToRenderer Called on the render thread while main GUI thread is blocked before rendering.
+ */
 void Abstract3DController::synchDataToRenderer()
 {
     // If we don't have a renderer, don't do anything
@@ -334,6 +362,12 @@ void Abstract3DController::synchDataToRenderer()
                                               valueAxisZ->labelFormat());
         }
     }
+
+    // TODO: Another (per-series?) flag about series visuals being dirty?
+    if (m_isDataDirty) {
+        m_renderer->updateSeriesData(m_seriesList);
+        m_isDataDirty = false;
+    }
 }
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
@@ -580,64 +614,6 @@ void Abstract3DController::releaseAxis(Q3DAbstractAxis *axis)
 QList<Q3DAbstractAxis *> Abstract3DController::axes() const
 {
     return m_axes;
-}
-
-QAbstractDataProxy *Abstract3DController::activeDataProxy() const
-{
-    return m_data;
-}
-
-void Abstract3DController::addDataProxy(QAbstractDataProxy *proxy)
-{
-    Q_ASSERT(proxy);
-    Abstract3DController *owner = qobject_cast<Abstract3DController *>(proxy->parent());
-    if (owner != this) {
-        Q_ASSERT_X(!owner, "addDataProxy", "Proxy already attached to a graph.");
-        proxy->setParent(this);
-    }
-    if (!m_dataProxies.contains(proxy))
-        m_dataProxies.append(proxy);
-}
-
-void Abstract3DController::releaseDataProxy(QAbstractDataProxy *proxy)
-{
-    if (proxy && m_dataProxies.contains(proxy)) {
-        // Clear the default status from released default proxies
-        if (proxy->d_ptr->isDefaultProxy())
-            proxy->d_ptr->setDefaultProxy(false);
-
-        // If the proxy is in use, replace it with a temporary one
-        if (m_data == proxy)
-            setActiveDataProxy(0);
-
-        m_dataProxies.removeAll(proxy);
-        proxy->setParent(0);
-    }
-}
-
-QList<QAbstractDataProxy *> Abstract3DController::dataProxies() const
-{
-    return m_dataProxies;
-}
-
-void Abstract3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
-{
-    // If existing proxy is the default proxy, delete it
-    if (m_data) {
-        if (m_data->d_ptr->isDefaultProxy()) {
-            m_dataProxies.removeAll(m_data);
-            delete m_data;
-        } else {
-            // Disconnect the old proxy from use
-            QObject::disconnect(m_data, 0, this, 0);
-        }
-    }
-
-    // Assume ownership and activate
-    addDataProxy(proxy);
-    m_data = proxy;
-    m_isDataDirty = true;
-    emitNeedRender();
 }
 
 void Abstract3DController::addInputHandler(QAbstract3DInputHandler *inputHandler)
@@ -1113,6 +1089,13 @@ void Abstract3DController::handleInputPositionChanged(const QPoint &position)
     emitNeedRender();
 }
 
+void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
+{
+    Q_UNUSED(visible)
+
+    handleSeriesVisibilityChangedBySender(sender());
+}
+
 void Abstract3DController::handleRequestShadowQuality(QDataVis::ShadowQuality quality)
 {
     setShadowQuality(quality);
@@ -1133,6 +1116,14 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
+{
+    Q_UNUSED(sender)
+
+    m_isDataDirty = true;
     emitNeedRender();
 }
 

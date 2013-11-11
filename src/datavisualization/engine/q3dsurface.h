@@ -29,7 +29,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
 class Q3DValueAxis;
-class QSurfaceDataProxy;
+class QSurface3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
@@ -38,7 +38,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(bool surfaceVisible READ isSurfaceVisible WRITE setSurfaceVisible NOTIFY surfaceVisibleChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
@@ -53,8 +52,9 @@ public:
     explicit Q3DSurface();
     ~Q3DSurface();
 
-    void setSurfaceVisible(bool visible);
-    bool isSurfaceVisible() const;
+    void addSeries(QSurface3DSeries *series);
+    void removeSeries(QSurface3DSeries *series);
+    QList<QSurface3DSeries *> seriesList();
 
     void setGridVisible(bool visible);
     bool isGridVisible() const;
@@ -91,12 +91,6 @@ public:
     void addAxis(Q3DValueAxis *axis);
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
-
-    void setActiveDataProxy(QSurfaceDataProxy *proxy);
-    QSurfaceDataProxy *activeDataProxy() const;
-    void addDataProxy(QSurfaceDataProxy *proxy);
-    void releaseDataProxy(QSurfaceDataProxy *proxy);
-    QList<QSurfaceDataProxy *> dataProxies() const;
 
     void setFont(const QFont &font);
     QFont font() const;

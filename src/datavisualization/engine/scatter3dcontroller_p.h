@@ -38,6 +38,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Scatter3DRenderer;
 class QScatterDataProxy;
+class QScatter3DSeries;
 
 struct Scatter3DChangeBitField {
     bool selectedItemIndexChanged : 1;
@@ -75,9 +76,11 @@ public:
     int selectedItemIndex() const;
     static inline int noSelectionIndex() { return -1; }
 
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
-
     void synchDataToRenderer();
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QScatter3DSeries *> scatterSeriesList();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);

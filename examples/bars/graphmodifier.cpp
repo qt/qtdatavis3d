@@ -22,6 +22,7 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
 #include <QTime>
 #include <QComboBox>
 
@@ -43,7 +44,8 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_temperatureAxis(new Q3DValueAxis),
       m_yearAxis(new Q3DCategoryAxis),
       m_monthAxis(new Q3DCategoryAxis),
-      m_temperatureData(new QBarDataProxy),
+      m_primaryData(new QBarDataProxy),
+      m_secondaryData(new QBarDataProxy),
       //! [1]
       m_style(QDataVis::MeshStyleBevelBars),
       m_smooth(false)
@@ -73,10 +75,15 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_graph->addAxis(m_monthAxis);
     //! [3]
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    QBar3DSeries *series = new QBar3DSeries(m_primaryData);
+    series->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
+    series2->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    series2->setVisible(false);
 
     //! [4]
-    m_graph->addDataProxy(m_temperatureData);
+    m_graph->addSeries(series);
+    m_graph->addSeries(series2);
     //! [4]
 
     changePresetCamera();
@@ -92,8 +99,6 @@ GraphModifier::~GraphModifier()
 void GraphModifier::start()
 {
     //! [6]
-    m_graph->setActiveDataProxy(m_temperatureData);
-
     m_graph->setValueAxis(m_temperatureAxis);
     m_graph->setRowAxis(m_yearAxis);
     m_graph->setColumnAxis(m_monthAxis);
@@ -113,25 +118,40 @@ void GraphModifier::resetTemperatureData()
         {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2},     // 2011
         {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
     };
+    static const qreal temp2[7][12] = {
+        {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1},     // 2006
+        {-7.8, -8.8, -4.2, 0.7, 9.3, 13.2, 15.8, 15.5, 11.2, 0.6, 0.7, -8.4},      // 2007
+        {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2008
+        {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2009
+        {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2010
+        {-14.4, -12.1, -7.0, 2.3, 11.0, 12.6, 18.8, 13.8, 9.4, 3.9, -5.6, -13.0},  // 2011
+        {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2}      // 2012
+    };
 
-    // Create data array
+    // Create data arrays
     QBarDataArray *dataSet = new QBarDataArray;
+    QBarDataArray *dataSet2 = new QBarDataArray;
     QBarDataRow *dataRow;
+    QBarDataRow *dataRow2;
 
     dataSet->reserve(m_years.size());
     for (int year = 0; year < m_years.size(); year++) {
         // Create a data row
         dataRow = new QBarDataRow(m_months.size());
+        dataRow2 = new QBarDataRow(m_months.size());
         for (int month = 0; month < m_months.size(); month++) {
             // Add data to the row
             (*dataRow)[month].setValue(temp[year][month]);
+            (*dataRow2)[month].setValue(temp2[year][month]);
         }
         // Add the row to the set
         dataSet->append(dataRow);
+        dataSet2->append(dataRow2);
     }
 
     // Add data to the graph (the graph assumes ownership of it)
-    m_temperatureData->resetArray(dataSet, m_years, m_months);
+    m_primaryData->resetArray(dataSet, m_years, m_months);
+    m_secondaryData->resetArray(dataSet2, m_years, m_months);
     //! [5]
 }
 
@@ -220,16 +240,28 @@ void GraphModifier::rotateY(int rotation)
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible((bool)enabled);
+    m_graph->setBackgroundVisible(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible((bool)enabled);
+    m_graph->setGridVisible(bool(enabled));
 }
 
 void GraphModifier::setSmoothBars(int smooth)
 {
     m_smooth = bool(smooth);
     m_graph->setBarType(m_style, m_smooth);
+}
+
+void GraphModifier::setSeriesVisibility(int enabled)
+{
+    m_graph->seriesList().at(1)->setVisible(bool(enabled));
+    if (enabled) {
+        m_graph->setBarThickness(2.0);
+        m_graph->setBarSpacing(QSizeF(1.0, 3.0));
+    } else {
+        m_graph->setBarThickness(1.0);
+        m_graph->setBarSpacing(QSizeF(1.0, 1.0));
+    }
 }

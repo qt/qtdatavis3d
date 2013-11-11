@@ -29,6 +29,7 @@
 #include "utils_p.h"
 #include "drawer_p.h"
 #include "q3dlight.h"
+#include "qsurface3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -101,7 +102,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQualityToShader(33.3f),
       m_cachedSmoothSurface(true),
       m_flatSupported(true),
-      m_cachedSurfaceOn(true),
+      m_cachedSurfaceVisible(true),
       m_cachedSurfaceGridOn(true),
       m_selectionPointer(0),
       m_selectionActive(false),
@@ -196,15 +197,25 @@ void Surface3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
+void Surface3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
 {
+    // Surface only supports single series for now, so we are only interested in the first series
+    const QSurfaceDataArray *array = 0;
+    if (seriesList.size()) {
+        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(seriesList.at(0));
+        m_cachedSurfaceVisible = firstSeries->isVisible(); // TODO: To series visuals update?
+        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
+            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+            if (dataProxy)
+                array = dataProxy->array();
+        }
+    }
+
     calculateSceneScalingFactors();
 
-    const QSurfaceDataArray &array = *dataProxy->array();
-
     // Need minimum of 2x2 array to draw a surface
-    if (array.size() >= 2 && array.at(0)->size() >= 2) {
-        QRect sampleSpace = calculateSampleRect(array);
+    if (array && array->size() >= 2 && array->at(0)->size() >= 2) {
+        QRect sampleSpace = calculateSampleRect(*array);
 
         bool dimensionChanged = false;
         if (m_sampleSpace != sampleSpace) {
@@ -225,7 +236,7 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
             }
             for (int i = 0; i < sampleSpace.height(); i++) {
                 for (int j = 0; j < sampleSpace.width(); j++)
-                    (*(m_dataArray.at(i)))[j] = array.at(i + sampleSpace.y())->at(j + sampleSpace.x());
+                    (*(m_dataArray.at(i)))[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
             }
 
             if (m_dataArray.size() > 0) {
@@ -258,7 +269,7 @@ void Surface3DRenderer::updateDataModel(QSurfaceDataProxy *dataProxy)
 
     m_selectionDirty = true;
 
-    Abstract3DRenderer::updateDataModel(dataProxy);
+    Abstract3DRenderer::updateSeriesData(seriesList);
 }
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
@@ -515,7 +526,7 @@ void Surface3DRenderer::drawSlicedScene()
 
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
-        if (m_cachedSurfaceOn) {
+        if (m_cachedSurfaceVisible) {
             if (m_cachedSurfaceGridOn) {
                 glEnable(GL_POLYGON_OFFSET_FILL);
                 glPolygonOffset(0.5f, 1.0f);
@@ -784,7 +795,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
     GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceOn) {
+    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceVisible) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -899,7 +910,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && m_surfaceObj && m_inputState == QDataVis::InputStateOnScene
-            && m_cachedSelectionMode > QDataVis::SelectionNone) {
+            && m_cachedSelectionMode > QDataVis::SelectionNone
+            && (m_cachedSurfaceVisible || m_cachedSurfaceGridOn)) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -970,7 +982,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-        if (m_cachedSurfaceOn) {
+        if (m_cachedSurfaceVisible) {
             // Set shader bindings
             m_surfaceShader->setUniformValue(m_surfaceShader->lightP(), lightPos);
             m_surfaceShader->setUniformValue(m_surfaceShader->view(), viewMatrix);
@@ -1063,7 +1075,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_cachedSurfaceOn) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_cachedSurfaceVisible) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -1779,11 +1791,6 @@ void Surface3DRenderer::updateSelectedPoint(const QPoint &position)
 {
     m_selectedPoint = position;
     m_selectionDirty = true;
-}
-
-void Surface3DRenderer::updateSurfaceVisibilityStatus(bool visible)
-{
-    m_cachedSurfaceOn = visible;
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)

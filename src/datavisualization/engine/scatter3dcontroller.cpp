@@ -22,6 +22,7 @@
 #include "q3dabstractaxis_p.h"
 #include "q3dvalueaxis_p.h"
 #include "qscatterdataproxy_p.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <qmath.h>
@@ -35,8 +36,6 @@ Scatter3DController::Scatter3DController(QRect boundRect)
 {
     // Default object type; specific to scatter
     setObjectType(QDataVis::MeshStyleSpheres, false);
-
-    setActiveDataProxy(new QScatterDataProxy);
 
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
@@ -77,42 +76,47 @@ void Scatter3DController::synchDataToRenderer()
         m_renderer->updateSelectedItemIndex(m_selectedItemIndex);
         m_changeTracker.selectedItemIndexChanged = false;
     }
+}
 
-    if (m_isDataDirty) {
-        m_renderer->updateSeriesData(static_cast<QScatterDataProxy *>(m_data));
-        m_isDataDirty = false;
+void Scatter3DController::addSeries(QAbstract3DSeries *series)
+{
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeScatter);
+
+    bool firstAdded = !m_seriesList.size();
+
+    Abstract3DController::addSeries(series);
+
+    if (firstAdded) {
+        adjustValueAxisRange();
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedItemIndex(noSelectionIndex());
     }
 }
 
-void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
+void Scatter3DController::removeSeries(QAbstract3DSeries *series)
 {
-    // Setting null proxy indicates default proxy
-    if (!proxy) {
-        proxy = new QScatterDataProxy;
-        proxy->d_ptr->setDefaultProxy(true);
+    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
+
+    Abstract3DController::removeSeries(series);
+
+    if (firstRemoved) {
+        adjustValueAxisRange();
+        // TODO: Temp until selection by series is properly implemented
+        setSelectedItemIndex(noSelectionIndex());
+    }
+}
+
+QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
+{
+    QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
+    QList<QScatter3DSeries *> scatterSeriesList;
+    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+        QScatter3DSeries *scatterSeries = qobject_cast<QScatter3DSeries *>(abstractSeries);
+        if (scatterSeries)
+            scatterSeriesList.append(scatterSeries);
     }
 
-    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeScatter);
-
-    Abstract3DController::setActiveDataProxy(proxy);
-
-    QScatterDataProxy *scatterDataProxy = static_cast<QScatterDataProxy *>(m_data);
-
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::arrayReset,
-                     this, &Scatter3DController::handleArrayReset);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsAdded,
-                     this, &Scatter3DController::handleItemsAdded);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsChanged,
-                     this, &Scatter3DController::handleItemsChanged);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsRemoved,
-                     this, &Scatter3DController::handleItemsRemoved);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsInserted,
-                     this, &Scatter3DController::handleItemsInserted);
-
-    adjustValueAxisRange();
-    setSelectedItemIndex(noSelectionIndex());
-    m_isDataDirty = true;
-    emitNeedRender();
+    return scatterSeriesList;
 }
 
 void Scatter3DController::handleArrayReset()
@@ -150,7 +154,8 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
-    if (startIndex >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
+    QScatterDataProxy *proxy = qobject_cast<QScatterDataProxy *>(sender());
+    if (!proxy || startIndex >= proxy->itemCount())
         setSelectedItemIndex(noSelectionIndex());
     emitNeedRender();
 }
@@ -243,8 +248,9 @@ void Scatter3DController::adjustValueAxisRange()
 {
     QVector3D minLimits;
     QVector3D maxLimits;
-    if (m_data) {
-        static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues(minLimits, maxLimits);
+    if (m_seriesList.size()) {
+        const QScatterDataProxy *proxy = static_cast<QScatter3DSeries *>(m_seriesList.at(0))->dataProxy();
+        proxy->dptrc()->limitValues(minLimits, maxLimits);
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (minLimits.x() != maxLimits.x())

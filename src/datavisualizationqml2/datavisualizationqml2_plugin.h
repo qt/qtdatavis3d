@@ -35,6 +35,10 @@
 #include "q3dobject.h"
 #include "q3dcamera.h"
 #include "q3dscene.h"
+#include "qabstract3dseries.h"
+#include "qbar3dseries.h"
+#include "qscatter3dseries.h"
+#include "qsurface3dseries.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -67,6 +71,11 @@ QML_DECLARE_TYPE(QItemModelScatterDataProxy)
 QML_DECLARE_TYPE(QSurfaceDataProxy)
 QML_DECLARE_TYPE(QItemModelSurfaceDataProxy)
 QML_DECLARE_TYPE(QHeightMapSurfaceDataProxy)
+
+QML_DECLARE_TYPE(QAbstract3DSeries)
+QML_DECLARE_TYPE(QBar3DSeries)
+QML_DECLARE_TYPE(QScatter3DSeries)
+QML_DECLARE_TYPE(QSurface3DSeries)
 
 QML_DECLARE_TYPE(ColorGradientStop)
 QML_DECLARE_TYPE(ColorGradient)

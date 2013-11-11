@@ -40,7 +40,7 @@ Item {
         ColorGradient {
             id: surfaceGradient
             ColorGradientStop { position: 0.0; color: "darkslategray" }
-            ColorGradientStop { id: middleGradient; position: 0.55; color: "peru" }
+            ColorGradientStop { id: middleGradient; position: 0.25; color: "peru" }
             ColorGradientStop { position: 1.0; color: "red" }
         }
         //! [0]
@@ -57,9 +57,9 @@ Item {
             font.family: "STCaiyun"
             font.pointSize: 35
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
-            dataProxy: surfaceData.heightProxy
+            seriesList: [surfaceData.series]
             axisY.min: 0.0
-            axisY.max: 250.0
+            axisY.max: 500.0
             axisX.segmentCount: 10
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%i"
@@ -109,11 +109,13 @@ Item {
         width: surfaceGridToggle.width
         text: "Hide Surface"
         onClicked: {
-            if (surfaceplot.surfaceVisible === true) {
-                surfaceplot.surfaceVisible = false;
+            if (surfaceplot.seriesList[0].visible === true) {
+                surfaceData.series.visible = false;
+                surfaceData.heightSeries.visible = false;
                 text = "Show Surface"
             } else {
-                surfaceplot.surfaceVisible = true;
+                surfaceData.series.visible = true;
+                surfaceData.heightSeries.visible = true;
                 text = "Hide Surface"
             }
         }
@@ -168,20 +170,20 @@ Item {
     }
 
     NewButton {
-        id: proxyToggle
+        id: seriesToggle
         anchors.top: gridToggle.bottom
         width: gridToggle.width
         text: "Switch to Item Model Proxy"
         //! [3]
         onClicked: {
-            if (surfaceplot.dataProxy === surfaceData.heightProxy) {
+            if (surfaceplot.seriesList[0] === surfaceData.heightSeries) {
                 surfaceplot.axisY.max = 500.0
-                surfaceplot.dataProxy = surfaceData.proxy
+                surfaceplot.seriesList = [surfaceData.series]
                 middleGradient.position = 0.25
                 text = "Switch to Height Map Proxy"
             } else {
                 surfaceplot.axisY.max = 250.0
-                surfaceplot.dataProxy = surfaceData.heightProxy
+                surfaceplot.seriesList = [surfaceData.heightSeries]
                 middleGradient.position = 0.55
                 text = "Switch to Item Model Proxy"
             }

@@ -21,6 +21,7 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qscatter3dseries.h>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -52,8 +53,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 
     //! [2]
     QScatterDataProxy *proxy = new QScatterDataProxy;
-    proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
-    m_graph->setActiveDataProxy(proxy);
+    QScatter3DSeries *series = new QScatter3DSeries(proxy);
+    series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
+    m_graph->addSeries(series);
     //! [2]
 
     changeLabelStyle();
@@ -107,7 +109,7 @@ void ScatterDataModifier::addData()
 #endif
 
     //! [7]
-    m_graph->activeDataProxy()->resetArray(dataArray);
+    m_graph->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     //! [7]
 }
 

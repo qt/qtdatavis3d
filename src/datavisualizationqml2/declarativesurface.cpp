@@ -41,9 +41,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     m_shared = new Surface3DController(boundingRect().toRect());
     setSharedController(m_shared);
 
-    QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy;
-    m_shared->setActiveDataProxy(proxy);
-
     QObject::connect(m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
                      &DeclarativeSurface::smoothSurfaceEnabledChanged);
     QObject::connect(m_shared, &Surface3DController::selectedPointChanged, this,
@@ -88,16 +85,6 @@ QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     return node;
 }
 
-void DeclarativeSurface::setDataProxy(QSurfaceDataProxy *dataProxy)
-{
-    m_shared->setActiveDataProxy(dataProxy);
-}
-
-QSurfaceDataProxy *DeclarativeSurface::dataProxy() const
-{
-    return static_cast<QSurfaceDataProxy *>(m_shared->activeDataProxy());
-}
-
 Q3DValueAxis *DeclarativeSurface::axisX() const
 {
     return static_cast<Q3DValueAxis *>(m_shared->axisX());
@@ -136,16 +123,6 @@ void DeclarativeSurface::setSmoothSurfaceEnabled(bool enabled)
 bool DeclarativeSurface::isSmoothSurfaceEnabled() const
 {
     return m_shared->smoothSurface();
-}
-
-void DeclarativeSurface::setSurfaceVisible(bool visible)
-{
-    m_shared->setSurfaceVisible(visible);
-}
-
-bool DeclarativeSurface::isSurfaceVisible() const
-{
-    return m_shared->surfaceVisible();
 }
 
 void DeclarativeSurface::setSurfaceGridEnabled(bool enabled)
@@ -209,6 +186,50 @@ void DeclarativeSurface::setControllerGradient(const ColorGradient &gradient)
 
     newGradient.setStops(stops);
     m_shared->setGradient(newGradient);
+}
+
+QQmlListProperty<QSurface3DSeries> DeclarativeSurface::seriesList()
+{
+    return QQmlListProperty<QSurface3DSeries>(this, this,
+                                          &DeclarativeSurface::appendSeriesFunc,
+                                          &DeclarativeSurface::countSeriesFunc,
+                                          &DeclarativeSurface::atSeriesFunc,
+                                          &DeclarativeSurface::clearSeriesFunc);
+}
+
+void DeclarativeSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series)
+{
+    reinterpret_cast<DeclarativeSurface *>(list->data)->addSeries(series);
+}
+
+int DeclarativeSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
+{
+    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_shared->surfaceSeriesList().size();
+}
+
+QSurface3DSeries *DeclarativeSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index)
+{
+    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_shared->surfaceSeriesList().at(index);
+}
+
+void DeclarativeSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
+{
+    DeclarativeSurface *declSurface = reinterpret_cast<DeclarativeSurface *>(list->data);
+    QList<QSurface3DSeries *> realList = declSurface->m_shared->surfaceSeriesList();
+    int count = realList.size();
+    for (int i = 0; i < count; i++)
+        declSurface->removeSeries(realList.at(i));
+}
+
+void DeclarativeSurface::addSeries(QSurface3DSeries *series)
+{
+    m_shared->addSeries(series);
+}
+
+void DeclarativeSurface::removeSeries(QSurface3DSeries *series)
+{
+    m_shared->removeSeries(series);
+    series->setParent(this); // Reparent as removing will leave series parentless
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

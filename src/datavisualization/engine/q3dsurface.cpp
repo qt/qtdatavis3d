@@ -21,6 +21,7 @@
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
 #include "q3dcamera.h"
+#include "qsurface3dseries_p.h"
 
 #include <QMouseEvent>
 
@@ -42,8 +43,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * a label which in default case shows the value of the data point and the coordinates of the point.
  *
  * The value range and the label format shown on the axis can be controlled through Q3DValueAxis.
- * The Q3DSurface supports only a grid with fixed steps, so when setting ranges set a value that matches
- * the grid step. To calculate the steps divide the whole data range with the number of segments.
  *
  * To rotate the graph, hold down the right mouse button and move the mouse. Zooming is done using mouse
  * wheel. Both assume the default input handler is in use.
@@ -52,9 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: if no data proxy is set explicitly, Q3DSurface creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DSurface supports only single series at a time.
  *
  * \section1 How to construct a minimal Q3DSurface graph
  *
@@ -132,6 +129,34 @@ Q3DSurface::Q3DSurface()
  */
 Q3DSurface::~Q3DSurface()
 {
+}
+
+/*!
+ * Adds the \a series to the graph.
+ *
+ * \note The surface graph currently supports only a single series at a time.
+ */
+void Q3DSurface::addSeries(QSurface3DSeries *series)
+{
+    d_ptr->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DSurface::removeSeries(QSurface3DSeries *series)
+{
+    d_ptr->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ *
+ * \note The surface graph currently supports only a single series at a time.
+ */
+QList<QSurface3DSeries *> Q3DSurface::seriesList()
+{
+    return d_ptr->m_shared->surfaceSeriesList();
 }
 
 /*!
@@ -294,21 +319,6 @@ void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
 QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DSurface::surfaceVisible
- *
- * Sets surface to \a visible. It is preset to \c true by default.
- */
-void Q3DSurface::setSurfaceVisible(bool visible)
-{
-    d_ptr->m_shared->setSurfaceVisible(visible);
-}
-
-bool Q3DSurface::isSurfaceVisible() const
-{
-    return d_ptr->m_shared->surfaceVisible();
 }
 
 /*!
@@ -509,69 +519,6 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
 
     return retList;
 }
-
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DSurface::setActiveDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QSurfaceDataProxy *Q3DSurface::activeDataProxy() const
-{
-    return static_cast<QSurfaceDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DSurface::addDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DSurface::releaseDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QSurfaceDataProxy *> Q3DSurface::dataProxies() const
-{
-    QList<QSurfaceDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QSurfaceDataProxy *>(proxy));
-
-    return retList;
-}
-
 
 /*!
  * Modifies the current surface gradient. Sets gradient color to \a color at \a pos.

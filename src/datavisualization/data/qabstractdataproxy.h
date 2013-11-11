@@ -32,7 +32,6 @@ class QT_DATAVISUALIZATION_EXPORT QAbstractDataProxy : public QObject
     Q_OBJECT
     Q_ENUMS(DataType)
     Q_PROPERTY(DataType type READ type)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
 
 public:
     enum DataType {
@@ -50,22 +49,17 @@ public:
 
     DataType type() const;
 
-    void setItemLabelFormat(const QString &format);
-    QString itemLabelFormat() const;
-
-signals:
-    void itemLabelFormatChanged(QString format);
-
 protected:
     QScopedPointer<QAbstractDataProxyPrivate> d_ptr;
 
 private:
     Q_DISABLE_COPY(QAbstractDataProxy)
 
-    friend class Abstract3DController;
-    friend class Bars3DController;
-    friend class Scatter3DController;
-    friend class Surface3DController;
+    friend class QAbstract3DSeriesPrivate;
+//    friend class Abstract3DController;
+//    friend class Bars3DController;
+//    friend class Scatter3DController;
+//    friend class Surface3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

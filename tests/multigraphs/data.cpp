@@ -21,6 +21,9 @@
 #include "data.h"
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QtDataVisualization/Q3DCamera>
+#include <QtDataVisualization/QBar3DSeries>
+#include <QtDataVisualization/QScatter3DSeries>
+#include <QtDataVisualization/QSurface3DSeries>
 #include <QScrollBar>
 #include <QSize>
 #include <QImage>
@@ -53,8 +56,8 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_surface->setSurfaceGridEnabled(false);
     m_surface->setBackgroundVisible(false);
     m_surface->setSmoothSurfaceEnabled(false);
-    m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
+    m_surface->addSeries(new QSurface3DSeries(new QHeightMapSurfaceDataProxy()));
 
     // Initialize scatter
     m_scatter->setTheme(QDataVis::ThemeStoneMoss);
@@ -63,6 +66,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_scatter->setObjectType(QDataVis::MeshStylePoints);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
+    m_scatter->addSeries(new QScatter3DSeries);
 
     // Initialize bars
     m_bars->setTheme(QDataVis::ThemeQt);
@@ -72,6 +76,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
     m_bars->scene()->activeCamera()->setCameraPosition(0.0, 75.0, 150);
+    m_bars->addSeries(new QBar3DSeries);
 
     // Hide scroll bar
     m_statusArea->verticalScrollBar()->setVisible(false);
@@ -108,15 +113,15 @@ void Data::updateData()
     if (m_mode != Surface)
         setData(depthMap);
     else
-        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->activeDataProxy())->setHeightMap(
+        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->seriesList().at(0)->dataProxy())->setHeightMap(
                 depthMap);
 }
 
 void Data::clearData()
 {
-    m_bars->activeDataProxy()->resetArray(0);
-    m_scatter->activeDataProxy()->resetArray(0);
-    m_surface->activeDataProxy()->resetArray(0);
+    m_bars->seriesList().at(0)->dataProxy()->resetArray(0);
+    m_scatter->seriesList().at(0)->dataProxy()->resetArray(0);
+    m_surface->seriesList().at(0)->dataProxy()->resetArray(0);
 }
 
 void Data::setResolution(int selection)
@@ -226,7 +231,7 @@ void Data::setData(const QImage &image)
         }
 
         QScatterDataArray *dataArray = new QScatterDataArray(m_scatterDataArray->mid(0, count));
-        m_scatter->activeDataProxy()->resetArray(dataArray);
+        m_scatter->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     } else {
         QBarDataArray *dataArray = m_barDataArray;
         for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
@@ -235,7 +240,7 @@ void Data::setData(const QImage &image)
                 newRow[j] = qreal(bits[bitCount + (j * 4)]);
         }
 
-        m_bars->activeDataProxy()->resetArray(dataArray);
+        m_bars->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     }
 }
 

@@ -23,6 +23,7 @@ Item {
     property alias mapping: valueMapping
     property alias model: dataModel
     property alias proxy: modelProxy
+    property alias series: barSeries
 
     BarDataMapping {
         id: valueMapping
@@ -35,6 +36,12 @@ Item {
         id: modelProxy
         activeMapping: valueMapping
         itemModel: dataModel
+    }
+
+    Bar3DSeries {
+        id: barSeries
+        dataProxy: modelProxy
+        itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
     }
 
     ListModel {

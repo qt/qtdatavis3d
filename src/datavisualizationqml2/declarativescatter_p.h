@@ -35,6 +35,7 @@
 #include "declarativescatter_p.h"
 #include "q3dvalueaxis.h"
 #include "qscatterdataproxy.h"
+#include "qscatter3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -45,7 +46,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeScatter : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
@@ -53,15 +53,13 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
+    Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
 
 public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
     ~DeclarativeScatter();
 
     Q_INVOKABLE void setObjectColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
-
-    QScatterDataProxy *dataProxy() const;
-    void setDataProxy(QScatterDataProxy *dataProxy);
 
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);
@@ -81,6 +79,14 @@ public:
 
     void setSelectedItemIndex(int index);
     int selectedItemIndex() const;
+
+    QQmlListProperty<QScatter3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
+    static QScatter3DSeries *atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
+    Q_INVOKABLE void addSeries(QScatter3DSeries *series);
+    Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
 signals:
     void selectedItemIndexChanged(int index);

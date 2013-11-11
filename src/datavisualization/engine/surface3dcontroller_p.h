@@ -37,18 +37,17 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Surface3DRenderer;
+class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
     bool gradientColorChanged     : 1;
     bool smoothStatusChanged      : 1;
-    bool surfaceVisibilityChanged : 1;
     bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
 
     Surface3DChangeBitField() :
         gradientColorChanged(true),
         smoothStatusChanged(true),
-        surfaceVisibilityChanged(true),
         surfaceGridChanged(true),
         selectedPointChanged(true)
     {
@@ -75,9 +74,6 @@ public:
     void initializeOpenGL();
     virtual void synchDataToRenderer();
 
-    void setSurfaceVisible(bool visible);
-    bool surfaceVisible() const;
-
     void setSmoothSurface(bool enable);
     bool smoothSurface();
 
@@ -94,12 +90,14 @@ public:
     void setSelectedPoint(const QPoint &position);
     QPoint selectedPoint() const;
 
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
-
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
 
     static QPoint noSelectionPoint();
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QSurface3DSeries *> surfaceSeriesList();
 
 public slots:
     void handleArrayReset();

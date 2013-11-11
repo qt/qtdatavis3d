@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qabstract3dinputhandler.h>
-
+#include <QtDataVisualization/qbar3dseries.h>
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
@@ -110,8 +110,9 @@ private:
     Q3DCategoryAxis *m_monthAxis;
     Q3DCategoryAxis *m_genericRowAxis;
     Q3DCategoryAxis *m_genericColumnAxis;
-    QBarDataProxy *m_temperatureData;
-    QBarDataProxy *m_genericData;
+    QBar3DSeries *m_temperatureData;
+    QBar3DSeries *m_temperatureData2;
+    QBar3DSeries *m_genericData;
     Q3DValueAxis *m_currentAxis;
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;

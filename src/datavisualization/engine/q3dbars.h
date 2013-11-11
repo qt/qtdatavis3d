@@ -30,8 +30,8 @@ class Q3DBarsPrivate;
 class Q3DAbstractAxis;
 class Q3DCategoryAxis;
 class Q3DValueAxis;
-class QBarDataProxy;
 class Q3DScene;
+class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
@@ -60,6 +60,10 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 public:
     explicit Q3DBars();
     ~Q3DBars();
+
+    void addSeries(QBar3DSeries *series);
+    void removeSeries(QBar3DSeries *series);
+    QList<QBar3DSeries *> seriesList();
 
     // TODO: Move to dataset object once that is done QTRD-2121
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
@@ -131,13 +135,6 @@ public:
     void addAxis(Q3DAbstractAxis *axis);
     void releaseAxis(Q3DAbstractAxis *axis);
     QList<Q3DAbstractAxis *> axes() const;
-
-    // TODO: Move to dataset object once that is done QTRD-2121
-    void setActiveDataProxy(QBarDataProxy *proxy);
-    QBarDataProxy *activeDataProxy() const;
-    void addDataProxy(QBarDataProxy *proxy);
-    void releaseDataProxy(QBarDataProxy *proxy);
-    QList<QBarDataProxy *> dataProxies() const;
 
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);

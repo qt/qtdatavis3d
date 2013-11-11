@@ -45,9 +45,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
                      &DeclarativeBars::selectedBarChanged);
     QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
                      &DeclarativeBars::meshFileNameChanged);
-
-    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy;
-    m_shared->setActiveDataProxy(proxy);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -81,16 +78,6 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 void DeclarativeBars::setBarColor(const QColor &baseColor)
 {
     m_shared->setObjectColor(baseColor);
-}
-
-void DeclarativeBars::setDataProxy(QBarDataProxy *dataProxy)
-{
-    m_shared->setActiveDataProxy(dataProxy);
-}
-
-QBarDataProxy *DeclarativeBars::dataProxy() const
-{
-    return static_cast<QBarDataProxy *>(m_shared->activeDataProxy());
 }
 
 Q3DCategoryAxis *DeclarativeBars::rowAxis() const
@@ -219,6 +206,50 @@ void DeclarativeBars::setSelectedBar(const QPointF &position)
 QPointF DeclarativeBars::selectedBar() const
 {
     return QPointF(m_shared->selectedBar());
+}
+
+QQmlListProperty<QBar3DSeries> DeclarativeBars::seriesList()
+{
+    return QQmlListProperty<QBar3DSeries>(this, this,
+                                          &DeclarativeBars::appendSeriesFunc,
+                                          &DeclarativeBars::countSeriesFunc,
+                                          &DeclarativeBars::atSeriesFunc,
+                                          &DeclarativeBars::clearSeriesFunc);
+}
+
+void DeclarativeBars::appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series)
+{
+    reinterpret_cast<DeclarativeBars *>(list->data)->addSeries(series);
+}
+
+int DeclarativeBars::countSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
+{
+    return reinterpret_cast<DeclarativeBars *>(list->data)->m_shared->barSeriesList().size();
+}
+
+QBar3DSeries *DeclarativeBars::atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, int index)
+{
+    return reinterpret_cast<DeclarativeBars *>(list->data)->m_shared->barSeriesList().at(index);
+}
+
+void DeclarativeBars::clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
+{
+    DeclarativeBars *declBars = reinterpret_cast<DeclarativeBars *>(list->data);
+    QList<QBar3DSeries *> realList = declBars->m_shared->barSeriesList();
+    int count = realList.size();
+    for (int i = 0; i < count; i++)
+        declBars->removeSeries(realList.at(i));
+}
+
+void DeclarativeBars::addSeries(QBar3DSeries *series)
+{
+    m_shared->addSeries(series);
+}
+
+void DeclarativeBars::removeSeries(QBar3DSeries *series)
+{
+    m_shared->removeSeries(series);
+    series->setParent(this); // Reparent as removing will leave series parentless
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -107,16 +107,6 @@ QDataVis::ShadowQuality AbstractDeclarative::shadowQuality() const
     return m_controller->shadowQuality();
 }
 
-void AbstractDeclarative::setItemLabelFormat(const QString &format)
-{
-    m_controller->activeDataProxy()->setItemLabelFormat(format);
-}
-
-QString AbstractDeclarative::itemLabelFormat() const
-{
-    return m_controller->activeDataProxy()->itemLabelFormat();
-}
-
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
@@ -137,8 +127,6 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::backgroundVisibleChanged);
     QObject::connect(m_controller, &Abstract3DController::gridVisibleChanged, this,
                      &AbstractDeclarative::gridVisibleChanged);
-    QObject::connect(m_controller->activeDataProxy(), &QAbstractDataProxy::itemLabelFormatChanged, this,
-                     &AbstractDeclarative::itemLabelFormatChanged);
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const

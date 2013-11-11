@@ -57,10 +57,9 @@ Item {
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [5]
-            dataProxy: graphData.proxy
+            seriesList: [graphData.series]
             //! [5]
             //! [6]
-            itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             axisX.segmentCount: 3
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%.2f"

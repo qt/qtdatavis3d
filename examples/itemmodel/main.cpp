@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -268,7 +269,8 @@ int main(int argc, char **argv)
     QItemModelBarDataMapping *mapping = new QItemModelBarDataMapping;
     mapping->setUseModelCategories(true);
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), mapping);
-    graph->setActiveDataProxy(proxy);
+    QBar3DSeries *series = new QBar3DSeries(proxy);
+    graph->addSeries(series);
     //! [2]
 
     //! [3]

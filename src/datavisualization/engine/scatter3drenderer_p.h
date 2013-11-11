@@ -96,8 +96,7 @@ public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    //void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
-    void updateSeriesData(QScatterDataProxy *dataProxy);
+    void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
     void updateScene(Q3DScene *scene);
     void updateInputState(QDataVis::InputState state);
 

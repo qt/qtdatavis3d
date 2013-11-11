@@ -51,7 +51,6 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -82,9 +81,6 @@ public:
 
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
     virtual QDataVis::ShadowQuality shadowQuality() const;
-
-    virtual void setItemLabelFormat(const QString &format);
-    virtual QString itemLabelFormat() const;
 
     void setSharedController(Abstract3DController *controller);
 

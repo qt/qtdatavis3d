@@ -70,8 +70,3 @@
   \qmlproperty bool AbstractGraph3D::backgroundVisible
   Background visibility. If false, background is not drawn.
  */
-
-/*!
-  \qmlproperty string AbstractGraph3D::itemLabelFormat
-  Label format of single item labels, e.g. a selected datapoint.
- */

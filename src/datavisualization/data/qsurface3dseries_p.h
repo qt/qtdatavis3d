@@ -26,40 +26,30 @@
 //
 // We mean it.
 
-#ifndef QSURFACEDATAPROXY_P_H
-#define QSURFACEDATAPROXY_P_H
+#ifndef QSURFACE3DSERIES_P_H
+#define QSURFACE3DSERIES_P_H
 
-#include "qsurfacedataproxy.h"
-#include "qabstractdataproxy_p.h"
-
-#include <QSize>
+#include "qsurface3dseries.h"
+#include "qabstract3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QSurfaceDataProxyPrivate : public QAbstractDataProxyPrivate
+class QSurface3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
     Q_OBJECT
 public:
-    QSurfaceDataProxyPrivate(QSurfaceDataProxy *q);
-    virtual ~QSurfaceDataProxyPrivate();
+    QSurface3DSeriesPrivate(QSurface3DSeries *q);
+    virtual ~QSurface3DSeriesPrivate();
 
-    void resetArray(QSurfaceDataArray *newArray);
-
-    void limitValues(QVector3D &minValues, QVector3D &maxValues) const;
-
-    virtual void setSeries(QAbstract3DSeries *series);
-
-protected:
-    QSurfaceDataArray *m_dataArray;
+    virtual void setDataProxy(QAbstractDataProxy *proxy);
+    virtual void connectControllerAndProxy(Abstract3DController *newController);
+private:
+    QSurface3DSeries *qptr();
 
 private:
-    QSurfaceDataProxy *qptr();
-    void clearRow(int rowIndex);
-    void clearArray();
-
-    friend class QSurfaceDataProxy;
+    friend class QSurface3DSeries;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QSURFACEDATAPROXY_P_H
+#endif

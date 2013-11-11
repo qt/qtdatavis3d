@@ -23,6 +23,7 @@
 #include "q3dscene_p.h"
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
+#include "qabstract3dseries_p.h"
 
 Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
 
@@ -140,11 +141,6 @@ QString Abstract3DRenderer::generateValueLabel(const QString &format, qreal valu
     Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
     QByteArray valueFormatArray = valueLabelFormat.toUtf8();
     return Utils::formatLabel(valueFormatArray, valueParamType, value);
-}
-
-void Abstract3DRenderer::updateDataModel(QAbstractDataProxy *dataProxy)
-{
-    m_cachedItemLabelFormat = dataProxy->itemLabelFormat();
 }
 
 QString Abstract3DRenderer::itemLabelFormat() const
@@ -376,6 +372,13 @@ void Abstract3DRenderer::updateMultiHighlightGradient(const QLinearGradient &gra
 {
     m_cachedMultiHighlightGradient = gradient;
     fixGradient(&m_cachedMultiHighlightGradient, &m_multiHighlightGradientTexture);
+}
+
+void Abstract3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
+{
+    // TODO: To series visuals update - just use first series format for now
+    if (seriesList.size())
+        m_cachedItemLabelFormat = seriesList.at(0)->itemLabelFormat();
 }
 
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation)

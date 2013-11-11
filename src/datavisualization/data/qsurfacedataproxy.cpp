@@ -18,6 +18,7 @@
 
 #include "qsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
+#include "qsurface3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -94,6 +95,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Surface3DSeries SurfaceDataProxy::series
+ *
+ * The series this proxy is attached to.
+ */
+
+/*!
  * Constructs QSurfaceDataProxy with the given \a parent.
  */
 QSurfaceDataProxy::QSurfaceDataProxy(QObject *parent) :
@@ -114,6 +121,16 @@ QSurfaceDataProxy::QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *paren
  */
 QSurfaceDataProxy::~QSurfaceDataProxy()
 {
+}
+
+/*!
+ * \property QSurfaceDataProxy::series
+ *
+ *  The series this proxy is attached to.
+ */
+QSurface3DSeries *QSurfaceDataProxy::series()
+{
+    return static_cast<QSurface3DSeries *>(d_ptr->series());
 }
 
 /*!
@@ -203,7 +220,6 @@ QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
       m_dataArray(new QSurfaceDataArray)
 {
-    m_itemLabelFormat = QStringLiteral("@yLabel (@xLabel, @zLabel)");
 }
 
 QSurfaceDataProxyPrivate::~QSurfaceDataProxyPrivate()
@@ -227,7 +243,7 @@ QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()
     return static_cast<QSurfaceDataProxy *>(q_ptr);
 }
 
-void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues)
+void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
 {
     qreal min = 0.0;
     qreal max = 0.0;
@@ -284,6 +300,13 @@ void QSurfaceDataProxyPrivate::clearArray()
         clearRow(i);
     m_dataArray->clear();
     delete m_dataArray;
+}
+
+void QSurfaceDataProxyPrivate::setSeries(QAbstract3DSeries *series)
+{
+    QAbstractDataProxyPrivate::setSeries(series);
+    QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
+    emit qptr()->seriesChanged(surfaceSeries);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

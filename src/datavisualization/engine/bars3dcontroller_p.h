@@ -37,7 +37,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Bars3DRenderer;
-class QBarDataProxy;
+class QBar3DSeries;
 
 struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
@@ -92,14 +92,16 @@ public:
     void setSelectedBar(const QPoint &position);
     QPoint selectedBar() const;
 
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
-
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
 
     static QPoint noSelectionPoint();
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual void setAxisZ(Q3DAbstractAxis *axis);
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
 
