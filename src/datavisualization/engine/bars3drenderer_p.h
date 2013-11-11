@@ -103,7 +103,7 @@ private:
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedBarPos;
     BarRenderItem m_dummyBarRenderItem;
-    BarRenderItemArray m_renderItemArray;
+    QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
 
 public:
