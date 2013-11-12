@@ -89,13 +89,15 @@ private:
     bool m_hasHeightAdjustmentChanged;
     bool m_drawingPoints;
     ScatterRenderItem m_dummyRenderItem;
-    ScatterRenderItemArray m_renderItemArray;
+    QVector<ScatterRenderItemArray> m_renderingArrays;
+    int m_seriesCount;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateDataModel(QScatterDataProxy *dataProxy);
+    //void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
+    void updateSeriesData(QScatterDataProxy *dataProxy);
     void updateScene(Q3DScene *scene);
     void updateInputState(QDataVis::InputState state);
 

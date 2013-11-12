@@ -79,7 +79,7 @@ void Scatter3DController::synchDataToRenderer()
     }
 
     if (m_isDataDirty) {
-        m_renderer->updateDataModel(static_cast<QScatterDataProxy *>(m_data));
+        m_renderer->updateSeriesData(static_cast<QScatterDataProxy *>(m_data));
         m_isDataDirty = false;
     }
 }
@@ -222,7 +222,8 @@ void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 
 void Scatter3DController::setSelectedItemIndex(int index)
 {
-    if (index < 0 || index >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
+    // TODO: Support for multiple sets. Just remove the item count test for now
+    if (index < 0 /*|| index >= static_cast<QScatterDataProxy *>(m_data)->itemCount()*/)
         index = noSelectionIndex();
 
     if (index != m_selectedItemIndex) {
