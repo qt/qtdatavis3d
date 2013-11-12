@@ -80,7 +80,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
-      m_clickedColor(invalidColorVector),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
@@ -212,17 +211,6 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
     scene->setLightPositionRelativeToCamera(defaultLightPos);
 
     Abstract3DRenderer::updateScene(scene);
-}
-
-void Scatter3DRenderer::updateInputState(QDataVis::InputState state)
-{
-    QDataVis::InputState oldInputState = m_inputState;
-
-    Abstract3DRenderer::updateInputState(state);
-
-    // Clear clicked color on input state change
-    if (oldInputState != m_inputState && m_inputState == QDataVis::InputStateOnScene)
-        m_clickedColor = invalidColorVector;
 }
 
 void Scatter3DRenderer::render(GLuint defaultFboHandle)
@@ -437,7 +425,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QDataVis::SelectionNone
-            && QDataVis::InputStateOnScene == m_inputState) {
+            && SelectOnScene == m_selectionState) {
         // Bind selection shader
         selectionShader->bind();
 
@@ -513,10 +501,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
-        if (m_clickedColor == invalidColorVector) {
-            m_clickedColor = clickedColor;
-            emit itemClicked(selectionColorToIndex(m_clickedColor));
-        }
+        emit itemClicked(selectionColorToIndex(clickedColor));
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 

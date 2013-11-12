@@ -51,6 +51,13 @@ class Abstract3DRenderer : public QObject, protected QOpenGLFunctions
     Q_OBJECT
 
 protected:
+    enum SelectionState {
+        SelectNone = 0,
+        SelectOnScene,
+        SelectOnOverview,
+        SelectOnSlice
+    };
+
     bool m_hasNegativeValues;
     Theme m_cachedTheme;
     QFont m_cachedFont;
@@ -85,7 +92,7 @@ protected:
 
     Q3DScene *m_cachedScene;
     bool m_selectionDirty;
-    QDataVis::InputState m_inputState;
+    SelectionState m_selectionState;
     QPoint m_inputPosition;
 
 #ifdef DISPLAY_RENDER_SPEED
@@ -117,7 +124,7 @@ public:
     virtual QString itemLabelFormat() const;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
-    virtual void updateInputState(QDataVis::InputState state);
+    virtual void updateSelectionState(SelectionState state);
     virtual void updateInputPosition(const QPoint &position);
 
 #if !defined(QT_OPENGL_ES_2)

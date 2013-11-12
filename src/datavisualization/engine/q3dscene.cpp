@@ -178,6 +178,34 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
 }
 
 /*!
+ * \property Q3DScene::selectionQueryPosition
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as selection. If this is set to value other than Q3DScene()::noSelectionPoint() the
+ * graph tries to select a data item at the given \a point within the main viewport.
+ * After the rendering pass the property is returned to its default state of Q3DScene()::noSelectionPoint().
+ */
+void Q3DScene::setSelectionQueryPosition(const QPoint &point)
+{
+    if (point != d_ptr->m_selectionQueryPosition) {
+        d_ptr->m_selectionQueryPosition = point;
+        d_ptr->m_changeTracker.selectionQueryPositionChanged = true;
+        emit selectionQueryPositionChanged(point);
+        emitNeedRender();
+    }
+}
+
+QPoint Q3DScene::selectionQueryPosition() const
+{
+    return d_ptr->m_selectionQueryPosition;
+}
+
+const QPoint Q3DScene::noSelectionPoint()
+{
+    static const QPoint noSelectionPos(-1, -1);
+    return noSelectionPos;
+}
+
+/*!
  * \property Q3DScene::slicingActive
  *
  * This property contains whether 2D slicing view is currently active or not.
@@ -329,7 +357,6 @@ void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePositio
  * \fn Q3DScene::needRender()
  * \internal
  */
-
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     q_ptr(q),
     m_isSecondarySubviewOnTop(true),
@@ -337,7 +364,8 @@ Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     m_camera(),
     m_light(),
     m_isUnderSideCameraEnabled(false),
-    m_isSlicingActive(false)
+    m_isSlicingActive(false),
+    m_selectionQueryPosition(Q3DScene::noSelectionPoint())
 {
 }
 
@@ -370,6 +398,11 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
         other.q_ptr->setSecondarySubViewport(q_ptr->secondarySubViewport());
         m_changeTracker.secondarySubViewportChanged = false;
         other.m_changeTracker.secondarySubViewportChanged = false;
+    }
+    if (m_changeTracker.selectionQueryPositionChanged) {
+        other.q_ptr->setSelectionQueryPosition(q_ptr->selectionQueryPosition());
+        m_changeTracker.selectionQueryPositionChanged = false;
+        other.m_changeTracker.selectionQueryPositionChanged = false;
     }
     if (m_changeTracker.cameraChanged) {
         m_camera->setDirty(true);

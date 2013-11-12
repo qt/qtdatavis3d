@@ -134,7 +134,6 @@ public:
 
     void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
     void updateScene(Q3DScene *scene);
-    void updateInputState(QDataVis::InputState state);
     bool updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);

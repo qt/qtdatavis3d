@@ -87,7 +87,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0f),
       m_visualSelectedBarPos(Bars3DController::noSelectionPoint()),
-      m_clickedBarColor(invalidColorVector),
       m_hasHeightAdjustmentChanged(true),
       m_selectedBarPos(Bars3DController::noSelectionPoint()),
       m_noZeroInRange(false),
@@ -868,7 +867,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // TODO: Selection must be enabled currently to support clicked signal. (QTRD-2517)
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::SelectionNone
-            && m_inputState == QDataVis::InputStateOnScene) {
+            && m_selectionState == SelectOnScene) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -947,10 +946,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
-        if (m_clickedBarColor == invalidColorVector) {
-            m_clickedBarColor = clickedColor;
-            emit barClicked(selectionColorToArrayPosition(m_clickedBarColor));
-        }
+        emit barClicked(selectionColorToArrayPosition(clickedColor));
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -1855,17 +1851,6 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position)
     } else {
         m_visualSelectedBarPos = QPoint(adjustedX, adjustedZ);
     }
-}
-
-void Bars3DRenderer::updateInputState(QDataVis::InputState state)
-{
-    QDataVis::InputState oldInputState = m_inputState;
-
-    Abstract3DRenderer::updateInputState(state);
-
-    // Clear clicked color on input state change
-    if (oldInputState != m_inputState && m_inputState == QDataVis::InputStateOnScene)
-        m_clickedBarColor = invalidColorVector;
 }
 
 void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)

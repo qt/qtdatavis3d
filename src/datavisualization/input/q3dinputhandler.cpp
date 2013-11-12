@@ -101,6 +101,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
             setInputState(QDataVis::InputStateOnScene);
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
+            scene()->setSelectionQueryPosition(mousePos);
         }
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations

@@ -81,7 +81,6 @@ private:
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
-    QVector3D m_clickedColor;
     int m_selectedItemIndex;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
@@ -98,7 +97,6 @@ public:
 
     void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
     void updateScene(Q3DScene *scene);
-    void updateInputState(QDataVis::InputState state);
 
     void render(GLuint defaultFboHandle);
 

@@ -36,6 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(QRect viewport READ viewport WRITE setViewport NOTIFY viewportChanged)
     Q_PROPERTY(QRect primarySubViewport READ primarySubViewport WRITE setPrimarySubViewport NOTIFY primarySubViewportChanged)
     Q_PROPERTY(QRect secondarySubViewport READ secondarySubViewport WRITE setSecondarySubViewport NOTIFY secondarySubViewportChanged)
+    Q_PROPERTY(QPoint selectionQueryPosition READ selectionQueryPosition WRITE setSelectionQueryPosition NOTIFY selectionQueryPositionChanged)
     Q_PROPERTY(bool secondarySubviewOnTop READ isSecondarySubviewOnTop  WRITE setSecondarySubviewOnTop  NOTIFY secondarySubviewOnTopChanged)
     Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive NOTIFY slicingActiveChanged)
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
@@ -58,6 +59,10 @@ public:
     void setSecondarySubViewport(const QRect &secondarySubViewport);
     bool isPointInSecondarySubView(const QPoint &point);
 
+    void setSelectionQueryPosition(const QPoint &point);
+    QPoint selectionQueryPosition() const;
+    static const QPoint noSelectionPoint();
+
     void setSlicingActive(bool isSlicing);
     bool isSlicingActive() const;
 
@@ -73,9 +78,9 @@ public:
     qreal devicePixelRatio() const;
     void setDevicePixelRatio(qreal pixelRatio);
 
-    void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                          qreal fixedRotation = 0.0,
-                                          qreal distanceModifier = 0.0);
+    Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
+                                                      qreal fixedRotation = 0.0,
+                                                      qreal distanceModifier = 0.0);
 private:
     void emitNeedRender();
 
@@ -89,6 +94,7 @@ signals:
     void activeLightChanged(const Q3DLight *light);
     void devicePixelRatioChanged(qreal pixelRatio);
     void needRender();
+    void selectionQueryPositionChanged(const QPoint position);
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;

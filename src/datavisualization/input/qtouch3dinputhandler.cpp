@@ -184,6 +184,7 @@ void QTouch3DInputHandlerPrivate::handleSelection(const QPointF &position)
     else
         q_ptr->setInputState(QDataVis::InputStateNone);
     q_ptr->setPreviousInputPos(position.toPoint());
+    q_ptr->scene()->setSelectionQueryPosition(position.toPoint());
 }
 
 void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)

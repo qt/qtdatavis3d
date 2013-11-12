@@ -448,17 +448,6 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     updateSlicingActive(scene->isSlicingActive());
 }
 
-void Surface3DRenderer::updateInputState(QDataVis::InputState state)
-{
-    QDataVis::InputState oldInputState = m_inputState;
-
-    Abstract3DRenderer::updateInputState(state);
-
-    // Clear clicked color on input state change
-    if (oldInputState != m_inputState && m_inputState == QDataVis::InputStateOnScene)
-        m_clickedPointId = invalidSelectionId;
-}
-
 void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     // Handle GL state setup for FBO buffers and clearing of the render surface
@@ -909,7 +898,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_surfaceObj && m_inputState == QDataVis::InputStateOnScene
+    if (!m_cachedIsSlicingActivated && m_surfaceObj && m_selectionState == SelectOnScene
             && m_cachedSelectionMode > QDataVis::SelectionNone
             && (m_cachedSurfaceVisible || m_cachedSurfaceGridOn)) {
         m_selectionShader->bind();
@@ -951,11 +940,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
 
-        if (m_clickedPointId == invalidSelectionId) {
-            m_clickedPointId = selectionId;
-            QPoint newPoint = selectionIdToSurfacePoint(m_clickedPointId);
-            emit pointClicked(newPoint);
-        }
+        emit pointClicked(QPoint(selectionIdToSurfacePoint(selectionId)));
     }
 
     // Draw the surface

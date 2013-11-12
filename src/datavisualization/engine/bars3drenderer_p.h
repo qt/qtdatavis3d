@@ -99,7 +99,6 @@ private:
     QPoint m_visualSelectedBarPos; // The selection id color
     int m_renderRows;
     int m_renderColumns;
-    QVector3D m_clickedBarColor;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedBarPos;
     BarRenderItem m_dummyBarRenderItem;
@@ -131,7 +130,6 @@ public slots:
     void updateSlicingActive(bool isSlicing);
     void updateBackgroundEnabled(bool enable);
     void updateSelectedBar(const QPoint &position);
-    void updateInputState(QDataVis::InputState state);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);

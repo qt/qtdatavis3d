@@ -134,16 +134,6 @@ void Abstract3DController::synchDataToRenderer()
 
     m_renderer->updateScene(m_scene);
 
-    if (m_changeTracker.inputPositionChanged) {
-        m_renderer->updateInputPosition(inputPosition());
-        m_changeTracker.inputPositionChanged = false;
-    }
-
-    if (m_changeTracker.inputStateChanged) {
-        m_renderer->updateInputState(inputState());
-        m_changeTracker.inputStateChanged = false;
-    }
-
     // TODO: Renderer doesn't need to know the theme, so remove this bit entirely (QTRD-2538)
     if (m_changeTracker.themeChanged) {
         m_renderer->updateTheme(m_theme);
@@ -916,22 +906,6 @@ void Abstract3DController::setSlicingActive(bool isSlicing)
 {
     m_scene->setSlicingActive(isSlicing);
     emitNeedRender();
-}
-
-QDataVis::InputState Abstract3DController::inputState()
-{
-    if (m_activeInputHandler)
-        return m_activeInputHandler->inputState();
-    else
-        return QDataVis::InputStateNone;
-}
-
-QPoint Abstract3DController::inputPosition()
-{
-    if (m_activeInputHandler)
-        return m_activeInputHandler->inputPosition();
-    else
-        return QPoint(0, 0);
 }
 
 void Abstract3DController::setMeshFileName(const QString &fileName)

@@ -127,8 +127,6 @@ struct Abstract3DChangeBitField {
         axisXLabelFormatChanged(true),
         axisYLabelFormatChanged(true),
         axisZLabelFormatChanged(true),
-        inputStateChanged(true),
-        inputPositionChanged(true),
         // Items that override values from theme default to false since we default to theme
         colorStyleChanged(false),
         objectColorChanged(false),
@@ -297,10 +295,6 @@ public:
     // Enable or disable background grid
     virtual void setGridEnabled(bool enable);
     virtual bool gridEnabled();
-
-    // Query input state and position
-    QDataVis::InputState inputState();
-    QPoint inputPosition();
 
     // Enable or disable slicing mode
     bool isSlicingActive();

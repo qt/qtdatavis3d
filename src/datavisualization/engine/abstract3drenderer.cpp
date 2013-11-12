@@ -49,7 +49,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
-      m_inputState(QDataVis::InputStateNone)
+      m_selectionState(SelectNone)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -148,9 +148,9 @@ QString Abstract3DRenderer::itemLabelFormat() const
     return m_cachedItemLabelFormat;
 }
 
-void Abstract3DRenderer::updateInputState(QDataVis::InputState state)
+void Abstract3DRenderer::updateSelectionState(SelectionState state)
 {
-    m_inputState = state;
+    m_selectionState = state;
 }
 
 void Abstract3DRenderer::updateInputPosition(const QPoint &position)
@@ -181,6 +181,26 @@ void Abstract3DRenderer::updateTheme(Theme theme)
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
 {
+    updateInputPosition(scene->selectionQueryPosition());
+
+    if (Q3DScene::noSelectionPoint() == scene->selectionQueryPosition()) {
+        updateSelectionState(SelectNone);
+    } else {
+        // Selections are one-shot, reset selection active to false before processing
+        scene->setSelectionQueryPosition(Q3DScene::noSelectionPoint());
+
+        if (scene->isSlicingActive()) {
+            if (scene->isPointInPrimarySubView(m_inputPosition))
+                updateSelectionState(SelectOnOverview);
+            else if (scene->isPointInSecondarySubView(m_inputPosition))
+                updateSelectionState(SelectOnSlice);
+            else
+                updateSelectionState(SelectNone);
+        } else {
+            updateSelectionState(SelectOnScene);
+        }
+    }
+
     // Synchronize the controller scene to that of the renderer, and vice versa.
     // Controller scene had priority if both have changed same values.
     scene->d_ptr->sync(*m_cachedScene->d_ptr);
