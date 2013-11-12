@@ -2048,7 +2048,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         }
     }
 #else
-    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexES2"),
                                        QStringLiteral(":/shaders/fragmentSurfaceES2"));
 #endif
     m_surfaceShader->initialize();
