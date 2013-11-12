@@ -34,7 +34,7 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.14383161, -0.14100790));
 
 void main() {
-    highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.001) / 2.0); // 1000 pixel texture, we need a margin for 1/1000 rounding error
+    highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.0) / 2.0);
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
     highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
     highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
