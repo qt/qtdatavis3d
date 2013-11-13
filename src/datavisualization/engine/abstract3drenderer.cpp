@@ -217,13 +217,13 @@ void Abstract3DRenderer::reInitShaders()
     }
 #else
     if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
+        initShaders(QStringLiteral(":/shaders/vertex"),
                     QStringLiteral(":/shaders/fragmentColorOnYES2"));
     } else {
-        initShaders(QStringLiteral(":/shaders/vertexES2"),
+        initShaders(QStringLiteral(":/shaders/vertex"),
                     QStringLiteral(":/shaders/fragmentES2"));
     }
-    initBackgroundShaders(QStringLiteral(":/shaders/vertexES2"),
+    initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                           QStringLiteral(":/shaders/fragmentES2"));
 #endif
 }

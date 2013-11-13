@@ -247,7 +247,7 @@ void SelectionPointer::initShaders()
     m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragment"));
 #else
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexES2"),
+    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragmentES2"));
 #endif
     m_pointShader->initialize();

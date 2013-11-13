@@ -2075,8 +2075,8 @@ void Bars3DRenderer::initSelectionShader()
 {
     if (m_selectionShader)
         delete m_selectionShader;
-    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSelection"),
-                                         QStringLiteral(":/shaders/fragmentSelection"));
+    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPlainColor"),
+                                         QStringLiteral(":/shaders/fragmentPlainColor"));
     m_selectionShader->initialize();
 }
 

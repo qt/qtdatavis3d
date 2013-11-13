@@ -2048,7 +2048,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         }
     }
 #else
-    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexES2"),
+    m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                        QStringLiteral(":/shaders/fragmentSurfaceES2"));
 #endif
     m_surfaceShader->initialize();
@@ -2077,8 +2077,8 @@ void Surface3DRenderer::initSurfaceShaders()
     // Gridline shader
     if (m_surfaceGridShader)
         delete m_surfaceGridShader;
-    m_surfaceGridShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceGrid"),
-                                           QStringLiteral(":/shaders/fragmentSurfaceGrid"));
+    m_surfaceGridShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPlainColor"),
+                                           QStringLiteral(":/shaders/fragmentPlainColor"));
     m_surfaceGridShader->initialize();
 
     // Triggers surface shader selection by shadow setting

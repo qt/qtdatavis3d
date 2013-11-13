@@ -1595,8 +1595,8 @@ void Scatter3DRenderer::initSelectionShader()
 {
     if (m_selectionShader)
         delete m_selectionShader;
-    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSelection"),
-                                         QStringLiteral(":/shaders/fragmentSelection"));
+    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPlainColor"),
+                                         QStringLiteral(":/shaders/fragmentPlainColor"));
     m_selectionShader->initialize();
 }
 
@@ -1649,7 +1649,7 @@ void Scatter3DRenderer::initPointShader()
     if (m_pointShader)
         delete m_pointShader;
     m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPointES2"),
-                                     QStringLiteral(":/shaders/fragmentSelection"));
+                                     QStringLiteral(":/shaders/fragmentPlainColor"));
     m_pointShader->initialize();
 }
 #endif

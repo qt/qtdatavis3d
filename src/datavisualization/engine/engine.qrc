@@ -31,12 +31,9 @@
     <qresource prefix="/shaders">
         <file alias="fragment">shaders/default.frag</file>
         <file alias="vertex">shaders/default.vert</file>
-        <file alias="fragmentAmbient">shaders/ambient.frag</file>
         <file alias="fragmentColorOnY">shaders/colorOnY.frag</file>
-        <file alias="fragmentSelection">shaders/selection.frag</file>
-        <file alias="vertexSelection">shaders/selection.vert</file>
-        <file alias="fragmentTexture">shaders/texture.frag</file>
-        <file alias="vertexTexture">shaders/texture.vert</file>
+        <file alias="fragmentPlainColor">shaders/plainColor.frag</file>
+        <file alias="vertexPlainColor">shaders/plainColor.vert</file>
         <file alias="fragmentLabel">shaders/label.frag</file>
         <file alias="vertexLabel">shaders/label.vert</file>
         <file alias="fragmentDepth">shaders/depth.frag</file>
@@ -47,11 +44,7 @@
         <file alias="fragmentShadowNoTexColorOnY">shaders/shadowNoTexColorOnY.frag</file>
         <file alias="fragmentColorOnYES2">shaders/colorOnY_ES2.frag</file>
         <file alias="fragmentES2">shaders/default_ES2.frag</file>
-        <file alias="vertexES2">shaders/default_ES2.vert</file>
-        <file alias="fragmentTextureES2">shaders/texture_ES2.frag</file>
         <file alias="fragmentSurface">shaders/surface.frag</file>
-        <file alias="fragmentSurfaceGrid">shaders/surfaceGrid.frag</file>
-        <file alias="vertexSurfaceGrid">shaders/surfaceGrid.vert</file>
         <file alias="vertexSurfaceFlat">shaders/surfaceFlat.vert</file>
         <file alias="fragmentSurfaceFlat">shaders/surfaceFlat.frag</file>
         <file alias="fragmentSurfaceES2">shaders/surface_ES2.frag</file>
