@@ -26,7 +26,8 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Theme::Theme()
-    : m_baseColor(QColor(Qt::gray)),
+    : m_theme(QDataVis::ThemeDefault),
+      m_baseColor(QColor(Qt::gray)),
       m_heightColor(QColor(Qt::black)),
       m_depthColor(QColor(Qt::black)),
       m_backgroundColor(QColor(Qt::gray)),
