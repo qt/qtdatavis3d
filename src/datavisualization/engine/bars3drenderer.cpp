@@ -47,7 +47,7 @@ const int smallerVPSize = 5;
 const bool sliceGridLabels = true; // TODO: Make this user controllable (QTRD-2546)
 
 // TODO: These will be based on sets (QTRD-2548)
-const int seriesCount = 3;
+const int seriesCount = 1;
 const float seriesScale = 1.0f / float(seriesCount);
 const float seriesStep = 1.0f / float(seriesCount);
 const float seriesStart = -((float(seriesCount) - 1.0f) / 2.0f) * seriesStep;
@@ -280,15 +280,9 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
-    if (m_cachedScene->isSecondarySubviewOnTop()) {
-        drawScene(defaultFboHandle);
-        if (m_cachedIsSlicingActivated)
-            drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
-    } else {
-        if (m_cachedIsSlicingActivated)
-            drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
-        drawScene(defaultFboHandle);
-    }
+    drawScene(defaultFboHandle);
+    if (m_cachedIsSlicingActivated)
+        drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
 }
 
 void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,

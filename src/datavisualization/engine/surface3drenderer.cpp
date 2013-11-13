@@ -453,15 +453,9 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
 
-    if (m_cachedScene->isSecondarySubviewOnTop()) {
-        drawScene(defaultFboHandle);
-        if (m_cachedIsSlicingActivated)
-            drawSlicedScene();
-    } else {
-        if (m_cachedIsSlicingActivated)
-            drawSlicedScene();
-        drawScene(defaultFboHandle);
-    }
+    drawScene(defaultFboHandle);
+    if (m_cachedIsSlicingActivated)
+        drawSlicedScene();
 
     // Render selection ball
     if (m_selectionPointer && m_selectionActive
