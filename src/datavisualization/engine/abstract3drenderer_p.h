@@ -37,6 +37,7 @@
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
 #include "qabstractdataproxy.h"
+#include "seriesrendercache_p.h"
 
 //#define DISPLAY_RENDER_SPEED
 
@@ -67,7 +68,6 @@ protected:
     QDataVis::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
 
-    QString m_cachedItemLabelFormat;
     QString m_cachedObjFile;
     QDataVis::SelectionFlags m_cachedSelectionMode;
     bool m_cachedIsGridEnabled;
@@ -94,6 +94,7 @@ protected:
     bool m_selectionDirty;
     SelectionState m_selectionState;
     QPoint m_inputPosition;
+    QVector<SeriesRenderCache> m_visibleSeriesList;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -106,7 +107,8 @@ protected:
 public:
     virtual ~Abstract3DRenderer();
 
-    virtual void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
+    virtual void updateData() = 0;
+    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
 
     virtual void render(GLuint defaultFboHandle);
 
@@ -121,7 +123,6 @@ public:
     virtual void updateBackgroundEnabled(bool enable);
     virtual void updateMeshFileName(const QString &objFileName);
     virtual void updateScene(Q3DScene *scene);
-    virtual QString itemLabelFormat() const;
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
     virtual void updateSelectionState(SelectionState state);

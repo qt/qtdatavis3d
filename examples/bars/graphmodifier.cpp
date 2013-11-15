@@ -76,9 +76,9 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     //! [3]
 
     QBar3DSeries *series = new QBar3DSeries(m_primaryData);
-    series->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
     QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
-    series2->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
     series2->setVisible(false);
 
     //! [4]
@@ -109,7 +109,7 @@ void GraphModifier::resetTemperatureData()
 {
     //! [5]
     // Set up data
-    static const qreal temp[7][12] = {
+    static const qreal tempOulu[7][12] = {
         {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2006
         {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2007
         {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2008
@@ -118,14 +118,15 @@ void GraphModifier::resetTemperatureData()
         {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2},     // 2011
         {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
     };
-    static const qreal temp2[7][12] = {
-        {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1},     // 2006
-        {-7.8, -8.8, -4.2, 0.7, 9.3, 13.2, 15.8, 15.5, 11.2, 0.6, 0.7, -8.4},      // 2007
-        {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2008
-        {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2009
-        {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2010
-        {-14.4, -12.1, -7.0, 2.3, 11.0, 12.6, 18.8, 13.8, 9.4, 3.9, -5.6, -13.0},  // 2011
-        {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2}      // 2012
+
+    static const qreal tempHelsinki[7][12] = {
+        {-3.7, -7.8, -5.4, 3.4, 10.7, 15.4, 18.6, 18.7, 14.3, 8.5, 2.9, 4.1},      // 2006
+        {-1.2, -7.5, 3.1, 5.5, 10.3, 15.9, 17.4, 17.9, 11.2, 7.3, 1.1, 0.5},       // 2007
+        {-0.6, 1.2, 0.2, 6.3, 10.2, 13.8, 18.1, 15.1, 10.1, 9.4, 2.5, 0.4},        // 2008
+        {-2.9, -3.5, -0.9, 4.7, 10.9, 14.0, 17.4, 16.8, 13.2, 4.1, 2.6, -2.3},     // 2009
+        {-10.2, -8.0, -1.9, 6.6, 11.3, 14.5, 21.0, 18.8, 12.6, 6.1, -0.5, -7.3},   // 2010
+        {-4.4, -9.1, -2.0, 5.5, 9.9, 15.6, 20.8, 17.8, 13.4, 8.9, 3.6, 1.5},       // 2011
+        {-3.5, -3.2, -0.7, 4.0, 11.1, 13.4, 17.3, 15.8, 13.1, 6.4, 4.1, -5.1}      // 2012
     };
 
     // Create data arrays
@@ -141,8 +142,8 @@ void GraphModifier::resetTemperatureData()
         dataRow2 = new QBarDataRow(m_months.size());
         for (int month = 0; month < m_months.size(); month++) {
             // Add data to the row
-            (*dataRow)[month].setValue(temp[year][month]);
-            (*dataRow2)[month].setValue(temp2[year][month]);
+            (*dataRow)[month].setValue(tempOulu[year][month]);
+            (*dataRow2)[month].setValue(tempHelsinki[year][month]);
         }
         // Add the row to the set
         dataSet->append(dataRow);

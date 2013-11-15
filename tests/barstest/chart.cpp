@@ -112,9 +112,9 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
     m_chart->setTheme(QDataVis::ThemeStoneMoss);
     m_chart->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
-    m_temperatureData2->setItemLabelFormat(QStringLiteral("** @valueTitle for @colLabel @rowLabel: @valueLabel **"));
-    m_genericData->setItemLabelFormat(QStringLiteral("@valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+    m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_temperatureData2->setItemLabelFormat(QStringLiteral("2: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
     m_chart->setFont(QFont("Times Roman", 20));
@@ -123,6 +123,18 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
     m_defaultInputHandler = m_chart->activeInputHandler();
     m_chart->releaseInputHandler(m_defaultInputHandler);
     m_chart->setActiveInputHandler(m_defaultInputHandler);
+
+    QObject::connect(m_chart, &Q3DBars::shadowQualityChanged, this,
+                     &GraphModifier::shadowQualityUpdatedByVisual);
+    QObject::connect(m_temperatureData, &QBar3DSeries::selectedBarChanged, this,
+                     &GraphModifier::handleSelectionChange);
+    QObject::connect(m_temperatureData2, &QBar3DSeries::selectedBarChanged, this,
+                     &GraphModifier::handleSelectionChange);
+    QObject::connect(m_genericData, &QBar3DSeries::selectedBarChanged, this,
+                     &GraphModifier::handleSelectionChange);
+
+    m_chart->addSeries(m_temperatureData);
+    m_chart->addSeries(m_temperatureData2);
 
     resetTemperatureData();
 }
@@ -143,8 +155,6 @@ void GraphModifier::restart(bool dynamicData)
     m_static = !dynamicData;
 
     if (m_static) {
-        m_chart->addSeries(m_temperatureData);
-        m_chart->addSeries(m_temperatureData2);
         m_chart->removeSeries(m_genericData);
 
         m_chart->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
@@ -153,10 +163,7 @@ void GraphModifier::restart(bool dynamicData)
         m_chart->setRowAxis(m_yearAxis);
         m_chart->setColumnAxis(m_monthAxis);
 
-        m_chart->setSelectionMode(QDataVis::SelectionRow | QDataVis::SelectionSlice);
     } else {
-        m_chart->removeSeries(m_temperatureData);
-        m_chart->removeSeries(m_temperatureData2);
         m_chart->addSeries(m_genericData);
 
         m_chart->setTitle(QStringLiteral("Generic data"));
@@ -166,8 +173,6 @@ void GraphModifier::restart(bool dynamicData)
         m_chart->setValueAxis(m_currentAxis);
         m_chart->setRowAxis(m_genericRowAxis);
         m_chart->setColumnAxis(m_genericColumnAxis);
-
-        m_chart->setSelectionMode(QDataVis::SelectionRow | QDataVis::SelectionSlice);
     }
 }
 
@@ -176,9 +181,9 @@ void GraphModifier::selectBar()
     QPoint targetBar(5, 5);
     QPoint noSelection(-1, -1);
     if (m_selectedBar != targetBar)
-        m_chart->setSelectedBar(targetBar);
+        m_chart->seriesList().at(0)->setSelectedBar(targetBar);
     else
-        m_chart->setSelectedBar(noSelection);
+        m_chart->seriesList().at(0)->setSelectedBar(noSelection);
 }
 
 void GraphModifier::swapAxis()
@@ -216,11 +221,16 @@ void GraphModifier::releaseAxes()
 
 void GraphModifier::releaseProxies()
 {
-    // Releases all series
-    // Correct series will get readded back when graph is switched
-    m_chart->removeSeries(m_temperatureData);
-    m_chart->removeSeries(m_temperatureData2);
-    m_chart->removeSeries(m_genericData);
+    // Releases all series/add all series toggle
+    if (m_chart->seriesList().size() > 0) {
+        m_chart->removeSeries(m_temperatureData);
+        m_chart->removeSeries(m_temperatureData2);
+        m_chart->removeSeries(m_genericData);
+    } else {
+        m_chart->addSeries(m_temperatureData);
+        m_chart->addSeries(m_temperatureData2);
+        m_chart->addSeries(m_genericData);
+    }
 }
 
 void GraphModifier::flipViews()
@@ -264,7 +274,7 @@ void GraphModifier::createMassiveArray()
         dataArray->append(dataRow);
     }
 
-    m_chart->seriesList().at(0)->dataProxy()->resetArray(dataArray, genericRowLabels, genericColumnLabels);
+    m_genericData->dataProxy()->resetArray(dataArray, genericRowLabels, genericColumnLabels);
 
     qDebug() << "Created Massive Array (" << arrayDimension << "), time:" << timer.elapsed();
 }
@@ -336,7 +346,7 @@ void GraphModifier::addRow()
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     QString label = QStringLiteral("Add %1").arg(addCounter++);
-    m_chart->seriesList().at(0)->dataProxy()->addRow(dataRow, label);
+    m_genericData->dataProxy()->addRow(dataRow, label);
 }
 
 void GraphModifier::addRows()
@@ -346,13 +356,13 @@ void GraphModifier::addRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_chart->seriesList().at(0)->dataProxy()->rowCount()) + m_minval);
+            (*dataRow)[j].setValue(qreal(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Add %1").arg(addCounter++));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
-    m_chart->seriesList().at(0)->dataProxy()->addRows(dataArray, labels);
+    m_genericData->dataProxy()->addRows(dataArray, labels);
 }
 
 void GraphModifier::insertRow()
@@ -365,7 +375,7 @@ void GraphModifier::insertRow()
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBar.x(), 0);
     QString label = QStringLiteral("Insert %1").arg(insertCounter++);
-    m_chart->seriesList().at(0)->dataProxy()->insertRow(row, dataRow, label);
+    m_genericData->dataProxy()->insertRow(row, dataRow, label);
 }
 
 void GraphModifier::insertRows()
@@ -377,14 +387,14 @@ void GraphModifier::insertRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_chart->seriesList().at(0)->dataProxy()->rowCount()) + m_minval);
+            (*dataRow)[j].setValue(qreal(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Insert %1").arg(insertCounter++));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBar.x(), 0);
-    m_chart->seriesList().at(0)->dataProxy()->insertRows(row, dataArray, labels);
+    m_genericData->dataProxy()->insertRows(row, dataArray, labels);
     qDebug() << "Inserted" << m_rowCount << "rows, time:" << timer.elapsed();
 }
 
@@ -395,7 +405,7 @@ void GraphModifier::changeItem()
     int column = m_selectedBar.y();
     if (row >= 0 && column >= 0) {
         QBarDataItem item(qreal(rand() % 100));
-        m_chart->seriesList().at(0)->dataProxy()->setItem(row, column, item);
+        m_genericData->dataProxy()->setItem(row, column, item);
     }
 }
 
@@ -404,11 +414,11 @@ void GraphModifier::changeRow()
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBar.x();
     if (row >= 0) {
-        QBarDataRow *newRow = new QBarDataRow(m_chart->seriesList().at(0)->dataProxy()->rowAt(row)->size());
+        QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
             (*newRow)[i].setValue(qreal(rand() % int(m_maxval)) + m_minval);
         QString label = QStringLiteral("Change %1").arg(changeCounter++);
-        m_chart->seriesList().at(0)->dataProxy()->setRow(row, newRow, label);
+        m_genericData->dataProxy()->setRow(row, newRow, label);
     }
 }
 
@@ -421,13 +431,13 @@ void GraphModifier::changeRows()
         QBarDataArray newArray;
         QStringList labels;
         for (int i = startRow; i <= row; i++ ) {
-            QBarDataRow *newRow = new QBarDataRow(m_chart->seriesList().at(0)->dataProxy()->rowAt(i)->size());
+            QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
                 (*newRow)[j].setValue(qreal(rand() % int(m_maxval)) + m_minval);
             newArray.append(newRow);
             labels.append(QStringLiteral("Change %1").arg(changeCounter++));
         }
-        m_chart->seriesList().at(0)->dataProxy()->setRows(startRow, newArray, labels);
+        m_genericData->dataProxy()->setRows(startRow, newArray, labels);
     }
 }
 
@@ -436,7 +446,7 @@ void GraphModifier::removeRow()
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBar.x();
     if (row >= 0)
-        m_chart->seriesList().at(0)->dataProxy()->removeRows(row, 1);
+        m_genericData->dataProxy()->removeRows(row, 1);
 }
 
 void GraphModifier::removeRows()
@@ -445,7 +455,7 @@ void GraphModifier::removeRows()
     int row = m_selectedBar.x();
     if (row >= 0) {
         int startRow = qMax(row - 2, 0);
-        m_chart->seriesList().at(0)->dataProxy()->removeRows(startRow, 3);
+        m_genericData->dataProxy()->removeRows(startRow, 3);
     }
 }
 
@@ -523,7 +533,7 @@ void GraphModifier::changeSelectionMode()
 {
     static int selectionMode = m_chart->selectionMode();
 
-    if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice))
+    if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice | QDataVis::SelectionMultiSeries))
         selectionMode = QDataVis::SelectionNone;
 
     m_chart->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
@@ -554,7 +564,14 @@ void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 void GraphModifier::handleSelectionChange(const QPoint &position)
 {
     m_selectedBar = position;
-    qDebug() << "Selected bar position:" << position;
+    int index = 0;
+    foreach (QBar3DSeries *series, m_chart->seriesList()) {
+        if (series == sender())
+            break;
+        index++;
+    }
+
+    qDebug() << "Selected bar position:" << position << "series:" << index;
 }
 
 void GraphModifier::setUseNullInputHandler(bool useNull)

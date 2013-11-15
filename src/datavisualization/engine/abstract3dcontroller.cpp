@@ -51,6 +51,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
+    m_isSeriesDirty(true),
     m_renderPending(false)
 {
     // Set initial theme
@@ -96,6 +97,8 @@ void Abstract3DController::addSeries(QAbstract3DSeries *series)
     if (series && !m_seriesList.contains(series)) {
         m_seriesList.append(series);
         series->d_ptr->setController(this);
+        if (series->isVisible())
+            handleSeriesVisibilityChangedBySender(series);
     }
 }
 
@@ -104,6 +107,9 @@ void Abstract3DController::removeSeries(QAbstract3DSeries *series)
     if (series && series->d_ptr->m_controller == this) {
         m_seriesList.removeAll(series);
         series->d_ptr->setController(0);
+        m_isDataDirty = true;
+        m_isSeriesDirty = true;
+        emitNeedRender();
     }
 }
 
@@ -353,9 +359,15 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
-    // TODO: Another (per-series?) flag about series visuals being dirty?
+    if (m_isSeriesDirty) {
+        m_renderer->updateSeries(m_seriesList);
+        m_isSeriesDirty = false;
+    }
+
     if (m_isDataDirty) {
-        m_renderer->updateSeriesData(m_seriesList);
+        // Series list supplied above in updateSeries() is used to access the data,
+        // so no data needs to be passed in updateData()
+        m_renderer->updateData();
         m_isDataDirty = false;
     }
 }
@@ -1086,6 +1098,7 @@ void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender
     Q_UNUSED(sender)
 
     m_isDataDirty = true;
+    m_isSeriesDirty = true;
     emitNeedRender();
 }
 

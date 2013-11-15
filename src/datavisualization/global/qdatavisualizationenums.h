@@ -106,7 +106,8 @@ public:
         SelectionItemAndColumn     = SelectionItem | SelectionColumn,
         SelectionRowAndColumn      = SelectionRow | SelectionColumn,
         SelectionItemRowAndColumn  = SelectionItem | SelectionRow | SelectionColumn,
-        SelectionSlice             = 8
+        SelectionSlice             = 8,
+        SelectionMultiSeries       = 16
     };
     Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
 

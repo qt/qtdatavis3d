@@ -43,8 +43,13 @@ public:
 
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
+
+    void setSelectedBar(const QPoint &position);
+
 private:
     QBar3DSeries *qptr();
+
+    QPoint m_selectedBar;
 
 private:
     friend class QBar3DSeries;

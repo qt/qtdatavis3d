@@ -29,7 +29,7 @@ Item {
         id: valueMapping
         rowRole: "year"
         columnRole: "month"
-        valueRole: "expenses"
+        valueRole: "income"
     }
     //! [1]
 
@@ -37,7 +37,7 @@ Item {
         id: secondaryMapping
         rowRole: "year"
         columnRole: "month"
-        valueRole: "income"
+        valueRole: "expenses"
     }
 
     //! [0]

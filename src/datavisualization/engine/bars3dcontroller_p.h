@@ -61,6 +61,8 @@ private:
 
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.
+    QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
+                                       // single series selection cases.
 
     // Look'n'feel
     bool m_isBarSpecRelative;
@@ -89,10 +91,10 @@ public:
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
-    void setSelectedBar(const QPoint &position);
-    QPoint selectedBar() const;
+    void setSelectedBar(const QPoint &position, QBar3DSeries *series);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
     static QPoint noSelectionPoint();
 
@@ -116,16 +118,14 @@ public slots:
     void handleDataColumnLabelsChanged();
 
     // Renderer callback handlers
-    void handleBarClicked(const QPoint &position);
-
-signals:
-    void selectedBarChanged(QPoint position);
+    void handleBarClicked(const QPoint &position, QBar3DSeries *series);
 
 protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
 
 private:
     void adjustAxisRanges();
+    void adjustSelectionPosition(QPoint &pos, const QBar3DSeries *series);
 
     Q_DISABLE_COPY(Bars3DController)
 

@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     //! [1]
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2006-2012)"));
 
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
@@ -108,6 +108,15 @@ int main(int argc, char **argv)
                                int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
     selectionModeList->addItem(QStringLiteral("Slice into Column and Item"),
                                int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
+    selectionModeList->addItem(QStringLiteral("Multi: Bar, Row, Col"),
+                               int(QDataVis::SelectionItemRowAndColumn
+                                   | QDataVis::SelectionMultiSeries));
+    selectionModeList->addItem(QStringLiteral("Multi, Slice: Row, Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow
+                                   | QDataVis::SelectionMultiSeries));
+    selectionModeList->addItem(QStringLiteral("Multi, Slice: Col, Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn
+                                   | QDataVis::SelectionMultiSeries));
     selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);

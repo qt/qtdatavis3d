@@ -96,15 +96,16 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
-    QPoint m_visualSelectedBarPos; // The selection id color
+    QPoint m_visualSelectedBarPos;
+    int m_visualSelectedBarSeriesIndex;
     int m_renderRows;
     int m_renderColumns;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedBarPos;
+    const QBar3DSeries *m_selectedBarSeries;
     BarRenderItem m_dummyBarRenderItem;
     QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
-    int m_seriesCount;
     float m_seriesScale;
     float m_seriesStep;
     float m_seriesStart;
@@ -113,7 +114,7 @@ public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
-    void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
+    void updateData();
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
@@ -129,13 +130,13 @@ public slots:
                         bool relative = true);
     void updateSlicingActive(bool isSlicing);
     void updateBackgroundEnabled(bool enable);
-    void updateSelectedBar(const QPoint &position);
+    void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
 signals:
-    void barClicked(QPoint position);
+    void barClicked(QPoint position, QBar3DSeries *series);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -160,8 +161,9 @@ private:
 #endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
-    Abstract3DController::SelectionType isSelected(GLint row, GLint bar);
+    Abstract3DController::SelectionType isSelected(int row, int bar, int seriesIndex);
     QPoint selectionColorToArrayPosition(const QVector3D &selectionColor);
+    QBar3DSeries *selectionColorToSeries(const QVector3D &selectionColor);
 
     Q_DISABLE_COPY(Bars3DRenderer)
 

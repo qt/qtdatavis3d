@@ -41,8 +41,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3DController(boundingRect().toRect());
     AbstractDeclarative::setSharedController(m_shared);
-    QObject::connect(m_shared, &Bars3DController::selectedBarChanged, this,
-                     &DeclarativeBars::selectedBarChanged);
     QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
                      &DeclarativeBars::meshFileNameChanged);
 }
@@ -196,16 +194,6 @@ void DeclarativeBars::setMeshFileName(const QString &objFileName)
 QString DeclarativeBars::meshFileName() const
 {
     return m_shared->meshFileName();
-}
-
-void DeclarativeBars::setSelectedBar(const QPointF &position)
-{
-    m_shared->setSelectedBar(position.toPoint());
-}
-
-QPointF DeclarativeBars::selectedBar() const
-{
-    return QPointF(m_shared->selectedBar());
 }
 
 QQmlListProperty<QBar3DSeries> DeclarativeBars::seriesList()

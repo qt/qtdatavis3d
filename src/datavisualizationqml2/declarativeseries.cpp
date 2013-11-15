@@ -26,6 +26,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 DeclarativeBar3DSeries::DeclarativeBar3DSeries(QObject *parent)
     : QBar3DSeries(parent)
 {
+    QObject::connect(this, &QBar3DSeries::selectedBarChanged, this,
+                     &DeclarativeBar3DSeries::selectedBarChanged);
 }
 
 DeclarativeBar3DSeries::~DeclarativeBar3DSeries()
@@ -43,6 +45,16 @@ void DeclarativeBar3DSeries::appendSeriesChildren(QQmlListProperty<QObject> *lis
     QBarDataProxy *proxy = qobject_cast<QBarDataProxy *>(element);
     if (proxy)
         reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->setDataProxy(proxy);
+}
+
+void DeclarativeBar3DSeries::setSelectedBar(const QPointF &position)
+{
+    QBar3DSeries::setSelectedBar(position.toPoint());
+}
+
+QPointF DeclarativeBar3DSeries::selectedBar() const
+{
+    return QBar3DSeries::selectedBar();
 }
 
 DeclarativeScatter3DSeries::DeclarativeScatter3DSeries(QObject *parent)

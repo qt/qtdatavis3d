@@ -223,7 +223,7 @@ void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
 {
     Q_UNUSED(previousRow)
     Q_UNUSED(previousColumn)
-    m_graph->setSelectedBar(QPoint(currentRow, currentColumn));
+    m_graph->seriesList().at(0)->setSelectedBar(QPoint(currentRow, currentColumn));
 }
 //! [14]
 
@@ -275,7 +275,7 @@ int main(int argc, char **argv)
 
     //! [3]
     GraphDataGenerator generator(graph, tableWidget);
-    QObject::connect(graph, &Q3DBars::selectedBarChanged, &generator,
+    QObject::connect(series, &QBar3DSeries::selectedBarChanged, &generator,
                      &GraphDataGenerator::selectFromTable);
     QObject::connect(tableWidget, &QTableWidget::currentCellChanged, &generator,
                      &GraphDataGenerator::selectedFromTable);

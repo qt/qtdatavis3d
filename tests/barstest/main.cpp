@@ -329,11 +329,6 @@ int main(int argc, char **argv)
                      SLOT(changeShadowQuality(int)));
     QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,
-                     &GraphModifier::shadowQualityUpdatedByVisual);
-    QObject::connect(widgetchart, &Q3DBars::selectedBarChanged, modifier,
-                     &GraphModifier::handleSelectionChange);
-
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
 

@@ -83,8 +83,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
-      m_drawingPoints(false),
-      m_seriesCount(0)
+      m_drawingPoints(false)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -141,14 +140,9 @@ void Scatter3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Scatter3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
+void Scatter3DRenderer::updateData()
 {
-    QList<QScatter3DSeries *> visibleSeries;
-    foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible())
-            visibleSeries.append(static_cast<QScatter3DSeries *>(current));
-    }
-    int seriesCount = visibleSeries.size();
+    int seriesCount = m_visibleSeriesList.size();
     calculateSceneScalingFactors();
     float minX = float(m_axisCacheX.min());
     float maxX = float(m_axisCacheX.max());
@@ -158,13 +152,12 @@ void Scatter3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &serie
     float maxZ = float(m_axisCacheZ.max());
     int totalDataSize = 0;
 
-    if (m_seriesCount != seriesCount) {
-        m_seriesCount = seriesCount;
-        m_renderingArrays.resize(m_seriesCount);
-    }
+    if (m_renderingArrays.size() != seriesCount)
+        m_renderingArrays.resize(seriesCount);
 
-    for (int series = 0; series < m_seriesCount; series++) {
-        QScatterDataProxy *dataProxy = visibleSeries.at(series)->dataProxy();
+    for (int series = 0; series < seriesCount; series++) {
+        QScatterDataProxy *dataProxy =
+                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->dataProxy();
         const QScatterDataArray &dataArray = *dataProxy->array();
         int dataSize = dataArray.size();
         totalDataSize += dataSize;
@@ -188,8 +181,6 @@ void Scatter3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &serie
     }
     m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)totalDataSize)), 0.1);
     m_selectedItem = 0;
-
-    Abstract3DRenderer::updateSeriesData(seriesList);
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
@@ -241,6 +232,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QMatrix4x4 viewMatrix = activeCamera->viewMatrix();
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
+
+    int seriesCount = m_visibleSeriesList.size();
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -337,7 +330,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw dots to depth buffer
-        for (int series = 0; series < m_seriesCount; series++) {
+        for (int series = 0; series < seriesCount; series++) {
             for (int dot = 0; dot < m_renderingArrays.at(series).size(); dot++) {
                 const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
                 if (!item.isVisible())
@@ -440,7 +433,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         int totalArraySize = 0;
         int dotNo = 0;
 
-        for (int series = 0; series < m_seriesCount; series++) {
+        for (int series = 0; series < seriesCount; series++) {
             arraySize = m_renderingArrays.at(series).size();
             totalArraySize += arraySize;
 
@@ -563,9 +556,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Draw dots
     bool dotSelectionFound = false;
     ScatterRenderItem *selectedItem(0);
+    int selectedSeriesIndex(0);
     int dotNo = 0;
 
-    for (int series = 0; series < m_seriesCount; series++) {
+    for (int series = 0; series < seriesCount; series++) {
         // TODO: Color per series. Let's just hack it while testing with 2 series QTRD-2557
         QVector3D baseColor = Utils::vectorFromColor(m_cachedObjectColor) * (series + 0.25f);
         QVector3D dotColor = baseColor;
@@ -610,6 +604,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 selectedItem = &item;
+                selectedSeriesIndex = series;
                 dotSelectionFound = true;
             }
 
@@ -1364,7 +1359,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 static const QString yLabelTag(QStringLiteral("@yLabel"));
                 static const QString zLabelTag(QStringLiteral("@zLabel"));
 
-                labelText = itemLabelFormat();
+                labelText = m_visibleSeriesList[selectedSeriesIndex].itemLabelFormat();
 
                 labelText.replace(xTitleTag, m_axisCacheX.title());
                 labelText.replace(yTitleTag, m_axisCacheY.title());

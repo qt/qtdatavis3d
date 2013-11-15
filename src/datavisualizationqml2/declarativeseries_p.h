@@ -41,6 +41,9 @@ class DeclarativeBar3DSeries : public QBar3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    // selectedBar property is overloaded to use QPointF instead of QPoint to work around qml bug
+    // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
+    Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 public:
     DeclarativeBar3DSeries(QObject *parent = 0);
@@ -48,6 +51,12 @@ public:
 
     QQmlListProperty<QObject> seriesChildren();
     static void appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element);
+
+    void setSelectedBar(const QPointF &position);
+    QPointF selectedBar() const;
+
+signals:
+    void selectedBarChanged(QPointF position);
 };
 
 class DeclarativeScatter3DSeries : public QScatter3DSeries

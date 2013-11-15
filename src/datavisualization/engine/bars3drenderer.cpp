@@ -87,10 +87,11 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0f),
       m_visualSelectedBarPos(Bars3DController::noSelectionPoint()),
+      m_visualSelectedBarSeriesIndex(-1),
       m_hasHeightAdjustmentChanged(true),
       m_selectedBarPos(Bars3DController::noSelectionPoint()),
+      m_selectedBarSeries(0),
       m_noZeroInRange(false),
-      m_seriesCount(0),
       m_seriesScale(0.0f),
       m_seriesStep(0.0f),
       m_seriesStart(0.0f)
@@ -151,15 +152,9 @@ void Bars3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
+void Bars3DRenderer::updateData()
 {
-    QList<QBar3DSeries *> visibleSeries;
-    foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible())
-            visibleSeries.append(static_cast<QBar3DSeries *>(current));
-    }
-
-    int seriesCount = visibleSeries.size();
+    int seriesCount = m_visibleSeriesList.size();
     int minRow = m_axisCacheX.min();
     int maxRow = m_axisCacheX.max();
     int minCol = m_axisCacheZ.min();
@@ -168,13 +163,13 @@ void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesLi
     int newColumns = maxCol - minCol + 1;
     int updateSize = 0;
     int dataRowCount = 0;
+    int maxDataRowCount = 0;
 
-    if (m_seriesCount != seriesCount) {
-        m_seriesCount = seriesCount;
-        m_renderingArrays.resize(m_seriesCount);
-        m_seriesScale = 1.0f / float(m_seriesCount);
-        m_seriesStep = 1.0f / float(m_seriesCount);
-        m_seriesStart = -((float(m_seriesCount) - 1.0f) / 2.0f) * m_seriesStep;
+    if (m_renderingArrays.size() != seriesCount) {
+        m_renderingArrays.resize(seriesCount);
+        m_seriesScale = 1.0f / float(seriesCount);
+        m_seriesStep = 1.0f / float(seriesCount);
+        m_seriesStart = -((float(seriesCount) - 1.0f) / 2.0f) * m_seriesStep;
     }
 
     if (m_cachedRowCount != newRows || m_cachedColumnCount != newColumns) {
@@ -194,7 +189,7 @@ void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesLi
         calculateSceneScalingFactors();
     }
 
-    for (int series = 0; series < m_seriesCount; series++) {
+    for (int series = 0; series < seriesCount; series++) {
         if (newRows != m_renderingArrays.at(series).size()
                 || newColumns != m_renderingArrays.at(series).at(0).size()) {
             // Destroy old render items and reallocate new array
@@ -204,8 +199,11 @@ void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesLi
         }
 
         // Update cached data window
-        QBarDataProxy *dataProxy = visibleSeries.at(series)->dataProxy();
+        QBarDataProxy *dataProxy =
+                static_cast<QBar3DSeries *>(m_visibleSeriesList.at(series).series())->dataProxy();
         dataRowCount = dataProxy->rowCount();
+        if (maxDataRowCount < dataRowCount)
+            maxDataRowCount = qMin(dataRowCount, newRows);
         int dataRowIndex = minRow;
         GLfloat heightValue = 0.0f;
         for (int i = 0; i < newRows; i++) {
@@ -248,14 +246,12 @@ void Bars3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesLi
 
     m_renderColumns = updateSize;
     if (m_renderingArrays.size())
-        m_renderRows = qMin((dataRowCount - minRow), newRows);
+        m_renderRows = qMin((maxDataRowCount - minRow), newRows);
     else
         m_renderRows = 0;
 
     // Reset selected bar to update selection
-    updateSelectedBar(m_selectedBarPos);
-
-    Abstract3DRenderer::updateSeriesData(seriesList);
+    updateSelectedBar(m_selectedBarPos, m_selectedBarSeries);
 }
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
@@ -606,9 +602,16 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     }
 
     int labelCount = m_sliceCache->labelItems().size();
+    int seriesCount = 1;
+    if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+        seriesCount = m_visibleSeriesList.size();
+    int adjustment = flipped ? (m_sliceSelection->size() - (labelCount * seriesCount)) : 0;
+
     for (int labelNo = 0; labelNo < labelCount; labelNo++) {
         // Get labels from first series only
-        BarRenderItem *item = m_sliceSelection->at(labelNo * m_seriesCount);
+        // Adjustment is used in flipped cases to fix label positioning in cases when there are
+        // more actual data rows in the slice than labeled rows
+        BarRenderItem *item = m_sliceSelection->at(labelNo * seriesCount + adjustment);
         // TODO: Make user controllable (QTRD-2546)
         // Draw labels
         int labelIndex = flipped ? m_sliceCache->labelItems().size() - 1 - labelNo : labelNo;
@@ -671,6 +674,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
+
+    int seriesCount = m_visibleSeriesList.size();
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
@@ -777,7 +782,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
                 GLfloat shadowOffset = 0.0f;
                 float seriesPos = m_seriesStart;
-                for (int series = 0; series < m_seriesCount; series++) {
+                for (int series = 0; series < seriesCount; series++) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value())
                         continue;
@@ -880,10 +885,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
                 float seriesPos = m_seriesStart;
-                for (int series = 0; series < m_seriesCount; series++) {
+                for (int series = 0; series < seriesCount; series++) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
-                    if (!item.value())
+                    if (!item.value()) {
+                        seriesPos += m_seriesStep;
                         continue;
+                    }
 
                     if (item.height() < 0)
                         glCullFace(GL_FRONT);
@@ -912,7 +919,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     //#else
                     QVector3D barColor = QVector3D((GLdouble)row / 255.0,
                                                    (GLdouble)bar / 255.0,
-                                                   0.0);
+                                                   (GLdouble)series / 255.0);
                     //#endif
 
                     m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
@@ -946,7 +953,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
-        emit barClicked(selectionColorToArrayPosition(clickedColor));
+        emit barClicked(selectionColorToArrayPosition(clickedColor), selectionColorToSeries(clickedColor));
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -990,7 +997,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         gradientTexture = m_objectGradientTexture;
     }
 
-    // TODO: Can't call back to controller here! (QTRD-2216)
     if (m_selectionDirty) {
         if (m_cachedIsSlicingActivated) {
             if (m_sliceSelection && m_sliceSelection->size()) {
@@ -1017,12 +1023,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     bool barSelectionFound = false;
     BarRenderItem *selectedBar(0);
+
     QVector3D modelScaler(m_scaleX * m_seriesScale, 0.0f, m_scaleZ);
     bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::noSelectionPoint());
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float seriesPos = m_seriesStart;
-            for (int series = 0; series < m_seriesCount; series++) {
+            for (int series = 0; series < seriesCount; series++) {
                 BarRenderItem &item = m_renderingArrays[series][row][bar];
 
                 if (item.height() < 0)
@@ -1060,7 +1067,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 if (m_cachedSelectionMode > QDataVis::SelectionNone) {
                     Bars3DController::SelectionType selectionType = Bars3DController::SelectionNone;
                     if (somethingSelected)
-                        selectionType = isSelected(row, bar);
+                        selectionType = isSelected(row, bar, series);
 
                     switch (selectionType) {
                     case Bars3DController::SelectionItem: {
@@ -1072,7 +1079,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         lightStrength = m_cachedTheme.m_highlightLightStrength;
                         shadowLightStrength = adjustedHighlightStrength;
                         // Insert position data into render item. We have no ownership, don't delete the previous one
-                        if (!m_cachedIsSlicingActivated) {
+                        if (!m_cachedIsSlicingActivated && m_visualSelectedBarSeriesIndex == series) {
                             selectedBar = &item;
                             selectedBar->setPosition(QPoint(row, bar));
                             item.setTranslation(modelMatrix.column(3).toVector3D());
@@ -1081,7 +1088,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         if (m_selectionDirty && m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
                             if (m_cachedSelectionMode & QDataVis::SelectionColumn
-                                    && m_seriesCount > 1) {
+                                    && seriesCount > 1) {
                                 translation.setZ((m_columnDepth - ((row + 0.5f + seriesPos)
                                                                    * (m_cachedBarSpacing.height())))
                                                  / m_scaleFactor);
@@ -1124,7 +1131,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         shadowLightStrength = adjustedHighlightStrength;
                         if (m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
-                            if (m_seriesCount > 1) {
+                            if (seriesCount > 1) {
                                 translation.setZ((m_columnDepth - ((row + 0.5f + seriesPos)
                                                                    * (m_cachedBarSpacing.height())))
                                                  / m_scaleFactor);
@@ -1712,7 +1719,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 static const QString valueLabelTag(QStringLiteral("@valueLabel"));
 
                 // Custom format expects printf format specifier. There is no tag for it.
-                labelText = generateValueLabel(itemLabelFormat(), selectedBar->value());
+                labelText = generateValueLabel(
+                            m_visibleSeriesList[m_visualSelectedBarSeriesIndex].itemLabelFormat(),
+                            selectedBar->value());
 
                 int selBarPosX = selectedBar->position().x();
                 int selBarPosY = selectedBar->position().y();
@@ -1829,13 +1838,15 @@ void Bars3DRenderer::updateBackgroundEnabled(bool enable)
     }
 }
 
-void Bars3DRenderer::updateSelectedBar(const QPoint &position)
+void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSeries *series)
 {
     m_selectedBarPos = position;
+    m_selectedBarSeries = series;
     m_selectionDirty = true;
 
     if (m_renderingArrays.isEmpty()) {
         m_visualSelectedBarPos = Bars3DController::noSelectionPoint();
+        m_visualSelectedBarSeriesIndex = -1;
         return;
     }
 
@@ -1843,6 +1854,14 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position)
     int adjustedZ = m_selectedBarPos.y() - int(m_axisCacheZ.min());
     int maxX = m_renderingArrays.at(0).size() - 1;
     int maxZ = maxX >= 0 ? m_renderingArrays.at(0).at(0).size() - 1 : -1;
+
+    m_visualSelectedBarSeriesIndex = -1;
+    for (int i = 0; i < m_visibleSeriesList.size(); i++) {
+        if (m_visibleSeriesList.at(i).series() == series) {
+            m_visualSelectedBarSeriesIndex = i;
+            break;
+        }
+    }
 
     if (m_selectedBarPos == Bars3DController::noSelectionPoint()
             || adjustedX < 0 || adjustedX > maxX
@@ -1983,20 +2002,25 @@ void Bars3DRenderer::calculateHeightAdjustment()
     }
 }
 
-Bars3DController::SelectionType Bars3DRenderer::isSelected(GLint row, GLint bar)
+Bars3DController::SelectionType Bars3DRenderer::isSelected(int row, int bar, int seriesIndex)
 {
     Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
 
-    if (row == m_visualSelectedBarPos.x() && bar == m_visualSelectedBarPos.y()
-            && (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))) {
-        isSelectedType = Bars3DController::SelectionItem;
-    } else if (row == m_visualSelectedBarPos.x()
-               && (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow))) {
-        isSelectedType = Bars3DController::SelectionRow;
-    } else if (bar == m_visualSelectedBarPos.y()
-               && (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn))) {
-        isSelectedType = Bars3DController::SelectionColumn;
+    if ((m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries)
+         && m_visualSelectedBarSeriesIndex >= 0)
+            || seriesIndex == m_visualSelectedBarSeriesIndex) {
+        if (row == m_visualSelectedBarPos.x() && bar == m_visualSelectedBarPos.y()
+                && (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))) {
+            isSelectedType = Bars3DController::SelectionItem;
+        } else if (row == m_visualSelectedBarPos.x()
+                   && (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow))) {
+            isSelectedType = Bars3DController::SelectionRow;
+        } else if (bar == m_visualSelectedBarPos.y()
+                   && (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn))) {
+            isSelectedType = Bars3DController::SelectionColumn;
+        }
     }
+
     return isSelectedType;
 }
 
@@ -2010,6 +2034,14 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector3D &selectionC
                           int(selectionColor.y()) + int(m_axisCacheZ.min()));
     }
     return position;
+}
+
+QBar3DSeries *Bars3DRenderer::selectionColorToSeries(const QVector3D &selectionColor)
+{
+    if (selectionColor == selectionSkipColor)
+        return 0;
+    else
+        return static_cast<QBar3DSeries *>(m_visibleSeriesList.at(int(selectionColor.z())).series());
 }
 
 void Bars3DRenderer::updateSlicingActive(bool isSlicing)

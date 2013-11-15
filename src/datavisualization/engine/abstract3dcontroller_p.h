@@ -194,6 +194,7 @@ protected:
     QList<Q3DAbstractAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
+    bool m_isSeriesDirty;
     bool m_renderPending;
 
     QList<QAbstract3DSeries *> m_seriesList;
@@ -306,7 +307,7 @@ public:
 
     Q3DScene *scene();
 
-    inline void setDataDirty() { m_isDataDirty = true; }
+    inline void setSeriesDirty() { m_isSeriesDirty = true; }
     void emitNeedRender();
 
     virtual void mouseDoubleClickEvent(QMouseEvent *event);

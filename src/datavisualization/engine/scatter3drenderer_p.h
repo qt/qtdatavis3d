@@ -89,13 +89,12 @@ private:
     bool m_drawingPoints;
     ScatterRenderItem m_dummyRenderItem;
     QVector<ScatterRenderItemArray> m_renderingArrays;
-    int m_seriesCount;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
+    void updateData();
     void updateScene(Q3DScene *scene);
 
     void render(GLuint defaultFboHandle);

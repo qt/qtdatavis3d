@@ -57,7 +57,6 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
-    Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -92,9 +91,6 @@ public:
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 
-    void setSelectedBar(const QPointF &position);
-    QPointF selectedBar() const;
-
     QQmlListProperty<QBar3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series);
     static int countSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
@@ -104,7 +100,6 @@ public:
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
 signals:
-    void selectedBarChanged(const QPointF &position);
     void barThicknessChanged(qreal thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);

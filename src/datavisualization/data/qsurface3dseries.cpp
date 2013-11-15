@@ -185,11 +185,6 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);
-
-        // Always clear selection on proxy change
-        // TODO: setSelectedPoint(noSelectionPoint());
-
-        newController->handleSeriesVisibilityChanged(m_visible);
     }
 }
 

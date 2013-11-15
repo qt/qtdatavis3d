@@ -16,41 +16,27 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVisualization API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
-
-#ifndef QSCATTER3DSERIES_P_H
-#define QSCATTER3DSERIES_P_H
-
-#include "qscatter3dseries.h"
-#include "qabstract3dseries_p.h"
+#include "seriesrendercache_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QScatter3DSeriesPrivate : public QAbstract3DSeriesPrivate
+SeriesRenderCache::SeriesRenderCache()
+    : m_series(0)
 {
-    Q_OBJECT
-public:
-    QScatter3DSeriesPrivate(QScatter3DSeries *q);
-    virtual ~QScatter3DSeriesPrivate();
+}
 
-    virtual void setDataProxy(QAbstractDataProxy *proxy);
-    virtual void connectControllerAndProxy(Abstract3DController *newController);
+SeriesRenderCache::~SeriesRenderCache()
+{
+}
 
-private:
-    QScatter3DSeries *qptr();
+void SeriesRenderCache::populate(QAbstract3DSeries *series)
+{
+    Q_ASSERT(series);
 
-private:
-    friend class QScatter3DSeries;
-};
+    m_series = series;
+    m_itemLabelFormat = series->itemLabelFormat();
+
+    // TODO: Add other visual element extractions
+}
 
 QT_DATAVISUALIZATION_END_NAMESPACE
-
-#endif

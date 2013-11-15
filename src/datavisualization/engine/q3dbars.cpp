@@ -119,8 +119,6 @@ Q3DBars::Q3DBars()
                      &Q3DBars::gridVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
                      &Q3DBars::backgroundVisibleChanged);
-    QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarChanged, this,
-                     &Q3DBars::selectedBarChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
                      &Q3DBars::colorStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
@@ -151,7 +149,8 @@ Q3DBars::~Q3DBars()
  * so the rows and columns of all series must match for the visualized data to be meaningful.
  * If the graph has multiple visible series, only the first one added will
  * generate the row or column labels on the axes in cases where the labels are not explicitly set
- * to the axes.
+ * to the axes. If newly added series has specified a selected bar, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
  */
 void Q3DBars::addSeries(QBar3DSeries *series)
 {
@@ -447,24 +446,6 @@ void Q3DBars::setBackgroundVisible(bool visible)
 bool Q3DBars::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
-}
-
-/*!
- * \property Q3DBars::selectedBar
- *
- * Selects a bar in a \a position. The position is the (row, column) position in
- * the data array of the series.
- * Only one bar can be selected at a time.
- * To clear selection, specify an illegal \a position, e.g. (-1, -1).
- */
-void Q3DBars::setSelectedBar(const QPoint &position)
-{
-    d_ptr->m_shared->setSelectedBar(position);
-}
-
-QPoint Q3DBars::selectedBar() const
-{
-    return d_ptr->m_shared->selectedBar();
 }
 
 /*!

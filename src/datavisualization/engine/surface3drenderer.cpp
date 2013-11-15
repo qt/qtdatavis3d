@@ -197,12 +197,12 @@ void Surface3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Surface3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
+void Surface3DRenderer::updateData()
 {
     // Surface only supports single series for now, so we are only interested in the first series
     const QSurfaceDataArray *array = 0;
-    if (seriesList.size()) {
-        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(seriesList.at(0));
+    if (m_visibleSeriesList.size()) {
+        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
         m_cachedSurfaceVisible = firstSeries->isVisible(); // TODO: To series visuals update?
         if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
             QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
@@ -268,8 +268,6 @@ void Surface3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &serie
     m_sliceDataArray.clear();
 
     m_selectionDirty = true;
-
-    Abstract3DRenderer::updateSeriesData(seriesList);
 }
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
@@ -1871,7 +1869,8 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 
 QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row)
 {
-    QString labelText = itemLabelFormat();
+    // TODO: Get from correct series once multiple series supported
+    QString labelText = m_visibleSeriesList[0].itemLabelFormat();
     static const QString xTitleTag(QStringLiteral("@xTitle"));
     static const QString yTitleTag(QStringLiteral("@yTitle"));
     static const QString zTitleTag(QStringLiteral("@zTitle"));

@@ -136,6 +136,31 @@ QBarDataProxy *QBar3DSeries::dataProxy() const
 }
 
 /*!
+ * \property Q3DBars::selectedBar
+ *
+ * Selects a bar in a \a position. The position is the (row, column) position in
+ * the data array of the series.
+ * Only one bar can be selected at a time.
+ * To clear selection, specify an illegal \a position, e.g. (-1, -1).
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid. Selecting a bar on another added series will also
+ * clear the selection.
+ */
+void QBar3DSeries::setSelectedBar(const QPoint &position)
+{
+    // Don't do this in private to avoid loops, as that is used for callback from controller.
+    if (d_ptr->m_controller)
+        static_cast<Bars3DController *>(d_ptr->m_controller)->setSelectedBar(position, this);
+    else
+        dptr()->setSelectedBar(position);
+}
+
+QPoint QBar3DSeries::selectedBar() const
+{
+    return dptrc()->m_selectedBar;
+}
+
+/*!
  * \internal
  */
 QBar3DSeriesPrivate *QBar3DSeries::dptr()
@@ -154,7 +179,8 @@ const QBar3DSeriesPrivate *QBar3DSeries::dptrc() const
 // QBar3DSeriesPrivate
 
 QBar3DSeriesPrivate::QBar3DSeriesPrivate(QBar3DSeries *q)
-    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeBar)
+    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeBar),
+      m_selectedBar(Bars3DController::noSelectionPoint())
 {
     m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
 }
@@ -180,16 +206,15 @@ void QBar3DSeriesPrivate::setDataProxy(QAbstractDataProxy *proxy)
 void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newController)
 {
     QBarDataProxy *barDataProxy = static_cast<QBarDataProxy *>(m_dataProxy);
+    Bars3DController *controller = static_cast<Bars3DController *>(newController);
 
     if (m_controller && barDataProxy) {
-        //Disconnect old controller/old proxy
+        // Disconnect old controller/old proxy
         QObject::disconnect(barDataProxy, 0, m_controller, 0);
         QObject::disconnect(q_ptr, 0, m_controller, 0);
     }
 
     if (newController && barDataProxy) {
-        Bars3DController *controller = static_cast<Bars3DController *>(newController);
-
         QObject::connect(barDataProxy, &QBarDataProxy::arrayReset, controller,
                          &Bars3DController::handleArrayReset);
         QObject::connect(barDataProxy, &QBarDataProxy::rowsAdded, controller,
@@ -206,14 +231,16 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
                          &Bars3DController::handleDataRowLabelsChanged);
         QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, controller,
                          &Bars3DController::handleDataColumnLabelsChanged);
-
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);
+    }
+}
 
-        // Always clear selection on proxy change
-        // TODO: setSelectedBar(noSelectionPoint());
-
-        newController->handleSeriesVisibilityChanged(m_visible);
+void QBar3DSeriesPrivate::setSelectedBar(const QPoint &position)
+{
+    if (position != m_selectedBar) {
+        m_selectedBar = position;
+        emit qptr()->selectedBarChanged(m_selectedBar);
     }
 }
 

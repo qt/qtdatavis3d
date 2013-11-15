@@ -47,7 +47,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
-    Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
@@ -104,9 +103,6 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
-    void setSelectedBar(const QPoint &position);
-    QPoint selectedBar() const;
-
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
@@ -148,7 +144,6 @@ signals:
     void themeChanged(QDataVis::Theme theme);
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
-    void selectedBarChanged(QPoint position);
     void colorStyleChanged(QDataVis::ColorStyle style);
     void barColorChanged(QColor color);
     void barGradientChanged(QLinearGradient gradient);

@@ -30,6 +30,7 @@ class QT_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
+    Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
 
 public:
     explicit QBar3DSeries(QObject *parent = 0);
@@ -39,8 +40,12 @@ public:
     void setDataProxy(QBarDataProxy *proxy);
     QBarDataProxy *dataProxy() const;
 
+    void setSelectedBar(const QPoint &position);
+    QPoint selectedBar() const;
+
 signals:
     void dataProxyChanged(QBarDataProxy *proxy);
+    void selectedBarChanged(QPoint position);
 
 protected:
     explicit QBar3DSeries(QBar3DSeriesPrivate *d, QObject *parent = 0);

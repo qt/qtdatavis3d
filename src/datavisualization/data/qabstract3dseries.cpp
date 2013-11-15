@@ -162,6 +162,8 @@ QAbstract3DSeriesPrivate::~QAbstract3DSeriesPrivate()
 void QAbstract3DSeriesPrivate::setItemLabelFormat(const QString &format)
 {
     m_itemLabelFormat = format;
+    if (m_controller)
+        m_controller->setSeriesDirty();
 }
 
 QAbstractDataProxy *QAbstract3DSeriesPrivate::dataProxy() const

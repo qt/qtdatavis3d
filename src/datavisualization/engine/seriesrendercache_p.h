@@ -26,49 +26,35 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstract3dseries.h"
-#include <QString>
+#ifndef SERIESRENDERCACHE_P_H
+#define SERIESRENDERCACHE_P_H
 
-#ifndef QABSTRACT3DSERIES_P_H
-#define QABSTRACT3DSERIES_P_H
+#include "datavisualizationglobal_p.h"
+#include "qabstract3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QAbstractDataProxy;
-class Abstract3DController;
-
-class QAbstract3DSeriesPrivate : public QObject
+class SeriesRenderCache
 {
-    Q_OBJECT
 public:
-    QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type);
-    virtual ~QAbstract3DSeriesPrivate();
+    SeriesRenderCache();
+    virtual ~SeriesRenderCache();
 
-    void setItemLabelFormat(const QString &format);
+    void populate(QAbstract3DSeries *series);
 
-    QAbstractDataProxy *dataProxy() const;
-    virtual void setDataProxy(QAbstractDataProxy *proxy);
-    virtual void setController(Abstract3DController *controller);
-    virtual void connectControllerAndProxy(Abstract3DController *newController) = 0;
+    inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
+
+    // NOTE: Series pointer can only be used to access the series when syncing with controller.
+    // It is not guaranteed to be valid while rendering and should only be used as an identifier.
+    inline QAbstract3DSeries *series() const { return m_series; }
+
+    // TODO: Add other visual elements
 
 protected:
-    QAbstract3DSeries *q_ptr;
-    QAbstract3DSeries::SeriesType m_type;
     QString m_itemLabelFormat;
-    QAbstractDataProxy *m_dataProxy;
-    bool m_visible;
-    Abstract3DController *m_controller;
-
-private:
-    friend class QAbstract3DSeries;
-    friend class Abstract3DController;
-    friend class Bars3DController;
-    friend class Surface3DController;
-    friend class Scatter3DController;
-    friend class QBar3DSeries;
+    QAbstract3DSeries *m_series;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QAbstract3DSeries_P_H
+#endif

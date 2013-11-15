@@ -132,7 +132,7 @@ public:
     explicit Surface3DRenderer(Surface3DController *controller);
     ~Surface3DRenderer();
 
-    void updateSeriesData(const QList<QAbstract3DSeries *> &seriesList);
+    void updateData();
     void updateScene(Q3DScene *scene);
     bool updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);

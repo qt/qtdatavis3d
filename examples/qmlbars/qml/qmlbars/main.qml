@@ -35,6 +35,36 @@ Item {
         id: graphAxes
     }
 
+    property Bar3DSeries selectedSeries
+    selectedSeries: barSeries
+
+    function handleSelectionChange(series, position) {
+        if (position.x !== -1) {
+            selectedSeries = series
+        }
+        // Set tableView current row to selected bar
+        var rowRole = series.dataProxy.rowLabels[position.x];
+        var colRole = series.dataProxy.columnLabels[position.y];
+        var currentRow = tableView.currentRow
+        if (currentRow === -1 || rowRole !== graphData.model.get(currentRow).year
+                || colRole !== graphData.model.get(currentRow).month) {
+            var totalRows = tableView.rowCount;
+            for (var i = 0; i < totalRows; i++) {
+                var currentRowRole = graphData.model.get(i).year
+                var currentColRole = graphData.model.get(i).month
+                if (currentRowRole === rowRole && currentColRole === colRole) {
+                    tableView.currentRow = i
+                    // Workaround to 5.2 row selection issue
+                    if (typeof tableView.selection != "undefined") {
+                        tableView.selection.clear()
+                        tableView.selection.select(i)
+                    }
+                    break
+                }
+            }
+        }
+    }
+
     Item {
         id: dataView
         width: parent.width - tableView.width
@@ -50,85 +80,63 @@ Item {
             font.pointSize: 35
             theme: AbstractGraph3D.ThemeRetro
             labelStyle: AbstractGraph3D.LabelStyleFromTheme
-            barThickness: 0.5
+            barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
-            valueAxis: graphAxes.expenses
+            valueAxis: graphAxes.income
 
             Bar3DSeries {
                 id: barSeries
-                itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+                itemLabelFormat: "Income for @colLabel, @rowLabel: @valueLabel"
 
                 ItemModelBarDataProxy {
                     id: modelProxy
                     activeMapping: graphData.mapping
                     itemModel: graphData.model
                 }
+
+                onSelectedBarChanged: handleSelectionChange(barSeries, position)
             }
 
             Bar3DSeries {
                 id: secondarySeries
                 visible: false
-                itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+                itemLabelFormat: "Expenses for @colLabel, @rowLabel: @valueLabel"
 
                 ItemModelBarDataProxy {
                     id: secondaryProxy
                     activeMapping: graphData.secondaryMapping
                     itemModel: graphData.model
                 }
-            }
 
-            onSelectedBarChanged: {
-                // Set tableView current row to selected bar
-                var rowRole = modelProxy.rowLabels[position.x];
-                var colRole = modelProxy.columnLabels[position.y];
-                var currentRow = tableView.currentRow
-                if (currentRow === -1 || rowRole !== graphData.model.get(currentRow).year
-                        || colRole !== graphData.model.get(currentRow).month) {
-                    var totalRows = tableView.rowCount;
-                    for (var i = 0; i < totalRows; i++) {
-                        var currentRowRole = graphData.model.get(i).year
-                        var currentColRole = graphData.model.get(i).month
-                        if (currentRowRole === rowRole && currentColRole === colRole) {
-                            tableView.currentRow = i
-                            // Workaround to 5.2 row selection issue
-                            if (typeof tableView.selection != "undefined") {
-                                tableView.selection.clear()
-                                tableView.selection.select(i)
-                            }
-                            break
-                        }
-                    }
-                }
+                onSelectedBarChanged: handleSelectionChange(secondarySeries, position)
             }
         }
     }
 
     Button {
-        id: mappingToggle
+        id: seriesToggle
         anchors.bottom: parent.bottom
         width: tableView.width
         height: 60
-        text: "Show Income"
+        text: "Show Expenses"
         //! [0]
         onClicked: {
-            if (graphData.mapping.valueRole === "expenses" && !secondarySeries.visible) {
-                // Change mapping to change series data
-                graphData.mapping.valueRole = "income"
+            if (!secondarySeries.visible) {
                 text = "Show Both"
-                testGraph.valueAxis = graphAxes.income
-            } else if (graphData.mapping.valueRole === "income"){
-                // Show both data set in separate series
+                testGraph.valueAxis = graphAxes.expenses
+                barSeries.visible = false
                 secondarySeries.visible = true
-                graphData.mapping.valueRole = "expenses"
-                text = "Show Expenses"
+            } else if (!barSeries.visible){
+                barSeries.visible = true
+                text = "Show Income"
                 testGraph.valueAxis = graphAxes.income
             } else {
                 secondarySeries.visible = false
-                text = "Show Income"
-                testGraph.valueAxis = graphAxes.expenses
+                text = "Show Expenses"
+                testGraph.valueAxis = graphAxes.income
             }
         }
         //! [0]
@@ -136,7 +144,7 @@ Item {
 
     Button {
         id: shadowToggle
-        anchors.bottom: mappingToggle.top
+        anchors.bottom: seriesToggle.top
         width: tableView.width
         height: 60
         text: "Hide Shadows"
@@ -181,7 +189,7 @@ Item {
         x: 0
         y: 0
         width: 298
-        height: parent.height - mappingToggle.height - shadowToggle.height - dataToggle.height
+        height: parent.height - seriesToggle.height - shadowToggle.height - dataToggle.height
         TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
         TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
         TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
@@ -192,7 +200,7 @@ Item {
         onCurrentRowChanged: {
             var rowIndex = modelProxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
             var colIndex = modelProxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
-            testGraph.selectedBar = Qt.point(rowIndex, colIndex)
+            mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
         }
         //! [2]
     }

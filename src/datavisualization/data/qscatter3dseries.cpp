@@ -193,11 +193,6 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);
-
-        // Always clear selection on proxy change
-        // TODO: setSelectedScatter(noSelectionPoint());
-
-        newController->handleSeriesVisibilityChanged(m_visible);
     }
 }
 

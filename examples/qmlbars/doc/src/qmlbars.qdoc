@@ -27,6 +27,7 @@
 
     \image qmlbars-example.png
 
+    TODO: **This example is no longer about remapping, as multiple series are used instead**
     The interesting thing about this example is remapping the data, so we concentrate on that
     and skip explaining the basic Bars3D functionality - for more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.

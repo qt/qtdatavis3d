@@ -16,6 +16,7 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/scatter3dcontroller_p.h \
            $$PWD/scatter3drenderer_p.h \
            $$PWD/axisrendercache_p.h \
+           $$PWD/seriesrendercache_p.h \
            $$PWD/abstract3drenderer_p.h \
            $$PWD/selectionpointer_p.h \
            $$PWD/q3dcamera.h \
@@ -42,6 +43,7 @@ SOURCES += $$PWD/q3dwindow.cpp \
            $$PWD/scatter3dcontroller.cpp \
            $$PWD/scatter3drenderer.cpp \
            $$PWD/axisrendercache.cpp \
+           $$PWD/seriesrendercache.cpp \
            $$PWD/abstract3drenderer.cpp \
            $$PWD/selectionpointer.cpp \
            $$PWD/q3dcamera.cpp \

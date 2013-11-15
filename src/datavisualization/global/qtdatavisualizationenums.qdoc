@@ -158,6 +158,9 @@
            automatically. If you wish to control the slice view yourself via Q3DScene, do not set this
            flag. When setting this mode flag, either \c SelectionRow or \c SelectionColumn must also
            be set, but not both. Slicing is supported by Q3DBars and Q3DSurface only.
+    \value SelectionMultiSeries
+           Setting this mode means that items for all series at same position are selected, instead
+           of just the selected item. Multi-series selection is only supported for Q3DBars.
 */
 
 /*!

@@ -143,11 +143,6 @@ QString Abstract3DRenderer::generateValueLabel(const QString &format, qreal valu
     return Utils::formatLabel(valueFormatArray, valueParamType, value);
 }
 
-QString Abstract3DRenderer::itemLabelFormat() const
-{
-    return m_cachedItemLabelFormat;
-}
-
 void Abstract3DRenderer::updateSelectionState(SelectionState state)
 {
     m_selectionState = state;
@@ -394,11 +389,22 @@ void Abstract3DRenderer::updateMultiHighlightGradient(const QLinearGradient &gra
     fixGradient(&m_cachedMultiHighlightGradient, &m_multiHighlightGradientTexture);
 }
 
-void Abstract3DRenderer::updateSeriesData(const QList<QAbstract3DSeries *> &seriesList)
+void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
 {
-    // TODO: To series visuals update - just use first series format for now
-    if (seriesList.size())
-        m_cachedItemLabelFormat = seriesList.at(0)->itemLabelFormat();
+    int visibleCount = 0;
+    foreach (QAbstract3DSeries *current, seriesList) {
+        if (current->isVisible())
+            visibleCount++;
+    }
+
+    if (visibleCount != m_visibleSeriesList.size())
+        m_visibleSeriesList.resize(visibleCount);
+
+    visibleCount = 0;
+    foreach (QAbstract3DSeries *current, seriesList) {
+        if (current->isVisible())
+            m_visibleSeriesList[visibleCount++].populate(current);
+    }
 }
 
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation)

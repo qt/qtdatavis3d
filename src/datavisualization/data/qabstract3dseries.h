@@ -79,6 +79,7 @@ private:
     friend class Bars3DController;
     friend class Surface3DController;
     friend class Scatter3DController;
+    friend class QBar3DSeries;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
