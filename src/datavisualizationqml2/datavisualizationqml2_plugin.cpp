@@ -43,6 +43,14 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                   QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
                                                   QLatin1String("Trying to create uncreatable: Scene3D."));
+    qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
+                                                  QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
+    qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",
+                                             QLatin1String("Trying to create uncreatable: QBar3DSeries, use Bar3DSeries instead."));
+    qmlRegisterUncreatableType<QScatter3DSeries>(uri, 1, 0, "QScatter3DSeries",
+                                                 QLatin1String("Trying to create uncreatable: QScatter3DSeries, use Scatter3DSeries instead."));
+    qmlRegisterUncreatableType<QSurface3DSeries>(uri, 1, 0, "QSurface3DSeries",
+                                                 QLatin1String("Trying to create uncreatable: QSurface3DSeries, use Surface3DSeries instead."));
 
     qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
     qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
@@ -62,12 +70,12 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<QItemModelSurfaceDataProxy>(uri, 1, 0, "ItemModelSurfaceDataProxy");
     qmlRegisterType<QHeightMapSurfaceDataProxy>(uri, 1, 0, "HeightMapSurfaceDataProxy");
 
-    qmlRegisterType<QBar3DSeries>(uri, 1, 0, "Bar3DSeries");
-    qmlRegisterType<QScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
-    qmlRegisterType<QSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
-
     qmlRegisterType<ColorGradientStop>(uri, 1, 0, "ColorGradientStop");
     qmlRegisterType<ColorGradient>(uri, 1, 0, "ColorGradient");
+
+    qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
+    qmlRegisterType<DeclarativeScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
+    qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

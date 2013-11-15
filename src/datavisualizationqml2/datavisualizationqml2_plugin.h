@@ -39,6 +39,7 @@
 #include "qbar3dseries.h"
 #include "qscatter3dseries.h"
 #include "qsurface3dseries.h"
+#include "declarativeseries_p.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -76,6 +77,9 @@ QML_DECLARE_TYPE(QAbstract3DSeries)
 QML_DECLARE_TYPE(QBar3DSeries)
 QML_DECLARE_TYPE(QScatter3DSeries)
 QML_DECLARE_TYPE(QSurface3DSeries)
+QML_DECLARE_TYPE(DeclarativeBar3DSeries)
+QML_DECLARE_TYPE(DeclarativeScatter3DSeries)
+QML_DECLARE_TYPE(DeclarativeSurface3DSeries)
 
 QML_DECLARE_TYPE(ColorGradientStop)
 QML_DECLARE_TYPE(ColorGradient)

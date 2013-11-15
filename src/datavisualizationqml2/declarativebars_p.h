@@ -59,6 +59,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);

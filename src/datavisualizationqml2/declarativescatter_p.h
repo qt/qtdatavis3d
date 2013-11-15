@@ -54,6 +54,7 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);

@@ -22,20 +22,6 @@ import QtDataVisualization 1.0
 Item {
     property alias mapping: surfaceMapping
     property alias model: dataModel
-    property alias series: surfaceSeries
-    property alias heightSeries: heightSeries
-
-    //! [0]
-    HeightMapSurfaceDataProxy {
-        id: heightMapProxy
-        heightMapFile: ":/heightmaps/image"
-        // We don't want the default data values set by heightmap proxy.
-        minZValue: 30
-        maxZValue: 60
-        minXValue: 67
-        maxXValue: 97
-    }
-    //! [0]
 
     //! [2]
     SurfaceDataMapping {
@@ -45,24 +31,6 @@ Item {
         valueRole: "height"
     }
     //! [2]
-
-    //! [3]
-    ItemModelSurfaceDataProxy {
-        id: modelProxy
-        activeMapping: surfaceMapping
-        itemModel: dataModel
-    }
-    //! [3]
-
-    Surface3DSeries {
-        id: surfaceSeries
-        dataProxy: modelProxy
-    }
-
-    Surface3DSeries {
-        id: heightSeries
-        dataProxy: heightMapProxy
-    }
 
     //! [1]
     ListModel {

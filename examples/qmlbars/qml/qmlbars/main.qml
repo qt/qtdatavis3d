@@ -56,12 +56,34 @@ Item {
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
             valueAxis: graphAxes.expenses
-            seriesList: [graphData.series, graphData.secondarySeries]
+
+            Bar3DSeries {
+                id: barSeries
+                itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+                ItemModelBarDataProxy {
+                    id: modelProxy
+                    activeMapping: graphData.mapping
+                    itemModel: graphData.model
+                }
+            }
+
+            Bar3DSeries {
+                id: secondarySeries
+                visible: false
+                itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+                ItemModelBarDataProxy {
+                    id: secondaryProxy
+                    activeMapping: graphData.secondaryMapping
+                    itemModel: graphData.model
+                }
+            }
 
             onSelectedBarChanged: {
                 // Set tableView current row to selected bar
-                var rowRole = graphData.proxy.rowLabels[position.x];
-                var colRole = graphData.proxy.columnLabels[position.y];
+                var rowRole = modelProxy.rowLabels[position.x];
+                var colRole = modelProxy.columnLabels[position.y];
                 var currentRow = tableView.currentRow
                 if (currentRow === -1 || rowRole !== graphData.model.get(currentRow).year
                         || colRole !== graphData.model.get(currentRow).month) {
@@ -92,19 +114,19 @@ Item {
         text: "Show Income"
         //! [0]
         onClicked: {
-            if (graphData.mapping.valueRole === "expenses" && !graphData.secondarySeries.visible) {
+            if (graphData.mapping.valueRole === "expenses" && !secondarySeries.visible) {
                 // Change mapping to change series data
                 graphData.mapping.valueRole = "income"
                 text = "Show Both"
                 testGraph.valueAxis = graphAxes.income
             } else if (graphData.mapping.valueRole === "income"){
                 // Show both data set in separate series
-                graphData.secondarySeries.visible = true
+                secondarySeries.visible = true
                 graphData.mapping.valueRole = "expenses"
                 text = "Show Expenses"
                 testGraph.valueAxis = graphAxes.income
             } else {
-                graphData.secondarySeries.visible = false
+                secondarySeries.visible = false
                 text = "Show Income"
                 testGraph.valueAxis = graphAxes.expenses
             }
@@ -168,8 +190,8 @@ Item {
 
         //! [2]
         onCurrentRowChanged: {
-            var rowIndex = graphData.proxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
-            var colIndex = graphData.proxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
+            var rowIndex = modelProxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
+            var colIndex = modelProxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
             testGraph.selectedBar = Qt.point(rowIndex, colIndex)
         }
         //! [2]

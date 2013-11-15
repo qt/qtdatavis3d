@@ -56,9 +56,6 @@ Item {
             theme: AbstractGraph3D.ThemeIsabelle
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
-            //! [5]
-            seriesList: [graphData.series]
-            //! [5]
             //! [6]
             axisX.segmentCount: 3
             axisX.subSegmentCount: 2
@@ -70,6 +67,18 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
             //! [6]
+            //! [5]
+            Scatter3DSeries {
+                id: scatterSeries
+                itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+
+                ItemModelScatterDataProxy {
+                    activeMapping: graphData.mapping
+                    itemModel: graphData.model
+                }
+            }
+
+            //! [5]
         }
     }
 

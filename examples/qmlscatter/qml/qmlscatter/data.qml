@@ -21,8 +21,8 @@ import QtDataVisualization 1.0
 
 Item {
     //! [3]
-    property alias proxy: modelProxy
-    property alias series: scatterSeries
+    property alias mapping: scatterMapping
+    property alias model: dataModel
     //! [3]
 
     //! [1]
@@ -33,20 +33,6 @@ Item {
         zPosRole: "zPos"
     }
     //! [1]
-
-    //! [2]
-    ItemModelScatterDataProxy {
-        id: modelProxy
-        activeMapping: scatterMapping
-        itemModel: dataModel
-    }
-    //! [2]
-
-    Scatter3DSeries {
-        id: scatterSeries
-        dataProxy: modelProxy
-        itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
-    }
 
     //! [0]
     ListModel {

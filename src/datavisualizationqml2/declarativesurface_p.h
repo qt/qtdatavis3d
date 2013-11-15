@@ -56,6 +56,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);

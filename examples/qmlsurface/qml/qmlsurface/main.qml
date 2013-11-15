@@ -57,7 +57,6 @@ Item {
             font.family: "STCaiyun"
             font.pointSize: 35
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
-            seriesList: [surfaceData.series]
             axisY.min: 0.0
             axisY.max: 500.0
             axisX.segmentCount: 10
@@ -71,6 +70,15 @@ Item {
             axisY.labelFormat: "%i"
             gradient: surfaceGradient
 
+            Surface3DSeries {
+                id: surfaceSeries
+
+                ItemModelSurfaceDataProxy {
+                    activeMapping: surfaceData.mapping
+                    itemModel: surfaceData.model
+                }
+            }
+
             // Since flat is not supported on all platforms, and changes back to smooth
             // asynchronously on those platforms, handle button text on changed
             // signal handler rather than when we set the value.
@@ -81,6 +89,20 @@ Item {
                     smoothSurfaceToggle.text = "Show Smooth"
                 }
             }
+        }
+    }
+
+    // TODO: Kept outside until surface supports multiple added series (QTRD-2579)
+    Surface3DSeries {
+        id: heightSeries
+
+        HeightMapSurfaceDataProxy {
+            heightMapFile: ":/heightmaps/image"
+            // We don't want the default data values set by heightmap proxy.
+            minZValue: 30
+            maxZValue: 60
+            minXValue: 67
+            maxXValue: 97
         }
     }
 
@@ -110,12 +132,12 @@ Item {
         text: "Hide Surface"
         onClicked: {
             if (surfaceplot.seriesList[0].visible === true) {
-                surfaceData.series.visible = false;
-                surfaceData.heightSeries.visible = false;
+                surfaceSeries.visible = false;
+                heightSeries.visible = false;
                 text = "Show Surface"
             } else {
-                surfaceData.series.visible = true;
-                surfaceData.heightSeries.visible = true;
+                surfaceSeries.visible = true;
+                heightSeries.visible = true;
                 text = "Hide Surface"
             }
         }
@@ -173,19 +195,19 @@ Item {
         id: seriesToggle
         anchors.top: gridToggle.bottom
         width: gridToggle.width
-        text: "Switch to Item Model Proxy"
+        text: "Switch to Item Model Series"
         //! [3]
         onClicked: {
-            if (surfaceplot.seriesList[0] === surfaceData.heightSeries) {
+            if (surfaceplot.seriesList[0] === heightSeries) {
                 surfaceplot.axisY.max = 500.0
-                surfaceplot.seriesList = [surfaceData.series]
+                surfaceplot.seriesList = [surfaceSeries]
                 middleGradient.position = 0.25
-                text = "Switch to Height Map Proxy"
+                text = "Switch to Height Map Series"
             } else {
                 surfaceplot.axisY.max = 250.0
-                surfaceplot.seriesList = [surfaceData.heightSeries]
+                surfaceplot.seriesList = [heightSeries]
                 middleGradient.position = 0.55
-                text = "Switch to Item Model Proxy"
+                text = "Switch to Item Model Series"
             }
         }
         //! [3]
