@@ -1060,7 +1060,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme.m_ambientStrength * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_cachedSurfaceVisible) {
+        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -2103,6 +2103,7 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
+        m_textureHelper->fillDepthTexture(m_depthTexture, m_mainViewPort.size(), m_shadowQualityMultiplier, 1.0f);
         m_depthModelTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
                                                                   m_shadowQualityMultiplier);
         if (!m_depthTexture || !m_depthModelTexture)

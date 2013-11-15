@@ -182,7 +182,7 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
-                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return depthtextureid;
@@ -216,6 +216,23 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return depthtextureid;
+}
+#endif
+
+#if !defined(QT_OPENGL_ES_2)
+void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize, GLfloat value)
+{
+    int nItems = size.width() * textureSize * size.height() * textureSize;
+    GLfloat *bits = new GLfloat[nItems];
+    for (int i = 0; i < nItems; i++)
+        bits[i] = value;
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
+                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, bits);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    delete[] bits;
 }
 #endif
 
