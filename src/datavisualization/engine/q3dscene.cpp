@@ -271,6 +271,8 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
                     &Q3DScene::emitNeedRender);
             disconnect(d_ptr->m_camera, &Q3DCamera::yRotationChanged, this,
                     &Q3DScene::emitNeedRender);
+            disconnect(d_ptr->m_camera, &Q3DCamera::zoomLevelChanged, this,
+                    &Q3DScene::emitNeedRender);
         }
 
         d_ptr->m_camera = camera;
@@ -280,6 +282,8 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
             connect(camera, &Q3DCamera::xRotationChanged, this,
                     &Q3DScene::emitNeedRender);
             connect(camera, &Q3DCamera::yRotationChanged, this,
+                    &Q3DScene::emitNeedRender);
+            connect(camera, &Q3DCamera::zoomLevelChanged, this,
                     &Q3DScene::emitNeedRender);
         }
 

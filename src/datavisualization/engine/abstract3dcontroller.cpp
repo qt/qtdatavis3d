@@ -380,48 +380,36 @@ void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseDoubleClickEvent(event);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::touchEvent(QTouchEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->touchEvent(event);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mousePressEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseReleaseEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseMoveEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::wheelEvent(QWheelEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->wheelEvent(event);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::setSize(const int width, const int height)

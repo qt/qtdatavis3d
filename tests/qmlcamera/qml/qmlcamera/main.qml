@@ -71,6 +71,30 @@ Item {
             scene.activeCamera.zoomLevel: zoomSlider.value
             inputHandler: null
         }
+
+        MouseArea {
+            id: inputArea
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            property bool selectionOn: false
+
+            onPressed: {
+                if (mouse.button == Qt.LeftButton)
+                    selectionOn = true;
+                    testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+            }
+
+            onReleased: {
+                if (mouse.button == Qt.LeftButton)
+                    selectionOn = false;
+            }
+
+            onPositionChanged: {
+                if (selectionOn) {
+                    testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+                }
+            }
+        }
     }
 
     ControlSurface {
