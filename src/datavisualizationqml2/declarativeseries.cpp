@@ -57,6 +57,11 @@ QPointF DeclarativeBar3DSeries::selectedBar() const
     return QBar3DSeries::selectedBar();
 }
 
+QPointF DeclarativeBar3DSeries::invalidSelectionPosition() const
+{
+    return QPointF(QBar3DSeries::invalidSelectionPosition());
+}
+
 DeclarativeScatter3DSeries::DeclarativeScatter3DSeries(QObject *parent)
     : QScatter3DSeries(parent)
 {

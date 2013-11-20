@@ -96,7 +96,7 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
-    static QPoint noSelectionPoint();
+    static QPoint invalidSelectionPosition();
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual void setAxisZ(Q3DAbstractAxis *axis);

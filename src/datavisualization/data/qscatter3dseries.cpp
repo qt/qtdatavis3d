@@ -126,6 +126,39 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
 }
 
 /*!
+ * \property QScatter3DSeries::selectedItem
+ *
+ * Selects an item at the \a index. The \a index is the index in the data array of the series.
+ * Only one item can be selected at a time.
+ * To clear selection, set invalidSelectionIndex() as the \a index.
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid. Selecting an item on another added series will also
+ * clear the selection.
+ */
+void QScatter3DSeries::setSelectedItem(int index)
+{
+    // Don't do this in private to avoid loops, as that is used for callback from controller.
+    if (d_ptr->m_controller)
+        static_cast<Scatter3DController *>(d_ptr->m_controller)->setSelectedItem(index, this);
+    else
+        dptr()->setSelectedItem(index);
+}
+
+int QScatter3DSeries::selectedItem() const
+{
+    return dptrc()->m_selectedItem;
+}
+
+/*!
+ * \return an invalid index for selection. Set this index to selectedItem property if you
+ * want to clear the selection.
+ */
+int QScatter3DSeries::invalidSelectionIndex() const
+{
+    return Scatter3DController::invalidSelectionIndex();
+}
+
+/*!
  * \internal
  */
 QScatter3DSeriesPrivate *QScatter3DSeries::dptr()
@@ -144,7 +177,8 @@ const QScatter3DSeriesPrivate *QScatter3DSeries::dptrc() const
 // QScatter3DSeriesPrivate
 
 QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
-    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeScatter)
+    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeScatter),
+      m_selectedItem(Scatter3DController::invalidSelectionIndex())
 {
     m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
 }
@@ -179,7 +213,6 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
     if (newController && scatterDataProxy) {
         Scatter3DController *controller = static_cast<Scatter3DController *>(newController);
-
         QObject::connect(scatterDataProxy, &QScatterDataProxy::arrayReset,
                          controller, &Scatter3DController::handleArrayReset);
         QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsAdded,
@@ -193,6 +226,14 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);
+    }
+}
+
+void QScatter3DSeriesPrivate::setSelectedItem(int index)
+{
+    if (index != m_selectedItem) {
+        m_selectedItem = index;
+        emit qptr()->selectedItemChanged(m_selectedItem);
     }
 }
 

@@ -30,6 +30,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
+    Q_PROPERTY(int selectedItem READ selectedItem WRITE setSelectedItem NOTIFY selectedItemChanged)
 
 public:
     explicit QScatter3DSeries(QObject *parent = 0);
@@ -39,8 +40,13 @@ public:
     void setDataProxy(QScatterDataProxy *proxy);
     QScatterDataProxy *dataProxy() const;
 
+    void setSelectedItem(int index);
+    int selectedItem() const;
+    Q_INVOKABLE int invalidSelectionIndex() const;
+
 signals:
     void dataProxyChanged(QScatterDataProxy *proxy);
+    void selectedItemChanged(int index);
 
 protected:
     explicit QScatter3DSeries(QScatter3DSeriesPrivate *d, QObject *parent = 0);

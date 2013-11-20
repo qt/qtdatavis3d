@@ -41,10 +41,10 @@ class QScatterDataProxy;
 class QScatter3DSeries;
 
 struct Scatter3DChangeBitField {
-    bool selectedItemIndexChanged : 1;
+    bool selectedItemChanged : 1;
 
     Scatter3DChangeBitField() :
-        selectedItemIndexChanged(true)
+        selectedItemChanged(true)
     {
     }
 };
@@ -58,7 +58,9 @@ private:
 
     // Rendering
     Scatter3DRenderer *m_renderer;
-    int m_selectedItemIndex;
+    int m_selectedItem;
+    QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
+                                            // in single series selection cases.
 
 public:
     explicit Scatter3DController(QRect rect);
@@ -72,9 +74,8 @@ public:
     // Change selection mode
     void setSelectionMode(QDataVis::SelectionFlags mode);
 
-    void setSelectedItemIndex(int index);
-    int selectedItemIndex() const;
-    static inline int noSelectionIndex() { return -1; }
+    void setSelectedItem(int index, QScatter3DSeries *series);
+    static inline int invalidSelectionIndex() { return -1; }
 
     void synchDataToRenderer();
 
@@ -93,10 +94,7 @@ public slots:
     void handleItemsInserted(int startIndex, int count);
 
     // Renderer callback handlers
-    void handleItemClicked(int index);
-
-signals:
-    void selectedItemIndexChanged(int index);
+    void handleItemClicked(int index, QScatter3DSeries *series);
 
 private:
     void adjustValueAxisRange();

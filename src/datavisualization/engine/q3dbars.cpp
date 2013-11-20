@@ -149,7 +149,7 @@ Q3DBars::~Q3DBars()
  * so the rows and columns of all series must match for the visualized data to be meaningful.
  * If the graph has multiple visible series, only the first one added will
  * generate the row or column labels on the axes in cases where the labels are not explicitly set
- * to the axes. If newly added series has specified a selected bar, it will be highlighted and
+ * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  */
 void Q3DBars::addSeries(QBar3DSeries *series)

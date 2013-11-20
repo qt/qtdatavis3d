@@ -44,7 +44,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
-    Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor itemColor READ itemColor WRITE setItemColor NOTIFY itemColorChanged)
@@ -90,9 +89,6 @@ public:
     void setBackgroundVisible(bool visible);
     bool isBackgroundVisible() const;
 
-    void setSelectedItemIndex(int index);
-    int selectedItemIndex() const;
-
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
@@ -131,7 +127,6 @@ signals:
     void themeChanged(QDataVis::Theme theme);
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
-    void selectedItemIndexChanged(int index);
     void colorStyleChanged(QDataVis::ColorStyle style);
     void itemColorChanged(QColor color);
     void itemGradientChanged(QLinearGradient gradient);

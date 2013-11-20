@@ -44,8 +44,11 @@ public:
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
 
+    void setSelectedItem(int index);
+
 private:
     QScatter3DSeries *qptr();
+    int m_selectedItem;
 
 private:
     friend class QScatter3DSeries;

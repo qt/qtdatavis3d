@@ -82,6 +82,9 @@ private:
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     int m_selectedItemIndex;
+    int m_selectedItemTotalIndex;
+    int m_selectedItemSeriesIndex;
+    const QScatter3DSeries *m_selectedSeries;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
     QVector3D m_translationOffset;
@@ -139,14 +142,14 @@ public slots:
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
 
-    void updateSelectedItemIndex(int index);
+    void updateSelectedItem(int index, const QScatter3DSeries *series);
 
 signals:
-    void itemClicked(int index);
+    void itemClicked(int index, QScatter3DSeries *series);
 
 private:
     QVector3D indexToSelectionColor(GLint index);
-    int selectionColorToIndex(const QVector3D &color);
+    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -32,7 +32,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 Bars3DController::Bars3DController(QRect boundRect)
     : Abstract3DController(boundRect),
-      m_selectedBar(noSelectionPoint()),
+      m_selectedBar(invalidSelectionPosition()),
       m_selectedBarSeries(0),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
@@ -179,11 +179,7 @@ void Bars3DController::handleDataColumnLabelsChanged()
 
 void Bars3DController::handleBarClicked(const QPoint &position, QBar3DSeries *series)
 {
-    // Series may already have been removed, so check it before setting the selection.
-    if (m_seriesList.contains(series))
-        setSelectedBar(position, series);
-    else
-        setSelectedBar(noSelectionPoint(), 0);
+    setSelectedBar(position, series);
 
     // TODO: pass clicked to parent. (QTRD-2517)
     // TODO: Also hover needed? (QTRD-2131)
@@ -206,7 +202,7 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
 }
 
-QPoint Bars3DController::noSelectionPoint()
+QPoint Bars3DController::invalidSelectionPosition()
 {
     static QPoint noSelectionPos(-1, -1);
     return noSelectionPos;
@@ -240,7 +236,7 @@ void Bars3DController::addSeries(QAbstract3DSeries *series)
     }
 
     QBar3DSeries *barSeries =  static_cast<QBar3DSeries *>(series);
-    if (barSeries->selectedBar() != noSelectionPoint())
+    if (barSeries->selectedBar() != invalidSelectionPosition())
         setSelectedBar(barSeries->selectedBar(), barSeries);
 }
 
@@ -249,7 +245,7 @@ void Bars3DController::removeSeries(QAbstract3DSeries *series)
     bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
 
     if (m_selectedBarSeries == series)
-        setSelectedBar(noSelectionPoint(), 0);
+        setSelectedBar(invalidSelectionPosition(), 0);
 
     Abstract3DController::removeSeries(series);
 
@@ -365,6 +361,10 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
     // If the selection targets non-existent bar, clear selection instead.
     QPoint pos = position;
 
+    // Series may already have been removed, so check it before setting the selection.
+    if (!m_seriesList.contains(series))
+        series = 0;
+
     adjustSelectionPosition(pos, series);
 
     if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
@@ -383,14 +383,15 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
         m_selectedBar = pos;
         m_selectedBarSeries = series;
         m_changeTracker.selectedBarChanged = true;
-        // Clear selection from other series and set the new selection to the affected series
+
+        // Clear selection from other series and finally set new selection to the specified series
         foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
             QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(otherSeries);
             if (barSeries != m_selectedBarSeries)
-                barSeries->dptr()->setSelectedBar(noSelectionPoint());
-            else
-                barSeries->dptr()->setSelectedBar(m_selectedBar);
+                barSeries->dptr()->setSelectedBar(invalidSelectionPosition());
         }
+        if (m_selectedBarSeries)
+            m_selectedBarSeries->dptr()->setSelectedBar(m_selectedBar);
 
         emitNeedRender();
     }
@@ -449,15 +450,15 @@ void Bars3DController::adjustSelectionPosition(QPoint &pos, const QBar3DSeries *
         proxy = series->dataProxy();
 
     if (!proxy)
-        pos = noSelectionPoint();
+        pos = invalidSelectionPosition();
 
-    if (pos != noSelectionPoint()) {
+    if (pos != invalidSelectionPosition()) {
         int maxRow = proxy->rowCount() - 1;
         int maxCol = (pos.x() <= maxRow && pos.x() >= 0 && proxy->rowAt(pos.x()))
                 ? proxy->rowAt(pos.x())->size() - 1 : -1;
 
         if (pos.x() < 0 || pos.x() > maxRow || pos.y() < 0 || pos.y() > maxCol)
-            pos = noSelectionPoint();
+            pos = invalidSelectionPosition();
     }
 }
 

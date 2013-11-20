@@ -80,6 +80,10 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
+      m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedItemTotalIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedItemSeriesIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedSeries(0),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
@@ -180,7 +184,8 @@ void Scatter3DRenderer::updateData()
         }
     }
     m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)totalDataSize)), 0.1);
-    m_selectedItem = 0;
+
+    updateSelectedItem(m_selectedItemIndex, m_selectedSeries);
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
@@ -342,6 +347,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 modelMatrix.translate(item.translation());
                 if (!m_drawingPoints) {
                     modelMatrix.scale(modelScaler);
+                    // TODO: Remove all references to item size?
                     //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
                     //                            heightMultiplier * item.size() + heightScaler,
                     //                            depthMultiplier * item.size() + depthScaler));
@@ -451,6 +457,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 modelMatrix.translate(item.translation());
                 if (!m_drawingPoints) {
                     modelMatrix.scale(modelScaler);
+                    // TODO: Remove all references to item size?
                     //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
                     //                            heightMultiplier * item.size() + heightScaler,
                     //                            depthMultiplier * item.size() + depthScaler));
@@ -494,7 +501,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_cachedBoundingRect.height());
-        emit itemClicked(selectionColorToIndex(clickedColor));
+        int clickedIndex = 0;
+        QScatter3DSeries *clickedSeries = 0;
+        selectionColorToSeriesAndIndex(clickedColor, clickedIndex, clickedSeries);
+        emit itemClicked(clickedIndex, clickedSeries);
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -556,7 +566,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Draw dots
     bool dotSelectionFound = false;
     ScatterRenderItem *selectedItem(0);
-    int selectedSeriesIndex(0);
     int dotNo = 0;
 
     for (int series = 0; series < seriesCount; series++) {
@@ -577,6 +586,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (!m_drawingPoints) {
                 modelMatrix.scale(modelScaler);
                 itModelMatrix.scale(modelScaler);
+                // TODO: Remove all references to item size?
                 //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
                 //                            heightMultiplier * item.size() + heightScaler,
                 //                            depthMultiplier * item.size() + depthScaler));
@@ -596,7 +606,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 gradientTexture = m_objectGradientTexture;
 
             GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-            if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemIndex == dotNo)) {
+            if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
                 if (m_cachedColorStyle == QDataVis::ColorStyleUniform || m_drawingPoints)
                     dotColor = Utils::vectorFromColor(m_cachedSingleHighlightColor);
                 else
@@ -604,7 +614,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lightStrength = m_cachedTheme.m_highlightLightStrength;
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 selectedItem = &item;
-                selectedSeriesIndex = series;
                 dotSelectionFound = true;
             }
 
@@ -1359,7 +1368,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 static const QString yLabelTag(QStringLiteral("@yLabel"));
                 static const QString zLabelTag(QStringLiteral("@zLabel"));
 
-                labelText = m_visibleSeriesList[selectedSeriesIndex].itemLabelFormat();
+                labelText = m_visibleSeriesList[m_selectedItemSeriesIndex].itemLabelFormat();
 
                 labelText.replace(xTitleTag, m_axisCacheX.title());
                 labelText.replace(yTitleTag, m_axisCacheY.title());
@@ -1410,12 +1419,30 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Release label shader
     m_labelShader->release();
+
+    m_selectionDirty = false;
 }
 
-void Scatter3DRenderer::updateSelectedItemIndex(int index)
+void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *series)
 {
     m_selectionDirty = true;
-    m_selectedItemIndex = index;
+    m_selectedSeries = series;
+    m_selectedItemIndex = Scatter3DController::invalidSelectionIndex();
+    m_selectedItemTotalIndex = Scatter3DController::invalidSelectionIndex();
+    m_selectedItemSeriesIndex = Scatter3DController::invalidSelectionIndex();
+
+    if (!m_renderingArrays.isEmpty() && index != Scatter3DController::invalidSelectionIndex()) {
+        int totalIndex = 0;
+        for (int i = 0; i < m_visibleSeriesList.size(); i++) {
+            if (m_visibleSeriesList.at(i).series() == series) {
+                m_selectedItemSeriesIndex = i;
+                m_selectedItemIndex = index;
+                m_selectedItemTotalIndex = index + totalIndex;
+                break;
+            }
+            totalIndex += m_renderingArrays.at(i).size();
+        }
+    }
 }
 
 void Scatter3DRenderer::handleResize()
@@ -1656,17 +1683,26 @@ QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
     return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
 }
 
-int Scatter3DRenderer::selectionColorToIndex(const QVector3D &color)
+void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series)
 {
-    int selectedIndex;
-    if (color == selectionSkipColor) {
-        selectedIndex = Scatter3DController::noSelectionIndex();
-    } else {
-        selectedIndex = int(color.x())
+    if (color != selectionSkipColor) {
+        index = int(color.x())
                 + (int(color.y()) << 8)
                 + (int(color.z()) << 16);
+        // Find the series and adjust the index accordingly
+        for (int i = 0; i < m_renderingArrays.size(); i++) {
+            if (index < m_renderingArrays.at(i).size()) {
+                series = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(i).series());
+                return; // Valid found and already set to return parameters, so we can return
+            } else {
+                index -= m_renderingArrays.at(i).size();
+            }
+        }
     }
-    return selectedIndex;
+
+    // No valid match found
+    index = Scatter3DController::invalidSelectionIndex();
+    series = 0;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

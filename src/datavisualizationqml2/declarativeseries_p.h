@@ -54,6 +54,7 @@ public:
 
     void setSelectedBar(const QPointF &position);
     QPointF selectedBar() const;
+    Q_INVOKABLE QPointF invalidSelectionPosition() const;
 
 signals:
     void selectedBarChanged(QPointF position);

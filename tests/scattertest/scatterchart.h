@@ -20,6 +20,7 @@
 #define SCATTERDATAMODIFIER_H
 
 #include <QtDataVisualization/q3dscatter.h>
+#include <QtDataVisualization/qscatter3dseries.h>
 
 #include <QFont>
 #include <QDebug>
@@ -63,17 +64,21 @@ public slots:
     void selectItem();
     void handleSelectionChange(int index);
     void setGradient();
+    void addSeries();
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
     QVector3D randVector();
+    QScatter3DSeries *createAndAddSeries();
+
     Q3DScatter *m_chart;
     int m_fontSize;
     QTimer m_timer;
     int m_loopCounter;
     int m_selectedItem;
+    QScatter3DSeries *m_targetSeries;
 };
 
 #endif

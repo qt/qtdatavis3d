@@ -39,9 +39,10 @@ Item {
     selectedSeries: barSeries
 
     function handleSelectionChange(series, position) {
-        if (position.x !== -1) {
+        if (position != series.invalidSelectionPosition()) {
             selectedSeries = series
         }
+
         // Set tableView current row to selected bar
         var rowRole = series.dataProxy.rowLabels[position.x];
         var colRole = series.dataProxy.columnLabels[position.y];
@@ -200,7 +201,12 @@ Item {
         onCurrentRowChanged: {
             var rowIndex = modelProxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
             var colIndex = modelProxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
-            mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
+            if (selectedSeries.visible)
+                mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
+            else if (barSeries.visible)
+                barSeries.selectedBar = Qt.point(rowIndex, colIndex)
+            else
+                secondarySeries.selectedBar = Qt.point(rowIndex, colIndex)
         }
         //! [2]
     }

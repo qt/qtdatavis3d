@@ -52,7 +52,6 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType NOTIFY meshFileNameChanged)
     Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled NOTIFY meshFileNameChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
-    Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -78,9 +77,6 @@ public:
     void setMeshFileName(const QString &objFileName);
     QString meshFileName() const;
 
-    void setSelectedItemIndex(int index);
-    int selectedItemIndex() const;
-
     QQmlListProperty<QScatter3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series);
     static int countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
@@ -90,7 +86,6 @@ public:
     Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
 signals:
-    void selectedItemIndexChanged(int index);
     void meshFileNameChanged(QString filename);
 
 protected:

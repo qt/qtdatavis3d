@@ -102,8 +102,6 @@ Q3DScatter::Q3DScatter()
                      &Q3DScatter::gridVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
                      &Q3DScatter::backgroundVisibleChanged);
-    QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
-                     &Q3DScatter::selectedItemIndexChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
                      &Q3DScatter::colorStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
@@ -131,7 +129,8 @@ Q3DScatter::~Q3DScatter()
 
 /*!
  * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
- * axes.
+ * axes. If the newly added series has specified a selected item, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
  */
 void Q3DScatter::addSeries(QScatter3DSeries *series)
 {
@@ -366,22 +365,6 @@ void Q3DScatter::setBackgroundVisible(bool visible)
 bool Q3DScatter::isBackgroundVisible() const
 {
     return d_ptr->m_shared->backgroundEnabled();
-}
-
-/*!
- * \property Q3DScatter::selectedItemIndex
- *
- * Selects an item in the \a index. Only one item can be selected at a time.
- * To clear selection, specify an illegal \a index, e.g. -1.
- */
-void Q3DScatter::setSelectedItemIndex(int index)
-{
-    d_ptr->m_shared->setSelectedItemIndex(index);
-}
-
-int Q3DScatter::selectedItemIndex() const
-{
-    return d_ptr->m_shared->selectedItemIndex();
 }
 
 /*!

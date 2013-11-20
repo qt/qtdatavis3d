@@ -100,6 +100,9 @@ int main(int argc, char **argv)
     QPushButton *setSelectedItemButton = new QPushButton(widget);
     setSelectedItemButton->setText(QStringLiteral("Select/deselect item 3"));
 
+    QPushButton *addSeriesButton = new QPushButton(widget);
+    addSeriesButton->setText(QStringLiteral("Add Series"));
+
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
@@ -158,6 +161,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
@@ -202,6 +206,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::removeBunch);
     QObject::connect(setSelectedItemButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::selectItem);
+    QObject::connect(addSeriesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::addSeries);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
@@ -215,11 +221,6 @@ int main(int argc, char **argv)
                      SLOT(changeShadowQuality(int)));
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(chart, &Q3DScatter::shadowQualityChanged, modifier,
-                     &ScatterDataModifier::shadowQualityUpdatedByVisual);
-    QObject::connect(chart, &Q3DScatter::selectedItemIndexChanged, modifier,
-                     &ScatterDataModifier::handleSelectionChange);
-
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
 

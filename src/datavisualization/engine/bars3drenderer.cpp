@@ -86,10 +86,10 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleZ(0),
       m_scaleFactor(0),
       m_maxSceneSize(40.0f),
-      m_visualSelectedBarPos(Bars3DController::noSelectionPoint()),
+      m_visualSelectedBarPos(Bars3DController::invalidSelectionPosition()),
       m_visualSelectedBarSeriesIndex(-1),
       m_hasHeightAdjustmentChanged(true),
-      m_selectedBarPos(Bars3DController::noSelectionPoint()),
+      m_selectedBarPos(Bars3DController::invalidSelectionPosition()),
       m_selectedBarSeries(0),
       m_noZeroInRange(false),
       m_seriesScale(0.0f),
@@ -1025,7 +1025,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     BarRenderItem *selectedBar(0);
 
     QVector3D modelScaler(m_scaleX * m_seriesScale, 0.0f, m_scaleZ);
-    bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::noSelectionPoint());
+    bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::invalidSelectionPosition());
     for (int row = startRow; row != stopRow; row += stepRow) {
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float seriesPos = m_seriesStart;
@@ -1843,10 +1843,10 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
     m_selectedBarPos = position;
     m_selectedBarSeries = series;
     m_selectionDirty = true;
+    m_visualSelectedBarSeriesIndex = -1;
 
     if (m_renderingArrays.isEmpty()) {
-        m_visualSelectedBarPos = Bars3DController::noSelectionPoint();
-        m_visualSelectedBarSeriesIndex = -1;
+        m_visualSelectedBarPos = Bars3DController::invalidSelectionPosition();
         return;
     }
 
@@ -1855,7 +1855,6 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
     int maxX = m_renderingArrays.at(0).size() - 1;
     int maxZ = maxX >= 0 ? m_renderingArrays.at(0).at(0).size() - 1 : -1;
 
-    m_visualSelectedBarSeriesIndex = -1;
     for (int i = 0; i < m_visibleSeriesList.size(); i++) {
         if (m_visibleSeriesList.at(i).series() == series) {
             m_visualSelectedBarSeriesIndex = i;
@@ -1863,10 +1862,10 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
         }
     }
 
-    if (m_selectedBarPos == Bars3DController::noSelectionPoint()
+    if (m_selectedBarPos == Bars3DController::invalidSelectionPosition()
             || adjustedX < 0 || adjustedX > maxX
             || adjustedZ < 0 || adjustedZ > maxZ) {
-        m_visualSelectedBarPos = Bars3DController::noSelectionPoint();
+        m_visualSelectedBarPos = Bars3DController::invalidSelectionPosition();
     } else {
         m_visualSelectedBarPos = QPoint(adjustedX, adjustedZ);
     }
@@ -2028,7 +2027,7 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector3D &selectionC
 {
     QPoint position;
     if (selectionColor == selectionSkipColor) {
-        position = Bars3DController::noSelectionPoint();
+        position = Bars3DController::invalidSelectionPosition();
     } else {
         position = QPoint(int(selectionColor.x() + int(m_axisCacheX.min())),
                           int(selectionColor.y()) + int(m_axisCacheZ.min()));

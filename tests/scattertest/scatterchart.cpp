@@ -32,7 +32,9 @@ const int numberOfItems = 10000;
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_chart(scatter),
       m_fontSize(30.0f),
-      m_selectedItem(-1)
+      m_loopCounter(0),
+      m_selectedItem(-1),
+      m_targetSeries(0)
 {
     QFont font = m_chart->font();
     font.setPointSize(m_fontSize);
@@ -44,17 +46,15 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
-    QScatter3DSeries *series = new QScatter3DSeries;
-    QScatter3DSeries *series2 = new QScatter3DSeries;
 
-    m_chart->addSeries(series);
-    m_chart->addSeries(series2);
-    series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
-    series->setItemLabelFormat("** @xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel **");
+    createAndAddSeries();
+    createAndAddSeries();
 
     m_chart->setSelectionMode(QDataVis::SelectionItem);
 
-    connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
+    QObject::connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
+    QObject::connect(m_chart, &Q3DScatter::shadowQualityChanged, this,
+                     &ScatterDataModifier::shadowQualityUpdatedByVisual);
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -186,7 +186,13 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality s
 
 void ScatterDataModifier::clear()
 {
-    m_chart->seriesList().at(0)->dataProxy()->resetArray(0);
+    foreach (QScatter3DSeries *series, m_chart->seriesList()) {
+        m_chart->removeSeries(series);
+        delete series;
+    }
+
+    m_targetSeries = 0;
+
     qDebug() << m_loopCounter << "Cleared array";
 }
 
@@ -209,74 +215,98 @@ void ScatterDataModifier::resetAxes()
 
 void ScatterDataModifier::addOne()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     QScatterDataItem item(randVector());
-    int addIndex = m_chart->seriesList().at(0)->dataProxy()->addItem(item);
-    qDebug() << m_loopCounter << "added one to index:" << addIndex << "array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+    int addIndex = m_targetSeries->dataProxy()->addItem(item);
+    qDebug() << m_loopCounter << "added one to index:" << addIndex << "array size:" << m_targetSeries->dataProxy()->array()->size();
 }
 
 void ScatterDataModifier::addBunch()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     QScatterDataArray items(100);
     for (int i = 0; i < items.size(); i++)
         items[i].setPosition(randVector());
-    int addIndex = m_chart->seriesList().at(0)->dataProxy()->addItems(items);
-    qDebug() << m_loopCounter << "added bunch to index:" << addIndex << "array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+    int addIndex = m_targetSeries->dataProxy()->addItems(items);
+    qDebug() << m_loopCounter << "added bunch to index:" << addIndex << "array size:" << m_targetSeries->dataProxy()->array()->size();
 }
 
 void ScatterDataModifier::insertOne()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     QScatterDataItem item(randVector());
-    m_chart->seriesList().at(0)->dataProxy()->insertItem(0, item);
-    qDebug() << m_loopCounter << "Inserted one, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+    m_targetSeries->dataProxy()->insertItem(0, item);
+    qDebug() << m_loopCounter << "Inserted one, array size:" << m_targetSeries->dataProxy()->array()->size();
 }
 
 void ScatterDataModifier::insertBunch()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     QScatterDataArray items(100);
     for (int i = 0; i < items.size(); i++)
         items[i].setPosition(randVector());
-    m_chart->seriesList().at(0)->dataProxy()->insertItems(0, items);
-    qDebug() << m_loopCounter << "Inserted bunch, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+    m_targetSeries->dataProxy()->insertItems(0, items);
+    qDebug() << m_loopCounter << "Inserted bunch, array size:" << m_targetSeries->dataProxy()->array()->size();
 }
 
 void ScatterDataModifier::changeOne()
 {
-    if (m_selectedItem >= 0 && m_chart->seriesList().at(0)->dataProxy()->array()->size()) {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
+    if (m_selectedItem >= 0 && m_targetSeries->dataProxy()->array()->size()) {
         QScatterDataItem item(randVector());
-        m_chart->seriesList().at(0)->dataProxy()->setItem(m_selectedItem, item);
-        qDebug() << m_loopCounter << "Changed one, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+        m_targetSeries->dataProxy()->setItem(m_selectedItem, item);
+        qDebug() << m_loopCounter << "Changed one, array size:" << m_targetSeries->dataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::changeBunch()
 {
-    if (m_chart->seriesList().at(0)->dataProxy()->array()->size()) {
-        int amount = qMin(m_chart->seriesList().at(0)->dataProxy()->array()->size(), 100);
+    if (!m_targetSeries)
+        createAndAddSeries();
+
+    if (m_targetSeries->dataProxy()->array()->size()) {
+        int amount = qMin(m_targetSeries->dataProxy()->array()->size(), 100);
         QScatterDataArray items(amount);
         for (int i = 0; i < items.size(); i++)
             items[i].setPosition(randVector());
-        m_chart->seriesList().at(0)->dataProxy()->setItems(0, items);
-        qDebug() << m_loopCounter << "Changed bunch, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+        m_targetSeries->dataProxy()->setItems(0, items);
+        qDebug() << m_loopCounter << "Changed bunch, array size:" << m_targetSeries->dataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::removeOne()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     if (m_selectedItem >= 0) {
-        m_chart->seriesList().at(0)->dataProxy()->removeItems(m_selectedItem, 1);
-        qDebug() << m_loopCounter << "Removed one, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+        m_targetSeries->dataProxy()->removeItems(m_selectedItem, 1);
+        qDebug() << m_loopCounter << "Removed one, array size:" << m_targetSeries->dataProxy()->array()->size();
     }
 }
 
 void ScatterDataModifier::removeBunch()
 {
-    m_chart->seriesList().at(0)->dataProxy()->removeItems(0, 100);
-    qDebug() << m_loopCounter << "Removed bunch, array size:" << m_chart->seriesList().at(0)->dataProxy()->array()->size();
+    if (!m_targetSeries)
+        createAndAddSeries();
+
+    m_targetSeries->dataProxy()->removeItems(0, 100);
+    qDebug() << m_loopCounter << "Removed bunch, array size:" << m_targetSeries->dataProxy()->array()->size();
 }
 
 void ScatterDataModifier::timeout()
 {
-    int doWhat = rand() % 8;
+    int doWhat = rand() % 10;
     if (!(rand() % 100))
         doWhat = -1;
 
@@ -305,6 +335,15 @@ void ScatterDataModifier::timeout()
     case 7:
         removeBunch();
         break;
+    case 8:
+        addSeries();
+        break;
+    case 9:
+        if (m_chart->seriesList().size())
+            m_targetSeries = m_chart->seriesList().at(rand() % m_chart->seriesList().size());
+        else
+            addSeries();
+        break;
     default:
         clear();
         break;
@@ -326,18 +365,29 @@ void ScatterDataModifier::startStopTimer()
 
 void ScatterDataModifier::selectItem()
 {
+    if (!m_targetSeries)
+        createAndAddSeries();
+
     int targetItem(3);
     int noSelection(-1);
-    if (m_selectedItem != targetItem)
-        m_chart->setSelectedItemIndex(targetItem);
+    if (m_selectedItem != targetItem || m_targetSeries != m_chart->seriesList().at(0))
+        m_chart->seriesList().at(0)->setSelectedItem(targetItem);
     else
-        m_chart->setSelectedItemIndex(noSelection);
+        m_chart->seriesList().at(0)->setSelectedItem(noSelection);
 }
 
 void ScatterDataModifier::handleSelectionChange(int index)
 {
     m_selectedItem = index;
-    qDebug() << "Selected item index:" << index;
+    m_targetSeries = static_cast<QScatter3DSeries *>(sender());
+    int seriesIndex = 0;
+    foreach (QScatter3DSeries *series, m_chart->seriesList()) {
+        if (series == sender())
+            break;
+        seriesIndex++;
+    }
+
+    qDebug() << "Selected item index:" << index << "series:" << seriesIndex;
 }
 
 void ScatterDataModifier::setGradient()
@@ -374,6 +424,16 @@ void ScatterDataModifier::setGradient()
         m_chart->setColorStyle(QDataVis::ColorStyleUniform);
 }
 
+void ScatterDataModifier::addSeries()
+{
+    QScatter3DSeries *series = createAndAddSeries();
+
+    QScatter3DSeries *oldTargetSeries = m_targetSeries;
+    m_targetSeries = series; // adding always adds to target series, so fake it for a bit
+    addOne(); // add one random item to start the new series off
+    m_targetSeries = oldTargetSeries;
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
@@ -397,4 +457,22 @@ QVector3D ScatterDataModifier::randVector()
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
         (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+}
+
+QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
+{
+    static int counter = 0;
+
+    QScatter3DSeries *series = new QScatter3DSeries;
+
+    if (!m_targetSeries)
+        m_targetSeries = series;
+
+    m_chart->addSeries(series);
+    series->setItemLabelFormat(QString("%1: @xLabel - @yLabel - @zLabel").arg(counter++));
+
+    QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
+                     &ScatterDataModifier::handleSelectionChange);
+
+    return series;
 }

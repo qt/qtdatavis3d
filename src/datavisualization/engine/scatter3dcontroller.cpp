@@ -32,7 +32,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
       m_renderer(0),
-      m_selectedItemIndex(noSelectionIndex())
+      m_selectedItem(invalidSelectionIndex()),
+      m_selectedItemSeries(0)
 {
     // Default object type; specific to scatter
     setObjectType(QDataVis::MeshStyleSpheres, false);
@@ -72,9 +73,9 @@ void Scatter3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
-    if (m_changeTracker.selectedItemIndexChanged) {
-        m_renderer->updateSelectedItemIndex(m_selectedItemIndex);
-        m_changeTracker.selectedItemIndexChanged = false;
+    if (m_changeTracker.selectedItemChanged) {
+        m_renderer->updateSelectedItem(m_selectedItem, m_selectedItemSeries);
+        m_changeTracker.selectedItemChanged = false;
     }
 }
 
@@ -86,24 +87,25 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 
     Abstract3DController::addSeries(series);
 
-    if (firstAdded) {
+    if (firstAdded)
         adjustValueAxisRange();
-        // TODO: Temp until selection by series is properly implemented
-        setSelectedItemIndex(noSelectionIndex());
-    }
+
+    QScatter3DSeries *scatterSeries =  static_cast<QScatter3DSeries *>(series);
+    if (scatterSeries->selectedItem() != invalidSelectionIndex())
+        setSelectedItem(scatterSeries->selectedItem(), scatterSeries);
 }
 
 void Scatter3DController::removeSeries(QAbstract3DSeries *series)
 {
     bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
 
+    if (m_selectedItemSeries == series)
+        setSelectedItem(invalidSelectionIndex(), 0);
+
     Abstract3DController::removeSeries(series);
 
-    if (firstRemoved) {
+    if (firstRemoved)
         adjustValueAxisRange();
-        // TODO: Temp until selection by series is properly implemented
-        setSelectedItemIndex(noSelectionIndex());
-    }
 }
 
 QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
@@ -123,7 +125,7 @@ void Scatter3DController::handleArrayReset()
 {
     adjustValueAxisRange();
     m_isDataDirty = true;
-    setSelectedItemIndex(m_selectedItemIndex);
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
     emitNeedRender();
 }
 
@@ -154,9 +156,10 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
-    QScatterDataProxy *proxy = qobject_cast<QScatterDataProxy *>(sender());
-    if (!proxy || startIndex >= proxy->itemCount())
-        setSelectedItemIndex(noSelectionIndex());
+
+    // Clear selection unless it is still valid
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
+
     emitNeedRender();
 }
 
@@ -170,9 +173,10 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     emitNeedRender();
 }
 
-void Scatter3DController::handleItemClicked(int index)
+void Scatter3DController::handleItemClicked(int index, QScatter3DSeries *series)
 {
-    setSelectedItemIndex(index);
+    setSelectedItem(index, series);
+
     // TODO: pass clicked to parent. (QTRD-2517)
     // TODO: Also hover needed? (QTRD-2131)
 }
@@ -190,7 +194,7 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
     Abstract3DController::handleAxisRangeChangedBySender(sender);
 
     // Update selected index - may be moved offscreen
-    setSelectedItemIndex(m_selectedItemIndex);
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
 }
 
 void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
@@ -222,26 +226,40 @@ void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
         qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }
+
     Abstract3DController::setSelectionMode(mode);
 }
 
-void Scatter3DController::setSelectedItemIndex(int index)
+void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
 {
-    // TODO: Support for multiple sets. Just remove the item count test for now
-    if (index < 0 /*|| index >= static_cast<QScatterDataProxy *>(m_data)->itemCount()*/)
-        index = noSelectionIndex();
+    const QScatterDataProxy *proxy = 0;
 
-    if (index != m_selectedItemIndex) {
-        m_selectedItemIndex = index;
-        m_changeTracker.selectedItemIndexChanged = true;
-        emit selectedItemIndexChanged(index);
+    // Series may already have been removed, so check it before setting the selection.
+    if (!m_seriesList.contains(series))
+        series = 0;
+
+    if (series)
+        proxy = series->dataProxy();
+
+    if (!proxy || index < 0 || index >= proxy->itemCount())
+        index = invalidSelectionIndex();
+
+    if (index != m_selectedItem || series != m_selectedItemSeries) {
+        m_selectedItem = index;
+        m_selectedItemSeries = series;
+        m_changeTracker.selectedItemChanged = true;
+
+        // Clear selection from other series and finally set new selection to the specified series
+        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+            QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(otherSeries);
+            if (scatterSeries != m_selectedItemSeries)
+                scatterSeries->dptr()->setSelectedItem(invalidSelectionIndex());
+        }
+        if (m_selectedItemSeries)
+            m_selectedItemSeries->dptr()->setSelectedItem(m_selectedItem);
+
         emitNeedRender();
     }
-}
-
-int Scatter3DController::selectedItemIndex() const
-{
-    return m_selectedItemIndex;
 }
 
 void Scatter3DController::adjustValueAxisRange()
