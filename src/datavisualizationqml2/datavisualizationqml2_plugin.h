@@ -40,6 +40,7 @@
 #include "qscatter3dseries.h"
 #include "qsurface3dseries.h"
 #include "declarativeseries_p.h"
+#include "q3dtheme.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -83,6 +84,8 @@ QML_DECLARE_TYPE(DeclarativeSurface3DSeries)
 
 QML_DECLARE_TYPE(ColorGradientStop)
 QML_DECLARE_TYPE(ColorGradient)
+
+QML_DECLARE_TYPE(Q3DTheme)
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

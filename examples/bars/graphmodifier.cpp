@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QTime>
 #include <QComboBox>
 
@@ -174,7 +175,7 @@ void GraphModifier::changePresetCamera()
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 }
 
 void GraphModifier::changeLabelStyle()

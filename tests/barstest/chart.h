@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QStringList>
 #include <QPointer>
+#include <QColorDialog>
 
 using namespace QtDataVisualization;
 
@@ -33,7 +34,7 @@ class GraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphModifier(Q3DBars *barchart);
+    explicit GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog);
     ~GraphModifier();
 
     void resetTemperatureData();
@@ -74,6 +75,8 @@ public:
     void releaseAxes();
     void releaseProxies();
     void createMassiveArray();
+    void useOwnTheme();
+    void changeBaseColor(const QColor &color);
 
 public slots:
     void flipViews();
@@ -87,7 +90,8 @@ signals:
     void shadowQualityChanged(int quality);
 
 private:
-    Q3DBars *m_chart;
+    Q3DBars *m_graph;
+    QColorDialog *m_colorDialog;
     int m_columnCount;
     int m_rowCount;
     qreal m_xRotation;

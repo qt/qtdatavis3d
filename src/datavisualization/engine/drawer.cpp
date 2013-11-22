@@ -44,7 +44,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
-Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style)
+Drawer::Drawer(Q3DTheme *theme, const QFont &font, QDataVis::LabelStyle style)
     : m_theme(theme),
       m_font(font),
       m_style(style),
@@ -67,13 +67,13 @@ void Drawer::initializeOpenGL()
     }
 }
 
-void Drawer::setTheme(const Theme &theme)
+void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
     emit drawerChanged();
 }
 
-Theme Drawer::theme() const
+Q3DTheme *Drawer::theme() const
 {
     return m_theme;
 }
@@ -358,10 +358,10 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
         // Print label into a QImage using QPainter
         QImage label = Utils::printTextToImage(m_font,
                                                text,
-                                               m_theme.m_textBackgroundColor,
-                                               m_theme.m_textColor,
+                                               m_theme->textBackgroundColor(),
+                                               m_theme->textColor(),
                                                m_style,
-                                               m_theme.m_labelBorders,
+                                               m_theme->isLabelBorderEnabled(),
                                                widestLabel);
 
         // Set label size

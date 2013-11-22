@@ -323,23 +323,18 @@ void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
 /*!
  * \property Q3DBars::theme
  *
- * A predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects label colors, text color, background color, window color and
- * grid color. Lighting is also adjusted by themes.
+ * A user-defined theme.
  *
- * \sa setBarColor()
- *
- * \preliminary
+ * TODO: Add docs.
  */
-
-void Q3DBars::setTheme(QDataVis::Theme theme)
+void Q3DBars::setTheme(Q3DTheme *theme)
 {
     d_ptr->m_shared->setTheme(theme);
 }
 
-QDataVis::Theme Q3DBars::theme() const
+Q3DTheme *Q3DBars::theme() const
 {
-    return d_ptr->m_shared->theme().theme();
+    return d_ptr->m_shared->theme();
 }
 
 /*!

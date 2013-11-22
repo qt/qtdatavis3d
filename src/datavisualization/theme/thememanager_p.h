@@ -26,54 +26,32 @@
 //
 // We mean it.
 
-#ifndef THEME_P_H
-#define THEME_P_H
+#ifndef THEMEMANAGER_P_H
+#define THEMEMANAGER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "q3dbars.h"
-#include <QLinearGradient>
-
-class QColor;
+#include "abstract3dcontroller_p.h"
+#include "q3dtheme.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QT_DATAVISUALIZATION_EXPORT Theme
+class ThemeManager : public QObject
 {
+    Q_OBJECT
 public:
-    explicit Theme();
-    ~Theme();
+    ThemeManager(Abstract3DController *controller);
+    ~ThemeManager();
 
-    void useTheme(QDataVis::Theme theme);
-    QDataVis::Theme theme();
-    void setFromTheme(Theme &theme);
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
+
+protected:
+    void connectThemeSignals();
+    void useTheme(QDataVis::Theme type);
 
 private:
-    friend class Abstract3DController;
-    friend class Abstract3DRenderer;
-    friend class Bars3DRenderer;
-    friend class Surface3DRenderer;
-    friend class Surface3DController;
-    friend class Scatter3DRenderer;
-    friend class SelectionPointer;
-    friend class Drawer;
-
-    QDataVis::Theme m_theme;
-    QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
-    QColor m_backgroundColor;
-    QColor m_windowColor;
-    QColor m_textColor;
-    QColor m_textBackgroundColor;
-    QColor m_gridLine;
-    QColor m_singleHighlightColor;
-    QColor m_multiHighlightColor;
-    QLinearGradient m_surfaceGradient;
-    float m_lightStrength;
-    float m_ambientStrength;
-    float m_highlightLightStrength;
-    bool m_uniformColor;
-    bool m_labelBorders;
+    QScopedPointer<Q3DTheme> m_theme;
+    Abstract3DController *m_controller;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

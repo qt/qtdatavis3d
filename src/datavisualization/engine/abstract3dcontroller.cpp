@@ -28,6 +28,7 @@
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
 #include "qabstract3dseries_p.h"
+#include "thememanager_p.h"
 
 #include <QThread>
 
@@ -36,7 +37,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     QObject(parent),
     m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
-    m_theme(),
+    m_themeManager(new ThemeManager(this)),
     m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
@@ -55,7 +56,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_renderPending(false)
 {
     // Set initial theme
-    setTheme(QDataVis::ThemeQt);
+    setTheme(new Q3DTheme(QDataVis::ThemeQt));
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);
@@ -142,7 +143,7 @@ void Abstract3DController::synchDataToRenderer()
 
     // TODO: Renderer doesn't need to know the theme, so remove this bit entirely (QTRD-2538)
     if (m_changeTracker.themeChanged) {
-        m_renderer->updateTheme(m_theme);
+        m_renderer->updateTheme(m_themeManager->theme());
         m_changeTracker.themeChanged = false;
     }
 
@@ -786,25 +787,31 @@ QLinearGradient Abstract3DController::multiHighlightGradient() const
     return m_multiHighlightGradient;
 }
 
-void Abstract3DController::setTheme(QDataVis::Theme theme)
+void Abstract3DController::setTheme(Q3DTheme *theme)
 {
-    if (theme != m_theme.theme()) {
-        m_theme.useTheme(theme);
+    if (theme != m_themeManager->theme()) {
+        m_themeManager->setTheme(theme);
+        QDataVis::ColorStyle colorStyle = theme->colorStyle();
         m_changeTracker.themeChanged = true;
         // TODO: set all colors/styles here (QTRD-2538)
-        setColorStyle(QDataVis::ColorStyleUniform);
-        setObjectColor(m_theme.m_baseColor);
-        setSingleHighlightColor(m_theme.m_singleHighlightColor);
-        setMultiHighlightColor(m_theme.m_multiHighlightColor);
+        setColorStyle(colorStyle);
+        if (colorStyle == QDataVis::ColorStyleUniform) {
+            setObjectColor(theme->baseColor());
+            setSingleHighlightColor(theme->singleHighlightColor());
+            setMultiHighlightColor(theme->multiHighlightColor());
+        } else {
+            setObjectGradient(theme->baseGradient());
+            setSingleHighlightGradient(theme->singleHighlightGradient());
+            setMultiHighlightGradient(theme->multiHighlightGradient());
+        }
 
         emit themeChanged(theme);
-        emitNeedRender();
     }
 }
 
-Theme Abstract3DController::theme()
+Q3DTheme *Abstract3DController::theme() const
 {
-    return m_theme;
+    return m_themeManager->theme();
 }
 
 void Abstract3DController::setFont(const QFont &font)
@@ -817,7 +824,7 @@ void Abstract3DController::setFont(const QFont &font)
     }
 }
 
-QFont Abstract3DController::font()
+QFont Abstract3DController::font() const
 {
     return m_font;
 }
@@ -832,7 +839,7 @@ void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
     }
 }
 
-QDataVis::SelectionFlags Abstract3DController::selectionMode()
+QDataVis::SelectionFlags Abstract3DController::selectionMode() const
 {
     return m_selectionMode;
 }
@@ -847,7 +854,7 @@ void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
     }
 }
 
-QDataVis::ShadowQuality Abstract3DController::shadowQuality()
+QDataVis::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
 }
@@ -862,7 +869,7 @@ void Abstract3DController::setLabelStyle(QDataVis::LabelStyle style)
     }
 }
 
-QDataVis::LabelStyle Abstract3DController::labelStyle()
+QDataVis::LabelStyle Abstract3DController::labelStyle() const
 {
     return m_labelStyle;
 }
@@ -877,7 +884,7 @@ void Abstract3DController::setBackgroundEnabled(bool enable)
     }
 }
 
-bool Abstract3DController::backgroundEnabled()
+bool Abstract3DController::backgroundEnabled() const
 {
     return m_isBackgroundEnabled;
 }
@@ -892,12 +899,12 @@ void Abstract3DController::setGridEnabled(bool enable)
     }
 }
 
-bool Abstract3DController::gridEnabled()
+bool Abstract3DController::gridEnabled() const
 {
     return m_isGridEnabled;
 }
 
-bool Abstract3DController::isSlicingActive()
+bool Abstract3DController::isSlicingActive() const
 {
     return m_scene->isSlicingActive();
 }
@@ -918,7 +925,7 @@ void Abstract3DController::setMeshFileName(const QString &fileName)
     }
 }
 
-QString Abstract3DController::meshFileName()
+QString Abstract3DController::meshFileName() const
 {
     return m_objFile;
 }

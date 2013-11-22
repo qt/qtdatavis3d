@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dbars.h"
-#include "theme_p.h"
+#include "q3dtheme.h"
 #include "labelitem_p.h"
 #include "abstractrenderitem_p.h"
 #include <QFont>
@@ -63,13 +63,13 @@ public:
     };
 
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style);
+    explicit Drawer(Q3DTheme *theme, const QFont &font, QDataVis::LabelStyle style);
     ~Drawer();
 
     void initializeOpenGL();
 
-    void setTheme(const Theme &theme);
-    Theme theme() const;
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
     void setFont(const QFont &font);
     QFont font() const;
     void setStyle(QDataVis::LabelStyle style);
@@ -93,7 +93,7 @@ Q_SIGNALS:
     void drawerChanged();
 
 private:
-    Theme m_theme;
+    Q3DTheme *m_theme;
     QFont m_font;
     QDataVis::LabelStyle m_style;
     TextureHelper *m_textureHelper;

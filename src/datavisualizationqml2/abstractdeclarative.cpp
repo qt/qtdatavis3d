@@ -18,7 +18,6 @@
 
 #include "abstractdeclarative_p.h"
 #include "q3dvalueaxis.h"
-#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -36,15 +35,14 @@ Q3DScene* AbstractDeclarative::scene() const
     return m_controller->scene();
 }
 
-void AbstractDeclarative::setTheme(QDataVis::Theme theme)
+void AbstractDeclarative::setTheme(Q3DTheme *theme)
 {
-    // TODO: Implement correctly once "user-modifiable themes" (QTRD-2120) is implemented
     m_controller->setTheme(theme);
 }
 
-QDataVis::Theme AbstractDeclarative::theme() const
+Q3DTheme *AbstractDeclarative::theme() const
 {
-    return m_controller->theme().theme();
+    return m_controller->theme();
 }
 
 void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)

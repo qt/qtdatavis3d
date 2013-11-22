@@ -120,8 +120,6 @@
 
     Predefined themes.
 
-    \value ThemeDefault
-           Used only in QML to indicate a theme has not been set.
     \value ThemeQt
     \value ThemePrimaryColors
     \value ThemeDigia
@@ -130,6 +128,7 @@
     \value ThemeRetro
     \value ThemeEbony
     \value ThemeIsabelle
+    \value ThemeUserDefined
 */
 
 /*!

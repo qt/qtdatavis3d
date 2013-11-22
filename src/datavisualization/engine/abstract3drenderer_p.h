@@ -60,7 +60,7 @@ protected:
     };
 
     bool m_hasNegativeValues;
-    Theme m_cachedTheme;
+    Q3DTheme *m_cachedTheme;
     QFont m_cachedFont;
     QDataVis::LabelStyle m_cachedLabelStyle;
     Drawer *m_drawer;
@@ -115,7 +115,7 @@ public:
     virtual void updateBoundingRect(const QRect &boundingRect);
     virtual void updatePosition(const QRect &boundingRect);
 
-    virtual void updateTheme(Theme theme);
+    virtual void updateTheme(Q3DTheme *theme);
     virtual void updateFont(const QFont &font);
     virtual void updateLabelStyle(QDataVis::LabelStyle style);
     virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);

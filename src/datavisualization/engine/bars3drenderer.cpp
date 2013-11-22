@@ -22,7 +22,6 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
-#include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
 #include "qbardataitem.h"
@@ -347,11 +346,11 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.0f);
         lineShader->setUniformValue(lineShader->lightS(), 0.25f);
 
         GLfloat scaleFactor = 0.0f;
@@ -412,7 +411,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
                 lineShader->setUniformValue(lineShader->color(),
-                                            Utils::vectorFromColor(m_cachedTheme.m_backgroundColor));
+                                            Utils::vectorFromColor(m_cachedTheme->backgroundColor()));
 
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj);
@@ -476,7 +475,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme.m_ambientStrength * 2.0f);
+                                 m_cachedTheme->ambientLightStrength() * 2.0f);
     if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
         m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
         if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient)
@@ -988,7 +987,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme.m_ambientStrength);
+                                 m_cachedTheme->ambientLightStrength());
     if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
         m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
         if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient)
@@ -1018,8 +1017,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QVector3D baseColor(Utils::vectorFromColor(m_cachedObjectColor));
     QVector3D barColor = baseColor;
 
-    GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
-    GLfloat adjustedHighlightStrength = m_cachedTheme.m_highlightLightStrength / 10.0f;
+    GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
+    GLfloat adjustedHighlightStrength = m_cachedTheme->highlightLightStrength() / 10.0f;
 
     bool barSelectionFound = false;
     BarRenderItem *selectedBar(0);
@@ -1061,7 +1060,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 else
                     gradientTexture = m_objectGradientTexture;
 
-                GLfloat lightStrength = m_cachedTheme.m_lightStrength;
+                GLfloat lightStrength = m_cachedTheme->lightStrength();
                 GLfloat shadowLightStrength = adjustedLightStrength;
 
                 if (m_cachedSelectionMode > QDataVis::SelectionNone) {
@@ -1076,7 +1075,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         else
                             gradientTexture = m_singleHighlightGradientTexture;
 
-                        lightStrength = m_cachedTheme.m_highlightLightStrength;
+                        lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
                         // Insert position data into render item. We have no ownership, don't delete the previous one
                         if (!m_cachedIsSlicingActivated && m_visualSelectedBarSeriesIndex == series) {
@@ -1107,7 +1106,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         else
                             gradientTexture = m_multiHighlightGradientTexture;
 
-                        lightStrength = m_cachedTheme.m_highlightLightStrength;
+                        lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
                         if (m_cachedIsSlicingActivated) {
                             item.setTranslation(modelMatrix.column(3).toVector3D());
@@ -1127,7 +1126,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         else
                             gradientTexture = m_multiHighlightGradientTexture;
 
-                        lightStrength = m_cachedTheme.m_highlightLightStrength;
+                        lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
                         if (m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
@@ -1228,7 +1227,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
+        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1239,7 +1238,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme.m_ambientStrength * 2.0f);
+                                            m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -1258,7 +1257,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme->lightStrength());
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
@@ -1320,22 +1319,22 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), barColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
-                                        m_cachedTheme.m_lightStrength / 20.0f);
+                                        m_cachedTheme->lightStrength() / 20.0f);
         } else
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
         }
 
         GLfloat yFloorLinePosition = 0.0f;

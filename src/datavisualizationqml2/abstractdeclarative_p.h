@@ -47,7 +47,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
@@ -61,8 +61,8 @@ public:
     virtual QAbstract3DInputHandler *inputHandler() const;
     virtual void setInputHandler(QAbstract3DInputHandler *inputHandler);
 
-    virtual void setTheme(QDataVis::Theme theme);
-    virtual QDataVis::Theme theme() const;
+    virtual void setTheme(Q3DTheme *theme);
+    virtual Q3DTheme *theme() const;
 
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;
@@ -96,7 +96,7 @@ signals:
     // Signals shadow quality changes.
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
-    void themeChanged(QDataVis::Theme theme);
+    void themeChanged(Q3DTheme *theme);
     void fontChanged(QFont font);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void labelStyleChanged(QDataVis::LabelStyle style);

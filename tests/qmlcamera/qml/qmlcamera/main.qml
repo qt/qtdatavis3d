@@ -48,7 +48,7 @@ Item {
             shadowQuality: Bars3D.ShadowQualityMedium
             selectionMode: Bars3D.SelectionItem
             font.pointSize: 35
-            theme: Bars3D.ThemeRetro
+            theme: Theme3D { type: Bars3D.ThemeRetro }
             labelStyle: Bars3D.LabelStyleFromTheme
             seriesList: [chartData.series]
             barThickness: 0.5

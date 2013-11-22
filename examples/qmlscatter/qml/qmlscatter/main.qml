@@ -53,7 +53,7 @@ Item {
             //! [3]
             font.family: "Lucida Handwriting"
             font.pointSize: 40
-            theme: AbstractGraph3D.ThemeIsabelle
+            theme: Theme3D { type: AbstractGraph3D.ThemeIsabelle }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [6]
@@ -135,10 +135,12 @@ Item {
         text: "Change Theme"
         anchors.left: cameraToggle.right
         onClicked: {
-            if (scatterGraph.theme === AbstractGraph3D.ThemeArmyBlue) {
-                scatterGraph.theme = AbstractGraph3D.ThemeIsabelle;
+            if (scatterGraph.theme.type === AbstractGraph3D.ThemeArmyBlue) {
+                // Ownership of the theme is transferred and old theme is destroyed when setting
+                // a new one, so we need to create them dynamically
+                scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0; Theme3D {type: AbstractGraph3D.ThemeIsabelle}', parent);
             } else {
-                scatterGraph.theme = AbstractGraph3D.ThemeArmyBlue;
+                scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0; Theme3D {type: AbstractGraph3D.ThemeArmyBlue}', parent);
             }
         }
     }

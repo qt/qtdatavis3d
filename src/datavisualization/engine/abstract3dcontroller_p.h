@@ -26,11 +26,10 @@
 //
 // We mean it.
 
-#ifndef CONTROLLER3DBASE_H
-#define CONTROLLER3DBASE_H
+#ifndef ABSTRACT3DCONTROLLER_P_H
+#define ABSTRACT3DCONTROLLER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "theme_p.h"
 #include "q3dabstractaxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
@@ -48,6 +47,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class CameraHelper;
 class Abstract3DRenderer;
 class QAbstract3DSeries;
+class ThemeManager;
 
 struct Abstract3DChangeBitField {
     bool positionChanged               : 1;
@@ -165,7 +165,7 @@ private:
     QRect m_boundingRect;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
-    Theme m_theme;
+    ThemeManager *m_themeManager;
     QFont m_font;
     QDataVis::SelectionFlags m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
@@ -270,40 +270,40 @@ public:
 
     // Set theme (bar colors, shaders, window color, background colors, light intensity and text
     // colors are affected)
-    virtual void setTheme(QDataVis::Theme theme);
-    virtual Theme theme();
+    virtual void setTheme(Q3DTheme *theme);
+    virtual Q3DTheme *theme() const;
 
     // Set font
     virtual void setFont(const QFont &font);
-    virtual QFont font();
+    virtual QFont font() const;
 
     // Selection mode
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
-    virtual QDataVis::SelectionFlags selectionMode();
+    virtual QDataVis::SelectionFlags selectionMode() const;
 
     // Adjust shadow quality
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
-    virtual QDataVis::ShadowQuality shadowQuality();
+    virtual QDataVis::ShadowQuality shadowQuality() const;
 
     // Label style adjustment
     virtual void setLabelStyle(QDataVis::LabelStyle style);
-    virtual QDataVis::LabelStyle labelStyle();
+    virtual QDataVis::LabelStyle labelStyle() const;
 
     // Enable or disable background mesh
     virtual void setBackgroundEnabled(bool enable);
-    virtual bool backgroundEnabled();
+    virtual bool backgroundEnabled() const;
 
     // Enable or disable background grid
     virtual void setGridEnabled(bool enable);
-    virtual bool gridEnabled();
+    virtual bool gridEnabled() const;
 
     // Enable or disable slicing mode
-    bool isSlicingActive();
+    bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
 
     // override bar type with own mesh
     virtual void setMeshFileName(const QString &fileName);
-    virtual QString meshFileName();
+    virtual QString meshFileName() const;
 
     Q3DScene *scene();
 
@@ -345,7 +345,7 @@ public slots:
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
-    void themeChanged(QDataVis::Theme theme);
+    void themeChanged(Q3DTheme *theme);
     void fontChanged(QFont font);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void labelStyleChanged(QDataVis::LabelStyle style);
@@ -373,4 +373,4 @@ private:
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // CONTROLLER3DBASE_H
+#endif

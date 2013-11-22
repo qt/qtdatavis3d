@@ -86,7 +86,6 @@ public:
     };
 
     enum Theme {
-        ThemeDefault = -1,
         ThemeQt,
         ThemePrimaryColors,
         ThemeDigia,
@@ -94,7 +93,8 @@ public:
         ThemeArmyBlue,
         ThemeRetro,
         ThemeEbony,
-        ThemeIsabelle
+        ThemeIsabelle,
+        ThemeUserDefined
     };
 
     enum SelectionFlag {

@@ -80,7 +80,7 @@ private:
     ObjectHelper *m_pointObj;
     TextureHelper *m_textureHelper;
     bool m_isInitialized;
-    Theme m_cachedTheme;
+    Q3DTheme *m_cachedTheme;
     QDataVis::LabelStyle m_labelStyle;
     LabelItem m_labelItem;
     Drawer *m_drawer;

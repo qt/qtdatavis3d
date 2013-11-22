@@ -538,7 +538,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Set unchanging shader bindings
         dotShader->setUniformValue(dotShader->lightP(), lightPos);
         dotShader->setUniformValue(dotShader->view(), viewMatrix);
-        dotShader->setUniformValue(dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        dotShader->setUniformValue(dotShader->ambientS(), m_cachedTheme->ambientLightStrength());
         if (m_cachedColorStyle != QDataVis::ColorStyleUniform && !m_drawingPoints) {
             if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient) {
                 // Round the gradient off a bit to avoid it looping over
@@ -605,13 +605,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             else
                 gradientTexture = m_objectGradientTexture;
 
-            GLfloat lightStrength = m_cachedTheme.m_lightStrength;
+            GLfloat lightStrength = m_cachedTheme->lightStrength();
             if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
                 if (m_cachedColorStyle == QDataVis::ColorStyleUniform || m_drawingPoints)
                     dotColor = Utils::vectorFromColor(m_cachedSingleHighlightColor);
                 else
                     gradientTexture = m_singleHighlightGradientTexture;
-                lightStrength = m_cachedTheme.m_highlightLightStrength;
+                lightStrength = m_cachedTheme->highlightLightStrength();
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 selectedItem = &item;
                 dotSelectionFound = true;
@@ -709,7 +709,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
+        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -720,7 +720,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme.m_ambientStrength * 2.0f);
+                                            m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -730,7 +730,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme->lightStrength() / 10.0f);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
@@ -739,7 +739,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme->lightStrength());
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
@@ -768,22 +768,22 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
-                                        m_cachedTheme.m_lightStrength / 20.0f);
+                                        m_cachedTheme->lightStrength() / 20.0f);
         } else
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
         }
 
         QQuaternion lineYRotation = QQuaternion();

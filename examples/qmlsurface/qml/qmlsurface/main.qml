@@ -49,7 +49,7 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
-            theme: AbstractGraph3D.ThemeStoneMoss
+            theme: Theme3D { type: AbstractGraph3D.ThemeStoneMoss }
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             smoothSurfaceEnabled: true

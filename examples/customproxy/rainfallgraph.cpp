@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>
@@ -74,7 +75,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
 
     // Set theme
-    m_graph->setTheme(QDataVis::ThemeArmyBlue);
+    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeArmyBlue));
 
     // Set camera position and zoom
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);

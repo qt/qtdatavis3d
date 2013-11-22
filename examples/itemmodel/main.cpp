@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -113,7 +114,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [7]
 
     // Set theme
-    m_graph->setTheme(QDataVis::ThemeDigia);
+    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeDigia));
 
     // Set preset camera position
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);

@@ -22,14 +22,16 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QTime>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
-GraphModifier::GraphModifier(Q3DBars *barchart)
-    : m_chart(barchart),
+GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
+    : m_graph(barchart),
+      m_colorDialog(colorDialog),
       m_columnCount(21),
       m_rowCount(21),
       m_xRotation(0.0),
@@ -101,30 +103,30 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
 
     m_monthAxis->setTitle("Month");
 
-    m_chart->addAxis(m_autoAdjustingAxis);
-    m_chart->addAxis(m_fixedRangeAxis);
-    m_chart->addAxis(m_temperatureAxis);
-    m_chart->addAxis(m_yearAxis);
-    m_chart->addAxis(m_monthAxis);
-    m_chart->addAxis(m_genericRowAxis);
-    m_chart->addAxis(m_genericColumnAxis);
+    m_graph->addAxis(m_autoAdjustingAxis);
+    m_graph->addAxis(m_fixedRangeAxis);
+    m_graph->addAxis(m_temperatureAxis);
+    m_graph->addAxis(m_yearAxis);
+    m_graph->addAxis(m_monthAxis);
+    m_graph->addAxis(m_genericRowAxis);
+    m_graph->addAxis(m_genericColumnAxis);
 
-    m_chart->setTheme(QDataVis::ThemeStoneMoss);
-    m_chart->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
+    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_temperatureData2->setItemLabelFormat(QStringLiteral("2: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
-    m_chart->setFont(QFont("Times Roman", 20));
+    m_graph->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.
-    m_defaultInputHandler = m_chart->activeInputHandler();
-    m_chart->releaseInputHandler(m_defaultInputHandler);
-    m_chart->setActiveInputHandler(m_defaultInputHandler);
+    m_defaultInputHandler = m_graph->activeInputHandler();
+    m_graph->releaseInputHandler(m_defaultInputHandler);
+    m_graph->setActiveInputHandler(m_defaultInputHandler);
 
-    QObject::connect(m_chart, &Q3DBars::shadowQualityChanged, this,
+    QObject::connect(m_graph, &Q3DBars::shadowQualityChanged, this,
                      &GraphModifier::shadowQualityUpdatedByVisual);
     QObject::connect(m_temperatureData, &QBar3DSeries::selectedBarChanged, this,
                      &GraphModifier::handleSelectionChange);
@@ -133,15 +135,15 @@ GraphModifier::GraphModifier(Q3DBars *barchart)
     QObject::connect(m_genericData, &QBar3DSeries::selectedBarChanged, this,
                      &GraphModifier::handleSelectionChange);
 
-    m_chart->addSeries(m_temperatureData);
-    m_chart->addSeries(m_temperatureData2);
+    m_graph->addSeries(m_temperatureData);
+    m_graph->addSeries(m_temperatureData2);
 
     resetTemperatureData();
 }
 
 GraphModifier::~GraphModifier()
 {
-    delete m_chart;
+    delete m_graph;
     delete m_defaultInputHandler;
 }
 
@@ -155,24 +157,24 @@ void GraphModifier::restart(bool dynamicData)
     m_static = !dynamicData;
 
     if (m_static) {
-        m_chart->removeSeries(m_genericData);
+        m_graph->removeSeries(m_genericData);
 
-        m_chart->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+        m_graph->setTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
 
-        m_chart->setValueAxis(m_temperatureAxis);
-        m_chart->setRowAxis(m_yearAxis);
-        m_chart->setColumnAxis(m_monthAxis);
+        m_graph->setValueAxis(m_temperatureAxis);
+        m_graph->setRowAxis(m_yearAxis);
+        m_graph->setColumnAxis(m_monthAxis);
 
     } else {
-        m_chart->addSeries(m_genericData);
+        m_graph->addSeries(m_genericData);
 
-        m_chart->setTitle(QStringLiteral("Generic data"));
+        m_graph->setTitle(QStringLiteral("Generic data"));
 
         m_minval = m_fixedRangeAxis->min();
         m_maxval = m_fixedRangeAxis->max();
-        m_chart->setValueAxis(m_currentAxis);
-        m_chart->setRowAxis(m_genericRowAxis);
-        m_chart->setColumnAxis(m_genericColumnAxis);
+        m_graph->setValueAxis(m_currentAxis);
+        m_graph->setRowAxis(m_genericRowAxis);
+        m_graph->setColumnAxis(m_genericColumnAxis);
     }
 }
 
@@ -181,9 +183,9 @@ void GraphModifier::selectBar()
     QPoint targetBar(5, 5);
     QPoint noSelection(-1, -1);
     if (m_selectedBar != targetBar)
-        m_chart->seriesList().at(0)->setSelectedBar(targetBar);
+        m_graph->seriesList().at(0)->setSelectedBar(targetBar);
     else
-        m_chart->seriesList().at(0)->setSelectedBar(noSelection);
+        m_graph->seriesList().at(0)->setSelectedBar(noSelection);
 }
 
 void GraphModifier::swapAxis()
@@ -202,7 +204,7 @@ void GraphModifier::swapAxis()
         qDebug() << "default axis";
     }
 
-    m_chart->setValueAxis(m_currentAxis);
+    m_graph->setValueAxis(m_currentAxis);
 }
 
 void GraphModifier::releaseAxes()
@@ -210,32 +212,32 @@ void GraphModifier::releaseAxes()
     // Releases all axes - results in default axes for all dimensions.
     // Axes reset when the graph is switched as set*Axis calls are made, which
     // implicitly add axes.
-    m_chart->releaseAxis(m_autoAdjustingAxis);
-    m_chart->releaseAxis(m_fixedRangeAxis);
-    m_chart->releaseAxis(m_temperatureAxis);
-    m_chart->releaseAxis(m_yearAxis);
-    m_chart->releaseAxis(m_monthAxis);
-    m_chart->releaseAxis(m_genericRowAxis);
-    m_chart->releaseAxis(m_genericColumnAxis);
+    m_graph->releaseAxis(m_autoAdjustingAxis);
+    m_graph->releaseAxis(m_fixedRangeAxis);
+    m_graph->releaseAxis(m_temperatureAxis);
+    m_graph->releaseAxis(m_yearAxis);
+    m_graph->releaseAxis(m_monthAxis);
+    m_graph->releaseAxis(m_genericRowAxis);
+    m_graph->releaseAxis(m_genericColumnAxis);
 }
 
 void GraphModifier::releaseProxies()
 {
     // Releases all series/add all series toggle
-    if (m_chart->seriesList().size() > 0) {
-        m_chart->removeSeries(m_temperatureData);
-        m_chart->removeSeries(m_temperatureData2);
-        m_chart->removeSeries(m_genericData);
+    if (m_graph->seriesList().size() > 0) {
+        m_graph->removeSeries(m_temperatureData);
+        m_graph->removeSeries(m_temperatureData2);
+        m_graph->removeSeries(m_genericData);
     } else {
-        m_chart->addSeries(m_temperatureData);
-        m_chart->addSeries(m_temperatureData2);
-        m_chart->addSeries(m_genericData);
+        m_graph->addSeries(m_temperatureData);
+        m_graph->addSeries(m_temperatureData2);
+        m_graph->addSeries(m_genericData);
     }
 }
 
 void GraphModifier::flipViews()
 {
-    m_chart->scene()->setSecondarySubviewOnTop(!m_chart->scene()->isSecondarySubviewOnTop());
+    m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
 }
 
 void GraphModifier::createMassiveArray()
@@ -464,34 +466,34 @@ void GraphModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_chart->setBarType(QDataVis::MeshStyleCylinders, false);
+        m_graph->setBarType(QDataVis::MeshStyleCylinders, false);
         break;
     case 1:
-        m_chart->setBarType(QDataVis::MeshStyleCylinders, true);
+        m_graph->setBarType(QDataVis::MeshStyleCylinders, true);
         break;
     case 2:
-        m_chart->setBarType(QDataVis::MeshStyleCones, false);
+        m_graph->setBarType(QDataVis::MeshStyleCones, false);
         break;
     case 3:
-        m_chart->setBarType(QDataVis::MeshStyleCones, true);
+        m_graph->setBarType(QDataVis::MeshStyleCones, true);
         break;
     case 4:
-        m_chart->setBarType(QDataVis::MeshStyleBars, false);
+        m_graph->setBarType(QDataVis::MeshStyleBars, false);
         break;
     case 5:
-        m_chart->setBarType(QDataVis::MeshStyleBars, true);
+        m_graph->setBarType(QDataVis::MeshStyleBars, true);
         break;
     case 6:
-        m_chart->setBarType(QDataVis::MeshStylePyramids, false);
+        m_graph->setBarType(QDataVis::MeshStylePyramids, false);
         break;
     case 7:
-        m_chart->setBarType(QDataVis::MeshStylePyramids, true);
+        m_graph->setBarType(QDataVis::MeshStylePyramids, true);
         break;
     case 8:
-        m_chart->setBarType(QDataVis::MeshStyleBevelBars, false);
+        m_graph->setBarType(QDataVis::MeshStyleBevelBars, false);
         break;
     case 9:
-        m_chart->setBarType(QDataVis::MeshStyleBevelBars, true);
+        m_graph->setBarType(QDataVis::MeshStyleBevelBars, true);
         break;
     }
     model++;
@@ -503,7 +505,7 @@ void GraphModifier::changePresetCamera()
 {
     static int preset = QDataVis::CameraPresetFrontLow;
 
-    m_chart->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
 
     if (++preset > QDataVis::CameraPresetDirectlyBelow)
         preset = QDataVis::CameraPresetFrontLow;
@@ -513,7 +515,7 @@ void GraphModifier::changeTheme()
 {
     static int theme = QDataVis::ThemeQt;
 
-    m_chart->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme((QDataVis::Theme)theme));
 
     if (++theme > QDataVis::ThemeIsabelle)
         theme = QDataVis::ThemeQt;
@@ -523,7 +525,7 @@ void GraphModifier::changeLabelStyle()
 {
     static int style = QDataVis::LabelStyleOpaque;
 
-    m_chart->setLabelStyle((QDataVis::LabelStyle)style);
+    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
 
     if (++style > QDataVis::LabelStyleTransparent)
         style = QDataVis::LabelStyleOpaque;
@@ -531,27 +533,27 @@ void GraphModifier::changeLabelStyle()
 
 void GraphModifier::changeSelectionMode()
 {
-    static int selectionMode = m_chart->selectionMode();
+    static int selectionMode = m_graph->selectionMode();
 
     if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice | QDataVis::SelectionMultiSeries))
         selectionMode = QDataVis::SelectionNone;
 
-    m_chart->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
+    m_graph->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
 }
 
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
-    m_chart->setFont(newFont);
+    m_graph->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_chart->font();
+    QFont font = m_graph->font();
     font.setPointSize(m_fontSize);
-    m_chart->setFont(font);
+    m_graph->setFont(font);
 }
 
 void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -565,7 +567,7 @@ void GraphModifier::handleSelectionChange(const QPoint &position)
 {
     m_selectedBar = position;
     int index = 0;
-    foreach (QBar3DSeries *series, m_chart->seriesList()) {
+    foreach (QBar3DSeries *series, m_graph->seriesList()) {
         if (series == sender())
             break;
         index++;
@@ -583,56 +585,56 @@ void GraphModifier::setUseNullInputHandler(bool useNull)
     m_useNullInputHandler = useNull;
 
     if (useNull)
-        m_chart->setActiveInputHandler(0);
+        m_graph->setActiveInputHandler(0);
     else
-        m_chart->setActiveInputHandler(m_defaultInputHandler);
+        m_graph->setActiveInputHandler(m_defaultInputHandler);
 }
 
 
 void GraphModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
-    m_chart->setShadowQuality(sq);
+    m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->setBackgroundVisible((bool)enabled);
+    m_graph->setBackgroundVisible((bool)enabled);
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_chart->setGridVisible((bool)enabled);
+    m_graph->setGridVisible((bool)enabled);
 }
 
 void GraphModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;
-    m_chart->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
+    m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
 
 void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
-    m_chart->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
+    m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
 
 void GraphModifier::setSpecsRatio(int barwidth)
 {
-    m_chart->setBarThickness((qreal)barwidth / 30.0);
+    m_graph->setBarThickness((qreal)barwidth / 30.0);
 }
 
 void GraphModifier::setSpacingSpecsX(int spacing)
 {
     m_barSpacingX = (qreal)spacing / 100.0;
-    m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_graph->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void GraphModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (qreal)spacing / 100.0;
-    m_chart->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
+    m_graph->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void GraphModifier::setSampleCountX(int samples)
@@ -670,6 +672,34 @@ void GraphModifier::setMaxY(int max)
     m_maxval = max;
 }
 
+void GraphModifier::useOwnTheme()
+{
+    Q3DTheme *theme = new Q3DTheme();
+    theme->setAmbientLightStrength(0.3f);
+    theme->setBackgroundColor(QColor(QRgb(0x99ca53)));
+    theme->setBaseColor(QColor(QRgb(0x209fdf)));
+    theme->setColorStyle(QDataVis::ColorStyleUniform);
+    theme->setGridLineColor(QColor(QRgb(0x99ca53)));
+    theme->setHighlightLightStrength(7.0f);
+    theme->setLabelBorderEnabled(false);
+    theme->setLightColor(Qt::white);
+    theme->setLightStrength(6.0f);
+    theme->setMultiHighlightColor(QColor(QRgb(0x6d5fd5)));
+    theme->setSingleHighlightColor(QColor(QRgb(0xf6a625)));
+    theme->setTextBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0));
+    theme->setTextColor(QColor(QRgb(0x404044)));
+    theme->setWindowColor(QColor(QRgb(0xffffff)));
+
+    m_graph->setTheme(theme);
+
+    m_colorDialog->open();
+}
+
+void GraphModifier::changeBaseColor(const QColor &color)
+{
+    qDebug() << "base color changed to" << color;
+    m_graph->theme()->setBaseColor(color);
+}
 
 void GraphModifier::setGradient()
 {
@@ -697,19 +727,19 @@ void GraphModifier::setGradient()
     multiHighlightGradient.setColorAt(0.25, Qt::darkYellow);
     multiHighlightGradient.setColorAt(0.0, Qt::darkGray);
 
-    m_chart->setBarColor(Qt::green);
-    m_chart->setSingleHighlightColor(Qt::white);
-    m_chart->setMultiHighlightColor(Qt::cyan);
+    m_graph->setBarColor(Qt::green);
+    m_graph->setSingleHighlightColor(Qt::white);
+    m_graph->setMultiHighlightColor(Qt::cyan);
 
-    m_chart->setBarGradient(barGradient);
-    m_chart->setSingleHighlightGradient(singleHighlightGradient);
-    m_chart->setMultiHighlightGradient(multiHighlightGradient);
+    m_graph->setBarGradient(barGradient);
+    m_graph->setSingleHighlightGradient(singleHighlightGradient);
+    m_graph->setMultiHighlightGradient(multiHighlightGradient);
 
-    QDataVis::ColorStyle oldStyle = m_chart->colorStyle();
+    QDataVis::ColorStyle oldStyle = m_graph->colorStyle();
     if (oldStyle == QDataVis::ColorStyleUniform)
-        m_chart->setColorStyle(QDataVis::ColorStyleObjectGradient);
+        m_graph->setColorStyle(QDataVis::ColorStyleObjectGradient);
     else if (oldStyle == QDataVis::ColorStyleObjectGradient)
-        m_chart->setColorStyle(QDataVis::ColorStyleRangeGradient);
+        m_graph->setColorStyle(QDataVis::ColorStyleRangeGradient);
     if (oldStyle == QDataVis::ColorStyleRangeGradient)
-        m_chart->setColorStyle(QDataVis::ColorStyleUniform);
+        m_graph->setColorStyle(QDataVis::ColorStyleUniform);
 }

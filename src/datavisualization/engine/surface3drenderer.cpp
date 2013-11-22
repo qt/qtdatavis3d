@@ -25,7 +25,6 @@
 #include "surfaceobject_p.h"
 #include "texturehelper_p.h"
 #include "selectionpointer_p.h"
-#include "theme_p.h"
 #include "utils_p.h"
 #include "drawer_p.h"
 #include "q3dlight.h"
@@ -523,7 +522,7 @@ void Surface3DRenderer::drawSlicedScene()
             surfaceShader->bind();
 
             QVector3D color;
-            color = Utils::vectorFromColor(m_cachedTheme.m_multiHighlightColor);
+            color = Utils::vectorFromColor(m_cachedTheme->multiHighlightColor());
 
             // Set shader bindings
             surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
@@ -535,7 +534,7 @@ void Surface3DRenderer::drawSlicedScene()
             surfaceShader->setUniformValue(surfaceShader->color(), color);
             surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
             surfaceShader->setUniformValue(surfaceShader->ambientS(),
-                                           m_cachedTheme.m_ambientStrength * 2.0f);
+                                           m_cachedTheme->ambientLightStrength() * 2.0f);
 
             m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
 
@@ -546,7 +545,7 @@ void Surface3DRenderer::drawSlicedScene()
         if (m_cachedSurfaceGridOn) {
             m_surfaceGridShader->bind();
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
-                                                 Utils::vectorFromColor(m_cachedTheme.m_gridLine));
+                                                 Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_sliceSurfaceObj);
             m_surfaceGridShader->release();
@@ -565,11 +564,11 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength * 2.0f);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.0f);
         lineShader->setUniformValue(lineShader->lightS(), 0.25f);
 
         // Horizontal lines
@@ -781,7 +780,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
-    GLfloat adjustedLightStrength = m_cachedTheme.m_lightStrength / 10.0f;
+    GLfloat adjustedLightStrength =  m_cachedTheme->lightStrength() / 10.0f;
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceVisible) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
@@ -974,7 +973,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                              itModelMatrix.inverted().transposed());
             m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
             m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
-                                             m_cachedTheme.m_ambientStrength);
+                                             m_cachedTheme->ambientLightStrength());
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -991,7 +990,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             {
                 // Set shadowless shader bindings
                 m_surfaceShader->setUniformValue(m_surfaceShader->lightS(),
-                                                 m_cachedTheme.m_lightStrength);
+                                                 m_cachedTheme->lightStrength());
 
                 // Draw the object
                 m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture);
@@ -1006,7 +1005,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         if (m_cachedSurfaceGridOn) {
             m_surfaceGridShader->bind();
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
-                                                 Utils::vectorFromColor(m_cachedTheme.m_gridLine));
+                                                 Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
             m_surfaceGridShader->release();
@@ -1044,7 +1043,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
+        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1055,7 +1054,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme.m_ambientStrength * 2.0f);
+                                            m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -1074,7 +1073,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme->lightStrength());
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
@@ -1096,22 +1095,22 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
-                                        m_cachedTheme.m_lightStrength / 20.0f);
+                                        m_cachedTheme->lightStrength() / 20.0f);
         } else
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
         }
 
         QQuaternion lineYRotation = QQuaternion();
@@ -1718,7 +1717,7 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 
 void Surface3DRenderer::updateTextures()
 {
-    updateSurfaceGradient(m_cachedTheme.m_surfaceGradient);
+    updateSurfaceGradient(m_cachedTheme->baseGradient());
 }
 
 void Surface3DRenderer::calculateSceneScalingFactors()

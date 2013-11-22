@@ -143,10 +143,10 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     m_pointShader->setUniformValue(m_pointShader->model(), modelMatrix);
     m_pointShader->setUniformValue(m_pointShader->nModel(), itModelMatrix.inverted().transposed());
     m_pointShader->setUniformValue(m_pointShader->color(),
-                                   Utils::vectorFromColor(m_cachedTheme.m_singleHighlightColor));
+                                   Utils::vectorFromColor(m_cachedTheme->singleHighlightColor()));
     m_pointShader->setUniformValue(m_pointShader->MVP(), MVPMatrix);
-    m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme.m_ambientStrength);
-    m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme.m_lightStrength * 2.0f);
+    m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme->ambientLightStrength());
+    m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme->lightStrength() * 2.0f);
 
     m_drawer->drawObject(m_pointShader, m_pointObj);
 

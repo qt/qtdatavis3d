@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -40,7 +41,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     font.setPointSize(m_fontSize);
     m_chart->setFont(font);
     m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
-    m_chart->setTheme(QDataVis::ThemeStoneMoss);
+    m_chart->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
@@ -146,7 +147,7 @@ void ScatterDataModifier::changeTheme()
 {
     static int theme = QDataVis::ThemeQt;
 
-    m_chart->setTheme((QDataVis::Theme)theme);
+    m_chart->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 
     if (++theme > QDataVis::ThemeIsabelle)
         theme = QDataVis::ThemeQt;

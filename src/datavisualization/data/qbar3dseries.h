@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qbardataproxy.h>
+#include <QPoint>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

@@ -31,6 +31,7 @@
 #include <QFontDatabase>
 #include <QLinearGradient>
 #include <QPainter>
+#include <QColorDialog>
 
 int main(int argc, char **argv)
 {
@@ -129,6 +130,12 @@ int main(int argc, char **argv)
     QPushButton *flipViewsButton = new QPushButton(widget);
     flipViewsButton->setText(QStringLiteral("Flip views"));
     flipViewsButton->setEnabled(true);
+
+    QPushButton *ownThemeButton = new QPushButton(widget);
+    ownThemeButton->setText(QStringLiteral("Use own theme"));
+    ownThemeButton->setEnabled(true);
+
+    QColorDialog *colorDialog = new QColorDialog(widget);
 
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
@@ -269,6 +276,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(colorDialog, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
@@ -300,7 +309,7 @@ int main(int argc, char **argv)
 
     widget->show();
 
-    GraphModifier *modifier = new GraphModifier(widgetchart);
+    GraphModifier *modifier = new GraphModifier(widgetchart, colorDialog);
 
     QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &GraphModifier::rotateX);
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &GraphModifier::rotateY);
@@ -361,6 +370,10 @@ int main(int argc, char **argv)
 
     QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
                      &GraphModifier::flipViews);
+    QObject::connect(ownThemeButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::useOwnTheme);
+    QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
+                     &GraphModifier::changeBaseColor);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &GraphModifier::setGradient);
 

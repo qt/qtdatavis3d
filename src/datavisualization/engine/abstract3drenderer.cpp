@@ -130,7 +130,7 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
                m_cachedScene->viewport().width(),
                m_cachedScene->viewport().height());
 
-    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme.m_windowColor);
+    QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme->windowColor());
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -164,9 +164,9 @@ void Abstract3DRenderer::updatePosition(const QRect &boundingRect)
     m_cachedBoundingRect = boundingRect;
 }
 
-void Abstract3DRenderer::updateTheme(Theme theme)
+void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
-    m_cachedTheme.setFromTheme(theme);
+    m_cachedTheme = theme;
 
     m_drawer->setTheme(m_cachedTheme);
 

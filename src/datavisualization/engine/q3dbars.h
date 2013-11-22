@@ -32,6 +32,7 @@ class Q3DCategoryAxis;
 class Q3DValueAxis;
 class Q3DScene;
 class QBar3DSeries;
+class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
@@ -44,7 +45,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
     Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
@@ -67,8 +68,8 @@ public:
     // TODO: Move to dataset object once that is done QTRD-2121
     void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
-    void setTheme(QDataVis::Theme theme);
-    QDataVis::Theme theme() const;
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
 
     void setBarThickness(qreal thicknessRatio);
     qreal barThickness();
@@ -141,7 +142,7 @@ signals:
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);
     void fontChanged(QFont font);
-    void themeChanged(QDataVis::Theme theme);
+    void themeChanged(Q3DTheme *theme);
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
     void colorStyleChanged(QDataVis::ColorStyle style);

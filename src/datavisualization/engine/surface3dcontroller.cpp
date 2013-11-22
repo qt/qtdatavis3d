@@ -47,7 +47,7 @@ Surface3DController::Surface3DController(QRect rect)
     setAxisZ(0);
 
     // Set the default from the theme
-    m_userDefinedGradient = theme().m_surfaceGradient;
+    m_userDefinedGradient = theme()->baseGradient();
 }
 
 Surface3DController::~Surface3DController()

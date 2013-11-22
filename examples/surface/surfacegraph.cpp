@@ -19,6 +19,7 @@
 #include "surfacegraph.h"
 
 #include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/Q3DTheme>
 #include <QtGui/QImage>
 #include <QtCore/qmath.h>
 
@@ -224,7 +225,7 @@ void SurfaceGraph::setAxisZRange(qreal min, qreal max)
 //! [6]
 void SurfaceGraph::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 }
 //! [6]
 

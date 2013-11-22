@@ -20,6 +20,7 @@
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/Q3DTheme>
 
 #include <qmath.h>
 #include <QLinearGradient>
@@ -334,7 +335,7 @@ void GraphModifier::selectedPointChanged(const QPoint &point)
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 }
 
 

@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qscatter3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -40,7 +41,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     font.setPointSize(m_fontSize);
     m_graph->setFont(font);
     m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
-    m_graph->setTheme(QDataVis::ThemeEbony);
+    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeEbony));
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     //! [0]
@@ -128,7 +129,7 @@ void ScatterDataModifier::setSmoothDots(int smooth)
 
 void ScatterDataModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 }
 
 void ScatterDataModifier::changePresetCamera()

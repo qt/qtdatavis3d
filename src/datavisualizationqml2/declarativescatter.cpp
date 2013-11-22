@@ -19,7 +19,6 @@
 #include "declarativescatter_p.h"
 #include "declarativescatterrenderer_p.h"
 #include "qitemmodelscatterdataproxy.h"
-#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

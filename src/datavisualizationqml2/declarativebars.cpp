@@ -20,7 +20,6 @@
 #include "declarativebarsrenderer_p.h"
 #include "q3dvalueaxis.h"
 #include "qitemmodelbardataproxy.h"
-#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
