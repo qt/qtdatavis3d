@@ -48,6 +48,7 @@ public:
 
     enum MeshStyle {
         MeshStyleBars = 0,
+        MeshStyleCubes = MeshStyleBars,
         MeshStylePyramids,
         MeshStyleCones,
         MeshStyleCylinders,

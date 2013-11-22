@@ -210,6 +210,11 @@ void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
             objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
         else
             objFile = QStringLiteral(":/defaultMeshes/dot");
+    } else if (style == QDataVis::MeshStyleBars) {
+        if (smooth)
+            objFile = QStringLiteral(":/defaultMeshes/barSmoothFull");
+        else
+            objFile = QStringLiteral(":/defaultMeshes/barFull");
     } else {
         objFile = QString();
 #if defined(QT_OPENGL_ES_2)
