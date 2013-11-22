@@ -39,8 +39,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * surface can be changed by controlling the smooth status.
  *
  * The Q3DSurface supports selection by showing a highlighted ball on the data point where the user has clicked
- * with left mouse button (when default input handler is in use). The selection pointer is accompanied with
- * a label which in default case shows the value of the data point and the coordinates of the point.
+ * with left mouse button (when default input handler is in use) or selected via QSurface3DSeries.
+ * The selection pointer is accompanied with a label which in default case shows the value of the
+ * data point and the coordinates of the point.
  *
  * The value range and the label format shown on the axis can be controlled through Q3DValueAxis.
  *
@@ -118,8 +119,6 @@ Q3DSurface::Q3DSurface()
                      &Q3DSurface::surfaceGridEnabledChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
                      &Q3DSurface::fontChanged);
-    QObject::connect(d_ptr->m_shared, &Surface3DController::selectedPointChanged, this,
-                     &Q3DSurface::selectedPointChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -371,24 +370,6 @@ QFont Q3DSurface::font() const
 Q3DScene *Q3DSurface::scene() const
 {
     return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DSurface::selectedPoint
- *
- * Selects a surface grid point in a \a position. The position is the (row, column) position in
- * the data array of the active data proxy.
- * Only one point can be selected at a time.
- * To clear selection, specify an illegal \a position, e.g. (-1, -1).
- */
-void Q3DSurface::setSelectedPoint(const QPoint &position)
-{
-    d_ptr->m_shared->setSelectedPoint(position);
-}
-
-QPoint Q3DSurface::selectedPoint() const
-{
-    return d_ptr->m_shared->selectedPoint();
 }
 
 /*!

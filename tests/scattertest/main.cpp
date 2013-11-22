@@ -103,6 +103,9 @@ int main(int argc, char **argv)
     QPushButton *addSeriesButton = new QPushButton(widget);
     addSeriesButton->setText(QStringLiteral("Add Series"));
 
+    QPushButton *removeSeriesButton = new QPushButton(widget);
+    removeSeriesButton->setText(QStringLiteral("Remove Series"));
+
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
@@ -162,6 +165,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
@@ -208,6 +212,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::selectItem);
     QObject::connect(addSeriesButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::addSeries);
+    QObject::connect(removeSeriesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::removeSeries);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,

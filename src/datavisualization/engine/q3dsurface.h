@@ -46,7 +46,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
 public:
     explicit Q3DSurface();
@@ -97,9 +96,6 @@ public:
 
     Q3DScene *scene() const;
 
-    void setSelectedPoint(const QPoint &position);
-    QPoint selectedPoint() const;
-
     void setLabelStyle(QDataVis::LabelStyle style);
     QDataVis::LabelStyle labelStyle() const;
 
@@ -114,7 +110,6 @@ signals:
     void smoothSurfaceEnabledChanged(bool enabled);
     void surfaceGridEnabledChanged(bool visible);
     void fontChanged(QFont font);
-    void selectedPointChanged(QPoint position);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

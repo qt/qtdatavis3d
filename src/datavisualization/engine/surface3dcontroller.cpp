@@ -37,7 +37,8 @@ Surface3DController::Surface3DController(QRect rect)
       m_isSmoothSurfaceEnabled(false),
       m_isSurfaceEnabled(true),
       m_isSurfaceGridEnabled(true),
-      m_selectedPoint(noSelectionPoint())
+      m_selectedPoint(invalidSelectionPosition()),
+      m_selectedSeries(0)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -97,7 +98,7 @@ void Surface3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.selectedPointChanged) {
-        m_renderer->updateSelectedPoint(m_selectedPoint);
+        m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
         m_changeTracker.selectedPointChanged = false;
     }
 }
@@ -115,10 +116,19 @@ void Surface3DController::handleAxisRangeChangedBySender(QObject *sender)
     Abstract3DController::handleAxisRangeChangedBySender(sender);
 
     // Update selected point - may be moved offscreen
-    setSelectedPoint(m_selectedPoint);
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-QPoint Surface3DController::noSelectionPoint()
+void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
+{
+    Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
+
+    // Visibility changes may require disabling/enabling slicing,
+    // so just reset selection to ensure everything is still valid.
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
+QPoint Surface3DController::invalidSelectionPosition()
 {
     static QPoint noSelectionPoint(-1, -1);
     return noSelectionPoint;
@@ -132,12 +142,13 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
         Abstract3DController::addSeries(series);
 
         adjustValueAxisRange();
-
-        // TODO: Temp until selection by series is properly implemented
-        setSelectedPoint(noSelectionPoint());
     } else {
         qWarning("Surface graph only supports a single series.");
     }
+
+    QSurface3DSeries *surfaceSeries =  static_cast<QSurface3DSeries *>(series);
+    if (surfaceSeries->selectedPoint() != invalidSelectionPosition())
+        setSelectedPoint(surfaceSeries->selectedPoint(), surfaceSeries);
 }
 
 void Surface3DController::removeSeries(QAbstract3DSeries *series)
@@ -145,10 +156,10 @@ void Surface3DController::removeSeries(QAbstract3DSeries *series)
     if (series && series->d_ptr->m_controller == this) {
         Abstract3DController::removeSeries(series);
 
-        adjustValueAxisRange();
+        if (m_selectedSeries == series)
+            setSelectedPoint(invalidSelectionPosition(), 0);
 
-        // TODO: Temp until selection by series is properly implemented
-        setSelectedPoint(noSelectionPoint());
+        adjustValueAxisRange();
     }
 }
 
@@ -228,43 +239,51 @@ void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
                && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        // When setting selection mode to a new slicing mode, activate slicing
-        if (mode != selectionMode()) {
-            bool isSlicing = mode.testFlag(QDataVis::SelectionSlice);
-            if (isSlicing && m_selectedPoint != noSelectionPoint())
-                scene()->setSlicingActive(true);
-            else
-                scene()->setSlicingActive(false);
-        }
+        QDataVis::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
+
+        if (mode != oldMode) {
+            // Refresh selection upon mode change to ensure slicing is correctly updated
+            // according to series the visibility.
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+
+            // Special case: Always deactivate slicing when changing away from slice
+            // automanagement, as this can't be handled in setSelectedBar.
+            if (!mode.testFlag(QDataVis::SelectionSlice)
+                    && oldMode.testFlag(QDataVis::SelectionSlice)) {
+                scene()->setSlicingActive(false);
+            }
+        }
     }
 }
 
-void Surface3DController::setSelectedPoint(const QPoint &position)
+void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSeries *series)
 {
     // If the selection targets non-existent point, clear selection instead.
     QPoint pos = position;
 
-    // TODO: Selection needs to be refactored to be handled by series
-    const QSurfaceDataProxy *proxy = 0;
-    if (m_seriesList.size()) {
-        QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_seriesList.at(0));
-        proxy = static_cast<QSurfaceDataProxy *>(series->dataProxy());
-    } else {
-        return;
-    }
+    // Series may already have been removed, so check it before setting the selection.
+    if (!m_seriesList.contains(series))
+        series = 0;
 
-    if (pos != noSelectionPoint()) {
+    const QSurfaceDataProxy *proxy = 0;
+    if (series)
+        proxy = series->dataProxy();
+
+    if (!proxy)
+        pos = invalidSelectionPosition();
+
+    if (pos != invalidSelectionPosition()) {
         int maxRow = proxy->rowCount() - 1;
         int maxCol = proxy->columnCount() - 1;
 
         if (pos.x() < 0 || pos.x() > maxRow || pos.y() < 0 || pos.y() > maxCol)
-            pos = noSelectionPoint();
+            pos = invalidSelectionPosition();
     }
 
     if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
-        if (pos == noSelectionPoint()) {
+        if (pos == invalidSelectionPosition() || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {
             // If the selected point is outside data window, or there is no selected point, disable slicing
@@ -276,7 +295,8 @@ void Surface3DController::setSelectedPoint(const QPoint &position)
             float axisMaxZ = float(m_axisZ->max());
 
             // Comparisons between float and double are not accurate, so fudge our comparison values
-            //a little to get all rows and columns into view that need to be visible.
+            // a little to get all rows and columns into view that need to be visible.
+            // TODO: Probably unnecessary after QTRD-2622 done
             const float fudgeFactor = 0.00001f;
             float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
             float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
@@ -297,15 +317,20 @@ void Surface3DController::setSelectedPoint(const QPoint &position)
 
     if (pos != m_selectedPoint) {
         m_selectedPoint = pos;
+        m_selectedSeries = series;
         m_changeTracker.selectedPointChanged = true;
-        emit selectedPointChanged(pos);
+
+        // Clear selection from other series and finally set new selection to the specified series
+        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+            QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(otherSeries);
+            if (surfaceSeries != m_selectedSeries)
+                surfaceSeries->dptr()->setSelectedPoint(invalidSelectionPosition());
+        }
+        if (m_selectedSeries)
+            m_selectedSeries->dptr()->setSelectedPoint(m_selectedPoint);
+
         emitNeedRender();
     }
-}
-
-QPoint Surface3DController::selectedPoint() const
-{
-    return m_selectedPoint;
 }
 
 void Surface3DController::handleArrayReset()
@@ -313,13 +338,13 @@ void Surface3DController::handleArrayReset()
     adjustValueAxisRange();
     m_isDataDirty = true;
     // Clear selection unless still valid
-    setSelectedPoint(m_selectedPoint);
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
     emitNeedRender();
 }
 
-void Surface3DController::handlePointClicked(const QPoint &position)
+void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DSeries *series)
 {
-    setSelectedPoint(position);
+    setSelectedPoint(position, series);
     // TODO: pass clicked to parent. (QTRD-2517)
     // TODO: Also hover needed? (QTRD-2131)
 }

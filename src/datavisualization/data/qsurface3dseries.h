@@ -30,6 +30,7 @@ class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
+    Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
 
 public:
     explicit QSurface3DSeries(QObject *parent = 0);
@@ -39,8 +40,13 @@ public:
     void setDataProxy(QSurfaceDataProxy *proxy);
     QSurfaceDataProxy *dataProxy() const;
 
+    void setSelectedPoint(const QPoint &position);
+    QPoint selectedPoint() const;
+    QPoint invalidSelectionPosition() const;
+
 signals:
     void dataProxyChanged(QSurfaceDataProxy *proxy);
+    void selectedPointChanged(QPoint position);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = 0);

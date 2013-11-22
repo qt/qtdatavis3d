@@ -112,7 +112,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQualityMultiplier(3),
       m_clickedPointId(invalidSelectionId),
       m_hasHeightAdjustmentChanged(true),
-      m_selectedPoint(Surface3DController::noSelectionPoint())
+      m_selectedPoint(Surface3DController::invalidSelectionPosition()),
+      m_selectedSeries(0)
 {
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -266,7 +267,7 @@ void Surface3DRenderer::updateData()
         delete m_sliceDataArray.at(i);
     m_sliceDataArray.clear();
 
-    m_selectionDirty = true;
+    updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
@@ -337,7 +338,8 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
     float axisMaxZ = float(m_axisCacheZ.max());
 
     // Comparisons between float and double are not accurate, so fudge our comparison values
-    //a little to get all rows and columns into view that need to be visible.
+    // a little to get all rows and columns into view that need to be visible.
+    // TODO: Probably unnecessary after QTRD-2622 done
     const float fudgeFactor = 0.00001f;
     float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
     float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
@@ -937,7 +939,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
 
-        emit pointClicked(QPoint(selectionIdToSurfacePoint(selectionId)));
+        emit pointClicked(QPoint(selectionIdToSurfacePoint(selectionId)),
+                          static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series()));
     }
 
     // Draw the surface
@@ -1588,8 +1591,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Selection handling
     if (m_selectionDirty) {
-        QPoint visiblePoint = Surface3DController::noSelectionPoint();
-        if (m_selectedPoint != Surface3DController::noSelectionPoint()) {
+        QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
+        if (m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
             int x = m_selectedPoint.x() - m_sampleSpace.y();
             int y = m_selectedPoint.y() - m_sampleSpace.x();
             if (x >= 0 && y >= 0 && x < m_sampleSpace.height() && y < m_sampleSpace.width()
@@ -1599,7 +1602,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         if (m_cachedSelectionMode == QDataVis::SelectionNone
-                || visiblePoint == Surface3DController::noSelectionPoint()) {
+                || visiblePoint == Surface3DController::invalidSelectionPosition()) {
             m_selectionActive = false;
         } else {
             // TODO: Need separate selection ball for slice and main surface view QTRD-2515
@@ -1769,9 +1772,10 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
     return m_cachedSmoothSurface;
 }
 
-void Surface3DRenderer::updateSelectedPoint(const QPoint &position)
+void Surface3DRenderer::updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series)
 {
     m_selectedPoint = position;
+    m_selectedSeries = series;
     m_selectionDirty = true;
 }
 

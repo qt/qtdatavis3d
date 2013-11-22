@@ -43,8 +43,13 @@ public:
 
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
+
+    void setSelectedPoint(const QPoint &position);
+
 private:
     QSurface3DSeries *qptr();
+
+    QPoint m_selectedPoint;
 
 private:
     friend class QSurface3DSeries;

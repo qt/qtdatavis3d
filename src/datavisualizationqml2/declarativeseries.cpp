@@ -54,7 +54,7 @@ void DeclarativeBar3DSeries::setSelectedBar(const QPointF &position)
 
 QPointF DeclarativeBar3DSeries::selectedBar() const
 {
-    return QBar3DSeries::selectedBar();
+    return QPointF(QBar3DSeries::selectedBar());
 }
 
 QPointF DeclarativeBar3DSeries::invalidSelectionPosition() const
@@ -87,10 +87,27 @@ void DeclarativeScatter3DSeries::appendSeriesChildren(QQmlListProperty<QObject> 
 DeclarativeSurface3DSeries::DeclarativeSurface3DSeries(QObject *parent)
     : QSurface3DSeries(parent)
 {
+    QObject::connect(this, &QSurface3DSeries::selectedPointChanged, this,
+                     &DeclarativeSurface3DSeries::selectedPointChanged);
 }
 
 DeclarativeSurface3DSeries::~DeclarativeSurface3DSeries()
 {
+}
+
+void DeclarativeSurface3DSeries::setSelectedPoint(const QPointF &position)
+{
+    QSurface3DSeries::setSelectedPoint(position.toPoint());
+}
+
+QPointF DeclarativeSurface3DSeries::selectedPoint() const
+{
+    return QPointF(QSurface3DSeries::selectedPoint());
+}
+
+QPointF DeclarativeSurface3DSeries::invalidSelectionPosition() const
+{
+    return QPointF(QSurface3DSeries::invalidSelectionPosition());
 }
 
 QQmlListProperty<QObject> DeclarativeSurface3DSeries::seriesChildren()

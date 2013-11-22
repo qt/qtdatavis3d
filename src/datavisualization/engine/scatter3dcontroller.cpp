@@ -99,10 +99,10 @@ void Scatter3DController::removeSeries(QAbstract3DSeries *series)
 {
     bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
 
+    Abstract3DController::removeSeries(series);
+
     if (m_selectedItemSeries == series)
         setSelectedItem(invalidSelectionIndex(), 0);
-
-    Abstract3DController::removeSeries(series);
 
     if (firstRemoved)
         adjustValueAxisRange();

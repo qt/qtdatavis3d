@@ -65,6 +65,7 @@ public slots:
     void handleSelectionChange(int index);
     void setGradient();
     void addSeries();
+    void removeSeries();
 
 signals:
     void shadowQualityChanged(int quality);

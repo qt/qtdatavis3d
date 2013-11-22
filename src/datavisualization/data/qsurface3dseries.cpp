@@ -126,6 +126,35 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
 }
 
 /*!
+ * \property QSurface3DSeries::selectedPoint
+ *
+ * Selects a surface grid point in a \a position. The position is the (row, column) position in
+ * the data array of the series.
+ * Only one point can be selected at a time.
+ * To clear selection, set invalidSelectionPosition() as the \a position.
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid.
+ */
+void QSurface3DSeries::setSelectedPoint(const QPoint &position)
+{
+    // Don't do this in private to avoid loops, as that is used for callback from controller.
+    if (d_ptr->m_controller)
+        static_cast<Surface3DController *>(d_ptr->m_controller)->setSelectedPoint(position, this);
+    else
+        dptr()->setSelectedPoint(position);
+}
+
+QPoint QSurface3DSeries::selectedPoint() const
+{
+    return dptrc()->m_selectedPoint;
+}
+
+QPoint QSurface3DSeries::invalidSelectionPosition() const
+{
+    return Surface3DController::invalidSelectionPosition();
+}
+
+/*!
  * \internal
  */
 QSurface3DSeriesPrivate *QSurface3DSeries::dptr()
@@ -144,7 +173,8 @@ const QSurface3DSeriesPrivate *QSurface3DSeries::dptrc() const
 // QSurface3DSeriesPrivate
 
 QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
-    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface)
+    : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface),
+      m_selectedPoint(Surface3DController::invalidSelectionPosition())
 {
     m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
 }
@@ -185,6 +215,14 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);
+    }
+}
+
+void QSurface3DSeriesPrivate::setSelectedPoint(const QPoint &position)
+{
+    if (position != m_selectedPoint) {
+        m_selectedPoint = position;
+        emit qptr()->selectedPointChanged(m_selectedPoint);
     }
 }
 

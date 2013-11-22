@@ -435,6 +435,18 @@ void ScatterDataModifier::addSeries()
     m_targetSeries = oldTargetSeries;
 }
 
+void ScatterDataModifier::removeSeries()
+{
+    if (m_targetSeries) {
+        m_chart->removeSeries(m_targetSeries);
+        delete m_targetSeries;
+        if (m_chart->seriesList().size())
+            m_targetSeries = m_chart->seriesList().at(0);
+        else
+            m_targetSeries = 0;
+    }
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);

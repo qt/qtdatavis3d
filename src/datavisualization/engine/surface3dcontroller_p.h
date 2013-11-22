@@ -66,6 +66,8 @@ private:
     bool m_isSurfaceGridEnabled;
     QLinearGradient m_userDefinedGradient;
     QPoint m_selectedPoint;
+    QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
+                                        // single series selection cases.
 
 public:
     explicit Surface3DController(QRect rect);
@@ -86,14 +88,13 @@ public:
     void setGradientColorAt(qreal pos, const QColor &color);
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
-
-    void setSelectedPoint(const QPoint &position);
-    QPoint selectedPoint() const;
+    void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
-    static QPoint noSelectionPoint();
+    static QPoint invalidSelectionPosition();
 
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
@@ -103,12 +104,11 @@ public slots:
     void handleArrayReset();
 
     // Renderer callback handlers
-    void handlePointClicked(const QPoint &position);
+    void handlePointClicked(const QPoint &position, QSurface3DSeries *series);
     void handleRequestSmoothSurface(bool enable);
 
 signals:
     void smoothSurfaceEnabledChanged(bool enable);
-    void selectedPointChanged(QPoint position);
     void surfaceVisibleChanged(bool visible);
     void surfaceGridEnabledChanged(bool enable);
 

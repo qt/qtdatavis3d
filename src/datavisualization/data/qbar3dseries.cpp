@@ -136,7 +136,7 @@ QBarDataProxy *QBar3DSeries::dataProxy() const
 }
 
 /*!
- * \property Q3DBars::selectedBar
+ * \property QBar3DSeries::selectedBar
  *
  * Selects a bar at the \a position. The \a position is the (row, column) position in
  * the data array of the series.

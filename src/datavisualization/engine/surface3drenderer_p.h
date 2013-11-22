@@ -127,6 +127,7 @@ private:
     uint m_clickedPointId;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
+    const QSurface3DSeries *m_selectedSeries;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -138,7 +139,7 @@ public:
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);
-    void updateSelectedPoint(const QPoint &position);
+    void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
 
     void drawSlicedScene();
     void render(GLuint defaultFboHandle = 0);
@@ -148,7 +149,7 @@ protected:
     virtual void loadMeshFile();
 
 signals:
-    void pointClicked(QPoint position);
+    void pointClicked(QPoint position, QSurface3DSeries *series);
     void requestSmoothSurface(bool enable);
 
 private:

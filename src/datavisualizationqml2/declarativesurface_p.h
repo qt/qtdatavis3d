@@ -54,7 +54,6 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
     Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
-    Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -78,9 +77,6 @@ public:
     void setGradient(ColorGradient *gradient);
     ColorGradient *gradient() const;
 
-    void setSelectedPoint(const QPointF &position);
-    QPointF selectedPoint() const;
-
     QQmlListProperty<QSurface3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
     static int countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
@@ -93,7 +89,6 @@ signals:
     void surfaceVisibleChanged(bool visible);
     void smoothSurfaceEnabledChanged(bool enabled);
     void surfaceGridEnabledChanged(bool visible);
-    void selectedPointChanged(QPoint position);
 
 protected:
     void handleGradientUpdate();

@@ -77,13 +77,21 @@ class DeclarativeSurface3DSeries : public QSurface3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 public:
     DeclarativeSurface3DSeries(QObject *parent = 0);
     virtual ~DeclarativeSurface3DSeries();
 
+    void setSelectedPoint(const QPointF &position);
+    QPointF selectedPoint() const;
+    Q_INVOKABLE QPointF invalidSelectionPosition() const;
+
     QQmlListProperty<QObject> seriesChildren();
     static void appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element);
+
+signals:
+    void selectedPointChanged(QPointF position);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

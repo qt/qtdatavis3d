@@ -42,8 +42,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
     QObject::connect(m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
                      &DeclarativeSurface::smoothSurfaceEnabledChanged);
-    QObject::connect(m_shared, &Surface3DController::selectedPointChanged, this,
-                     &DeclarativeSurface::selectedPointChanged);
     QObject::connect(m_shared, &Surface3DController::surfaceVisibleChanged, this,
                      &DeclarativeSurface::surfaceVisibleChanged);
     QObject::connect(m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
@@ -157,16 +155,6 @@ ColorGradient *DeclarativeSurface::gradient() const
 {
 
     return m_gradient;
-}
-
-void DeclarativeSurface::setSelectedPoint(const QPointF &position)
-{
-    m_shared->setSelectedPoint(position.toPoint());
-}
-
-QPointF DeclarativeSurface::selectedPoint() const
-{
-    return QPointF(m_shared->selectedPoint());
 }
 
 void DeclarativeSurface::setControllerGradient(const ColorGradient &gradient)

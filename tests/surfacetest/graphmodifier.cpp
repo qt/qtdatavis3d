@@ -60,7 +60,7 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     changeStyle();
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
-    connect(m_graph, &Q3DSurface::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
+    connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
 }
 
 GraphModifier::~GraphModifier()
@@ -324,7 +324,7 @@ void GraphModifier::selectButtonClicked()
     int row = rand() % proxy->rowCount();
     int col = rand() % proxy->columnCount();
 
-    m_graph->setSelectedPoint(QPoint(row, col));
+    m_theSeries->setSelectedPoint(QPoint(row, col));
 }
 
 void GraphModifier::selectedPointChanged(const QPoint &point)

@@ -244,10 +244,10 @@ void Bars3DController::removeSeries(QAbstract3DSeries *series)
 {
     bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
 
+    Abstract3DController::removeSeries(series);
+
     if (m_selectedBarSeries == series)
         setSelectedBar(invalidSelectionPosition(), 0);
-
-    Abstract3DController::removeSeries(series);
 
     if (firstRemoved) {
         adjustAxisRanges();
