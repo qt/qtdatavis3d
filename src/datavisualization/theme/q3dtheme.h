@@ -136,6 +136,8 @@ protected:
                       QObject *parent = 0);
     QScopedPointer<Q3DThemePrivate> d_ptr;
 
+    friend class ThemeManager;
+
 private:
     Q_DISABLE_COPY(Q3DTheme)
 };

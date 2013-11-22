@@ -48,6 +48,23 @@ public:
 protected:
     void connectThemeSignals();
     void useTheme(QDataVis::Theme type);
+    void setBaseColor(const QColor &color);
+    void setBackgroundColor(const QColor &color);
+    void setWindowColor(const QColor &color);
+    void setTextColor(const QColor &color);
+    void setTextBackgroundColor(const QColor &color);
+    void setGridLineColor(const QColor &color);
+    void setSingleHighlightColor(const QColor &color);
+    void setMultiHighlightColor(const QColor &color);
+    void setLightColor(const QColor &color);
+    void setBaseGradient(const QLinearGradient &gradient);
+    void setSingleHighlightGradient(const QLinearGradient &gradient);
+    void setMultiHighlightGradient(const QLinearGradient &gradient);
+    void setLightStrength(float strength);
+    void setAmbientLightStrength(float strength);
+    void setHighlightLightStrength(float strength);
+    void setLabelBorderEnabled(bool enabled);
+    void setColorStyle(QDataVis::ColorStyle style);
 
 private:
     QScopedPointer<Q3DTheme> m_theme;

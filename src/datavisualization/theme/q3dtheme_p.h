@@ -37,6 +37,47 @@ class QLinearGradient;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+struct Q3DThemeDirtyBitField {
+    bool baseColorDirty                : 1;
+    bool backgroundColorDirty          : 1;
+    bool windowColorDirty              : 1;
+    bool textColorDirty                : 1;
+    bool textBackgroundColorDirty      : 1;
+    bool gridLineColorDirty            : 1;
+    bool singleHighlightColorDirty     : 1;
+    bool multiHighlightColorDirty      : 1;
+    bool lightColorDirty               : 1;
+    bool baseGradientDirty             : 1;
+    bool singleHighlightGradientDirty  : 1;
+    bool multiHighlightGradientDirty   : 1;
+    bool lightStrengthDirty            : 1;
+    bool ambientLightStrengthDirty     : 1;
+    bool highlightLightStrengthDirty   : 1;
+    bool labelBorderEnabledDirty       : 1;
+    bool colorStyleDirty               : 1;
+
+    Q3DThemeDirtyBitField()
+        : baseColorDirty(false),
+          backgroundColorDirty(false),
+          windowColorDirty(false),
+          textColorDirty(false),
+          textBackgroundColorDirty(false),
+          gridLineColorDirty(false),
+          singleHighlightColorDirty(false),
+          multiHighlightColorDirty(false),
+          lightColorDirty(false),
+          baseGradientDirty(false),
+          singleHighlightGradientDirty(false),
+          multiHighlightGradientDirty(false),
+          lightStrengthDirty(false),
+          ambientLightStrengthDirty(false),
+          highlightLightStrengthDirty(false),
+          labelBorderEnabledDirty(false),
+          colorStyleDirty(false)
+    {
+    }
+};
+
 class Q3DThemePrivate : public QObject
 {
     Q_OBJECT
@@ -47,6 +88,8 @@ public:
 
 public:
     QDataVis::Theme m_themeId;
+
+    Q3DThemeDirtyBitField m_dirtyBits;
 
     QColor m_baseColor;
     QColor m_heightColor;

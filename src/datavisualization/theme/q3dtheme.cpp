@@ -49,6 +49,7 @@ Q3DTheme::~Q3DTheme()
 void Q3DTheme::setBaseColor(const QColor &color)
 {
     if (d_ptr->m_baseColor != color) {
+        d_ptr->m_dirtyBits.baseColorDirty = true;
         d_ptr->m_baseColor = color;
         emit baseColorChanged(color);
     }
@@ -62,6 +63,7 @@ QColor Q3DTheme::baseColor() const
 void Q3DTheme::setBackgroundColor(const QColor &color)
 {
     if (d_ptr->m_backgroundColor != color) {
+        d_ptr->m_dirtyBits.backgroundColorDirty = true;
         d_ptr->m_backgroundColor = color;
         emit backgroundColorChanged(color);
     }
@@ -75,6 +77,7 @@ QColor Q3DTheme::backgroundColor() const
 void Q3DTheme::setWindowColor(const QColor &color)
 {
     if (d_ptr->m_windowColor != color) {
+        d_ptr->m_dirtyBits.windowColorDirty = true;
         d_ptr->m_windowColor = color;
         emit windowColorChanged(color);
     }
@@ -88,6 +91,7 @@ QColor Q3DTheme::windowColor() const
 void Q3DTheme::setTextColor(const QColor &color)
 {
     if (d_ptr->m_textColor != color) {
+        d_ptr->m_dirtyBits.textColorDirty = true;
         d_ptr->m_textColor = color;
         emit textColorChanged(color);
     }
@@ -101,6 +105,7 @@ QColor Q3DTheme::textColor() const
 void Q3DTheme::setTextBackgroundColor(const QColor &color)
 {
     if (d_ptr->m_textBackgroundColor != color) {
+        d_ptr->m_dirtyBits.textBackgroundColorDirty = true;
         d_ptr->m_textBackgroundColor = color;
         emit textBackgroundColorChanged(color);
     }
@@ -114,6 +119,7 @@ QColor Q3DTheme::textBackgroundColor() const
 void Q3DTheme::setGridLineColor(const QColor &color)
 {
     if (d_ptr->m_gridLineColor != color) {
+        d_ptr->m_dirtyBits.gridLineColorDirty = true;
         d_ptr->m_gridLineColor = color;
         emit gridLineColorChanged(color);
     }
@@ -127,6 +133,7 @@ QColor Q3DTheme::gridLineColor() const
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
 {
     if (d_ptr->m_singleHighlightColor != color) {
+        d_ptr->m_dirtyBits.singleHighlightColorDirty = true;
         d_ptr->m_singleHighlightColor = color;
         emit singleHighlightColorChanged(color);
     }
@@ -140,6 +147,7 @@ QColor Q3DTheme::singleHighlightColor() const
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
 {
     if (d_ptr->m_multiHighlightColor != color) {
+        d_ptr->m_dirtyBits.multiHighlightColorDirty = true;
         d_ptr->m_multiHighlightColor = color;
         emit multiHighlightColorChanged(color);
     }
@@ -153,6 +161,7 @@ QColor Q3DTheme::multiHighlightColor() const
 void Q3DTheme::setLightColor(const QColor &color)
 {
     if (d_ptr->m_lightColor != color) {
+        d_ptr->m_dirtyBits.lightColorDirty = true;
         d_ptr->m_lightColor = color;
         emit lightColorChanged(color);
     }
@@ -167,6 +176,7 @@ QColor Q3DTheme::lightColor() const
 void Q3DTheme::setBaseGradient(const QLinearGradient &gradient)
 {
     if (d_ptr->m_baseGradient != gradient) {
+        d_ptr->m_dirtyBits.baseGradientDirty = true;
         d_ptr->m_baseGradient = gradient;
         emit baseGradientChanged(gradient);
     }
@@ -180,6 +190,7 @@ QLinearGradient Q3DTheme::baseGradient() const
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
     if (d_ptr->m_singleHighlightGradient != gradient) {
+        d_ptr->m_dirtyBits.singleHighlightGradientDirty = true;
         d_ptr->m_singleHighlightGradient = gradient;
         emit singleHighlightGradientChanged(gradient);
     }
@@ -193,6 +204,7 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
     if (d_ptr->m_multiHighlightGradient != gradient) {
+        d_ptr->m_dirtyBits.multiHighlightGradientDirty = true;
         d_ptr->m_multiHighlightGradient = gradient;
         emit multiHighlightGradientChanged(gradient);
     }
@@ -206,6 +218,7 @@ QLinearGradient Q3DTheme::multiHighlightGradient() const
 void Q3DTheme::setLightStrength(float strength)
 {
     if (d_ptr->m_lightStrength != strength) {
+        d_ptr->m_dirtyBits.lightStrengthDirty = true;
         d_ptr->m_lightStrength = strength;
         emit lightStrengthChanged(strength);
     }
@@ -219,6 +232,7 @@ float Q3DTheme::lightStrength() const
 void Q3DTheme::setAmbientLightStrength(float strength)
 {
     if (d_ptr->m_ambientLightStrength != strength) {
+        d_ptr->m_dirtyBits.ambientLightStrengthDirty = true;
         d_ptr->m_ambientLightStrength = strength;
         emit ambientLightStrengthChanged(strength);
     }
@@ -232,6 +246,7 @@ float Q3DTheme::ambientLightStrength() const
 void Q3DTheme::setHighlightLightStrength(float strength)
 {
     if (d_ptr->m_highlightLightStrength != strength) {
+        d_ptr->m_dirtyBits.highlightLightStrengthDirty = true;
         d_ptr->m_highlightLightStrength = strength;
         emit highlightLightStrengthChanged(strength);
     }
@@ -245,6 +260,7 @@ float Q3DTheme::highlightLightStrength() const
 void Q3DTheme::setLabelBorderEnabled(bool enabled)
 {
     if (d_ptr->m_labelBorders != enabled) {
+        d_ptr->m_dirtyBits.labelBorderEnabledDirty = true;
         d_ptr->m_labelBorders = enabled;
         emit labelBorderEnabledChanged(enabled);
     }
@@ -258,6 +274,7 @@ bool Q3DTheme::isLabelBorderEnabled() const
 void Q3DTheme::setColorStyle(QDataVis::ColorStyle style)
 {
     if (d_ptr->m_colorStyle != style) {
+        d_ptr->m_dirtyBits.colorStyleDirty = true;
         d_ptr->m_colorStyle = style;
         emit colorStyleChanged(style);
     }

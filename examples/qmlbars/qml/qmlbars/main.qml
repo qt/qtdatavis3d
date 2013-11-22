@@ -79,7 +79,7 @@ Item {
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionItem
             font.pointSize: 35
-            theme: Theme3D { type: AbstractGraph3D.ThemeRetro }
+            theme: Theme3D { type: AbstractGraph3D.ThemeRetro; labelBorderEnabled: true }
             labelStyle: AbstractGraph3D.LabelStyleFromTheme
             barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)
