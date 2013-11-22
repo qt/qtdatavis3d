@@ -77,6 +77,7 @@ public:
     void createMassiveArray();
     void useOwnTheme();
     void changeBaseColor(const QColor &color);
+    void changeColorStyle();
 
 public slots:
     void flipViews();

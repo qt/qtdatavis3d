@@ -102,6 +102,9 @@ void ThemeManager::connectThemeSignals()
 
 void ThemeManager::useTheme(QDataVis::Theme type)
 {
+    QColor color;
+    QLinearGradient gradient;
+
     switch (type) {
     case QDataVis::ThemeQt: {
         m_theme->setBaseColor(QColor(QRgb(0x80c342)));
@@ -117,6 +120,27 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(true);
         m_theme->setColorStyle(QDataVis::ColorStyleUniform);
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
+        color.setRed(0x80 * 0.7);
+        color.setGreen(0xc3 * 0.7);
+        color.setBlue(0x42 * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0x80c342)));
+        m_theme->setBaseGradient(gradient);
+        color.setRed(0x14 * 0.7);
+        color.setGreen(0xaa * 0.7);
+        color.setBlue(0xff * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0x14aaff)));
+        m_theme->setSingleHighlightGradient(gradient);
+        color.setRed(0x64 * 0.7);
+        color.setGreen(0x00);
+        color.setBlue(0xaa * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0x6400aa)));
+        m_theme->setMultiHighlightGradient(gradient);
         break;
     }
 
@@ -134,10 +158,32 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleUniform);
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
+        color.setRed(0xff * 0.7);
+        color.setGreen(0xe4 * 0.7);
+        color.setBlue(0x00);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xffe400)));
+        m_theme->setBaseGradient(gradient);
+        color.setRed(0x27 * 0.7);
+        color.setGreen(0xbe * 0.7);
+        color.setBlue(0xee * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0x27beee)));
+        m_theme->setSingleHighlightGradient(gradient);
+        color.setRed(0xee * 0.7);
+        color.setGreen(0x14 * 0.7);
+        color.setBlue(0x14 * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xee1414)));
+        m_theme->setMultiHighlightGradient(gradient);
         break;
     }
 
     case QDataVis::ThemeDigia: {
+        m_theme->setBaseColor(QColor(QRgb(0xcccccc)));
         m_theme->setBackgroundColor(QColor(QRgb(0xffffff)));
         m_theme->setWindowColor(QColor(QRgb(0xffffff)));
         m_theme->setTextColor(QColor(QRgb(0x000000)));
@@ -150,10 +196,9 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleObjectGradient);
-        QLinearGradient gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                                   qreal(gradientTextureHeight),
-                                                   0.0, 0.0);
-        QColor color;
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
         color.setRed(0xcc * 0.7);
         color.setGreen(0xcc * 0.7);
         color.setBlue(0xcc * 0.7);
@@ -189,10 +234,32 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(true);
         m_theme->setColorStyle(QDataVis::ColorStyleUniform);
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
+        color.setRed(0xbe * 0.7);
+        color.setGreen(0xb3 * 0.7);
+        color.setBlue(0x2b * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xbeb32b)));
+        m_theme->setBaseGradient(gradient);
+        color.setRed(0xfb* 0.7);
+        color.setGreen(0xf6 * 0.7);
+        color.setBlue(0xd6 * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xfbf6d6)));
+        m_theme->setSingleHighlightGradient(gradient);
+        color.setRed(0x44 * 0.7);
+        color.setGreen(0x2f * 0.7);
+        color.setBlue(0x20 * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0x442f20)));
+        m_theme->setMultiHighlightGradient(gradient);
         break;
     }
 
     case QDataVis::ThemeArmyBlue: {
+        m_theme->setBaseColor(QColor(QRgb(0x495f76)));
         m_theme->setBackgroundColor(QColor(QRgb(0xd5d6d7)));
         m_theme->setWindowColor(QColor(QRgb(0xd5d6d7)));
         m_theme->setTextColor(QColor(QRgb(0x000000)));
@@ -205,10 +272,9 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleObjectGradient);
-        QLinearGradient gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                                   qreal(gradientTextureHeight),
-                                                   0.0, 0.0);
-        QColor color;
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
         color.setRed(0x49 * 0.7);
         color.setGreen(0x5f * 0.7);
         color.setBlue(0x76 * 0.7);
@@ -231,6 +297,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeRetro: {
+        m_theme->setBaseColor(QColor(QRgb(0x533b23)));
         m_theme->setBackgroundColor(QColor(QRgb(0xe9e2ce)));
         m_theme->setWindowColor(QColor(QRgb(0xe9e2ce)));
         m_theme->setTextColor(QColor(QRgb(0x000000)));
@@ -243,10 +310,9 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleObjectGradient);
-        QLinearGradient gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                                   qreal(gradientTextureHeight),
-                                                   0.0, 0.0);
-        QColor color;
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
         color.setRed(0x53 * 0.7);
         color.setGreen(0x3b * 0.7);
         color.setBlue(0x23 * 0.7);
@@ -282,6 +348,27 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleUniform);
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
+        color.setRed(0xff * 0.7);
+        color.setGreen(0xff * 0.7);
+        color.setBlue(0xff * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xffffff)));
+        m_theme->setBaseGradient(gradient);
+        color.setRed(0xf5 * 0.7);
+        color.setGreen(0xdc * 0.7);
+        color.setBlue(0x0d * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xf5dc0d)));
+        m_theme->setSingleHighlightGradient(gradient);
+        color.setRed(0x72 * 0.7);
+        color.setGreen(0x22 * 0.7);
+        color.setBlue(0x22 * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xd72222)));
+        m_theme->setMultiHighlightGradient(gradient);
         break;
     }
 
@@ -299,8 +386,31 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         m_theme->setHighlightLightStrength(5.0f);
         m_theme->setLabelBorderEnabled(false);
         m_theme->setColorStyle(QDataVis::ColorStyleUniform);
+        gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                   qreal(gradientTextureHeight),
+                                   0.0, 0.0);
+        color.setRed(0xf9 * 0.7);
+        color.setGreen(0xd9 * 0.7);
+        color.setBlue(0x00);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xf9d900)));
+        m_theme->setBaseGradient(gradient);
+        color.setRed(0xff * 0.7);
+        color.setGreen(0xf7 * 0.7);
+        color.setBlue(0xcc * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xfff7cc)));
+        m_theme->setSingleHighlightGradient(gradient);
+        color.setRed(0xde * 0.7);
+        color.setGreen(0x0a * 0.7);
+        color.setBlue(0x0a * 0.7);
+        gradient.setColorAt(0.0, color);
+        gradient.setColorAt(1.0, QColor(QRgb(0xde0a0a)));
+        m_theme->setMultiHighlightGradient(gradient);
         break;
     }
+    default:
+        break;
     }
 }
 

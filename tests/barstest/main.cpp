@@ -131,6 +131,11 @@ int main(int argc, char **argv)
     flipViewsButton->setText(QStringLiteral("Flip views"));
     flipViewsButton->setEnabled(true);
 
+
+    QPushButton *changeColorStyleButton = new QPushButton(widget);
+    changeColorStyleButton->setText(QStringLiteral("Change color style"));
+    changeColorStyleButton->setEnabled(true);
+
     QPushButton *ownThemeButton = new QPushButton(widget);
     ownThemeButton->setText(QStringLiteral("Use own theme"));
     ownThemeButton->setEnabled(true);
@@ -276,6 +281,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
     vLayout->addWidget(colorDialog, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
@@ -370,6 +376,8 @@ int main(int argc, char **argv)
 
     QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
                      &GraphModifier::flipViews);
+    QObject::connect(changeColorStyleButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::changeColorStyle);
     QObject::connect(ownThemeButton, &QPushButton::clicked, modifier,
                      &GraphModifier::useOwnTheme);
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,

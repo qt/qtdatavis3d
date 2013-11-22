@@ -672,6 +672,16 @@ void GraphModifier::setMaxY(int max)
     m_maxval = max;
 }
 
+void GraphModifier::changeColorStyle()
+{
+    int style = m_graph->theme()->colorStyle();
+
+    if (++style > QDataVis::ColorStyleRangeGradient)
+        style = QDataVis::ColorStyleUniform;
+
+    m_graph->theme()->setColorStyle(QDataVis::ColorStyle(style));
+}
+
 void GraphModifier::useOwnTheme()
 {
     Q3DTheme *theme = new Q3DTheme();
@@ -727,19 +737,9 @@ void GraphModifier::setGradient()
     multiHighlightGradient.setColorAt(0.25, Qt::darkYellow);
     multiHighlightGradient.setColorAt(0.0, Qt::darkGray);
 
-    m_graph->setBarColor(Qt::green);
-    m_graph->setSingleHighlightColor(Qt::white);
-    m_graph->setMultiHighlightColor(Qt::cyan);
+    m_graph->theme()->setBaseGradient(barGradient);
+    m_graph->theme()->setSingleHighlightGradient(singleHighlightGradient);
+    m_graph->theme()->setMultiHighlightGradient(multiHighlightGradient);
 
-    m_graph->setBarGradient(barGradient);
-    m_graph->setSingleHighlightGradient(singleHighlightGradient);
-    m_graph->setMultiHighlightGradient(multiHighlightGradient);
-
-    QDataVis::ColorStyle oldStyle = m_graph->colorStyle();
-    if (oldStyle == QDataVis::ColorStyleUniform)
-        m_graph->setColorStyle(QDataVis::ColorStyleObjectGradient);
-    else if (oldStyle == QDataVis::ColorStyleObjectGradient)
-        m_graph->setColorStyle(QDataVis::ColorStyleRangeGradient);
-    if (oldStyle == QDataVis::ColorStyleRangeGradient)
-        m_graph->setColorStyle(QDataVis::ColorStyleUniform);
+    m_graph->theme()->setColorStyle(QDataVis::ColorStyleObjectGradient);
 }

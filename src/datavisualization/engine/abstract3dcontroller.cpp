@@ -684,6 +684,18 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
 
 void Abstract3DController::setColorStyle(QDataVis::ColorStyle style)
 {
+    if (style != m_colorStyle || m_changeTracker.themeChanged) {
+        Q3DTheme *theme = m_themeManager->theme();
+        if (style == QDataVis::ColorStyleUniform) {
+            setObjectColor(theme->baseColor());
+            setSingleHighlightColor(theme->singleHighlightColor());
+            setMultiHighlightColor(theme->multiHighlightColor());
+        } else {
+            setObjectGradient(theme->baseGradient());
+            setSingleHighlightGradient(theme->singleHighlightGradient());
+            setMultiHighlightGradient(theme->multiHighlightGradient());
+        }
+    }
     if (style != m_colorStyle) {
         m_colorStyle = style;
         m_changeTracker.colorStyleChanged = true;
@@ -795,16 +807,6 @@ void Abstract3DController::setTheme(Q3DTheme *theme)
         m_changeTracker.themeChanged = true;
         // TODO: set all colors/styles here (QTRD-2538)
         setColorStyle(colorStyle);
-        if (colorStyle == QDataVis::ColorStyleUniform) {
-            setObjectColor(theme->baseColor());
-            setSingleHighlightColor(theme->singleHighlightColor());
-            setMultiHighlightColor(theme->multiHighlightColor());
-        } else {
-            setObjectGradient(theme->baseGradient());
-            setSingleHighlightGradient(theme->singleHighlightGradient());
-            setMultiHighlightGradient(theme->multiHighlightGradient());
-        }
-
         emit themeChanged(theme);
     }
 }
