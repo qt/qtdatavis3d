@@ -36,7 +36,9 @@ Item {
         width: parent.width
         height: parent.height - shadowToggle.height
 
+        //! [0]
         Scatter3D {
+            //! [0]
             id: scatterGraph
             width: dataView.width
             height: dataView.height
@@ -44,7 +46,9 @@ Item {
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             objectType: AbstractGraph3D.MeshStyleCubes
+            //! [1]
             inputHandler: null
+            //! [1]
 
             Scatter3DSeries {
                 id: scatterSeries
@@ -59,25 +63,24 @@ Item {
             }
         }
 
+        //! [2]
         MouseArea {
             id: inputArea
             anchors.fill: parent
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
+            property int mouseX: -1
+            property int mouseY: -1
+            //! [2]
 
-            onPressed: {
-                scatterGraph.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
-            }
-
-            onReleased: {
-                scatterGraph.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
-            }
-
+            //! [3]
             onPositionChanged: {
-                // Do selection on mouse hover
-                scatterGraph.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+                mouseX = mouse.x;
+                mouseY = mouse.y;
             }
+            //! [3]
 
+            //! [5]
             onWheel: {
                 // Adjust zoom level based on what zoom range we're in.
                 var zoomLevel = scatterGraph.scene.activeCamera.zoomLevel;
@@ -94,9 +97,23 @@ Item {
 
                 scatterGraph.scene.activeCamera.zoomLevel = zoomLevel;
             }
+            //! [5]
         }
+
+        //! [4]
+        Timer {
+            id: reselectTimer
+            interval: 10
+            running: true
+            repeat: true
+            onTriggered: {
+                scatterGraph.scene.selectionQueryPosition = Qt.point(inputArea.mouseX, inputArea.mouseY);
+            }
+        }
+        //! [4]
     }
 
+    //! [6]
     NumberAnimation {
         id: cameraAnimationX
         loops: Animation.Infinite
@@ -107,7 +124,10 @@ Item {
         to: 360.0
         duration: 20000
     }
+    //! [6]
 
+
+    //! [7]
     SequentialAnimation {
         id: cameraAnimationY
         loops: Animation.Infinite
@@ -119,7 +139,7 @@ Item {
             from: 5.0
             to: 45.0
             duration: 9000
-            easing: Easing.InOutSine
+            easing.type: Easing.InOutSine
         }
 
         NumberAnimation {
@@ -128,9 +148,10 @@ Item {
             from: 45.0
             to: 5.0
             duration: 9000
-            easing: Easing.InOutSine
+            easing.type: Easing.InOutSine
         }
     }
+    //! [7]
 
     NewButton {
         id: shadowToggle
