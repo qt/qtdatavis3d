@@ -41,7 +41,9 @@ int main(int argc, char **argv)
     //! [2]
 
     //! [3]
-    surface.activeDataProxy()->resetArray(data);
+    QSurface3DSeries *series = new QSurface3DSeries;
+    series->dataProxy()->resetArray(data);
+    surface.addSeries(series);
     //! [3]
     //! [4]
     surface.show();

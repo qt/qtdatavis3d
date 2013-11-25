@@ -130,8 +130,8 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 
 QPoint Surface3DController::invalidSelectionPosition()
 {
-    static QPoint noSelectionPoint(-1, -1);
-    return noSelectionPoint;
+    static QPoint invalidSelectionPoint(-1, -1);
+    return invalidSelectionPoint;
 }
 
 void Surface3DController::addSeries(QAbstract3DSeries *series)

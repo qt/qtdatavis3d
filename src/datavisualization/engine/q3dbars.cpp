@@ -46,8 +46,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Q3DBars supports more than one series visible at the same time, but all series added to the
- * graph must have proxies with identical row and column counts for the graph to draw properly.
+ * Q3DBars supports more than one series visible at the same time. It is not necessary for all series
+ * to have the same amount of rows and columns.
  * Row and column labels are taken from the first added series, unless explicitly defined to
  * row and column axes.
  *
@@ -67,8 +67,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
  *
- * Now Q3DBars is ready to receive data to be rendered. Add one row of 5 qreals into the data
- * set:
+ * Now Q3DBars is ready to receive data to be rendered. Create a series with one row of 5 values:
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
  *
@@ -96,7 +95,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D bar window.
+ * Constructs a new 3D bar graph.
  */
 Q3DBars::Q3DBars()
     : d_ptr(new Q3DBarsPrivate(this, geometry()))
@@ -138,7 +137,7 @@ Q3DBars::Q3DBars()
 }
 
 /*!
- * Destroys the 3D bar window.
+ * Destroys the 3D bar graph.
  */
 Q3DBars::~Q3DBars()
 {

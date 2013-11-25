@@ -43,25 +43,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
  * not get rendered.
  *
- * QSurfaceDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
- * \table
- *   \row
- *     \li @xTitle    \li Title from X axis
- *   \row
- *     \li @yTitle    \li Title from Y axis
- *   \row
- *     \li @zTitle    \li Title from Z axis
- *   \row
- *     \li @xLabel    \li Item value formatted using the same format as the X axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @yLabel    \li Item value formatted using the same format as the Y axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @zLabel    \li Item value formatted using the same format as the Z axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- * \endtable
- *
  * \sa {Qt Data Visualization Data Handling}
  */
 

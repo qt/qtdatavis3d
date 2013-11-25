@@ -37,6 +37,7 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
     Q_ENUMS(ColorStyle)
 
 public:
+    // TODO: Move to input handler (QTRD-2505)
     enum InputState {
         InputStateNone = 0,
         InputStateOnScene,
@@ -46,6 +47,7 @@ public:
         InputStateOnPinch
     };
 
+    // TODO: Move to series (QTRD-2557)
     enum MeshStyle {
         MeshStyleBars = 0,
         MeshStyleCubes = MeshStyleBars,
@@ -58,6 +60,7 @@ public:
         MeshStylePoints
     };
 
+    // TODO: Move to camera (QTRD-2505)
     enum CameraPreset {
         CameraPresetNone = -1,
         CameraPresetFrontLow = 0,
@@ -86,6 +89,7 @@ public:
         CameraPresetDirectlyBelow
     };
 
+    // TODO: Move to theme
     enum Theme {
         ThemeQt,
         ThemePrimaryColors,
@@ -122,12 +126,14 @@ public:
         ShadowQualitySoftHigh
     };
 
+    // TODO: remove
     enum LabelStyle {
         LabelStyleOpaque = 0,
         LabelStyleFromTheme,
         LabelStyleTransparent
     };
 
+    // TODO: to theme
     enum ColorStyle {
         ColorStyleUniform = 0,
         ColorStyleObjectGradient,

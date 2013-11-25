@@ -109,7 +109,6 @@ public slots:
 
 signals:
     void smoothSurfaceEnabledChanged(bool enable);
-    void surfaceVisibleChanged(bool visible);
     void surfaceGridEnabledChanged(bool enable);
 
 private:

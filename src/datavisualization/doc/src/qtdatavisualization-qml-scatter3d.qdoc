@@ -97,24 +97,20 @@
  */
 
 /*!
-  \qmlproperty int Scatter3D::selectedItemIndex
-  Selects an item in the \a index. Only one item can be selected at a time.
-  To clear selection, specify an illegal \a index, e.g. -1.
- */
-
-/*!
- * \qmlproperty list<QScatter3DSeries> seriesList
+ * \qmlproperty list<QScatter3DSeries> Scatter3D::seriesList
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
  */
 
 /*!
- * \qmlmethod void addSeries(QScatter3DSeries *series)
- * Add the \a series to the graph.
+ * \qmlmethod void Scatter3D::addSeries(QScatter3DSeries *series)
+ * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
+ * axes. If the newly added series has specified a selected item, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
  */
 
 /*!
- * \qmlmethod void removeSeries(QScatter3DSeries *series)
+ * \qmlmethod void Scatter3D::removeSeries(QScatter3DSeries *series)
  * Remove the \a series from the graph.
  */

@@ -55,7 +55,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dscatter_construction.cpp 0
  *
- * Now Q3DScatter is ready to receive data to be rendered. Add one set of 3 QVector3D items:
+ * Now Q3DScatter is ready to receive data to be rendered. Add one series of 3 QVector3D items:
  *
  * \snippet doc_src_q3dscatter_construction.cpp 1
  *
@@ -79,7 +79,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D scatter window.
+ * Constructs a new 3D scatter graph.
  */
 Q3DScatter::Q3DScatter()
     : d_ptr(new Q3DScatterPrivate(this, geometry()))
@@ -121,7 +121,7 @@ Q3DScatter::Q3DScatter()
 }
 
 /*!
- * Destroys the 3D scatter window.
+ * Destroys the 3D scatter graph.
  */
 Q3DScatter::~Q3DScatter()
 {

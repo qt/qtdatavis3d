@@ -68,7 +68,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dsurface_construction.cpp 2
  *
- * For the active data proxy set pointer of the data element:
+ * Create a new series and set data to it:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 3
  *
@@ -92,7 +92,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D surface window.
+ * Constructs a new 3D surface graph.
  */
 Q3DSurface::Q3DSurface()
     : d_ptr(new Q3DSurfacePrivate(this, geometry()))
@@ -107,8 +107,6 @@ Q3DSurface::Q3DSurface()
                      &Q3DSurface::themeChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DSurface::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Surface3DController::surfaceVisibleChanged, this,
-                     &Q3DSurface::surfaceVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
                      &Q3DSurface::gridVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
@@ -124,7 +122,7 @@ Q3DSurface::Q3DSurface()
 }
 
 /*!
- *  Destroys the 3D surface window.
+ *  Destroys the 3D surface graph.
  */
 Q3DSurface::~Q3DSurface()
 {

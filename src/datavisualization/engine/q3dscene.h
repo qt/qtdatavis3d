@@ -61,7 +61,7 @@ public:
 
     void setSelectionQueryPosition(const QPoint &point);
     QPoint selectionQueryPosition() const;
-    static const QPoint noSelectionPoint();
+    static const QPoint invalidSelectionPoint();
 
     void setSlicingActive(bool isSlicing);
     bool isSlicingActive() const;

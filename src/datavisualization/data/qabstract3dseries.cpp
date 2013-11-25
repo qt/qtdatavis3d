@@ -26,7 +26,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \class QAbstract3DSeries
  * \inmodule QtDataVisualization
- * \brief Base class for all QtDataVisualization data proxies.
+ * \brief Base class for all QtDataVisualization series.
  * \since Qt Data Visualization 1.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
@@ -39,7 +39,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QAbstract3DSeries
- * \brief Base type for all QtDataVisualization data proxies.
+ * \brief Base type for all QtDataVisualization series.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
@@ -111,7 +111,7 @@ QAbstract3DSeries::SeriesType QAbstract3DSeries::type() const
  * for example, when an item is selected. How the format is interpreted depends on series type. See
  * each series class documentation for more information.
  *
- * \sa QBar3DSeries, Q3DScatterSeries, Q3DSurfaceSeries
+ * \sa QBar3DSeries, QScatter3DSeries, QSurface3DSeries
  */
 void QAbstract3DSeries::setItemLabelFormat(const QString &format)
 {

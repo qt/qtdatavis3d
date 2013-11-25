@@ -204,8 +204,8 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 
 QPoint Bars3DController::invalidSelectionPosition()
 {
-    static QPoint noSelectionPos(-1, -1);
-    return noSelectionPos;
+    static QPoint invalidSelectionPos(-1, -1);
+    return invalidSelectionPos;
 }
 
 void Bars3DController::setAxisX(Q3DAbstractAxis *axis)

@@ -178,11 +178,11 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
 {
     updateInputPosition(scene->selectionQueryPosition());
 
-    if (Q3DScene::noSelectionPoint() == scene->selectionQueryPosition()) {
+    if (Q3DScene::invalidSelectionPoint() == scene->selectionQueryPosition()) {
         updateSelectionState(SelectNone);
     } else {
         // Selections are one-shot, reset selection active to false before processing
-        scene->setSelectionQueryPosition(Q3DScene::noSelectionPoint());
+        scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
 
         if (scene->isSlicingActive()) {
             if (scene->isPointInPrimarySubView(m_inputPosition))

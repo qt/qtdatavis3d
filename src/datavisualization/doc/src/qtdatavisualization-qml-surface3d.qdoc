@@ -88,16 +88,7 @@
  */
 
 /*!
-  \qmlproperty point Surface3D::selectedPoint
-
-  Selects a surface grid point in a \a position. The position is the (row, column) position in
-  the data array of the series.
-  Only one point can be selected at a time.
-  To clear selection, specify an illegal \a position, e.g. (-1, -1).
- */
-
-/*!
- * \qmlproperty list<QSurface3DSeries> seriesList
+ * \qmlproperty list<QSurface3DSeries> Surface3D::seriesList
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
@@ -105,11 +96,12 @@
  */
 
 /*!
- * \qmlmethod void addSeries(QSurface3DSeries *series)
- * Add the \a series to the graph.
+ * \qmlmethod void Surface3D::addSeries(QSurface3DSeries *series)
+ * Adds the \a series to the graph.
+ * \note The surface graph currently supports only a single series at a time.
  */
 
 /*!
- * \qmlmethod void removeSeries(QSurface3DSeries *series)
+ * \qmlmethod void Surface3D::removeSeries(QSurface3DSeries *series)
  * Remove the \a series from the graph.
  */

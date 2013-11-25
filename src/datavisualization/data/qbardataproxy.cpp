@@ -44,32 +44,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * This enables the option of having row labels that relate to the position of the data in the
  * array rather than the data itself.
  *
- * QBarDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
- * \table
- *   \row
- *     \li @rowTitle      \li Title from row axis
- *   \row
- *     \li @colTitle      \li Title from column axis
- *   \row
- *     \li @valueTitle    \li Title from value axis
- *   \row
- *     \li @rowIdx        \li Visible row index
- *   \row
- *     \li @colIdx        \li Visible Column index
- *   \row
- *     \li @rowLabel      \li Label from row axis
- *   \row
- *     \li @colLabel      \li Label from column axis
- *   \row
- *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li %<format spec> \li Item value in specified format.
- * \endtable
- *
- * For example:
- * \snippet doc_src_qtdatavisualization.cpp 1
- *
  * \sa {Qt Data Visualization Data Handling}
  */
 

@@ -32,28 +32,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
  *
- * QScatterDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
- * \table
- *   \row
- *     \li @xTitle    \li Title from X axis
- *   \row
- *     \li @yTitle    \li Title from Y axis
- *   \row
- *     \li @zTitle    \li Title from Z axis
- *   \row
- *     \li @xLabel    \li Item value formatted using the same format the X axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @yLabel    \li Item value formatted using the same format the Y axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- * \endtable
- *
- * For example:
- * \snippet doc_src_qtdatavisualization.cpp 2
- *
  * \sa {Qt Data Visualization Data Handling}
  */
 

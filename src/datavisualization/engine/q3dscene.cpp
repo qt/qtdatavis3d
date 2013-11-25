@@ -180,9 +180,9 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
 /*!
  * \property Q3DScene::selectionQueryPosition
  * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than Q3DScene()::noSelectionPoint() the
+ * by the scene as selection. If this is set to value other than Q3DScene()::invalidSelectionPoint() the
  * graph tries to select a data item at the given \a point within the main viewport.
- * After the rendering pass the property is returned to its default state of Q3DScene()::noSelectionPoint().
+ * After the rendering pass the property is returned to its default state of Q3DScene()::invalidSelectionPoint().
  */
 void Q3DScene::setSelectionQueryPosition(const QPoint &point)
 {
@@ -199,10 +199,13 @@ QPoint Q3DScene::selectionQueryPosition() const
     return d_ptr->m_selectionQueryPosition;
 }
 
-const QPoint Q3DScene::noSelectionPoint()
+/*!
+ * \return a QPoint signifying an invalid selection position.
+ */
+const QPoint Q3DScene::invalidSelectionPoint()
 {
-    static const QPoint noSelectionPos(-1, -1);
-    return noSelectionPos;
+    static const QPoint invalidSelectionPos(-1, -1);
+    return invalidSelectionPos;
 }
 
 /*!
@@ -369,7 +372,7 @@ Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     m_light(),
     m_isUnderSideCameraEnabled(false),
     m_isSlicingActive(false),
-    m_selectionQueryPosition(Q3DScene::noSelectionPoint())
+    m_selectionQueryPosition(Q3DScene::invalidSelectionPoint())
 {
 }
 

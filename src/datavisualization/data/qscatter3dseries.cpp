@@ -30,9 +30,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QScatter3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).
  *
- * If no data proxy is set explicitly for the series, QScatter3DSeries creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it are destroyed.
+ * If no data proxy is set explicitly for the series, the series creates a default
+ * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
  * QScatter3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
@@ -76,6 +75,30 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \sa {Qt Data Visualization Data Handling}
  */
 
+/*!
+ * \qmlproperty ScatterDataProxy Scatter3DSeries::dataProxy
+ *
+ * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
+ * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
+ * set to another series.
+ */
+
+/*!
+ * \qmlproperty int Scatter3DSeries::selectedItem
+ *
+ * Selects an item at the \a index. The \a index is the index in the data array of the series.
+ * Only one item can be selected at a time.
+ * To clear selection, set invalidSelectionIndex() as the \a index.
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid. Selecting an item on another added series will also
+ * clear the selection.
+ */
+
+/*!
+ * \qmlmethod int Scatter3DSeries::invalidSelectionIndex()
+ * \return an invalid index for selection. Set this index to selectedItem property if you
+ * want to clear the selection.
+ */
 
 /*!
  * Constructs QScatter3DSeries with the given \a parent.
@@ -87,6 +110,9 @@ QScatter3DSeries::QScatter3DSeries(QObject *parent) :
     dptr()->setDataProxy(new QScatterDataProxy);
 }
 
+/*!
+ * Constructs QScatter3DSeries with the given \a dataProxy and the \a parent.
+ */
 QScatter3DSeries::QScatter3DSeries(QScatterDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QScatter3DSeriesPrivate(this), parent)
 {

@@ -42,8 +42,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
     QObject::connect(m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
                      &DeclarativeSurface::smoothSurfaceEnabledChanged);
-    QObject::connect(m_shared, &Surface3DController::surfaceVisibleChanged, this,
-                     &DeclarativeSurface::surfaceVisibleChanged);
     QObject::connect(m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
                      &DeclarativeSurface::surfaceGridEnabledChanged);
 }

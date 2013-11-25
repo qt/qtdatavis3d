@@ -33,9 +33,11 @@ int main(int argc, char **argv)
     bars.columnAxis()->setRange(0, 4);
     //! [0]
     //! [1]
+    QBar3DSeries *series = new QBar3DSeries;
     QBarDataRow *data = new QBarDataRow;
     *data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
-    bars.activeDataProxy()->addRow(data);
+    series->dataProxy()->addRow(data);
+    bars.addSeries(series);
     //! [1]
     //! [2]
     bars.show();

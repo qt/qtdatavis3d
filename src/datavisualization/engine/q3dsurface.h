@@ -104,7 +104,6 @@ signals:
     void labelStyleChanged(QDataVis::LabelStyle style);
     void themeChanged(Q3DTheme *theme);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void surfaceVisibleChanged(bool visible);
     void gridVisibleChanged(bool visible);
     void backgroundVisibleChanged(bool visible);
     void smoothSurfaceEnabledChanged(bool enabled);

@@ -36,7 +36,7 @@
  *
  * See \l{Qt Quick 2 Bars Example} for more thorough usage example.
  *
- * \sa Bar3DSeries, ItemModelBarData, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ * \sa Bar3DSeries, ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 
 /*!
@@ -122,24 +122,23 @@
  */
 
 /*!
- * \qmlproperty point Bars3D::selectedBar
- * Position of the selected bar in data window. Only one bar can be selected at a time.
- * To clear selection, specify an illegal position, e.g. Qt.point(-1.0, -1.0).
- */
-
-/*!
- * \qmlproperty list<QBar3DSeries> seriesList
+ * \qmlproperty list<QBar3DSeries> Bars3D::seriesList
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
  */
 
 /*!
- * \qmlmethod void addSeries(QBar3DSeries *series)
- * Add the \a series to the graph.
+ * \qmlmethod void Bars3D::addSeries(QBar3DSeries *series)
+ * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
+ * so the rows and columns of all series must match for the visualized data to be meaningful.
+ * If the graph has multiple visible series, only the first one added will
+ * generate the row or column labels on the axes in cases where the labels are not explicitly set
+ * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
  */
 
 /*!
- * \qmlmethod void removeSeries(QBar3DSeries *series)
+ * \qmlmethod void Bars3D::removeSeries(QBar3DSeries *series)
  * Remove the \a series from the graph.
  */

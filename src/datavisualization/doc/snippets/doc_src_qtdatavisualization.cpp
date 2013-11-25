@@ -116,5 +116,5 @@ for (int i = 0; i < 10; i++) {
 }
 
 newProxy->resetArray(dataArray);
-graph->setActiveDataProxy(newProxy);
+graph->addSeries(new QBar3DSeries(newProxy));
 //! [10]

@@ -30,15 +30,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QBar3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).
  *
- * If no data proxy is set explicitly for the series, QBar3DSeries creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it are destroyed.
- *
- * QBar3DSeries optionally keeps track of row and column labels, which Q3DCategoryAxis can utilize
- * to show axis labels. The row and column labels are stored in separate array from the data and
- * row manipulation methods provide an alternate versions that don't affect the row labels.
- * This enables the option of having row labels that relate to the position of the data in the
- * array rather than the data itself.
+ * If no data proxy is set explicitly for the series, the series creates a default
+ * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
  * QBar3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
@@ -86,6 +79,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \sa {Qt Data Visualization Data Handling}
  */
 
+/*!
+ * \qmlproperty BarDataProxy Bar3DSeries::dataProxy
+ *
+ * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
+ * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
+ * set to another series.
+ */
+
+/*!
+ * \qmlproperty point Bar3DSeries::selectedBar
+ *
+ * Selects a bar at the \a position. The \a position is the (row, column) position in
+ * the data array of the series.
+ * Only one bar can be selected at a time.
+ * To clear selection, set invalidSelectionPosition() as the \a position.
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid. Selecting a bar on another added series will also
+ * clear the selection.
+ */
+
+/*!
+ * \qmlmethod point Bar3DSeries::invalidSelectionPosition()
+ * \return an invalid position for selection. Set this position to selectedBar property if you
+ * want to clear the selection.
+ */
 
 /*!
  * Constructs QBar3DSeries with the given \a parent.
@@ -97,6 +115,9 @@ QBar3DSeries::QBar3DSeries(QObject *parent) :
     dptr()->setDataProxy(new QBarDataProxy);
 }
 
+/*!
+ * Constructs QBar3DSeries with the given \a dataProxy and the \a parent.
+ */
 QBar3DSeries::QBar3DSeries(QBarDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QBar3DSeriesPrivate(this), parent)
 {

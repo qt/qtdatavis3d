@@ -86,7 +86,6 @@ public:
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
 signals:
-    void surfaceVisibleChanged(bool visible);
     void smoothSurfaceEnabledChanged(bool enabled);
     void surfaceGridEnabledChanged(bool visible);
 

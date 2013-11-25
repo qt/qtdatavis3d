@@ -30,9 +30,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QSurface3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).
  *
- * If no data proxy is set explicitly for the series, QSurface3DSeries creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it are destroyed.
+ * If no data proxy is set explicitly for the series, the series creates a default
+ * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
  * QSurface3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
@@ -76,6 +75,30 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \sa {Qt Data Visualization Data Handling}
  */
 
+/*!
+ * \qmlproperty SurfaceDataProxy Surface3DSeries::dataProxy
+ *
+ * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
+ * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
+ * set to another series.
+ */
+
+/*!
+ * \qmlproperty point Surface3DSeries::selectedPoint
+ *
+ * Selects a surface grid point in a \a position. The position is the (row, column) position in
+ * the data array of the series.
+ * Only one point can be selected at a time.
+ * To clear selection, set invalidSelectionPosition() as the \a position.
+ * If this series is added to a graph, the graph can adjust the selection according to user
+ * interaction or if it becomes invalid.
+ */
+
+/*!
+ * \qmlmethod point Surface3DSeries::invalidSelectionPosition()
+ * \return a point signifying an invalid selection position. Set this to selectedPoint property
+ * to clear the selection.
+ */
 
 /*!
  * Constructs QSurface3DSeries with the given \a parent.
@@ -87,6 +110,9 @@ QSurface3DSeries::QSurface3DSeries(QObject *parent) :
     dptr()->setDataProxy(new QSurfaceDataProxy);
 }
 
+/*!
+ * Constructs QSurface3DSeries with the given \a dataProxy and the \a parent.
+ */
 QSurface3DSeries::QSurface3DSeries(QSurfaceDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QSurface3DSeriesPrivate(this), parent)
 {
@@ -149,6 +175,10 @@ QPoint QSurface3DSeries::selectedPoint() const
     return dptrc()->m_selectedPoint;
 }
 
+/*!
+ * \return a QPoint signifying an invalid selection position. Set this to selectedPoint property
+ * to clear the selection.
+ */
 QPoint QSurface3DSeries::invalidSelectionPosition() const
 {
     return Surface3DController::invalidSelectionPosition();
