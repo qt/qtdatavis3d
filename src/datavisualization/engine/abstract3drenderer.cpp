@@ -110,7 +110,7 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     // Measure speed (as milliseconds per frame)
     m_numFrames++;
     if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << qreal(m_lastFrameTime.elapsed()) / qreal(m_numFrames) << "ms/frame (=" << qreal(m_numFrames) << "fps)";
+        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (=" << float(m_numFrames) << "fps)";
         m_numFrames = 0;
         m_lastFrameTime.restart();
     }
@@ -135,7 +135,7 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-QString Abstract3DRenderer::generateValueLabel(const QString &format, qreal value)
+QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)
 {
     QString valueLabelFormat = format;
     Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
@@ -324,7 +324,7 @@ void Abstract3DRenderer::updateAxisLabels(Q3DAbstractAxis::AxisOrientation orien
     axisCacheForOrientation(orientation).setLabels(labels);
 }
 
-void Abstract3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max)
+void Abstract3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max)
 {
     AxisRenderCache &cache = axisCacheForOrientation(orientation);
     cache.setMin(min);

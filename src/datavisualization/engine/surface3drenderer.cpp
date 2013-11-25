@@ -282,19 +282,19 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
     m_sliceDataArray.reserve(2);
     QSurfaceDataRow *sliceRow;
 
-    qreal adjust = (0.025 * m_heightNormalizer) / 2.0;
-    qreal stepDown = 2.0 * adjust;
+    float adjust = (0.025f * m_heightNormalizer) / 2.0f;
+    float stepDown = 2.0f * adjust;
     if (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow)) {
         QSurfaceDataRow *src = m_dataArray.at(row);
         sliceRow = new QSurfaceDataRow(src->size());
         for (int i = 0; i < sliceRow->size(); i++)
-            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0));
+            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0f));
     } else {
         sliceRow = new QSurfaceDataRow(m_sampleSpace.height());
         for (int i = 0; i < m_sampleSpace.height(); i++) {
             (*sliceRow)[i].setPosition(QVector3D(m_dataArray.at(i)->at(column).z(),
                                                  m_dataArray.at(i)->at(column).y() + adjust,
-                                                 -1.0));
+                                                 -1.0f));
         }
     }
 
@@ -303,7 +303,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
     // Make a duplicate, so that we get a little bit depth
     QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
     for (int i = 0; i < sliceRow->size(); i++)
-        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown, 1.0));
+        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown, 1.0f));
 
     m_sliceDataArray << duplicateRow;
 
@@ -332,21 +332,10 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 
     int i;
     bool found;
-    float axisMinX = float(m_axisCacheX.min());
-    float axisMaxX = float(m_axisCacheX.max());
-    float axisMinZ = float(m_axisCacheZ.min());
-    float axisMaxZ = float(m_axisCacheZ.max());
-
-    // Comparisons between float and double are not accurate, so fudge our comparison values
-    // a little to get all rows and columns into view that need to be visible.
-    // TODO: Probably unnecessary after QTRD-2622 done
-    const float fudgeFactor = 0.00001f;
-    float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
-    float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
-    axisMinX -= fudgedAxisXRange;
-    axisMinZ -= fudgedAxisZRange;
-    axisMaxX += fudgedAxisXRange;
-    axisMaxZ += fudgedAxisZRange;
+    float axisMinX = m_axisCacheX.min();
+    float axisMaxX = m_axisCacheX.max();
+    float axisMinZ = m_axisCacheZ.min();
+    float axisMaxZ = m_axisCacheZ.max();
 
     // m_minVisibleColumnValue
     for (i = 0, found = false; i < columnCount; i++) {
@@ -1032,7 +1021,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
-            modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+            modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
             modelMatrix.rotate(270.0f - backgroundRotation, 0.0f, 1.0f, 0.0f);
         } else {
             modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
@@ -1284,8 +1273,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleY);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1336,8 +1325,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleX);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1829,7 +1818,7 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
     int row = point.x();
     int column = point.y();
 
-    qreal value = qreal(m_dataArray.at(row)->at(column).y());
+    float value = m_dataArray.at(row)->at(column).y();
 
     if (!m_selectionPointer)
         m_selectionPointer = new SelectionPointer(m_drawer);
@@ -1870,7 +1859,7 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     return QPoint(row, column);
 }
 
-QString Surface3DRenderer::createSelectionLabel(qreal value, int column, int row)
+QString Surface3DRenderer::createSelectionLabel(float value, int column, int row)
 {
     // TODO: Get from correct series once multiple series supported
     QString labelText = m_visibleSeriesList[0].itemLabelFormat();

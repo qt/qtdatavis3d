@@ -92,7 +92,7 @@ void BarItemModelHandler::resolveModel()
         QHash<QString, bool> columnListHash;
 
         // Sort values into rows and columns
-        typedef QHash<QString, qreal> ColumnValueMap;
+        typedef QHash<QString, float> ColumnValueMap;
         QHash <QString, ColumnValueMap> itemValueMap;
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {

@@ -257,8 +257,8 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
     if (dstImage.size() != srcImage.size()) {
         int target_width = dstImage.width();
         int target_height = dstImage.height();
-        qreal sx = target_width / qreal(srcImage.width());
-        qreal sy = target_height / qreal(srcImage.height());
+        float sx = target_width / float(srcImage.width());
+        float sy = target_height / float(srcImage.height());
 
         quint32 *dest = (quint32 *) dstImage.scanLine(0); // NB! avoid detach here
         uchar *srcPixels = (uchar *) srcImage.scanLine(srcImage.height() - 1);

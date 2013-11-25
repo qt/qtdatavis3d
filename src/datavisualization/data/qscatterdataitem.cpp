@@ -123,12 +123,12 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  * \return the Z component of the position of this data item.
  */
 
-//void QScatterDataItem::setSize(qreal size)
+//void QScatterDataItem::setSize(float size)
 //{
 //    m_size = size;
 //}
 
-//const qreal &QScatterDataItem::size() const
+//const float &QScatterDataItem::size() const
 //{
 //    return m_size;
 //}

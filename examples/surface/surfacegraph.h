@@ -73,15 +73,15 @@ private:
     QSlider *m_axisMaxSliderX;
     QSlider *m_axisMinSliderZ;
     QSlider *m_axisMaxSliderZ;
-    qreal m_rangeMinX;
-    qreal m_rangeMinZ;
-    qreal m_stepX;
-    qreal m_stepZ;
+    float m_rangeMinX;
+    float m_rangeMinZ;
+    float m_stepX;
+    float m_stepZ;
     int m_heightMapWidth;
     int m_heightMapHeight;
 
-    void setAxisXRange(qreal min, qreal max);
-    void setAxisZRange(qreal min, qreal max);
+    void setAxisXRange(float min, float max);
+    void setAxisZRange(float min, float max);
     void fillSqrtSinProxy();
 };
 

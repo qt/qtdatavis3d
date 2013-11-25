@@ -41,7 +41,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(bool slicingActive READ isSlicingActive WRITE setSlicingActive NOTIFY slicingActiveChanged)
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
     Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight NOTIFY activeLightChanged)
-    Q_PROPERTY(qreal devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
+    Q_PROPERTY(float devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
 
 public:
     Q3DScene(QObject *parent = 0);
@@ -75,12 +75,12 @@ public:
     Q3DLight *activeLight() const;
     void setActiveLight(Q3DLight *light);
 
-    qreal devicePixelRatio() const;
-    void setDevicePixelRatio(qreal pixelRatio);
+    float devicePixelRatio() const;
+    void setDevicePixelRatio(float pixelRatio);
 
     Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                                      qreal fixedRotation = 0.0,
-                                                      qreal distanceModifier = 0.0);
+                                                      float fixedRotation = 0.0f,
+                                                      float distanceModifier = 0.0f);
 private:
     void emitNeedRender();
 
@@ -92,7 +92,7 @@ signals:
     void slicingActiveChanged(bool isSlicingActive);
     void activeCameraChanged(const Q3DCamera *camera);
     void activeLightChanged(const Q3DLight *light);
-    void devicePixelRatioChanged(qreal pixelRatio);
+    void devicePixelRatioChanged(float pixelRatio);
     void needRender();
     void selectionQueryPositionChanged(const QPoint position);
 

@@ -30,7 +30,7 @@
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
 //#define JITTER_PLANE
-#define WONKY_PLANE
+//#define WONKY_PLANE
 
 GraphModifier::GraphModifier(Q3DSurface *graph)
     : m_graph(graph),
@@ -91,10 +91,10 @@ void GraphModifier::toggleSqrtSin(bool enable)
     if (enable) {
         qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
 
-        float minX = -10.0;
-        float maxX = 10.0;
-        float minZ = -10.0;
-        float maxZ = 10.0;
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
 
@@ -102,9 +102,11 @@ void GraphModifier::toggleSqrtSin(bool enable)
         dataArray->reserve(m_zCount);
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            // Keep values within range bounds, since just adding step can cause minor drift due
+            // to the rounding errors.
+            float z = qMin(maxZ, (i * stepZ + minZ));
             for (float j = 0; j < m_xCount; j++) {
-                float x = j * stepX + minX;
-                float z = i * stepZ + minZ;
+                float x = qMin(maxX, (j * stepX + minX));
                 float R = qSqrt(x * x + z * z) + 0.01f;
                 float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
                 (*newRow)[j].setPosition(QVector3D(x, y, z));
@@ -139,10 +141,10 @@ void GraphModifier::togglePlane(bool enable)
         m_graph->axisZ()->setLabelFormat("%.2f");
 
         m_planeArray->reserve(m_zCount);
-        float minX = -10.0;
-        float maxX = 20.0;
-        float minZ = -10.0;
-        float maxZ = 10.0;
+        float minX = -10.0f;
+        float maxX = 20.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
 #ifdef WONKY_PLANE
@@ -172,8 +174,18 @@ void GraphModifier::togglePlane(bool enable)
 #else
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-            for (float j = 0; j < m_xCount; j++)
-                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, i * stepZ + minZ));
+            // Keep values within range bounds, since just adding step can cause minor drift due
+            // to the rounding errors.
+            float zVal;
+            if (i == (m_zCount - 1))
+                zVal = maxZ;
+            else
+                zVal = i * stepZ + minZ;
+
+            float j = 0;
+            for (; j < m_xCount - 1; j++)
+                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, zVal));
+            (*newRow)[j].setPosition(QVector3D(maxX, -0.04f, zVal));
 
             *m_planeArray << newRow;
         }
@@ -365,7 +377,7 @@ void GraphModifier::timeout()
     m_theSeries->dataProxy()->resetArray(m_planeArray);
 }
 
-void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX, qreal maxX)
+void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);
     m_axisMinSliderZ->setValue(minZ);

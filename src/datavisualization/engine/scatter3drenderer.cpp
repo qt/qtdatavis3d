@@ -171,7 +171,6 @@ void Scatter3DRenderer::updateData()
 
         for (int i = 0; i < dataSize; i++) {
             QVector3D dotPos = dataArray.at(i).position();
-            // TODO: qreal -> float conversion for axis min/max may cause issues like in surface
             if ((dotPos.x() >= minX && dotPos.x() <= maxX )
                     && (dotPos.y() >= minY && dotPos.y() <= maxY)
                     && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
@@ -183,7 +182,7 @@ void Scatter3DRenderer::updateData()
             }
         }
     }
-    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)totalDataSize)), 0.1);
+    m_dotSizeScale = GLfloat(qBound(0.01f, 2.0f / float(qSqrt(qreal(totalDataSize))), 0.1f));
 
     updateSelectedItem(m_selectedItemIndex, m_selectedSeries);
 }
@@ -993,8 +992,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaler);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1054,8 +1053,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaler);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1552,7 +1551,7 @@ void Scatter3DRenderer::updateTextures()
 }
 
 void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation,
-                                        qreal min, qreal max)
+                                        float min, float max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 }

@@ -48,7 +48,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
 
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_graph->setBarThickness(1.0);
+    m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
 
     // Set axis labels and titles

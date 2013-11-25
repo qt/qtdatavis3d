@@ -50,7 +50,7 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     QImage heightMapImage(":/maps/mountain");
     m_heightMapProxy = new QHeightMapSurfaceDataProxy(heightMapImage);
     m_heightMapSeries = new QSurface3DSeries(m_heightMapProxy);
-    m_heightMapProxy->setValueRanges(34.0, 40.0, 18.0, 24.0);
+    m_heightMapProxy->setValueRanges(34.0f, 40.0f, 18.0f, 24.0f);
     //! [2]
     m_heightMapWidth = heightMapImage.width();
     m_heightMapHeight = heightMapImage.height();
@@ -71,12 +71,14 @@ void SurfaceGraph::fillSqrtSinProxy()
     dataArray->reserve(sampleCountZ);
     for (int i = 0 ; i < sampleCountZ ; i++) {
         QSurfaceDataRow *newRow = new QSurfaceDataRow(sampleCountX);
-        float z = i * stepZ + sampleMin;
+        // Keep values within range bounds, since just adding step can cause minor drift due
+        // to the rounding errors.
+        float z = qMin(sampleMax, (i * stepZ + sampleMin));
         int index = 0;
         for (int j = 0; j < sampleCountX; j++) {
-            float x = j * stepX + sampleMin;
-            float R = qSqrt(z * z + x * x) + 0.01;
-            float y = (qSin(R) / R + 0.24) * 1.61;
+            float x = qMin(sampleMax, (j * stepX + sampleMin));
+            float R = qSqrt(z * z + x * x) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f;
             (*newRow)[index++].setPosition(QVector3D(x, y, z));
         }
         *dataArray << newRow;
@@ -96,7 +98,7 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
         m_graph->axisX()->setLabelFormat("%.2f");
         m_graph->axisZ()->setLabelFormat("%.2f");
         m_graph->axisX()->setRange(sampleMin, sampleMax);
-        m_graph->axisY()->setRange(0.0, 2.0);
+        m_graph->axisY()->setRange(0.0f, 2.0f);
         m_graph->axisZ()->setRange(sampleMin, sampleMax);
 
         m_graph->removeSeries(m_heightMapSeries);
@@ -106,8 +108,8 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
         // Reset range sliders for Sqrt&Sin
         m_rangeMinX = sampleMin;
         m_rangeMinZ = sampleMin;
-        m_stepX = (sampleMax - sampleMin) / qreal(sampleCountX - 1);
-        m_stepZ = (sampleMax - sampleMin) / qreal(sampleCountZ - 1);
+        m_stepX = (sampleMax - sampleMin) / float(sampleCountX - 1);
+        m_stepZ = (sampleMax - sampleMin) / float(sampleCountZ - 1);
         m_axisMinSliderX->setMaximum(sampleCountX - 2);
         m_axisMinSliderX->setValue(0);
         m_axisMaxSliderX->setMaximum(sampleCountX - 1);
@@ -128,9 +130,9 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
 
         m_graph->axisX()->setLabelFormat("%.1f N");
         m_graph->axisZ()->setLabelFormat("%.1f E");
-        m_graph->axisX()->setRange(34.0, 40.0);
+        m_graph->axisX()->setRange(34.0f, 40.0f);
         m_graph->axisY()->setAutoAdjustRange(true);
-        m_graph->axisZ()->setRange(18.0, 24.0);
+        m_graph->axisZ()->setRange(18.0f, 24.0f);
 
         m_graph->removeSeries(m_sqrtSinSeries);
         m_graph->addSeries(m_heightMapSeries);
@@ -139,10 +141,10 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
         // Reset range sliders for height map
         int mapGridCountX = m_heightMapWidth / heightMapGridStepX;
         int mapGridCountZ = m_heightMapHeight / heightMapGridStepZ;
-        m_rangeMinX = 34.0;
-        m_rangeMinZ = 18.0;
-        m_stepX = 6.0 / qreal(mapGridCountX - 1);
-        m_stepZ = 6.0 / qreal(mapGridCountZ - 1);
+        m_rangeMinX = 34.0f;
+        m_rangeMinZ = 18.0f;
+        m_stepX = 6.0f / float(mapGridCountX - 1);
+        m_stepZ = 6.0f / float(mapGridCountZ - 1);
         m_axisMinSliderX->setMaximum(mapGridCountX - 2);
         m_axisMinSliderX->setValue(0);
         m_axisMaxSliderX->setMaximum(mapGridCountX - 1);
@@ -156,67 +158,67 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
 
 void SurfaceGraph::adjustXMin(int min)
 {
-    qreal minX = m_stepX * qreal(min) + m_rangeMinX;
+    float minX = m_stepX * float(min) + m_rangeMinX;
 
     int max = m_axisMaxSliderX->value();
     if (min >= max) {
         max = min + 1;
         m_axisMaxSliderX->setValue(max);
     }
-    qreal maxX = m_stepX * max + m_rangeMinX;
+    float maxX = m_stepX * max + m_rangeMinX;
 
     setAxisXRange(minX, maxX);
 }
 
 void SurfaceGraph::adjustXMax(int max)
 {
-    qreal maxX = m_stepX * qreal(max) + m_rangeMinX;
+    float maxX = m_stepX * float(max) + m_rangeMinX;
 
     int min = m_axisMinSliderX->value();
     if (max <= min) {
         min = max - 1;
         m_axisMinSliderX->setValue(min);
     }
-    qreal minX = m_stepX * min + m_rangeMinX;
+    float minX = m_stepX * min + m_rangeMinX;
 
     setAxisXRange(minX, maxX);
 }
 
 void SurfaceGraph::adjustZMin(int min)
 {
-    qreal minZ = m_stepZ * qreal(min) + m_rangeMinZ;
+    float minZ = m_stepZ * float(min) + m_rangeMinZ;
 
     int max = m_axisMaxSliderZ->value();
     if (min >= max) {
         max = min + 1;
         m_axisMaxSliderZ->setValue(max);
     }
-    qreal maxZ = m_stepZ * max + m_rangeMinZ;
+    float maxZ = m_stepZ * max + m_rangeMinZ;
 
     setAxisZRange(minZ, maxZ);
 }
 
 void SurfaceGraph::adjustZMax(int max)
 {
-    qreal maxX = m_stepZ * qreal(max) + m_rangeMinZ;
+    float maxX = m_stepZ * float(max) + m_rangeMinZ;
 
     int min = m_axisMinSliderZ->value();
     if (max <= min) {
         min = max - 1;
         m_axisMinSliderZ->setValue(min);
     }
-    qreal minX = m_stepZ * min + m_rangeMinZ;
+    float minX = m_stepZ * min + m_rangeMinZ;
 
     setAxisZRange(minX, maxX);
 }
 
 //! [5]
-void SurfaceGraph::setAxisXRange(qreal min, qreal max)
+void SurfaceGraph::setAxisXRange(float min, float max)
 {
     m_graph->axisX()->setRange(min, max);
 }
 
-void SurfaceGraph::setAxisZRange(qreal min, qreal max)
+void SurfaceGraph::setAxisZRange(float min, float max)
 {
     m_graph->axisZ()->setRange(min, max);
 }

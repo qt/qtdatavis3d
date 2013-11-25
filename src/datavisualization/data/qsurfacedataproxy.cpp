@@ -226,8 +226,8 @@ QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()
 
 void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
 {
-    qreal min = 0.0;
-    qreal max = 0.0;
+    float min = 0.0f;
+    float max = 0.0f;
 
     int rows = m_dataArray->size();
     int columns = 0;
@@ -243,7 +243,7 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
         QSurfaceDataRow *row = m_dataArray->at(i);
         if (row) {
             for (int j = 0; j < columns; j++) {
-                qreal itemValue = m_dataArray->at(i)->at(j).y();
+                float itemValue = m_dataArray->at(i)->at(j).y();
                 if (min > itemValue)
                     min = itemValue;
                 if (max < itemValue)

@@ -332,12 +332,12 @@ void Q3DScene::setActiveLight(Q3DLight *light)
  * This property contains the current device pixel ratio that is used when mapping input
  * coordinates to pixel coordinates.
  */
-qreal Q3DScene::devicePixelRatio() const
+float Q3DScene::devicePixelRatio() const
 {
     return d_ptr->m_devicePixelRatio;
 }
 
-void Q3DScene::setDevicePixelRatio(qreal pixelRatio)
+void Q3DScene::setDevicePixelRatio(float pixelRatio)
 {
     if (d_ptr->m_devicePixelRatio != pixelRatio) {
         d_ptr->m_devicePixelRatio = pixelRatio;
@@ -352,7 +352,7 @@ void Q3DScene::setDevicePixelRatio(qreal pixelRatio)
  * Optional \a distanceModifier modifies the distance of the light from the data visualization.
  */
 void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                                qreal fixedRotation, qreal distanceModifier)
+                                                float fixedRotation, float distanceModifier)
 {
     d_ptr->m_light->setPosition(
                 d_ptr->m_camera->calculatePositionRelativeToCamera(relativePosition,

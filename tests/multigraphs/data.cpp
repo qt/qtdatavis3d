@@ -217,14 +217,14 @@ void Data::setData(const QImage &image)
 
         int limitsX = imageWidth / 2;
         int limitsZ = imageHeight / 2;
-        qreal height = 0;
+        float height = 0;
         int count = 0;
 
         for (int i = -limitsZ; i < limitsZ; i++, bitCount -= widthBits) {
             for (int j = -limitsX; j < limitsX; j++) {
-                height = qreal(bits[bitCount + ((j + limitsX) * 4)]) - 128.0;
+                height = float(bits[bitCount + ((j + limitsX) * 4)]) - 128.0;
                 if (height > -128) {
-                    ptrToDataArray->setPosition(QVector3D(qreal(j), height, qreal(i)));
+                    ptrToDataArray->setPosition(QVector3D(float(j), height, float(i)));
                     ptrToDataArray++;
                     count++;
                 }
@@ -238,7 +238,7 @@ void Data::setData(const QImage &image)
         for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
             QBarDataRow &newRow = *dataArray->at(i);
             for (int j = 0; j < imageWidth; j++)
-                newRow[j] = qreal(bits[bitCount + (j * 4)]);
+                newRow[j] = float(bits[bitCount + (j * 4)]);
         }
 
         m_bars->seriesList().at(0)->dataProxy()->resetArray(dataArray);

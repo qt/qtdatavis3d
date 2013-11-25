@@ -319,10 +319,10 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     modelMatrix.rotate(rotQuaternion);
 
     if (useDepth && !rotateAlong) {
-        qreal yComp = qreal(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
+        float yComp = float(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
         // Apply negative camera rotations to keep labels facing camera
-        qreal camRotationX = camera->xRotation();
-        qreal camRotationY = camera->yRotation();
+        float camRotationX = camera->xRotation();
+        float camRotationY = camera->yRotation();
         modelMatrix.rotate(-camRotationX, 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotationY - yComp, 1.0f, 0.0f, 0.0f);
     }

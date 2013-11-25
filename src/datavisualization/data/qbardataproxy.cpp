@@ -683,7 +683,7 @@ QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endR
             endColumn = qMin(endColumn, row->size() - 1);
             for (int j = startColumn; j <= endColumn; j++) {
                 const QBarDataItem &item = m_dataArray->at(i)->at(j);
-                qreal itemValue = item.value();
+                float itemValue = item.value();
                 if (limits.second < itemValue)
                     limits.second = itemValue;
                 if (limits.first > itemValue)

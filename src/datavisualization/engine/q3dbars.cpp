@@ -253,7 +253,7 @@ void Q3DBars::setHeight(const int height)
  * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
  * makes them twice as deep as they are wide. It is preset to \c 1.0 by default.
  */
-void Q3DBars::setBarThickness(qreal thicknessRatio)
+void Q3DBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
         d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
@@ -261,7 +261,7 @@ void Q3DBars::setBarThickness(qreal thicknessRatio)
     }
 }
 
-qreal Q3DBars::barThickness()
+float Q3DBars::barThickness()
 {
     return d_ptr->m_shared->barThickness();
 }

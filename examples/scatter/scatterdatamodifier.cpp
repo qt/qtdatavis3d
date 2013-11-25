@@ -81,9 +81,9 @@ void ScatterDataModifier::addData()
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
-    m_graph->axisX()->setRange(-30.0, 30.0);
-    m_graph->axisY()->setRange(-1.0, 1.0);
-    m_graph->axisZ()->setRange(-30.0, 30.0);
+    m_graph->axisX()->setRange(-30.0f, 30.0f);
+    m_graph->axisY()->setRange(-1.0f, 1.0f);
+    m_graph->axisZ()->setRange(-30.0f, 30.0f);
     //! [4]
 
     //! [5]
@@ -102,7 +102,7 @@ void ScatterDataModifier::addData()
     float limit = qSqrt(numberOfItems) / 2.0f;
     for (float i = -limit; i < limit; i++) {
         for (float j = -limit; j < limit; j++) {
-            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0)), j));
+            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0f)), j));
             ptrToDataArray++;
         }
     }

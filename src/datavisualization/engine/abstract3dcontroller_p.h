@@ -248,7 +248,7 @@ public:
     virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual QAbstract3DInputHandler *activeInputHandler();
 
-    virtual void updateDevicePixelRatio(qreal ratio);
+    virtual void updateDevicePixelRatio(float ratio);
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
@@ -330,7 +330,7 @@ public:
 public slots:
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();
-    void handleAxisRangeChanged(qreal min, qreal max);
+    void handleAxisRangeChanged(float min, float max);
     void handleAxisSegmentCountChanged(int count);
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);

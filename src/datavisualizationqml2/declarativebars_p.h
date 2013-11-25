@@ -52,7 +52,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
     Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
     Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle barType READ barType WRITE setBarType NOTIFY meshFileNameChanged)
-    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
+    Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled NOTIFY meshFileNameChanged)
@@ -73,8 +73,8 @@ public:
     Q3DCategoryAxis *columnAxis() const;
     void setColumnAxis(Q3DCategoryAxis *axis);
 
-    void setBarThickness(qreal thicknessRatio);
-    qreal barThickness() const;
+    void setBarThickness(float thicknessRatio);
+    float barThickness() const;
 
     void setBarSpacing(QSizeF spacing);
     QSizeF barSpacing() const;
@@ -100,7 +100,7 @@ public:
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
 signals:
-    void barThicknessChanged(qreal thicknessRatio);
+    void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);

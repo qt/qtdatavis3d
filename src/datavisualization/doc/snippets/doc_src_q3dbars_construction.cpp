@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     //! [1]
     QBar3DSeries *series = new QBar3DSeries;
     QBarDataRow *data = new QBarDataRow;
-    *data << 1.0 << 3.0 << 7.5 << 5.0 << 2.2;
+    *data << 1.0f << 3.0f << 7.5f << 5.0f << 2.2f;
     series->dataProxy()->addRow(data);
     bars.addSeries(series);
     //! [1]

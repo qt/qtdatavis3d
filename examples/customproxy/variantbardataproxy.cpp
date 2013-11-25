@@ -118,7 +118,7 @@ void VariantBarDataProxy::resolveDataSet()
     const QStringList &columnList = m_mapping->columnCategories();
 
     // Sort values into rows and columns
-    typedef QHash<QString, qreal> ColumnValueMap;
+    typedef QHash<QString, float> ColumnValueMap;
     QHash <QString, ColumnValueMap> itemValueMap;
     foreach (const VariantDataItem *item, itemList) {
         itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()]

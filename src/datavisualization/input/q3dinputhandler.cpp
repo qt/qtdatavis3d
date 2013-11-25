@@ -146,8 +146,8 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 #else
     if (QDataVis::InputStateRotating == inputState()) {
         // Calculate mouse movement since last frame
-        qreal xRotation = scene()->activeCamera()->xRotation();
-        qreal yRotation = scene()->activeCamera()->yRotation();
+        float xRotation = scene()->activeCamera()->xRotation();
+        float yRotation = scene()->activeCamera()->yRotation();
         float mouseMoveX = float(inputPosition().x() - mousePos.x())
                 / (scene()->viewport().width() / rotationSpeed);
         float mouseMoveY = float(inputPosition().y() - mousePos.y())

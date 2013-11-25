@@ -178,7 +178,7 @@ private:
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(const QPoint &point);
     QPoint selectionIdToSurfacePoint(uint id);
-    QString createSelectionLabel(qreal value, int column, int row);
+    QString createSelectionLabel(float value, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif

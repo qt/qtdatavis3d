@@ -102,7 +102,7 @@ protected:
     GLint m_numFrames;
 #endif
 
-    QString generateValueLabel(const QString &format, qreal value);
+    QString generateValueLabel(const QString &format, float value);
 
 public:
     virtual ~Abstract3DRenderer();
@@ -137,7 +137,7 @@ public:
     virtual void updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type);
     virtual void updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title);
     virtual void updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
     virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);

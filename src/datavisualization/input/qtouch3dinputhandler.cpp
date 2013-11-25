@@ -23,7 +23,7 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-const qreal maxTapAndHoldJitter = 20;
+const float maxTapAndHoldJitter = 20.0f;
 const int maxPinchJitter = 10;
 #if defined (Q_OS_ANDROID)
 const int maxSelectionJitter = 10;
@@ -145,7 +145,7 @@ QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
     delete m_holdTimer;
 }
 
-void QTouch3DInputHandlerPrivate::handlePinchZoom(qreal distance)
+void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance)
 {
     int newDistance = distance;
     int prevDist = q_ptr->prevDistance();
@@ -154,7 +154,7 @@ void QTouch3DInputHandlerPrivate::handlePinchZoom(qreal distance)
     q_ptr->setInputState(QDataVis::InputStateOnPinch);
     Q3DCamera *camera = q_ptr->scene()->activeCamera();
     int zoomLevel = camera->zoomLevel();
-    qreal zoomRate = qSqrt(qSqrt(zoomLevel));
+    float zoomRate = qSqrt(qSqrt(zoomLevel));
     if (newDistance > prevDist)
         zoomLevel += zoomRate;
     else

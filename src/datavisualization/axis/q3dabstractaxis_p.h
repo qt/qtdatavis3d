@@ -47,9 +47,9 @@ public:
     inline bool isDefaultAxis() { return m_isDefaultAxis; }
     inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
 
-    virtual void setRange(qreal min, qreal max);
-    virtual void setMin(qreal min);
-    virtual void setMax (qreal max);
+    virtual void setRange(float min, float max);
+    virtual void setMin(float min);
+    virtual void setMax (float max);
 
 protected:
     virtual void updateLabels();
@@ -61,8 +61,8 @@ protected:
     Q3DAbstractAxis::AxisOrientation m_orientation;
     Q3DAbstractAxis::AxisType m_type;
     bool m_isDefaultAxis;
-    qreal m_min;
-    qreal m_max;
+    float m_min;
+    float m_max;
     bool m_autoAdjust;
     bool m_onlyPositiveValues;
     bool m_allowMinMaxSame;

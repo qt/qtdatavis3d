@@ -140,7 +140,7 @@ public slots:
     void updateBackgroundEnabled(bool enable);
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
 
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 

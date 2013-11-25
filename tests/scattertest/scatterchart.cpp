@@ -74,9 +74,9 @@ void ScatterDataModifier::addData()
     m_chart->axisX()->setTitle("X");
     m_chart->axisY()->setTitle("Y");
     m_chart->axisZ()->setTitle("Z");
-    m_chart->axisX()->setRange(-50.0, 50.0);
-    m_chart->axisY()->setRange(-1.0, 1.2);
-    m_chart->axisZ()->setRange(-50.0, 50.0);
+    m_chart->axisX()->setRange(-50.0f, 50.0f);
+    m_chart->axisY()->setRange(-1.0f, 1.2f);
+    m_chart->axisZ()->setRange(-50.0f, 50.0f);
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);

@@ -162,8 +162,8 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     modelMatrixLabel.translate(m_position + labelAlign);
 
     // Position the label towards the camera
-    qreal camRotationsX = camera->xRotation();
-    qreal camRotationsY = camera->yRotation();
+    float camRotationsX = camera->xRotation();
+    float camRotationsY = camera->yRotation();
     if (!m_cachedIsSlicingActivated) {
         modelMatrixLabel.rotate(-camRotationsX, 0.0f, 1.0f, 0.0f);
         modelMatrixLabel.rotate(-camRotationsY, 1.0f, 0.0f, 0.0f);

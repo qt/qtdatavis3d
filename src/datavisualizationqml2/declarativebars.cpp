@@ -107,7 +107,7 @@ void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
     m_shared->setAxisZ(axis);
 }
 
-void DeclarativeBars::setBarThickness(qreal thicknessRatio)
+void DeclarativeBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
         m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
@@ -115,7 +115,7 @@ void DeclarativeBars::setBarThickness(qreal thicknessRatio)
     }
 }
 
-qreal DeclarativeBars::barThickness() const
+float DeclarativeBars::barThickness() const
 {
     return m_shared->barThickness();
 }

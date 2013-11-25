@@ -45,8 +45,9 @@ public:
     inline float y() const { return m_position.y(); }
     inline float z() const { return m_position.z(); }
 
-    //void setSize(qreal size);
-    //qreal size() const;
+    // TODO: Will we ever support item specific size? If not, remove.
+    //void setSize(float size);
+    //float size() const;
 
 protected:
     virtual void createExtraData();
@@ -55,7 +56,7 @@ protected:
 
 private:
     QVector3D m_position;
-    //qreal m_size;
+    //float m_size;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

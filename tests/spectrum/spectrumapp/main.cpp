@@ -75,7 +75,7 @@ MainApp::MainApp(Q3DBars *window)
     // Disable grid
     m_chart->setGridVisible(false);
     // Disable auto-scaling of height by defining explicit range
-    m_chart->valueAxis()->setRange(0.0, 1.0);
+    m_chart->valueAxis()->setRange(0.0f, 1.0f);
     // Disable shadows
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
 #if USE_CONES
@@ -87,15 +87,15 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setBarType(QDataVis::MeshStyleCones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpacing)
-    m_chart->setCameraPosition(10.0f, 5.0f, 70);
+    m_chart->setCameraPosition(10.0f, 5.0f, 70.0f);
 #else
     // Set bar specifications; make them twice as wide as they're deep
-    m_chart->setBarThickness(2.0);
+    m_chart->setBarThickness(2.0f);
     m_chart->setBarSpacing(QSizeF(0.0, 0.0));
     // Set bar type, flat bars
     m_chart->setBarType(QDataVis::MeshStyleBars, false);
     // Adjust camera position
-    m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75);
+    m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif
     // Set color scheme
     m_chart->setBarColor(QColor(Qt::red));
@@ -141,7 +141,7 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
     for ( ; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
         if (e.frequency >= m_lowFreq && e.frequency < m_highFreq) {
-            (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), qreal(e.amplitude)));
+            (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), float(e.amplitude)));
         }
     }
     m_chart->seriesList().at(0)->dataProxy()->insertRow(0, data);

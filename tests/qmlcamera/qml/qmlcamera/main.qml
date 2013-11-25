@@ -58,12 +58,6 @@ Item {
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
 
-            onSelectedBarChanged: {
-                // Set camControlArea current row to selected bar
-                var rowRole = chartData.proxy.rowLabels[position.x];
-                var colRole = chartData.proxy.columnLabels[position.y];
-            }
-
             // Bind UI controls to the camera
             scene.activeCamera.wrapXRotation: false
             scene.activeCamera.xRotation: camControlArea.xValue

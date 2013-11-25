@@ -214,7 +214,7 @@ void Bars3DRenderer::updateData()
                 if (dataRow) {
                     int dataColIndex = minCol;
                     for (; j < updateSize ; j++) {
-                        qreal value = dataRow->at(dataColIndex).value();
+                        float value = dataRow->at(dataColIndex).value();
                         if (!m_noZeroInRange) {
                             heightValue = GLfloat(value);
                         } else {
@@ -223,7 +223,7 @@ void Bars3DRenderer::updateData()
                                 heightValue = value - m_axisCacheY.min();
                                 if (heightValue < 0.0f)
                                     heightValue = 0.0f;
-                            } else if (m_axisCacheY.max() < 0.0) {
+                            } else if (m_axisCacheY.max() < 0.0f) {
                                 heightValue = value - m_axisCacheY.max();
                                 if (heightValue > 0.0f)
                                     heightValue = 0.0f;
@@ -236,7 +236,7 @@ void Bars3DRenderer::updateData()
                 }
             }
             for (; j < m_renderingArrays.at(series).at(i).size(); j++) {
-                m_renderingArrays[series][i][j].setValue(0.0);
+                m_renderingArrays[series][i][j].setValue(0.0f);
                 m_renderingArrays[series][i][j].setHeight(0.0f);
             }
             dataRowIndex++;
@@ -263,7 +263,7 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
     if (m_hasNegativeValues)
         scene->activeCamera()->setMinYRotation(-90.0);
     else
-        scene->activeCamera()->setMinYRotation(0.0);
+        scene->activeCamera()->setMinYRotation(0.0f);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
@@ -580,7 +580,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         // TODO: Make user controllable (QTRD-2546)
         if (!sliceGridLabels) {
             // Draw values
-            if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0)) {
+            if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0f)) {
                 m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
                                     valuePositionComp, sliceValueRotation, item->height(),
                                     m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
@@ -912,13 +912,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     MVPMatrix = projectionViewMatrix * modelMatrix;
 
                     //#if !defined(QT_OPENGL_ES_2)
-                    //                QVector3D barColor = QVector3D((GLdouble)row / 32767.0,
-                    //                                               (GLdouble)bar / 32767.0,
-                    //                                               0.0);
+                    //                QVector3D barColor = QVector3D(GLfloat(row) / 32767.0f,
+                    //                                               GLfloat(bar) / 32767.0f,
+                    //                                               0.0f);
                     //#else
-                    QVector3D barColor = QVector3D((GLdouble)row / 255.0,
-                                                   (GLdouble)bar / 255.0,
-                                                   (GLdouble)series / 255.0);
+                    QVector3D barColor = QVector3D(GLfloat(row) / 255.0f,
+                                                   GLfloat(bar) / 255.0f,
+                                                   GLfloat(series) / 255.0f);
                     //#endif
 
                     m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
@@ -1455,8 +1455,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1807,8 +1807,8 @@ void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, const QSizeF &spacin
     calculateSceneScalingFactors();
 }
 
-void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min,
-                                     qreal max)
+void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min,
+                                     float max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 
@@ -1974,7 +1974,7 @@ void Bars3DRenderer::calculateHeightAdjustment()
     GLfloat newAdjustment = 0.0f;
     GLfloat maxAbs = qFabs(m_axisCacheY.max());
 
-    if (m_axisCacheY.max() < 0.0) {
+    if (m_axisCacheY.max() < 0.0f) {
         m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) - qFabs(m_axisCacheY.max()));
         maxAbs = qFabs(m_axisCacheY.max()) - qFabs(m_axisCacheY.min());
     } else {
@@ -1982,7 +1982,7 @@ void Bars3DRenderer::calculateHeightAdjustment()
     }
 
     // Height fractions are used in gradient calculations and are therefore doubled
-    if (m_axisCacheY.max() < 0.0 || m_axisCacheY.min() > 0.0) {
+    if (m_axisCacheY.max() < 0.0f || m_axisCacheY.min() > 0.0f) {
         m_noZeroInRange = true;
         m_gradientFraction = 2.0f;
     } else {

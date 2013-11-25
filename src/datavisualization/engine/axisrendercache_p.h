@@ -51,10 +51,10 @@ public:
     inline const QString &title() { return m_title; }
     void setLabels(const QStringList &labels);
     inline const QStringList &labels() { return m_labels; }
-    void setMin(qreal min);
-    inline qreal min() { return m_min; }
-    void setMax(qreal max);
-    inline qreal max() { return m_max; }
+    void setMin(float min);
+    inline float min() { return m_min; }
+    void setMax(float max);
+    inline float max() { return m_max; }
     void setSegmentCount(int count);
     inline int segmentCount() const { return m_segmentCount; }
     void setSubSegmentCount(int count);
@@ -79,8 +79,8 @@ private:
     Q3DAbstractAxis::AxisType m_type;
     QString m_title;
     QStringList m_labels;
-    qreal m_min;
-    qreal m_max;
+    float m_min;
+    float m_max;
     int m_segmentCount;
     int m_subSegmentCount;
     QString m_labelFormat;

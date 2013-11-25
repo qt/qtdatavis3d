@@ -219,7 +219,7 @@ Utils::ParamType Utils::findFormatParamType(const QString &format)
     return ParamTypeUnknown;
 }
 
-QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
+QString Utils::formatLabel(const QByteArray &format, ParamType paramType, float value)
 {
     switch (paramType) {
     case ParamTypeInt:
@@ -239,7 +239,7 @@ QString Utils::defaultLabelFormat()
     return defaultFormat;
 }
 
-qreal Utils::wrapValue(qreal value, qreal min, qreal max)
+float Utils::wrapValue(float value, float min, float max)
 {
     if (value > max) {
         value = min + (value - max);

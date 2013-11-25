@@ -34,16 +34,16 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_colorDialog(colorDialog),
       m_columnCount(21),
       m_rowCount(21),
-      m_xRotation(0.0),
-      m_yRotation(0.0),
+      m_xRotation(0.0f),
+      m_yRotation(0.0f),
       m_static(true),
-      m_barSpacingX(0.1),
-      m_barSpacingZ(0.1),
+      m_barSpacingX(0.1f),
+      m_barSpacingZ(0.1f),
       m_fontSize(20),
       m_segments(4),
       m_subSegments(3),
-      m_minval(-16.0),
-      m_maxval(20.0),
+      m_minval(-16.0f),
+      m_maxval(20.0f),
       m_selectedBar(-1, -1),
       m_autoAdjustingAxis(new Q3DValueAxis),
       m_fixedRangeAxis(new Q3DValueAxis),
@@ -268,9 +268,9 @@ void GraphModifier::createMassiveArray()
         QBarDataRow *dataRow = new QBarDataRow(arrayDimension);
         for (int j = 0; j < arrayDimension; j++) {
             if (!m_negativeValuesOn)
-                (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % int(m_maxval)));
+                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0) * float(rand() % int(m_maxval)));
             else
-                (*dataRow)[j].setValue((qreal(i % 300 + 1) / 300.0) * qreal(rand() % int(m_maxval))
+                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0) * float(rand() % int(m_maxval))
                                        + m_minval);
         }
         dataArray->append(dataRow);
@@ -285,14 +285,14 @@ void GraphModifier::resetTemperatureData()
 {
 
     // Set up data
-    static const qreal temp[7][12] = {
-        {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2006
-        {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2007
-        {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2008
-        {-7.8, -8.8, -4.2, 0.7, 9.3, 13.2, 15.8, 15.5, 11.2, 0.6, 0.7, -8.4},      // 2009
-        {-14.4, -12.1, -7.0, 2.3, 11.0, 12.6, 18.8, 13.8, 9.4, 3.9, -5.6, -13.0},  // 2010
-        {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2},     // 2011
-        {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
+    static const float temp[7][12] = {
+        {-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
+        {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
+        {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
+        {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
+        {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
+        {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
+        {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}      // 2012
     };
 
     // Create data rows
@@ -338,12 +338,12 @@ static int changeCounter = 0;
 void GraphModifier::addRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (qreal i = 0; i < m_columnCount; i++) {
+    for (float i = 0; i < m_columnCount; i++) {
         if (!m_negativeValuesOn)
-            (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval)));
+            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval)));
         else
-            (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval))
-                                   - (qreal)(rand() % int(m_minval)));
+            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval))
+                                   - (float)(rand() % int(m_minval)));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
@@ -358,7 +358,7 @@ void GraphModifier::addRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
+            (*dataRow)[j].setValue(float(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Add %1").arg(addCounter++));
     }
@@ -370,8 +370,8 @@ void GraphModifier::addRows()
 void GraphModifier::insertRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
-    for (qreal i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (qreal)m_columnCount) * (qreal)(rand() % int(m_maxval))
+    for (float i = 0; i < m_columnCount; i++)
+        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval))
                                + m_minval);
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
@@ -389,7 +389,7 @@ void GraphModifier::insertRows()
     for (int i = 0; i < m_rowCount; i++) {
         QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
         for (int j = 0; j < m_columnCount; j++)
-            (*dataRow)[j].setValue(qreal(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
+            (*dataRow)[j].setValue(float(j + i + m_genericData->dataProxy()->rowCount()) + m_minval);
         dataArray.append(dataRow);
         labels.append(QStringLiteral("Insert %1").arg(insertCounter++));
     }
@@ -406,7 +406,7 @@ void GraphModifier::changeItem()
     int row = m_selectedBar.x();
     int column = m_selectedBar.y();
     if (row >= 0 && column >= 0) {
-        QBarDataItem item(qreal(rand() % 100));
+        QBarDataItem item(float(rand() % 100));
         m_genericData->dataProxy()->setItem(row, column, item);
     }
 }
@@ -418,7 +418,7 @@ void GraphModifier::changeRow()
     if (row >= 0) {
         QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
-            (*newRow)[i].setValue(qreal(rand() % int(m_maxval)) + m_minval);
+            (*newRow)[i].setValue(float(rand() % int(m_maxval)) + m_minval);
         QString label = QStringLiteral("Change %1").arg(changeCounter++);
         m_genericData->dataProxy()->setRow(row, newRow, label);
     }
@@ -435,7 +435,7 @@ void GraphModifier::changeRows()
         for (int i = startRow; i <= row; i++ ) {
             QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
-                (*newRow)[j].setValue(qreal(rand() % int(m_maxval)) + m_minval);
+                (*newRow)[j].setValue(float(rand() % int(m_maxval)) + m_minval);
             newArray.append(newRow);
             labels.append(QStringLiteral("Change %1").arg(changeCounter++));
         }
@@ -622,18 +622,18 @@ void GraphModifier::rotateY(int rotation)
 
 void GraphModifier::setSpecsRatio(int barwidth)
 {
-    m_graph->setBarThickness((qreal)barwidth / 30.0);
+    m_graph->setBarThickness((float)barwidth / 30.0f);
 }
 
 void GraphModifier::setSpacingSpecsX(int spacing)
 {
-    m_barSpacingX = (qreal)spacing / 100.0;
+    m_barSpacingX = (float)spacing / 100.0f;
     m_graph->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 
 void GraphModifier::setSpacingSpecsZ(int spacing)
 {
-    m_barSpacingZ = (qreal)spacing / 100.0;
+    m_barSpacingZ = (float)spacing / 100.0f;
     m_graph->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
 }
 

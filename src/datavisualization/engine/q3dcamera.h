@@ -32,12 +32,12 @@ class Q3DCameraPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
 {
     Q_OBJECT
-    Q_PROPERTY(qreal xRotation READ xRotation WRITE setXRotation NOTIFY xRotationChanged)
-    Q_PROPERTY(qreal yRotation READ yRotation WRITE setYRotation NOTIFY yRotationChanged)
-    Q_PROPERTY(qreal minXRotation READ minXRotation NOTIFY minXRotationChanged)
-    Q_PROPERTY(qreal minYRotation READ minYRotation NOTIFY minYRotationChanged)
-    Q_PROPERTY(qreal maxXRotation READ maxXRotation NOTIFY maxXRotationChanged)
-    Q_PROPERTY(qreal maxYRotation READ maxYRotation NOTIFY maxYRotationChanged)
+    Q_PROPERTY(float xRotation READ xRotation WRITE setXRotation NOTIFY xRotationChanged)
+    Q_PROPERTY(float yRotation READ yRotation WRITE setYRotation NOTIFY yRotationChanged)
+    Q_PROPERTY(float minXRotation READ minXRotation NOTIFY minXRotationChanged)
+    Q_PROPERTY(float minYRotation READ minYRotation NOTIFY minYRotationChanged)
+    Q_PROPERTY(float maxXRotation READ maxXRotation NOTIFY maxXRotationChanged)
+    Q_PROPERTY(float maxYRotation READ maxYRotation NOTIFY maxYRotationChanged)
     Q_PROPERTY(int zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QMatrix4x4 viewMatrix READ viewMatrix WRITE setViewMatrix NOTIFY viewMatrixChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
@@ -50,16 +50,16 @@ public:
     Q3DCamera(QObject *parent = 0);
     virtual ~Q3DCamera();
 
-    qreal xRotation() const;
-    void setXRotation(qreal rotation);
-    qreal yRotation() const;
-    void setYRotation(qreal rotation);
+    float xRotation() const;
+    void setXRotation(float rotation);
+    float yRotation() const;
+    void setYRotation(float rotation);
 
-    qreal minXRotation() const;
-    qreal maxXRotation() const;
+    float minXRotation() const;
+    float maxXRotation() const;
 
-    qreal minYRotation() const;
-    qreal maxYRotation() const;
+    float minYRotation() const;
+    float maxYRotation() const;
 
     bool wrapXRotation() const;
     void setWrapXRotation(bool isEnabled);
@@ -86,17 +86,17 @@ public:
                             const QVector3D &defaultUp);
 
     QVector3D calculatePositionRelativeToCamera(const QVector3D &relativePosition,
-                                                qreal fixedRotation,
-                                                qreal distanceModifier) const;
-    void setCameraPosition(qreal horizontal, qreal vertical, qreal distance = 100.0);
+                                                float fixedRotation,
+                                                float distanceModifier) const;
+    void setCameraPosition(float horizontal, float vertical, float distance = 100.0f);
 
 signals:
-    void xRotationChanged(qreal rotation);
-    void yRotationChanged(qreal rotation);
-    void minXRotationChanged(qreal rotation);
-    void minYRotationChanged(qreal rotation);
-    void maxXRotationChanged(qreal rotation);
-    void maxYRotationChanged(qreal rotation);
+    void xRotationChanged(float rotation);
+    void yRotationChanged(float rotation);
+    void minXRotationChanged(float rotation);
+    void minYRotationChanged(float rotation);
+    void maxXRotationChanged(float rotation);
+    void maxYRotationChanged(float rotation);
     void zoomLevelChanged(int zoomLevel);
     void viewMatrixChanged(QMatrix4x4 viewMatrix);
     void cameraPresetChanged(QDataVis::CameraPreset preset);
@@ -105,10 +105,10 @@ signals:
     void wrapYRotationChanged(bool isEnabled);
 
 protected:
-    void setMinXRotation(qreal rotation);
-    void setMinYRotation(qreal rotation);
-    void setMaxXRotation(qreal rotation);
-    void setMaxYRotation(qreal rotation);
+    void setMinXRotation(float rotation);
+    void setMinYRotation(float rotation);
+    void setMaxXRotation(float rotation);
+    void setMaxYRotation(float rotation);
 
 private:
     QScopedPointer<Q3DCameraPrivate> d_ptr;

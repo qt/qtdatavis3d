@@ -408,7 +408,7 @@ void Bars3DController::adjustAxisRanges()
             int rowCount = proxy->rowCount();
             if (rowCount)
                 rowCount--;
-            categoryAxisX->dptr()->setRange(0.0, qreal(rowCount));
+            categoryAxisX->dptr()->setRange(0.0f, float(rowCount));
         }
 
         Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
@@ -420,7 +420,7 @@ void Bars3DController::adjustAxisRanges()
             }
             if (columnCount)
                 columnCount--;
-            categoryAxisZ->dptr()->setRange(0.0, qreal(columnCount));
+            categoryAxisZ->dptr()->setRange(0.0f, float(columnCount));
         }
 
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
@@ -432,11 +432,11 @@ void Bars3DController::adjustAxisRanges()
             if (limits.first < 0) {
                 // Call private implementation to avoid unsetting auto adjust flag
                 valueAxis->dptr()->setRange(limits.first, limits.second);
-            } else if (limits.second == 0.0) {
+            } else if (limits.second == 0.0f) {
                 // Only zero value values in data set, set range to something.
-                valueAxis->dptr()->setRange(0.0, 1.0);
+                valueAxis->dptr()->setRange(0.0f, 1.0f);
             } else {
-                valueAxis->dptr()->setRange(0.0, limits.second);
+                valueAxis->dptr()->setRange(0.0f, limits.second);
             }
         }
     }

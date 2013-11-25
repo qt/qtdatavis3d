@@ -37,14 +37,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 QBarDataItem::QBarDataItem()
     : d_ptr(0), // private data doesn't exist by default (optimization)
-      m_value(0.0)
+      m_value(0.0f)
 {
 }
 
 /*!
  * Constructs QBarDataItem with \a value.
  */
-QBarDataItem::QBarDataItem(qreal value)
+QBarDataItem::QBarDataItem(float value)
     : d_ptr(0),
       m_value(value)
 {
@@ -81,12 +81,12 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 }
 
 /*!
- * \fn void QBarDataItem::setValue(qreal value)
+ * \fn void QBarDataItem::setValue(float value)
  * Sets \a value to this data item.
  */
 
 /*!
- * \fn qreal QBarDataItem::value() const
+ * \fn float QBarDataItem::value() const
  * \return value of this data item.
  */
 

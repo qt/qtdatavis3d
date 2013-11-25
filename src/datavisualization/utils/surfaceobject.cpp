@@ -53,8 +53,8 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-    GLfloat uvX = 1.0 / GLfloat(m_columns - 1);
-    GLfloat uvY = 1.0 / GLfloat(m_rows - 1);
+    GLfloat uvX = 1.0f / GLfloat(m_columns - 1);
+    GLfloat uvY = 1.0f / GLfloat(m_rows - 1);
 
     m_surfaceType = SurfaceSmooth;
 
@@ -169,8 +169,8 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
     GLfloat yNormalizer = yRange / 2.0f;
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-    GLfloat uvX = 1.0 / GLfloat(m_columns - 1);
-    GLfloat uvY = 1.0 / GLfloat(m_rows - 1);
+    GLfloat uvX = 1.0f / GLfloat(m_columns - 1);
+    GLfloat uvY = 1.0f / GLfloat(m_rows - 1);
 
     m_surfaceType = SurfaceFlat;
 

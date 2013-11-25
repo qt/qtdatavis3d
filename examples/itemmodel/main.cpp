@@ -78,7 +78,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [5]
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between them
-    m_graph->setBarThickness(1.0);
+    m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
 
     // Set bar type to flat pyramids
@@ -161,11 +161,11 @@ void GraphDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    qreal hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 10.0},     // week 1
-                         {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
-                         {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
-                         {0.0, 1.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
-                         {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
+    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 10.0f},     // week 1
+                         {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
+                         {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
+                         {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
+                         {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
     //! [9]
 
     // Add labels
@@ -205,7 +205,7 @@ void GraphDataGenerator::addRow()
     for (int i = 0; i < m_columnCount; i++) {
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
-            ((qreal)i / (qreal)m_columnCount) / 2.0 + (qreal)(rand() % 30) / 100.0);
+            ((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
     }
     m_tableWidget->resizeColumnsToContents();
 }

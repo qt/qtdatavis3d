@@ -42,9 +42,9 @@ public:
     Q3DValueAxisPrivate(Q3DValueAxis *q);
     virtual ~Q3DValueAxisPrivate();
 
-    virtual void setRange(qreal min, qreal max);
-    virtual void setMin(qreal min);
-    virtual void setMax (qreal max);
+    virtual void setRange(float min, float max);
+    virtual void setMin(float min);
+    virtual void setMax (float max);
 
 protected:
     void emitLabelsChanged();

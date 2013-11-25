@@ -528,7 +528,7 @@ void Abstract3DController::setSecondarySubViewport(const QRect &secondarySubView
     m_scene->setSecondarySubViewport(secondarySubViewport);
 }
 
-void Abstract3DController::updateDevicePixelRatio(qreal ratio)
+void Abstract3DController::updateDevicePixelRatio(float ratio)
 {
     m_scene->setDevicePixelRatio(ratio);
 }
@@ -974,7 +974,7 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
     emitNeedRender();
 }
 
-void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
+void Abstract3DController::handleAxisRangeChanged(float min, float max)
 {
     Q_UNUSED(min)
     Q_UNUSED(max)
@@ -1190,12 +1190,7 @@ Q3DAbstractAxis *Abstract3DController::createDefaultAxis(Q3DAbstractAxis::AxisOr
 Q3DValueAxis *Abstract3DController::createDefaultValueAxis()
 {
     // Default value axis has single segment, empty label format, and auto scaling
-    // TODO: Grid should be also hidden, but that is not currently controlled by axis
     Q3DValueAxis *defaultAxis = new Q3DValueAxis;
-    defaultAxis->setSegmentCount(1);
-    defaultAxis->setSubSegmentCount(1);
-    defaultAxis->setAutoAdjustRange(true);
-    defaultAxis->setLabelFormat(QString());
     defaultAxis->d_ptr->setDefaultAxis(true);
 
     return defaultAxis;
@@ -1204,9 +1199,7 @@ Q3DValueAxis *Abstract3DController::createDefaultValueAxis()
 Q3DCategoryAxis *Abstract3DController::createDefaultCategoryAxis()
 {
     // Default category axis has no labels
-    // TODO: Grid should be also hidden, but that is not currently controlled by axis.
     Q3DCategoryAxis *defaultAxis = new Q3DCategoryAxis;
-    defaultAxis->setAutoAdjustRange(true);
     defaultAxis->d_ptr->setDefaultAxis(true);
     return defaultAxis;
 }

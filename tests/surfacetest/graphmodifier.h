@@ -76,8 +76,8 @@ public slots:
     void timeout();
 
 private:
-    void resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX,
-                              qreal maxX);
+    void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
+                              float maxX);
 
     Q3DSurface *m_graph;
     QSlider *m_gridSliderX;
@@ -91,10 +91,10 @@ private:
     int m_zCount;
     int m_activeSample;
     int m_fontSize;
-    qreal m_rangeX;
-    qreal m_rangeZ;
-    qreal m_minX;
-    qreal m_minZ;
+    float m_rangeX;
+    float m_rangeZ;
+    float m_minX;
+    float m_minZ;
     QTimer m_timer;
     QSurfaceDataArray *m_planeArray;
     QLabel *m_selectionInfoLabel;

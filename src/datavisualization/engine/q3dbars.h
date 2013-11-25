@@ -40,7 +40,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
+    Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
@@ -71,8 +71,8 @@ public:
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
 
-    void setBarThickness(qreal thicknessRatio);
-    qreal barThickness();
+    void setBarThickness(float thicknessRatio);
+    float barThickness();
 
     void setBarSpacing(QSizeF spacing);
     QSizeF barSpacing();
@@ -137,7 +137,7 @@ signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void labelStyleChanged(QDataVis::LabelStyle style);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void barThicknessChanged(qreal thicknessRatio);
+    void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);

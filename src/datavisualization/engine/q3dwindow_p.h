@@ -51,7 +51,7 @@ public:
     bool m_updatePending;
     QOpenGLContext *m_context;
     Abstract3DController *m_visualController;
-    qreal m_devicePixelRatio;
+    float m_devicePixelRatio;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

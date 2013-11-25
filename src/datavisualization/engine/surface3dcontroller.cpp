@@ -289,21 +289,11 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             // If the selected point is outside data window, or there is no selected point, disable slicing
             // TODO: (QTRD-2351) This logic doesn't match the renderer logic for non straight surfaces,
             // but that logic needs to change anyway, so this is good for now.
-            float axisMinX = float(m_axisX->min());
-            float axisMaxX = float(m_axisX->max());
-            float axisMinZ = float(m_axisZ->min());
-            float axisMaxZ = float(m_axisZ->max());
+            float axisMinX = m_axisX->min();
+            float axisMaxX = m_axisX->max();
+            float axisMinZ = m_axisZ->min();
+            float axisMaxZ = m_axisZ->max();
 
-            // Comparisons between float and double are not accurate, so fudge our comparison values
-            // a little to get all rows and columns into view that need to be visible.
-            // TODO: Probably unnecessary after QTRD-2622 done
-            const float fudgeFactor = 0.00001f;
-            float fudgedAxisXRange = (axisMaxX - axisMinX) * fudgeFactor;
-            float fudgedAxisZRange = (axisMaxZ - axisMinZ) * fudgeFactor;
-            axisMinX -= fudgedAxisXRange;
-            axisMinZ -= fudgedAxisZRange;
-            axisMaxX += fudgedAxisXRange;
-            axisMaxZ += fudgedAxisZRange;
             QSurfaceDataItem item = proxy->array()->at(pos.x())->at(pos.y());
             if (item.x() < axisMinX || item.x() > axisMaxX
                     || item.z() < axisMinZ || item.z() > axisMaxZ) {

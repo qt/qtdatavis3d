@@ -78,7 +78,7 @@ public:
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     bool m_isSecondarySubviewOnTop;
-    qreal m_devicePixelRatio;
+    float m_devicePixelRatio;
     Q3DCamera *m_camera;
     Q3DLight *m_light;
     bool m_isUnderSideCameraEnabled;

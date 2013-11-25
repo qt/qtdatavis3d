@@ -38,8 +38,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DAbstractAxis : public QObject
     Q_PROPERTY(QStringList labels READ labels NOTIFY labelsChanged)
     Q_PROPERTY(AxisOrientation orientation READ orientation)
     Q_PROPERTY(AxisType type READ type)
-    Q_PROPERTY(qreal min READ min WRITE setMin NOTIFY rangeChanged)
-    Q_PROPERTY(qreal max READ max WRITE setMax NOTIFY rangeChanged)
+    Q_PROPERTY(float min READ min WRITE setMin NOTIFY rangeChanged)
+    Q_PROPERTY(float max READ max WRITE setMax NOTIFY rangeChanged)
     Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
 
 public:
@@ -69,20 +69,20 @@ public:
     AxisOrientation orientation() const;
     AxisType type() const;
 
-    qreal min() const;
-    qreal max() const;
+    float min() const;
+    float max() const;
     bool isAutoAdjustRange() const;
 
     void setTitle(QString title);
-    void setRange(qreal min, qreal max);
-    void setMin(qreal min);
-    void setMax(qreal max);
+    void setRange(float min, float max);
+    void setMin(float min);
+    void setMax(float max);
     void setAutoAdjustRange(bool autoAdjust);
 
 signals:
     void titleChanged(QString newTitle);
     void labelsChanged();
-    void rangeChanged(qreal min, qreal max);
+    void rangeChanged(float min, float max);
     void autoAdjustRangeChanged(bool autoAdjust);
 
 protected:

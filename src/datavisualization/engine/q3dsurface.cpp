@@ -498,6 +498,7 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
 /*!
  * Modifies the current surface gradient. Sets gradient color to \a color at \a pos.
  */
+// TODO: Surface gradient should use base color of series
 void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
 {
     d_ptr->m_shared->setGradientColorAt(pos, color);
