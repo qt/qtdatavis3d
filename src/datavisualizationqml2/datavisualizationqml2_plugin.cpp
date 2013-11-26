@@ -52,10 +52,6 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QSurface3DSeries>(uri, 1, 0, "QSurface3DSeries",
                                                  QLatin1String("Trying to create uncreatable: QSurface3DSeries, use Surface3DSeries instead."));
 
-    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
-    qmlRegisterType<QItemModelSurfaceDataMapping>(uri, 1, 0, "SurfaceDataMapping");
-
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
     qmlRegisterType<DeclarativeSurface>(uri, 1, 0, "Surface3D");

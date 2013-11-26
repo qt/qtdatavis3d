@@ -23,9 +23,6 @@
 #include "declarativebars_p.h"
 #include "declarativescatter_p.h"
 #include "declarativesurface_p.h"
-#include "qitemmodelbardatamapping.h"
-#include "qitemmodelscatterdatamapping.h"
-#include "qitemmodelsurfacedatamapping.h"
 #include "qitemmodelbardataproxy.h"
 #include "qitemmodelscatterdataproxy.h"
 #include "qitemmodelsurfacedataproxy.h"
@@ -50,10 +47,6 @@ QML_DECLARE_TYPE(AbstractDeclarative)
 QML_DECLARE_TYPE(DeclarativeBars)
 QML_DECLARE_TYPE(DeclarativeScatter)
 QML_DECLARE_TYPE(DeclarativeSurface)
-
-QML_DECLARE_TYPE(QItemModelBarDataMapping)
-QML_DECLARE_TYPE(QItemModelScatterDataMapping)
-QML_DECLARE_TYPE(QItemModelSurfaceDataMapping)
 
 QML_DECLARE_TYPE(const QAbstractItemModel)
 QML_DECLARE_TYPE(QDataVis)

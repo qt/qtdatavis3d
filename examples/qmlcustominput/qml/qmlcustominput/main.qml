@@ -51,8 +51,10 @@ Item {
                 itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
 
                 ItemModelScatterDataProxy {
-                    activeMapping: graphData.mapping
                     itemModel: graphData.model
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
                 }
             }
         }

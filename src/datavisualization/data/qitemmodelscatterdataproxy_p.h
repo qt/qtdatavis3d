@@ -31,8 +31,6 @@
 
 #include "qitemmodelscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
-#include <QPointer>
-#include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -49,7 +47,11 @@ private:
     QItemModelScatterDataProxy *qptr();
 
     ScatterItemModelHandler *m_itemModelHandler;
+    QString m_xPosRole;
+    QString m_yPosRole;
+    QString m_zPosRole;
 
+    friend class ScatterItemModelHandler;
     friend class QItemModelScatterDataProxy;
 };
 

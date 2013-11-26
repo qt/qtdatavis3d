@@ -8,8 +8,6 @@ HEADERS += \
     $$PWD/barrenderitem_p.h \
     $$PWD/qbardataitem.h \
     $$PWD/qbardataitem_p.h \
-    $$PWD/qitemmodelbardatamapping.h \
-    $$PWD/qitemmodelbardatamapping_p.h \
     $$PWD/qitemmodelbardataproxy_p.h \
     $$PWD/qitemmodelbardataproxy.h \
     $$PWD/scatterrenderitem_p.h \
@@ -17,21 +15,15 @@ HEADERS += \
     $$PWD/qscatterdataitem_p.h \
     $$PWD/qscatterdataproxy.h \
     $$PWD/qscatterdataproxy_p.h \
-    $$PWD/qitemmodelscatterdatamapping.h \
-    $$PWD/qitemmodelscatterdatamapping_p.h \
     $$PWD/qitemmodelscatterdataproxy.h \
     $$PWD/qitemmodelscatterdataproxy_p.h \
     $$PWD/abstractitemmodelhandler_p.h \
     $$PWD/baritemmodelhandler_p.h \
-    $$PWD/qabstractdatamapping.h \
-    $$PWD/qabstractdatamapping_p.h \
     $$PWD/scatteritemmodelhandler_p.h \
     $$PWD/qsurfacedataproxy.h \
     $$PWD/qsurfacedataproxy_p.h \
     $$PWD/qheightmapsurfacedataproxy.h \
     $$PWD/qheightmapsurfacedataproxy_p.h \
-    $$PWD/qitemmodelsurfacedatamapping.h \
-    $$PWD/qitemmodelsurfacedatamapping_p.h \
     $$PWD/qitemmodelsurfacedataproxy.h \
     $$PWD/qitemmodelsurfacedataproxy_p.h \
     $$PWD/surfaceitemmodelhandler_p.h \
@@ -53,20 +45,16 @@ SOURCES += \
     $$PWD/abstractrenderitem.cpp \
     $$PWD/barrenderitem.cpp \
     $$PWD/qbardataitem.cpp \
-    $$PWD/qitemmodelbardatamapping.cpp \
     $$PWD/qitemmodelbardataproxy.cpp \
     $$PWD/scatterrenderitem.cpp \
     $$PWD/qscatterdataitem.cpp \
     $$PWD/qscatterdataproxy.cpp \
-    $$PWD/qitemmodelscatterdatamapping.cpp \
     $$PWD/qitemmodelscatterdataproxy.cpp \
     $$PWD/abstractitemmodelhandler.cpp \
     $$PWD/baritemmodelhandler.cpp \
-    $$PWD/qabstractdatamapping.cpp \
     $$PWD/scatteritemmodelhandler.cpp \
     $$PWD/qsurfacedataproxy.cpp \
     $$PWD/qheightmapsurfacedataproxy.cpp \
-    $$PWD/qitemmodelsurfacedatamapping.cpp \
     $$PWD/qitemmodelsurfacedataproxy.cpp \
     $$PWD/surfaceitemmodelhandler.cpp \
     $$PWD/qsurfacedataitem.cpp \

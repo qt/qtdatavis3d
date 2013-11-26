@@ -24,17 +24,27 @@ import QtDataVisualization 1.0
 Bars3D {
     rows: 4
     columns: 4
-    dataProxy: barProxy // an ItemModelBarDataProxy
     barSpacing: Qt.size(0.5, 0.5)
     barSpacingRelative: false
-    itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+    Bar3DSeries {
+        itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+
+        ItemModelBarDataProxy {
+            itemModel: model // E.g. a list model defined elsewhere containing monthly expenses data.
+            // Mapping model roles to bar series rows, columns, and values.
+            rowRole: "year"
+            columnRole: "city"
+            valueRole: "expenses"
+            rowCategories: ["2010", "2011", "2012", "2013"]
+            columnCategories: ["Oulu", "Rauma", "Helsinki", "Tampere"]
+        }
+    }
 }
 //! [1]
 
 //! [2]
 Scatter3D {
-    dataProxy: scatterProxy // an ItemModelScatterDataProxy
-    itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
     axisX.segmentCount: 2
     axisX.subSegmentCount: 2
     axisX.labelFormat: "%.2f"
@@ -44,12 +54,23 @@ Scatter3D {
     axisY.segmentCount: 3
     axisY.subSegmentCount: 2
     axisY.labelFormat: "%.2f"
+
+    Scatter3DSeries {
+        itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+
+        ItemModelScatterDataProxy {
+            itemModel: model // E.g. a list model defined elsewhere containing point coordinates.
+            // Mapping model roles to scatter series item coordinates.
+            xPosRole: "xPos"
+            yPosRole: "yPos"
+            zPosRole: "zPos"
+        }
+    }
 }
 //! [2]
 
 //! [3]
 Surface3D {
-    dataProxy: surfaceProxy // an ItemModelSurfaceDataProxy
     axisX.min: 0.0
     axisX.max: 10.0
     axisZ.min: 0.0
@@ -64,58 +85,47 @@ Surface3D {
     axisZ.labelFormat: "%i"
     axisY.segmentCount: 5
     axisY.labelFormat: "%.1f"
+
+    Surface3DSeries {
+        ItemModelSurfaceDataProxy {
+            itemModel: model // E.g. a list model defined elsewhere containing population data.
+            // Mapping model roles to surface series rows, columns, and values.
+            rowRole: "longitude"
+            columnRole: "latitude"
+            valueRole: "pop_density"
+        }
+    }
 }
 //! [3]
 
-//! [4]
-BarDataMapping {
-    id: barMapping
+//! [7]
+ItemModelBarDataProxy {
+    itemModel: model // E.g. a list model defined elsewhere containing monthly expenses data.
+    // Mapping model roles to bar series rows, columns, and values.
     rowRole: "year"
     columnRole: "city"
     valueRole: "expenses"
     rowCategories: ["2010", "2011", "2012", "2013"]
     columnCategories: ["Oulu", "Rauma", "Helsinki", "Tampere"]
 }
-//! [4]
-
-//! [5]
-ScatterDataMapping {
-    id: scatterMapping
-    xPosRole: "xPos"
-    yPosRole: "yPos"
-    zPosRole: "zPos"
-}
-//! [5]
-
-//! [6]
-SurfaceDataMapping {
-    id: surfaceMapping
-    rowRole: "latitude"
-    columnRole: "longitude"
-    valueRole: "population"
-}
-//! [6]
-
-//! [7]
-ItemModelBarDataProxy {
-    id: barProxy
-    activeMapping: barMapping       // a BarDataMapping
-    itemModel: dataModel            // a ListModel
-}
 //! [7]
 
 //! [8]
 ItemModelScatterDataProxy {
-    id: scatterProxy
-    activeMapping: scatterMapping   // a ScatterDataMapping
-    itemModel: dataModel            // a ListModel
+    itemModel: model // E.g. a list model defined elsewhere containing point coordinates.
+    // Mapping model roles to scatter series item coordinates.
+    xPosRole: "xPos"
+    yPosRole: "yPos"
+    zPosRole: "zPos"
 }
 //! [8]
 
 //! [9]
 ItemModelSurfaceDataProxy {
-    id: surfaceProxy
-    activeMapping: surfaceMapping   // a SurfaceDataMapping
-    itemModel: dataModel            // a ListModel
+    itemModel: model // E.g. a list model defined elsewhere containing population data.
+    // Mapping model roles to surface series rows, columns, and values.
+    rowRole: "longitude"
+    columnRole: "latitude"
+    valueRole: "pop_density"
 }
 //! [9]

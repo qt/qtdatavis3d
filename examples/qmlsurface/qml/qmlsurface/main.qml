@@ -74,8 +74,10 @@ Item {
                 id: surfaceSeries
 
                 ItemModelSurfaceDataProxy {
-                    activeMapping: surfaceData.mapping
                     itemModel: surfaceData.model
+                    rowRole: "longitude"
+                    columnRole: "latitude"
+                    valueRole: "height"
                 }
             }
 

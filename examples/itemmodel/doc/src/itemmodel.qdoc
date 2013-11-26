@@ -27,7 +27,7 @@
 
     \list
         \li How to create an application with Q3DBars and widgets
-        \li How to use QItemModelBarDataMapping and QItemModelBarDataProxy to set data to the graph
+        \li How to use QItemModelBarDataProxy to set data to the graph
         \li How to use a table widget to modify the data in the graph
     \endlist
 
@@ -52,15 +52,13 @@
     The table widget is going to be used to display the numerical data being inserted into the
     graph, and to modify it (See \l {Adding data to the graph} and \l {Interacting with the data}).
 
-    We need to instantiate QItemModelBarDataMapping and QItemModelBarDataProxy and give them to the
-    graph:
+    We need to instantiate QItemModelBarDataProxy and give it to the graph:
 
     \snippet ../examples/itemmodel/main.cpp 2
 
-    Here we tell the mapping object to directly map the model's rows and columns into the proxy's rows and
+    Here we tell the proxy to directly map the model's rows and columns into the proxy's rows and
     columns instead of defining row and column roles to map for them. Then we give the model from
-    the table widget and the mapping object to the proxy. Finally we set the proxy as the active
-    data proxy for the graph.
+    the table widget to the proxy. Finally we set the proxy to a series and add it to the graph.
 
     Next, let's create another class to handle the data addition and other interaction with the
     graph. Let's call it GraphDataGenerator (See \l {Setting up the graph} and
@@ -149,11 +147,10 @@
 
     \snippet ../examples/itemmodel/main.cpp 2
 
-    We created QItemModelBarDataMapping and QItemModelBarDataProxy instances, and gave the proxy
-    the model of the table widget and the model mapping we just created. Then we set the proxy as
-    the active proxy for the graph. The proxy maps the rows and the columns in the model of the table
-    widget into rows and columns for itself using the model mapping, and the graph gets the data
-    to be displayed from its active proxy.
+    We created QItemModelBarDataProxy instance, and gave the proxy the model of the table widget
+    we just created. The proxy maps the rows and the columns in the model of the table widget into
+    rows and columns for itself directly, as we set the useModelCategories property to true, and
+    the graph gets the data to be displayed via the series that owns the proxy.
 
     \section1 Interacting with the data
 

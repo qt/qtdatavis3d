@@ -21,15 +21,7 @@ import QtDataVisualization 1.0
 import QtQuick.XmlListModel 2.0
 
 Item {
-    property alias mapping: scatterMapping
     property alias model: dataModel
-
-    ScatterDataMapping {
-        id: scatterMapping
-        xPosRole: "xPos"
-        yPosRole: "yPos"
-        zPosRole: "zPos"
-    }
 
     ListModel {
         id: dataModel

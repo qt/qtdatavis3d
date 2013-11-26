@@ -20,17 +20,7 @@ import QtQuick 2.1
 import QtDataVisualization 1.0
 
 Item {
-    property alias mapping: surfaceMapping
     property alias model: dataModel
-
-    //! [2]
-    SurfaceDataMapping {
-        id: surfaceMapping
-        rowRole: "longitude"
-        columnRole: "latitude"
-        valueRole: "height"
-    }
-    //! [2]
 
     //! [1]
     ListModel {

@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "baritemmodelhandler_p.h"
-#include "qitemmodelbardatamapping_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -36,14 +35,13 @@ BarItemModelHandler::~BarItemModelHandler()
 // Resolve entire item model into QBarDataArray.
 void BarItemModelHandler::resolveModel()
 {
-    QItemModelBarDataMapping *mapping = static_cast<QItemModelBarDataMapping *>(m_activeMapping);
-    if (m_itemModel.isNull() || !mapping) {
+    if (m_itemModel.isNull()) {
         m_proxy->resetArray(0);
         return;
     }
 
-    if (!mapping->useModelCategories()
-            && (mapping->rowRole().isEmpty() || mapping->columnRole().isEmpty())) {
+    if (!m_proxy->useModelCategories()
+            && (m_proxy->rowRole().isEmpty() || m_proxy->columnRole().isEmpty())) {
         m_proxy->resetArray(0);
         return;
     }
@@ -54,11 +52,11 @@ void BarItemModelHandler::resolveModel()
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
-    int valueRole = roleHash.key(mapping->valueRole().toLatin1(), Qt::DisplayRole);
+    int valueRole = roleHash.key(m_proxy->valueRole().toLatin1(), Qt::DisplayRole);
     int rowCount = m_itemModel->rowCount();
     int columnCount = m_itemModel->columnCount();
 
-    if (mapping->useModelCategories()) {
+    if (m_proxy->useModelCategories()) {
         // If dimensions have changed, recreate the array
         if (m_proxyArray != m_proxy->array() || columnCount != m_columnCount
                 || rowCount != m_proxyArray->size()) {
@@ -79,11 +77,11 @@ void BarItemModelHandler::resolveModel()
             columnLabels << m_itemModel->headerData(i, Qt::Horizontal).toString();
         m_columnCount = columnCount;
     } else {
-        int rowRole = roleHash.key(mapping->rowRole().toLatin1());
-        int columnRole = roleHash.key(mapping->columnRole().toLatin1());
+        int rowRole = roleHash.key(m_proxy->rowRole().toLatin1());
+        int columnRole = roleHash.key(m_proxy->columnRole().toLatin1());
 
-        bool generateRows = mapping->autoRowCategories();
-        bool generateColumns = mapping->autoColumnCategories();
+        bool generateRows = m_proxy->autoRowCategories();
+        bool generateColumns = m_proxy->autoColumnCategories();
         QStringList rowList;
         QStringList columnList;
         // For detecting duplicates in categories generation, using QHashes should be faster than
@@ -112,14 +110,14 @@ void BarItemModelHandler::resolveModel()
         }
 
         if (generateRows)
-            mapping->dptr()->m_rowCategories = rowList;
+            m_proxy->dptr()->m_rowCategories = rowList;
         else
-            rowList = mapping->rowCategories();
+            rowList = m_proxy->rowCategories();
 
         if (generateColumns)
-            mapping->dptr()->m_columnCategories = columnList;
+            m_proxy->dptr()->m_columnCategories = columnList;
         else
-            columnList = mapping->columnCategories();
+            columnList = m_proxy->columnCategories();
 
         // If dimensions have changed, recreate the array
         if (m_proxyArray != m_proxy->array() || columnList.size() != m_columnCount

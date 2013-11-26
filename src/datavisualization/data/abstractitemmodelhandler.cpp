@@ -17,14 +17,12 @@
 ****************************************************************************/
 
 #include "abstractitemmodelhandler_p.h"
-#include "qabstractdatamapping.h"
 #include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AbstractItemModelHandler::AbstractItemModelHandler(QObject *parent)
     : QObject(parent),
-      m_activeMapping(0),
       resolvePending(0)
 {
     m_resolveTimer.setSingleShot(true);
@@ -38,91 +36,42 @@ AbstractItemModelHandler::~AbstractItemModelHandler()
 
 void AbstractItemModelHandler::setItemModel(const QAbstractItemModel *itemModel)
 {
-    if (!m_itemModel.isNull())
-        QObject::disconnect(m_itemModel, 0, this, 0);
+    if (itemModel != m_itemModel.data()) {
+        if (!m_itemModel.isNull())
+            QObject::disconnect(m_itemModel, 0, this, 0);
 
-    m_itemModel = itemModel;
+        m_itemModel = itemModel;
 
-    if (!m_itemModel.isNull()) {
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsInserted,
-                         this, &AbstractItemModelHandler::handleColumnsInserted);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsMoved,
-                         this, &AbstractItemModelHandler::handleColumnsMoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsRemoved,
-                         this, &AbstractItemModelHandler::handleColumnsRemoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::dataChanged,
-                         this, &AbstractItemModelHandler::handleDataChanged);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::layoutChanged,
-                         this, &AbstractItemModelHandler::handleLayoutChanged);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::modelReset,
-                         this, &AbstractItemModelHandler::handleModelReset);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsInserted,
-                         this, &AbstractItemModelHandler::handleRowsInserted);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsMoved,
-                         this, &AbstractItemModelHandler::handleRowsMoved);
-        QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsRemoved,
-                         this, &AbstractItemModelHandler::handleRowsRemoved);
+        if (!m_itemModel.isNull()) {
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsInserted,
+                             this, &AbstractItemModelHandler::handleColumnsInserted);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsMoved,
+                             this, &AbstractItemModelHandler::handleColumnsMoved);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::columnsRemoved,
+                             this, &AbstractItemModelHandler::handleColumnsRemoved);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::dataChanged,
+                             this, &AbstractItemModelHandler::handleDataChanged);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::layoutChanged,
+                             this, &AbstractItemModelHandler::handleLayoutChanged);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::modelReset,
+                             this, &AbstractItemModelHandler::handleModelReset);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsInserted,
+                             this, &AbstractItemModelHandler::handleRowsInserted);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsMoved,
+                             this, &AbstractItemModelHandler::handleRowsMoved);
+            QObject::connect(m_itemModel.data(), &QAbstractItemModel::rowsRemoved,
+                             this, &AbstractItemModelHandler::handleRowsRemoved);
+        }
+        if (!m_resolveTimer.isActive())
+            m_resolveTimer.start(0);
+
+        emit itemModelChanged(itemModel);
     }
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0);
 }
 
 const QAbstractItemModel *AbstractItemModelHandler::itemModel() const
 {
     return m_itemModel.data();
-}
-
-void AbstractItemModelHandler::setActiveMapping(QAbstractDataMapping *mapping)
-{
-    if (m_activeMapping)
-        QObject::disconnect(m_activeMapping, 0, this, 0);
-
-    if (mapping)
-        addMapping(mapping);
-
-    m_activeMapping = mapping;
-
-    if (m_activeMapping) {
-        QObject::connect(m_activeMapping, &QAbstractDataMapping::mappingChanged,
-                         this, &AbstractItemModelHandler::handleMappingChanged);
-    }
-
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0);
-}
-
-QAbstractDataMapping *AbstractItemModelHandler::activeMapping() const
-{
-    return m_activeMapping;
-}
-
-void AbstractItemModelHandler::addMapping(QAbstractDataMapping *mapping)
-{
-    Q_ASSERT(mapping);
-    AbstractItemModelHandler *owner = qobject_cast<AbstractItemModelHandler *>(mapping->parent());
-    if (owner != this) {
-        Q_ASSERT_X(!owner, "addMapping", "Mapping already attached to a proxy.");
-        mapping->setParent(this);
-    }
-    if (!m_mappings.contains(mapping))
-        m_mappings.append(mapping);
-}
-
-void AbstractItemModelHandler::releaseMapping(QAbstractDataMapping *mapping)
-{
-    if (mapping && m_mappings.contains(mapping)) {
-        // If the mapping is in use, clear the existing mapping
-        if (m_activeMapping == mapping)
-            setActiveMapping(0);
-
-        m_mappings.removeAll(mapping);
-        mapping->setParent(0);
-    }
-}
-
-QList<QAbstractDataMapping *> AbstractItemModelHandler::mappings() const
-{
-    return m_mappings;
 }
 
 void AbstractItemModelHandler::handleColumnsInserted(const QModelIndex &parent,

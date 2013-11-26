@@ -30,7 +30,7 @@
 #define BARITEMMODELHANDLER_P_H
 
 #include "abstractitemmodelhandler_p.h"
-#include "qitemmodelbardataproxy.h"
+#include "qitemmodelbardataproxy_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

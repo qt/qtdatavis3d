@@ -47,36 +47,32 @@ QStringList months;
 years << "2006" << "2007" << "2008" << "2009" << "2010" << "2011" << "2012";
 months << "jan" << "feb" << "mar" << "apr" << "may" << "jun" << "jul" << "aug" << "sep" << "oct" << "nov" << "dec";
 
-QItemModelBarDataMapping *mapping = new QItemModelBarDataMapping(QStringLiteral("year"), // Row role
-                                                                 QStringLiteral("month"), // Column role
-                                                                 QStringLiteral("income"), // Value role
-                                                                 years, // Row categories
-                                                                 months); // Column categories
-
-QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(customModel, mapping);
+QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(customModel,
+                                                           QStringLiteral("year"), // Row role
+                                                           QStringLiteral("month"), // Column role
+                                                           QStringLiteral("income"), // Value role
+                                                           years, // Row categories
+                                                           months); // Column categories
 
 //...
 
-// To display different data later, you can simply change the mapping of the current
-// mapping object, or set another mapping object.
-proxy->activeMapping()->setValueRole(QStringLiteral("expenses"));
+// To display different data later, you can simply change the mapping.
+proxy->setValueRole(QStringLiteral("expenses"));
 //! [3]
 
 //! [4]
 // Map "density" value to X-axis, "hardness" to Y-axis and "conductivity" to Z-axis.
-QItemModelScatterDataMapping *mapping = new QItemModelScatterDataMapping(QStringLiteral("density"),
-                                                                         QStringLiteral("hardness"),
-                                                                         QStringLiteral("conductivity"))
-
-QItemModelScatterDataProxy *proxy = new QItemModelScatterDataProxy(customModel, mapping);
+QItemModelScatterDataProxy *proxy = new QItemModelScatterDataProxy(customModel,
+                                                                   QStringLiteral("density"),
+                                                                   QStringLiteral("hardness"),
+                                                                   QStringLiteral("conductivity"));
 //! [4]
 
 //! [5]
-QItemModelSurfaceDataMapping *mapping = new QItemModelSurfaceDataMapping(QStringLiteral("longitude"), // Row role
-                                                                         QStringLiteral("latitude"), // Column role
-                                                                         QStringLiteral("height")); // value role
-
-QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel, mapping);
+QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel,
+                                                                   QStringLiteral("longitude"), // Row role
+                                                                   QStringLiteral("latitude"), // Column role
+                                                                   QStringLiteral("height")); // value role
 //! [5]
 
 //! [6]

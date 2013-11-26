@@ -63,7 +63,7 @@
     In the \c main.qml, we set up the graph and various UI elements. There are three interesting
     mapping related code blocks we want to highlight here. The first one shows how to change the
     visualized data from expenses to income, and vice versa, by simply changing the value role on the
-    BarDataMapping item:
+    ItemModelBarDataProxy item:
 
     \snippet ../examples/qmlbars/qml/qmlbars/main.qml 0
 
@@ -74,11 +74,11 @@
 
     \snippet ../examples/qmlbars/qml/qmlbars/main.qml 1
 
-    The filtering is done by setting \c autoRowCategories to false on the BarDataMapping item and defining
+    The filtering is done by setting \c autoRowCategories to false on the ItemModelBarDataProxy item and defining
     the row categories explicitly. This way, only the items in specified rows are visualized.
 
     The third interesting block shows how to get the row and column index of an item if you know the
-    row and column values by using BarDataMapping methods \c rowCategoryIndex() and \c columnCategoryIndex():
+    row and column values by using ItemModelBarDataProxy methods \c rowCategoryIndex() and \c columnCategoryIndex():
 
     \snippet ../examples/qmlbars/qml/qmlbars/main.qml 2
 */

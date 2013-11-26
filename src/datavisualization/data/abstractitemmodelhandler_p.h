@@ -36,8 +36,6 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class QAbstractDataMapping;
-
 class AbstractItemModelHandler : public QObject
 {
     Q_OBJECT
@@ -47,11 +45,6 @@ public:
 
     virtual void setItemModel(const QAbstractItemModel *itemModel);
     virtual const QAbstractItemModel *itemModel() const;
-    virtual void setActiveMapping(QAbstractDataMapping *mapping);
-    virtual QAbstractDataMapping *activeMapping() const;
-    virtual void addMapping(QAbstractDataMapping *mapping);
-    virtual void releaseMapping(QAbstractDataMapping *mapping);
-    virtual QList<QAbstractDataMapping *> mappings() const;
 
 public slots:
     virtual void handleColumnsInserted(const QModelIndex &parent, int start, int end);
@@ -72,14 +65,15 @@ public slots:
     virtual void handleMappingChanged();
     virtual void handlePendingResolve();
 
+signals:
+    void itemModelChanged(const QAbstractItemModel *itemModel);
+
 protected:
     virtual void resolveModel() = 0;
 
     QPointer<const QAbstractItemModel> m_itemModel;  // Not owned
-    QAbstractDataMapping *m_activeMapping;
     bool resolvePending;
     QTimer m_resolveTimer;
-    QList<QAbstractDataMapping *> m_mappings;
 
 private:
     Q_DISABLE_COPY(AbstractItemModelHandler)

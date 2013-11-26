@@ -30,7 +30,7 @@
 #define SURFACEITEMMODELHANDLER_P_H
 
 #include "abstractitemmodelhandler_p.h"
-#include "qitemmodelsurfacedataproxy.h"
+#include "qitemmodelsurfacedataproxy_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

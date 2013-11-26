@@ -266,10 +266,9 @@ int main(int argc, char **argv)
 
     //! [2]
     // Since we are dealing with QTableWidget, the model will already have data sorted properly
-    // in rows and columns, so create a mapping to utilize this.
-    QItemModelBarDataMapping *mapping = new QItemModelBarDataMapping;
-    mapping->setUseModelCategories(true);
-    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), mapping);
+    // in rows and columns, so we simply set useModelCategories property to true to utilize this.
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model());
+    proxy->setUseModelCategories(true);
     QBar3DSeries *series = new QBar3DSeries(proxy);
     graph->addSeries(series);
     //! [2]

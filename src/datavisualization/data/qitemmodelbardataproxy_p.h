@@ -31,8 +31,6 @@
 
 #include "qitemmodelbardataproxy.h"
 #include "qbardataproxy_p.h"
-#include <QPointer>
-#include <QTimer>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -50,6 +48,19 @@ private:
 
     BarItemModelHandler *m_itemModelHandler;
 
+    QString m_rowRole;
+    QString m_columnRole;
+    QString m_valueRole;
+
+    // For row/column items, sort items into these categories. Other categories are ignored.
+    QStringList m_rowCategories;
+    QStringList m_columnCategories;
+
+    bool m_useModelCategories;
+    bool m_autoRowCategories;
+    bool m_autoColumnCategories;
+
+    friend class BarItemModelHandler;
     friend class QItemModelBarDataProxy;
 };
 

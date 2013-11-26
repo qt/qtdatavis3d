@@ -94,8 +94,10 @@ Item {
 
                 ItemModelBarDataProxy {
                     id: modelProxy
-                    activeMapping: graphData.mapping
                     itemModel: graphData.model
+                    rowRole: "year"
+                    columnRole: "month"
+                    valueRole: "income"
                 }
 
                 onSelectedBarChanged: handleSelectionChange(barSeries, position)
@@ -108,8 +110,10 @@ Item {
 
                 ItemModelBarDataProxy {
                     id: secondaryProxy
-                    activeMapping: graphData.secondaryMapping
                     itemModel: graphData.model
+                    rowRole: "year"
+                    columnRole: "month"
+                    valueRole: "expenses"
                 }
 
                 onSelectedBarChanged: handleSelectionChange(secondarySeries, position)
@@ -170,16 +174,16 @@ Item {
         onClicked: {
             if (testGraph.rowAxis.max !== 6) {
                 text = "Show 2010 - 2012"
-                graphData.mapping.autoRowCategories = true
-                graphData.secondaryMapping.autoRowCategories = true
+                modelProxy.autoRowCategories = true
+                secondaryProxy.autoRowCategories = true
             } else {
                 text = "Show all years"
                 // Explicitly defining row categories, since we do not want to show data for
                 // all years in the model, just for the selected ones.
-                graphData.mapping.autoRowCategories = false
-                graphData.secondaryMapping.autoRowCategories = false
-                graphData.mapping.rowCategories = ["2010", "2011", "2012"]
-                graphData.secondaryMapping.rowCategories = ["2010", "2011", "2012"]
+                modelProxy.autoRowCategories = false
+                secondaryProxy.autoRowCategories = false
+                modelProxy.rowCategories = ["2010", "2011", "2012"]
+                secondaryProxy.rowCategories = ["2010", "2011", "2012"]
             }
         }
         //! [1]
@@ -199,8 +203,8 @@ Item {
 
         //! [2]
         onCurrentRowChanged: {
-            var rowIndex = modelProxy.activeMapping.rowCategoryIndex(graphData.model.get(currentRow).year)
-            var colIndex = modelProxy.activeMapping.columnCategoryIndex(graphData.model.get(currentRow).month)
+            var rowIndex = modelProxy.rowCategoryIndex(graphData.model.get(currentRow).year)
+            var colIndex = modelProxy.columnCategoryIndex(graphData.model.get(currentRow).month)
             if (selectedSeries.visible)
                 mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
             else if (barSeries.visible)

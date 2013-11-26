@@ -118,12 +118,12 @@ Item {
         width: camControlArea.width
         text: "Show Income"
         onClicked: {
-            if (chartData.mapping.valueRole === "expenses") {
-                chartData.mapping.valueRole = "income"
+            if (chartData.proxy.valueRole === "expenses") {
+                chartData.proxy.valueRole = "income"
                 text = "Show Expenses"
                 testChart.valueAxis = chartAxes.income
             } else {
-                chartData.mapping.valueRole = "expenses"
+                chartData.proxy.valueRole = "expenses"
                 text = "Show Income"
                 testChart.valueAxis = chartAxes.expenses
             }
@@ -154,13 +154,13 @@ Item {
         onClicked: {
             if (testChart.rowAxis.max !== 6) {
                 text = "Show 2010 - 2012"
-                chartData.mapping.autoRowCategories = true
+                chartData.proxy.autoRowCategories = true
             } else {
                 text = "Show all years"
                 // Explicitly defining row categories, since we do not want to show data for
                 // all years in the model, just for the selected ones.
-                chartData.mapping.autoRowCategories = false
-                chartData.mapping.rowCategories = ["2010", "2011", "2012"]
+                chartData.proxy.autoRowCategories = false
+                chartData.proxy.rowCategories = ["2010", "2011", "2012"]
             }
         }
     }

@@ -21,18 +21,8 @@ import QtDataVisualization 1.0
 
 Item {
     //! [3]
-    property alias mapping: scatterMapping
     property alias model: dataModel
     //! [3]
-
-    //! [1]
-    ScatterDataMapping {
-        id: scatterMapping
-        xPosRole: "xPos"
-        yPosRole: "yPos"
-        zPosRole: "zPos"
-    }
-    //! [1]
 
     //! [0]
     ListModel {

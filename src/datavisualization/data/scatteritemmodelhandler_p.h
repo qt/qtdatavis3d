@@ -30,7 +30,7 @@
 #define SCATTERITEMMODELHANDLER_P_H
 
 #include "abstractitemmodelhandler_p.h"
-#include "qitemmodelscatterdataproxy.h"
+#include "qitemmodelscatterdataproxy_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

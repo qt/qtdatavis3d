@@ -21,24 +21,6 @@ import QtDataVisualization 1.0
 
 Item {
     property alias model: dataModel
-    property alias mapping: valueMapping
-    property alias secondaryMapping: secondaryMapping
-
-    //! [1]
-    BarDataMapping {
-        id: valueMapping
-        rowRole: "year"
-        columnRole: "month"
-        valueRole: "income"
-    }
-    //! [1]
-
-    BarDataMapping {
-        id: secondaryMapping
-        rowRole: "year"
-        columnRole: "month"
-        valueRole: "expenses"
-    }
 
     //! [0]
     ListModel {
