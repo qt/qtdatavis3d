@@ -105,58 +105,164 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
                                          m_vertices.at(j - m_columns),
                                          m_vertices.at(j + 1));
     }
-    int p = m_rows * colLimit;
-    m_normals[totalIndex++] = normal(m_vertices.at(p),
-                                     m_vertices.at(p - 1),
-                                     m_vertices.at(p - m_columns - 1));
+    m_normals[totalIndex++] = normal(m_vertices.at(totalLimit),
+                                     m_vertices.at(totalLimit - 1),
+                                     m_vertices.at(totalLimit - m_columns));
 
     // Create indices table
-    GLint *indices = 0;
-    if (changeGeometry) {
-        m_indexCount = 6 * colLimit * rowLimit;
-        indices = new GLint[m_indexCount];
-        p = 0;
-        for (int row = 0; row < rowLimit * m_columns; row += m_columns) {
-            for (int j = 0; j < colLimit; j++) {
-                // Left triangle
-                indices[p++] = row + j + 1;
-                indices[p++] = row + m_columns + j;
-                indices[p++] = row + j;
-
-                // Right triangle
-                indices[p++] = row + m_columns + j + 1;
-                indices[p++] = row + m_columns + j;
-                indices[p++] = row + j + 1;
-            }
-        }
-    }
+    if (changeGeometry)
+        createSmoothIndices(0, 0, colLimit, rowLimit);
 
     // Create line element indices
-    GLint *gridIndices = 0;
-    if (changeGeometry) {
-        m_gridIndexCount = 2 * m_columns * rowLimit + 2 * m_rows * colLimit;
-        gridIndices = new GLint[m_gridIndexCount];
-        p = 0;
-        for (int i = 0, row = 0; i < m_rows; i++, row += m_columns) {
-            for (int j = 0; j < colLimit; j++) {
-                gridIndices[p++] = row + j;
-                gridIndices[p++] = row + j + 1;
-            }
-        }
-        for (int i = 0, row = 0; i < rowLimit; i++, row += m_columns) {
-            for (int j = 0; j < m_columns; j++) {
-                gridIndices[p++] = row + j;
-                gridIndices[p++] = row + j + m_columns;
-            }
+    if (changeGeometry)
+        createSmoothGridlineIndices(0, 0, colLimit, rowLimit);
+
+    createBuffers(m_vertices, uvs, m_normals, 0, changeGeometry);
+}
+
+void SurfaceObject::updateSmoothRows(const QSurfaceDataArray &dataArray, int startRow,
+                                     int endRow, GLfloat yRange, GLfloat yMin)
+{
+    GLfloat xMin = dataArray.at(0)->at(0).x();
+    GLfloat zMin = dataArray.at(0)->at(0).z();
+    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
+    GLfloat yNormalizer = yRange / 2.0f;
+    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+
+    // Update vertices
+    int totalIndex = startRow * m_columns;
+    for (int i = startRow; i < endRow; i++) {
+        const QSurfaceDataRow &p = *dataArray.at(i);
+        for (int j = 0; j < m_columns; j++) {
+            const QSurfaceDataItem &data = p.at(j);
+            float normalizedX = ((data.x() - xMin) / xNormalizer);
+            float normalizedY = ((data.y() - yMin) / yNormalizer);
+            float normalizedZ = ((data.z() - zMin) / zNormalizer);
+            m_vertices[totalIndex++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
         }
     }
 
-    createBuffers(m_vertices, uvs, m_normals, indices, gridIndices, changeGeometry);
+    // Create normals
+    int colLimit = m_columns - 1;
+    int rowColLimit = endRow * m_columns;
+    if (endRow == m_rows)
+        rowColLimit = (endRow - 1) * m_columns;
+    int totalLimit = endRow * m_columns - 1;
 
-    delete[] indices;
-    delete[] gridIndices;
+    totalIndex = startRow * m_columns;
+    if (startRow > 0) {
+        // Change the normals for the previous row also
+        totalIndex -= m_columns;
+    }
+    if (totalIndex < (m_rows - 1) * m_columns) {
+        for (int row = totalIndex; row < rowColLimit; row += m_columns) {
+            for (int j = 0; j < colLimit; j++) {
+                // One right and one up
+                m_normals[totalIndex++] = normal(m_vertices.at(row + j),
+                                                 m_vertices.at(row + j + 1),
+                                                 m_vertices.at(row + m_columns + j));
+            }
+            int p = row + colLimit;
+            // One up and one left
+            m_normals[totalIndex++] = normal(m_vertices.at(p),
+                                             m_vertices.at(p + m_columns),
+                                             m_vertices.at(p - 1));
+        }
+    }
+    if (endRow == m_rows) {
+        // Top most line, nothing above, must have different handling.
+        // Take from one down and one right. Read till second-to-last
+        for (int j = rowColLimit; j < totalLimit; j++) {
+            m_normals[totalIndex++] = normal(m_vertices.at(j),
+                                             m_vertices.at(j - m_columns),
+                                             m_vertices.at(j + 1));
+        }
+
+        // Top left corner. Take from one left and one down
+        m_normals[totalIndex++] = normal(m_vertices.at(totalLimit),
+                                         m_vertices.at(totalLimit - 1),
+                                         m_vertices.at(totalLimit - m_columns));
+    }
+
+    QVector<QVector2D> uvs; // Empty dummy
+    createBuffers(m_vertices, uvs, m_normals, 0, false);
 }
 
+void SurfaceObject::createSmoothIndices(int x, int y, int endX, int endY)
+{
+    if (endX >= m_columns)
+        endX = m_columns - 1;
+    if (endY >= m_rows)
+        endY = m_rows - 1;
+    if (x > endX)
+        x = endX - 1;
+    if (y > endY)
+        y = endY - 1;
+
+    m_indexCount = 6 * (endX - x) * (endY - y);
+    GLint *indices = new GLint[m_indexCount];
+    int p = 0;
+    int rowEnd = endY * m_columns;
+    for (int row = y * m_columns; row < rowEnd; row += m_columns) {
+        for (int j = x; j < endX; j++) {
+            // Left triangle
+            indices[p++] = row + j + 1;
+            indices[p++] = row + m_columns + j;
+            indices[p++] = row + j;
+
+            // Right triangle
+            indices[p++] = row + m_columns + j + 1;
+            indices[p++] = row + m_columns + j;
+            indices[p++] = row + j + 1;
+        }
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
+                 indices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    delete[] indices;
+}
+
+void SurfaceObject::createSmoothGridlineIndices(int x, int y, int endX, int endY)
+{
+    if (endX >= m_columns)
+        endX = m_columns - 1;
+    if (endY >= m_rows)
+        endY = m_rows - 1;
+    if (x > endX)
+        x = endX - 1;
+    if (y > endY)
+        y = endY - 1;
+
+    int nColumns = endX - x + 1;
+    int nRows = endY - y + 1;
+    m_gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
+    GLint *gridIndices = new GLint[m_gridIndexCount];
+    int p = 0;
+    for (int i = y, row = m_columns * y; i <= endY; i++, row += m_columns) {
+        for (int j = x; j < endX; j++) {
+            gridIndices[p++] = row + j;
+            gridIndices[p++] = row + j + 1;
+        }
+    }
+    for (int i = y, row = m_columns * y; i < endY; i++, row += m_columns) {
+        for (int j = x; j <= endX; j++) {
+            gridIndices[p++] = row + j;
+            gridIndices[p++] = row + j + m_columns;
+        }
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLint),
+                 gridIndices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    delete[] gridIndices;
+}
 
 void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
                               GLfloat yRange, GLfloat yMin, bool changeGeometry)
@@ -250,38 +356,164 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     }
 
     // Create grid line element indices
-    GLint *gridIndices = 0;
-    if (changeGeometry) {
-        m_gridIndexCount = 2 * m_columns * rowLimit + 2 * m_rows * colLimit;
-        gridIndices = new GLint[m_gridIndexCount];
-        p = 0;
-        int fullRowLimit = m_rows * doubleColumns;
-        for (int row = 0; row < fullRowLimit; row += doubleColumns) {
-            for (int j = 0; j < doubleColumns; j += 2) {
-                gridIndices[p++] = row + j;
-                gridIndices[p++] = row + j + 1;
+    if (changeGeometry)
+        createCoarseGridlineIndices(0, 0, colLimit, rowLimit);
 
-                if (row < rowColLimit) {
-                    gridIndices[p++] = row + j;
-                    gridIndices[p++] = row + j + doubleColumns;
-                }
+    createBuffers(m_vertices, uvs, m_normals, indices, changeGeometry);
+
+    delete[] indices;
+}
+
+void SurfaceObject::updateCoarseRows(const QSurfaceDataArray &dataArray, int startRow,
+                                     int endRow, GLfloat yRange, GLfloat yMin)
+{
+    GLfloat xMin = dataArray.at(0)->at(0).x();
+    GLfloat zMin = dataArray.at(0)->at(0).z();
+    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
+    GLfloat yNormalizer = yRange / 2.0f;
+    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+
+    int colLimit = m_columns - 1;
+    int doubleColumns = m_columns * 2 - 2;
+    int totalIndex = startRow * doubleColumns;
+
+    for (int i = startRow; i < endRow; i++) {
+        const QSurfaceDataRow &row = *dataArray.at(i);
+        for (int j = 0; j < m_columns; j++) {
+            const QSurfaceDataItem &data = row.at(j);
+            float normalizedX = ((data.x() - xMin) / xNormalizer);
+            float normalizedY = ((data.y() - yMin) / yNormalizer);
+            float normalizedZ = ((data.z() - zMin) / zNormalizer);
+            m_vertices[totalIndex++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+
+            if (j > 0 && j < colLimit) {
+                m_vertices[totalIndex] = m_vertices[totalIndex - 1];
+                totalIndex++;
             }
-        }
-        for (int i = doubleColumns - 1; i < rowColLimit; i += doubleColumns) {
-            gridIndices[p++] = i;
-            gridIndices[p++] = i  + doubleColumns;
         }
     }
 
-    createBuffers(m_vertices, uvs, m_normals, indices, gridIndices, changeGeometry);
+    // Create normals
+    if (startRow > 0)
+        startRow--;
+    totalIndex = startRow * doubleColumns;
+    int rowColLimit = startRow * doubleColumns;
+    for (int row = totalIndex, upperRow = totalIndex + doubleColumns;
+         row <= rowColLimit;
+         row += doubleColumns, upperRow += doubleColumns) {
+        for (int j = 0; j < doubleColumns; j += 2) {
+            // Normal for the left triangle
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j),
+                                             m_vertices.at(row + j + 1),
+                                             m_vertices.at(upperRow + j));
+
+            // Normal for the right triangle
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j + 1),
+                                             m_vertices.at(upperRow + j + 1),
+                                             m_vertices.at(upperRow + j));
+        }
+    }
+
+    QVector<QVector2D> uvs; // Empty dummy
+    createBuffers(m_vertices, uvs, m_normals, 0, false);
+}
+
+void SurfaceObject::createCoarseIndices(int x, int y, int columns, int rows)
+{
+    if (columns > m_columns)
+        columns = m_columns;
+    if (rows > m_rows)
+        rows = m_rows;
+    if (x > columns)
+        x = columns - 1;
+    if (y > rows)
+        y = rows - 1;
+
+    int rowLimit = rows - 1;
+    int doubleColumns = m_columns * 2 - 2;
+    int doubleColumnsLimit = columns * 2 - 2;
+    int rowColLimit = rowLimit * doubleColumns;
+    m_indexCount = 6 * (columns - 1 - x) * (rowLimit - y);
+
+    int p = 0;
+    GLint *indices = new GLint[m_indexCount];
+    for (int row = y * doubleColumns, upperRow = (y + 1) * doubleColumns;
+         row < rowColLimit;
+         row += doubleColumns, upperRow += doubleColumns) {
+        for (int j = 2 * x; j < doubleColumnsLimit; j += 2) {
+            // Left triangle
+            indices[p++] = row + j + 1;
+            indices[p++] = upperRow + j;
+            indices[p++] = row + j;
+
+            // Right triangle
+            indices[p++] = upperRow + j + 1;
+            indices[p++] = upperRow + j;
+            indices[p++] = row + j + 1;
+        }
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
+                 indices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     delete[] indices;
+}
+
+void SurfaceObject::createCoarseGridlineIndices(int x, int y, int endX, int endY)
+{
+    if (endX >= m_columns)
+        endX = m_columns - 1;
+    if (endY >= m_rows)
+        endY = m_rows - 1;
+    if (x > endX)
+        x = endX - 1;
+    if (y > endY)
+        y = endY - 1;
+
+    int nColumns = endX - x + 1;
+    int nRows = endY - y + 1;
+    int doubleEndX = endX * 2;
+    int doubleColumns = m_columns * 2 - 2;
+    int rowColLimit = endY * doubleColumns;
+
+    m_gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
+    GLint *gridIndices = new GLint[m_gridIndexCount];
+    int p = 0;
+
+    for (int row = y * doubleColumns; row <= rowColLimit; row += doubleColumns) {
+        for (int j = x * 2; j < doubleEndX; j += 2) {
+            // Horizontal line
+            gridIndices[p++] = row + j;
+            gridIndices[p++] = row + j + 1;
+
+            if (row < rowColLimit) {
+                // Vertical line
+                gridIndices[p++] = row + j;
+                gridIndices[p++] = row + j + doubleColumns;
+            }
+        }
+    }
+    // The rightmost line separately, since there isn't double vertice
+    for (int i = y * doubleColumns + doubleEndX - 1; i < rowColLimit; i += doubleColumns) {
+        gridIndices[p++] = i;
+        gridIndices[p++] = i  + doubleColumns;
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLint),
+                 gridIndices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     delete[] gridIndices;
 }
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                                   const QVector<QVector3D> &normals, const GLint *indices,
-                                  const GLint *gridIndices, bool changeGeometry)
+                                  bool changeGeometry)
 {
     // Move to buffers
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
@@ -293,18 +525,15 @@ void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVec
                  &normals.at(0), GL_DYNAMIC_DRAW);
 
     if (changeGeometry) {
-        if (uvs.size()) {
-            glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-            glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
-                         &uvs.at(0), GL_STATIC_DRAW);
-        }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
-                     indices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                     &uvs.at(0), GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gridElementbuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_gridIndexCount * sizeof(GLint),
-                     gridIndices, GL_STATIC_DRAW);
+        if (indices) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLint),
+                         indices, GL_STATIC_DRAW);
+        }
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }

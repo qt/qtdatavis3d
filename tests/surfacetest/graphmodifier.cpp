@@ -402,6 +402,66 @@ void GraphModifier::changeSelectionMode(int mode)
     }
 }
 
+void GraphModifier::changeRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values to a row at randon pos";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float i = float(rand() % m_zCount);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float z = qMin(maxZ, (i * stepZ + minZ));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+
+        m_theSeries->dataProxy()->setRow(int(i), newRow);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::changeRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values to 3 rows from randon pos";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float start = float(rand() % (m_zCount - 3));
+
+        QSurfaceDataArray dataArray;
+
+        for (float i = start; i < (start + 3.0f); i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = qMin(maxZ, (i * stepZ + minZ));
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+        }
+
+        m_theSeries->dataProxy()->setRows(int(start), dataArray);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
 void GraphModifier::updateSamples()
 {
     switch (m_activeSample) {

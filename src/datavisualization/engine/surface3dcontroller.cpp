@@ -38,7 +38,9 @@ Surface3DController::Surface3DController(QRect rect)
       m_isSurfaceEnabled(true),
       m_isSurfaceGridEnabled(true),
       m_selectedPoint(invalidSelectionPosition()),
-      m_selectedSeries(0)
+      m_selectedSeries(0),
+      m_rowsChangeStartId(0),
+      m_rowsChangeCount(0)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -97,10 +99,16 @@ void Surface3DController::synchDataToRenderer()
             emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
     }
 
+    if (m_changeTracker.rowsChanged) {
+        m_renderer->updateRows(m_rowsChangeStartId, m_rowsChangeCount);
+        m_changeTracker.rowsChanged = false;
+    }
+
     if (m_changeTracker.selectedPointChanged) {
         m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
         m_changeTracker.selectedPointChanged = false;
     }
+
 }
 
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
@@ -339,6 +347,22 @@ void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DS
     // TODO: Also hover needed? (QTRD-2131)
 }
 
+void Surface3DController::handleRowsChanged(int startIndex, int count)
+{
+    QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
+    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+        // Change is for the visible series, put the change to queue
+        m_rowsChangeStartId = startIndex;
+        m_rowsChangeCount = count;
+        m_changeTracker.rowsChanged = true;
+
+        adjustValueAxisRange();
+        // Clear selection unless still valid
+        setSelectedPoint(m_selectedPoint, m_selectedSeries);
+        emitNeedRender();
+    }
+}
+
 void Surface3DController::handleRequestSmoothSurface(bool enable)
 {
     setSmoothSurface(enable);
@@ -352,7 +376,7 @@ void Surface3DController::adjustValueAxisRange()
         QVector3D maxLimits;
         QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_seriesList.at(0));
         static_cast<QSurfaceDataProxy *>(series->dataProxy())->dptrc()->limitValues(minLimits,
-                                                                                   maxLimits);
+                                                                                    maxLimits);
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
         if (valueAxis && valueAxis->isAutoAdjustRange()) {
             if (minLimits.x() != maxLimits.x())

@@ -242,6 +242,8 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
 
         QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset, controller,
                          &Surface3DController::handleArrayReset);
+        QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::rowsChanged, controller,
+                         &Surface3DController::handleRowsChanged);
 
         QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
                          &Abstract3DController::handleSeriesVisibilityChanged);

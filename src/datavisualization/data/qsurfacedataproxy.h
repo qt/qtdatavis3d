@@ -50,8 +50,12 @@ public:
 
     void resetArray(QSurfaceDataArray *newArray);
 
+    void setRow(int rowIndex, QSurfaceDataRow *row);
+    void setRows(int rowIndex, const QSurfaceDataArray &rows);
+
 signals:
     void arrayReset();
+    void rowsChanged(int startIndex, int count);
     void seriesChanged(QSurface3DSeries *series);
 
 protected:

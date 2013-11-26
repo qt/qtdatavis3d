@@ -44,12 +44,14 @@ struct Surface3DChangeBitField {
     bool smoothStatusChanged      : 1;
     bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
+    bool rowsChanged              : 1;
 
     Surface3DChangeBitField() :
         gradientColorChanged(true),
         smoothStatusChanged(true),
         surfaceGridChanged(true),
-        selectedPointChanged(true)
+        selectedPointChanged(true),
+        rowsChanged(true)
     {
     }
 };
@@ -68,6 +70,8 @@ private:
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.
+    int m_rowsChangeStartId;
+    int m_rowsChangeCount;
 
 public:
     explicit Surface3DController(QRect rect);
@@ -102,6 +106,7 @@ public:
 
 public slots:
     void handleArrayReset();
+    void handleRowsChanged(int startIndex, int count);
 
     // Renderer callback handlers
     void handlePointClicked(const QPoint &position, QSurface3DSeries *series);

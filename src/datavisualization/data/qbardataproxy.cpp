@@ -159,7 +159,7 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLa
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with \a row. The \a row can be
+ * Changes existing rows by replacing a row at \a rowIndex with a new \a row. The \a row can be
  * the same as the existing row already stored at the \a rowIndex.
  * Existing row labels are not affected.
  */

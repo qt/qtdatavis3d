@@ -270,6 +270,48 @@ void Surface3DRenderer::updateData()
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
+void Surface3DRenderer::updateRows(int startIndex, int count)
+{
+    // TODO: Properly support non-straight rows and columns (QTRD-2643)
+    if (startIndex > m_sampleSpace.height()) {
+        // No changes on visible area
+        return;
+    }
+
+    // Surface only supports single series for now, so we are only interested in the first series
+    const QSurfaceDataArray *array = 0;
+    if (m_visibleSeriesList.size()) {
+        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
+        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
+            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+            if (dataProxy)
+                array = dataProxy->array();
+        }
+    }
+
+    if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
+        m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
+        int endRow = startIndex + count;
+        if (endRow > m_sampleSpace.height())
+            endRow = m_sampleSpace.height();
+
+        for (int i = startIndex; i < endRow; i++) {
+            for (int j = 0; j < m_sampleSpace.width(); j++)
+                (*(m_dataArray.at(i)))[j] = array->at(i + m_sampleSpace.y())->at(j + m_sampleSpace.x());
+        }
+
+        if (m_cachedSmoothSurface) {
+            m_surfaceObj->updateSmoothRows(m_dataArray, startIndex, endRow, m_heightNormalizer,
+                                           m_axisCacheY.min());
+        } else {
+            m_surfaceObj->updateCoarseRows(m_dataArray, startIndex, endRow, m_heightNormalizer,
+                                           m_axisCacheY.min());
+        }
+    }
+
+    updateSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 {
     int column = point.y();

@@ -134,6 +134,7 @@ public:
     ~Surface3DRenderer();
 
     void updateData();
+    void updateRows(int startIndex, int count);
     void updateScene(Q3DScene *scene);
     bool updateSmoothStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);

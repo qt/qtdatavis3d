@@ -67,6 +67,8 @@ public:
     void selectButtonClicked();
     void setSelectionInfoLabel(QLabel *label) {m_selectionInfoLabel = label; }
     void selectedPointChanged(const QPoint &point);
+    void changeRow();
+    void changeRows();
 
 public slots:
     void changeShadowQuality(int quality);

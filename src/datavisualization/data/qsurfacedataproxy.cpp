@@ -36,6 +36,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * All rows must have the same number of items.
  *
+ * QSurfaceDataProxy takes ownership of all QSurfaceDataRows passed to it, whether directly or
+ * in a QSurfaceDataArray container.
+ * If you use QSurfaceDataRow pointers to directly modify data after adding the array to the proxy,
+ * you must also emit proper signal to make the graph update.
+ *
  * When determining what rows and columns are visible, the first item in each row and the first item in
  * each column determine if the whole row or column is visible, even if other items in the row or column
  * individually have different X- or Z-coordinates.
@@ -130,6 +135,29 @@ void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
 }
 
 /*!
+ * Changes existing row by replacing a row at \a rowIndex with a new \a row. The \a row can be
+ * the same as the existing row already stored at the \a rowIndex. The new \a row must have
+ * the same number of columns as the row it is replacing.
+ */
+void QSurfaceDataProxy::setRow(int rowIndex, QSurfaceDataRow *row)
+{
+    dptr()->setRow(rowIndex, row);
+    emit rowsChanged(rowIndex, 1);
+}
+
+/*!
+ * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
+ * The rows in the \a rows array can be the same as the existing rows already
+ * stored at the \a rowIndex. The new rows must have the same number of columns
+ * as the rows they are replacing.
+ */
+void QSurfaceDataProxy::setRows(int rowIndex, const QSurfaceDataArray &rows)
+{
+    dptr()->setRows(rowIndex, rows);
+    emit rowsChanged(rowIndex, rows.size());
+}
+
+/*!
  * \return pointer to the data array.
  */
 const QSurfaceDataArray *QSurfaceDataProxy::array() const
@@ -216,6 +244,32 @@ void QSurfaceDataProxyPrivate::resetArray(QSurfaceDataArray *newArray)
     if (newArray != m_dataArray) {
         clearArray();
         m_dataArray = newArray;
+    }
+}
+
+void QSurfaceDataProxyPrivate::setRow(int rowIndex, QSurfaceDataRow *row)
+{
+    Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray->size());
+    Q_ASSERT(m_dataArray->at(rowIndex)->size() == row->size());
+
+    if (row != m_dataArray->at(rowIndex)) {
+        clearRow(rowIndex);
+        (*m_dataArray)[rowIndex] = row;
+    }
+}
+
+void QSurfaceDataProxyPrivate::setRows(int rowIndex, const QSurfaceDataArray &rows)
+{
+    QSurfaceDataArray &dataArray = *m_dataArray;
+    Q_ASSERT(rowIndex >= 0 && (rowIndex + rows.size()) <= dataArray.size());
+    Q_ASSERT(m_dataArray->at(rowIndex)->size() == rows.at(0)->size());
+
+    for (int i = 0; i < rows.size(); i++) {
+        if (rows.at(i) != dataArray.at(rowIndex)) {
+            clearRow(rowIndex);
+            dataArray[rowIndex] = rows.at(i);
+        }
+        rowIndex++;
     }
 }
 

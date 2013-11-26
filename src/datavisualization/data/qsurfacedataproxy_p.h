@@ -44,7 +44,8 @@ public:
     virtual ~QSurfaceDataProxyPrivate();
 
     void resetArray(QSurfaceDataArray *newArray);
-
+    void setRow(int rowIndex, QSurfaceDataRow *row);
+    void setRows(int rowIndex, const QSurfaceDataArray &rows);
     void limitValues(QVector3D &minValues, QVector3D &maxValues) const;
 
     virtual void setSeries(QAbstract3DSeries *series);

@@ -207,6 +207,12 @@ int main(int argc, char *argv[])
 
     QLabel *selectionInfoLabel = new QLabel(widget);
 
+    QPushButton *changeRowButton = new QPushButton(widget);
+    changeRowButton->setText(QStringLiteral("Change a row"));
+
+    QPushButton *changeRowsButton = new QPushButton(widget);
+    changeRowsButton->setText(QStringLiteral("Change 3 rows"));
+
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
@@ -238,6 +244,8 @@ int main(int argc, char *argv[])
     vLayout->addWidget(selectButton);
     vLayout->addWidget(selectionInfoLabel);
     vLayout->addWidget(flipViewsButton);
+    vLayout->addWidget(changeRowButton);
+    vLayout->addWidget(changeRowsButton);
 
     widget->show();
 
@@ -286,6 +294,10 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::selectButtonClicked);
     QObject::connect(flipViewsButton, &QPushButton::clicked,
                      modifier, &GraphModifier::flipViews);
+    QObject::connect(changeRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeRow);
+    QObject::connect(changeRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeRows);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
