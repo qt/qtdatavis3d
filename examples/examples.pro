@@ -5,6 +5,7 @@ SUBDIRS += qmlbars \
            qmlcustominput
 !android: {
     SUBDIRS += bars \
+               custominput \
                customproxy \
                itemmodel \
                scatter \
