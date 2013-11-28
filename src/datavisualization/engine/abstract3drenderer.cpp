@@ -24,6 +24,7 @@
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
 #include "qabstract3dseries_p.h"
+#include "q3dtheme_p.h"
 
 Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
 
@@ -32,16 +33,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
       m_hasNegativeValues(false),
-      m_cachedTheme(),
-      m_cachedFont(QFont(QStringLiteral("Arial"))),
-      m_cachedLabelBackground(false),
-      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelBackground)),
+      m_cachedTheme(new Q3DTheme()),
+      m_drawer(new Drawer(m_cachedTheme)),
       m_cachedBoundingRect(QRect(0, 0, 0, 0)),
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::SelectionNone),
-      m_cachedIsGridEnabled(false),
-      m_cachedIsBackgroundEnabled(false),
       m_cachedColorStyle(QDataVis::ColorStyleUniform),
       m_objectGradientTexture(0),
       m_singleHighlightGradientTexture(0),
@@ -166,12 +163,15 @@ void Abstract3DRenderer::updatePosition(const QRect &boundingRect)
 
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
-    m_cachedTheme = theme;
+    // Synchronize the controller theme with renderer
+    bool changed = theme->d_ptr->sync(*m_cachedTheme->d_ptr);
 
-    m_drawer->setTheme(m_cachedTheme);
-
-    // Re-initialize shaders
-    reInitShaders();
+    if (changed) {
+        // Update drawer if sync changed something
+        m_drawer->setTheme(m_cachedTheme);
+        // Re-initialize shaders
+        reInitShaders();
+    }
 }
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
@@ -196,10 +196,8 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
         }
     }
 
-    // Synchronize the controller scene to that of the renderer, and vice versa.
-    // Controller scene had priority if both have changed same values.
+    // Synchronize the controller scene with renderer
     scene->d_ptr->sync(*m_cachedScene->d_ptr);
-    m_cachedScene->d_ptr->sync(*scene->d_ptr);
 }
 
 void Abstract3DRenderer::reInitShaders()
@@ -252,19 +250,6 @@ void Abstract3DRenderer::handleShadowQualityChange()
 #endif
 }
 
-void Abstract3DRenderer::updateFont(const QFont &font)
-{
-    m_cachedFont = font;
-    m_drawer->setFont(font);
-}
-
-void Abstract3DRenderer::updateLabelBackgroundEnabled(bool enabled)
-{
-    qDebug() << __FUNCTION__ << enabled;
-    m_cachedLabelBackground = enabled;
-    m_drawer->setLabelBackground(enabled);
-}
-
 void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)
 {
     if (objFileName != m_cachedObjFile) {
@@ -277,16 +262,6 @@ void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
 {
     m_cachedSelectionMode = mode;
     m_selectionDirty = true;
-}
-
-void Abstract3DRenderer::updateGridEnabled(bool enable)
-{
-    m_cachedIsGridEnabled = enable;
-}
-
-void Abstract3DRenderer::updateBackgroundEnabled(bool enable)
-{
-    m_cachedIsBackgroundEnabled = enable;
 }
 
 void Abstract3DRenderer::handleResize()

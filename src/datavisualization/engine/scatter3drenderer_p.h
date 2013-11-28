@@ -137,8 +137,6 @@ private:
     friend class ScatterRenderItem;
 
 public slots:
-    void updateBackgroundEnabled(bool enable);
-
     // Overloaded from abstract renderer
     virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
 

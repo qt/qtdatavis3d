@@ -63,7 +63,7 @@ public:
     };
 
 public:
-    explicit Drawer(Q3DTheme *theme, const QFont &font, bool labelBackground);
+    explicit Drawer(Q3DTheme *theme);
     ~Drawer();
 
     void initializeOpenGL();

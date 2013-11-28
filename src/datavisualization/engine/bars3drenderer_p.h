@@ -129,7 +129,6 @@ public slots:
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
     void updateSlicingActive(bool isSlicing);
-    void updateBackgroundEnabled(bool enable);
     void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
 
     // Overloaded from abstract renderer
@@ -142,6 +141,7 @@ private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
+    virtual void updateTheme(Q3DTheme *theme);
 
     void drawSlicedScene(const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
     void drawScene(GLuint defaultFboHandle);

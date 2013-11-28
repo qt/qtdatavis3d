@@ -176,6 +176,10 @@ void GraphModifier::changePresetCamera()
 void GraphModifier::changeTheme(int theme)
 {
     m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
+    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
+    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
+    emit fontChanged(m_graph->theme()->font());
+    emit fontSizeChanged(m_graph->theme()->font().pointSize());
 }
 
 void GraphModifier::changeLabelBackground()
@@ -195,7 +199,6 @@ void GraphModifier::changeSelectionMode(int selectionMode)
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
-    newFont.setPointSize(m_fontSize);
     m_graph->theme()->setFont(newFont);
 }
 

@@ -339,7 +339,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     bool itemMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionItem);
 
     // Draw grid lines
-    if (m_cachedIsGridEnabled) {
+    if (m_cachedTheme->isGridEnabled()) {
         glDisable(GL_DEPTH_TEST);
         ShaderHelper *lineShader = m_backgroundShader;
         // Bind line shader
@@ -1205,7 +1205,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat rowScaleFactor = m_rowWidth / m_scaleFactor;
     GLfloat columnScaleFactor = m_columnDepth / m_scaleFactor;
 
-    if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
+    if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
@@ -1311,7 +1311,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
 
     // Draw grid lines
-    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
         QQuaternion lineRotation = QQuaternion();
 
@@ -1829,12 +1829,14 @@ void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientatio
     }
 }
 
-void Bars3DRenderer::updateBackgroundEnabled(bool enable)
+void Bars3DRenderer::updateTheme(Q3DTheme *theme)
 {
-    if (enable != m_cachedIsBackgroundEnabled) {
-        Abstract3DRenderer::updateBackgroundEnabled(enable);
+    bool wasEnabled = m_cachedTheme->isBackgroundEnabled();
+
+    Abstract3DRenderer::updateTheme(theme);
+
+    if (theme->isBackgroundEnabled() != wasEnabled)
         loadMeshFile(); // Load changed bar type
-    }
 }
 
 void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSeries *series)
@@ -1921,7 +1923,7 @@ void Bars3DRenderer::loadMeshFile()
     if (m_barObj)
         delete m_barObj;
     // If background is disabled, load full version of bar mesh
-    if (!m_cachedIsBackgroundEnabled)
+    if (!m_cachedTheme->isBackgroundEnabled())
         objectFileName.append(QStringLiteral("Full"));
     m_barObj = new ObjectHelper(objectFileName);
     m_barObj->load();

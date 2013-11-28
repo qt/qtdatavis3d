@@ -591,7 +591,7 @@ void Surface3DRenderer::drawSlicedScene()
     glDisable(GL_TEXTURE_2D);
 
     // Grid lines
-    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
         // Bind line shader
         lineShader->bind();
@@ -1050,7 +1050,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glCullFace(GL_BACK);
 
     // Draw background
-    if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
+    if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
@@ -1119,7 +1119,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
     QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
 
-    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
 
         // Bind line shader

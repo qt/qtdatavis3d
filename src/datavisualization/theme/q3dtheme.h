@@ -150,6 +150,8 @@ signals:
     void labelBackgroundEnabledChanged(bool enabled);
     void colorStyleChanged(QDataVis::ColorStyle style);
 
+    void needRender();
+
 protected:
     explicit Q3DTheme(Q3DThemePrivate *d,
                       QDataVis::Theme themeType,
@@ -157,6 +159,7 @@ protected:
     QScopedPointer<Q3DThemePrivate> d_ptr;
 
     friend class ThemeManager;
+    friend class Abstract3DRenderer;
 
 private:
     Q_DISABLE_COPY(Q3DTheme)

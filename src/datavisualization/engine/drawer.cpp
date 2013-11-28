@@ -44,10 +44,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
-Drawer::Drawer(Q3DTheme *theme, const QFont &font, bool labelBackground)
+Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
-      m_font(font),
-      m_labelBackground(labelBackground),
+      m_font(theme->font()),
+      m_labelBackground(theme->isLabelBackgroundEnabled()),
       m_textureHelper(0),
       m_pointbuffer(0)
 {
@@ -70,6 +70,8 @@ void Drawer::initializeOpenGL()
 void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
+    m_font = m_theme->font();
+    m_labelBackground = m_theme->isLabelBackgroundEnabled();
     emit drawerChanged();
 }
 
@@ -80,6 +82,8 @@ Q3DTheme *Drawer::theme() const
 
 void Drawer::setFont(const QFont &font)
 {
+    // We need to be able to override theme's font for drawer
+    // TODO: (or do we?)
     m_font = font;
     emit drawerChanged();
 }
@@ -91,6 +95,8 @@ QFont Drawer::font() const
 
 void Drawer::setLabelBackground(bool enabled)
 {
+    // We need to be able to override theme's label background for drawer
+    // TODO: (or do we?)
     m_labelBackground = enabled;
     emit drawerChanged();
 }

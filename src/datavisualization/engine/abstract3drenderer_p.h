@@ -61,8 +61,6 @@ protected:
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
-    QFont m_cachedFont;
-    bool m_cachedLabelBackground;
     Drawer *m_drawer;
     QRect m_cachedBoundingRect;
     QDataVis::ShadowQuality m_cachedShadowQuality;
@@ -70,8 +68,6 @@ protected:
 
     QString m_cachedObjFile;
     QDataVis::SelectionFlags m_cachedSelectionMode;
-    bool m_cachedIsGridEnabled;
-    bool m_cachedIsBackgroundEnabled;
 
     QDataVis::ColorStyle m_cachedColorStyle;
     QColor m_cachedObjectColor;
@@ -116,11 +112,7 @@ public:
     virtual void updatePosition(const QRect &boundingRect);
 
     virtual void updateTheme(Q3DTheme *theme);
-    virtual void updateFont(const QFont &font);
-    virtual void updateLabelBackgroundEnabled(bool enabled);
     virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
-    virtual void updateGridEnabled(bool enable);
-    virtual void updateBackgroundEnabled(bool enable);
     virtual void updateMeshFileName(const QString &objFileName);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;

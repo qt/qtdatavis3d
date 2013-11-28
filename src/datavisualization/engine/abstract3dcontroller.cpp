@@ -141,13 +141,9 @@ void Abstract3DController::synchDataToRenderer()
 
     m_renderer->updateScene(m_scene);
 
-    // TODO: Renderer doesn't need to know the theme, so remove this bit entirely (QTRD-2538)
-    if (m_changeTracker.themeChanged) {
-        m_renderer->updateTheme(m_themeManager->theme());
-        m_changeTracker.themeChanged = false;
-    }
+    m_renderer->updateTheme(m_themeManager->theme());
 
-    // TODO: Move to a sync function to clean this up a bit (make a separate task)
+    // TODO: Rethink these after color api has been moveed to series (QTRD-2200/2557)
     if (m_changeTracker.colorStyleChanged) {
         m_renderer->updateColorStyle(m_colorStyle);
         m_changeTracker.colorStyleChanged = false;
@@ -181,26 +177,6 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.multiHighlightGradientChanged) {
         m_renderer->updateMultiHighlightGradient(m_multiHighlightGradient);
         m_changeTracker.multiHighlightGradientChanged = false;
-    }
-
-    if (m_changeTracker.fontChanged) {
-        m_renderer->updateFont(m_font);
-        m_changeTracker.fontChanged = false;
-    }
-
-    if (m_changeTracker.labelBackgroundEnabledChanged) {
-        m_renderer->updateLabelBackgroundEnabled(m_labelBackground);
-        m_changeTracker.labelBackgroundEnabledChanged = false;
-    }
-
-    if (m_changeTracker.gridEnabledChanged) {
-        m_renderer->updateGridEnabled(m_isGridEnabled);
-        m_changeTracker.gridEnabledChanged = false;
-    }
-
-    if (m_changeTracker.backgroundEnabledChanged) {
-        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
-        m_changeTracker.backgroundEnabledChanged = false;
     }
 
     if (m_changeTracker.shadowQualityChanged) {
@@ -805,13 +781,8 @@ void Abstract3DController::setTheme(Q3DTheme *theme)
     if (theme != m_themeManager->theme()) {
         m_themeManager->setTheme(theme);
         m_changeTracker.themeChanged = true;
-        // TODO: set all colors/styles here (QTRD-2538)
+        // TODO: Rethink this once color api has been moved to series (QTRD-2200/2557)
         setColorStyle(theme->colorStyle());
-        // Set all other theme properties
-        setBackgroundEnabled(theme->isBackgroundEnabled());
-        setFont(theme->font());
-        setGridEnabled(theme->isGridEnabled());
-        setLabelBackgroundEnabled(theme->isLabelBackgroundEnabled());
         emit themeChanged(theme);
     }
 }
@@ -819,20 +790,6 @@ void Abstract3DController::setTheme(Q3DTheme *theme)
 Q3DTheme *Abstract3DController::theme() const
 {
     return m_themeManager->theme();
-}
-
-void Abstract3DController::setFont(const QFont &font)
-{
-    if (font != m_font) {
-        m_font = font;
-        m_changeTracker.fontChanged = true;
-        emitNeedRender();
-    }
-}
-
-QFont Abstract3DController::font() const
-{
-    return m_font;
 }
 
 void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
@@ -863,48 +820,6 @@ void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 QDataVis::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
-}
-
-void Abstract3DController::setLabelBackgroundEnabled(bool enable)
-{
-    if (enable != m_labelBackground) {
-        m_labelBackground = enable;
-        m_changeTracker.labelBackgroundEnabledChanged = true;
-        emitNeedRender();
-    }
-}
-
-bool Abstract3DController::isLabelBackgroundEnabled() const
-{
-    return m_labelBackground;
-}
-
-void Abstract3DController::setBackgroundEnabled(bool enable)
-{
-    if (enable != m_isBackgroundEnabled) {
-        m_isBackgroundEnabled = enable;
-        m_changeTracker.backgroundEnabledChanged = true;
-        emitNeedRender();
-    }
-}
-
-bool Abstract3DController::backgroundEnabled() const
-{
-    return m_isBackgroundEnabled;
-}
-
-void Abstract3DController::setGridEnabled(bool enable)
-{
-    if (enable != m_isGridEnabled) {
-        m_isGridEnabled = enable;
-        m_changeTracker.gridEnabledChanged = true;
-        emitNeedRender();
-    }
-}
-
-bool Abstract3DController::gridEnabled() const
-{
-    return m_isGridEnabled;
 }
 
 bool Abstract3DController::isSlicingActive() const

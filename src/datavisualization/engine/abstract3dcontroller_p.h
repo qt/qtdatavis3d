@@ -256,7 +256,8 @@ public:
     virtual void setTheme(Q3DTheme *theme);
     virtual Q3DTheme *theme() const;
 
-    // Properties from theme
+    // Properties from color api
+    // TODO: Rethink these after color api has been moveed to series (QTRD-2200/2557)
     virtual void setColorStyle(QDataVis::ColorStyle style);
     virtual QDataVis::ColorStyle colorStyle() const;
     virtual void setBaseColor(const QColor &color);
@@ -271,14 +272,6 @@ public:
     virtual QColor multiHighlightColor() const;
     virtual void setMultiHighlightGradient(const QLinearGradient &gradient);
     virtual QLinearGradient multiHighlightGradient() const;
-    virtual void setFont(const QFont &font);
-    virtual QFont font() const;
-    virtual void setLabelBackgroundEnabled(bool enable);
-    virtual bool isLabelBackgroundEnabled() const;
-    virtual void setBackgroundEnabled(bool enable);
-    virtual bool backgroundEnabled() const;
-    virtual void setGridEnabled(bool enable);
-    virtual bool gridEnabled() const;
 
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;

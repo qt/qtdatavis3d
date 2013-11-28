@@ -58,6 +58,10 @@ public slots:
 
 signals:
     void shadowQualityChanged(int quality);
+    void backgroundEnabledChanged(bool enabled);
+    void gridEnabledChanged(bool enabled);
+    void fontChanged(QFont font);
+    void fontSizeChanged(int size);
 
 private:
     Q3DBars *m_graph;

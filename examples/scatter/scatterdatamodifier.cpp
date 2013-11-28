@@ -130,6 +130,9 @@ void ScatterDataModifier::setSmoothDots(int smooth)
 void ScatterDataModifier::changeTheme(int theme)
 {
     m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
+    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
+    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
+    emit fontChanged(m_graph->theme()->font());
 }
 
 void ScatterDataModifier::changePresetCamera()

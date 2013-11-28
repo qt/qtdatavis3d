@@ -214,6 +214,11 @@ int main(int argc, char **argv)
     QObject::connect(seriesCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setSeriesVisibility);
 
+    QObject::connect(modifier, &GraphModifier::backgroundEnabledChanged,
+                     backgroundCheckBox, &QCheckBox::setChecked);
+    QObject::connect(modifier, &GraphModifier::gridEnabledChanged,
+                     gridCheckBox, &QCheckBox::setChecked);
+
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));
 
@@ -235,6 +240,11 @@ int main(int argc, char **argv)
                      &GraphModifier::changeFontSize);
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
+
+    QObject::connect(modifier, &GraphModifier::fontSizeChanged, fontSizeSlider,
+                     &QSlider::setValue);
+    QObject::connect(modifier, &GraphModifier::fontChanged, fontList,
+                     &QFontComboBox::setCurrentFont);
 
     //! [3]
     widget->show();

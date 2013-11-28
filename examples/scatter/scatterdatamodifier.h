@@ -49,7 +49,10 @@ public slots:
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
 signals:
+    void backgroundEnabledChanged(bool enabled);
+    void gridEnabledChanged(bool enabled);
     void shadowQualityChanged(int quality);
+    void fontChanged(QFont font);
 
 private:
     QVector3D randVector();

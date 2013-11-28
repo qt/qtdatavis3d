@@ -679,7 +679,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glCullFace(GL_BACK);
 
     // Draw background
-    if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
+    if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
@@ -760,7 +760,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         axisCacheMax = &m_axisCacheX;
 #endif
 
-    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
 
         // Bind line shader
@@ -1453,14 +1453,6 @@ void Scatter3DRenderer::handleResize()
     m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
 
     Abstract3DRenderer::handleResize();
-}
-
-void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
-{
-    if (enable != m_cachedIsBackgroundEnabled) {
-        Abstract3DRenderer::updateBackgroundEnabled(enable);
-        loadMeshFile(); // Load changed dot type
-    }
 }
 
 void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)

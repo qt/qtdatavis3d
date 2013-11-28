@@ -136,6 +136,11 @@ int main(int argc, char **argv)
     QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setSmoothDots);
 
+    QObject::connect(modifier, &ScatterDataModifier::backgroundEnabledChanged,
+                     backgroundCheckBox, &QCheckBox::setChecked);
+    QObject::connect(modifier, &ScatterDataModifier::gridEnabledChanged,
+                     gridCheckBox, &QCheckBox::setChecked);
+
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));
 
@@ -152,6 +157,9 @@ int main(int argc, char **argv)
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
+
+    QObject::connect(modifier, &ScatterDataModifier::fontChanged, fontList,
+                     &QFontComboBox::setCurrentFont);
     //! [6]
 
     //! [3]

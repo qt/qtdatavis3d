@@ -49,6 +49,7 @@ void ThemeManager::setTheme(Q3DTheme *theme)
 
         if (type != QDataVis::ThemeUserDefined) {
             useTheme(type);
+            // Reset all bits to dirty for sync
             m_theme->d_ptr->resetDirtyBits();
         }
 
@@ -64,48 +65,23 @@ Q3DTheme *ThemeManager::theme() const
 
 void ThemeManager::connectThemeSignals()
 {
+    // TODO: Rethink these once color api is added to series (QTRD-2200/2557)
+    connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
+            m_controller, &Abstract3DController::setColorStyle);
     connect(m_theme.data(), &Q3DTheme::baseColorChanged,
             m_controller, &Abstract3DController::setBaseColor);
-//    connect(m_theme.data(), &Q3DTheme::backgroundColorChanged,
-//            m_controller, &Abstract3DController::setBackgroundColor);
-//    connect(m_theme.data(), &Q3DTheme::windowColorChanged,
-//            m_controller, &Abstract3DController::setWindowColor);
-//    connect(m_theme.data(), &Q3DTheme::textColorChanged,
-//            m_controller, &Abstract3DController::setTextColor);
-//    connect(m_theme.data(), &Q3DTheme::textBackgroundColorChanged,
-//            m_controller, &Abstract3DController::setTextBackgroundColor);
-//    connect(m_theme.data(), &Q3DTheme::gridLineColorChanged,
-//            m_controller, &Abstract3DController::setGridLineColor);
     connect(m_theme.data(), &Q3DTheme::singleHighlightColorChanged,
             m_controller, &Abstract3DController::setSingleHighlightColor);
     connect(m_theme.data(), &Q3DTheme::multiHighlightColorChanged,
             m_controller, &Abstract3DController::setMultiHighlightColor);
-//    connect(m_theme.data(), &Q3DTheme::lightColorChanged,
-//            m_controller, &Abstract3DController::setLightColor);
     connect(m_theme.data(), &Q3DTheme::baseGradientChanged,
             m_controller, &Abstract3DController::setBaseGradient);
     connect(m_theme.data(), &Q3DTheme::singleHighlightGradientChanged,
             m_controller, &Abstract3DController::setSingleHighlightGradient);
     connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
             m_controller, &Abstract3DController::setMultiHighlightGradient);
-//    connect(m_theme.data(), &Q3DTheme::lightStrengthChanged,
-//            m_controller, &Abstract3DController::setLightStrength);
-//    connect(m_theme.data(), &Q3DTheme::ambientLightStrengthChanged,
-//            m_controller, &Abstract3DController::setAmbientLightStrength);
-//    connect(m_theme.data(), &Q3DTheme::highlightLightStrengthChanged,
-//            m_controller, &Abstract3DController::setHighlightLightStrength);
-//    connect(m_theme.data(), &Q3DTheme::labelBorderEnabledChanged,
-//            m_controller, &Abstract3DController::setLabelBorderEnabled);
-    connect(m_theme.data(), &Q3DTheme::fontChanged,
-            m_controller, &Abstract3DController::setFont);
-    connect(m_theme.data(), &Q3DTheme::backgroundEnabledChanged,
-            m_controller, &Abstract3DController::setBackgroundEnabled);
-    connect(m_theme.data(), &Q3DTheme::gridEnabledChanged,
-            m_controller, &Abstract3DController::setGridEnabled);
-    connect(m_theme.data(), &Q3DTheme::labelBackgroundEnabledChanged,
-            m_controller, &Abstract3DController::setLabelBackgroundEnabled);
-    connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
-            m_controller, &Abstract3DController::setColorStyle);
+
+    connect(m_theme.data(), &Q3DTheme::needRender, m_controller, &Abstract3DController::needRender);
 
     connect(m_theme.data(), &Q3DTheme::typeChanged, this, &ThemeManager::useTheme);
 }
