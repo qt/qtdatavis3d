@@ -126,13 +126,6 @@ public:
         ShadowQualitySoftHigh
     };
 
-    // TODO: remove
-    enum LabelStyle {
-        LabelStyleOpaque = 0,
-        LabelStyleFromTheme,
-        LabelStyleTransparent
-    };
-
     // TODO: to theme
     enum ColorStyle {
         ColorStyleUniform = 0,

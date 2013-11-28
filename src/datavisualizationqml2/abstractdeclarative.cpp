@@ -55,46 +55,6 @@ QDataVis::SelectionFlags AbstractDeclarative::selectionMode() const
     return m_controller->selectionMode();
 }
 
-void AbstractDeclarative::setFont(const QFont &font)
-{
-    m_controller->setFont(font);
-}
-
-QFont AbstractDeclarative::font() const
-{
-    return m_controller->font();
-}
-
-void AbstractDeclarative::setLabelStyle(QDataVis::LabelStyle style)
-{
-    m_controller->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle AbstractDeclarative::labelStyle() const
-{
-    return m_controller->labelStyle();
-}
-
-void AbstractDeclarative::setGridVisible(bool visible)
-{
-    m_controller->setGridEnabled(visible);
-}
-
-bool AbstractDeclarative::isGridVisible() const
-{
-    return m_controller->gridEnabled();
-}
-
-void AbstractDeclarative::setBackgroundVisible(bool visible)
-{
-    m_controller->setBackgroundEnabled(visible);
-}
-
-bool AbstractDeclarative::isBackgroundVisible() const
-{
-    return m_controller->backgroundEnabled();
-}
-
 void AbstractDeclarative::setShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_controller->setShadowQuality(quality);
@@ -115,16 +75,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::inputHandlerChanged);
     QObject::connect(m_controller, &Abstract3DController::themeChanged, this,
                      &AbstractDeclarative::themeChanged);
-    QObject::connect(m_controller, &Abstract3DController::fontChanged, this,
-                     &AbstractDeclarative::fontChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::selectionModeChanged);
-    QObject::connect(m_controller, &Abstract3DController::labelStyleChanged, this,
-                     &AbstractDeclarative::labelStyleChanged);
-    QObject::connect(m_controller, &Abstract3DController::backgroundVisibleChanged, this,
-                     &AbstractDeclarative::backgroundVisibleChanged);
-    QObject::connect(m_controller, &Abstract3DController::gridVisibleChanged, this,
-                     &AbstractDeclarative::gridVisibleChanged);
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const

@@ -62,7 +62,7 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
 public:
     // Visual parameters
     QRect m_boundingRect;
-    QDataVis::LabelStyle m_labelStyle;
+    bool m_labelBackground;
     QFont m_font;
     bool m_isGridEnabled;
 

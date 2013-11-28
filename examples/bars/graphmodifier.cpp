@@ -52,10 +52,10 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_smooth(false)
 {
     //! [2]
-    m_graph->setBackgroundVisible(false);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
-    m_graph->setFont(QFont("Times New Roman", m_fontSize));
-    m_graph->setLabelStyle(QDataVis::LabelStyleFromTheme);
+    m_graph->theme()->setBackgroundEnabled(false);
+    m_graph->theme()->setFont(QFont("Times New Roman", m_fontSize));
+    m_graph->theme()->setLabelBackgroundEnabled(true);
     //! [2]
 
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
@@ -178,14 +178,9 @@ void GraphModifier::changeTheme(int theme)
     m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
 }
 
-void GraphModifier::changeLabelStyle()
+void GraphModifier::changeLabelBackground()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode(int selectionMode)
@@ -201,15 +196,15 @@ void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_graph->font();
+    QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->setFont(font);
+    m_graph->theme()->setFont(font);
 }
 
 void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -242,12 +237,12 @@ void GraphModifier::rotateY(int rotation)
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible(bool(enabled));
+    m_graph->theme()->setBackgroundEnabled(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible(bool(enabled));
+    m_graph->theme()->setGridEnabled(bool(enabled));
 }
 
 void GraphModifier::setSmoothBars(int smooth)

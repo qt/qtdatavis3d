@@ -44,10 +44,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
-Drawer::Drawer(Q3DTheme *theme, const QFont &font, QDataVis::LabelStyle style)
+Drawer::Drawer(Q3DTheme *theme, const QFont &font, bool labelBackground)
     : m_theme(theme),
       m_font(font),
-      m_style(style),
+      m_labelBackground(labelBackground),
       m_textureHelper(0),
       m_pointbuffer(0)
 {
@@ -89,9 +89,9 @@ QFont Drawer::font() const
     return m_font;
 }
 
-void Drawer::setStyle(QDataVis::LabelStyle style)
+void Drawer::setLabelBackground(bool enabled)
 {
-    m_style = style;
+    m_labelBackground = enabled;
     emit drawerChanged();
 }
 
@@ -360,7 +360,7 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
                                                text,
                                                m_theme->textBackgroundColor(),
                                                m_theme->textColor(),
-                                               m_style,
+                                               m_labelBackground,
                                                m_theme->isLabelBorderEnabled(),
                                                widestLabel);
 

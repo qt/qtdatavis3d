@@ -88,20 +88,12 @@ Q3DScatter::Q3DScatter()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DScatter::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
-                     &Q3DScatter::labelStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DScatter::shadowQualityChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::meshFileNameChanged, this,
                      &Q3DScatter::meshFileNameChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
-                     &Q3DScatter::fontChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DScatter::themeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
-                     &Q3DScatter::gridVisibleChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
-                     &Q3DScatter::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
                      &Q3DScatter::colorStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
@@ -293,21 +285,6 @@ QString Q3DScatter::meshFileName() const
 }
 
 /*!
- * \property Q3DScatter::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DScatter::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DScatter::font() const
-{
-    return d_ptr->m_shared->font();
-}
-
-/*!
  * \property Q3DScatter::scene
  *
  * This property contains the read only Q3DScene that can be used to access e.g. camera object.
@@ -315,52 +292,6 @@ QFont Q3DScatter::font() const
 Q3DScene *Q3DScatter::scene() const
 {
     return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DScatter::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DScatter::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DScatter::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
-}
-
-/*!
- * \property Q3DScatter::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DScatter::setGridVisible(bool visible)
-{
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DScatter::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DScatter::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DScatter::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DScatter::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
 }
 
 /*!
@@ -411,12 +342,12 @@ QDataVis::ColorStyle Q3DScatter::colorStyle() const
  */
 void Q3DScatter::setItemColor(const QColor &color)
 {
-    d_ptr->m_shared->setObjectColor(color);
+    d_ptr->m_shared->setBaseColor(color);
 }
 
 QColor Q3DScatter::itemColor() const
 {
-    return d_ptr->m_shared->objectColor();
+    return d_ptr->m_shared->baseColor();
 }
 
 /*!
@@ -429,12 +360,12 @@ QColor Q3DScatter::itemColor() const
  */
 void Q3DScatter::setItemGradient(const QLinearGradient &gradient)
 {
-    d_ptr->m_shared->setObjectGradient(gradient);
+    d_ptr->m_shared->setBaseGradient(gradient);
 }
 
 QLinearGradient Q3DScatter::itemGradient() const
 {
-    return d_ptr->m_shared->objectGradient();
+    return d_ptr->m_shared->baseGradient();
 }
 
 /*!

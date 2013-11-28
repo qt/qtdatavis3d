@@ -47,8 +47,10 @@ void ThemeManager::setTheme(Q3DTheme *theme)
 
         QDataVis::Theme type = m_theme->type();
 
-        if (type != QDataVis::ThemeUserDefined)
+        if (type != QDataVis::ThemeUserDefined) {
             useTheme(type);
+            m_theme->d_ptr->resetDirtyBits();
+        }
 
         // Connect signals from new one
         connectThemeSignals();
@@ -62,39 +64,46 @@ Q3DTheme *ThemeManager::theme() const
 
 void ThemeManager::connectThemeSignals()
 {
-    // TODO: Implement receiving end for the commented ones (QTRD-2538)
     connect(m_theme.data(), &Q3DTheme::baseColorChanged,
-            m_controller, &Abstract3DController::setObjectColor);
-    //        connect(m_theme.data(), &Q3DTheme::backgroundColorChanged,
-    //                m_controller, &Abstract3DController::setBackgroundColorColor);
-    //        connect(m_theme.data(), &Q3DTheme::windowColorChanged,
-    //                m_controller, &Abstract3DController::setWindowColor);
-    //        connect(m_theme.data(), &Q3DTheme::textColorChanged,
-    //                m_controller, &Abstract3DController::setTextColor);
-    //        connect(m_theme.data(), &Q3DTheme::textBackgroundColorChanged,
-    //                m_controller, &Abstract3DController::setTextBackgroundColor);
-    //        connect(m_theme.data(), &Q3DTheme::gridLineColorChanged,
-    //                m_controller, &Abstract3DController::setGridLineColor);
+            m_controller, &Abstract3DController::setBaseColor);
+//    connect(m_theme.data(), &Q3DTheme::backgroundColorChanged,
+//            m_controller, &Abstract3DController::setBackgroundColor);
+//    connect(m_theme.data(), &Q3DTheme::windowColorChanged,
+//            m_controller, &Abstract3DController::setWindowColor);
+//    connect(m_theme.data(), &Q3DTheme::textColorChanged,
+//            m_controller, &Abstract3DController::setTextColor);
+//    connect(m_theme.data(), &Q3DTheme::textBackgroundColorChanged,
+//            m_controller, &Abstract3DController::setTextBackgroundColor);
+//    connect(m_theme.data(), &Q3DTheme::gridLineColorChanged,
+//            m_controller, &Abstract3DController::setGridLineColor);
     connect(m_theme.data(), &Q3DTheme::singleHighlightColorChanged,
             m_controller, &Abstract3DController::setSingleHighlightColor);
     connect(m_theme.data(), &Q3DTheme::multiHighlightColorChanged,
             m_controller, &Abstract3DController::setMultiHighlightColor);
-    //        connect(m_theme.data(), &Q3DTheme::lightColorChanged,
-    //                m_controller, &Abstract3DController::setLightColor);
+//    connect(m_theme.data(), &Q3DTheme::lightColorChanged,
+//            m_controller, &Abstract3DController::setLightColor);
     connect(m_theme.data(), &Q3DTheme::baseGradientChanged,
-            m_controller, &Abstract3DController::setObjectGradient);
+            m_controller, &Abstract3DController::setBaseGradient);
     connect(m_theme.data(), &Q3DTheme::singleHighlightGradientChanged,
             m_controller, &Abstract3DController::setSingleHighlightGradient);
     connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
             m_controller, &Abstract3DController::setMultiHighlightGradient);
-    //        connect(m_theme.data(), &Q3DTheme::lightStrengthChanged,
-    //                m_controller, &Abstract3DController::setLightStrength);
-    //        connect(m_theme.data(), &Q3DTheme::ambientLightStrengthChanged,
-    //                m_controller, &Abstract3DController::setAmbientLightStrength);
-    //        connect(m_theme.data(), &Q3DTheme::highlightLightStrengthChanged,
-    //                m_controller, &Abstract3DController::setHighlightLightStrength);
-    //        connect(m_theme.data(), &Q3DTheme::labelBorderEnabledChanged,
-    //                m_controller, &Abstract3DController::setLabelBorderEnabled);
+//    connect(m_theme.data(), &Q3DTheme::lightStrengthChanged,
+//            m_controller, &Abstract3DController::setLightStrength);
+//    connect(m_theme.data(), &Q3DTheme::ambientLightStrengthChanged,
+//            m_controller, &Abstract3DController::setAmbientLightStrength);
+//    connect(m_theme.data(), &Q3DTheme::highlightLightStrengthChanged,
+//            m_controller, &Abstract3DController::setHighlightLightStrength);
+//    connect(m_theme.data(), &Q3DTheme::labelBorderEnabledChanged,
+//            m_controller, &Abstract3DController::setLabelBorderEnabled);
+    connect(m_theme.data(), &Q3DTheme::fontChanged,
+            m_controller, &Abstract3DController::setFont);
+    connect(m_theme.data(), &Q3DTheme::backgroundEnabledChanged,
+            m_controller, &Abstract3DController::setBackgroundEnabled);
+    connect(m_theme.data(), &Q3DTheme::gridEnabledChanged,
+            m_controller, &Abstract3DController::setGridEnabled);
+    connect(m_theme.data(), &Q3DTheme::labelBackgroundEnabledChanged,
+            m_controller, &Abstract3DController::setLabelBackgroundEnabled);
     connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
             m_controller, &Abstract3DController::setColorStyle);
 
@@ -108,6 +117,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
 
     switch (type) {
     case QDataVis::ThemeQt: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0x80c342)));
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
@@ -146,6 +160,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemePrimaryColors: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0xffe400)));
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
@@ -184,6 +203,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeDigia: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0xcccccc)));
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
@@ -222,6 +246,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeStoneMoss: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0xbeb32b)));
         setBackgroundColor(QColor(QRgb(0x4d4d4f)));
         setWindowColor(QColor(QRgb(0x4d4d4f)));
@@ -260,6 +289,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeArmyBlue: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0x495f76)));
         setBackgroundColor(QColor(QRgb(0xd5d6d7)));
         setWindowColor(QColor(QRgb(0xd5d6d7)));
@@ -298,6 +332,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeRetro: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0x533b23)));
         setBackgroundColor(QColor(QRgb(0xe9e2ce)));
         setWindowColor(QColor(QRgb(0xe9e2ce)));
@@ -336,6 +375,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeEbony: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0xffffff)));
         setBackgroundColor(QColor(QRgb(0x000000)));
         setWindowColor(QColor(QRgb(0x000000)));
@@ -374,6 +418,11 @@ void ThemeManager::useTheme(QDataVis::Theme type)
     }
 
     case QDataVis::ThemeIsabelle: {
+        setBackgroundEnabled(true);
+        setGridEnabled(true);
+        setFont(QFont(QStringLiteral("Arial")));
+        setLabelBackgroundEnabled(true);
+        setLightColor(Qt::white);
         setBaseColor(QColor(QRgb(0xf9d900)));
         setBackgroundColor(QColor(QRgb(0x000000)));
         setWindowColor(QColor(QRgb(0x000000)));
@@ -509,6 +558,30 @@ void ThemeManager::setLabelBorderEnabled(bool enabled)
 {
     if (!m_theme->d_ptr->m_dirtyBits.labelBorderEnabledDirty)
         m_theme->setLabelBorderEnabled(enabled);
+}
+
+void ThemeManager::setFont(const QFont &font)
+{
+    if (!m_theme->d_ptr->m_dirtyBits.fontDirty)
+        m_theme->setFont(font);
+}
+
+void ThemeManager::setBackgroundEnabled(bool enabled)
+{
+    if (!m_theme->d_ptr->m_dirtyBits.backgroundEnabledDirty)
+        m_theme->setBackgroundEnabled(enabled);
+}
+
+void ThemeManager::setGridEnabled(bool enabled)
+{
+    if (!m_theme->d_ptr->m_dirtyBits.gridEnabledDirty)
+        m_theme->setGridEnabled(enabled);
+}
+
+void ThemeManager::setLabelBackgroundEnabled(bool enabled)
+{
+    if (!m_theme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty)
+        m_theme->setLabelBackgroundEnabled(enabled);
 }
 
 void ThemeManager::setColorStyle(QDataVis::ColorStyle style)

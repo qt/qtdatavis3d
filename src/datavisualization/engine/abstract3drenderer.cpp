@@ -34,9 +34,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_hasNegativeValues(false),
       m_cachedTheme(),
       m_cachedFont(QFont(QStringLiteral("Arial"))),
-      m_cachedLabelStyle(QDataVis::LabelStyleFromTheme),
-      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelStyle)),
-      m_cachedBoundingRect(QRect(0,0,0,0)),
+      m_cachedLabelBackground(false),
+      m_drawer(new Drawer(m_cachedTheme, m_cachedFont, m_cachedLabelBackground)),
+      m_cachedBoundingRect(QRect(0, 0, 0, 0)),
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::SelectionNone),
@@ -258,10 +258,11 @@ void Abstract3DRenderer::updateFont(const QFont &font)
     m_drawer->setFont(font);
 }
 
-void Abstract3DRenderer::updateLabelStyle(QDataVis::LabelStyle style)
+void Abstract3DRenderer::updateLabelBackgroundEnabled(bool enabled)
 {
-    m_cachedLabelStyle = style;
-    m_drawer->setStyle(style);
+    qDebug() << __FUNCTION__ << enabled;
+    m_cachedLabelBackground = enabled;
+    m_drawer->setLabelBackground(enabled);
 }
 
 void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)

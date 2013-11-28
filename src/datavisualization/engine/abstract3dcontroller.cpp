@@ -41,7 +41,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
-    m_labelStyle(QDataVis::LabelStyleTransparent),
+    m_labelBackground(false),
     m_isBackgroundEnabled(true),
     m_isGridEnabled(true),
     m_scene(new Q3DScene()),
@@ -147,6 +147,7 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.themeChanged = false;
     }
 
+    // TODO: Move to a sync function to clean this up a bit (make a separate task)
     if (m_changeTracker.colorStyleChanged) {
         m_renderer->updateColorStyle(m_colorStyle);
         m_changeTracker.colorStyleChanged = false;
@@ -187,9 +188,19 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.fontChanged = false;
     }
 
-    if (m_changeTracker.labelStyleChanged) {
-        m_renderer->updateLabelStyle(m_labelStyle);
-        m_changeTracker.labelStyleChanged = false;
+    if (m_changeTracker.labelBackgroundEnabledChanged) {
+        m_renderer->updateLabelBackgroundEnabled(m_labelBackground);
+        m_changeTracker.labelBackgroundEnabledChanged = false;
+    }
+
+    if (m_changeTracker.gridEnabledChanged) {
+        m_renderer->updateGridEnabled(m_isGridEnabled);
+        m_changeTracker.gridEnabledChanged = false;
+    }
+
+    if (m_changeTracker.backgroundEnabledChanged) {
+        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
+        m_changeTracker.backgroundEnabledChanged = false;
     }
 
     if (m_changeTracker.shadowQualityChanged) {
@@ -205,16 +216,6 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.objFileChanged) {
         m_renderer->updateMeshFileName(m_objFile);
         m_changeTracker.objFileChanged = false;
-    }
-
-    if (m_changeTracker.gridEnabledChanged) {
-        m_renderer->updateGridEnabled(m_isGridEnabled);
-        m_changeTracker.gridEnabledChanged = false;
-    }
-
-    if (m_changeTracker.backgroundEnabledChanged) {
-        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
-        m_changeTracker.backgroundEnabledChanged = false;
     }
 
     if (m_changeTracker.axisXTypeChanged) {
@@ -687,11 +688,11 @@ void Abstract3DController::setColorStyle(QDataVis::ColorStyle style)
     if (style != m_colorStyle || m_changeTracker.themeChanged) {
         Q3DTheme *theme = m_themeManager->theme();
         if (style == QDataVis::ColorStyleUniform) {
-            setObjectColor(theme->baseColor());
+            setBaseColor(theme->baseColor());
             setSingleHighlightColor(theme->singleHighlightColor());
             setMultiHighlightColor(theme->multiHighlightColor());
         } else {
-            setObjectGradient(theme->baseGradient());
+            setBaseGradient(theme->baseGradient());
             setSingleHighlightGradient(theme->singleHighlightGradient());
             setMultiHighlightGradient(theme->multiHighlightGradient());
         }
@@ -709,7 +710,7 @@ QDataVis::ColorStyle Abstract3DController::colorStyle() const
     return m_colorStyle;
 }
 
-void Abstract3DController::setObjectColor(const QColor &color)
+void Abstract3DController::setBaseColor(const QColor &color)
 {
     if (color != m_objectColor) {
         m_objectColor = color;
@@ -719,12 +720,12 @@ void Abstract3DController::setObjectColor(const QColor &color)
     }
 }
 
-QColor Abstract3DController::objectColor() const
+QColor Abstract3DController::baseColor() const
 {
     return m_objectColor;
 }
 
-void Abstract3DController::setObjectGradient(const QLinearGradient &gradient)
+void Abstract3DController::setBaseGradient(const QLinearGradient &gradient)
 {
     if (gradient != m_objectGradient) {
         m_objectGradient = gradient;
@@ -734,7 +735,7 @@ void Abstract3DController::setObjectGradient(const QLinearGradient &gradient)
     }
 }
 
-QLinearGradient Abstract3DController::objectGradient() const
+QLinearGradient Abstract3DController::baseGradient() const
 {
     return m_objectGradient;
 }
@@ -803,10 +804,14 @@ void Abstract3DController::setTheme(Q3DTheme *theme)
 {
     if (theme != m_themeManager->theme()) {
         m_themeManager->setTheme(theme);
-        QDataVis::ColorStyle colorStyle = theme->colorStyle();
         m_changeTracker.themeChanged = true;
         // TODO: set all colors/styles here (QTRD-2538)
-        setColorStyle(colorStyle);
+        setColorStyle(theme->colorStyle());
+        // Set all other theme properties
+        setBackgroundEnabled(theme->isBackgroundEnabled());
+        setFont(theme->font());
+        setGridEnabled(theme->isGridEnabled());
+        setLabelBackgroundEnabled(theme->isLabelBackgroundEnabled());
         emit themeChanged(theme);
     }
 }
@@ -821,7 +826,6 @@ void Abstract3DController::setFont(const QFont &font)
     if (font != m_font) {
         m_font = font;
         m_changeTracker.fontChanged = true;
-        emit fontChanged(font);
         emitNeedRender();
     }
 }
@@ -861,19 +865,18 @@ QDataVis::ShadowQuality Abstract3DController::shadowQuality() const
     return m_shadowQuality;
 }
 
-void Abstract3DController::setLabelStyle(QDataVis::LabelStyle style)
+void Abstract3DController::setLabelBackgroundEnabled(bool enable)
 {
-    if (style != m_labelStyle) {
-        m_labelStyle = style;
-        m_changeTracker.labelStyleChanged = true;
-        emit labelStyleChanged(style);
+    if (enable != m_labelBackground) {
+        m_labelBackground = enable;
+        m_changeTracker.labelBackgroundEnabledChanged = true;
         emitNeedRender();
     }
 }
 
-QDataVis::LabelStyle Abstract3DController::labelStyle() const
+bool Abstract3DController::isLabelBackgroundEnabled() const
 {
-    return m_labelStyle;
+    return m_labelBackground;
 }
 
 void Abstract3DController::setBackgroundEnabled(bool enable)
@@ -881,7 +884,6 @@ void Abstract3DController::setBackgroundEnabled(bool enable)
     if (enable != m_isBackgroundEnabled) {
         m_isBackgroundEnabled = enable;
         m_changeTracker.backgroundEnabledChanged = true;
-        emit backgroundVisibleChanged(enable);
         emitNeedRender();
     }
 }
@@ -896,7 +898,6 @@ void Abstract3DController::setGridEnabled(bool enable)
     if (enable != m_isGridEnabled) {
         m_isGridEnabled = enable;
         m_changeTracker.gridEnabledChanged = true;
-        emit gridVisibleChanged(enable);
         emitNeedRender();
     }
 }

@@ -317,17 +317,12 @@ void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void GraphModifier::changeStyle()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::selectButtonClicked()

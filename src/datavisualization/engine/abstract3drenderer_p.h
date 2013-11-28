@@ -62,7 +62,7 @@ protected:
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     QFont m_cachedFont;
-    QDataVis::LabelStyle m_cachedLabelStyle;
+    bool m_cachedLabelBackground;
     Drawer *m_drawer;
     QRect m_cachedBoundingRect;
     QDataVis::ShadowQuality m_cachedShadowQuality;
@@ -117,7 +117,7 @@ public:
 
     virtual void updateTheme(Q3DTheme *theme);
     virtual void updateFont(const QFont &font);
-    virtual void updateLabelStyle(QDataVis::LabelStyle style);
+    virtual void updateLabelBackgroundEnabled(bool enabled);
     virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
     virtual void updateGridEnabled(bool enable);
     virtual void updateBackgroundEnabled(bool enable);

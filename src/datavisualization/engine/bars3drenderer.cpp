@@ -1914,6 +1914,9 @@ void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 
 void Bars3DRenderer::loadMeshFile()
 {
+    if (m_cachedObjFile.isEmpty())
+        return;
+
     QString objectFileName = m_cachedObjFile;
     if (m_barObj)
         delete m_barObj;

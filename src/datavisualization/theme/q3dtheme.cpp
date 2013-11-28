@@ -271,6 +271,62 @@ bool Q3DTheme::isLabelBorderEnabled() const
     return d_ptr->m_labelBorders;
 }
 
+void Q3DTheme::setFont(const QFont &font)
+{
+    if (d_ptr->m_font != font) {
+        d_ptr->m_dirtyBits.fontDirty = true;
+        d_ptr->m_font = font;
+        emit fontChanged(font);
+    }
+}
+
+QFont Q3DTheme::font() const
+{
+    return d_ptr->m_font;
+}
+
+void Q3DTheme::setBackgroundEnabled(bool enabled)
+{
+    if (d_ptr->m_backgoundEnabled != enabled) {
+        d_ptr->m_dirtyBits.backgroundEnabledDirty = true;
+        d_ptr->m_backgoundEnabled = enabled;
+        emit backgroundEnabledChanged(enabled);
+    }
+}
+
+bool Q3DTheme::isBackgroundEnabled() const
+{
+    return d_ptr->m_backgoundEnabled;
+}
+
+void Q3DTheme::setGridEnabled(bool enabled)
+{
+    if (d_ptr->m_gridEnabled != enabled) {
+        d_ptr->m_dirtyBits.gridEnabledDirty = true;
+        d_ptr->m_gridEnabled = enabled;
+        emit gridEnabledChanged(enabled);
+    }
+}
+
+bool Q3DTheme::isGridEnabled() const
+{
+    return d_ptr->m_gridEnabled;
+}
+
+void Q3DTheme::setLabelBackgroundEnabled(bool enabled)
+{
+    if (d_ptr->m_labelBackground != enabled) {
+        d_ptr->m_dirtyBits.labelBackgroundEnabledDirty = true;
+        d_ptr->m_labelBackground = enabled;
+        emit labelBackgroundEnabledChanged(enabled);
+    }
+}
+
+bool Q3DTheme::isLabelBackgroundEnabled() const
+{
+    return d_ptr->m_labelBackground;
+}
+
 void Q3DTheme::setColorStyle(QDataVis::ColorStyle style)
 {
     if (d_ptr->m_colorStyle != style) {
@@ -303,6 +359,15 @@ QDataVis::Theme Q3DTheme::type() const
 Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, QDataVis::Theme theme_id)
     : QObject(0),
       m_themeId(theme_id),
+      m_baseColor(Qt::white),
+      m_backgroundColor(Qt::black),
+      m_windowColor(Qt::black),
+      m_textColor(Qt::white),
+      m_textBackgroundColor(Qt::gray),
+      m_gridLineColor(Qt::white),
+      m_singleHighlightColor(Qt::red),
+      m_multiHighlightColor(Qt::blue),
+      m_lightColor(Qt::white),
       m_baseGradient(QLinearGradient(qreal(gradientTextureWidth),
                                      qreal(gradientTextureHeight),
                                      0.0, 0.0)),
@@ -312,12 +377,46 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, QDataVis::Theme theme_id)
       m_multiHighlightGradient(QLinearGradient(qreal(gradientTextureWidth),
                                                qreal(gradientTextureHeight),
                                                0.0, 0.0)),
+      m_lightStrength(0.5f),
+      m_ambientLightStrength(0.25f),
+      m_highlightLightStrength(0.75f),
+      m_labelBorders(true),
+      m_colorStyle(QDataVis::ColorStyleUniform),
+      m_font(QFont(QStringLiteral("Arial"))),
+      m_backgoundEnabled(true),
+      m_gridEnabled(true),
+      m_labelBackground(true),
       q_ptr(q)
 {
 }
 
 Q3DThemePrivate::~Q3DThemePrivate()
 {
+}
+
+void Q3DThemePrivate::resetDirtyBits()
+{
+    m_dirtyBits.ambientLightStrengthDirty = false;
+    m_dirtyBits.backgroundColorDirty = false;
+    m_dirtyBits.backgroundEnabledDirty = false;
+    m_dirtyBits.baseColorDirty = false;
+    m_dirtyBits.baseGradientDirty = false;
+    m_dirtyBits.colorStyleDirty = false;
+    m_dirtyBits.fontDirty = false;
+    m_dirtyBits.gridEnabledDirty = false;
+    m_dirtyBits.gridLineColorDirty = false;
+    m_dirtyBits.highlightLightStrengthDirty = false;
+    m_dirtyBits.labelBackgroundEnabledDirty = false;
+    m_dirtyBits.labelBorderEnabledDirty = false;
+    m_dirtyBits.lightColorDirty = false;
+    m_dirtyBits.lightStrengthDirty = false;
+    m_dirtyBits.multiHighlightColorDirty = false;
+    m_dirtyBits.multiHighlightGradientDirty = false;
+    m_dirtyBits.singleHighlightColorDirty = false;
+    m_dirtyBits.singleHighlightGradientDirty = false;
+    m_dirtyBits.textBackgroundColorDirty = false;
+    m_dirtyBits.textColorDirty = false;
+    m_dirtyBits.windowColorDirty = false;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

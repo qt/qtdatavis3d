@@ -38,7 +38,6 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
-    m_graph->setLabelStyle(QDataVis::LabelStyleFromTheme);
 
     //! [0]
     m_sqrtSinProxy = new QSurfaceDataProxy();

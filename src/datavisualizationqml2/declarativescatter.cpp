@@ -74,7 +74,7 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
 
 void DeclarativeScatter::setObjectColor(const QColor &baseColor)
 {
-    m_shared->setObjectColor(baseColor);
+    m_shared->setBaseColor(baseColor);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisX() const

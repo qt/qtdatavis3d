@@ -37,11 +37,11 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_smooth(true)
 {
     //! [0]
-    QFont font = m_graph->font();
-    font.setPointSize(m_fontSize);
-    m_graph->setFont(font);
-    m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_graph->setTheme(new Q3DTheme(QDataVis::ThemeEbony));
+    QFont font = m_graph->theme()->font();
+    font.setPointSize(m_fontSize);
+    m_graph->theme()->setFont(font);
+    m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     //! [0]
@@ -144,19 +144,14 @@ void ScatterDataModifier::changePresetCamera()
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -173,12 +168,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible((bool)enabled);
+    m_graph->theme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible((bool)enabled);
+    m_graph->theme()->setGridEnabled((bool)enabled);
 }
 //! [8]
 

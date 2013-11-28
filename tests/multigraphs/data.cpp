@@ -52,10 +52,10 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
     m_surface->setSelectionMode(QDataVis::SelectionNone);
-    m_surface->setGridVisible(false);
+    m_surface->theme()->setGridEnabled(false);
     m_surface->setGradient(gradient);
     m_surface->setSurfaceGridEnabled(false);
-    m_surface->setBackgroundVisible(false);
+    m_surface->theme()->setBackgroundEnabled(false);
     m_surface->setSmoothSurfaceEnabled(false);
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
     m_surface->addSeries(new QSurface3DSeries(new QHeightMapSurfaceDataProxy()));
@@ -63,7 +63,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     // Initialize scatter
     m_scatter->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
     m_scatter->setSelectionMode(QDataVis::SelectionNone);
-    m_scatter->setGridVisible(false);
+    m_scatter->theme()->setGridEnabled(false);
     m_scatter->setObjectType(QDataVis::MeshStylePoints);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
@@ -72,7 +72,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     // Initialize bars
     m_bars->setTheme(new Q3DTheme(QDataVis::ThemeQt));
     m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
-    m_bars->setGridVisible(false);
+    m_bars->theme()->setGridEnabled(false);
     m_bars->setBarType(QDataVis::MeshStyleBars, false);
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));

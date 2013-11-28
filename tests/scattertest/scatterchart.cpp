@@ -37,11 +37,11 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_selectedItem(-1),
       m_targetSeries(0)
 {
-    QFont font = m_chart->font();
-    font.setPointSize(m_fontSize);
-    m_chart->setFont(font);
-    m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_chart->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
+    QFont font = m_chart->theme()->font();
+    font.setPointSize(m_fontSize);
+    m_chart->theme()->setFont(font);
+    m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
@@ -155,27 +155,22 @@ void ScatterDataModifier::changeTheme()
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    static int style = QDataVis::LabelStyleOpaque;
-
-    m_chart->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_chart->theme()->setLabelBackgroundEnabled(!m_chart->theme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_chart->setFont(newFont);
+    m_chart->theme()->setFont(newFont);
 }
 
 void ScatterDataModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_chart->font();
+    QFont font = m_chart->theme()->font();
     font.setPointSize(m_fontSize);
-    m_chart->setFont(font);
+    m_chart->theme()->setFont(font);
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -456,12 +451,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->setBackgroundVisible((bool)enabled);
+    m_chart->theme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_chart->setGridVisible((bool)enabled);
+    m_chart->theme()->setGridEnabled((bool)enabled);
 }
 
 QVector3D ScatterDataModifier::randVector()

@@ -38,13 +38,9 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor itemColor READ itemColor WRITE setItemColor NOTIFY itemColorChanged)
@@ -73,22 +69,10 @@ public:
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
 
-    void setFont(const QFont &font);
-    QFont font() const;
-
     Q3DScene *scene() const;
-
-    void setLabelStyle(QDataVis::LabelStyle style);
-    QDataVis::LabelStyle labelStyle() const;
-
-    void setGridVisible(bool visible);
-    bool isGridVisible() const;
 
     void setWidth(const int width);
     void setHeight(const int height);
-
-    void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
@@ -121,13 +105,9 @@ public:
 
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void labelStyleChanged(QDataVis::LabelStyle style);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void meshFileNameChanged(QString filename);
-    void fontChanged(QFont font);
     void themeChanged(Q3DTheme* theme);
-    void gridVisibleChanged(bool visible);
-    void backgroundVisibleChanged(bool visible);
     void colorStyleChanged(QDataVis::ColorStyle style);
     void itemColorChanged(QColor color);
     void itemGradientChanged(QLinearGradient gradient);

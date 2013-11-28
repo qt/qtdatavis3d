@@ -54,7 +54,7 @@ struct Abstract3DChangeBitField {
     bool zoomLevelChanged              : 1;
     bool themeChanged                  : 1;
     bool fontChanged                   : 1;
-    bool labelStyleChanged             : 1;
+    bool labelBackgroundEnabledChanged : 1;
     bool boundingRectChanged           : 1;
     bool sizeChanged                   : 1;
     bool shadowQualityChanged          : 1;
@@ -98,7 +98,7 @@ struct Abstract3DChangeBitField {
         zoomLevelChanged(true),
         themeChanged(true),
         fontChanged(true),
-        labelStyleChanged(true),
+        labelBackgroundEnabledChanged(true),
         boundingRectChanged(true),
         sizeChanged(true),
         shadowQualityChanged(true),
@@ -169,7 +169,7 @@ private:
     QFont m_font;
     QDataVis::SelectionFlags m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
-    QDataVis::LabelStyle m_labelStyle;
+    bool m_labelBackground;
     bool m_isBackgroundEnabled;
     bool m_isGridEnabled;
     QString m_objFile;
@@ -253,12 +253,16 @@ public:
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
 
+    virtual void setTheme(Q3DTheme *theme);
+    virtual Q3DTheme *theme() const;
+
+    // Properties from theme
     virtual void setColorStyle(QDataVis::ColorStyle style);
     virtual QDataVis::ColorStyle colorStyle() const;
-    virtual void setObjectColor(const QColor &color);
-    virtual QColor objectColor() const;
-    virtual void setObjectGradient(const QLinearGradient &gradient);
-    virtual QLinearGradient objectGradient() const;
+    virtual void setBaseColor(const QColor &color);
+    virtual QColor baseColor() const;
+    virtual void setBaseGradient(const QLinearGradient &gradient);
+    virtual QLinearGradient baseGradient() const;
     virtual void setSingleHighlightColor(const QColor &color);
     virtual QColor singleHighlightColor() const;
     virtual void setSingleHighlightGradient(const QLinearGradient &gradient);
@@ -267,41 +271,24 @@ public:
     virtual QColor multiHighlightColor() const;
     virtual void setMultiHighlightGradient(const QLinearGradient &gradient);
     virtual QLinearGradient multiHighlightGradient() const;
-
-    // Set theme (bar colors, shaders, window color, background colors, light intensity and text
-    // colors are affected)
-    virtual void setTheme(Q3DTheme *theme);
-    virtual Q3DTheme *theme() const;
-
-    // Set font
     virtual void setFont(const QFont &font);
     virtual QFont font() const;
-
-    // Selection mode
-    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
-    virtual QDataVis::SelectionFlags selectionMode() const;
-
-    // Adjust shadow quality
-    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
-    virtual QDataVis::ShadowQuality shadowQuality() const;
-
-    // Label style adjustment
-    virtual void setLabelStyle(QDataVis::LabelStyle style);
-    virtual QDataVis::LabelStyle labelStyle() const;
-
-    // Enable or disable background mesh
+    virtual void setLabelBackgroundEnabled(bool enable);
+    virtual bool isLabelBackgroundEnabled() const;
     virtual void setBackgroundEnabled(bool enable);
     virtual bool backgroundEnabled() const;
-
-    // Enable or disable background grid
     virtual void setGridEnabled(bool enable);
     virtual bool gridEnabled() const;
 
-    // Enable or disable slicing mode
+    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
+    virtual QDataVis::SelectionFlags selectionMode() const;
+
+    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
+    virtual QDataVis::ShadowQuality shadowQuality() const;
+
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
 
-    // override bar type with own mesh
     virtual void setMeshFileName(const QString &fileName);
     virtual QString meshFileName() const;
 
@@ -346,11 +333,7 @@ signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void fontChanged(QFont font);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void labelStyleChanged(QDataVis::LabelStyle style);
-    void backgroundVisibleChanged(bool visible);
-    void gridVisibleChanged(bool visible);
     void meshFileNameChanged(QString filename);
     void needRender();
     void colorStyleChanged(QDataVis::ColorStyle style);

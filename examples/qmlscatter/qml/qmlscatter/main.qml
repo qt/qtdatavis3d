@@ -51,9 +51,11 @@ Item {
             height: dataView.height
             //! [2]
             //! [3]
-            font.family: "Lucida Handwriting"
-            font.pointSize: 40
-            theme: Theme3D { type: AbstractGraph3D.ThemeIsabelle }
+            theme: Theme3D {
+                type: AbstractGraph3D.ThemeIsabelle
+                font.family: "Lucida Handwriting"
+                font.pointSize: 40
+            }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [6]
@@ -153,11 +155,11 @@ Item {
         text: "Hide Background"
         anchors.left: themeToggle.right
         onClicked: {
-            if (scatterGraph.backgroundVisible === true) {
-                scatterGraph.backgroundVisible = false;
+            if (scatterGraph.theme.backgroundEnabled === true) {
+                scatterGraph.theme.backgroundEnabled = false;
                 text = "Show Background";
             } else {
-                scatterGraph.backgroundVisible = true;
+                scatterGraph.theme.backgroundEnabled = true;
                 text = "Hide Background";
             }
         }

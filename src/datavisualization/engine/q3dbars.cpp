@@ -104,20 +104,12 @@ Q3DBars::Q3DBars()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DBars::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
-                     &Q3DBars::labelStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::shadowQualityChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::meshFileNameChanged, this,
                      &Q3DBars::meshFileNameChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
-                     &Q3DBars::fontChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DBars::themeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
-                     &Q3DBars::gridVisibleChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
-                     &Q3DBars::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
                      &Q3DBars::colorStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::objectColorChanged, this,
@@ -372,21 +364,6 @@ QString Q3DBars::meshFileName() const
 }
 
 /*!
- * \property Q3DBars::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DBars::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DBars::font() const
-{
-    return d_ptr->m_shared->font();
-}
-
-/*!
  * \property Q3DBars::scene
  *
  * This property contains the read only Q3DScene that can be used to access e.g. camera object.
@@ -394,52 +371,6 @@ QFont Q3DBars::font() const
 Q3DScene *Q3DBars::scene() const
 {
     return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DBars::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DBars::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DBars::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
-}
-
-/*!
- * \property Q3DBars::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DBars::setGridVisible(bool visible)
-{
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DBars::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DBars::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DBars::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DBars::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
 }
 
 /*!
@@ -490,12 +421,12 @@ QDataVis::ColorStyle Q3DBars::colorStyle() const
  */
 void Q3DBars::setBarColor(const QColor &color)
 {
-    d_ptr->m_shared->setObjectColor(color);
+    d_ptr->m_shared->setBaseColor(color);
 }
 
 QColor Q3DBars::barColor() const
 {
-    return d_ptr->m_shared->objectColor();
+    return d_ptr->m_shared->baseColor();
 }
 
 /*!
@@ -508,12 +439,12 @@ QColor Q3DBars::barColor() const
  */
 void Q3DBars::setBarGradient(const QLinearGradient &gradient)
 {
-    d_ptr->m_shared->setObjectGradient(gradient);
+    d_ptr->m_shared->setBaseGradient(gradient);
 }
 
 QLinearGradient Q3DBars::barGradient() const
 {
-    return d_ptr->m_shared->objectGradient();
+    return d_ptr->m_shared->baseGradient();
 }
 
 /*!

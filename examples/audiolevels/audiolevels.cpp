@@ -40,16 +40,16 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     // Set up the graph
     m_graph->setBarThickness(0.5f);
     m_graph->setBarSpacing(QSizeF(0.0, 1.0));
-    m_graph->setGridVisible(true);
-    m_graph->setBackgroundVisible(false);
     m_graph->valueAxis()->setRange(-100.0f, 100.0f);
     m_graph->valueAxis()->setSegmentCount(20);
     m_graph->valueAxis()->setLabelFormat(QStringLiteral("%d%%"));
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
     m_graph->setSelectionMode(QDataVis::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
-    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeIsabelle));
     m_graph->setBarType(QDataVis::MeshStyleBars);
+    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeIsabelle));
+    m_graph->theme()->setGridEnabled(true);
+    m_graph->theme()->setBackgroundEnabled(false);
     m_graph->addSeries(new QBar3DSeries);
 
     //! [0]

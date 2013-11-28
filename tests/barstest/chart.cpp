@@ -119,7 +119,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
-    m_graph->setFont(QFont("Times Roman", 20));
+    m_graph->theme()->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.
     m_defaultInputHandler = m_graph->activeInputHandler();
@@ -523,12 +523,7 @@ void GraphModifier::changeTheme()
 
 void GraphModifier::changeLabelStyle()
 {
-    static int style = QDataVis::LabelStyleOpaque;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode()
@@ -545,15 +540,15 @@ void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_graph->font();
+    QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->setFont(font);
+    m_graph->theme()->setFont(font);
 }
 
 void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -600,12 +595,12 @@ void GraphModifier::changeShadowQuality(int quality)
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible((bool)enabled);
+    m_graph->theme()->setBackgroundEnabled(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible((bool)enabled);
+    m_graph->theme()->setGridEnabled(bool(enabled));
 }
 
 void GraphModifier::rotateX(int rotation)
@@ -685,13 +680,16 @@ void GraphModifier::changeColorStyle()
 void GraphModifier::useOwnTheme()
 {
     Q3DTheme *theme = new Q3DTheme();
+    theme->setBackgroundEnabled(true);
+    theme->setGridEnabled(true);
     theme->setAmbientLightStrength(0.3f);
     theme->setBackgroundColor(QColor(QRgb(0x99ca53)));
     theme->setBaseColor(QColor(QRgb(0x209fdf)));
     theme->setColorStyle(QDataVis::ColorStyleUniform);
     theme->setGridLineColor(QColor(QRgb(0x99ca53)));
     theme->setHighlightLightStrength(7.0f);
-    theme->setLabelBorderEnabled(false);
+    theme->setLabelBackgroundEnabled(true);
+    theme->setLabelBorderEnabled(true);
     theme->setLightColor(Qt::white);
     theme->setLightStrength(6.0f);
     theme->setMultiHighlightColor(QColor(QRgb(0x6d5fd5)));

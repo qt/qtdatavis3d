@@ -201,7 +201,7 @@ int main(int argc, char **argv)
     //! [6]
 
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::changeLabelStyle);
+                     &GraphModifier::changeLabelBackground);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);
 

@@ -68,14 +68,14 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     // Set shadows to medium
     m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
 
-    // Set font
-    m_graph->setFont(QFont("Century Gothic", 30));
-
     // Set selection mode to bar and column
     m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
 
     // Set theme
     m_graph->setTheme(new Q3DTheme(QDataVis::ThemeArmyBlue));
+
+    // Set font to theme
+    m_graph->theme()->setFont(QFont("Century Gothic", 30));
 
     // Set camera position and zoom
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);

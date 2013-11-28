@@ -64,6 +64,10 @@ protected:
     void setAmbientLightStrength(float strength);
     void setHighlightLightStrength(float strength);
     void setLabelBorderEnabled(bool enabled);
+    void setFont(const QFont &font);
+    void setBackgroundEnabled(bool enabled);
+    void setGridEnabled(bool enabled);
+    void setLabelBackgroundEnabled(bool enabled);
     void setColorStyle(QDataVis::ColorStyle style);
 
 private:

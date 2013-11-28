@@ -59,7 +59,7 @@ const uint invalidSelectionId = uint(-1);
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
-      m_labelStyle(QDataVis::LabelStyleFromTheme),
+      m_labelBackground(false),
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_cachedIsSlicingActivated(false),
@@ -685,10 +685,8 @@ void Surface3DRenderer::drawSlicedScene()
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
-    if (m_cachedLabelStyle > QDataVis::LabelStyleOpaque) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Y Labels to back wall
     GLfloat posStep = 2.0f * m_axisCacheY.segmentStep() / m_heightNormalizer;
@@ -757,8 +755,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
-    if (m_cachedLabelStyle > QDataVis::LabelStyleOpaque)
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
     // Release label shader
     m_labelShader->release();

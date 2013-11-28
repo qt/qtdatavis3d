@@ -101,22 +101,14 @@ Q3DSurface::Q3DSurface()
     d_ptr->m_shared->initializeOpenGL();
     QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DSurface::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::labelStyleChanged, this,
-                     &Q3DSurface::labelStyleChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DSurface::themeChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DSurface::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::gridVisibleChanged, this,
-                     &Q3DSurface::gridVisibleChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::backgroundVisibleChanged, this,
-                     &Q3DSurface::backgroundVisibleChanged);
     QObject::connect(d_ptr->m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
                      &Q3DSurface::smoothSurfaceEnabledChanged);
     QObject::connect(d_ptr->m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
                      &Q3DSurface::surfaceGridEnabledChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::fontChanged, this,
-                     &Q3DSurface::fontChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -212,36 +204,6 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
     d_ptr->m_shared->setWidth(width());
     d_ptr->m_shared->setHeight(height());
-}
-
-/*!
- * \property Q3DSurface::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DSurface::setGridVisible(bool visible)
-{
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DSurface::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DSurface::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DSurface::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DSurface::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
 }
 
 /*!
@@ -346,21 +308,6 @@ QLinearGradient Q3DSurface::gradient() const
 }
 
 /*!
- * \property Q3DSurface::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DSurface::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DSurface::font() const
-{
-    return d_ptr->m_shared->font();
-}
-
-/*!
  * \property Q3DSurface::scene
  *
  * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
@@ -368,22 +315,6 @@ QFont Q3DSurface::font() const
 Q3DScene *Q3DSurface::scene() const
 {
     return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DSurface::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DSurface::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DSurface::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
 }
 
 /*!

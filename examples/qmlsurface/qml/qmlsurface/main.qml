@@ -49,13 +49,15 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
-            theme: Theme3D { type: AbstractGraph3D.ThemeStoneMoss }
+            theme: Theme3D {
+                type: AbstractGraph3D.ThemeStoneMoss
+                font.family: "STCaiyun"
+                font.pointSize: 35
+            }
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             smoothSurfaceEnabled: true
             surfaceGridEnabled: false
-            font.family: "STCaiyun"
-            font.pointSize: 35
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
             axisY.min: 0.0
             axisY.max: 500.0
@@ -167,11 +169,11 @@ Item {
         width: smoothSurfaceToggle.width
         text: "Hide Background"
         onClicked: {
-            if (surfaceplot.backgroundVisible === true) {
-                surfaceplot.backgroundVisible = false;
+            if (surfaceplot.theme.backgroundEnabled === true) {
+                surfaceplot.theme.backgroundEnabled = false;
                 text = "Show Background"
             } else {
-                surfaceplot.backgroundVisible = true;
+                surfaceplot.theme.backgroundEnabled = true;
                 text = "Hide Background"
             }
         }
@@ -183,11 +185,11 @@ Item {
         width: backgroundToggle.width
         text: "Hide Grid"
         onClicked: {
-            if (surfaceplot.gridVisible === true) {
-                surfaceplot.gridVisible = false;
+            if (surfaceplot.theme.gridEnabled === true) {
+                surfaceplot.theme.gridEnabled = false;
                 text = "Show Grid"
             } else {
-                surfaceplot.gridVisible = true;
+                surfaceplot.theme.gridEnabled = true;
                 text = "Hide Grid"
             }
         }

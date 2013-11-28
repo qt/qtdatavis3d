@@ -26,6 +26,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -73,7 +74,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->rowAxis()->setMax(SpectrumNumBands * 2);
     m_chart->columnAxis()->setMax(SpectrumNumBands - 1);
     // Disable grid
-    m_chart->setGridVisible(false);
+    m_chart->theme()->setGridEnabled(false);
     // Disable auto-scaling of height by defining explicit range
     m_chart->valueAxis()->setRange(0.0f, 1.0f);
     // Disable shadows

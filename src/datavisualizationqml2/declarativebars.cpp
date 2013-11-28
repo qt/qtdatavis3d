@@ -74,7 +74,7 @@ QSGNode *DeclarativeBars::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData 
 
 void DeclarativeBars::setBarColor(const QColor &baseColor)
 {
-    m_shared->setObjectColor(baseColor);
+    m_shared->setBaseColor(baseColor);
 }
 
 Q3DCategoryAxis *DeclarativeBars::rowAxis() const

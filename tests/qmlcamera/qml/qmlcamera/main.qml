@@ -47,9 +47,11 @@ Item {
             height: dataView.height
             shadowQuality: Bars3D.ShadowQualityMedium
             selectionMode: Bars3D.SelectionItem
-            font.pointSize: 35
-            theme: Theme3D { type: Bars3D.ThemeRetro }
-            labelStyle: Bars3D.LabelStyleFromTheme
+            theme: Theme3D {
+                type: Bars3D.ThemeRetro
+                font.pointSize: 35
+                labelBackgroundEnabled: true
+            }
             seriesList: [chartData.series]
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)

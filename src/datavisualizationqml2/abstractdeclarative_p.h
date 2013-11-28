@@ -43,14 +43,10 @@ class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle NOTIFY labelStyleChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible NOTIFY gridVisibleChanged)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible NOTIFY backgroundVisibleChanged)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -66,18 +62,6 @@ public:
 
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;
-
-    virtual void setFont(const QFont &font);
-    virtual QFont font() const;
-
-    virtual void setLabelStyle(QDataVis::LabelStyle style);
-    virtual QDataVis::LabelStyle labelStyle() const;
-
-    virtual void setGridVisible(bool visible);
-    virtual bool isGridVisible() const;
-
-    virtual void setBackgroundVisible(bool visible);
-    virtual bool isBackgroundVisible() const;
 
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
     virtual QDataVis::ShadowQuality shadowQuality() const;
@@ -97,11 +81,7 @@ signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void fontChanged(QFont font);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void labelStyleChanged(QDataVis::LabelStyle style);
-    void backgroundVisibleChanged(bool visible);
-    void gridVisibleChanged(bool visible);
     void itemLabelFormatChanged(QString format);
 
 private:

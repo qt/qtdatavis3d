@@ -81,7 +81,7 @@ private:
     TextureHelper *m_textureHelper;
     bool m_isInitialized;
     Q3DTheme *m_cachedTheme;
-    QDataVis::LabelStyle m_labelStyle;
+    bool m_labelBackground;
     LabelItem m_labelItem;
     Drawer *m_drawer;
     QRect m_mainViewPort;

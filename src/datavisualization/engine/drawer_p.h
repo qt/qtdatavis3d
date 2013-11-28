@@ -63,7 +63,7 @@ public:
     };
 
 public:
-    explicit Drawer(Q3DTheme *theme, const QFont &font, QDataVis::LabelStyle style);
+    explicit Drawer(Q3DTheme *theme, const QFont &font, bool labelBackground);
     ~Drawer();
 
     void initializeOpenGL();
@@ -72,7 +72,7 @@ public:
     Q3DTheme *theme() const;
     void setFont(const QFont &font);
     QFont font() const;
-    void setStyle(QDataVis::LabelStyle style);
+    void setLabelBackground(bool enabled);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
@@ -95,7 +95,7 @@ Q_SIGNALS:
 private:
     Q3DTheme *m_theme;
     QFont m_font;
-    QDataVis::LabelStyle m_style;
+    bool m_labelBackground;
     TextureHelper *m_textureHelper;
     GLuint m_pointbuffer;
 };

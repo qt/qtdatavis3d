@@ -21,8 +21,8 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QLinearGradient>
-
-class QColor;
+#include <QFont>
+#include <QColor>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -48,6 +48,10 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_PROPERTY(float ambientLightStrength READ ambientLightStrength WRITE setAmbientLightStrength NOTIFY ambientLightStrengthChanged)
     Q_PROPERTY(float highlightLightStrength READ highlightLightStrength WRITE setHighlightLightStrength NOTIFY highlightLightStrengthChanged)
     Q_PROPERTY(bool labelBorderEnabled READ isLabelBorderEnabled WRITE setLabelBorderEnabled NOTIFY labelBorderEnabledChanged)
+    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    Q_PROPERTY(bool backgroundEnabled READ isBackgroundEnabled WRITE setBackgroundEnabled NOTIFY backgroundEnabledChanged)
+    Q_PROPERTY(bool gridEnabled READ isGridEnabled WRITE setGridEnabled NOTIFY gridEnabledChanged)
+    Q_PROPERTY(bool labelBackgroundEnabled READ isLabelBackgroundEnabled WRITE setLabelBackgroundEnabled NOTIFY labelBackgroundEnabledChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     // TODO: Add everything that we need
 
@@ -107,6 +111,18 @@ public:
     void setLabelBorderEnabled(bool enabled);
     bool isLabelBorderEnabled() const;
 
+    void setFont(const QFont &font);
+    QFont font() const;
+
+    void setBackgroundEnabled(bool enabled);
+    bool isBackgroundEnabled() const;
+
+    void setGridEnabled(bool enabled);
+    bool isGridEnabled() const;
+
+    void setLabelBackgroundEnabled(bool enabled);
+    bool isLabelBackgroundEnabled() const;
+
     void setColorStyle(QDataVis::ColorStyle style);
     QDataVis::ColorStyle colorStyle() const;
 
@@ -128,6 +144,10 @@ signals:
     void ambientLightStrengthChanged(float strength);
     void highlightLightStrengthChanged(float strength);
     void labelBorderEnabledChanged(bool enabled);
+    void fontChanged(QFont font);
+    void backgroundEnabledChanged(bool enabled);
+    void gridEnabledChanged(bool enabled);
+    void labelBackgroundEnabledChanged(bool enabled);
     void colorStyleChanged(QDataVis::ColorStyle style);
 
 protected:

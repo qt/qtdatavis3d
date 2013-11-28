@@ -105,9 +105,6 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     // Set selection mode to slice row
     m_graph->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
 
-    // Set font
-    m_graph->setFont(QFont("Impact", 20));
-
     //! [6]
 #endif
 
@@ -115,6 +112,9 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 
     // Set theme
     m_graph->setTheme(new Q3DTheme(QDataVis::ThemeDigia));
+
+    // Set font
+    m_graph->theme()->setFont(QFont("Impact", 20));
 
     // Set preset camera position
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);

@@ -38,7 +38,7 @@ public:
 
     void resetTemperatureData();
     void changePresetCamera();
-    void changeLabelStyle();
+    void changeLabelBackground();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
     void rotateX(int rotation);

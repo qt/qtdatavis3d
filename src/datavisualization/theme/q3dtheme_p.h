@@ -32,9 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dtheme.h"
 
-class QColor;
-class QLinearGradient;
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 struct Q3DThemeDirtyBitField {
@@ -55,6 +52,10 @@ struct Q3DThemeDirtyBitField {
     bool highlightLightStrengthDirty   : 1;
     bool labelBorderEnabledDirty       : 1;
     bool colorStyleDirty               : 1;
+    bool fontDirty                     : 1;
+    bool backgroundEnabledDirty        : 1;
+    bool gridEnabledDirty              : 1;
+    bool labelBackgroundEnabledDirty   : 1;
 
     Q3DThemeDirtyBitField()
         : baseColorDirty(false),
@@ -73,7 +74,11 @@ struct Q3DThemeDirtyBitField {
           ambientLightStrengthDirty(false),
           highlightLightStrengthDirty(false),
           labelBorderEnabledDirty(false),
-          colorStyleDirty(false)
+          colorStyleDirty(false),
+          fontDirty(false),
+          backgroundEnabledDirty(false),
+          gridEnabledDirty(false),
+          labelBackgroundEnabledDirty(false)
     {
     }
 };
@@ -86,14 +91,14 @@ public:
                     QDataVis::Theme theme_id = QDataVis::ThemeUserDefined);
     virtual ~Q3DThemePrivate();
 
+    void resetDirtyBits();
+
 public:
     QDataVis::Theme m_themeId;
 
     Q3DThemeDirtyBitField m_dirtyBits;
 
     QColor m_baseColor;
-    QColor m_heightColor;
-    QColor m_depthColor;
     QColor m_backgroundColor;
     QColor m_windowColor;
     QColor m_textColor;
@@ -110,6 +115,10 @@ public:
     float m_highlightLightStrength;
     bool m_labelBorders;
     QDataVis::ColorStyle m_colorStyle;
+    QFont m_font;
+    bool m_backgoundEnabled;
+    bool m_gridEnabled;
+    bool m_labelBackground;
 
 protected:
     Q3DTheme *q_ptr;
