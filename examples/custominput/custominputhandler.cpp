@@ -25,11 +25,15 @@ CustomInputHandler::CustomInputHandler(QObject *parent) :
 {
 }
 
+//! [0]
 void CustomInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
+    Q_UNUSED(event)
     setInputPosition(mousePos);
 }
+//! [0]
 
+//! [1]
 void CustomInputHandler::wheelEvent(QWheelEvent *event)
 {
     // Adjust zoom level based on what zoom range we're in.
@@ -47,3 +51,4 @@ void CustomInputHandler::wheelEvent(QWheelEvent *event)
 
     scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
+//! [1]

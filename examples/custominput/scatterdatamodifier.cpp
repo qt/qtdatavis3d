@@ -45,12 +45,15 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     series->setMesh(QAbstract3DSeries::MeshCube);
     m_graph->addSeries(series);
 
+    //! [2]
     m_animationCameraX = new QPropertyAnimation(m_graph->scene()->activeCamera(), "xRotation");
     m_animationCameraX->setDuration(20000);
     m_animationCameraX->setStartValue(QVariant::fromValue(0.0f));
     m_animationCameraX->setEndValue(QVariant::fromValue(360.0f));
     m_animationCameraX->setLoopCount(-1);
+    //! [2]
 
+    //! [3]
     QPropertyAnimation *upAnimation = new QPropertyAnimation(m_graph->scene()->activeCamera(), "yRotation");
     upAnimation->setDuration(9000);
     upAnimation->setStartValue(QVariant::fromValue(5.0f));
@@ -65,20 +68,24 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_animationCameraY->setLoopCount(-1);
     m_animationCameraY->addAnimation(upAnimation);
     m_animationCameraY->addAnimation(downAnimation);
+    //! [3]
 
     m_animationCameraX->start();
     m_animationCameraY->start();
 
     // Give ownership of the handler to the graph and make it the active handler
+    //! [0]
     m_graph->setActiveInputHandler(m_inputHandler);
+    //! [0]
 
+    //! [1]
     m_selectionTimer = new QTimer(this);
     m_selectionTimer->setInterval(10);
     m_selectionTimer->setSingleShot(false);
     QObject::connect(m_selectionTimer, &QTimer::timeout, this,
                      &ScatterDataModifier::triggerSelection);
-
     m_selectionTimer->start();
+    //! [1]
 }
 
 ScatterDataModifier::~ScatterDataModifier()
