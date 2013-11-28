@@ -61,12 +61,18 @@ public:
     void setSliceLabel(const QString &label);
     QString &sliceLabel(); // Formats label if not previously formatted
 
+    // Series index in visual series that this item belongs to.
+    // This is only utilized by slicing, so it may not be up to date on all items.
+    inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
+    inline int seriesIndex() { return m_seriesIndex; }
+
 protected:
     float m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;
     QString m_sliceLabel;
     LabelItem *m_sliceLabelItem;
+    int m_seriesIndex;
 
     friend class QBarDataItem;
 };

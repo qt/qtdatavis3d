@@ -32,7 +32,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_inputHandler(new CustomInputHandler())
 {
-    m_graph->setObjectType(QDataVis::MeshStyleCubes, false);
     m_graph->setTheme(new Q3DTheme(QDataVis::ThemeDigia));
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
@@ -42,7 +41,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->setAxisZ(new Q3DValueAxis);
 
     QScatter3DSeries *series = new QScatter3DSeries;
-    series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
+    series->setItemLabelFormat("@xLabel, @yLabel, @zLabel");
+    series->setMesh(QAbstract3DSeries::MeshCube);
     m_graph->addSeries(series);
 
     m_animationCameraX = new QPropertyAnimation(m_graph->scene()->activeCamera(), "xRotation");

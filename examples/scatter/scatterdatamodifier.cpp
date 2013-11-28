@@ -24,6 +24,8 @@
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <qmath.h>
+#include <QComboBox>
+
 using namespace QtDataVisualization;
 
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
@@ -33,7 +35,7 @@ const int numberOfItems = 3600;
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_fontSize(40.0f),
-      m_style(QDataVis::MeshStyleSpheres),
+      m_style(QAbstract3DSeries::MeshSphere),
       m_smooth(true)
 {
     //! [0]
@@ -41,7 +43,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
     m_graph->theme()->setFont(font);
-    m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     //! [0]
@@ -56,6 +57,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);
     series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
+    series->setMesh(QAbstract3DSeries::MeshSphere);
     m_graph->addSeries(series);
     //! [2]
 
@@ -117,14 +119,19 @@ void ScatterDataModifier::addData()
 //! [8]
 void ScatterDataModifier::changeStyle(int style)
 {
-    m_style = QDataVis::MeshStyle(style + 5); // skip unsupported mesh types
-    m_graph->setObjectType(m_style, m_smooth);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        m_style = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        if (m_graph->seriesList().size())
+            m_graph->seriesList().at(0)->setMesh(m_style);
+    }
 }
 
 void ScatterDataModifier::setSmoothDots(int smooth)
 {
     m_smooth = bool(smooth);
-    m_graph->setObjectType(m_style, m_smooth);
+    QScatter3DSeries *series = m_graph->seriesList().at(0);
+    series->setMeshSmooth(m_smooth);
 }
 
 void ScatterDataModifier::changeTheme(int theme)

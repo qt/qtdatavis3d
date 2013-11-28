@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qbardataproxy.h>
+#include <QtDataVisualization/qabstract3dseries.h>
 
 #include <QFont>
 #include <QDebug>
@@ -79,7 +80,8 @@ private:
     Q3DCategoryAxis *m_monthAxis;
     QBarDataProxy *m_primaryData;
     QBarDataProxy *m_secondaryData;
-    QDataVis::MeshStyle m_style;
+    QAbstract3DSeries::Mesh m_primaryStyle;
+    QAbstract3DSeries::Mesh m_secondaryStyle;
     bool m_smooth;
 };
 

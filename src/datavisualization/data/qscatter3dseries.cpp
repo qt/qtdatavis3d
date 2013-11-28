@@ -207,6 +207,7 @@ QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
       m_selectedItem(Scatter3DController::invalidSelectionIndex())
 {
     m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
+    m_mesh = QAbstract3DSeries::MeshSphere;
 }
 
 QScatter3DSeriesPrivate::~QScatter3DSeriesPrivate()
@@ -249,9 +250,6 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
                          controller, &Scatter3DController::handleItemsRemoved);
         QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsInserted,
                          controller, &Scatter3DController::handleItemsInserted);
-
-        QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
-                         &Abstract3DController::handleSeriesVisibilityChanged);
     }
 }
 

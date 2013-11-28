@@ -74,7 +74,6 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -122,7 +121,6 @@ public:
 
 protected:
     virtual void initializeOpenGL();
-    virtual void loadMeshFile();
 
 public slots:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
@@ -141,7 +139,7 @@ private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
-    virtual void updateTheme(Q3DTheme *theme);
+    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawSlicedScene(const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
     void drawScene(GLuint defaultFboHandle);

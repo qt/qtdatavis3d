@@ -45,7 +45,6 @@ Item {
             theme: Theme3D { type: AbstractGraph3D.ThemeDigia }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
-            objectType: AbstractGraph3D.MeshStyleCubes
             //! [1]
             inputHandler: null
             //! [1]
@@ -53,6 +52,7 @@ Item {
             Scatter3DSeries {
                 id: scatterSeries
                 itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+                mesh: Abstract3DSeries.MeshCube
 
                 ItemModelScatterDataProxy {
                     itemModel: graphData.model

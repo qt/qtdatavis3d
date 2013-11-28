@@ -80,10 +80,6 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     // and add a small space between them
     m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
-
-    // Set bar type to flat pyramids
-    m_graph->setBarType(QDataVis::MeshStylePyramids, false);
-
     //! [5]
 
 #ifndef USE_STATIC_DATA
@@ -270,6 +266,7 @@ int main(int argc, char **argv)
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model());
     proxy->setUseModelCategories(true);
     QBar3DSeries *series = new QBar3DSeries(proxy);
+    series->setMesh(QAbstract3DSeries::MeshPyramid);
     graph->addSeries(series);
     //! [2]
 

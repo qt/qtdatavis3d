@@ -51,12 +51,9 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
     Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
     Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle barType READ barType WRITE setBarType NOTIFY meshFileNameChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled NOTIFY meshFileNameChanged)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -81,15 +78,6 @@ public:
 
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative() const;
-
-    void setBarType(QDataVis::MeshStyle style);
-    QDataVis::MeshStyle barType() const;
-
-    void setBarSmoothingEnabled(bool enabled);
-    bool isBarSmoothingEnabled() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
 
     QQmlListProperty<QBar3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series);

@@ -52,7 +52,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_isSeriesDirty(true),
+    m_isSeriesVisibilityDirty(true),
+    m_isSeriesVisualsDirty(true),
     m_renderPending(false)
 {
     // Set initial theme
@@ -98,6 +99,8 @@ void Abstract3DController::addSeries(QAbstract3DSeries *series)
     if (series && !m_seriesList.contains(series)) {
         m_seriesList.append(series);
         series->d_ptr->setController(this);
+        QObject::connect(series, &QAbstract3DSeries::visibilityChanged,
+                         this, &Abstract3DController::handleSeriesVisibilityChanged);
         if (series->isVisible())
             handleSeriesVisibilityChangedBySender(series);
     }
@@ -107,9 +110,11 @@ void Abstract3DController::removeSeries(QAbstract3DSeries *series)
 {
     if (series && series->d_ptr->m_controller == this) {
         m_seriesList.removeAll(series);
+        QObject::disconnect(series, &QAbstract3DSeries::visibilityChanged,
+                            this, &Abstract3DController::handleSeriesVisibilityChanged);
         series->d_ptr->setController(0);
         m_isDataDirty = true;
-        m_isSeriesDirty = true;
+        m_isSeriesVisibilityDirty = true;
         emitNeedRender();
     }
 }
@@ -187,11 +192,6 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.selectionModeChanged) {
         m_renderer->updateSelectionMode(m_selectionMode);
         m_changeTracker.selectionModeChanged = false;
-    }
-
-    if (m_changeTracker.objFileChanged) {
-        m_renderer->updateMeshFileName(m_objFile);
-        m_changeTracker.objFileChanged = false;
     }
 
     if (m_changeTracker.axisXTypeChanged) {
@@ -337,9 +337,10 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
-    if (m_isSeriesDirty) {
-        m_renderer->updateSeries(m_seriesList);
-        m_isSeriesDirty = false;
+    if (m_isSeriesVisibilityDirty || m_isSeriesVisualsDirty) {
+        m_renderer->updateSeries(m_seriesList, m_isSeriesVisibilityDirty);
+        m_isSeriesVisibilityDirty = false;
+        m_isSeriesVisualsDirty = false;
     }
 
     if (m_isDataDirty) {
@@ -833,24 +834,21 @@ void Abstract3DController::setSlicingActive(bool isSlicing)
     emitNeedRender();
 }
 
-void Abstract3DController::setMeshFileName(const QString &fileName)
-{
-    if (fileName != m_objFile) {
-        m_objFile = fileName;
-        m_changeTracker.objFileChanged = true;
-        emit meshFileNameChanged(fileName);
-        emitNeedRender();
-    }
-}
-
-QString Abstract3DController::meshFileName() const
-{
-    return m_objFile;
-}
-
 Q3DScene *Abstract3DController::scene()
 {
     return m_scene;
+}
+
+void Abstract3DController::markDataDirty()
+{
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::markSeriesVisualsDirty()
+{
+    m_isSeriesVisualsDirty = true;
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
@@ -1023,7 +1021,7 @@ void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender
     Q_UNUSED(sender)
 
     m_isDataDirty = true;
-    m_isSeriesDirty = true;
+    m_isSeriesVisibilityDirty = true;
     emitNeedRender();
 }
 

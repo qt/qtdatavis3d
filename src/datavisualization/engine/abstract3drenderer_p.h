@@ -66,7 +66,6 @@ protected:
     QDataVis::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
 
-    QString m_cachedObjFile;
     QDataVis::SelectionFlags m_cachedSelectionMode;
 
     QDataVis::ColorStyle m_cachedColorStyle;
@@ -104,7 +103,7 @@ public:
     virtual ~Abstract3DRenderer();
 
     virtual void updateData() = 0;
-    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
 
     virtual void render(GLuint defaultFboHandle);
 
@@ -113,7 +112,6 @@ public:
 
     virtual void updateTheme(Q3DTheme *theme);
     virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
-    virtual void updateMeshFileName(const QString &objFileName);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
@@ -141,6 +139,8 @@ public:
     virtual void updateMultiHighlightColor(const QColor &color);
     virtual void updateMultiHighlightGradient(const QLinearGradient &gradient);
 
+    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
     void requestShadowQuality(QDataVis::ShadowQuality quality); // For automatic quality adjustments
@@ -153,7 +153,6 @@ protected:
     void reInitShaders();
     virtual void handleShadowQualityChange();
     virtual void handleResize();
-    virtual void loadMeshFile() = 0;
 
     AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
 

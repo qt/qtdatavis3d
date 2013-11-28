@@ -49,9 +49,6 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType NOTIFY meshFileNameChanged)
-    Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled NOTIFY meshFileNameChanged)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -59,23 +56,12 @@ public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
     ~DeclarativeScatter();
 
-    Q_INVOKABLE void setObjectColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
-
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);
     Q3DValueAxis *axisY() const;
     void setAxisY(Q3DValueAxis *axis);
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
-
-    void setObjectType(QDataVis::MeshStyle style);
-    QDataVis::MeshStyle objectType() const;
-
-    void setObjectSmoothingEnabled(bool enabled);
-    bool isObjectSmoothingEnabled() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
 
     QQmlListProperty<QScatter3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series);

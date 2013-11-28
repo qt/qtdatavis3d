@@ -34,27 +34,35 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+class Abstract3DRenderer;
+class ObjectHelper;
+
 class SeriesRenderCache
 {
 public:
     SeriesRenderCache();
     virtual ~SeriesRenderCache();
 
-    void populate(QAbstract3DSeries *series);
-
-    inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
+    void populate(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
 
     // NOTE: Series pointer can only be used to access the series when syncing with controller.
     // It is not guaranteed to be valid while rendering and should only be used as an identifier.
     inline QAbstract3DSeries *series() const { return m_series; }
 
+    inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
+    inline const QAbstract3DSeries::Mesh &mesh() const { return m_mesh; }
+    inline ObjectHelper *object() const { return m_object; }
+
     // TODO: Add other visual elements
 
 protected:
-    QString m_itemLabelFormat;
     QAbstract3DSeries *m_series;
+    QString m_itemLabelFormat;
+    ObjectHelper *m_object;
+    QAbstract3DSeries::Mesh m_mesh;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
 #endif
+

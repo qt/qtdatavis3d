@@ -64,7 +64,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_scatter->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
     m_scatter->setSelectionMode(QDataVis::SelectionNone);
     m_scatter->theme()->setGridEnabled(false);
-    m_scatter->setObjectType(QDataVis::MeshStylePoints);
+    m_scatter->setObjectType(QDataVis::MeshPoint);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
     m_scatter->addSeries(new QScatter3DSeries);
@@ -73,7 +73,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_bars->setTheme(new Q3DTheme(QDataVis::ThemeQt));
     m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
     m_bars->theme()->setGridEnabled(false);
-    m_bars->setBarType(QDataVis::MeshStyleBars, false);
+    m_bars->setBarType(QDataVis::MeshBar, false);
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
     m_bars->scene()->activeCamera()->setCameraPosition(0.0, 75.0, 150);

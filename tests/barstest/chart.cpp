@@ -466,34 +466,44 @@ void GraphModifier::changeStyle()
     static int model = 0;
     switch (model) {
     case 0:
-        m_graph->setBarType(QDataVis::MeshStyleCylinders, false);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCylinder);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 1:
-        m_graph->setBarType(QDataVis::MeshStyleCylinders, true);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCylinder);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     case 2:
-        m_graph->setBarType(QDataVis::MeshStyleCones, false);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCone);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 3:
-        m_graph->setBarType(QDataVis::MeshStyleCones, true);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCone);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     case 4:
-        m_graph->setBarType(QDataVis::MeshStyleBars, false);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 5:
-        m_graph->setBarType(QDataVis::MeshStyleBars, true);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     case 6:
-        m_graph->setBarType(QDataVis::MeshStylePyramids, false);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshPyramid);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 7:
-        m_graph->setBarType(QDataVis::MeshStylePyramids, true);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshPyramid);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     case 8:
-        m_graph->setBarType(QDataVis::MeshStyleBevelBars, false);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBevelBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 9:
-        m_graph->setBarType(QDataVis::MeshStyleBevelBars, true);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBevelBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     }
     model++;

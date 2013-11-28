@@ -73,11 +73,12 @@ int main(int argc, char **argv)
     smoothCheckBox->setChecked(false);
 
     QComboBox *barStyleList = new QComboBox(widget);
-    barStyleList->addItem(QStringLiteral("Bars"));
-    barStyleList->addItem(QStringLiteral("Pyramids"));
-    barStyleList->addItem(QStringLiteral("Cones"));
-    barStyleList->addItem(QStringLiteral("Cylinders"));
-    barStyleList->addItem(QStringLiteral("Beveled Bars"));
+    barStyleList->addItem(QStringLiteral("Bar"), int(QAbstract3DSeries::MeshBar));
+    barStyleList->addItem(QStringLiteral("Pyramid"), int(QAbstract3DSeries::MeshPyramid));
+    barStyleList->addItem(QStringLiteral("Cone"), int(QAbstract3DSeries::MeshCone));
+    barStyleList->addItem(QStringLiteral("Cylinder"), int(QAbstract3DSeries::MeshCylinder));
+    barStyleList->addItem(QStringLiteral("Bevel bar"), int(QAbstract3DSeries::MeshBevelBar));
+    barStyleList->addItem(QStringLiteral("Sphere"), int(QAbstract3DSeries::MeshSphere));
     barStyleList->setCurrentIndex(4);
 
     QPushButton *cameraButton = new QPushButton(widget);

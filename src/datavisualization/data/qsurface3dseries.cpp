@@ -33,6 +33,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * If no data proxy is set explicitly for the series, the series creates a default
  * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
+ * The object mesh set via QAbstract3DSeries::mesh property defines the selection
+ * pointer shape in surface series.
+ *
  * QSurface3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
  *   \row
@@ -207,6 +210,7 @@ QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
       m_selectedPoint(Surface3DController::invalidSelectionPosition())
 {
     m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
+    m_mesh = QAbstract3DSeries::MeshSphere;
 }
 
 QSurface3DSeriesPrivate::~QSurface3DSeriesPrivate()
@@ -244,9 +248,6 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
                          &Surface3DController::handleArrayReset);
         QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::rowsChanged, controller,
                          &Surface3DController::handleRowsChanged);
-
-        QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
-                         &Abstract3DController::handleSeriesVisibilityChanged);
     }
 }
 

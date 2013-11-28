@@ -61,7 +61,6 @@ struct Abstract3DChangeBitField {
     bool selectionModeChanged          : 1;
     bool objFileChanged                : 1;
     bool gridEnabledChanged            : 1;
-    bool backgroundEnabledChanged      : 1;
     bool axisXTypeChanged              : 1;
     bool axisYTypeChanged              : 1;
     bool axisZTypeChanged              : 1;
@@ -105,7 +104,6 @@ struct Abstract3DChangeBitField {
         selectionModeChanged(true),
         objFileChanged(true),
         gridEnabledChanged(true),
-        backgroundEnabledChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -172,7 +170,6 @@ private:
     bool m_labelBackground;
     bool m_isBackgroundEnabled;
     bool m_isGridEnabled;
-    QString m_objFile;
     Q3DScene *m_scene;
     QDataVis::ColorStyle m_colorStyle;
     QColor m_objectColor;
@@ -194,7 +191,8 @@ protected:
     QList<Q3DAbstractAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
-    bool m_isSeriesDirty;
+    bool m_isSeriesVisibilityDirty;
+    bool m_isSeriesVisualsDirty;
     bool m_renderPending;
 
     QList<QAbstract3DSeries *> m_seriesList;
@@ -282,12 +280,11 @@ public:
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
 
-    virtual void setMeshFileName(const QString &fileName);
-    virtual QString meshFileName() const;
-
     Q3DScene *scene();
 
-    inline void setSeriesDirty() { m_isSeriesDirty = true; }
+    void markDataDirty();
+    void markSeriesVisualsDirty();
+
     void emitNeedRender();
 
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -327,7 +324,6 @@ signals:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void meshFileNameChanged(QString filename);
     void needRender();
     void colorStyleChanged(QDataVis::ColorStyle style);
     void objectColorChanged(QColor color);
@@ -345,6 +341,8 @@ protected:
 private:
     void setAxisHelper(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis *axis,
                        Q3DAbstractAxis **axisPtr);
+
+    friend class Bars3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

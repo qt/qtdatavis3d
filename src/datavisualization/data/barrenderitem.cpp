@@ -25,7 +25,8 @@ BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_value(0),
       m_height(0.0f),
-      m_sliceLabelItem(0)
+      m_sliceLabelItem(0),
+      m_seriesIndex(0)
 {
 }
 
@@ -37,6 +38,7 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_height = other.m_height;
     m_sliceLabel = other.m_sliceLabel;
     m_sliceLabelItem = 0;
+    m_seriesIndex = other.m_seriesIndex;
 }
 
 BarRenderItem::~BarRenderItem()

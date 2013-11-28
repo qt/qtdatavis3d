@@ -31,9 +31,13 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
 {
     Q_OBJECT
     Q_ENUMS(SeriesType)
+    Q_ENUMS(Mesh)
     Q_PROPERTY(SeriesType type READ type)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
+    Q_PROPERTY(Mesh mesh READ mesh WRITE setMesh NOTIFY meshChanged)
+    Q_PROPERTY(bool meshSmooth READ isMeshSmooth WRITE setMeshSmooth NOTIFY meshSmoothChanged)
+    Q_PROPERTY(QString userDefinedMesh READ userDefinedMesh WRITE setUserDefinedMesh NOTIFY userDefinedMeshChanged)
 
 public:
     enum SeriesType {
@@ -41,6 +45,20 @@ public:
         SeriesTypeBar = 1,
         SeriesTypeScatter = 2,
         SeriesTypeSurface = 4
+    };
+
+    enum Mesh {
+        MeshUserDefined = 0,
+        MeshBar,
+        MeshCube,
+        MeshPyramid,
+        MeshCone,
+        MeshCylinder,
+        MeshBevelBar,
+        MeshBevelCube,
+        MeshSphere,
+        MeshMinimal,
+        MeshPoint
     };
 
 protected:
@@ -57,9 +75,21 @@ public:
     void setVisible(bool visible);
     bool isVisible() const;
 
+    void setMesh(Mesh mesh);
+    Mesh mesh() const;
+
+    void setMeshSmooth(bool enable);
+    bool isMeshSmooth() const;
+
+    void setUserDefinedMesh(const QString &fileName);
+    QString userDefinedMesh() const;
+
 signals:
     void itemLabelFormatChanged(QString format);
     void visibilityChanged(bool visible);
+    void meshChanged(Mesh mesh);
+    void meshSmoothChanged(bool enabled);
+    void userDefinedMeshChanged(QString fileName);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;
@@ -80,6 +110,7 @@ private:
     friend class Surface3DController;
     friend class Scatter3DController;
     friend class QBar3DSeries;
+    friend class SeriesRenderCache;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

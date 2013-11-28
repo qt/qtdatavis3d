@@ -48,7 +48,8 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_primaryData(new QBarDataProxy),
       m_secondaryData(new QBarDataProxy),
       //! [1]
-      m_style(QDataVis::MeshStyleBevelBars),
+      m_primaryStyle(QAbstract3DSeries::MeshBevelBar),
+      m_secondaryStyle(QAbstract3DSeries::MeshSphere),
       m_smooth(false)
 {
     //! [2]
@@ -78,8 +79,13 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
 
     QBar3DSeries *series = new QBar3DSeries(m_primaryData);
     series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
+    series->setMesh(m_primaryStyle);
+    series->setMeshSmooth(m_smooth);
+
     QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
     series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
+    series2->setMesh(m_secondaryStyle);
+    series2->setMeshSmooth(m_smooth);
     series2->setVisible(false);
 
     //! [4]
@@ -159,8 +165,12 @@ void GraphModifier::resetTemperatureData()
 
 void GraphModifier::changeStyle(int style)
 {
-    m_style = QDataVis::MeshStyle(style);
-    m_graph->setBarType(m_style, m_smooth);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        m_primaryStyle = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        if (m_graph->seriesList().size())
+            m_graph->seriesList().at(0)->setMesh(m_primaryStyle);
+    }
 }
 
 void GraphModifier::changePresetCamera()
@@ -251,7 +261,10 @@ void GraphModifier::setGridEnabled(int enabled)
 void GraphModifier::setSmoothBars(int smooth)
 {
     m_smooth = bool(smooth);
-    m_graph->setBarType(m_style, m_smooth);
+    if (m_graph->seriesList().size()) {
+        m_graph->seriesList().at(0)->setMeshSmooth(m_smooth);
+        m_graph->seriesList().at(1)->setMeshSmooth(m_smooth);
+    }
 }
 
 void GraphModifier::setSeriesVisibility(int enabled)

@@ -23,8 +23,6 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-const QString smoothString(QStringLiteral("Smooth"));
-
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_shared(0),
@@ -40,8 +38,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_shared = new Bars3DController(boundingRect().toRect());
     AbstractDeclarative::setSharedController(m_shared);
-    QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
-                     &DeclarativeBars::meshFileNameChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -144,55 +140,6 @@ void DeclarativeBars::setBarSpacingRelative(bool relative)
 bool DeclarativeBars::isBarSpacingRelative() const
 {
     return m_shared->isBarSpecRelative();
-}
-
-void DeclarativeBars::setBarType(QDataVis::MeshStyle style)
-{
-    QString objFile = m_shared->meshFileName();
-    bool smooth = objFile.endsWith(smoothString);
-    m_shared->setBarType(style, smooth);
-}
-
-QDataVis::MeshStyle DeclarativeBars::barType() const
-{
-    QString objFile = m_shared->meshFileName();
-    if (objFile.contains("/sphere"))
-        return QDataVis::MeshStyleSpheres;
-    else
-        return QDataVis::MeshStyleDots;
-}
-
-void DeclarativeBars::setBarSmoothingEnabled(bool enabled)
-{
-    QString objFile = m_shared->meshFileName();
-    if (objFile.endsWith(smoothString)) {
-        if (enabled)
-            return; // Already smooth; do nothing
-        else // Rip Smooth off the end
-            objFile.resize(objFile.indexOf(smoothString));
-    } else {
-        if (!enabled) // Already flat; do nothing
-            return;
-        else // Append Smooth to the end
-            objFile.append(smoothString);
-    }
-    m_shared->setMeshFileName(objFile);
-}
-
-bool DeclarativeBars::isBarSmoothingEnabled() const
-{
-    QString objFile = m_shared->meshFileName();
-    return objFile.endsWith(smoothString);
-}
-
-void DeclarativeBars::setMeshFileName(const QString &objFileName)
-{
-    m_shared->setMeshFileName(objFileName);
-}
-
-QString DeclarativeBars::meshFileName() const
-{
-    return m_shared->meshFileName();
 }
 
 QQmlListProperty<QBar3DSeries> DeclarativeBars::seriesList()

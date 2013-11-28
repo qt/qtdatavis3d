@@ -64,7 +64,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
-      m_barObj(0),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -114,7 +113,6 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_barObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
     delete m_labelObj;
@@ -297,9 +295,6 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                      const LabelItem &zLabel)
 {
     GLfloat barPosX = 0;
-    GLint startBar = 0;
-    GLint stopBar = m_sliceSelection->size();
-    GLint stepBar = 1;
     QVector3D lightPos;
 
     // Specify viewport
@@ -484,7 +479,8 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         gradientTexture = m_objectGradientTexture;
     }
 
-    for (int bar = startBar; bar != stopBar; bar += stepBar) {
+    int stopBar = m_sliceSelection->size();
+    for (int bar = 0; bar < stopBar; bar++) {
         BarRenderItem *item = m_sliceSelection->at(bar);
         if (!item)
             continue;
@@ -517,6 +513,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
         QVector3D barColor;
+        // TODO: Get color from correct series
         if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                 && m_visualSelectedBarPos.y() == item->position().y()) {
             if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
@@ -544,7 +541,9 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
             }
 
             // Draw the object
-            m_drawer->drawObject(m_barShader, m_barObj, gradientTexture);
+            m_drawer->drawObject(m_barShader,
+                                 m_visibleSeriesList.at(item->seriesIndex()).object(),
+                                 gradientTexture);
         }
     }
 
@@ -591,7 +590,8 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
             // TODO: Maybe use selection label instead of value? Should it be user controllable
             // as well? (QTRD-2546)
             if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
-                    && m_visualSelectedBarPos.y() == item->position().y()) {
+                    && m_visualSelectedBarPos.y() == item->position().y()
+                    && item->seriesIndex() == m_visualSelectedBarSeriesIndex) {
                 m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
                                     valuePositionComp, sliceValueRotation, item->height(),
                                     m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
@@ -785,6 +785,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value())
                         continue;
+                    ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
                     // Set front face culling for negative valued bars and back face culling for
                     // positive valued bars to remove peter-panning issues
                     if (item.height() > 0) {
@@ -818,15 +819,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     // 1st attribute buffer : vertices
                     glEnableVertexAttribArray(m_depthShader->posAtt());
-                    glBindBuffer(GL_ARRAY_BUFFER, m_barObj->vertexBuf());
+                    glBindBuffer(GL_ARRAY_BUFFER, barObj->vertexBuf());
                     glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
                                           (void *)0);
 
                     // Index buffer
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_barObj->elementBuf());
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, barObj->elementBuf());
 
                     // Draw the triangles
-                    glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT,
+                    glDrawElements(GL_TRIANGLES, barObj->indexCount(), GL_UNSIGNED_SHORT,
                                    (void *)0);
 
                     // Free buffers
@@ -890,6 +891,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         seriesPos += m_seriesStep;
                         continue;
                     }
+                    ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
 
                     if (item.height() < 0)
                         glCullFace(GL_FRONT);
@@ -926,15 +928,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     // 1st attribute buffer : vertices
                     glEnableVertexAttribArray(m_selectionShader->posAtt());
-                    glBindBuffer(GL_ARRAY_BUFFER, m_barObj->vertexBuf());
+                    glBindBuffer(GL_ARRAY_BUFFER, barObj->vertexBuf());
                     glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
                                           (void *)0);
 
                     // Index buffer
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_barObj->elementBuf());
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, barObj->elementBuf());
 
                     // Draw the triangles
-                    glDrawElements(GL_TRIANGLES, m_barObj->indexCount(), GL_UNSIGNED_SHORT,
+                    glDrawElements(GL_TRIANGLES, barObj->indexCount(), GL_UNSIGNED_SHORT,
                                    (void *)0);
 
                     // Free buffers
@@ -1001,6 +1003,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_sliceSelection && m_sliceSelection->size()) {
                 // Slice doesn't own its items, no need to delete them - just clear
                 m_sliceSelection->clear();
+                int reserveAmount = 0;
+                if (rowMode)
+                    reserveAmount = m_renderColumns;
+                else
+                    reserveAmount = m_renderRows;
+                if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+                    reserveAmount *= m_visibleSeriesList.size();
+                m_sliceSelection->reserve(reserveAmount);
             }
             // Set slice cache, i.e. axis cache from where slice labels are taken
             if (rowMode)
@@ -1029,6 +1039,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         for (int bar = startBar; bar != stopBar; bar += stepBar) {
             float seriesPos = m_seriesStart;
             for (int series = 0; series < seriesCount; series++) {
+                ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
                 BarRenderItem &item = m_renderingArrays[series][row][bar];
 
                 if (item.height() < 0)
@@ -1094,6 +1105,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             }
                             item.setTranslation(translation);
                             item.setPosition(QPoint(row, bar));
+                            item.setSeriesIndex(series);
                             m_sliceSelection->append(&item);
                             barSelectionFound = true;
                         }
@@ -1112,6 +1124,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             item.setTranslation(modelMatrix.column(3).toVector3D());
                             item.setPosition(QPoint(row, bar));
                             if (m_selectionDirty && bar < m_renderColumns) {
+                                item.setSeriesIndex(series);
                                 if (!m_sliceTitleItem && m_axisCacheX.labelItems().size() > row)
                                     m_sliceTitleItem = m_axisCacheX.labelItems().at(row);
                                 m_sliceSelection->append(&item);
@@ -1138,6 +1151,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             item.setTranslation(translation);
                             item.setPosition(QPoint(row, bar));
                             if (m_selectionDirty && row < m_renderRows) {
+                                item.setSeriesIndex(series);
                                 if (!m_sliceTitleItem && m_axisCacheZ.labelItems().size() > bar)
                                     m_sliceTitleItem = m_axisCacheZ.labelItems().at(bar);
                                 m_sliceSelection->append(&item);
@@ -1176,7 +1190,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         m_barShader->setUniformValue(m_barShader->lightS(), shadowLightStrength);
 
                         // Draw the object
-                        m_drawer->drawObject(m_barShader, m_barObj, gradientTexture, m_depthTexture);
+                        m_drawer->drawObject(m_barShader, barObj, gradientTexture, m_depthTexture);
                     } else
 #endif
                     {
@@ -1184,7 +1198,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
 
                         // Draw the object
-                        m_drawer->drawObject(m_barShader, m_barObj, gradientTexture);
+                        m_drawer->drawObject(m_barShader, barObj, gradientTexture);
                     }
                 }
                 seriesPos += m_seriesStep;
@@ -1829,16 +1843,6 @@ void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientatio
     }
 }
 
-void Bars3DRenderer::updateTheme(Q3DTheme *theme)
-{
-    bool wasEnabled = m_cachedTheme->isBackgroundEnabled();
-
-    Abstract3DRenderer::updateTheme(theme);
-
-    if (theme->isBackgroundEnabled() != wasEnabled)
-        loadMeshFile(); // Load changed bar type
-}
-
 void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSeries *series)
 {
     m_selectedBarPos = position;
@@ -1914,21 +1918,6 @@ void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
-void Bars3DRenderer::loadMeshFile()
-{
-    if (m_cachedObjFile.isEmpty())
-        return;
-
-    QString objectFileName = m_cachedObjFile;
-    if (m_barObj)
-        delete m_barObj;
-    // If background is disabled, load full version of bar mesh
-    if (!m_cachedTheme->isBackgroundEnabled())
-        objectFileName.append(QStringLiteral("Full"));
-    m_barObj = new ObjectHelper(objectFileName);
-    m_barObj->load();
-}
-
 void Bars3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
@@ -1960,6 +1949,16 @@ void Bars3DRenderer::updateTextures()
 {
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
+}
+
+void Bars3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
+{
+    if (!m_cachedTheme->isBackgroundEnabled()) {
+        // Load full version of meshes that have it available
+        // Note: Minimal and Point not supported in bar charts
+        if (mesh != QAbstract3DSeries::MeshSphere)
+            fileName.append(QStringLiteral("Full"));
+    }
 }
 
 void Bars3DRenderer::calculateSceneScalingFactors()

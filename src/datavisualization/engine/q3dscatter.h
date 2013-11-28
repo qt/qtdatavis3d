@@ -39,7 +39,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
@@ -58,13 +57,8 @@ public:
     void removeSeries(QScatter3DSeries *series);
     QList<QScatter3DSeries *> seriesList();
 
-    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
-
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
@@ -106,7 +100,6 @@ public:
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void meshFileNameChanged(QString filename);
     void themeChanged(Q3DTheme* theme);
     void colorStyleChanged(QDataVis::ColorStyle style);
     void itemColorChanged(QColor color);

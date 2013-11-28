@@ -42,7 +42,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName NOTIFY meshFileNameChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
@@ -61,9 +60,6 @@ public:
     void removeSeries(QBar3DSeries *series);
     QList<QBar3DSeries *> seriesList();
 
-    // TODO: Move to dataset object once that is done QTRD-2121
-    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
-
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
 
@@ -75,10 +71,6 @@ public:
 
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative();
-
-    // TODO: Move to dataset object once that is done QTRD-2121
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
@@ -123,7 +115,6 @@ signals:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
-    void meshFileNameChanged(QString filename);
     void themeChanged(Q3DTheme *theme);
     void colorStyleChanged(QDataVis::ColorStyle style);
     void barColorChanged(QColor color);

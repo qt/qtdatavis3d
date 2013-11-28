@@ -41,7 +41,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QFont font = m_chart->theme()->font();
     font.setPointSize(m_fontSize);
     m_chart->theme()->setFont(font);
-    m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
@@ -110,27 +109,42 @@ void ScatterDataModifier::addData()
 
 void ScatterDataModifier::changeStyle()
 {
-    static int model = 0;
-    switch (model) {
-    case 0:
-        m_chart->setObjectType(QDataVis::MeshStyleDots, false);
-        break;
-    case 1:
-        m_chart->setObjectType(QDataVis::MeshStyleDots, true);
-        break;
-    case 2:
-        m_chart->setObjectType(QDataVis::MeshStyleSpheres, false);
-        break;
-    case 3:
-        m_chart->setObjectType(QDataVis::MeshStyleSpheres, true);
-        break;
-    case 4:
-        m_chart->setObjectType(QDataVis::MeshStylePoints);
-        break;
+    if (!m_targetSeries)
+        createAndAddSeries();
+
+    if (m_targetSeries->isMeshSmooth()) {
+        m_targetSeries->setMeshSmooth(false);
+        switch (m_targetSeries->mesh()) {
+        case QAbstract3DSeries::MeshCube:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshPyramid);
+            break;
+        case QAbstract3DSeries::MeshPyramid:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshCone);
+            break;
+        case QAbstract3DSeries::MeshCone:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshCylinder);
+            break;
+        case QAbstract3DSeries::MeshCylinder:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshBevelCube);
+            break;
+        case QAbstract3DSeries::MeshBevelCube:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshSphere);
+            break;
+        case QAbstract3DSeries::MeshSphere:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshMinimal);
+            break;
+        case QAbstract3DSeries::MeshMinimal:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshPoint);
+            break;
+        default:
+            m_targetSeries->setMesh(QAbstract3DSeries::MeshCube);
+            break;
+        }
+    } else {
+        m_targetSeries->setMeshSmooth(true);
     }
-    model++;
-    if (model > 4)
-        model = 0;
+
+    qDebug() << __FUNCTION__ << m_targetSeries->mesh() << m_targetSeries->isMeshSmooth();
 }
 
 void ScatterDataModifier::changePresetCamera()
@@ -478,6 +492,8 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
 
     m_chart->addSeries(series);
     series->setItemLabelFormat(QString("%1: @xLabel - @yLabel - @zLabel").arg(counter++));
+    series->setMesh(QAbstract3DSeries::MeshSphere);
+    series->setMeshSmooth(true);
 
     QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
                      &ScatterDataModifier::handleSelectionChange);

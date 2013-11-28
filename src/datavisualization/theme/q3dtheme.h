@@ -160,6 +160,7 @@ protected:
 
     friend class ThemeManager;
     friend class Abstract3DRenderer;
+    friend class Bars3DController;
 
 private:
     Q_DISABLE_COPY(Q3DTheme)

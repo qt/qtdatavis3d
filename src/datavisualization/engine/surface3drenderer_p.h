@@ -147,7 +147,6 @@ public:
 
 protected:
     void initializeOpenGL();
-    virtual void loadMeshFile();
 
 signals:
     void pointClicked(QPoint position, QSurface3DSeries *series);

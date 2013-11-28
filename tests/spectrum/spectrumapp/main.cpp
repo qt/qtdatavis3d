@@ -85,7 +85,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setBarThickness(1.25);
     m_chart->setBarSpacing(QSizeF(0.2, -0.75));
     // Set bar type, smooth cones
-    m_chart->setBarType(QDataVis::MeshStyleCones, true);
+    m_chart->setBarType(QDataVis::MeshCones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpacing)
     m_chart->setCameraPosition(10.0f, 5.0f, 70.0f);
@@ -94,7 +94,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setBarThickness(2.0f);
     m_chart->setBarSpacing(QSizeF(0.0, 0.0));
     // Set bar type, flat bars
-    m_chart->setBarType(QDataVis::MeshStyleBars, false);
+    m_chart->setBarType(QDataVis::MeshBar, false);
     // Adjust camera position
     m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif

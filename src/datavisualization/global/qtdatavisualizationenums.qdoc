@@ -56,30 +56,6 @@
 */
 
 /*!
-    \enum QtDataVisualization::QDataVis::MeshStyle
-
-    Predefined mesh types. All styles are not usable with all visualization types.
-
-    \value MeshStyleBars
-           Basic cubic bar. Usable only with Q3DBars.
-    \value MeshStylePyramids
-           Four-sided pyramid. Usable only with Q3DBars.
-    \value MeshStyleCones
-           Basic cone. Usable only with Q3DBars.
-    \value MeshStyleCylinders
-           Basic cylinder. Usable only with Q3DBars.
-    \value MeshStyleBevelBars
-           Slightly beveled (rounded) cubic bar. Usable only with Q3DBars.
-    \value MeshStyleSpheres
-           Sphere. Usable only with Q3DScatter.
-    \value MeshStyleDots
-           Triangular pyramid. Usable only with Q3DScatter.
-    \value MeshStylePoints
-           2D spots. Usable only with Q3DScatter.
-           \b Note: Shadows and color gradients do not affect this style.
-*/
-
-/*!
     \enum QtDataVisualization::QDataVis::CameraPreset
 
     Predefined positions for camera.

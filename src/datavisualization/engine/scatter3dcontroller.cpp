@@ -35,9 +35,6 @@ Scatter3DController::Scatter3DController(QRect boundRect)
       m_selectedItem(invalidSelectionIndex()),
       m_selectedItemSeries(0)
 {
-    // Default object type; specific to scatter
-    setObjectType(QDataVis::MeshStyleSpheres, false);
-
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
@@ -195,33 +192,6 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
 
     // Update selected index - may be moved offscreen
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
-}
-
-void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
-{
-    QString objFile;
-    if (style == QDataVis::MeshStyleSpheres) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/sphere");
-    } else if (style == QDataVis::MeshStyleDots) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/dot");
-    } else if (style == QDataVis::MeshStyleBars) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/barSmoothFull");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/barFull");
-    } else {
-        objFile = QString();
-#if defined(QT_OPENGL_ES_2)
-        qWarning("MeshStylePoints is not fully supported on OpenGL ES2");
-#endif
-    }
-    Abstract3DController::setMeshFileName(objFile);
 }
 
 void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)

@@ -109,12 +109,12 @@ Item {
         text: "Use Smooth Dots"
         anchors.left: shadowToggle.right
         onClicked: {
-            if (scatterGraph.objectSmoothingEnabled === false) {
+            if (scatterSeries.meshSmooth === false) {
                 text = "Use Flat Dots";
-                scatterGraph.objectSmoothingEnabled = true;
+                scatterSeries.meshSmooth = true;
             } else {
                 text = "Use Smooth Dots"
-                scatterGraph.objectSmoothingEnabled = false;
+                scatterSeries.meshSmooth = false;
             }
         }
     }

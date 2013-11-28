@@ -25,6 +25,7 @@
 #include "q3dlight_p.h"
 #include "qabstract3dseries_p.h"
 #include "q3dtheme_p.h"
+#include "objecthelper_p.h"
 
 Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
 
@@ -71,6 +72,8 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_drawer;
     delete m_textureHelper;
     delete m_cachedScene;
+    for (int i = 0; i < m_visibleSeriesList.size(); i++)
+        delete m_visibleSeriesList.at(i).object();
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -250,14 +253,6 @@ void Abstract3DRenderer::handleShadowQualityChange()
 #endif
 }
 
-void Abstract3DRenderer::updateMeshFileName(const QString &objFileName)
-{
-    if (objFileName != m_cachedObjFile) {
-        m_cachedObjFile = objFileName;
-        loadMeshFile();
-    }
-}
-
 void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
 {
     m_cachedSelectionMode = mode;
@@ -365,21 +360,31 @@ void Abstract3DRenderer::updateMultiHighlightGradient(const QLinearGradient &gra
     fixGradient(&m_cachedMultiHighlightGradient, &m_multiHighlightGradientTexture);
 }
 
-void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
+void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
+{
+    // Default implementation does nothing.
+    Q_UNUSED(fileName)
+    Q_UNUSED(mesh)
+}
+
+void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
+                                      bool updateVisibility)
 {
     int visibleCount = 0;
-    foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible())
-            visibleCount++;
+    if (updateVisibility) {
+        foreach (QAbstract3DSeries *current, seriesList) {
+            if (current->isVisible())
+                visibleCount++;
+        }
+
+        if (visibleCount != m_visibleSeriesList.size())
+            m_visibleSeriesList.resize(visibleCount);
+
+        visibleCount = 0;
     }
-
-    if (visibleCount != m_visibleSeriesList.size())
-        m_visibleSeriesList.resize(visibleCount);
-
-    visibleCount = 0;
     foreach (QAbstract3DSeries *current, seriesList) {
         if (current->isVisible())
-            m_visibleSeriesList[visibleCount++].populate(current);
+            m_visibleSeriesList[visibleCount++].populate(current, this);
     }
 }
 

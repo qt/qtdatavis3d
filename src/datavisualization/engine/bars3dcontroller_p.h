@@ -88,7 +88,6 @@ public:
     GLfloat barThickness();
     QSizeF barSpacing();
     bool isBarSpecRelative();
-    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     void setSelectedBar(const QPoint &position, QBar3DSeries *series);

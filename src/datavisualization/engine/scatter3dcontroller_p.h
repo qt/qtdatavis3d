@@ -68,9 +68,6 @@ public:
 
     void initializeOpenGL();
 
-    // Object type
-    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
-
     // Change selection mode
     void setSelectionMode(QDataVis::SelectionFlags mode);
 

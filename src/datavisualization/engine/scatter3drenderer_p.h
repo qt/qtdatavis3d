@@ -67,7 +67,6 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_dotObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -89,7 +88,6 @@ private:
     GLfloat m_dotSizeScale;
     QVector3D m_translationOffset;
     bool m_hasHeightAdjustmentChanged;
-    bool m_drawingPoints;
     ScatterRenderItem m_dummyRenderItem;
     QVector<ScatterRenderItemArray> m_renderingArrays;
 
@@ -106,12 +104,12 @@ public:
 
 protected:
     virtual void initializeOpenGL();
-    virtual void loadMeshFile();
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
+    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawScene(GLuint defaultFboHandle);
     void handleResize();

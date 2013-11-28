@@ -28,7 +28,6 @@ namespace QtDataVisualization {
 class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(MeshStyle)
     Q_ENUMS(CameraPreset)
     Q_ENUMS(Theme)
     Q_ENUMS(ShadowQuality)
@@ -45,19 +44,6 @@ public:
         InputStateOnSlice,
         InputStateRotating,
         InputStateOnPinch
-    };
-
-    // TODO: Move to series (QTRD-2557)
-    enum MeshStyle {
-        MeshStyleBars = 0,
-        MeshStyleCubes = MeshStyleBars,
-        MeshStylePyramids,
-        MeshStyleCones,
-        MeshStyleCylinders,
-        MeshStyleBevelBars,
-        MeshStyleSpheres,
-        MeshStyleDots,
-        MeshStylePoints
     };
 
     // TODO: Move to camera (QTRD-2505)

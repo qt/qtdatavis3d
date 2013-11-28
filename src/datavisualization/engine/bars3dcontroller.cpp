@@ -24,6 +24,8 @@
 #include "q3dcategoryaxis_p.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
+#include "thememanager_p.h"
+#include "q3dtheme_p.h"
 
 #include <QMatrix4x4>
 #include <qmath.h>
@@ -39,9 +41,6 @@ Bars3DController::Bars3DController(QRect boundRect)
       m_barSpacing(QSizeF(1.0, 1.0)),
       m_renderer(0)
 {
-    // Default bar type; specific to bars
-    setBarType(QDataVis::MeshStyleBevelBars, false);
-
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
@@ -72,6 +71,13 @@ void Bars3DController::initializeOpenGL()
 
 void Bars3DController::synchDataToRenderer()
 {
+    // Background change requires reloading the meshes in bar graphs, so dirty the series visuals
+    if (m_themeManager->theme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
+        m_isSeriesVisualsDirty = true;
+        foreach (QAbstract3DSeries *series, m_seriesList)
+            series->d_ptr->m_changeTracker.meshChanged = true;
+    }
+
     Abstract3DController::synchDataToRenderer();
 
     if (!isInitialized())
@@ -309,26 +315,6 @@ QSizeF Bars3DController::barSpacing()
 bool Bars3DController::isBarSpecRelative()
 {
     return m_isBarSpecRelative;
-}
-
-void Bars3DController::setBarType(QDataVis::MeshStyle style, bool smooth)
-{
-    QString objFile;
-    if (style == QDataVis::MeshStyleBars)
-        objFile = QStringLiteral(":/defaultMeshes/bar");
-    else if (style == QDataVis::MeshStylePyramids)
-        objFile = QStringLiteral(":/defaultMeshes/pyramid");
-    else if (style == QDataVis::MeshStyleCones)
-        objFile = QStringLiteral(":/defaultMeshes/cone");
-    else if (style == QDataVis::MeshStyleCylinders)
-        objFile = QStringLiteral(":/defaultMeshes/cylinder");
-    else if (style == QDataVis::MeshStyleBevelBars)
-        objFile = QStringLiteral(":/defaultMeshes/bevelbar");
-
-    if (smooth)
-        objFile += QStringLiteral("Smooth");
-
-    Abstract3DController::setMeshFileName(objFile);
 }
 
 void Bars3DController::setSelectionMode(QDataVis::SelectionFlags mode)

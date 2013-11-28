@@ -213,6 +213,7 @@ QBar3DSeriesPrivate::QBar3DSeriesPrivate(QBar3DSeries *q)
       m_selectedBar(Bars3DController::invalidSelectionPosition())
 {
     m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
+    m_mesh = QAbstract3DSeries::MeshBevelBar;
 }
 
 QBar3DSeriesPrivate::~QBar3DSeriesPrivate()
@@ -261,8 +262,6 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
                          &Bars3DController::handleDataRowLabelsChanged);
         QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, controller,
                          &Bars3DController::handleDataColumnLabelsChanged);
-        QObject::connect(q_ptr, &QAbstract3DSeries::visibilityChanged, controller,
-                         &Abstract3DController::handleSeriesVisibilityChanged);
     }
 }
 

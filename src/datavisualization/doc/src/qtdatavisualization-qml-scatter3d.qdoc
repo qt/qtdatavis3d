@@ -40,19 +40,6 @@
  */
 
 /*!
- * \qmlmethod void Scatter3D::setObjectColor(const QColor &baseColor, bool uniform)
- * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
- * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
- * be applied by height. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa AbstractGraph3D::theme
- *
- * \warning This method is subject to change.
- */
-
-/*!
   \qmlproperty ValueAxis3D Scatter3D::axisX
   A user-defined X axis.
 
@@ -77,23 +64,6 @@
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
   This temporary axis is destroyed if another axis is explicitly set to same orientation.
- */
-
-/*!
-  \qmlproperty Scatter3D.MeshStyle Scatter3D::objectType
-  Dot object type.
- */
-
-/*!
-  \qmlproperty bool Scatter3D::objectSmoothingEnabled
-  Dot smoothing. If false, dot shading is flat.
- */
-
-/*!
-  \qmlproperty string Scatter3D::meshFileName
-  Override object type with a mesh object.
-  \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
-  It also needs to be in triangles.
  */
 
 /*!

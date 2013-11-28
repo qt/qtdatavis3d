@@ -63,7 +63,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->columnAxis()->setCategoryLabels(months);
 
     // Set bar type to cylinder
-    m_graph->setBarType(QDataVis::MeshStyleCylinders, false);
+    series->setMesh(QAbstract3DSeries::MeshCylinder);
 
     // Set shadows to medium
     m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);

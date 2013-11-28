@@ -22,8 +22,6 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-const QString smoothString(QStringLiteral("Smooth"));
-
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_shared(0),
@@ -39,9 +37,6 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_shared = new Scatter3DController(boundingRect().toRect());
     setSharedController(m_shared);
-
-    QObject::connect(m_shared, &Abstract3DController::meshFileNameChanged, this,
-                     &DeclarativeScatter::meshFileNameChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -72,11 +67,6 @@ QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDa
     return node;
 }
 
-void DeclarativeScatter::setObjectColor(const QColor &baseColor)
-{
-    m_shared->setBaseColor(baseColor);
-}
-
 Q3DValueAxis *DeclarativeScatter::axisX() const
 {
     return static_cast<Q3DValueAxis *>(m_shared->axisX());
@@ -105,55 +95,6 @@ Q3DValueAxis *DeclarativeScatter::axisZ() const
 void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
 {
     m_shared->setAxisZ(axis);
-}
-
-void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
-{
-    QString objFile = m_shared->meshFileName();
-    bool smooth = objFile.endsWith(smoothString);
-    m_shared->setObjectType(style, smooth);
-}
-
-QDataVis::MeshStyle DeclarativeScatter::objectType() const
-{
-    QString objFile = m_shared->meshFileName();
-    if (objFile.contains("/sphere"))
-        return QDataVis::MeshStyleSpheres;
-    else
-        return QDataVis::MeshStyleDots;
-}
-
-void DeclarativeScatter::setObjectSmoothingEnabled(bool enabled)
-{
-    QString objFile = m_shared->meshFileName();
-    if (objFile.endsWith(smoothString)) {
-        if (enabled)
-            return; // Already smooth; do nothing
-        else // Rip Smooth off the end
-            objFile.resize(objFile.indexOf(smoothString));
-    } else {
-        if (!enabled) // Already flat; do nothing
-            return;
-        else // Append Smooth to the end
-            objFile.append(smoothString);
-    }
-    m_shared->setMeshFileName(objFile);
-}
-
-bool DeclarativeScatter::isObjectSmoothingEnabled() const
-{
-    QString objFile = m_shared->meshFileName();
-    return objFile.endsWith(smoothString);
-}
-
-void DeclarativeScatter::setMeshFileName(const QString &objFileName)
-{
-    m_shared->setMeshFileName(objFileName);
-}
-
-QString DeclarativeScatter::meshFileName() const
-{
-    return m_shared->meshFileName();
 }
 
 QQmlListProperty<QScatter3DSeries> DeclarativeScatter::seriesList()

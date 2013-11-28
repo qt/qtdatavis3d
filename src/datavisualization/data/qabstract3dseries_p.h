@@ -38,6 +38,21 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class QAbstractDataProxy;
 class Abstract3DController;
 
+struct QAbstract3DSeriesChangeBitField {
+    bool itemLabelFormatChanged        : 1;
+    bool meshChanged                   : 1;
+    bool meshSmoothChanged             : 1;
+    bool userDefinedMeshChanged        : 1;
+
+    QAbstract3DSeriesChangeBitField()
+        : itemLabelFormatChanged(true),
+          meshChanged(true),
+          meshSmoothChanged(true),
+          userDefinedMeshChanged(true)
+    {
+    }
+};
+
 class QAbstract3DSeriesPrivate : public QObject
 {
     Q_OBJECT
@@ -45,30 +60,27 @@ public:
     QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type);
     virtual ~QAbstract3DSeriesPrivate();
 
-    void setItemLabelFormat(const QString &format);
-
     QAbstractDataProxy *dataProxy() const;
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void setController(Abstract3DController *controller);
     virtual void connectControllerAndProxy(Abstract3DController *newController) = 0;
 
-protected:
+    void setItemLabelFormat(const QString &format);
+    void setVisible(bool visible);
+    void setMesh(QAbstract3DSeries::Mesh mesh);
+    void setMeshSmooth(bool enable);
+    void setUserDefinedMesh(const QString &meshFile);
+
+    QAbstract3DSeriesChangeBitField m_changeTracker;
     QAbstract3DSeries *q_ptr;
     QAbstract3DSeries::SeriesType m_type;
     QString m_itemLabelFormat;
     QAbstractDataProxy *m_dataProxy;
     bool m_visible;
     Abstract3DController *m_controller;
-
-private:
-    friend class QAbstract3DSeries;
-    friend class Abstract3DController;
-    friend class Bars3DController;
-    friend class Surface3DController;
-    friend class Scatter3DController;
-    friend class QBar3DSeries;
-    friend class QScatter3DSeries;
-    friend class QSurface3DSeries;
+    QAbstract3DSeries::Mesh m_mesh;
+    bool m_meshSmooth;
+    QString m_userDefinedMesh;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -106,8 +106,6 @@ Q3DBars::Q3DBars()
                      &Q3DBars::selectionModeChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::meshFileNameChanged, this,
-                     &Q3DBars::meshFileNameChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DBars::themeChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::colorStyleChanged, this,
@@ -300,18 +298,6 @@ bool Q3DBars::isBarSpacingRelative()
 }
 
 /*!
- * Sets the bar \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
- * \c QDataVis::MeshStyleBars by default. A \a smooth flag can be used to set shading to smooth.
- * It is \c false by default.
- *
- * \sa setMeshFileName()
- */
-void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
-{
-    d_ptr->m_shared->setBarType(style, smooth);
-}
-
-/*!
  * \property Q3DBars::theme
  *
  * A user-defined theme.
@@ -342,25 +328,6 @@ void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
 QDataVis::SelectionFlags Q3DBars::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DBars::meshFileName
- *
- * Override bar type with a mesh object located in \a objFileName.
- * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
- * It also needs to be in triangles.
- *
- * \sa setBarType()
- */
-void Q3DBars::setMeshFileName(const QString &objFileName)
-{
-    d_ptr->m_shared->setMeshFileName(objFileName);
-}
-
-QString Q3DBars::meshFileName() const
-{
-    return d_ptr->m_shared->meshFileName();
 }
 
 /*!

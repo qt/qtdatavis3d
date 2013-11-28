@@ -1940,12 +1940,6 @@ QString Surface3DRenderer::createSelectionLabel(float value, int column, int row
     return labelText;
 }
 
-void Surface3DRenderer::loadMeshFile()
-{
-    // Do nothing, not yet supported by this renderer
-    // TODO: To be used for overriding the selection ball mesh after technology preview
-}
-
 void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
