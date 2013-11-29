@@ -254,8 +254,17 @@ void Bars3DRenderer::updateData()
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setSecondarySubViewport(m_sliceViewPort);
-    scene->setPrimarySubViewport(m_mainViewPort);
+    float devicePixelRatio = scene->devicePixelRatio();
+    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
+                                            m_mainViewPort.y() / devicePixelRatio,
+                                            m_mainViewPort.width() / devicePixelRatio,
+                                            m_mainViewPort.height() / devicePixelRatio);
+    QRect logicalSecondarySubViewport = QRect(m_sliceViewPort.x() / devicePixelRatio,
+                                              m_sliceViewPort.y() / devicePixelRatio,
+                                              m_sliceViewPort.width() / devicePixelRatio,
+                                              m_sliceViewPort.height() / devicePixelRatio);
+    scene->setPrimarySubViewport(logicalPrimarySubViewport);
+    scene->setSecondarySubViewport(logicalSecondarySubViewport);
 
     // TODO: See QTRD-2374
     if (m_hasNegativeValues)
@@ -2082,11 +2091,6 @@ void Bars3DRenderer::setViewPorts()
         m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
         m_sliceViewPort = QRect(0, 0, 0, 0);
     }
-}
-
-QRect Bars3DRenderer::mainViewPort()
-{
-    return m_mainViewPort;
 }
 
 void Bars3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)

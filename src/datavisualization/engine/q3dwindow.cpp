@@ -106,9 +106,8 @@ void Q3DWindow::handleDevicePixelRatioChange()
     if (QWindow::devicePixelRatio() == d_ptr->m_devicePixelRatio || !d_ptr->m_visualController)
         return;
 
-    // Device pixel ratio changed, resize accordingly and inform the scene
     d_ptr->m_devicePixelRatio = QWindow::devicePixelRatio();
-    d_ptr->m_visualController->updateDevicePixelRatio(d_ptr->m_devicePixelRatio);
+    d_ptr->m_visualController->scene()->setDevicePixelRatio(d_ptr->m_devicePixelRatio);
 }
 
 /*!
@@ -166,6 +165,7 @@ void Q3DWindow::render()
     d_ptr->m_visualController->synchDataToRenderer();
     d_ptr->m_visualController->render();
 }
+
 
 /*!
  * \internal

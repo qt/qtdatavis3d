@@ -117,8 +117,6 @@ public:
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
-    QRect mainViewPort();
-
 protected:
     virtual void initializeOpenGL();
 

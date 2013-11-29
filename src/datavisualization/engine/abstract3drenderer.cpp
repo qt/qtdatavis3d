@@ -179,18 +179,21 @@ void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
 {
-    updateInputPosition(scene->selectionQueryPosition());
+    float devicePixelRatio = scene->devicePixelRatio();
+    QPoint logicalPixelPosition = scene->selectionQueryPosition();
+    updateInputPosition(QPoint(logicalPixelPosition.x() * devicePixelRatio,
+                               logicalPixelPosition.y() * devicePixelRatio));
 
-    if (Q3DScene::invalidSelectionPoint() == scene->selectionQueryPosition()) {
+    if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
     } else {
         // Selections are one-shot, reset selection active to false before processing
         scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
 
         if (scene->isSlicingActive()) {
-            if (scene->isPointInPrimarySubView(m_inputPosition))
+            if (scene->isPointInPrimarySubView(logicalPixelPosition))
                 updateSelectionState(SelectOnOverview);
-            else if (scene->isPointInSecondarySubView(m_inputPosition))
+            else if (scene->isPointInSecondarySubView(logicalPixelPosition))
                 updateSelectionState(SelectOnSlice);
             else
                 updateSelectionState(SelectNone);

@@ -203,17 +203,11 @@ public:
 
     // Size
     virtual void setSize(const int width, const int height);
-    virtual const QSize size();
-    virtual const QRect boundingRect();
     virtual void setBoundingRect(const QRect boundingRect);
     virtual void setWidth(const int width);
-    virtual int width();
     virtual void setHeight(const int height);
-    virtual int height();
     virtual void setX(const int x);
-    virtual int x();
     virtual void setY(const int y);
-    virtual int y();
 
     virtual QRect primarySubViewport() const;
     virtual void setPrimarySubViewport(const QRect &primarySubViewport);
@@ -235,8 +229,6 @@ public:
     virtual void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual QAbstract3DInputHandler *activeInputHandler();
-
-    virtual void updateDevicePixelRatio(float ratio);
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
@@ -305,6 +297,7 @@ public slots:
     void handleInputStateChanged(QDataVis::InputState state);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);
+    void handlePixelRatioChanged(float ratio);
 
     // Renderer callback handlers
     void handleRequestShadowQuality(QDataVis::ShadowQuality quality);

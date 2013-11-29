@@ -187,7 +187,12 @@ void Scatter3DRenderer::updateData()
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setPrimarySubViewport(m_mainViewPort);
+    float devicePixelRatio = scene->devicePixelRatio();
+    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
+                                            m_mainViewPort.y() / devicePixelRatio,
+                                            m_mainViewPort.width() / devicePixelRatio,
+                                            m_mainViewPort.height() / devicePixelRatio);
+    scene->setPrimarySubViewport(logicalPrimarySubViewport);
 
     // TODO: See QTRD-2374
     scene->activeCamera()->setMinYRotation(-90.0f);
@@ -1588,11 +1593,6 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     m_translationOffset = QVector3D((m_axisCacheX.max() + m_axisCacheX.min()) / 2.0f,
                                     (m_axisCacheY.max() + m_axisCacheY.min()) / 2.0f,
                                     (m_axisCacheZ.max() + m_axisCacheZ.min()) / 2.0f);
-}
-
-QRect Scatter3DRenderer::mainViewPort()
-{
-    return m_mainViewPort;
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)

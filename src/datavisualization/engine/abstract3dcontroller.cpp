@@ -69,6 +69,8 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
             &Abstract3DController::handleInputPositionChanged);
     connect(m_scene, &Q3DScene::needRender, this,
             &Abstract3DController::emitNeedRender);
+    connect(m_scene, &Q3DScene::devicePixelRatioChanged, this,
+            &Abstract3DController::handlePixelRatioChanged);
 }
 
 Abstract3DController::~Abstract3DController()
@@ -401,27 +403,22 @@ void Abstract3DController::wheelEvent(QWheelEvent *event)
 
 void Abstract3DController::setSize(const int width, const int height)
 {
-    m_boundingRect.setWidth(width);
-    m_boundingRect.setHeight(height);
+    float devicePixelRatio = m_scene->devicePixelRatio();
     m_scene->setViewportSize(width, height);
+    m_boundingRect.setWidth(width * devicePixelRatio);
+    m_boundingRect.setHeight(height * devicePixelRatio);
 
     m_changeTracker.boundingRectChanged = true;
     emitNeedRender();
 }
 
-const QSize Abstract3DController::size()
-{
-    return m_boundingRect.size();
-}
-
-const QRect Abstract3DController::boundingRect()
-{
-    return m_boundingRect;
-}
-
 void Abstract3DController::setBoundingRect(const QRect boundingRect)
 {
-    m_boundingRect = boundingRect;
+    float devicePixelRatio = m_scene->devicePixelRatio();
+    m_boundingRect = QRect(boundingRect.x() * devicePixelRatio,
+                           boundingRect.y() * devicePixelRatio,
+                           boundingRect.width() * devicePixelRatio,
+                           boundingRect.height() * devicePixelRatio);
     m_scene->setViewport(boundingRect);
 
     m_changeTracker.boundingRectChanged = true;
@@ -430,56 +427,44 @@ void Abstract3DController::setBoundingRect(const QRect boundingRect)
 
 void Abstract3DController::setWidth(const int width)
 {
-    m_boundingRect.setWidth(width);
+    m_boundingRect.setWidth(width * m_scene->devicePixelRatio());
     m_scene->setViewportSize(width, m_scene->viewport().height());
 
     m_changeTracker.sizeChanged = true;
     emitNeedRender();
 }
 
-int Abstract3DController::width()
-{
-    return m_boundingRect.width();
-}
-
 void Abstract3DController::setHeight(const int height)
 {
-    m_boundingRect.setHeight(height);
+    m_boundingRect.setHeight(height * m_scene->devicePixelRatio());
     m_scene->setViewportSize(m_scene->viewport().width(), height);
 
     m_changeTracker.sizeChanged = true;
     emitNeedRender();
 }
 
-int Abstract3DController::height()
-{
-    return m_boundingRect.height();
-}
-
 void Abstract3DController::setX(const int x)
 {
-    m_boundingRect.setX(x);
+    m_boundingRect.setX(x * m_scene->devicePixelRatio());
+    m_scene->setViewport( QRect(x,
+                                m_scene->viewport().y(),
+                                m_scene->viewport().width(),
+                                m_scene->viewport().height()));
 
     m_changeTracker.positionChanged = true;
     emitNeedRender();
-}
-
-int Abstract3DController::x()
-{
-    return m_boundingRect.x();
 }
 
 void Abstract3DController::setY(const int y)
 {
-    m_boundingRect.setY(y);
+    m_boundingRect.setY(y * m_scene->devicePixelRatio());
+    m_scene->setViewport( QRect(m_scene->viewport().x(),
+                                y,
+                                m_scene->viewport().width(),
+                                m_scene->viewport().height()));
 
     m_changeTracker.positionChanged = true;
     emitNeedRender();
-}
-
-int Abstract3DController::y()
-{
-    return m_boundingRect.y();
 }
 
 QRect Abstract3DController::primarySubViewport() const
@@ -502,9 +487,14 @@ void Abstract3DController::setSecondarySubViewport(const QRect &secondarySubView
     m_scene->setSecondarySubViewport(secondarySubViewport);
 }
 
-void Abstract3DController::updateDevicePixelRatio(float ratio)
+void Abstract3DController::handlePixelRatioChanged(float ratio)
 {
-    m_scene->setDevicePixelRatio(ratio);
+    m_boundingRect.setX(ratio * m_scene->viewport().x());
+    m_boundingRect.setY(ratio * m_scene->viewport().y());
+    m_boundingRect.setWidth(ratio * m_scene->viewport().width());
+    m_boundingRect.setHeight(ratio * m_scene->viewport().height());
+    m_changeTracker.boundingRectChanged = true;
+    emitNeedRender();
 }
 
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)

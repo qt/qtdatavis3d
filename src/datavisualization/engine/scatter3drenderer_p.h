@@ -100,8 +100,6 @@ public:
 
     void render(GLuint defaultFboHandle);
 
-    QRect mainViewPort();
-
 protected:
     virtual void initializeOpenGL();
 

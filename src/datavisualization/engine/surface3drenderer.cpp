@@ -456,8 +456,17 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
     // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setSecondarySubViewport(m_sliceViewPort);
-    scene->setPrimarySubViewport(m_mainViewPort);
+    float devicePixelRatio = scene->devicePixelRatio();
+    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
+                                            m_mainViewPort.y() / devicePixelRatio,
+                                            m_mainViewPort.width() / devicePixelRatio,
+                                            m_mainViewPort.height() / devicePixelRatio);
+    QRect logicalSecondarySubViewport = QRect(m_sliceViewPort.x() / devicePixelRatio,
+                                              m_sliceViewPort.y() / devicePixelRatio,
+                                              m_sliceViewPort.width() / devicePixelRatio,
+                                              m_sliceViewPort.height() / devicePixelRatio);
+    scene->setPrimarySubViewport(logicalPrimarySubViewport);
+    scene->setSecondarySubViewport(logicalSecondarySubViewport);
 
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
