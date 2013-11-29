@@ -44,7 +44,7 @@ class AbstractDeclarative : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
 
@@ -83,6 +83,7 @@ signals:
     void themeChanged(Q3DTheme *theme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void itemLabelFormatChanged(QString format);
+    void sceneChanged(Q3DScene *scene);
 
 private:
     Abstract3DController *m_controller;
