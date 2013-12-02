@@ -40,7 +40,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::SelectionNone),
-      m_cachedColorStyle(QDataVis::ColorStyleUniform),
+      m_cachedColorStyle(Q3DTheme::ColorStyleUniform),
       m_objectGradientTexture(0),
       m_singleHighlightGradientTexture(0),
       m_multiHighlightGradientTexture(0),
@@ -207,7 +207,7 @@ void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
+        if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
             initShaders(QStringLiteral(":/shaders/vertexShadow"),
                         QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         } else {
@@ -217,7 +217,7 @@ void Abstract3DRenderer::reInitShaders()
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
     } else {
-        if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
+        if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
             initShaders(QStringLiteral(":/shaders/vertex"),
                         QStringLiteral(":/shaders/fragmentColorOnY"));
         } else {
@@ -228,7 +228,7 @@ void Abstract3DRenderer::reInitShaders()
                               QStringLiteral(":/shaders/fragment"));
     }
 #else
-    if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
+    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
         initShaders(QStringLiteral(":/shaders/vertex"),
                     QStringLiteral(":/shaders/fragmentColorOnYES2"));
     } else {
@@ -317,7 +317,7 @@ void Abstract3DRenderer::updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation 
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
 
-void Abstract3DRenderer::updateColorStyle(QDataVis::ColorStyle style)
+void Abstract3DRenderer::updateColorStyle(Q3DTheme::ColorStyle style)
 {
     bool changed = (m_cachedColorStyle != style);
 

@@ -48,7 +48,7 @@ Item {
             shadowQuality: Bars3D.ShadowQualityMedium
             selectionMode: Bars3D.SelectionItem
             theme: Theme3D {
-                type: Bars3D.ThemeRetro
+                type: Theme3D.ThemeRetro
                 font.pointSize: 35
                 labelBackgroundEnabled: true
             }

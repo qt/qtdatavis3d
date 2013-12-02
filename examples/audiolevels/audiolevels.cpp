@@ -46,7 +46,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
     m_graph->setSelectionMode(QDataVis::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
-    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeIsabelle));
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
     m_graph->theme()->setGridEnabled(true);
     m_graph->theme()->setBackgroundEnabled(false);
     QBar3DSeries *series = new QBar3DSeries;

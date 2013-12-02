@@ -35,10 +35,6 @@
   \qmlproperty AbstractGraph3D.SelectionMode AbstractGraph3D::selectionMode
   Active selection mode in the visualization.
  */
-/*!
-  \qmlproperty AbstractGraph3D.LabelStyle AbstractGraph3D::labelStyle
-  Label style.
- */
 
 /*!
   \qmlproperty AbstractGraph3D.ShadowQuality AbstractGraph3D::shadowQuality
@@ -51,22 +47,6 @@
  */
 
 /*!
-  \qmlproperty AbstractGraph3D.Theme AbstractGraph3D::theme
-  Theme of the graph. Theme affects visualization colors, label colors, text color, background color, window
-  color and grid color. Lighting is also adjusted by themes.
- */
-
-/*!
-  \qmlproperty font AbstractGraph3D::font
-  Font used for labels.
- */
-
-/*!
-  \qmlproperty bool AbstractGraph3D::gridVisible
-  Grid visibility. If false, grid lines are not drawn.
- */
-
-/*!
-  \qmlproperty bool AbstractGraph3D::backgroundVisible
-  Background visibility. If false, background is not drawn.
+  \qmlproperty Theme3D AbstractGraph3D::theme
+  Theme of the graph.
  */

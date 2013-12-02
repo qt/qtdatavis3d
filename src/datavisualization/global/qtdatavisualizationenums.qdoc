@@ -92,22 +92,6 @@
 */
 
 /*!
-    \enum QtDataVisualization::QDataVis::Theme
-
-    Predefined themes.
-
-    \value ThemeQt
-    \value ThemePrimaryColors
-    \value ThemeDigia
-    \value ThemeStoneMoss
-    \value ThemeArmyBlue
-    \value ThemeRetro
-    \value ThemeEbony
-    \value ThemeIsabelle
-    \value ThemeUserDefined
-*/
-
-/*!
     \enum QtDataVisualization::QDataVis::SelectionFlag
 
     Item selection modes. Values of this enumeration can be combined with OR operator.
@@ -158,32 +142,4 @@
            Shadows are rendered in medium quality with softened edges.
     \value ShadowQualitySoftHigh
            Shadows are rendered in high quality with softened edges.
-*/
-
-/*!
-    \enum QtDataVisualization::QDataVis::LabelStyle
-
-    Label styles.
-
-    \value LabelStyleOpaque
-           Fully opaque background, using colors and borders from theme.
-    \value LabelStyleFromTheme
-           Use transparencies, colors and borders from theme.
-    \value LabelStyleTransparent
-           Fully transparent background, using text color from theme.
-*/
-
-/*!
-    \enum QtDataVisualization::QDataVis::ColorStyle
-
-    Color styles.
-
-    \value ColorStyleUniform
-           Objects are rendered in a single color.
-    \value ColorStyleObjectGradient
-           Objects are colored using a full gradient for each object regardless
-           of object height.
-    \value ColorStyleRangeGradient
-           Objects are colored using a portion of the full gradient determined by
-           the object's height and its position on the Y-axis.
 */

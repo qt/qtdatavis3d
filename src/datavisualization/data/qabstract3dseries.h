@@ -94,7 +94,7 @@ signals:
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;
 
-//    QDataVis::ColorStyle m_colorStyle;
+//    Q3DTheme::ColorStyle m_colorStyle;
 //    QColor m_objectColor;
 //    QLinearGradient m_objectGradient;
 //    QColor m_singleHighlightColor;

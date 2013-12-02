@@ -22,6 +22,7 @@
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QLinearGradient>
 
@@ -41,7 +42,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
+    Q_PROPERTY(QtDataVisualization::Q3DTheme::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor itemColor READ itemColor WRITE setItemColor NOTIFY itemColorChanged)
     Q_PROPERTY(QLinearGradient itemGradient READ itemGradient WRITE setItemGradient NOTIFY itemGradientChanged)
     Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
@@ -72,8 +73,8 @@ public:
     QDataVis::ShadowQuality shadowQuality() const;
 
     // TODO: Move to dataset object once that is done QTRD-2121
-    void setColorStyle(QDataVis::ColorStyle style);
-    QDataVis::ColorStyle colorStyle() const;
+    void setColorStyle(Q3DTheme::ColorStyle style);
+    Q3DTheme::ColorStyle colorStyle() const;
     void setItemColor(const QColor &color);
     QColor itemColor() const;
     void setItemGradient(const QLinearGradient &gradient);
@@ -101,7 +102,7 @@ signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void themeChanged(Q3DTheme* theme);
-    void colorStyleChanged(QDataVis::ColorStyle style);
+    void colorStyleChanged(Q3DTheme::ColorStyle style);
     void itemColorChanged(QColor color);
     void itemGradientChanged(QLinearGradient gradient);
     void singleHighlightColorChanged(QColor color);

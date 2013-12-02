@@ -209,7 +209,9 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
 /*!
  * \property Q3DSurface::theme
  *
- * TODO: Add docs
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
 void Q3DSurface::setTheme(Q3DTheme *theme)
 {

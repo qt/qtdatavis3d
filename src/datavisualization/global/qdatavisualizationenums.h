@@ -29,11 +29,8 @@ class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
 {
     Q_OBJECT
     Q_ENUMS(CameraPreset)
-    Q_ENUMS(Theme)
     Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelStyle)
     Q_FLAGS(SelectionFlag SelectionFlags)
-    Q_ENUMS(ColorStyle)
 
 public:
     // TODO: Move to input handler (QTRD-2505)
@@ -75,19 +72,6 @@ public:
         CameraPresetDirectlyBelow
     };
 
-    // TODO: Move to theme
-    enum Theme {
-        ThemeQt,
-        ThemePrimaryColors,
-        ThemeDigia,
-        ThemeStoneMoss,
-        ThemeArmyBlue,
-        ThemeRetro,
-        ThemeEbony,
-        ThemeIsabelle,
-        ThemeUserDefined
-    };
-
     enum SelectionFlag {
         SelectionNone              = 0,
         SelectionItem              = 1,
@@ -110,13 +94,6 @@ public:
         ShadowQualitySoftLow,
         ShadowQualitySoftMedium,
         ShadowQualitySoftHigh
-    };
-
-    // TODO: to theme
-    enum ColorStyle {
-        ColorStyleUniform = 0,
-        ColorStyleObjectGradient,
-        ColorStyleRangeGradient
     };
 };
 

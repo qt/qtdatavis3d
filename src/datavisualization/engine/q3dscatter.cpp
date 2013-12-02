@@ -221,7 +221,9 @@ void Q3DScatter::setHeight(const int height)
 /*!
  * \property Q3DScatter::theme
  *
- * TODO: Add docs
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
 void Q3DScatter::setTheme(Q3DTheme *theme)
 {
@@ -289,12 +291,12 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  *
  * \sa itemColor, itemGradient
  */
-void Q3DScatter::setColorStyle(QDataVis::ColorStyle style)
+void Q3DScatter::setColorStyle(Q3DTheme::ColorStyle style)
 {
     d_ptr->m_shared->setColorStyle(style);
 }
 
-QDataVis::ColorStyle Q3DScatter::colorStyle() const
+Q3DTheme::ColorStyle Q3DScatter::colorStyle() const
 {
     return d_ptr->m_shared->colorStyle();
 }

@@ -38,14 +38,10 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     QObject(parent),
     m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
     m_themeManager(new ThemeManager(this)),
-    m_font(QFont(QStringLiteral("Arial"))),
     m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
-    m_labelBackground(false),
-    m_isBackgroundEnabled(true),
-    m_isGridEnabled(true),
     m_scene(new Q3DScene()),
-    m_colorStyle(QDataVis::ColorStyleUniform),
+    m_colorStyle(Q3DTheme::ColorStyleUniform),
     m_activeInputHandler(0),
     m_axisX(0),
     m_axisY(0),
@@ -57,7 +53,7 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_renderPending(false)
 {
     // Set initial theme
-    setTheme(new Q3DTheme(QDataVis::ThemeQt));
+    setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);
@@ -660,11 +656,11 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emitNeedRender();
 }
 
-void Abstract3DController::setColorStyle(QDataVis::ColorStyle style)
+void Abstract3DController::setColorStyle(Q3DTheme::ColorStyle style)
 {
     if (style != m_colorStyle || m_changeTracker.themeChanged) {
         Q3DTheme *theme = m_themeManager->theme();
-        if (style == QDataVis::ColorStyleUniform) {
+        if (style == Q3DTheme::ColorStyleUniform) {
             setBaseColor(theme->baseColor());
             setSingleHighlightColor(theme->singleHighlightColor());
             setMultiHighlightColor(theme->multiHighlightColor());
@@ -682,7 +678,7 @@ void Abstract3DController::setColorStyle(QDataVis::ColorStyle style)
     }
 }
 
-QDataVis::ColorStyle Abstract3DController::colorStyle() const
+Q3DTheme::ColorStyle Abstract3DController::colorStyle() const
 {
     return m_colorStyle;
 }

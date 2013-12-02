@@ -471,9 +471,9 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
     m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
                                  m_cachedTheme->ambientLightStrength() * 2.0f);
-    if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
+    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
         m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
-        if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient)
+        if (m_cachedColorStyle == Q3DTheme::ColorStyleObjectGradient)
             m_barShader->setUniformValue(m_barShader->gradientHeight(), 0.5f);
 
         gradientTexture = m_objectGradientTexture;
@@ -516,12 +516,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
         // TODO: Get color from correct series
         if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                 && m_visualSelectedBarPos.y() == item->position().y()) {
-            if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                 barColor = barHighlightColor;
             else
                 gradientTexture = m_singleHighlightGradientTexture;
         } else {
-            if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                 barColor = rowHighlightColor;
             else
                 gradientTexture = m_multiHighlightGradientTexture;
@@ -533,9 +533,9 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
             m_barShader->setUniformValue(m_barShader->nModel(),
                                          itModelMatrix.inverted().transposed());
             m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-            if (m_cachedColorStyle == QDataVis::ColorStyleUniform) {
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform) {
                 m_barShader->setUniformValue(m_barShader->color(), barColor);
-            } else if (m_cachedColorStyle == QDataVis::ColorStyleRangeGradient) {
+            } else if (m_cachedColorStyle == Q3DTheme::ColorStyleRangeGradient) {
                 m_barShader->setUniformValue(m_barShader->gradientHeight(),
                                              (qAbs(item->height()) / m_gradientFraction));
             }
@@ -990,9 +990,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->ambientS(),
                                  m_cachedTheme->ambientLightStrength());
-    if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
+    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
         m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
-        if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient)
+        if (m_cachedColorStyle == Q3DTheme::ColorStyleObjectGradient)
             m_barShader->setUniformValue(m_barShader->gradientHeight(), 0.5f);
 
         gradientTexture = m_objectGradientTexture;
@@ -1066,7 +1066,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-                if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+                if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                     barColor = baseColor;
                 else
                     gradientTexture = m_objectGradientTexture;
@@ -1081,7 +1081,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     switch (selectionType) {
                     case Bars3DController::SelectionItem: {
-                        if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                             barColor = barHighlightColor;
                         else
                             gradientTexture = m_singleHighlightGradientTexture;
@@ -1113,7 +1113,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     case Bars3DController::SelectionRow: {
                         // Current bar is on the same row as the selected bar
-                        if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                             barColor = rowHighlightColor;
                         else
                             gradientTexture = m_multiHighlightGradientTexture;
@@ -1134,7 +1134,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     case Bars3DController::SelectionColumn: {
                         // Current bar is on the same column as the selected bar
-                        if (m_cachedColorStyle == QDataVis::ColorStyleUniform)
+                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
                             barColor = rowHighlightColor;
                         else
                             gradientTexture = m_multiHighlightGradientTexture;
@@ -1174,9 +1174,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     m_barShader->setUniformValue(m_barShader->nModel(),
                                                  itModelMatrix.transposed().inverted());
                     m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-                    if (m_cachedColorStyle == QDataVis::ColorStyleUniform) {
+                    if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform) {
                         m_barShader->setUniformValue(m_barShader->color(), barColor);
-                    } else if (m_cachedColorStyle == QDataVis::ColorStyleRangeGradient) {
+                    } else if (m_cachedColorStyle == Q3DTheme::ColorStyleRangeGradient) {
                         m_barShader->setUniformValue(m_barShader->gradientHeight(),
                                                      qAbs(item.height()) / m_gradientFraction);
                     }

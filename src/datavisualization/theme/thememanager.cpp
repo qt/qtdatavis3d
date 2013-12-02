@@ -39,15 +39,16 @@ void ThemeManager::setTheme(Q3DTheme *theme)
     if (m_theme.data() != theme) {
         // Disconnect old theme signal connections
         if (m_theme) {
+            disconnect(m_theme->d_ptr.data(), 0, m_controller, 0);
             disconnect(m_theme.data(), 0, m_controller, 0);
             disconnect(m_theme.data(), 0, this, 0);
         }
 
         m_theme.reset(theme);
 
-        QDataVis::Theme type = m_theme->type();
+        Q3DTheme::Theme type = m_theme->type();
 
-        if (type != QDataVis::ThemeUserDefined) {
+        if (type != Q3DTheme::ThemeUserDefined) {
             useTheme(type);
             // Reset all bits to dirty for sync
             m_theme->d_ptr->resetDirtyBits();
@@ -81,18 +82,19 @@ void ThemeManager::connectThemeSignals()
     connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
             m_controller, &Abstract3DController::setMultiHighlightGradient);
 
-    connect(m_theme.data(), &Q3DTheme::needRender, m_controller, &Abstract3DController::needRender);
+    connect(m_theme->d_ptr.data(), &Q3DThemePrivate::needRender,
+            m_controller, &Abstract3DController::needRender);
 
     connect(m_theme.data(), &Q3DTheme::typeChanged, this, &ThemeManager::useTheme);
 }
 
-void ThemeManager::useTheme(QDataVis::Theme type)
+void ThemeManager::useTheme(Q3DTheme::Theme type)
 {
     QColor color;
     QLinearGradient gradient;
 
     switch (type) {
-    case QDataVis::ThemeQt: {
+    case Q3DTheme::ThemeQt: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -110,7 +112,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(true);
-        setColorStyle(QDataVis::ColorStyleUniform);
+        setColorStyle(Q3DTheme::ColorStyleUniform);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -135,7 +137,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemePrimaryColors: {
+    case Q3DTheme::ThemePrimaryColors: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -153,7 +155,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleUniform);
+        setColorStyle(Q3DTheme::ColorStyleUniform);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -178,7 +180,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeDigia: {
+    case Q3DTheme::ThemeDigia: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -196,7 +198,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleObjectGradient);
+        setColorStyle(Q3DTheme::ColorStyleObjectGradient);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -221,7 +223,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeStoneMoss: {
+    case Q3DTheme::ThemeStoneMoss: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -239,7 +241,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(true);
-        setColorStyle(QDataVis::ColorStyleUniform);
+        setColorStyle(Q3DTheme::ColorStyleUniform);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -264,7 +266,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeArmyBlue: {
+    case Q3DTheme::ThemeArmyBlue: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -282,7 +284,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleObjectGradient);
+        setColorStyle(Q3DTheme::ColorStyleObjectGradient);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -307,7 +309,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeRetro: {
+    case Q3DTheme::ThemeRetro: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -325,7 +327,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleObjectGradient);
+        setColorStyle(Q3DTheme::ColorStyleObjectGradient);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -350,7 +352,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeEbony: {
+    case Q3DTheme::ThemeEbony: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -368,7 +370,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleUniform);
+        setColorStyle(Q3DTheme::ColorStyleUniform);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -393,7 +395,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         break;
     }
 
-    case QDataVis::ThemeIsabelle: {
+    case Q3DTheme::ThemeIsabelle: {
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -411,7 +413,7 @@ void ThemeManager::useTheme(QDataVis::Theme type)
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
-        setColorStyle(QDataVis::ColorStyleUniform);
+        setColorStyle(Q3DTheme::ColorStyleUniform);
         gradient = QLinearGradient(qreal(gradientTextureWidth),
                                    qreal(gradientTextureHeight),
                                    0.0, 0.0);
@@ -460,14 +462,14 @@ void ThemeManager::setWindowColor(const QColor &color)
 
 void ThemeManager::setTextColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.textColorDirty)
-        m_theme->setTextColor(color);
+    if (!m_theme->d_ptr->m_dirtyBits.labelTextColorDirty)
+        m_theme->setLabelTextColor(color);
 }
 
 void ThemeManager::setTextBackgroundColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.textBackgroundColorDirty)
-        m_theme->setTextBackgroundColor(color);
+    if (!m_theme->d_ptr->m_dirtyBits.labelBackgroundColorDirty)
+        m_theme->setLabelBackgroundColor(color);
 }
 
 void ThemeManager::setGridLineColor(const QColor &color)
@@ -560,7 +562,7 @@ void ThemeManager::setLabelBackgroundEnabled(bool enabled)
         m_theme->setLabelBackgroundEnabled(enabled);
 }
 
-void ThemeManager::setColorStyle(QDataVis::ColorStyle style)
+void ThemeManager::setColorStyle(Q3DTheme::ColorStyle style)
 {
     if (!m_theme->d_ptr->m_dirtyBits.colorStyleDirty)
         m_theme->setColorStyle(style);

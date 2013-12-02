@@ -300,9 +300,9 @@ bool Q3DBars::isBarSpacingRelative()
 /*!
  * \property Q3DBars::theme
  *
- * A user-defined theme.
- *
- * TODO: Add docs.
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
 void Q3DBars::setTheme(Q3DTheme *theme)
 {
@@ -368,12 +368,12 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  *
  * \sa barColor, barGradient
  */
-void Q3DBars::setColorStyle(QDataVis::ColorStyle style)
+void Q3DBars::setColorStyle(Q3DTheme::ColorStyle style)
 {
     d_ptr->m_shared->setColorStyle(style);
 }
 
-QDataVis::ColorStyle Q3DBars::colorStyle() const
+Q3DTheme::ColorStyle Q3DBars::colorStyle() const
 {
     return d_ptr->m_shared->colorStyle();
 }

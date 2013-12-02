@@ -38,8 +38,8 @@ struct Q3DThemeDirtyBitField {
     bool baseColorDirty                : 1;
     bool backgroundColorDirty          : 1;
     bool windowColorDirty              : 1;
-    bool textColorDirty                : 1;
-    bool textBackgroundColorDirty      : 1;
+    bool labelTextColorDirty           : 1;
+    bool labelBackgroundColorDirty     : 1;
     bool gridLineColorDirty            : 1;
     bool singleHighlightColorDirty     : 1;
     bool multiHighlightColorDirty      : 1;
@@ -62,8 +62,8 @@ struct Q3DThemeDirtyBitField {
         : baseColorDirty(false),
           backgroundColorDirty(false),
           windowColorDirty(false),
-          textColorDirty(false),
-          textBackgroundColorDirty(false),
+          labelTextColorDirty(false),
+          labelBackgroundColorDirty(false),
           gridLineColorDirty(false),
           singleHighlightColorDirty(false),
           multiHighlightColorDirty(false),
@@ -90,15 +90,18 @@ class Q3DThemePrivate : public QObject
     Q_OBJECT
 public:
     Q3DThemePrivate(Q3DTheme *q,
-                    QDataVis::Theme theme_id = QDataVis::ThemeUserDefined);
+                    Q3DTheme::Theme theme_id = Q3DTheme::ThemeUserDefined);
     virtual ~Q3DThemePrivate();
 
     void resetDirtyBits();
 
     bool sync(Q3DThemePrivate &other);
 
+signals:
+    void needRender();
+
 public:
-    QDataVis::Theme m_themeId;
+    Q3DTheme::Theme m_themeId;
 
     Q3DThemeDirtyBitField m_dirtyBits;
 
@@ -118,7 +121,7 @@ public:
     float m_ambientLightStrength;
     float m_highlightLightStrength;
     bool m_labelBorders;
-    QDataVis::ColorStyle m_colorStyle;
+    Q3DTheme::ColorStyle m_colorStyle;
     QFont m_font;
     bool m_backgoundEnabled;
     bool m_gridEnabled;

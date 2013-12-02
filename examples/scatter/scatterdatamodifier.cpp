@@ -39,7 +39,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_smooth(true)
 {
     //! [0]
-    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeEbony));
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeEbony));
     QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
     m_graph->theme()->setFont(font);
@@ -136,7 +136,7 @@ void ScatterDataModifier::setSmoothDots(int smooth)
 
 void ScatterDataModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
     emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
     emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
     emit fontChanged(m_graph->theme()->font());

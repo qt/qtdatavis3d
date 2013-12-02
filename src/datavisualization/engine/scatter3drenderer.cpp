@@ -561,8 +561,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         dotShader->setUniformValue(dotShader->lightP(), lightPos);
         dotShader->setUniformValue(dotShader->view(), viewMatrix);
         dotShader->setUniformValue(dotShader->ambientS(), m_cachedTheme->ambientLightStrength());
-        if (m_cachedColorStyle != QDataVis::ColorStyleUniform) {
-            if (m_cachedColorStyle == QDataVis::ColorStyleObjectGradient) {
+        if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleObjectGradient) {
                 dotShader->setUniformValue(dotShader->gradientMin(), 0.0f);
                 dotShader->setUniformValue(dotShader->gradientHeight(), 0.5f);
             } else {
@@ -624,14 +624,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-            if (m_cachedColorStyle == QDataVis::ColorStyleUniform || drawingPoints)
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform || drawingPoints)
                 dotColor = baseColor;
             else
                 gradientTexture = m_objectGradientTexture;
 
             GLfloat lightStrength = m_cachedTheme->lightStrength();
             if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
-                if (m_cachedColorStyle == QDataVis::ColorStyleUniform || drawingPoints)
+                if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform || drawingPoints)
                     dotColor = Utils::vectorFromColor(m_cachedSingleHighlightColor);
                 else
                     gradientTexture = m_singleHighlightGradientTexture;
@@ -648,9 +648,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                            itModelMatrix.inverted().transposed());
             }
             dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
-            if (m_cachedColorStyle == QDataVis::ColorStyleUniform || drawingPoints) {
+            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform || drawingPoints) {
                 dotShader->setUniformValue(dotShader->color(), dotColor);
-            } else if (m_cachedColorStyle == QDataVis::ColorStyleRangeGradient) {
+            } else if (m_cachedColorStyle == Q3DTheme::ColorStyleRangeGradient) {
                 dotShader->setUniformValue(dotShader->gradientMin(),
                                            (item.position().y() + 1.0f) / 2.0f);
             }

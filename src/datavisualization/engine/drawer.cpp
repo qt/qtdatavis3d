@@ -364,8 +364,8 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
         // Print label into a QImage using QPainter
         QImage label = Utils::printTextToImage(m_font,
                                                text,
-                                               m_theme->textBackgroundColor(),
-                                               m_theme->textColor(),
+                                               m_theme->labelBackgroundColor(),
+                                               m_theme->labelTextColor(),
                                                m_labelBackground,
                                                m_theme->isLabelBorderEnabled(),
                                                widestLabel);

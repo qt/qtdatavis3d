@@ -68,7 +68,7 @@ protected:
 
     QDataVis::SelectionFlags m_cachedSelectionMode;
 
-    QDataVis::ColorStyle m_cachedColorStyle;
+    Q3DTheme::ColorStyle m_cachedColorStyle;
     QColor m_cachedObjectColor;
     QLinearGradient m_cachedObjectGradient;
     GLuint m_objectGradientTexture;
@@ -131,7 +131,7 @@ public:
     virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
-    virtual void updateColorStyle(QDataVis::ColorStyle style);
+    virtual void updateColorStyle(Q3DTheme::ColorStyle style);
     virtual void updateObjectColor(const QColor &color);
     virtual void updateObjectGradient(const QLinearGradient &gradient);
     virtual void updateSingleHighlightColor(const QColor &color);

@@ -42,7 +42,7 @@ Item {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
-            theme: Theme3D { type: AbstractGraph3D.ThemeDigia }
+            theme: Theme3D { type: Theme3D.ThemeDigia }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             //! [1]

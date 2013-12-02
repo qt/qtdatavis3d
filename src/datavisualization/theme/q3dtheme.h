@@ -31,12 +31,14 @@ class Q3DThemePrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme type READ type WRITE setType NOTIFY typeChanged)
+    Q_ENUMS(ColorStyle)
+    Q_ENUMS(Theme)
+    Q_PROPERTY(Theme type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QColor baseColor READ baseColor WRITE setBaseColor NOTIFY baseColorChanged)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
     Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor NOTIFY windowColorChanged)
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
-    Q_PROPERTY(QColor textBackgroundColor READ textBackgroundColor WRITE setTextBackgroundColor NOTIFY textBackgroundColorChanged)
+    Q_PROPERTY(QColor labelTextColor READ labelTextColor WRITE setLabelTextColor NOTIFY labelTextColorChanged)
+    Q_PROPERTY(QColor labelBackgroundColor READ labelBackgroundColor WRITE setLabelBackgroundColor NOTIFY labelBackgroundColorChanged)
     Q_PROPERTY(QColor gridLineColor READ gridLineColor WRITE setGridLineColor NOTIFY gridLineColorChanged)
     Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
@@ -52,16 +54,35 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_PROPERTY(bool backgroundEnabled READ isBackgroundEnabled WRITE setBackgroundEnabled NOTIFY backgroundEnabledChanged)
     Q_PROPERTY(bool gridEnabled READ isGridEnabled WRITE setGridEnabled NOTIFY gridEnabledChanged)
     Q_PROPERTY(bool labelBackgroundEnabled READ isLabelBackgroundEnabled WRITE setLabelBackgroundEnabled NOTIFY labelBackgroundEnabledChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
-    // TODO: Add everything that we need
+    Q_PROPERTY(ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
+    // TODO: Add everything we need (specularIntensity, lightDegradation, shaders?)
+
+public:
+    enum ColorStyle {
+        ColorStyleUniform = 0,
+        ColorStyleObjectGradient,
+        ColorStyleRangeGradient
+    };
+
+    enum Theme {
+        ThemeQt,
+        ThemePrimaryColors,
+        ThemeDigia,
+        ThemeStoneMoss,
+        ThemeArmyBlue,
+        ThemeRetro,
+        ThemeEbony,
+        ThemeIsabelle,
+        ThemeUserDefined
+    };
 
 public:
     explicit Q3DTheme(QObject *parent = 0);
-    explicit Q3DTheme(QDataVis::Theme themeType, QObject *parent = 0);
+    explicit Q3DTheme(Theme themeType, QObject *parent = 0);
     virtual ~Q3DTheme();
 
-    void setType(QDataVis::Theme themeType);
-    QDataVis::Theme type() const;
+    void setType(Theme themeType);
+    Theme type() const;
 
     void setBaseColor(const QColor &color);
     QColor baseColor() const;
@@ -72,11 +93,11 @@ public:
     void setWindowColor(const QColor &color);
     QColor windowColor() const;
 
-    void setTextColor(const QColor &color);
-    QColor textColor() const;
+    void setLabelTextColor(const QColor &color);
+    QColor labelTextColor() const;
 
-    void setTextBackgroundColor(const QColor &color);
-    QColor textBackgroundColor() const;
+    void setLabelBackgroundColor(const QColor &color);
+    QColor labelBackgroundColor() const;
 
     void setGridLineColor(const QColor &color);
     QColor gridLineColor() const;
@@ -123,16 +144,16 @@ public:
     void setLabelBackgroundEnabled(bool enabled);
     bool isLabelBackgroundEnabled() const;
 
-    void setColorStyle(QDataVis::ColorStyle style);
-    QDataVis::ColorStyle colorStyle() const;
+    void setColorStyle(ColorStyle style);
+    ColorStyle colorStyle() const;
 
 signals:
-    void typeChanged(QDataVis::Theme themeType);
+    void typeChanged(Theme themeType);
     void baseColorChanged(QColor color);
     void backgroundColorChanged(QColor color);
     void windowColorChanged(QColor color);
-    void textColorChanged(QColor color);
-    void textBackgroundColorChanged(QColor color);
+    void labelTextColorChanged(QColor color);
+    void labelBackgroundColorChanged(QColor color);
     void gridLineColorChanged(QColor color);
     void singleHighlightColorChanged(QColor color);
     void multiHighlightColorChanged(QColor color);
@@ -148,14 +169,10 @@ signals:
     void backgroundEnabledChanged(bool enabled);
     void gridEnabledChanged(bool enabled);
     void labelBackgroundEnabledChanged(bool enabled);
-    void colorStyleChanged(QDataVis::ColorStyle style);
-
-    void needRender();
+    void colorStyleChanged(ColorStyle style);
 
 protected:
-    explicit Q3DTheme(Q3DThemePrivate *d,
-                      QDataVis::Theme themeType,
-                      QObject *parent = 0);
+    explicit Q3DTheme(Q3DThemePrivate *d, Theme themeType, QObject *parent = 0);
     QScopedPointer<Q3DThemePrivate> d_ptr;
 
     friend class ThemeManager;

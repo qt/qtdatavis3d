@@ -53,14 +53,11 @@ struct Abstract3DChangeBitField {
     bool positionChanged               : 1;
     bool zoomLevelChanged              : 1;
     bool themeChanged                  : 1;
-    bool fontChanged                   : 1;
-    bool labelBackgroundEnabledChanged : 1;
     bool boundingRectChanged           : 1;
     bool sizeChanged                   : 1;
     bool shadowQualityChanged          : 1;
     bool selectionModeChanged          : 1;
     bool objFileChanged                : 1;
-    bool gridEnabledChanged            : 1;
     bool axisXTypeChanged              : 1;
     bool axisYTypeChanged              : 1;
     bool axisZTypeChanged              : 1;
@@ -96,14 +93,11 @@ struct Abstract3DChangeBitField {
         positionChanged(true),
         zoomLevelChanged(true),
         themeChanged(true),
-        fontChanged(true),
-        labelBackgroundEnabledChanged(true),
         boundingRectChanged(true),
         sizeChanged(true),
         shadowQualityChanged(true),
         selectionModeChanged(true),
         objFileChanged(true),
-        gridEnabledChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -164,14 +158,10 @@ private:
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     ThemeManager *m_themeManager;
-    QFont m_font;
     QDataVis::SelectionFlags m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
-    bool m_labelBackground;
-    bool m_isBackgroundEnabled;
-    bool m_isGridEnabled;
     Q3DScene *m_scene;
-    QDataVis::ColorStyle m_colorStyle;
+    Q3DTheme::ColorStyle m_colorStyle;
     QColor m_objectColor;
     QLinearGradient m_objectGradient;
     QColor m_singleHighlightColor;
@@ -256,8 +246,8 @@ public:
 
     // Properties from color api
     // TODO: Rethink these after color api has been moveed to series (QTRD-2200/2557)
-    virtual void setColorStyle(QDataVis::ColorStyle style);
-    virtual QDataVis::ColorStyle colorStyle() const;
+    virtual void setColorStyle(Q3DTheme::ColorStyle style);
+    virtual Q3DTheme::ColorStyle colorStyle() const;
     virtual void setBaseColor(const QColor &color);
     virtual QColor baseColor() const;
     virtual void setBaseGradient(const QLinearGradient &gradient);
@@ -325,7 +315,7 @@ signals:
     void themeChanged(Q3DTheme *theme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void needRender();
-    void colorStyleChanged(QDataVis::ColorStyle style);
+    void colorStyleChanged(Q3DTheme::ColorStyle style);
     void objectColorChanged(QColor color);
     void objectGradientChanged(QLinearGradient gradient);
     void singleHighlightColorChanged(QColor color);

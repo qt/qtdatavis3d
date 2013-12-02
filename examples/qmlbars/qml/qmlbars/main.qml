@@ -79,7 +79,7 @@ Item {
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionItem
             theme: Theme3D {
-                type: AbstractGraph3D.ThemeRetro
+                type: Theme3D.ThemeRetro
                 labelBorderEnabled: true
                 font.pointSize: 35
                 labelBackgroundEnabled: true

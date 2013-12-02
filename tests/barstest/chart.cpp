@@ -111,7 +111,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->addAxis(m_genericRowAxis);
     m_graph->addAxis(m_genericColumnAxis);
 
-    m_graph->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
@@ -523,12 +523,12 @@ void GraphModifier::changePresetCamera()
 
 void GraphModifier::changeTheme()
 {
-    static int theme = QDataVis::ThemeQt;
+    static int theme = Q3DTheme::ThemeQt;
 
-    m_graph->setTheme(new Q3DTheme((QDataVis::Theme)theme));
+    m_graph->setTheme(new Q3DTheme((Q3DTheme::Theme)theme));
 
-    if (++theme > QDataVis::ThemeIsabelle)
-        theme = QDataVis::ThemeQt;
+    if (++theme > Q3DTheme::ThemeIsabelle)
+        theme = Q3DTheme::ThemeQt;
 }
 
 void GraphModifier::changeLabelStyle()
@@ -681,10 +681,10 @@ void GraphModifier::changeColorStyle()
 {
     int style = m_graph->theme()->colorStyle();
 
-    if (++style > QDataVis::ColorStyleRangeGradient)
-        style = QDataVis::ColorStyleUniform;
+    if (++style > Q3DTheme::ColorStyleRangeGradient)
+        style = Q3DTheme::ColorStyleUniform;
 
-    m_graph->theme()->setColorStyle(QDataVis::ColorStyle(style));
+    m_graph->theme()->setColorStyle(Q3DTheme::ColorStyle(style));
 }
 
 void GraphModifier::useOwnTheme()
@@ -695,7 +695,7 @@ void GraphModifier::useOwnTheme()
     theme->setAmbientLightStrength(0.3f);
     theme->setBackgroundColor(QColor(QRgb(0x99ca53)));
     theme->setBaseColor(QColor(QRgb(0x209fdf)));
-    theme->setColorStyle(QDataVis::ColorStyleUniform);
+    theme->setColorStyle(Q3DTheme::ColorStyleUniform);
     theme->setGridLineColor(QColor(QRgb(0x99ca53)));
     theme->setHighlightLightStrength(7.0f);
     theme->setLabelBackgroundEnabled(true);
@@ -704,8 +704,8 @@ void GraphModifier::useOwnTheme()
     theme->setLightStrength(6.0f);
     theme->setMultiHighlightColor(QColor(QRgb(0x6d5fd5)));
     theme->setSingleHighlightColor(QColor(QRgb(0xf6a625)));
-    theme->setTextBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0));
-    theme->setTextColor(QColor(QRgb(0x404044)));
+    theme->setLabelBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0));
+    theme->setLabelTextColor(QColor(QRgb(0x404044)));
     theme->setWindowColor(QColor(QRgb(0xffffff)));
 
     m_graph->setTheme(theme);
@@ -749,5 +749,5 @@ void GraphModifier::setGradient()
     m_graph->theme()->setSingleHighlightGradient(singleHighlightGradient);
     m_graph->theme()->setMultiHighlightGradient(multiHighlightGradient);
 
-    m_graph->theme()->setColorStyle(QDataVis::ColorStyleObjectGradient);
+    m_graph->theme()->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
 }

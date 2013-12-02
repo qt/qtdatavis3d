@@ -45,7 +45,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_started(false)
 {
     // Initialize surface
-    m_surface->setTheme(new Q3DTheme(QDataVis::ThemeIsabelle));
+    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -61,7 +61,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_surface->addSeries(new QSurface3DSeries(new QHeightMapSurfaceDataProxy()));
 
     // Initialize scatter
-    m_scatter->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
+    m_scatter->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
     m_scatter->setSelectionMode(QDataVis::SelectionNone);
     m_scatter->theme()->setGridEnabled(false);
     m_scatter->setObjectType(QDataVis::MeshPoint);
@@ -70,7 +70,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_scatter->addSeries(new QScatter3DSeries);
 
     // Initialize bars
-    m_bars->setTheme(new Q3DTheme(QDataVis::ThemeQt));
+    m_bars->setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
     m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
     m_bars->theme()->setGridEnabled(false);
     m_bars->setBarType(QDataVis::MeshBar, false);
@@ -180,7 +180,7 @@ void Data::scrollDown()
 
 void Data::useGradientOne()
 {
-    m_surface->setTheme(new Q3DTheme(QDataVis::ThemeIsabelle));
+    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -192,7 +192,7 @@ void Data::useGradientOne()
 
 void Data::useGradientTwo()
 {
-    m_surface->setTheme(new Q3DTheme(QDataVis::ThemeQt));
+    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(0.8, Qt::red);

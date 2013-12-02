@@ -47,7 +47,7 @@ public:
 
 protected:
     void connectThemeSignals();
-    void useTheme(QDataVis::Theme type);
+    void useTheme(Q3DTheme::Theme type);
     void setBaseColor(const QColor &color);
     void setBackgroundColor(const QColor &color);
     void setWindowColor(const QColor &color);
@@ -68,7 +68,7 @@ protected:
     void setBackgroundEnabled(bool enabled);
     void setGridEnabled(bool enabled);
     void setLabelBackgroundEnabled(bool enabled);
-    void setColorStyle(QDataVis::ColorStyle style);
+    void setColorStyle(Q3DTheme::ColorStyle style);
 
 private:
     QScopedPointer<Q3DTheme> m_theme;

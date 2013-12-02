@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QLinearGradient>
 
@@ -32,7 +33,6 @@ class Q3DCategoryAxis;
 class Q3DValueAxis;
 class Q3DScene;
 class QBar3DSeries;
-class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
@@ -44,7 +44,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
+    Q_PROPERTY(QtDataVisualization::Q3DTheme::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor barColor READ barColor WRITE setBarColor NOTIFY barColorChanged)
     Q_PROPERTY(QLinearGradient barGradient READ barGradient WRITE setBarGradient NOTIFY barGradientChanged)
     Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
@@ -84,8 +84,8 @@ public:
     QDataVis::ShadowQuality shadowQuality() const;
 
     // TODO: Move to dataset object once that is done QTRD-2121
-    void setColorStyle(QDataVis::ColorStyle style);
-    QDataVis::ColorStyle colorStyle() const;
+    void setColorStyle(Q3DTheme::ColorStyle style);
+    Q3DTheme::ColorStyle colorStyle() const;
     void setBarColor(const QColor &color);
     QColor barColor() const;
     void setBarGradient(const QLinearGradient &gradient);
@@ -116,7 +116,7 @@ signals:
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
     void themeChanged(Q3DTheme *theme);
-    void colorStyleChanged(QDataVis::ColorStyle style);
+    void colorStyleChanged(Q3DTheme::ColorStyle style);
     void barColorChanged(QColor color);
     void barGradientChanged(QLinearGradient gradient);
     void singleHighlightColorChanged(QColor color);

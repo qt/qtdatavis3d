@@ -37,7 +37,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_selectedItem(-1),
       m_targetSeries(0)
 {
-    m_chart->setTheme(new Q3DTheme(QDataVis::ThemeStoneMoss));
+    m_chart->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
     QFont font = m_chart->theme()->font();
     font.setPointSize(m_fontSize);
     m_chart->theme()->setFont(font);
@@ -159,12 +159,12 @@ void ScatterDataModifier::changePresetCamera()
 
 void ScatterDataModifier::changeTheme()
 {
-    static int theme = QDataVis::ThemeQt;
+    static int theme = Q3DTheme::ThemeQt;
 
-    m_chart->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
+    m_chart->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
 
-    if (++theme > QDataVis::ThemeIsabelle)
-        theme = QDataVis::ThemeQt;
+    if (++theme > Q3DTheme::ThemeIsabelle)
+        theme = Q3DTheme::ThemeQt;
 }
 
 void ScatterDataModifier::changeLabelStyle()
@@ -425,13 +425,13 @@ void ScatterDataModifier::setGradient()
     m_chart->setItemGradient(barGradient);
     m_chart->setSingleHighlightGradient(singleHighlightGradient);
 
-    QDataVis::ColorStyle oldStyle = m_chart->colorStyle();
-    if (oldStyle == QDataVis::ColorStyleUniform)
-        m_chart->setColorStyle(QDataVis::ColorStyleObjectGradient);
-    else if (oldStyle == QDataVis::ColorStyleObjectGradient)
-        m_chart->setColorStyle(QDataVis::ColorStyleRangeGradient);
-    if (oldStyle == QDataVis::ColorStyleRangeGradient)
-        m_chart->setColorStyle(QDataVis::ColorStyleUniform);
+    Q3DTheme::ColorStyle oldStyle = m_chart->colorStyle();
+    if (oldStyle == Q3DTheme::ColorStyleUniform)
+        m_chart->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+    else if (oldStyle == Q3DTheme::ColorStyleObjectGradient)
+        m_chart->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    if (oldStyle == Q3DTheme::ColorStyleRangeGradient)
+        m_chart->setColorStyle(Q3DTheme::ColorStyleUniform);
 }
 
 void ScatterDataModifier::addSeries()

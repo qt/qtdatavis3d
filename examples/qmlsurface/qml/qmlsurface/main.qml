@@ -50,7 +50,7 @@ Item {
             width: surfaceView.width
             height: surfaceView.height
             theme: Theme3D {
-                type: AbstractGraph3D.ThemeStoneMoss
+                type: Theme3D.ThemeStoneMoss
                 font.family: "STCaiyun"
                 font.pointSize: 35
             }

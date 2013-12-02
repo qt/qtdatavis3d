@@ -342,7 +342,7 @@ void GraphModifier::selectedPointChanged(const QPoint &point)
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(QDataVis::Theme(theme)));
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
 }
 
 
