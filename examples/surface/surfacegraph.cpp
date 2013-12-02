@@ -91,8 +91,8 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
 {
     if (enable) {
         //! [3]
-        m_graph->setSurfaceGridEnabled(true);
-        m_graph->setSmoothSurfaceEnabled(false);
+        m_sqrtSinSeries->setSurfaceGridEnabled(true);
+        m_sqrtSinSeries->setFlatShadingEnabled(true);
 
         m_graph->axisX()->setLabelFormat("%.2f");
         m_graph->axisZ()->setLabelFormat("%.2f");
@@ -124,8 +124,8 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
 {
     if (enable) {
         //! [4]
-        m_graph->setSurfaceGridEnabled(false);
-        m_graph->setSmoothSurfaceEnabled(true);
+        m_heightMapSeries->setSurfaceGridEnabled(false);
+        m_heightMapSeries->setFlatShadingEnabled(false);
 
         m_graph->axisX()->setLabelFormat("%.1f N");
         m_graph->axisZ()->setLabelFormat("%.1f E");

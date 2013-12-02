@@ -98,15 +98,17 @@ void ShaderHelper::initialize()
 bool ShaderHelper::testCompile()
 {
     bool result = true;
+
     // Discard warnings, we only need the result
     QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
     if (m_program)
         delete m_program;
-    m_program = new QOpenGLShaderProgram(m_caller);
+    m_program = new QOpenGLShaderProgram();
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, m_vertexShaderFile))
         result = false;
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
         result = false;
+
     // Restore actual message handler
     qInstallMessageHandler(handler);
     return result;

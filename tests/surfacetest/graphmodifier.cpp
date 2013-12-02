@@ -71,13 +71,13 @@ GraphModifier::~GraphModifier()
 void GraphModifier::toggleSmooth(bool enabled)
 {
     qDebug() << "GraphModifier::toggleSmooth " << enabled;
-    m_graph->setSmoothSurfaceEnabled(enabled);
+    m_theSeries->setFlatShadingEnabled(enabled);
 }
 
 void GraphModifier::toggleSurfaceGrid(bool enable)
 {
     qDebug() << "GraphModifier::toggleSurfaceGrid" << enable;
-    m_graph->setSurfaceGridEnabled(enable);
+    m_theSeries->setSurfaceGridEnabled(enable);
 }
 
 void GraphModifier::toggleSurface(bool enable)

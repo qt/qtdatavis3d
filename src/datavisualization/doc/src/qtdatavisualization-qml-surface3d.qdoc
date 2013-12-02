@@ -67,15 +67,6 @@
  */
 
 /*!
-  \qmlproperty bool Surface3D::smoothSurfaceEnabled
-  The smoothing of surface. If false, the shading of the surface is flat.
- */
-
-/*!
-  \qmlproperty bool Surface3D::surfaceGridEnabled
-  The surface grid visibility. If false, no surface grid is drawn.
- */
-
 /*!
   \qmlproperty ColorGradient Surface3D::gradient
   The current surface gradient. Setting this property replaces the previous gradient.

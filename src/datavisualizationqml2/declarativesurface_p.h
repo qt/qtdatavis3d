@@ -51,8 +51,6 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
@@ -68,12 +66,6 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    void setSmoothSurfaceEnabled(bool enabled);
-    bool isSmoothSurfaceEnabled() const;
-
-    void setSurfaceGridEnabled(bool enabled);
-    bool isSurfaceGridEnabled() const;
-
     void setGradient(ColorGradient *gradient);
     ColorGradient *gradient() const;
 
@@ -84,10 +76,6 @@ public:
     static void clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
     Q_INVOKABLE void addSeries(QSurface3DSeries *series);
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
-
-signals:
-    void smoothSurfaceEnabledChanged(bool enabled);
-    void surfaceGridEnabledChanged(bool visible);
 
 protected:
     void handleGradientUpdate();

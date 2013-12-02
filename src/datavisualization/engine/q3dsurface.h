@@ -38,8 +38,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
@@ -57,14 +55,8 @@ public:
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    void setSmoothSurfaceEnabled(bool enabled);
-    bool isSmoothSurfaceEnabled() const;
-
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
-    void setSurfaceGridEnabled(bool enabled);
-    bool isSurfaceGridEnabled() const;
-
     void setGradient(const QLinearGradient &gradient);
     QLinearGradient gradient() const;
 
@@ -87,8 +79,6 @@ signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void themeChanged(Q3DTheme *theme);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void smoothSurfaceEnabledChanged(bool enabled);
-    void surfaceGridEnabledChanged(bool visible);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

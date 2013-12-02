@@ -109,7 +109,7 @@ private:
     GLuint m_selectionTexture;
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
-    bool m_cachedSmoothSurface;
+    bool m_cachedFlatShading;
     bool m_flatSupported;
     bool m_cachedSurfaceVisible;
     bool m_cachedSurfaceGridOn;
@@ -134,9 +134,10 @@ public:
     ~Surface3DRenderer();
 
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateRows(int startIndex, int count);
     void updateScene(Q3DScene *scene);
-    bool updateSmoothStatus(bool enable);
+    bool updateFlatStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
     void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);
@@ -150,7 +151,7 @@ protected:
 
 signals:
     void pointClicked(QPoint position, QSurface3DSeries *series);
-    void requestSmoothSurface(bool enable);
+    void flatShadingSupportedChanged(bool supported);
 
 private:
     void setViewPorts();

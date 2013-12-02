@@ -63,15 +63,13 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DControl
 private:
     Surface3DChangeBitField m_changeTracker;
     Surface3DRenderer *m_renderer;
-    bool m_isSmoothSurfaceEnabled;
-    bool m_isSurfaceEnabled;
-    bool m_isSurfaceGridEnabled;
     QLinearGradient m_userDefinedGradient;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.
     int m_rowsChangeStartId;
     int m_rowsChangeCount;
+    bool m_flatShadingSupported;
 
 public:
     explicit Surface3DController(QRect rect);
@@ -79,12 +77,6 @@ public:
 
     void initializeOpenGL();
     virtual void synchDataToRenderer();
-
-    void setSmoothSurface(bool enable);
-    bool smoothSurface();
-
-    void setSurfaceGrid(bool enable);
-    bool surfaceGrid();
 
     void setGradient(const QLinearGradient &gradient);
     QLinearGradient gradient() const;
@@ -99,6 +91,7 @@ public:
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
     static QPoint invalidSelectionPosition();
+    bool isFlatShadingSupported();
 
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
@@ -110,11 +103,8 @@ public slots:
 
     // Renderer callback handlers
     void handlePointClicked(const QPoint &position, QSurface3DSeries *series);
-    void handleRequestSmoothSurface(bool enable);
 
-signals:
-    void smoothSurfaceEnabledChanged(bool enable);
-    void surfaceGridEnabledChanged(bool enable);
+    void handleFlatShadingSupportedChange(bool supported);
 
 private:
     void adjustValueAxisRange();

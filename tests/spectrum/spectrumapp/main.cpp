@@ -94,7 +94,6 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setBarThickness(2.0f);
     m_chart->setBarSpacing(QSizeF(0.0, 0.0));
     // Set bar type, flat bars
-    m_chart->setBarType(QDataVis::MeshBar, false);
     // Adjust camera position
     m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif
@@ -107,8 +106,9 @@ MainApp::MainApp(Q3DBars *window)
     m_restartTimer->setSingleShot(true);
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
-    QBarDataProxy *proxy = new QBarDataProxy;
-    m_chart->addSeries(new QBar3DSeries(proxy));
+    QBar3DSeries *series = new QBar3DSeries();
+    series->setMesh(QAbstract3DSeries::MeshBar);
+    m_chart->addSeries(series);
 }
 
 MainApp::~MainApp()

@@ -99,7 +99,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionTexture(0),
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
-      m_cachedSmoothSurface(true),
+      m_cachedFlatShading(false),
       m_flatSupported(true),
       m_cachedSurfaceVisible(true),
       m_cachedSurfaceGridOn(true),
@@ -120,7 +120,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
     if (!tester.testCompile()) {
         m_flatSupported = false;
-        emit requestSmoothSurface(true);
+        connect(this, &Surface3DRenderer::flatShadingSupportedChanged,
+                controller, &Surface3DController::handleFlatShadingSupportedChange);
+        emit flatShadingSupportedChanged(m_flatSupported);
         qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
                       " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
     }
@@ -244,7 +246,7 @@ void Surface3DRenderer::updateData()
                     loadSurfaceObj();
 
                 // Note: Data setup can change sample space (as min width/height is 1)
-                if (m_cachedSmoothSurface) {
+                if (!m_cachedFlatShading) {
                     m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
                                                   m_axisCacheY.min(), dimensionChanged);
                 } else {
@@ -268,6 +270,19 @@ void Surface3DRenderer::updateData()
     m_sliceDataArray.clear();
 
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
+void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility)
+{
+    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+
+    // TODO: move to render cache when multiseries support implemented QTRD-2657
+    // TODO: until then just update them always.
+    if (m_visibleSeriesList.size()) {
+        QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
+        updateFlatStatus(series->isFlatShadingEnabled());
+        updateSurfaceGridStatus(series->isSurfaceGridEnabled());
+    }
 }
 
 void Surface3DRenderer::updateRows(int startIndex, int count)
@@ -300,7 +315,7 @@ void Surface3DRenderer::updateRows(int startIndex, int count)
                 (*(m_dataArray.at(i)))[j] = array->at(i + m_sampleSpace.y())->at(j + m_sampleSpace.x());
         }
 
-        if (m_cachedSmoothSurface) {
+        if (!m_cachedFlatShading) {
             m_surfaceObj->updateSmoothRows(m_dataArray, startIndex, endRow, m_heightNormalizer,
                                            m_axisCacheY.min());
         } else {
@@ -355,7 +370,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
         if (!m_sliceSurfaceObj)
             loadSliceSurfaceObj();
 
-        if (m_cachedSmoothSurface) {
+        if (!m_cachedFlatShading) {
             m_sliceSurfaceObj->setUpSmoothData(m_sliceDataArray, sliceRect, m_heightNormalizer,
                                                m_axisCacheY.min(), true);
         } else {
@@ -1781,24 +1796,24 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 #endif
 }
 
-bool Surface3DRenderer::updateSmoothStatus(bool enable)
+bool Surface3DRenderer::updateFlatStatus(bool enable)
 {
-    if (!enable && !m_flatSupported) {
+    if (enable && !m_flatSupported) {
         qWarning() << "Warning: Flat qualifier not supported on your platform's GLSL language."
                       " Requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.";
-        enable = true;
+        enable = false;
     }
 
     bool changed = false;
-    if (enable != m_cachedSmoothSurface) {
-        m_cachedSmoothSurface = enable;
+    if (enable != m_cachedFlatShading) {
+        m_cachedFlatShading = enable;
         changed = true;
         initSurfaceShaders();
     }
 
     // If no surface object created yet, don't try to update the object
     if (m_surfaceObj && changed && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
-        if (m_cachedSmoothSurface) {
+        if (!m_cachedFlatShading) {
             m_surfaceObj->setUpSmoothData(m_dataArray, m_sampleSpace, m_heightNormalizer,
                                           m_axisCacheY.min(), true);
         } else {
@@ -1807,7 +1822,7 @@ bool Surface3DRenderer::updateSmoothStatus(bool enable)
         }
     }
 
-    return m_cachedSmoothSurface;
+    return m_cachedFlatShading;
 }
 
 void Surface3DRenderer::updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series)
@@ -2050,7 +2065,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
     if (m_surfaceShader)
         delete m_surfaceShader;
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedSmoothSurface) {
+    if (!m_cachedFlatShading) {
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
                                                QStringLiteral(":/shaders/fragmentSurfaceShadowNoTex"));

@@ -45,11 +45,15 @@ public:
     virtual void connectControllerAndProxy(Abstract3DController *newController);
 
     void setSelectedPoint(const QPoint &position);
+    void setFlatShadingEnabled(bool enabled);
+    void setSurfaceGridEnabled(bool enabled);
 
 private:
     QSurface3DSeries *qptr();
 
     QPoint m_selectedPoint;
+    bool m_flatShadingEnabled;
+    bool m_surfaceGridEnabled;
 
 private:
     friend class QSurface3DSeries;

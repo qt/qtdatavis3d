@@ -31,6 +31,9 @@ class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
     Q_OBJECT
     Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
+    Q_PROPERTY(bool flatShadingEnabled READ isFlatShadingEnabled WRITE setFlatShadingEnabled NOTIFY flatShadingEnabledChanged)
+    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
+    Q_PROPERTY(bool flatShadingSupported READ isFlatShadingSupported NOTIFY flatShadingSupportedChanged)
 
 public:
     explicit QSurface3DSeries(QObject *parent = 0);
@@ -44,9 +47,20 @@ public:
     QPoint selectedPoint() const;
     QPoint invalidSelectionPosition() const;
 
+    void setFlatShadingEnabled(bool enabled);
+    bool isFlatShadingEnabled() const;
+
+    void setSurfaceGridEnabled(bool enabled);
+    bool isSurfaceGridEnabled() const;
+
+    bool isFlatShadingSupported() const;
+
 signals:
     void dataProxyChanged(QSurfaceDataProxy *proxy);
     void selectedPointChanged(QPoint position);
+    void flatShadingEnabledChanged(bool enable);
+    void surfaceGridEnabledChanged(bool enable);
+    void flatShadingSupportedChanged(bool enable);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = 0);

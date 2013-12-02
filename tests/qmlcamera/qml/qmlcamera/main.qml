@@ -138,11 +138,11 @@ Item {
         width: camControlArea.width
         text: "Hide Shadows"
         onClicked: {
-            if (testChart.shadowQuality == Bars3D.ShadowQualityNone) {
-                testChart.shadowQuality = Bars3D.ShadowQualityMedium;
+            if (testChart.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
+                testChart.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
                 text = "Hide Shadows"
             } else {
-                testChart.shadowQuality = Bars3D.ShadowQualityNone;
+                testChart.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                 text = "Show Shadows"
             }
         }

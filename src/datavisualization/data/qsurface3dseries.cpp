@@ -104,6 +104,32 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty bool Surface3DSeries::flatShadingEnabled
+ *
+ * Sets surface flat shading to \a enabled. It is preset to \c true by default.
+ * When disabled, the normals on the surface are interpolated making edges looking round.
+ * When enabled, the normals are kept same on a triangle making the color of the triangle solid.
+ * This makes the data more readable from the model.
+ * \note Flat shaded surfaces require at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
+ * The value of flatShadingSupported property indicates if flat shading is supported at runtime.
+ */
+
+/*!
+ * \qmlproperty bool Surface3DSeries::surfaceGridEnabled
+ *
+ * Sets surface grid to \a enabled. It is preset to \c true by default.
+ */
+
+/*!
+ * \qmlproperty bool Surface3DSeries::flatShadingSupported
+ *
+ * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
+ * If true, flat shading for surfaces is supported by current system.
+ * \note This read-only property is set to its correct value after first render pass.
+ * Before then it is always true.
+ */
+
+/*!
  * Constructs QSurface3DSeries with the given \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QObject *parent) :
@@ -188,6 +214,62 @@ QPoint QSurface3DSeries::invalidSelectionPosition() const
 }
 
 /*!
+ * \property QSurface3DSeries::flatShadingEnabled
+ *
+ * Sets surface flat shading to \a enabled. It is preset to \c true by default.
+ * When disabled, the normals on the surface are interpolated making edges looking round.
+ * When enabled, the normals are kept same on a triangle making the color of the triangle solid.
+ * This makes the data more readable from the model.
+ * \note Flat shaded surfaces require at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
+ * The value of flatShadingSupported property indicates if flat shading is supported at runtime.
+ */
+void QSurface3DSeries::setFlatShadingEnabled(bool enabled)
+{
+    if (dptr()->m_flatShadingEnabled != enabled) {
+        dptr()->setFlatShadingEnabled(enabled);
+        emit flatShadingEnabledChanged(enabled);
+    }
+}
+
+bool QSurface3DSeries::isFlatShadingEnabled() const
+{
+    return dptrc()->m_flatShadingEnabled;
+}
+
+/*!
+ * \property QSurface3DSeries::flatShadingSupported
+ * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
+ * If true, flat shading for surfaces is supported by current system.
+ * \note This read-only property is set to its correct value after first render pass.
+ * Before then it is always true.
+ */
+bool QSurface3DSeries::isFlatShadingSupported() const
+{
+    if (d_ptr->m_controller)
+        return static_cast<Surface3DController *>(d_ptr->m_controller)->isFlatShadingSupported();
+    else
+        return true;
+}
+
+/*!
+ * \property QSurface3DSeries::surfaceGridEnabled
+ *
+ * Sets surface grid to \a enabled. It is preset to \c true by default.
+ */
+void QSurface3DSeries::setSurfaceGridEnabled(bool enabled)
+{
+    if (dptr()->m_surfaceGridEnabled != enabled) {
+        dptr()->setSurfaceGridEnabled(enabled);
+        emit surfaceGridEnabledChanged(enabled);
+    }
+}
+
+bool QSurface3DSeries::isSurfaceGridEnabled() const
+{
+    return dptrc()->m_surfaceGridEnabled;
+}
+
+/*!
  * \internal
  */
 QSurface3DSeriesPrivate *QSurface3DSeries::dptr()
@@ -207,7 +289,9 @@ const QSurface3DSeriesPrivate *QSurface3DSeries::dptrc() const
 
 QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface),
-      m_selectedPoint(Surface3DController::invalidSelectionPosition())
+      m_selectedPoint(Surface3DController::invalidSelectionPosition()),
+      m_flatShadingEnabled(true),
+      m_surfaceGridEnabled(true)
 {
     m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
     m_mesh = QAbstract3DSeries::MeshSphere;
@@ -257,6 +341,20 @@ void QSurface3DSeriesPrivate::setSelectedPoint(const QPoint &position)
         m_selectedPoint = position;
         emit qptr()->selectedPointChanged(m_selectedPoint);
     }
+}
+
+void QSurface3DSeriesPrivate::setFlatShadingEnabled(bool enabled)
+{
+    m_flatShadingEnabled = enabled;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QSurface3DSeriesPrivate::setSurfaceGridEnabled(bool enabled)
+{
+    m_surfaceGridEnabled = enabled;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

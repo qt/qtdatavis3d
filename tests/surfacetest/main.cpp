@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
     hLayout->addLayout(vLayout);
 
     QCheckBox *smoothCB = new QCheckBox(widget);
-    smoothCB->setText(QStringLiteral("Smooth "));
-    smoothCB->setChecked(surfaceGraph->isSmoothSurfaceEnabled());
+    smoothCB->setText(QStringLiteral("Flat Surface"));
+    smoothCB->setChecked(true);
 
     QCheckBox *surfaceGridCB = new QCheckBox(widget);
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));

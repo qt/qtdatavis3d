@@ -39,11 +39,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_shared = new Surface3DController(boundingRect().toRect());
     setSharedController(m_shared);
-
-    QObject::connect(m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
-                     &DeclarativeSurface::smoothSurfaceEnabledChanged);
-    QObject::connect(m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
-                     &DeclarativeSurface::surfaceGridEnabledChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -108,26 +103,6 @@ Q3DValueAxis *DeclarativeSurface::axisZ() const
 void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
 {
     m_shared->setAxisZ(axis);
-}
-
-void DeclarativeSurface::setSmoothSurfaceEnabled(bool enabled)
-{
-    m_shared->setSmoothSurface(enabled);
-}
-
-bool DeclarativeSurface::isSmoothSurfaceEnabled() const
-{
-    return m_shared->smoothSurface();
-}
-
-void DeclarativeSurface::setSurfaceGridEnabled(bool enabled)
-{
-    m_shared->setSurfaceGrid(enabled);
-}
-
-bool DeclarativeSurface::isSurfaceGridEnabled() const
-{
-    return m_shared->surfaceGrid();
 }
 
 void DeclarativeSurface::setGradient(ColorGradient *gradient)

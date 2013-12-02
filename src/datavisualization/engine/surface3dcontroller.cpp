@@ -24,6 +24,7 @@
 #include "q3dcategoryaxis.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
+#include "shaderhelper_p.h"
 
 #include <QMatrix4x4>
 
@@ -34,13 +35,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
-      m_isSmoothSurfaceEnabled(false),
-      m_isSurfaceEnabled(true),
-      m_isSurfaceGridEnabled(true),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),
       m_rowsChangeStartId(0),
-      m_rowsChangeCount(0)
+      m_rowsChangeCount(0),
+      m_flatShadingSupported(true)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -68,8 +67,6 @@ void Surface3DController::initializeOpenGL()
     synchDataToRenderer();
     QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
                      &Surface3DController::handlePointClicked, Qt::QueuedConnection);
-    QObject::connect(m_renderer, &Surface3DRenderer::requestSmoothSurface, this,
-                     &Surface3DController::handleRequestSmoothSurface, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -78,25 +75,12 @@ void Surface3DController::synchDataToRenderer()
     if (!isInitialized())
         return;
 
-    if (m_changeTracker.surfaceGridChanged) {
-        m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
-        m_changeTracker.surfaceGridChanged = false;
-    }
-
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
     if (m_changeTracker.gradientColorChanged) {
         m_renderer->updateSurfaceGradient(m_userDefinedGradient);
         m_changeTracker.gradientColorChanged = false;
-    }
-
-    if (m_changeTracker.smoothStatusChanged) {
-        bool oldSmoothStatus = m_isSmoothSurfaceEnabled;
-        m_isSmoothSurfaceEnabled = m_renderer->updateSmoothStatus(m_isSmoothSurfaceEnabled);
-        m_changeTracker.smoothStatusChanged = false;
-        if (oldSmoothStatus != m_isSmoothSurfaceEnabled)
-            emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
     }
 
     if (m_changeTracker.rowsChanged) {
@@ -108,7 +92,6 @@ void Surface3DController::synchDataToRenderer()
         m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
         m_changeTracker.selectedPointChanged = false;
     }
-
 }
 
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
@@ -142,6 +125,11 @@ QPoint Surface3DController::invalidSelectionPosition()
     return invalidSelectionPoint;
 }
 
+bool Surface3DController::isFlatShadingSupported()
+{
+    return m_flatShadingSupported;
+}
+
 void Surface3DController::addSeries(QAbstract3DSeries *series)
 {
     Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeSurface);
@@ -154,7 +142,7 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
         qWarning("Surface graph only supports a single series.");
     }
 
-    QSurface3DSeries *surfaceSeries =  static_cast<QSurface3DSeries *>(series);
+    QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
     if (surfaceSeries->selectedPoint() != invalidSelectionPosition())
         setSelectedPoint(surfaceSeries->selectedPoint(), surfaceSeries);
 }
@@ -182,37 +170,6 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
     }
 
     return surfaceSeriesList;
-}
-
-void Surface3DController::setSmoothSurface(bool enable)
-{
-    if (enable != m_isSmoothSurfaceEnabled) {
-        m_isSmoothSurfaceEnabled = enable;
-        m_changeTracker.smoothStatusChanged = true;
-        emit smoothSurfaceEnabledChanged(enable);
-        emitNeedRender();
-    }
-}
-
-bool Surface3DController::smoothSurface()
-{
-    return m_isSmoothSurfaceEnabled;
-}
-
-void Surface3DController::setSurfaceGrid(bool enable)
-{
-    if (enable != m_isSurfaceGridEnabled) {
-        m_isSurfaceGridEnabled = enable;
-        m_changeTracker.surfaceGridChanged = true;
-        emit surfaceGridEnabledChanged(enable);
-        emitNeedRender();
-        m_isDataDirty = true;
-    }
-}
-
-bool Surface3DController::surfaceGrid()
-{
-    return m_isSurfaceGridEnabled;
 }
 
 void Surface3DController::setGradient(const QLinearGradient &gradient)
@@ -347,6 +304,19 @@ void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DS
     // TODO: Also hover needed? (QTRD-2131)
 }
 
+void Surface3DController::handleFlatShadingSupportedChange(bool supported)
+{
+    // Handle renderer flat surface support indicator signal. This happens exactly once per renderer.
+    if (m_flatShadingSupported != supported) {
+        m_flatShadingSupported = supported;
+        // Emit the change for all added surfaces
+        foreach (QAbstract3DSeries *series, m_seriesList) {
+            QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
+            emit surfaceSeries->flatShadingSupportedChanged(m_flatShadingSupported);
+        }
+    }
+}
+
 void Surface3DController::handleRowsChanged(int startIndex, int count)
 {
     QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
@@ -361,12 +331,6 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
         setSelectedPoint(m_selectedPoint, m_selectedSeries);
         emitNeedRender();
     }
-}
-
-void Surface3DController::handleRequestSmoothSurface(bool enable)
-{
-    setSmoothSurface(enable);
-    emitNeedRender();
 }
 
 void Surface3DController::adjustValueAxisRange()

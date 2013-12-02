@@ -58,8 +58,6 @@ Item {
             }
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
-            smoothSurfaceEnabled: true
-            surfaceGridEnabled: false
             scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
             axisY.min: 0.0
             axisY.max: 500.0
@@ -75,6 +73,8 @@ Item {
 
             Surface3DSeries {
                 id: surfaceSeries
+                flatShadingEnabled: false
+                surfaceGridEnabled: false
 
                 ItemModelSurfaceDataProxy {
                     itemModel: surfaceData.model
@@ -82,16 +82,9 @@ Item {
                     columnRole: "latitude"
                     valueRole: "height"
                 }
-            }
 
-            // Since flat is not supported on all platforms, and changes back to smooth
-            // asynchronously on those platforms, handle button text on changed
-            // signal handler rather than when we set the value.
-            onSmoothSurfaceEnabledChanged: {
-                if (enabled === true) {
-                    smoothSurfaceToggle.text = "Show Flat"
-                } else {
-                    smoothSurfaceToggle.text = "Show Smooth"
+                onFlatShadingSupportedChanged: {
+                    flatShadingToggle.text = "Flat not supported"
                 }
             }
         }
@@ -100,6 +93,8 @@ Item {
     // TODO: Kept outside until surface supports multiple added series (QTRD-2579)
     Surface3DSeries {
         id: heightSeries
+        flatShadingEnabled: false
+        surfaceGridEnabled: false
 
         HeightMapSurfaceDataProxy {
             heightMapFile: ":/heightmaps/image"
@@ -119,11 +114,13 @@ Item {
         text: "Show Surface Grid"
         //! [1]
         onClicked: {
-            if (surfaceplot.surfaceGridEnabled === false) {
-                surfaceplot.surfaceGridEnabled = true;
+            if (surfaceSeries.surfaceGridEnabled === false) {
+                surfaceSeries.surfaceGridEnabled = true;
+                heightSeries.surfaceGridEnabled = true;
                 text = "Hide Surface Grid"
             } else {
-                surfaceplot.surfaceGridEnabled = false;
+                surfaceSeries.surfaceGridEnabled = false;
+                heightSeries.surfaceGridEnabled = false;
                 text = "Show Surface Grid"
             }
         }
@@ -136,7 +133,7 @@ Item {
         width: surfaceGridToggle.width
         text: "Hide Surface"
         onClicked: {
-            if (surfaceplot.seriesList[0].visible === true) {
+            if (surfaceSeries.visible === true) {
                 surfaceSeries.visible = false;
                 heightSeries.visible = false;
                 text = "Show Surface"
@@ -149,16 +146,21 @@ Item {
     }
 
     NewButton {
-        id: smoothSurfaceToggle
+        id: flatShadingToggle
         anchors.top: surfaceToggle.bottom
         width: surfaceToggle.width
         text: "Show Flat"
+        enabled: surfaceSeries.flatShadingSupported
         //! [2]
         onClicked: {
-            if (surfaceplot.smoothSurfaceEnabled === true) {
-                surfaceplot.smoothSurfaceEnabled = false;
+            if (surfaceSeries.flatShadingEnabled === true) {
+                surfaceSeries.flatShadingEnabled = false;
+                heightSeries.flatShadingEnabled = false;
+                text = "Show Flat"
             } else {
-                surfaceplot.smoothSurfaceEnabled = true;
+                surfaceSeries.flatShadingEnabled = true;
+                heightSeries.flatShadingEnabled = true;
+                text = "Show Smooth"
             }
         }
         //! [2]
@@ -166,8 +168,8 @@ Item {
 
     NewButton {
         id: backgroundToggle
-        anchors.top: smoothSurfaceToggle.bottom
-        width: smoothSurfaceToggle.width
+        anchors.top: flatShadingToggle.bottom
+        width: flatShadingToggle.width
         text: "Hide Background"
         onClicked: {
             if (surfaceplot.theme.backgroundEnabled === true) {

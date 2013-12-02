@@ -64,6 +64,33 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Abstract3DSeries.Mesh Abstract3DSeries::mesh
+ *
+ * Sets the mesh of the items in the series, or the selection pointer in case of
+ * Surface3DSeries. If the \a mesh is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined},
+ * then the userDefinedMesh property must also be set for items to render properly.
+ * The default value depends on the graph type.
+ */
+
+/*!
+ * \qmlproperty bool Abstract3DSeries::meshSmooth
+ *
+ * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
+ * This property doesn't affect custom meshes used when mesh is
+ * \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
+ * Defaults to \c false.
+ */
+
+/*!
+ * \qmlproperty string Abstract3DSeries::userDefinedMesh
+ *
+ * Sets the \a fileName for user defined custom mesh for objects that is used when mesh
+ * is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
+ * \note The file specified by \a fileName needs to be in Wavefront obj format and include
+ * vertices, normals and UVs. It also needs to be in triangles.
+ */
+
+/*!
  * \enum QAbstract3DSeries::SeriesType
  *
  * Type of the series.
@@ -79,34 +106,34 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
-    \enum QAbstract3DSeries::Mesh
-
-    Predefined mesh types. All styles are not usable with all visualization types.
-
-    \value MeshUserDefined
-           User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
-    \value MeshBar
-           Basic rectangular bar.
-    \value MeshCube
-           Basic cube.
-    \value MeshPyramid
-           Four-sided pyramid.
-    \value MeshCone
-           Basic cone.
-    \value MeshCylinder
-           Basic cylinder.
-    \value MeshBevelBar
-           Slightly beveled (rounded) rectangular bar.
-    \value MeshBevelCube
-           Slightly beveled (rounded) cube.
-    \value MeshSphere
-           Sphere.
-    \value MeshMinimal
-           The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
-    \value MeshPoint
-           2D point. Usable only with Q3DScatter.
-           \b Note: Shadows and color gradients do not affect this style.
-*/
+ *  \enum QAbstract3DSeries::Mesh
+ *
+ *  Predefined mesh types. All styles are not usable with all visualization types.
+ *
+ *  \value MeshUserDefined
+ *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
+ *  \value MeshBar
+ *         Basic rectangular bar.
+ *  \value MeshCube
+ *         Basic cube.
+ *  \value MeshPyramid
+ *         Four-sided pyramid.
+ *  \value MeshCone
+ *         Basic cone.
+ *  \value MeshCylinder
+ *         Basic cylinder.
+ *  \value MeshBevelBar
+ *         Slightly beveled (rounded) rectangular bar.
+ *  \value MeshBevelCube
+ *         Slightly beveled (rounded) cube.
+ *  \value MeshSphere
+ *         Sphere.
+ *  \value MeshMinimal
+ *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
+ *  \value MeshPoint
+ *         2D point. Usable only with Q3DScatter.
+ *         \b Note: Shadows and color gradients do not affect this style.
+ */
 
 /*!
  * \internal
@@ -201,9 +228,9 @@ QAbstract3DSeries::Mesh QAbstract3DSeries::mesh() const
 /*!
  * \property QAbstract3DSeries::meshSmooth
  *
- * If \a enable is true, smooth versions of predefined meshes set via mesh property are used.
+ * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
  * This property doesn't affect custom meshes used when mesh is MeshUserDefined.
- * Defaults to false.
+ * Defaults to \c false.
  */
 void QAbstract3DSeries::setMeshSmooth(bool enable)
 {

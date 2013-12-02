@@ -105,10 +105,6 @@ Q3DSurface::Q3DSurface()
                      &Q3DSurface::themeChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DSurface::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Surface3DController::smoothSurfaceEnabledChanged, this,
-                     &Q3DSurface::smoothSurfaceEnabledChanged);
-    QObject::connect(d_ptr->m_shared, &Surface3DController::surfaceGridEnabledChanged, this,
-                     &Q3DSurface::surfaceGridEnabledChanged);
     QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
                      &Q3DWindow::renderLater);
 }
@@ -244,24 +240,6 @@ QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
 }
 
 /*!
- * \property Q3DSurface::smoothSurfaceEnabled
- *
- * Sets surface smoothing to \a enabled. It is preset to \c false by default.
- * When enabled the normals on the surface are interpolated making edges looking round. If turned
- * off the normals are kept same on a triangle making the color of the triangle solid. This makes
- * the data more readable from the model.
- */
-void Q3DSurface::setSmoothSurfaceEnabled(bool enabled)
-{
-    d_ptr->m_shared->setSmoothSurface(enabled);
-}
-
-bool Q3DSurface::isSmoothSurfaceEnabled() const
-{
-    return d_ptr->m_shared->smoothSurface();
-}
-
-/*!
  * \property Q3DSurface::selectionMode
  *
  * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports
@@ -276,21 +254,6 @@ void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
 QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 {
     return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DSurface::surfaceGridEnabled
- *
- * Sets surface grid to \a enabled. It is preset to \c true by default.
- */
-void Q3DSurface::setSurfaceGridEnabled(bool enabled)
-{
-    d_ptr->m_shared->setSurfaceGrid(enabled);
-}
-
-bool Q3DSurface::isSurfaceGridEnabled() const
-{
-    return d_ptr->m_shared->surfaceGrid();
 }
 
 /*!

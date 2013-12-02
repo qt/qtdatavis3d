@@ -82,6 +82,7 @@ public:
                                                       float fixedRotation = 0.0f,
                                                       float distanceModifier = 0.0f);
 private:
+    // TODO: Move to private
     void emitNeedRender();
 
 signals:
