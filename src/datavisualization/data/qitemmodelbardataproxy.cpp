@@ -143,7 +143,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 QItemModelBarDataProxy::QItemModelBarDataProxy(QObject *parent)
     : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
 {
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -154,7 +154,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
     : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
 {
     setItemModel(itemModel);
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -171,7 +171,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
     dptr()->m_itemModelHandler->setItemModel(itemModel);
     dptr()->m_valueRole = valueRole;
     dptr()->m_useModelCategories = true;
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -189,7 +189,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
     dptr()->m_rowRole = rowRole;
     dptr()->m_columnRole = columnRole;
     dptr()->m_valueRole = valueRole;
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -216,7 +216,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
     dptr()->m_columnCategories = columnCategories;
     dptr()->m_autoRowCategories = false;
     dptr()->m_autoColumnCategories = false;
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -446,26 +446,26 @@ const QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptrc() const
     return static_cast<const QItemModelBarDataProxyPrivate *>(d_ptr.data());
 }
 
-void QItemModelBarDataProxy::connectItemModelHandler()
+void QItemModelBarDataProxyPrivate::connectItemModelHandler()
 {
-    QObject::connect(dptr()->m_itemModelHandler, &BarItemModelHandler::itemModelChanged,
-                     this, &QItemModelBarDataProxy::itemModelChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::rowRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::columnRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::valueRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::rowCategoriesChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::columnCategoriesChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::useModelCategoriesChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::autoRowCategoriesChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelBarDataProxy::autoColumnCategoriesChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(m_itemModelHandler, &BarItemModelHandler::itemModelChanged,
+                     qptr(), &QItemModelBarDataProxy::itemModelChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rowRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::columnRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::valueRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rowCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::columnCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::useModelCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::autoRowCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::autoColumnCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
 // QItemModelBarDataProxyPrivate

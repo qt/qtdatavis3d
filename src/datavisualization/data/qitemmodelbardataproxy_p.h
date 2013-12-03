@@ -43,6 +43,8 @@ public:
     QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q);
     virtual ~QItemModelBarDataProxyPrivate();
 
+    void connectItemModelHandler();
+
 private:
     QItemModelBarDataProxy *qptr();
 

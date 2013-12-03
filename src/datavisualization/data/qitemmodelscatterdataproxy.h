@@ -66,7 +66,6 @@ protected:
     const QItemModelScatterDataProxyPrivate *dptrc() const;
 
 private:
-    void connectItemModelHandler();
     Q_DISABLE_COPY(QItemModelScatterDataProxy)
 
     friend class ScatterItemModelHandler;

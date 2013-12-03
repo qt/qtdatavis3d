@@ -43,6 +43,8 @@ public:
     QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q);
     virtual ~QItemModelScatterDataProxyPrivate();
 
+    void connectItemModelHandler();
+
 private:
     QItemModelScatterDataProxy *qptr();
 

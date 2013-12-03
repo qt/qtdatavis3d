@@ -96,7 +96,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 QItemModelScatterDataProxy::QItemModelScatterDataProxy(QObject *parent)
     : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -108,7 +108,7 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
     : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -128,7 +128,7 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
     dptr()->m_xPosRole = xPosRole;
     dptr()->m_yPosRole = yPosRole;
     dptr()->m_zPosRole = zPosRole;
-    connectItemModelHandler();
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -235,16 +235,16 @@ const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() con
     return static_cast<const QItemModelScatterDataProxyPrivate *>(d_ptr.data());
 }
 
-void QItemModelScatterDataProxy::connectItemModelHandler()
+void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
 {
-    QObject::connect(dptr()->m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
-                     this, &QItemModelScatterDataProxy::itemModelChanged);
-    QObject::connect(this, &QItemModelScatterDataProxy::xPosRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelScatterDataProxy::yPosRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(this, &QItemModelScatterDataProxy::zPosRoleChanged,
-                     dptr()->m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
+                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
 // QItemModelScatterDataProxyPrivate

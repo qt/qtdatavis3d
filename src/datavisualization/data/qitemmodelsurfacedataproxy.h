@@ -99,7 +99,6 @@ protected:
     const QItemModelSurfaceDataProxyPrivate *dptrc() const;
 
 private:
-    void connectItemModelHandler();
     Q_DISABLE_COPY(QItemModelSurfaceDataProxy)
 
     friend class SurfaceItemModelHandler;

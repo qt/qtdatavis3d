@@ -99,7 +99,6 @@ protected:
     const QItemModelBarDataProxyPrivate *dptrc() const;
 
 private:
-    void connectItemModelHandler();
     Q_DISABLE_COPY(QItemModelBarDataProxy)
 
     friend class BarItemModelHandler;

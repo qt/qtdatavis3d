@@ -43,7 +43,7 @@ Item {
             if (isIncreasing) {
                 graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
                 if (graphModel.count == 500) {
-                    scatterGraph.theme.type = AbstractGraph3D.ThemeIsabelle;
+                    scatterGraph.theme.type = Theme3D.ThemeIsabelle;
                     isIncreasing = false;
                 }
             } else {
@@ -51,7 +51,7 @@ Item {
                 // random index to add coverage.
                 graphModel.remove(2);
                 if (graphModel.count == 2) {
-                    scatterGraph.theme.type = AbstractGraph3D.ThemeDigia;
+                    scatterGraph.theme.type = Theme3D.ThemeDigia;
                     isIncreasing = true;
                 }
             }
@@ -68,7 +68,7 @@ Item {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
-            theme: Theme3D { type: AbstractGraph3D.ThemeDigia }
+            theme: Theme3D { type: Theme3D.ThemeDigia }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             inputHandler: null

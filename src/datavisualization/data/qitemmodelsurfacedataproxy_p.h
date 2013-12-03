@@ -43,6 +43,8 @@ public:
     QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q);
     virtual ~QItemModelSurfaceDataProxyPrivate();
 
+    void connectItemModelHandler();
+
 private:
     QItemModelSurfaceDataProxy *qptr();
 
