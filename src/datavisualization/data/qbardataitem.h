@@ -38,8 +38,6 @@ public:
     void setValue(float value) { m_value = value; }
     float value() const { return m_value; }
 
-    // TODO Set color, label format, ...?
-
 protected:
     virtual void createExtraData();
 

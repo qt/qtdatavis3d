@@ -34,8 +34,6 @@ public:
     Q3DLight(QObject *parent = 0);
     virtual ~Q3DLight();
 
-    void copyValuesFrom(const Q3DLight &source);
-
 private:
     QScopedPointer<Q3DLightPrivate> d_ptr;
 

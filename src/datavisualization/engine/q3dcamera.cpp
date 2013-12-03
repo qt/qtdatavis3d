@@ -60,36 +60,38 @@ Q3DCamera::~Q3DCamera()
  * Copies the 3D camera's properties from the given source camera.
  * Values are copied from the \a source to this object.
  */
-void Q3DCamera::copyValuesFrom(const Q3DCamera &source)
+void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 {
     Q3DObject::copyValuesFrom(source);
 
-    d_ptr->m_target.setX(source.d_ptr->m_target.x());
-    d_ptr->m_target.setY(source.d_ptr->m_target.y());
-    d_ptr->m_target.setZ(source.d_ptr->m_target.z());
+    const Q3DCamera &sourceCamera = static_cast<const Q3DCamera &>(source);
 
-    d_ptr->m_up.setX(source.d_ptr->m_up.x());
-    d_ptr->m_up.setY(source.d_ptr->m_up.y());
-    d_ptr->m_up.setZ(source.d_ptr->m_up.z());
+    d_ptr->m_target.setX(sourceCamera.d_ptr->m_target.x());
+    d_ptr->m_target.setY(sourceCamera.d_ptr->m_target.y());
+    d_ptr->m_target.setZ(sourceCamera.d_ptr->m_target.z());
+
+    d_ptr->m_up.setX(sourceCamera.d_ptr->m_up.x());
+    d_ptr->m_up.setY(sourceCamera.d_ptr->m_up.y());
+    d_ptr->m_up.setZ(sourceCamera.d_ptr->m_up.z());
 
     float *values = new float[16];
-    source.d_ptr->m_viewMatrix.copyDataTo(values);
+    sourceCamera.d_ptr->m_viewMatrix.copyDataTo(values);
     d_ptr->m_viewMatrix = QMatrix4x4(values);
     delete[] values;
 
-    d_ptr->m_xRotation = source.d_ptr->m_xRotation;
-    d_ptr->m_yRotation = source.d_ptr->m_yRotation;
+    d_ptr->m_xRotation = sourceCamera.d_ptr->m_xRotation;
+    d_ptr->m_yRotation = sourceCamera.d_ptr->m_yRotation;
 
-    d_ptr->m_minXRotation = source.d_ptr->m_minXRotation;
-    d_ptr->m_minYRotation = source.d_ptr->m_minYRotation;
-    d_ptr->m_maxXRotation = source.d_ptr->m_maxXRotation;
-    d_ptr->m_maxYRotation = source.d_ptr->m_maxYRotation;
+    d_ptr->m_minXRotation = sourceCamera.d_ptr->m_minXRotation;
+    d_ptr->m_minYRotation = sourceCamera.d_ptr->m_minYRotation;
+    d_ptr->m_maxXRotation = sourceCamera.d_ptr->m_maxXRotation;
+    d_ptr->m_maxYRotation = sourceCamera.d_ptr->m_maxYRotation;
 
-    d_ptr->m_wrapXRotation = source.d_ptr->m_wrapXRotation;
-    d_ptr->m_wrapYRotation = source.d_ptr->m_wrapYRotation;
+    d_ptr->m_wrapXRotation = sourceCamera.d_ptr->m_wrapXRotation;
+    d_ptr->m_wrapYRotation = sourceCamera.d_ptr->m_wrapYRotation;
 
-    d_ptr->m_zoomLevel = source.d_ptr->m_zoomLevel;
-    d_ptr->m_activePreset = source.d_ptr->m_activePreset;
+    d_ptr->m_zoomLevel = sourceCamera.d_ptr->m_zoomLevel;
+    d_ptr->m_activePreset = sourceCamera.d_ptr->m_activePreset;
 }
 
 /*!

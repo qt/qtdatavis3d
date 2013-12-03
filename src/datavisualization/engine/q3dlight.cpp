@@ -42,14 +42,6 @@ Q3DLight::Q3DLight(QObject *parent) :
 }
 
 /*!
- * Copies the properties of the 3D light from the given source \a source light to this light instance.
- */
-void Q3DLight::copyValuesFrom(const Q3DLight &source)
-{
-    Q3DObject::copyValuesFrom(source);
-}
-
-/*!
  * Destroys the light object.
  */
 Q3DLight::~Q3DLight()

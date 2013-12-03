@@ -40,14 +40,6 @@ public:
     explicit QScatterDataProxy(QObject *parent = 0);
     virtual ~QScatterDataProxy();
 
-    // TODO: Replace first part of class description in docs with this once all TODOs are done:
-    /*
-    * QScatterDataProxy handles adding, inserting, changing and removing data items.
-    * QScatterDataProxy is optimized to use cases where the only defining characteristics of an
-    * individual scatter item are it's position and size. Modifying other data that might be
-    * added in the future such as color requires allocating additional data object for the bar.
-    */
-
     QScatter3DSeries *series();
     int itemCount() const;
     const QScatterDataArray *array() const;

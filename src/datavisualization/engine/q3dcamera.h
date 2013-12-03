@@ -67,7 +67,7 @@ public:
     bool wrapYRotation() const;
     void setWrapYRotation(bool isEnabled);
 
-    void copyValuesFrom(const Q3DCamera &source);
+    virtual void copyValuesFrom(const Q3DObject &source);
 
     QMatrix4x4 viewMatrix() const;
     void setViewMatrix(const QMatrix4x4 &viewMatrix);
@@ -104,7 +104,8 @@ signals:
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);
 
-protected:
+private:
+    // To be exposed in the future
     void setMinXRotation(float rotation);
     void setMinYRotation(float rotation);
     void setMaxXRotation(float rotation);

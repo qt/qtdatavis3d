@@ -190,7 +190,7 @@ void Q3DScene::setSelectionQueryPosition(const QPoint &point)
         d_ptr->m_selectionQueryPosition = point;
         d_ptr->m_changeTracker.selectionQueryPositionChanged = true;
         emit selectionQueryPositionChanged(point);
-        emitNeedRender();
+        emit needRender();
     }
 }
 
@@ -225,7 +225,7 @@ void Q3DScene::setSlicingActive(bool isSlicing)
         d_ptr->m_isSlicingActive = isSlicing;
         d_ptr->m_changeTracker.slicingActivatedChanged = true;
         emit slicingActiveChanged(isSlicing);
-        emitNeedRender();
+        emit needRender();
     }
 }
 
@@ -245,7 +245,7 @@ void Q3DScene::setSecondarySubviewOnTop(bool isSecondaryOnTop)
         d_ptr->m_isSecondarySubviewOnTop = isSecondaryOnTop;
         d_ptr->m_changeTracker.subViewportOrderChanged = true;
         emit secondarySubviewOnTopChanged(isSecondaryOnTop);
-        emitNeedRender();
+        emit needRender();
     }
 }
 
@@ -271,11 +271,11 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
     if (camera != d_ptr->m_camera) {
         if (d_ptr->m_camera) {
             disconnect(d_ptr->m_camera, &Q3DCamera::xRotationChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
             disconnect(d_ptr->m_camera, &Q3DCamera::yRotationChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
             disconnect(d_ptr->m_camera, &Q3DCamera::zoomLevelChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
         }
 
         d_ptr->m_camera = camera;
@@ -283,21 +283,16 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
 
         if (camera) {
             connect(camera, &Q3DCamera::xRotationChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
             connect(camera, &Q3DCamera::yRotationChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
             connect(camera, &Q3DCamera::zoomLevelChanged, this,
-                    &Q3DScene::emitNeedRender);
+                    &Q3DScene::needRender);
         }
 
         emit activeCameraChanged(camera);
-        emitNeedRender();
+        emit needRender();
     }
-}
-
-void Q3DScene::emitNeedRender()
-{
-    emit needRender();
 }
 
 /*!

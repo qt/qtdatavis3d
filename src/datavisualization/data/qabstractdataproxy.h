@@ -56,10 +56,6 @@ private:
     Q_DISABLE_COPY(QAbstractDataProxy)
 
     friend class QAbstract3DSeriesPrivate;
-//    friend class Abstract3DController;
-//    friend class Bars3DController;
-//    friend class Scatter3DController;
-//    friend class Surface3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

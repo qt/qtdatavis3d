@@ -81,9 +81,6 @@ public:
     Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
                                                       float fixedRotation = 0.0f,
                                                       float distanceModifier = 0.0f);
-private:
-    // TODO: Move to private
-    void emitNeedRender();
 
 signals:
     void viewportChanged(QRect viewport);

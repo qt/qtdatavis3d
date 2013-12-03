@@ -51,6 +51,7 @@ protected slots:
     void renderNow();
 
 protected:
+    // TODO: Move to private unnecessarily exposed functionality when doing QTRD-2213
     virtual void render();
 
     bool event(QEvent *event);

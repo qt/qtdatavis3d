@@ -38,7 +38,7 @@ public:
     Q3DObject(QObject *parent = 0);
     virtual ~Q3DObject();
 
-    void copyValuesFrom(const Q3DObject &source);
+    virtual void copyValuesFrom(const Q3DObject &source);
 
     Q3DScene *parentScene();
 
