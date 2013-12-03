@@ -1912,6 +1912,8 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 
     m_selectionPointer->setPosition(pos);
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
+    // TODO: Get pointer object from correct series once multiseries support implemented
+    m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
     m_selectionPointer->updateScene(m_cachedScene);
 }
 

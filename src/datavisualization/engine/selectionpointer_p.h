@@ -59,27 +59,26 @@ public:
     explicit SelectionPointer(Drawer *drawer);
     ~SelectionPointer();
 
-    void initializeOpenGL();
     void render(GLuint defaultFboHandle = 0);
     void setPosition(QVector3D position);
-    void setLabel(QString label);
+    void setLabel(const QString &label);
+    void setPointerObject(ObjectHelper *object);
     void handleDrawerChange();
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
 
 private:
+    void initializeOpenGL();
     void initShaders();
     void loadLabelMesh();
-    void loadPointMesh();
 
 private:
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
     ObjectHelper *m_labelObj;
-    ObjectHelper *m_pointObj;
+    ObjectHelper *m_pointObj; // Not owned
     TextureHelper *m_textureHelper;
-    bool m_isInitialized;
     Q3DTheme *m_cachedTheme;
     bool m_labelBackground;
     LabelItem m_labelItem;

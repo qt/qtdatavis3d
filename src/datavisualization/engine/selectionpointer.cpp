@@ -43,7 +43,6 @@ SelectionPointer::SelectionPointer(Drawer *drawer)
       m_labelObj(0),
       m_pointObj(0),
       m_textureHelper(0),
-      m_isInitialized(false),
       m_cachedTheme(drawer->theme()),
       m_labelBackground(false),
       m_drawer(drawer),
@@ -60,27 +59,18 @@ SelectionPointer::~SelectionPointer()
     delete m_labelShader;
     delete m_pointShader;
     delete m_labelObj;
-    delete m_pointObj;
     delete m_textureHelper;
 }
 
 void SelectionPointer::initializeOpenGL()
 {
-    if (m_isInitialized)
-        return;
-
     initializeOpenGLFunctions();
 
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
     initShaders();
-
     loadLabelMesh();
-    loadPointMesh();
-
-    // Set initialized -flag
-    m_isInitialized = true;
 }
 
 void SelectionPointer::updateScene(Q3DScene *scene)
@@ -213,11 +203,15 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setLabel(QString label)
+void SelectionPointer::setLabel(const QString &label)
 {
     m_label = label;
-
     m_drawer->generateLabelItem(m_labelItem, m_label);
+}
+
+void SelectionPointer::setPointerObject(ObjectHelper *object)
+{
+    m_pointObj = object;
 }
 
 void SelectionPointer::handleDrawerChange()
@@ -260,14 +254,6 @@ void SelectionPointer::loadLabelMesh()
         delete m_labelObj;
     m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_labelObj->load();
-}
-
-void SelectionPointer::loadPointMesh()
-{
-    if (m_pointObj)
-        delete m_pointObj;
-    m_pointObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/sphereSmooth"));
-    m_pointObj->load();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

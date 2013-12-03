@@ -69,6 +69,7 @@ public:
     void selectedPointChanged(const QPoint &point);
     void changeRow();
     void changeRows();
+    void changeMesh();
 
 public slots:
     void changeShadowQuality(int quality);

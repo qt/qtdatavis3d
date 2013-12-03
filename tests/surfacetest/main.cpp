@@ -151,6 +151,9 @@ int main(int argc, char *argv[])
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
+    QPushButton *meshButton = new QPushButton(widget);
+    meshButton->setText(QStringLiteral("Change pointer mesh"));
+
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
@@ -235,6 +238,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(labelButton);
+    vLayout->addWidget(meshButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -284,6 +288,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::changeFont);
     QObject::connect(labelButton, &QPushButton::clicked,
                      modifier, &GraphModifier::changeStyle);
+    QObject::connect(meshButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::changeMesh);
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeTheme(int)));
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
