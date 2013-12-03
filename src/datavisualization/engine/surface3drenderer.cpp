@@ -285,13 +285,49 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     }
 }
 
-void Surface3DRenderer::updateRows(int startIndex, int count)
+void Surface3DRenderer::updateRows(const QVector<int> &rows)
+{
+    // Surface only supports single series for now, so we are only interested in the first series
+    const QSurfaceDataArray *array = 0;
+    if (m_visibleSeriesList.size()) {
+        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
+        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
+            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+            if (dataProxy)
+                array = dataProxy->array();
+        }
+    }
+
+    if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
+        m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
+        bool updateBuffers = false;
+        int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
+        foreach (int row, rows) {
+            if (row >= m_sampleSpace.y() && row <= sampleSpaceTop) {
+                updateBuffers = true;
+                for (int j = 0; j < m_sampleSpace.width(); j++)
+                    (*(m_dataArray.at(row - m_sampleSpace.y())))[j] =
+                        array->at(row)->at(j + m_sampleSpace.x());
+
+                if (m_cachedFlatShading) {
+                    m_surfaceObj->updateCoarseRow(m_dataArray, row - m_sampleSpace.y(), m_heightNormalizer,
+                                                  m_axisCacheY.min());
+                } else {
+                    m_surfaceObj->updateSmoothRow(m_dataArray, row - m_sampleSpace.y(), m_heightNormalizer,
+                                                  m_axisCacheY.min());
+                }
+            }
+        }
+        if (updateBuffers)
+            m_surfaceObj->uploadBuffers();
+    }
+
+    updateSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
+void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
 {
     // TODO: Properly support non-straight rows and columns (QTRD-2643)
-    if (startIndex > m_sampleSpace.height()) {
-        // No changes on visible area
-        return;
-    }
 
     // Surface only supports single series for now, so we are only interested in the first series
     const QSurfaceDataArray *array = 0;
@@ -306,22 +342,26 @@ void Surface3DRenderer::updateRows(int startIndex, int count)
 
     if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
         m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
-        int endRow = startIndex + count;
-        if (endRow > m_sampleSpace.height())
-            endRow = m_sampleSpace.height();
+        int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
+        int sampleSpaceRight = m_sampleSpace.x() + m_sampleSpace.width();
+        bool updateBuffers = false;
+        foreach (QPoint item, points) {
+            if (item.y() <= sampleSpaceTop && item.y() >= m_sampleSpace.y() &&
+                item.x() <= sampleSpaceRight && item.x() >= m_sampleSpace.x()) {
+                updateBuffers = true;
+                int x = item.x() - m_sampleSpace.x();
+                int y = item.y() - m_sampleSpace.y();
+                (*(m_dataArray.at(y)))[x] = array->at(item.y())->at(item.x());
 
-        for (int i = startIndex; i < endRow; i++) {
-            for (int j = 0; j < m_sampleSpace.width(); j++)
-                (*(m_dataArray.at(i)))[j] = array->at(i + m_sampleSpace.y())->at(j + m_sampleSpace.x());
+                if (m_cachedFlatShading) {
+                    m_surfaceObj->updateCoarseItem(m_dataArray, y, x, m_heightNormalizer, m_axisCacheY.min());
+                } else {
+                    m_surfaceObj->updateSmoothItem(m_dataArray, y, x, m_heightNormalizer, m_axisCacheY.min());
+                }
+            }
         }
-
-        if (!m_cachedFlatShading) {
-            m_surfaceObj->updateSmoothRows(m_dataArray, startIndex, endRow, m_heightNormalizer,
-                                           m_axisCacheY.min());
-        } else {
-            m_surfaceObj->updateCoarseRows(m_dataArray, startIndex, endRow, m_heightNormalizer,
-                                           m_axisCacheY.min());
-        }
+        if (updateBuffers)
+            m_surfaceObj->uploadBuffers();
     }
 
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);

@@ -70,6 +70,9 @@ public:
     void changeRow();
     void changeRows();
     void changeMesh();
+    void changeItem();
+    void changeMultipleItem();
+    void changeMultipleRows();
 
 public slots:
     void changeShadowQuality(int quality);

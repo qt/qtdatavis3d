@@ -158,6 +158,15 @@ void QSurfaceDataProxy::setRows(int rowIndex, const QSurfaceDataArray &rows)
 }
 
 /*!
+ * Changes a single item at \a rowIndex, \a columnIndex to the \a item.
+ */
+void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item)
+{
+    dptr()->setItem(rowIndex, columnIndex, item);
+    emit itemChanged(rowIndex, columnIndex);
+}
+
+/*!
  * \return pointer to the data array.
  */
 const QSurfaceDataArray *QSurfaceDataProxy::array() const
@@ -271,6 +280,14 @@ void QSurfaceDataProxyPrivate::setRows(int rowIndex, const QSurfaceDataArray &ro
         }
         rowIndex++;
     }
+}
+
+void QSurfaceDataProxyPrivate::setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item)
+{
+    Q_ASSERT(rowIndex >= 0 && rowIndex < m_dataArray->size());
+    QSurfaceDataRow &row = *(*m_dataArray)[rowIndex];
+    Q_ASSERT(columnIndex < row.size());
+    row[columnIndex] = item;
 }
 
 QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()

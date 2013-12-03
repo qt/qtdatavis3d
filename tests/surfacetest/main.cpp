@@ -44,7 +44,9 @@ int main(int argc, char *argv[])
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
     vLayout->setAlignment(Qt::AlignTop);
+    vLayout2->setAlignment(Qt::AlignTop);
 
     Q3DSurface *surfaceGraph = new Q3DSurface();
     QSize screenSize = surfaceGraph->screen()->size();
@@ -62,6 +64,7 @@ int main(int argc, char *argv[])
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     QCheckBox *smoothCB = new QCheckBox(widget);
     smoothCB->setText(QStringLiteral("Flat Surface"));
@@ -216,6 +219,15 @@ int main(int argc, char *argv[])
     QPushButton *changeRowsButton = new QPushButton(widget);
     changeRowsButton->setText(QStringLiteral("Change 3 rows"));
 
+    QPushButton *changeItemButton = new QPushButton(widget);
+    changeItemButton->setText(QStringLiteral("Change item"));
+
+    QPushButton *changeMultipleItemButton = new QPushButton(widget);
+    changeMultipleItemButton->setText(QStringLiteral("Change many items"));
+
+    QPushButton *changeMultipleRowsButton = new QPushButton(widget);
+    changeMultipleRowsButton->setText(QStringLiteral("Change many rows"));
+
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
@@ -248,8 +260,12 @@ int main(int argc, char *argv[])
     vLayout->addWidget(selectButton);
     vLayout->addWidget(selectionInfoLabel);
     vLayout->addWidget(flipViewsButton);
-    vLayout->addWidget(changeRowButton);
-    vLayout->addWidget(changeRowsButton);
+
+    vLayout2->addWidget(changeRowButton);
+    vLayout2->addWidget(changeRowsButton);
+    vLayout2->addWidget(changeMultipleRowsButton);
+    vLayout2->addWidget(changeItemButton);
+    vLayout2->addWidget(changeMultipleItemButton);
 
     widget->show();
 
@@ -304,6 +320,12 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::changeRow);
     QObject::connect(changeRowsButton,&QPushButton::clicked,
                      modifier, &GraphModifier::changeRows);
+    QObject::connect(changeItemButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeItem);
+    QObject::connect(changeMultipleItemButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeMultipleItem);
+    QObject::connect(changeMultipleRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeMultipleRows);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);

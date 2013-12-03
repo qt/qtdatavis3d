@@ -332,6 +332,8 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
                          &Surface3DController::handleArrayReset);
         QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::rowsChanged, controller,
                          &Surface3DController::handleRowsChanged);
+        QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::itemChanged, controller,
+                         &Surface3DController::handleItemChanged);
     }
 }
 

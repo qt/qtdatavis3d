@@ -37,8 +37,6 @@ Surface3DController::Surface3DController(QRect rect)
       m_renderer(0),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),
-      m_rowsChangeStartId(0),
-      m_rowsChangeCount(0),
       m_flatShadingSupported(true)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
@@ -84,8 +82,15 @@ void Surface3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.rowsChanged) {
-        m_renderer->updateRows(m_rowsChangeStartId, m_rowsChangeCount);
+        m_renderer->updateRows(m_changedRows);
         m_changeTracker.rowsChanged = false;
+        m_changedRows.clear();
+    }
+
+    if (m_changeTracker.itemChanged) {
+        m_renderer->updateItem(m_changedItems);
+        m_changeTracker.itemChanged = false;
+        m_changedItems.clear();
     }
 
     if (m_changeTracker.selectedPointChanged) {
@@ -320,16 +325,57 @@ void Surface3DController::handleFlatShadingSupportedChange(bool supported)
 void Surface3DController::handleRowsChanged(int startIndex, int count)
 {
     QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
+    if (m_changedRows.size() == 0)
+        m_changedRows.reserve(sender->rowCount());
+
     if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
         // Change is for the visible series, put the change to queue
-        m_rowsChangeStartId = startIndex;
-        m_rowsChangeCount = count;
-        m_changeTracker.rowsChanged = true;
+        int oldChangeCount = m_changedRows.size();
+        for (int i = 0; i < count; i++) {
+            bool newItem = true;
+            int candidate = startIndex + i;
+            for (int i = 0; i < oldChangeCount; i++) {
+                if (m_changedRows.at(i) == candidate) {
+                    newItem = false;
+                    break;
+                }
+            }
+            if (newItem)
+                m_changedRows.append(candidate);
+        }
+        if (m_changedRows.size()) {
+            m_changeTracker.rowsChanged = true;
 
-        adjustValueAxisRange();
-        // Clear selection unless still valid
-        setSelectedPoint(m_selectedPoint, m_selectedSeries);
-        emitNeedRender();
+            adjustValueAxisRange();
+            // Clear selection unless still valid
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+            emitNeedRender();
+        }
+    }
+}
+
+void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
+{
+    QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
+    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+        // Change is for the visible series, put the change to queue
+        bool newItem = true;
+        QPoint candidate(columnIndex, rowIndex);
+        foreach (QPoint item, m_changedItems) {
+            if (item == candidate) {
+                newItem = false;
+                break;
+            }
+        }
+        if (newItem) {
+            m_changedItems.append(candidate);
+            m_changeTracker.itemChanged = true;
+
+            adjustValueAxisRange();
+            // Clear selection unless still valid
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+            emitNeedRender();
+        }
     }
 }
 

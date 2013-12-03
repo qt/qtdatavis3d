@@ -427,7 +427,7 @@ void GraphModifier::changeRow()
 void GraphModifier::changeRows()
 {
     if (m_activeSample == GraphModifier::SqrtSin) {
-        qDebug() << "Generating new values to 3 rows from randon pos";
+        qDebug() << "Generating new values to 3 rows from random pos";
 
         float minX = -10.0f;
         float maxX = 10.0f;
@@ -455,6 +455,43 @@ void GraphModifier::changeRows()
     } else {
         qDebug() << "Change row function active only for SqrtSin";
     }
+}
+
+void GraphModifier::changeItem()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values for an item at random pos";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float i = float(rand() % m_zCount);
+        float j = float(rand() % m_xCount);
+
+        float x = qMin(maxX, (j * stepX + minX));
+        float z = qMin(maxZ, (i * stepZ + minZ));
+        float R = qSqrt(x * x + z * z) + 0.01f;
+        float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+        QSurfaceDataItem newItem(QVector3D(x, y, z));
+
+        m_theSeries->dataProxy()->setItem(int(i), int(j), newItem);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::changeMultipleRows()
+{
+    for (int i = 0; i < 3; i++)
+        changeRow();
+}
+
+void GraphModifier::changeMultipleItem()
+{
+    for (int i = 0; i < 3; i++)
+        changeItem();
 }
 
 void GraphModifier::changeMesh()

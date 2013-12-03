@@ -135,7 +135,8 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
-    void updateRows(int startIndex, int count);
+    void updateRows(const QVector<int> &rows);
+    void updateItem(const QVector<QPoint> &points);
     void updateScene(Q3DScene *scene);
     bool updateFlatStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);

@@ -120,8 +120,8 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     createBuffers(m_vertices, uvs, m_normals, 0, changeGeometry);
 }
 
-void SurfaceObject::updateSmoothRows(const QSurfaceDataArray &dataArray, int startRow,
-                                     int endRow, GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowIndex,
+                                    GLfloat yRange, GLfloat yMin)
 {
     GLfloat xMin = dataArray.at(0)->at(0).x();
     GLfloat zMin = dataArray.at(0)->at(0).z();
@@ -130,63 +130,113 @@ void SurfaceObject::updateSmoothRows(const QSurfaceDataArray &dataArray, int sta
     GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
 
     // Update vertices
-    int totalIndex = startRow * m_columns;
-    for (int i = startRow; i < endRow; i++) {
-        const QSurfaceDataRow &p = *dataArray.at(i);
-        for (int j = 0; j < m_columns; j++) {
-            const QSurfaceDataItem &data = p.at(j);
-            float normalizedX = ((data.x() - xMin) / xNormalizer);
-            float normalizedY = ((data.y() - yMin) / yNormalizer);
-            float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
-        }
+    int p = rowIndex * m_columns;
+    const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
+    for (int j = 0; j < m_columns; j++) {
+        const QSurfaceDataItem &data = dataRow.at(j);
+        float normalizedX = ((data.x() - xMin) / xNormalizer);
+        float normalizedY = ((data.y() - yMin) / yNormalizer);
+        float normalizedZ = ((data.z() - zMin) / zNormalizer);
+        m_vertices[p++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
     }
 
     // Create normals
     int colLimit = m_columns - 1;
-    int rowColLimit = endRow * m_columns;
-    if (endRow == m_rows)
-        rowColLimit = (endRow - 1) * m_columns;
-    int totalLimit = endRow * m_columns - 1;
+    int startRow = rowIndex;
+    if (startRow > 0)
+        startRow--;
+    int totalIndex = startRow * m_columns;
+    int rowLimit = (rowIndex + 1) * m_columns;
+    if (rowIndex == m_rows - 1)
+        rowLimit = rowIndex * m_columns; // The rowIndex is top most row, special handling
 
-    totalIndex = startRow * m_columns;
-    if (startRow > 0) {
-        // Change the normals for the previous row also
-        totalIndex -= m_columns;
-    }
-    if (totalIndex < (m_rows - 1) * m_columns) {
-        for (int row = totalIndex; row < rowColLimit; row += m_columns) {
-            for (int j = 0; j < colLimit; j++) {
-                // One right and one up
-                m_normals[totalIndex++] = normal(m_vertices.at(row + j),
-                                                 m_vertices.at(row + j + 1),
-                                                 m_vertices.at(row + m_columns + j));
-            }
-            int p = row + colLimit;
-            // One up and one left
-            m_normals[totalIndex++] = normal(m_vertices.at(p),
-                                             m_vertices.at(p + m_columns),
-                                             m_vertices.at(p - 1));
+    for (int row = totalIndex; row < rowLimit; row += m_columns) {
+        for (int j = 0; j < colLimit; j++) {
+            // One right and one up
+            m_normals[totalIndex++] = normal(m_vertices.at(row + j),
+                                             m_vertices.at(row + j + 1),
+                                             m_vertices.at(row + m_columns + j));
         }
+        int p = row + colLimit;
+        // One up and one left
+        m_normals[totalIndex++] = normal(m_vertices.at(p),
+                                         m_vertices.at(p + m_columns),
+                                         m_vertices.at(p - 1));
     }
-    if (endRow == m_rows) {
+    if (rowIndex == m_rows - 1) {
         // Top most line, nothing above, must have different handling.
         // Take from one down and one right. Read till second-to-last
-        for (int j = rowColLimit; j < totalLimit; j++) {
+        rowLimit = (rowIndex + 1) * m_columns - 1;
+        for (int j = rowIndex * m_columns; j < rowLimit; j++) {
             m_normals[totalIndex++] = normal(m_vertices.at(j),
                                              m_vertices.at(j - m_columns),
                                              m_vertices.at(j + 1));
         }
 
         // Top left corner. Take from one left and one down
-        m_normals[totalIndex++] = normal(m_vertices.at(totalLimit),
-                                         m_vertices.at(totalLimit - 1),
-                                         m_vertices.at(totalLimit - m_columns));
+        m_normals[totalIndex++] = normal(m_vertices.at(rowLimit),
+                                         m_vertices.at(rowLimit - 1),
+                                         m_vertices.at(rowLimit - m_columns));
     }
-
-    QVector<QVector2D> uvs; // Empty dummy
-    createBuffers(m_vertices, uvs, m_normals, 0, false);
 }
+
+void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row,
+                                     int column, GLfloat yRange, GLfloat yMin)
+{
+    GLfloat xMin = dataArray.at(0)->at(0).x();
+    GLfloat zMin = dataArray.at(0)->at(0).z();
+    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
+    GLfloat yNormalizer = yRange / 2.0f;
+    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+
+    // Update a vertice
+    const QSurfaceDataItem &data = dataArray.at(row)->at(column);
+    float normalizedX = ((data.x() - xMin) / xNormalizer);
+    float normalizedY = ((data.y() - yMin) / yNormalizer);
+    float normalizedZ = ((data.z() - zMin) / zNormalizer);
+    m_vertices[row * m_columns + column] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+
+    // Create normals
+    int startRow = row;
+    if (startRow > 0)
+        startRow--; // Change the normal for previous row also
+    int startCol = column;
+    if (startCol > 0)
+        startCol--;
+
+    for (int i = startRow; i <= row; i++) {
+        for (int j = startCol; j <= column; j++) {
+            int p = i * m_columns + j;
+            if (i < m_rows) {
+                if (j < m_columns) {
+                    // One right and one up
+                    m_normals[p] = normal(m_vertices.at(p),
+                                          m_vertices.at(p + 1),
+                                          m_vertices.at(p + m_columns));
+                } else {
+                    // Last item, nothing on the right. One up and one left
+                    m_normals[p] = normal(m_vertices.at(p),
+                                          m_vertices.at(p + m_columns),
+                                          m_vertices.at(p - 1));
+                }
+            } else {
+                // Top most line, nothing above, must have different handling.
+                if (j < m_columns) {
+                    // Take from one down and one right. Read till second-to-last
+                    m_normals[p] = normal(m_vertices.at(p),
+                                          m_vertices.at(j - m_columns),
+                                          m_vertices.at(j + 1));
+                } else {
+                    // Top left corner. Take from one left and one down
+                    m_normals[p] = normal(m_vertices.at(p),
+                                          m_vertices.at(p - 1),
+                                          m_vertices.at(p - m_columns));
+                }
+            }
+        }
+    }
+}
+
 
 void SurfaceObject::createSmoothIndices(int x, int y, int endX, int endY)
 {
@@ -364,8 +414,8 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     delete[] indices;
 }
 
-void SurfaceObject::updateCoarseRows(const QSurfaceDataArray &dataArray, int startRow,
-                                     int endRow, GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex,
+                                    GLfloat yRange, GLfloat yMin)
 {
     GLfloat xMin = dataArray.at(0)->at(0).x();
     GLfloat zMin = dataArray.at(0)->at(0).z();
@@ -375,47 +425,95 @@ void SurfaceObject::updateCoarseRows(const QSurfaceDataArray &dataArray, int sta
 
     int colLimit = m_columns - 1;
     int doubleColumns = m_columns * 2 - 2;
-    int totalIndex = startRow * doubleColumns;
 
-    for (int i = startRow; i < endRow; i++) {
-        const QSurfaceDataRow &row = *dataArray.at(i);
-        for (int j = 0; j < m_columns; j++) {
-            const QSurfaceDataItem &data = row.at(j);
-            float normalizedX = ((data.x() - xMin) / xNormalizer);
-            float normalizedY = ((data.y() - yMin) / yNormalizer);
-            float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+    int p = rowIndex * doubleColumns;
+    const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
+    for (int j = 0; j < m_columns; j++) {
+        const QSurfaceDataItem &data = dataRow.at(j);
+        float normalizedX = ((data.x() - xMin) / xNormalizer);
+        float normalizedY = ((data.y() - yMin) / yNormalizer);
+        float normalizedZ = ((data.z() - zMin) / zNormalizer);
+        m_vertices[p++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
 
-            if (j > 0 && j < colLimit) {
-                m_vertices[totalIndex] = m_vertices[totalIndex - 1];
-                totalIndex++;
-            }
+        if (j > 0 && j < colLimit) {
+            m_vertices[p] = m_vertices[p - 1];
+            p++;
         }
     }
 
     // Create normals
-    if (startRow > 0)
-        startRow--;
-    totalIndex = startRow * doubleColumns;
-    int rowColLimit = startRow * doubleColumns;
-    for (int row = totalIndex, upperRow = totalIndex + doubleColumns;
-         row <= rowColLimit;
+    p = rowIndex * doubleColumns;
+    if (p > 0)
+        p -= doubleColumns;
+    int rowLimit = (rowIndex + 1) * doubleColumns;
+    for (int row = p, upperRow = p + doubleColumns;
+         row < rowLimit;
          row += doubleColumns, upperRow += doubleColumns) {
         for (int j = 0; j < doubleColumns; j += 2) {
             // Normal for the left triangle
-            m_normals[totalIndex++] = normal(m_vertices.at(row + j),
-                                             m_vertices.at(row + j + 1),
-                                             m_vertices.at(upperRow + j));
+            m_normals[p++] = normal(m_vertices.at(row + j),
+                                    m_vertices.at(row + j + 1),
+                                    m_vertices.at(upperRow + j));
 
             // Normal for the right triangle
-            m_normals[totalIndex++] = normal(m_vertices.at(row + j + 1),
-                                             m_vertices.at(upperRow + j + 1),
-                                             m_vertices.at(upperRow + j));
+            m_normals[p++] = normal(m_vertices.at(row + j + 1),
+                                    m_vertices.at(upperRow + j + 1),
+                                    m_vertices.at(upperRow + j));
         }
     }
+}
 
-    QVector<QVector2D> uvs; // Empty dummy
-    createBuffers(m_vertices, uvs, m_normals, 0, false);
+void SurfaceObject::updateCoarseItem(const QSurfaceDataArray &dataArray, int row,
+                                     int column, GLfloat yRange, GLfloat yMin)
+{
+    GLfloat xMin = dataArray.at(0)->at(0).x();
+    GLfloat zMin = dataArray.at(0)->at(0).z();
+    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
+    GLfloat yNormalizer = yRange / 2.0f;
+    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
+
+    int colLimit = m_columns - 1;
+    int doubleColumns = m_columns * 2 - 2;
+
+    // Update a vertice
+    int p = row * doubleColumns + column * 2 - (column > 0);
+    const QSurfaceDataItem &data = dataArray.at(row)->at(column);
+    float normalizedX = ((data.x() - xMin) / xNormalizer);
+    float normalizedY = ((data.y() - yMin) / yNormalizer);
+    float normalizedZ = ((data.z() - zMin) / zNormalizer);
+    m_vertices[p] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+    p++;
+
+    if (column > 0 && column < colLimit)
+        m_vertices[p] = m_vertices[p - 1];
+
+    // Create normals
+    int startRow = row;
+    if (startRow > 0)
+        startRow--; // Change the normal for previous row also
+    int startCol = column;
+    if (startCol > 0)
+        startCol--;
+    if (row == m_rows - 1)
+        row--;
+    if (column == m_columns - 1)
+        column--;
+
+    for (int i = startRow; i <= row; i++) {
+        for (int j = startCol; j <= column; j++) {
+            p = i * doubleColumns + j * 2;
+            // Normal for the left triangle
+            m_normals[p] = normal(m_vertices.at(p),
+                                  m_vertices.at(p + 1),
+                                  m_vertices.at(p + doubleColumns));
+            p++;
+
+            // Normal for the right triangle
+            m_normals[p] = normal(m_vertices.at(p),
+                                  m_vertices.at(p + doubleColumns),
+                                  m_vertices.at(p + doubleColumns - 1));
+        }
+    }
 }
 
 void SurfaceObject::createCoarseIndices(int x, int y, int columns, int rows)
@@ -509,6 +607,12 @@ void SurfaceObject::createCoarseGridlineIndices(int x, int y, int endX, int endY
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     delete[] gridIndices;
+}
+
+void SurfaceObject::uploadBuffers()
+{
+    QVector<QVector2D> uvs; // Empty dummy
+    createBuffers(m_vertices, uvs, m_normals, 0, false);
 }
 
 void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,

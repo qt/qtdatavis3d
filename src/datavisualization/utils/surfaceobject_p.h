@@ -48,14 +48,19 @@ public:
                    GLfloat yMin, bool changeGeometry);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
                          GLfloat yMin, bool changeGeometry);
-    void updateCoarseRows(const QSurfaceDataArray &dataArray, int startRow,
-                          int endRow, GLfloat yRange, GLfloat yMin);
-    void updateSmoothRows(const QSurfaceDataArray &dataArray, int startRow,
-                          int endRow, GLfloat yRange, GLfloat yMin);
+    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex,
+                         GLfloat yRange, GLfloat yMin);
+    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow,
+                         GLfloat yRange, GLfloat yMin);
+    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row,
+                          int column, GLfloat yRange, GLfloat yMin);
+    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row,
+                          int column, GLfloat yRange, GLfloat yMin);
     void createSmoothIndices(int x, int y, int endX, int endY);
     void createCoarseIndices(int x, int y, int columns, int rows);
     void createSmoothGridlineIndices(int x, int y, int endX, int endY);
     void createCoarseGridlineIndices(int x, int y, int endX, int endY);
+    void uploadBuffers();
     GLuint gridElementBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
