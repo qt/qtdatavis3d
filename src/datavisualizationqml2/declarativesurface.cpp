@@ -151,7 +151,6 @@ void DeclarativeSurface::setGradient(ColorGradient *gradient)
 
 ColorGradient *DeclarativeSurface::gradient() const
 {
-
     return m_gradient;
 }
 

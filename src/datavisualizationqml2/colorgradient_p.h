@@ -83,6 +83,7 @@ private:
 
     friend class ColorGradientStop;
     friend class DeclarativeSurface;
+    friend class DeclarativeTheme3D;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

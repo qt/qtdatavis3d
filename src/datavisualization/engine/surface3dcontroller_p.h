@@ -47,7 +47,7 @@ struct Surface3DChangeBitField {
     bool rowsChanged              : 1;
 
     Surface3DChangeBitField() :
-        gradientColorChanged(true),
+        gradientColorChanged(false), // Set to false, as it is initially set in theme
         smoothStatusChanged(true),
         surfaceGridChanged(true),
         selectedPointChanged(true),

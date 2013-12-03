@@ -53,6 +53,8 @@ Item {
                 type: Theme3D.ThemeStoneMoss
                 font.family: "STCaiyun"
                 font.pointSize: 35
+                colorStyle: Theme3D.ColorStyleRangeGradient
+                baseGradient: surfaceGradient
             }
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
@@ -70,7 +72,6 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
-            gradient: surfaceGradient
 
             Surface3DSeries {
                 id: surfaceSeries

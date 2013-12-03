@@ -40,9 +40,9 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QSurfaceDataProxy>(uri, 1, 0, "SurfaceDataProxy",
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
-                                                  QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+                                                    QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
-                                                  QLatin1String("Trying to create uncreatable: Scene3D."));
+                                         QLatin1String("Trying to create uncreatable: Scene3D."));
     qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
                                                   QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",
@@ -51,6 +51,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                  QLatin1String("Trying to create uncreatable: QScatter3DSeries, use Scatter3DSeries instead."));
     qmlRegisterUncreatableType<QSurface3DSeries>(uri, 1, 0, "QSurface3DSeries",
                                                  QLatin1String("Trying to create uncreatable: QSurface3DSeries, use Surface3DSeries instead."));
+    qmlRegisterUncreatableType<Q3DTheme>(uri, 1, 0, "Q3DTheme",
+                                         QLatin1String("Trying to create uncreatable: Q3DTheme, use Theme3D instead."));
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
@@ -69,7 +71,7 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<ColorGradientStop>(uri, 1, 0, "ColorGradientStop");
     qmlRegisterType<ColorGradient>(uri, 1, 0, "ColorGradient");
 
-    qmlRegisterType<Q3DTheme>(uri, 1, 0, "Theme3D");
+    qmlRegisterType<DeclarativeTheme3D>(uri, 1, 0, "Theme3D");
 
     qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
     qmlRegisterType<DeclarativeScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
