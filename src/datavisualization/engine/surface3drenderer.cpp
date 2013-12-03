@@ -936,7 +936,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && m_surfaceObj && m_selectionState == SelectOnScene
             && m_cachedSelectionMode > QDataVis::SelectionNone
-            && (m_cachedSurfaceVisible || m_cachedSurfaceGridOn)) {
+            && (m_cachedSurfaceVisible || m_cachedSurfaceGridOn)
+            && m_visibleSeriesList.size() > 0) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used

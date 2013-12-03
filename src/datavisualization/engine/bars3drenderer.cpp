@@ -881,7 +881,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // TODO: Selection must be enabled currently to support clicked signal. (QTRD-2517)
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::SelectionNone
-            && m_selectionState == SelectOnScene) {
+            && m_selectionState == SelectOnScene && seriesCount > 0) {
         // Bind selection shader
         m_selectionShader->bind();
 

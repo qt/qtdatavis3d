@@ -434,7 +434,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QDataVis::SelectionNone
-            && SelectOnScene == m_selectionState) {
+            && SelectOnScene == m_selectionState && seriesCount > 0) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
