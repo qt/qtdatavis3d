@@ -36,6 +36,7 @@
 #include <QAbstractItemModel>
 #include <QQuickItem>
 #include <QObject>
+#include <QQuickWindow>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -75,6 +76,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 signals:
     // Signals shadow quality changes.
@@ -87,6 +89,8 @@ signals:
 
 private:
     Abstract3DController *m_controller;
+    QSize m_initialisedSize;
+    qreal m_devicePixelRatio;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

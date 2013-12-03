@@ -80,14 +80,10 @@ public:
 protected:
     void handleGradientUpdate();
 
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
-
 private:
-    Surface3DController *m_shared;
-
     void setControllerGradient(const ColorGradient &gradient);
 
-    QSize m_initialisedSize;
+    Surface3DController *m_surfaceController;
     ColorGradient *m_gradient; // Not owned
 };
 

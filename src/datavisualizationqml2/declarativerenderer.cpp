@@ -16,42 +16,49 @@
 **
 ****************************************************************************/
 
-#include "declarativebarsrenderer_p.h"
+#include "declarativerenderer_p.h"
 
 #include <QtQuick/QQuickWindow>
 #include <QtGui/QOpenGLFramebufferObject>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-DeclarativeBarsRenderer::DeclarativeBarsRenderer(QQuickWindow *window, Bars3DController *renderer)
-    : m_fbo(0),
-      m_texture(0),
-      m_window(window),
-      m_barsRenderer(renderer)
+DeclarativeRenderer::DeclarativeRenderer(QQuickWindow *window, Abstract3DController *controller) :
+    m_fbo(0),
+    m_texture(0),
+    m_window(window),
+    m_controller(controller)
 {
     connect(m_window, &QQuickWindow::beforeSynchronizing, this,
-            &DeclarativeBarsRenderer::synchDataToRenderer, Qt::DirectConnection);
+            &DeclarativeRenderer::synchDataToRenderer, Qt::DirectConnection);
     connect(m_window, &QQuickWindow::beforeRendering, this,
-            &DeclarativeBarsRenderer::renderFBO, Qt::DirectConnection);
-    connect(m_barsRenderer, &Abstract3DController::needRender, m_window,
+            &DeclarativeRenderer::renderFBO, Qt::DirectConnection);
+    connect(m_controller, &Abstract3DController::needRender, m_window,
             &QQuickWindow::update);
 }
 
-DeclarativeBarsRenderer::~DeclarativeBarsRenderer()
+DeclarativeRenderer::~DeclarativeRenderer()
 {
     delete m_texture;
     delete m_fbo;
 }
 
-void DeclarativeBarsRenderer::synchDataToRenderer()
+void DeclarativeRenderer::synchDataToRenderer()
 {
-    m_barsRenderer->initializeOpenGL();
-    m_barsRenderer->synchDataToRenderer();
+    m_controller->initializeOpenGL();
+    m_controller->synchDataToRenderer();
 }
 
-void DeclarativeBarsRenderer::renderFBO()
+void DeclarativeRenderer::setDevicePixelRatio(float devicePixelRatio )
+{
+    m_devicePixelRatio = devicePixelRatio;
+}
+
+void DeclarativeRenderer::renderFBO()
 {
     QSize size = rect().size().toSize();
+    size.setWidth(size.width() * m_devicePixelRatio);
+    size.setHeight(size.height() * m_devicePixelRatio);
 
     // Create FBO
     if (!m_fbo) {
@@ -73,13 +80,12 @@ void DeclarativeBarsRenderer::renderFBO()
         QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
                                                 m_texture->convertToNormalizedSourceRect(sourceRect));
         markDirty(DirtyMaterial);
-        //qDebug() << "create node" << m_fbo->handle() << m_texture->textureId() << m_fbo->size();
     }
 
-    // Call the shared rendering function
+    // Call the graph rendering function
     m_fbo->bind();
 
-    m_barsRenderer->render(m_fbo->handle());
+    m_controller->render(m_fbo->handle());
 
     m_fbo->release();
 }

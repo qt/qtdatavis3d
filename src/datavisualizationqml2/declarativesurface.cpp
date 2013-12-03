@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "declarativesurface_p.h"
-#include "declarativesurfacerenderer_p.h"
+#include "declarativerenderer_p.h"
 #include "q3dvalueaxis.h"
 #include "qitemmodelsurfacedataproxy.h"
 
@@ -25,8 +25,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
-      m_shared(0),
-      m_initialisedSize(0, 0),
+      m_surfaceController(0),
       m_gradient(0)
 {
     setFlags(QQuickItem::ItemHasContents);
@@ -37,13 +36,13 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_shared = new Surface3DController(boundingRect().toRect());
-    setSharedController(m_shared);
+    m_surfaceController = new Surface3DController(boundingRect().toRect());
+    setSharedController(m_surfaceController);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
 {
-    delete m_shared;
+    delete m_surfaceController;
 }
 
 void DeclarativeSurface::handleGradientUpdate()
@@ -52,57 +51,34 @@ void DeclarativeSurface::handleGradientUpdate()
         setControllerGradient(*m_gradient);
 }
 
-QSGNode *DeclarativeSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-    // If old node exists and has right size, reuse it.
-    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
-        // Update bounding rectangle (that has same size as before).
-        static_cast<DeclarativeSurfaceRenderer *>( oldNode )->setRect(boundingRect());
-        return oldNode;
-    }
-
-    // Create a new render node when size changes or if there is no node yet
-    m_initialisedSize = boundingRect().size().toSize();
-
-    // Delete old node
-    if (oldNode)
-        delete oldNode;
-
-    // Create a new one and set its bounding rectangle
-    DeclarativeSurfaceRenderer *node = new DeclarativeSurfaceRenderer(window(), m_shared);
-    node->setRect(boundingRect());
-    m_shared->setBoundingRect(boundingRect().toRect());
-    return node;
-}
-
 Q3DValueAxis *DeclarativeSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(m_surfaceController->axisX());
 }
 
 void DeclarativeSurface::setAxisX(Q3DValueAxis *axis)
 {
-    m_shared->setAxisX(axis);
+    m_surfaceController->setAxisX(axis);
 }
 
 Q3DValueAxis *DeclarativeSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(m_surfaceController->axisY());
 }
 
 void DeclarativeSurface::setAxisY(Q3DValueAxis *axis)
 {
-    m_shared->setAxisY(axis);
+    m_surfaceController->setAxisY(axis);
 }
 
 Q3DValueAxis *DeclarativeSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(m_surfaceController->axisZ());
 }
 
 void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
 {
-    m_shared->setAxisZ(axis);
+    m_surfaceController->setAxisZ(axis);
 }
 
 void DeclarativeSurface::setGradient(ColorGradient *gradient)
@@ -144,7 +120,7 @@ void DeclarativeSurface::setControllerGradient(const ColorGradient &gradient)
     }
 
     newGradient.setStops(stops);
-    m_shared->setGradient(newGradient);
+    m_surfaceController->setGradient(newGradient);
 }
 
 QQmlListProperty<QSurface3DSeries> DeclarativeSurface::seriesList()
@@ -163,18 +139,18 @@ void DeclarativeSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *li
 
 int DeclarativeSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
 {
-    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_shared->surfaceSeriesList().size();
+    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_surfaceController->surfaceSeriesList().size();
 }
 
 QSurface3DSeries *DeclarativeSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index)
 {
-    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_shared->surfaceSeriesList().at(index);
+    return reinterpret_cast<DeclarativeSurface *>(list->data)->m_surfaceController->surfaceSeriesList().at(index);
 }
 
 void DeclarativeSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
 {
     DeclarativeSurface *declSurface = reinterpret_cast<DeclarativeSurface *>(list->data);
-    QList<QSurface3DSeries *> realList = declSurface->m_shared->surfaceSeriesList();
+    QList<QSurface3DSeries *> realList = declSurface->m_surfaceController->surfaceSeriesList();
     int count = realList.size();
     for (int i = 0; i < count; i++)
         declSurface->removeSeries(realList.at(i));
@@ -182,12 +158,12 @@ void DeclarativeSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *lis
 
 void DeclarativeSurface::addSeries(QSurface3DSeries *series)
 {
-    m_shared->addSeries(series);
+    m_surfaceController->addSeries(series);
 }
 
 void DeclarativeSurface::removeSeries(QSurface3DSeries *series)
 {
-    m_shared->removeSeries(series);
+    m_surfaceController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 

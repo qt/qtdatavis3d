@@ -21,27 +21,23 @@ INCLUDEPATH += ../../include \
 SOURCES += \
     datavisualizationqml2_plugin.cpp \
     declarativebars.cpp \
-    declarativebarsrenderer.cpp \
     declarativescatter.cpp \
-    declarativescatterrenderer.cpp \
     declarativesurface.cpp \
-    declarativesurfacerenderer.cpp \
     abstractdeclarative.cpp \
     colorgradient.cpp \
     declarativeseries.cpp \
+    declarativerenderer.cpp \
     declarativetheme.cpp
 
 HEADERS += \
     datavisualizationqml2_plugin.h \
     declarativebars_p.h \
-    declarativebarsrenderer_p.h \
     declarativescatter_p.h \
-    declarativescatterrenderer_p.h \
     declarativesurface_p.h \
-    declarativesurfacerenderer_p.h \
     abstractdeclarative_p.h \
     colorgradient_p.h \
     declarativeseries_p.h \
+    declarativerenderer_p.h \
     declarativetheme_p.h
 
 OTHER_FILES = qmldir

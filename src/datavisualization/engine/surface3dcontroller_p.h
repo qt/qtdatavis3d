@@ -75,7 +75,7 @@ public:
     explicit Surface3DController(QRect rect);
     ~Surface3DController();
 
-    void initializeOpenGL();
+    virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
 
     void setGradient(const QLinearGradient &gradient);

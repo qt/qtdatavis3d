@@ -76,7 +76,7 @@ public:
     explicit Bars3DController(QRect rect);
     ~Bars3DController();
 
-    void initializeOpenGL();
+    virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute

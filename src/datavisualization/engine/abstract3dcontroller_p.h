@@ -195,6 +195,7 @@ public:
     inline bool isInitialized() { return (m_renderer != 0); }
     virtual void synchDataToRenderer();
     virtual void render(const GLuint defaultFboHandle = 0);
+    virtual void initializeOpenGL() = 0;
     void setRenderer(Abstract3DRenderer *renderer);
 
     virtual void addSeries(QAbstract3DSeries *series);

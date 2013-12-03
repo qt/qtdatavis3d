@@ -17,12 +17,16 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
+#include "declarativerenderer_p.h"
 #include "q3dvalueaxis.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
-    QQuickItem(parent)
+    QQuickItem(parent),
+    m_controller(0),
+    m_initialisedSize(0, 0),
+    m_devicePixelRatio(1.0)
 {
 }
 
@@ -77,6 +81,34 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::selectionModeChanged);
+}
+
+QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+{
+    qreal devicePixelRatio = window()->devicePixelRatio();
+
+    // If old node exists and has right size and right device pixel ratio, reuse it.
+    if (oldNode && m_initialisedSize == boundingRect().size().toSize() && devicePixelRatio == m_devicePixelRatio) {
+        // Update bounding rectangle (that has same size as before).
+        static_cast<DeclarativeRenderer *>(oldNode)->setRect(boundingRect());
+        return oldNode;
+    }
+
+    // Create a new render node when size changes or if there is no node yet
+    m_initialisedSize = boundingRect().size().toSize();
+    m_devicePixelRatio = devicePixelRatio;
+
+    // Delete old node
+    if (oldNode)
+        delete oldNode;
+
+    // Create a new one and set it's bounding rectangle
+    DeclarativeRenderer *node = new DeclarativeRenderer(window(), m_controller);
+    node->setDevicePixelRatio(float(m_devicePixelRatio));
+    node->setRect(boundingRect());
+    m_controller->scene()->setDevicePixelRatio(m_devicePixelRatio);
+    m_controller->setBoundingRect(boundingRect().toRect());
+    return node;
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const

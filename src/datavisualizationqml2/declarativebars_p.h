@@ -93,12 +93,8 @@ signals:
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);
 
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
-
 private:
-    Bars3DController *m_shared;
-    QSize m_initialisedSize;
+    Bars3DController *m_barsController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

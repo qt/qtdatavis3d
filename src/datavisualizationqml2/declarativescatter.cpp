@@ -17,15 +17,14 @@
 ****************************************************************************/
 
 #include "declarativescatter_p.h"
-#include "declarativescatterrenderer_p.h"
+#include "declarativerenderer_p.h"
 #include "qitemmodelscatterdataproxy.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
-      m_shared(0),
-      m_initialisedSize(0, 0)
+      m_scatterController(0)
 {
     setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -35,66 +34,43 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_shared = new Scatter3DController(boundingRect().toRect());
-    setSharedController(m_shared);
+    m_scatterController = new Scatter3DController(boundingRect().toRect());
+    setSharedController(m_scatterController);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
 {
-    delete m_shared;
-}
-
-QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-    // If old node exists and has right size, reuse it.
-    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
-        // Update bounding rectangle (that has same size as before).
-        static_cast<DeclarativeScatterRenderer *>( oldNode )->setRect(boundingRect());
-        return oldNode;
-    }
-
-    // Create a new render node when size changes or if there is no node yet
-    m_initialisedSize = boundingRect().size().toSize();
-
-    // Delete old node
-    if (oldNode)
-        delete oldNode;
-
-    // Create a new one and set it's bounding rectangle
-    DeclarativeScatterRenderer *node = new DeclarativeScatterRenderer(window(), m_shared);
-    node->setRect(boundingRect());
-    m_shared->setBoundingRect(boundingRect().toRect());
-    return node;
+    delete m_scatterController;
 }
 
 Q3DValueAxis *DeclarativeScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisX());
 }
 
 void DeclarativeScatter::setAxisX(Q3DValueAxis *axis)
 {
-    m_shared->setAxisX(axis);
+    m_scatterController->setAxisX(axis);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisY());
 }
 
 void DeclarativeScatter::setAxisY(Q3DValueAxis *axis)
 {
-    m_shared->setAxisY(axis);
+    m_scatterController->setAxisY(axis);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisZ());
 }
 
 void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
 {
-    m_shared->setAxisZ(axis);
+    m_scatterController->setAxisZ(axis);
 }
 
 QQmlListProperty<QScatter3DSeries> DeclarativeScatter::seriesList()
@@ -113,18 +89,18 @@ void DeclarativeScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *li
 
 int DeclarativeScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
-    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_shared->scatterSeriesList().size();
+    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().size();
 }
 
 QScatter3DSeries *DeclarativeScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index)
 {
-    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_shared->scatterSeriesList().at(index);
+    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
 }
 
 void DeclarativeScatter::clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
     DeclarativeScatter *declScatter = reinterpret_cast<DeclarativeScatter *>(list->data);
-    QList<QScatter3DSeries *> realList = declScatter->m_shared->scatterSeriesList();
+    QList<QScatter3DSeries *> realList = declScatter->m_scatterController->scatterSeriesList();
     int count = realList.size();
     for (int i = 0; i < count; i++)
         declScatter->removeSeries(realList.at(i));
@@ -132,12 +108,12 @@ void DeclarativeScatter::clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *lis
 
 void DeclarativeScatter::addSeries(QScatter3DSeries *series)
 {
-    m_shared->addSeries(series);
+    m_scatterController->addSeries(series);
 }
 
 void DeclarativeScatter::removeSeries(QScatter3DSeries *series)
 {
-    m_shared->removeSeries(series);
+    m_scatterController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 

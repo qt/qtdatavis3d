@@ -75,11 +75,7 @@ signals:
     void meshFileNameChanged(QString filename);
 
 protected:
-    Scatter3DController *m_shared;
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
-
-private:
-    QSize m_initialisedSize;
+    Scatter3DController *m_scatterController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

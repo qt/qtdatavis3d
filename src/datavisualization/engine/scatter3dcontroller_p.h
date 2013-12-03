@@ -66,7 +66,7 @@ public:
     explicit Scatter3DController(QRect rect);
     ~Scatter3DController();
 
-    void initializeOpenGL();
+    virtual void initializeOpenGL();
 
     // Change selection mode
     void setSelectionMode(QDataVis::SelectionFlags mode);

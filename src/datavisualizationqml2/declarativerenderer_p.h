@@ -26,12 +26,12 @@
 //
 // We mean it.
 
-#ifndef DECLARATIVESURFACERENDERER_H
-#define DECLARATIVESURFACERENDERER_H
+#ifndef ABSTRACTDECLARATIVERENDERER_P_H
+#define ABSTRACTDECLARATIVERENDERER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "surface3dcontroller_p.h"
-#include <qsgsimpletexturenode.h>
+#include <abstract3dcontroller_p.h>
+#include <QSGSimpleTextureNode>
 
 class QOpenGLFramebufferObject;
 class QSGTexture;
@@ -39,27 +39,28 @@ class QQuickWindow;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class DeclarativeSurfaceRenderer : public QObject, public QSGSimpleTextureNode
+class DeclarativeRenderer : public QObject, public QSGSimpleTextureNode
 {
     Q_OBJECT
-
 public:
-    DeclarativeSurfaceRenderer(QQuickWindow *window, Surface3DController *shared);
-    ~DeclarativeSurfaceRenderer();
+    explicit DeclarativeRenderer(QQuickWindow *window, Abstract3DController *shared);
+    virtual ~DeclarativeRenderer();
 
 public slots:
     // Used to synch up data model from controller to renderer while main thread is locked
     void synchDataToRenderer();
     // Renders view to FBO before render cycle starts.
     void renderFBO();
+    void setDevicePixelRatio(float devicePixelRatio);
 
 private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    Surface3DController *m_surfaceRenderer;
+    Abstract3DController *m_controller;
+    float m_devicePixelRatio;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif
+#endif // ABSTRACTDECLARATIVERENDERER_P_H
