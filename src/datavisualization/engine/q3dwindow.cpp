@@ -39,6 +39,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * This class creates a QWindow and provides render loop for visualization types inheriting it.
  * \warning This class is not intended to be used directly by developers.
  *
+ * \note Q3DWindow sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
+ * graph windows as standalone windows with regular window frame, clear this flag after constructing
+ * the graph. For example:
+ *
+ * \code
+ *  Q3DBars *graphWindow = new Q3DBars;
+ *  graphWindow->setFlags(graphWindow->flags() ^ Qt::FramelessWindowHint);
+ * \endcode
+ *
  * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
 
@@ -50,6 +59,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     : QWindow(parent),
       d_ptr(new Q3DWindowPrivate(this))
 {
+    setFlags(flags() | Qt::FramelessWindowHint);
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
