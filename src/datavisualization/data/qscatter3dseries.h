@@ -31,6 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
     Q_OBJECT
     Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(int selectedItem READ selectedItem WRITE setSelectedItem NOTIFY selectedItemChanged)
+    Q_PROPERTY(float itemSize READ itemSize WRITE setItemSize NOTIFY itemSizeChanged)
 
 public:
     explicit QScatter3DSeries(QObject *parent = 0);
@@ -42,11 +43,16 @@ public:
 
     void setSelectedItem(int index);
     int selectedItem() const;
+
+    void setItemSize(float size);
+    float itemSize() const;
+
     Q_INVOKABLE int invalidSelectionIndex() const;
 
 signals:
     void dataProxyChanged(QScatterDataProxy *proxy);
     void selectedItemChanged(int index);
+    void itemSizeChanged(float size);
 
 protected:
     explicit QScatter3DSeries(QScatter3DSeriesPrivate *d, QObject *parent = 0);

@@ -47,8 +47,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat labelMargin = 0.05f;
-// TODO: Make margin modifiable?
-const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
+const GLfloat defaultMinSize = 0.01f;
+const GLfloat defaultMaxSize = 0.1f;
+const GLfloat defaultMargin = 1.0f + defaultMaxSize; // Default margin for background
+const GLfloat itemScaler = 3.0f;
 const GLfloat gridLineWidth = 0.005f;
 
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
@@ -85,7 +87,9 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectedSeries(0),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
-      m_hasHeightAdjustmentChanged(true)
+      m_hasHeightAdjustmentChanged(true),
+      m_backgroundMargin(defaultMargin),
+      m_maxItemSize(0.0f)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -141,6 +145,26 @@ void Scatter3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
+void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
+                                     bool updateVisibility)
+{
+    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+
+    int seriesCount = m_visibleSeriesList.size();
+    float maxItemSize = 0.0f;
+    float itemSize = 0.0f;
+
+    for (int series = 0; series < seriesCount; series++) {
+        itemSize = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize();
+        if (maxItemSize < itemSize)
+            maxItemSize = itemSize;
+    }
+    m_backgroundMargin = defaultMargin;
+    m_maxItemSize = maxItemSize;
+    if (maxItemSize > defaultMaxSize)
+        m_backgroundMargin += maxItemSize / itemScaler;
+}
+
 void Scatter3DRenderer::updateData()
 {
     int seriesCount = m_visibleSeriesList.size();
@@ -179,7 +203,8 @@ void Scatter3DRenderer::updateData()
             }
         }
     }
-    m_dotSizeScale = GLfloat(qBound(0.01f, 2.0f / float(qSqrt(qreal(totalDataSize))), 0.1f));
+    m_dotSizeScale = GLfloat(qBound(defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))),
+                                    defaultMaxSize));
 
     updateSelectedItem(m_selectedItemIndex, m_selectedSeries);
 }
@@ -270,17 +295,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Get light position from the scene
     QVector3D lightPos = m_cachedScene->activeLight()->position();
 
-    // Map adjustment direction to model matrix scaling
-    // TODO: Let's use these for testing the autoscaling of dots based on their number
-    GLfloat heightMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat widthMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat depthMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat heightScaler = 0.0f;
-    GLfloat widthScaler = 0.0f;
-    GLfloat depthScaler = 0.0f;
-    QVector3D modelScaler(widthMultiplier + widthScaler,
-                          heightMultiplier + heightScaler,
-                          depthMultiplier + depthScaler);
     // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
@@ -300,8 +314,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     if (havePointSeries) {
         glEnable(GL_POINT_SMOOTH);
         glEnable(GL_PROGRAM_POINT_SIZE);
-        // Scale points based on shadow quality for shadows, not by zoom level
-        glPointSize(m_dotSizeScale * 100.0f * m_shadowQualityMultiplier);
     }
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -349,6 +361,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
+
+            float itemSize =
+                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
+                    / itemScaler;
+            if (itemSize == 0.0f)
+                itemSize = m_dotSizeScale;
+            if (drawingPoints) {
+                // Scale points based on shadow quality for shadows, not by zoom level
+                glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
+            }
+            QVector3D modelScaler(itemSize, itemSize, itemSize);
+
             for (int dot = 0; dot < m_renderingArrays.at(series).size(); dot++) {
                 const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
                 if (!item.isVisible())
@@ -358,13 +382,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
 
                 modelMatrix.translate(item.translation());
-                if (!drawingPoints) {
+                if (!drawingPoints)
                     modelMatrix.scale(modelScaler);
-                    // TODO: Remove all references to item size?
-                    //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-                    //                            heightMultiplier * item.size() + heightScaler,
-                    //                            depthMultiplier * item.size() + depthScaler));
-                }
 
                 MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
@@ -423,9 +442,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
     }
 
-    if (havePointSeries)
-        glPointSize(m_dotSizeScale * activeCamera->zoomLevel()); // Scale points based on zoom
-
     ShaderHelper *pointSelectionShader = m_selectionShader;
 #else
     ShaderHelper *pointSelectionShader = m_pointShader;
@@ -451,6 +467,16 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
+
+            float itemSize =
+                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
+                    / itemScaler;
+            if (itemSize == 0.0f)
+                itemSize = m_dotSizeScale;
+            if (drawingPoints)
+                glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+            QVector3D modelScaler(itemSize, itemSize, itemSize);
+
             // Rebind selection shader if it has changed
             if (drawingPoints != previousDrawingPoints) {
                 previousDrawingPoints = drawingPoints;
@@ -478,13 +504,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
 
                 modelMatrix.translate(item.translation());
-                if (!drawingPoints) {
+                if (!drawingPoints)
                     modelMatrix.scale(modelScaler);
-                    // TODO: Remove all references to item size?
-                    //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-                    //                            heightMultiplier * item.size() + heightScaler,
-                    //                            depthMultiplier * item.size() + depthScaler));
-                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -587,6 +608,16 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     for (int series = 0; series < seriesCount; series++) {
         ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
         bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
+
+        float itemSize =
+                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
+                / itemScaler;
+        if (itemSize == 0.0f)
+            itemSize = m_dotSizeScale;
+        if (drawingPoints)
+            glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+        QVector3D modelScaler(itemSize, itemSize, itemSize);
+
         // Rebind selection shader if it has changed
         if (drawingPoints != previousDrawingPoints) {
             previousDrawingPoints = drawingPoints;
@@ -615,13 +646,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (!drawingPoints) {
                 modelMatrix.scale(modelScaler);
                 itModelMatrix.scale(modelScaler);
-                // TODO: Remove all references to item size?
-                //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-                //                            heightMultiplier * item.size() + heightScaler,
-                //                            depthMultiplier * item.size() + depthScaler));
-                //itModelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-                //                              heightMultiplier * item.size() + heightScaler,
-                //                              depthMultiplier * item.size() + depthScaler));
             }
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -713,13 +737,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QMatrix4x4 itModelMatrix;
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        QVector3D bgScale((aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                          backgroundMargin,
-                          (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+        GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+        GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height()) / m_scaleFactor;
+        if (m_maxItemSize > xScale)
+            xScale = m_maxItemSize;
+        if (m_maxItemSize > zScale)
+            zScale = m_maxItemSize;
+        QVector3D bgScale(xScale, m_backgroundMargin, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-        QVector3D bgScale((aspectRatio * backgroundMargin),
-                          backgroundMargin,
-                          (aspectRatio * backgroundMargin));
+        QVector3D bgScale((aspectRatio * m_backgroundMargin),
+                          m_backgroundMargin,
+                          (aspectRatio * m_backgroundMargin));
 #endif
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
@@ -826,7 +854,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         else
             lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
 
-        GLfloat yFloorLinePosition = -backgroundMargin + gridLineOffset;
+        GLfloat yFloorLinePosition = -m_backgroundMargin + gridLineOffset;
         if (m_yFlipped)
             yFloorLinePosition = -yFloorLinePosition;
 
@@ -844,11 +872,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            QVector3D gridLineScaler(
-                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        gridLineWidth, gridLineWidth);
+            GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+            if (m_maxItemSize > xScale)
+                xScale = m_maxItemSize;
+            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            QVector3D gridLineScaler((aspectRatio * backgroundMargin),
+            QVector3D gridLineScaler((aspectRatio * m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
 
@@ -890,13 +919,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
 
             // Side wall lines
-            gridLineScaler = QVector3D(gridLineWidth, backgroundMargin, gridLineWidth);
+            gridLineScaler = QVector3D(gridLineWidth, m_backgroundMargin, gridLineWidth);
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+            GLfloat lineXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                     / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineXTrans)
+                lineXTrans = m_maxItemSize - gridLineOffset;
             linePos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z()); // Start line
 #else
-            GLfloat lineXTrans = aspectRatio * backgroundMargin - gridLineOffset;
+            GLfloat lineXTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor; // Start line
 #endif
             if (!m_xFlipped)
@@ -947,15 +978,16 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             GLfloat lineStep = aspectRatio * m_axisCacheX.subSegmentStep();
             GLfloat linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
             int lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
-            QVector3D gridLineScaler(
-                        gridLineWidth, gridLineWidth,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+            GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height()) / m_scaleFactor;
+            if (m_maxItemSize > zScale)
+                zScale = m_maxItemSize;
+            QVector3D gridLineScaler(gridLineWidth, gridLineWidth, zScale);
 #else
             GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
             GLfloat linePos = -aspectRatio * m_scaleFactor;
             int lastSegment = axisCacheMax->subSegmentCount() * axisCacheMax->segmentCount();
             QVector3D gridLineScaler(gridLineWidth, gridLineWidth,
-                                     aspectRatio * backgroundMargin);
+                                     aspectRatio * m_backgroundMargin);
 #endif
 
             for (int segment = 0; segment <= lastSegment; segment++) {
@@ -997,17 +1029,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             // Back wall lines
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+            GLfloat lineZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                     / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineZTrans)
+                lineZTrans = m_maxItemSize - gridLineOffset;
             linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
 #else
-            GLfloat lineZTrans = aspectRatio * backgroundMargin - gridLineOffset;
+            GLfloat lineZTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor;
 #endif
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
-            gridLineScaler = QVector3D(gridLineWidth, backgroundMargin, gridLineWidth);
+            gridLineScaler = QVector3D(gridLineWidth, m_backgroundMargin, gridLineWidth);
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -1057,14 +1091,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+            GLfloat lineZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                     / m_scaleFactor - gridLineOffset;
-            QVector3D gridLineScaler(
-                        (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
-                        gridLineWidth, gridLineWidth);
+            if (m_maxItemSize > lineZTrans)
+                lineZTrans = m_maxItemSize - gridLineOffset;
+            GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+            if (m_maxItemSize > xScale)
+                xScale = m_maxItemSize;
+            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineZTrans = aspectRatio * backgroundMargin - gridLineOffset;
-            QVector3D gridLineScaler((aspectRatio * backgroundMargin),
+            GLfloat lineZTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
+            QVector3D gridLineScaler((aspectRatio * m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
             if (!m_zFlipped)
@@ -1113,15 +1150,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             linePos = m_axisCacheY.min() - m_translationOffset.y();
             lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+            GLfloat lineXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                     / m_scaleFactor - gridLineOffset;
-            gridLineScaler = QVector3D(
-                        gridLineWidth, gridLineWidth,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+            if (m_maxItemSize > lineXTrans)
+                lineXTrans = m_maxItemSize - gridLineOffset;
+            GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor;
+            if (m_maxItemSize > zScale)
+                zScale = m_maxItemSize;
+            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineXTrans = aspectRatio * backgroundMargin - gridLineOffset;
+            GLfloat lineXTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth,
-                                       aspectRatio * backgroundMargin);
+                                       aspectRatio * m_backgroundMargin);
 #endif
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -1185,16 +1226,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
         GLfloat labelPos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z());
         int lastSegment = m_axisCacheZ.segmentCount();
-        GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+        GLfloat labelXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                 / m_scaleFactor + labelMargin;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize + labelMargin;
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = aspectRatio * m_scaleFactor;
         int lastSegment = axisCacheMax->segmentCount();
-        GLfloat labelXTrans = aspectRatio * backgroundMargin + labelMargin;
+        GLfloat labelXTrans = aspectRatio * m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
-        GLfloat labelYTrans = -backgroundMargin;
+        GLfloat labelYTrans = -m_backgroundMargin;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 0.0f;
         GLfloat rotLabelZ = 0.0f;
@@ -1245,16 +1288,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         GLfloat posStep = aspectRatio * m_axisCacheX.segmentStep();
         GLfloat labelPos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
         int lastSegment = m_axisCacheX.segmentCount();
-        GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+        GLfloat labelZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                 / m_scaleFactor + labelMargin;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize + labelMargin;
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = -aspectRatio * m_scaleFactor;
         int lastSegment = axisCacheMax->segmentCount();
-        GLfloat labelZTrans = aspectRatio * backgroundMargin + labelMargin;
+        GLfloat labelZTrans = aspectRatio * m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
-        GLfloat labelYTrans = -backgroundMargin;
+        GLfloat labelYTrans = -m_backgroundMargin;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 90.0f;
         GLfloat rotLabelZ = 0.0f;
@@ -1305,12 +1350,16 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         GLfloat labelPos = m_axisCacheY.min() - m_translationOffset.y();
         int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+        GLfloat labelXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                 / m_scaleFactor;
-        GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+        GLfloat labelZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                 / m_scaleFactor;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize;
 #else // ..and this if we want uniform scaling based on largest dimension
-        GLfloat labelXTrans = aspectRatio * backgroundMargin;
+        GLfloat labelXTrans = aspectRatio * m_backgroundMargin;
         GLfloat labelZTrans = labelXTrans;
 #endif
         // Back wall init

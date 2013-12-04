@@ -90,11 +90,14 @@ private:
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
     QVector<ScatterRenderItemArray> m_renderingArrays;
+    GLfloat m_backgroundMargin;
+    GLfloat m_maxItemSize;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateData();
     void updateScene(Q3DScene *scene);
 

@@ -30,9 +30,17 @@ Item {
 
     //! [4]
     Data {
-        id: graphData
+        id: seriesOneData
     }
     //! [4]
+
+    Data {
+        id: seriesTwoData
+    }
+
+    Data {
+        id: seriesThreeData
+    }
 
     //! [8]
     //! [9]
@@ -69,13 +77,20 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
             //! [6]
+            // TODO: Remove once QTRD-2605 is fixed
+            axisX.min: -10
+            axisX.max: 10
+            axisY.min: -5
+            axisY.max: 5
+            axisZ.min: -5
+            axisZ.max: 5
             //! [5]
             Scatter3DSeries {
                 id: scatterSeries
-                itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+                itemLabelFormat: "Series 1: X:@xLabel Y:@yLabel Z:@zLabel"
 
                 ItemModelScatterDataProxy {
-                    itemModel: graphData.model
+                    itemModel: seriesOneData.model
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -83,6 +98,32 @@ Item {
             }
 
             //! [5]
+            Scatter3DSeries {
+                id: scatterSeriesTwo
+                itemLabelFormat: "Series 2: X:@xLabel Y:@yLabel Z:@zLabel"
+                itemSize: 0.1
+                mesh: Abstract3DSeries.MeshCube
+
+                ItemModelScatterDataProxy {
+                    itemModel: seriesTwoData.modelTwo
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
+            }
+            Scatter3DSeries {
+                id: scatterSeriesThree
+                itemLabelFormat: "Series 3: X:@xLabel Y:@yLabel Z:@zLabel"
+                itemSize: 0.2
+                mesh: Abstract3DSeries.MeshMinimal
+
+                ItemModelScatterDataProxy {
+                    itemModel: seriesThreeData.modelThree
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
+            }
         }
     }
 
@@ -106,14 +147,14 @@ Item {
     NewButton {
         id: smoothToggle
         width: parent.width / 6
-        text: "Use Smooth Dots"
+        text: "Use Smooth for Series One"
         anchors.left: shadowToggle.right
         onClicked: {
             if (scatterSeries.meshSmooth === false) {
-                text = "Use Flat Dots";
+                text = "Use Flat for Series One";
                 scatterSeries.meshSmooth = true;
             } else {
-                text = "Use Smooth Dots"
+                text = "Use Smooth for Series One"
                 scatterSeries.meshSmooth = false;
             }
         }
@@ -142,7 +183,7 @@ Item {
             if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
                 // Ownership of the theme is transferred and old theme is destroyed when setting
                 // a new one, so we need to create them dynamically
-                scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0; Theme3D {type: Theme3D.ThemeIsabelle}', parent);
+                scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0; Theme3D {type: Theme3D.ThemeIsabelle; font.family: "Lucida Handwriting"; font.pointSize: 40}', parent);
             } else {
                 scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0; Theme3D {type: Theme3D.ThemeArmyBlue}', parent);
             }

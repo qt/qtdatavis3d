@@ -95,6 +95,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty float Scatter3DSeries::itemSize
+ *
+ * Set item size for the series. Size must be between 0.0 and 1.0. Setting the size to 0.0
+ * causes item size to be automatically scaled based on combined item count in all the series for
+ * the graph. Preset default is \c 0.0.
+ */
+
+/*!
  * \qmlmethod int Scatter3DSeries::invalidSelectionIndex()
  * \return an invalid index for selection. Set this index to selectedItem property if you
  * want to clear the selection.
@@ -176,6 +184,28 @@ int QScatter3DSeries::selectedItem() const
 }
 
 /*!
+ * \property QScatter3DSeries::selectedItem
+ *
+ * Set item \a size for the series. Size must be between 0.0f and 1.0f. Setting the size to 0.0f
+ * causes item size to be automatically scaled based on combined item count in all the series for
+ * the graph. Preset default is \c 0.0f.
+ */
+void QScatter3DSeries::setItemSize(float size)
+{
+    if (size < 0.0f || size > 1.0f) {
+        qWarning("Invalid size. Valid range for itemSize is 0.0f...1.0f");
+    } else if (size != dptr()->m_itemSize) {
+        dptr()->setItemSize(size);
+        emit itemSizeChanged(size);
+    }
+}
+
+float QScatter3DSeries::itemSize() const
+{
+    return dptrc()->m_itemSize;
+}
+
+/*!
  * \return an invalid index for selection. Set this index to selectedItem property if you
  * want to clear the selection.
  */
@@ -204,7 +234,8 @@ const QScatter3DSeriesPrivate *QScatter3DSeries::dptrc() const
 
 QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeScatter),
-      m_selectedItem(Scatter3DController::invalidSelectionIndex())
+      m_selectedItem(Scatter3DController::invalidSelectionIndex()),
+      m_itemSize(0.0f)
 {
     m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
     m_mesh = QAbstract3DSeries::MeshSphere;
@@ -259,6 +290,13 @@ void QScatter3DSeriesPrivate::setSelectedItem(int index)
         m_selectedItem = index;
         emit qptr()->selectedItemChanged(m_selectedItem);
     }
+}
+
+void QScatter3DSeriesPrivate::setItemSize(float size)
+{
+    m_itemSize = size;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

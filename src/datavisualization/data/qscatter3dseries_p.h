@@ -45,10 +45,12 @@ public:
     virtual void connectControllerAndProxy(Abstract3DController *newController);
 
     void setSelectedItem(int index);
+    void setItemSize(float size);
 
 private:
     QScatter3DSeries *qptr();
     int m_selectedItem;
+    float m_itemSize;
 
 private:
     friend class QScatter3DSeries;

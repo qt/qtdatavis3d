@@ -72,13 +72,11 @@ QScatterDataItem::~QScatterDataItem()
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
-    //m_size = other.m_size;
 
     if (other.d_ptr)
         createExtraData();
     else
         d_ptr = 0;
-    // TODO set extra data
 
     return *this;
 }
@@ -122,16 +120,6 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  * \fn float QScatterDataItem::z() const
  * \return the Z component of the position of this data item.
  */
-
-//void QScatterDataItem::setSize(float size)
-//{
-//    m_size = size;
-//}
-
-//const float &QScatterDataItem::size() const
-//{
-//    return m_size;
-//}
 
 /*!
  * \internal
