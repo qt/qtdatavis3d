@@ -139,7 +139,7 @@ private:
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
-    void drawSlicedScene(const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
     void handleResize();
 

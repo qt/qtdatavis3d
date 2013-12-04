@@ -51,12 +51,12 @@ void DeclarativeBars::setBarColor(const QColor &baseColor)
 
 Q3DCategoryAxis *DeclarativeBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisX());
+    return static_cast<Q3DCategoryAxis *>(m_barsController->axisZ());
 }
 
 void DeclarativeBars::setRowAxis(Q3DCategoryAxis *axis)
 {
-    m_barsController->setAxisX(axis);
+    m_barsController->setAxisZ(axis);
 }
 
 Q3DValueAxis *DeclarativeBars::valueAxis() const
@@ -71,12 +71,12 @@ void DeclarativeBars::setValueAxis(Q3DValueAxis *axis)
 
 Q3DCategoryAxis *DeclarativeBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisZ());
+    return static_cast<Q3DCategoryAxis *>(m_barsController->axisX());
 }
 
 void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
-    m_barsController->setAxisZ(axis);
+    m_barsController->setAxisX(axis);
 }
 
 void DeclarativeBars::setBarThickness(float thicknessRatio)

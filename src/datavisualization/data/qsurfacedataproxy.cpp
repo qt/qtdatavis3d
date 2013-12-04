@@ -41,9 +41,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * If you use QSurfaceDataRow pointers to directly modify data after adding the array to the proxy,
  * you must also emit proper signal to make the graph update.
  *
- * When determining what rows and columns are visible, the first item in each row and the first item in
- * each column determine if the whole row or column is visible, even if other items in the row or column
- * individually have different X- or Z-coordinates.
+ * To make a sensible surface, the X-value of each successive item in the same row must be greater than the
+ * previous item in that row, and the the Z-value of each successive item in a column  must be greater than
+ * the previous item in that column.
+ *
+ * \note In the initial release, only surfaces with straight rows and columns are fully supported. Any row
+ * with items that do not have the exact same Z-value or any columns with items that do not have the exact
+ * same X-value may get clipped incorrectly if the whole surface doesn't fit to the visible X or Z axis
+ * ranges.
  *
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
  * not get rendered.

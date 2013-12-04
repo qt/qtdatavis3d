@@ -152,10 +152,10 @@ void Bars3DRenderer::initializeOpenGL()
 void Bars3DRenderer::updateData()
 {
     int seriesCount = m_visibleSeriesList.size();
-    int minRow = m_axisCacheX.min();
-    int maxRow = m_axisCacheX.max();
-    int minCol = m_axisCacheZ.min();
-    int maxCol = m_axisCacheZ.max();
+    int minRow = m_axisCacheZ.min();
+    int maxRow = m_axisCacheZ.max();
+    int minCol = m_axisCacheX.min();
+    int maxCol = m_axisCacheX.max();
     int newRows = maxRow - minRow + 1;
     int newColumns = maxCol - minCol + 1;
     int updateSize = 0;
@@ -296,12 +296,10 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
 
     drawScene(defaultFboHandle);
     if (m_cachedIsSlicingActivated)
-        drawSlicedScene(m_axisCacheX.titleItem(), m_axisCacheY.titleItem(), m_axisCacheZ.titleItem());
+        drawSlicedScene();
 }
 
-void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
-                                     const LabelItem &yLabel,
-                                     const LabelItem &zLabel)
+void Bars3DRenderer::drawSlicedScene()
 {
     GLfloat barPosX = 0;
     QVector3D lightPos;
@@ -639,12 +637,12 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                 m_labelObj, activeCamera, false, false, Drawer::LabelTop,
                                 Qt::AlignCenter, true);
         }
-        m_drawer->drawLabel(*dummyItem, zLabel, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, m_axisCacheX.titleItem(), viewMatrix, projectionMatrix,
                             positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
                             Qt::AlignCenter, true);
     } else {
-        m_drawer->drawLabel(*dummyItem, xLabel, viewMatrix, projectionMatrix,
+        m_drawer->drawLabel(*dummyItem, m_axisCacheZ.titleItem(), viewMatrix, projectionMatrix,
                             positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
                             Qt::AlignCenter, true);
@@ -655,7 +653,7 @@ void Bars3DRenderer::drawSlicedScene(const LabelItem &xLabel,
                                 Qt::AlignCenter, true);
         }
     }
-    m_drawer->drawLabel(*dummyItem, yLabel, viewMatrix, projectionMatrix,
+    m_drawer->drawLabel(*dummyItem, m_axisCacheY.titleItem(), viewMatrix, projectionMatrix,
                         positionComp, QVector3D(0.0f, 0.0f, 90.0f), 0,
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
                         false, false, Drawer::LabelLeft, Qt::AlignCenter, true);
@@ -1023,9 +1021,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
             // Set slice cache, i.e. axis cache from where slice labels are taken
             if (rowMode)
-                m_sliceCache = &m_axisCacheZ;
-            else
                 m_sliceCache = &m_axisCacheX;
+            else
+                m_sliceCache = &m_axisCacheZ;
             m_sliceTitleItem = 0;
         }
     }
@@ -1134,8 +1132,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             item.setPosition(QPoint(row, bar));
                             if (m_selectionDirty && bar < m_renderColumns) {
                                 item.setSeriesIndex(series);
-                                if (!m_sliceTitleItem && m_axisCacheX.labelItems().size() > row)
-                                    m_sliceTitleItem = m_axisCacheX.labelItems().at(row);
+                                if (!m_sliceTitleItem && m_axisCacheZ.labelItems().size() > row)
+                                    m_sliceTitleItem = m_axisCacheZ.labelItems().at(row);
                                 m_sliceSelection->append(&item);
                             }
                         }
@@ -1161,8 +1159,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             item.setPosition(QPoint(row, bar));
                             if (m_selectionDirty && row < m_renderRows) {
                                 item.setSeriesIndex(series);
-                                if (!m_sliceTitleItem && m_axisCacheZ.labelItems().size() > bar)
-                                    m_sliceTitleItem = m_axisCacheZ.labelItems().at(bar);
+                                if (!m_sliceTitleItem && m_axisCacheX.labelItems().size() > bar)
+                                    m_sliceTitleItem = m_axisCacheX.labelItems().at(bar);
                                 m_sliceSelection->append(&item);
                             }
                         }
@@ -1586,7 +1584,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     Qt::AlignmentFlag alignment = m_xFlipped ? Qt::AlignLeft : Qt::AlignRight;
     for (int row = 0; row != m_cachedRowCount; row++) {
-        if (m_axisCacheX.labelItems().size() > row) {
+        if (m_axisCacheZ.labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
@@ -1602,8 +1600,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                            (m_columnDepth - rowPos) / m_scaleFactor);
 
             m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(row);
-            //qDebug() << "labelPos, row" << row + 1 << ":" << labelPos << m_axisCacheX.labels().at(row);
+            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(row);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 zeroVector, labelRotation, 0, m_cachedSelectionMode,
@@ -1624,7 +1621,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     alignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
     for (int column = 0; column != m_cachedColumnCount; column++) {
-        if (m_axisCacheZ.labelItems().size() > column) {
+        if (m_axisCacheX.labelItems().size() > column) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
             // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
             colPos = (column + 0.5f) * m_cachedBarSpacing.width();
@@ -1640,7 +1637,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                            rowPos);
 
             m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(column);
+            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(column);
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 zeroVector, labelRotation, 0, m_cachedSelectionMode,
@@ -1745,20 +1742,20 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             m_visibleSeriesList[m_visualSelectedBarSeriesIndex].itemLabelFormat(),
                             selectedBar->value());
 
-                int selBarPosX = selectedBar->position().x();
-                int selBarPosY = selectedBar->position().y();
-                labelText.replace(rowIndexTag, QString::number(selBarPosX));
-                if (m_axisCacheX.labels().size() > selBarPosX)
-                    labelText.replace(rowLabelTag, m_axisCacheX.labels().at(selBarPosX));
+                int selBarPosRow = selectedBar->position().x();
+                int selBarPosCol = selectedBar->position().y();
+                labelText.replace(rowIndexTag, QString::number(selBarPosRow));
+                if (m_axisCacheZ.labels().size() > selBarPosRow)
+                    labelText.replace(rowLabelTag, m_axisCacheZ.labels().at(selBarPosRow));
                 else
                     labelText.replace(rowLabelTag, QString());
-                labelText.replace(rowTitleTag, m_axisCacheX.title());
-                labelText.replace(colIndexTag, QString::number(selBarPosY));
-                if (m_axisCacheZ.labels().size() > selBarPosY)
-                    labelText.replace(colLabelTag, m_axisCacheZ.labels().at(selBarPosY));
+                labelText.replace(rowTitleTag, m_axisCacheZ.title());
+                labelText.replace(colIndexTag, QString::number(selBarPosCol));
+                if (m_axisCacheX.labels().size() > selBarPosCol)
+                    labelText.replace(colLabelTag, m_axisCacheX.labels().at(selBarPosCol));
                 else
                     labelText.replace(colLabelTag, QString());
-                labelText.replace(colTitleTag, m_axisCacheZ.title());
+                labelText.replace(colTitleTag, m_axisCacheX.title());
                 labelText.replace(valueTitleTag, m_axisCacheY.title());
 
                 if (labelText.contains(valueLabelTag)) {
@@ -1864,10 +1861,10 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
         return;
     }
 
-    int adjustedX = m_selectedBarPos.x() - int(m_axisCacheX.min());
-    int adjustedZ = m_selectedBarPos.y() - int(m_axisCacheZ.min());
-    int maxX = m_renderingArrays.at(0).size() - 1;
-    int maxZ = maxX >= 0 ? m_renderingArrays.at(0).at(0).size() - 1 : -1;
+    int adjustedZ = m_selectedBarPos.x() - int(m_axisCacheZ.min());
+    int adjustedX = m_selectedBarPos.y() - int(m_axisCacheX.min());
+    int maxZ = m_renderingArrays.at(0).size() - 1;
+    int maxX = maxZ >= 0 ? m_renderingArrays.at(0).at(0).size() - 1 : -1;
 
     for (int i = 0; i < m_visibleSeriesList.size(); i++) {
         if (m_visibleSeriesList.at(i).series() == series) {
@@ -1877,11 +1874,11 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
     }
 
     if (m_selectedBarPos == Bars3DController::invalidSelectionPosition()
-            || adjustedX < 0 || adjustedX > maxX
-            || adjustedZ < 0 || adjustedZ > maxZ) {
+            || adjustedZ < 0 || adjustedZ > maxZ
+            || adjustedX < 0 || adjustedX > maxX) {
         m_visualSelectedBarPos = Bars3DController::invalidSelectionPosition();
     } else {
-        m_visualSelectedBarPos = QPoint(adjustedX, adjustedZ);
+        m_visualSelectedBarPos = QPoint(adjustedZ, adjustedX);
     }
 }
 
@@ -2041,8 +2038,8 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector3D &selectionC
     if (selectionColor == selectionSkipColor) {
         position = Bars3DController::invalidSelectionPosition();
     } else {
-        position = QPoint(int(selectionColor.x() + int(m_axisCacheX.min())),
-                          int(selectionColor.y()) + int(m_axisCacheZ.min()));
+        position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())),
+                          int(selectionColor.y()) + int(m_axisCacheX.min()));
     }
     return position;
 }

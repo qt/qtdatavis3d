@@ -159,12 +159,12 @@ void Bars3DController::handleDataRowLabelsChanged()
     QBar3DSeries *firstSeries = 0;
     if (m_seriesList.size())
         firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
-    if (m_axisX && firstSeries && firstSeries->dataProxy()) {
+    if (m_axisZ && firstSeries && firstSeries->dataProxy()) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
-        int min = int(m_axisX->min());
-        int count = int(m_axisX->max()) - min + 1;
+        int min = int(m_axisZ->min());
+        int count = int(m_axisZ->max()) - min + 1;
         QStringList subList = firstSeries->dataProxy()->rowLabels().mid(min, count);
-        static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
+        static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
     }
 }
 
@@ -173,13 +173,13 @@ void Bars3DController::handleDataColumnLabelsChanged()
     QBar3DSeries *firstSeries = 0;
     if (m_seriesList.size())
         firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
-    if (m_axisZ && firstSeries && firstSeries->dataProxy()) {
+    if (m_axisX && firstSeries && firstSeries->dataProxy()) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
-        int min = int(m_axisZ->min());
-        int count = int(m_axisZ->max()) - min + 1;
+        int min = int(m_axisX->min());
+        int count = int(m_axisX->max()) - min + 1;
         QStringList subList = static_cast<QBarDataProxy *>(firstSeries->dataProxy())
                 ->columnLabels().mid(min, count);
-        static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
+        static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
     }
 }
 
@@ -217,13 +217,13 @@ QPoint Bars3DController::invalidSelectionPosition()
 void Bars3DController::setAxisX(Q3DAbstractAxis *axis)
 {
     Abstract3DController::setAxisX(axis);
-    handleDataRowLabelsChanged();
+    handleDataColumnLabelsChanged();
 }
 
 void Bars3DController::setAxisZ(Q3DAbstractAxis *axis)
 {
     Abstract3DController::setAxisZ(axis);
-    handleDataColumnLabelsChanged();
+    handleDataRowLabelsChanged();
 }
 
 void Bars3DController::addSeries(QAbstract3DSeries *series)
@@ -281,9 +281,9 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
     // Data window changed
     if (sender == m_axisX || sender == m_axisZ) {
         if (sender == m_axisX)
-            handleDataRowLabelsChanged();
-        if (sender == m_axisZ)
             handleDataColumnLabelsChanged();
+        if (sender == m_axisZ)
+            handleDataRowLabelsChanged();
     }
 
     Abstract3DController::handleAxisRangeChangedBySender(sender);
@@ -355,8 +355,8 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
     if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
         // If the selected bar is outside data window, or there is no visible selected bar, disable slicing
-        if (pos.x() < m_axisX->min() || pos.x() > m_axisX->max()
-                || pos.y() < m_axisZ->min() || pos.y() > m_axisZ->max()
+        if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()
+                || pos.y() < m_axisX->min() || pos.y() > m_axisX->max()
                 || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {
@@ -389,16 +389,16 @@ void Bars3DController::adjustAxisRanges()
         const QBarDataProxy *proxy = static_cast<QBar3DSeries *>(m_seriesList.at(0))->dataProxy();
         const QBarDataArray *array = proxy->array();
 
-        Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
-        if (categoryAxisX && categoryAxisX->isAutoAdjustRange() && proxy) {
+        Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
+        if (categoryAxisZ && categoryAxisZ->isAutoAdjustRange() && proxy) {
             int rowCount = proxy->rowCount();
             if (rowCount)
                 rowCount--;
-            categoryAxisX->dptr()->setRange(0.0f, float(rowCount));
+            categoryAxisZ->dptr()->setRange(0.0f, float(rowCount));
         }
 
-        Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
-        if (categoryAxisZ && categoryAxisZ->isAutoAdjustRange() && proxy) {
+        Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
+        if (categoryAxisX && categoryAxisX->isAutoAdjustRange() && proxy) {
             int columnCount = 0;
             for (int i = 0; i < array->size(); i++) {
                 if (columnCount < array->at(i)->size())
@@ -406,15 +406,15 @@ void Bars3DController::adjustAxisRanges()
             }
             if (columnCount)
                 columnCount--;
-            categoryAxisZ->dptr()->setRange(0.0f, float(columnCount));
+            categoryAxisX->dptr()->setRange(0.0f, float(columnCount));
         }
 
         Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
         if (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange() && proxy) {
-            QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisX->min(),
-                                                                         categoryAxisX->max(),
-                                                                         categoryAxisZ->min(),
-                                                                         categoryAxisZ->max());
+            QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisZ->min(),
+                                                                         categoryAxisZ->max(),
+                                                                         categoryAxisX->min(),
+                                                                         categoryAxisX->max());
             if (limits.first < 0) {
                 // Call private implementation to avoid unsetting auto adjust flag
                 valueAxis->dptr()->setRange(limits.first, limits.second);

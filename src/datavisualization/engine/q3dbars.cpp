@@ -500,7 +500,7 @@ QLinearGradient Q3DBars::multiHighlightGradient() const
  */
 void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    d_ptr->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -508,7 +508,7 @@ void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisZ());
 }
 
 /*!
@@ -522,7 +522,7 @@ Q3DCategoryAxis *Q3DBars::rowAxis() const
  */
 void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    d_ptr->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -530,7 +530,7 @@ void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisX());
 }
 
 /*!
