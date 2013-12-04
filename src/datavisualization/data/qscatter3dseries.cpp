@@ -184,7 +184,7 @@ int QScatter3DSeries::selectedItem() const
 }
 
 /*!
- * \property QScatter3DSeries::selectedItem
+ * \property QScatter3DSeries::itemSize
  *
  * Set item \a size for the series. Size must be between 0.0f and 1.0f. Setting the size to 0.0f
  * causes item size to be automatically scaled based on combined item count in all the series for
