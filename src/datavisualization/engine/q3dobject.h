@@ -26,9 +26,10 @@
 #include <QVector3D>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+
 class Q3DObjectPrivate;
 
-class Q3DObject : public QObject
+class QT_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Q3DScene* parentScene READ parentScene)
