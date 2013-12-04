@@ -48,6 +48,9 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_rangeZ(16.0),
       m_minX(-8.0),
       m_minZ(-8.0),
+      m_addRowCounter(m_zCount),
+      m_insertTestZPos(0),
+      m_insertTestIndexPos(1),
       m_planeArray(0),
       m_theSeries(new QSurface3DSeries)
 {
@@ -410,9 +413,9 @@ void GraphModifier::changeRow()
         float i = float(rand() % m_zCount);
 
         QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = qMin(maxZ, (i * stepZ + minZ));
         for (float j = 0; j < m_xCount; j++) {
             float x = qMin(maxX, (j * stepX + minX));
-            float z = qMin(maxZ, (i * stepZ + minZ));
             float R = qSqrt(x * x + z * z) + 0.01f;
             float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
             (*newRow)[j].setPosition(QVector3D(x, y, z));
@@ -494,6 +497,135 @@ void GraphModifier::changeMultipleItem()
         changeItem();
 }
 
+void GraphModifier::addRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Adding a new row";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = float(m_addRowCounter) * stepZ + minZ;
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+        m_addRowCounter++;
+
+        m_theSeries->dataProxy()->addRow(newRow);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::addRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Adding few new row";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataArray dataArray;
+
+        for (int i = 0; i < 3; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = m_addRowCounter * stepZ + minZ;
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+            m_addRowCounter++;
+        }
+
+        m_theSeries->dataProxy()->addRows(dataArray);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::insertRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Inserting a row";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = qMin(maxZ, (float(m_insertTestZPos) * stepZ + minZ + (stepZ / 2.0f)));
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.3f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+        m_insertTestZPos++;
+
+        m_theSeries->dataProxy()->insertRow(m_insertTestIndexPos, newRow);
+        m_insertTestIndexPos += 2;
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::insertRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Inserting 3 rows";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataArray dataArray;
+        for (int i = 0; i < 3; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = qMin(maxZ, (float(m_insertTestZPos) * stepZ + minZ + i * (stepZ / 4.0f)));
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.3f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+        }
+        m_insertTestZPos++;
+
+        m_theSeries->dataProxy()->insertRows(m_insertTestIndexPos, dataArray);
+        m_insertTestIndexPos += 4;
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::removeRow()
+{
+    qDebug() << "Remove an arbitrary row";
+    int row = rand() % m_zCount;
+    m_theSeries->dataProxy()->removeRows(row, 1);
+    m_zCount--;
+}
+
 void GraphModifier::changeMesh()
 {
     static int model = 0;
@@ -559,4 +691,3 @@ void GraphModifier::updateSamples()
         break;
     }
 }
-

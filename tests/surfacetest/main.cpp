@@ -228,6 +228,21 @@ int main(int argc, char *argv[])
     QPushButton *changeMultipleRowsButton = new QPushButton(widget);
     changeMultipleRowsButton->setText(QStringLiteral("Change many rows"));
 
+    QPushButton *addRowButton = new QPushButton(widget);
+    addRowButton->setText(QStringLiteral("Add a row"));
+
+    QPushButton *addRowsButton = new QPushButton(widget);
+    addRowsButton->setText(QStringLiteral("Add 3 rows"));
+
+    QPushButton *insertRowButton = new QPushButton(widget);
+    insertRowButton->setText(QStringLiteral("Insert a row"));
+
+    QPushButton *insertRowsButton = new QPushButton(widget);
+    insertRowsButton->setText(QStringLiteral("Insert 3 rows"));
+
+    QPushButton *removeRowButton = new QPushButton(widget);
+    removeRowButton->setText(QStringLiteral("Remove a row"));
+
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
@@ -266,6 +281,11 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(changeMultipleRowsButton);
     vLayout2->addWidget(changeItemButton);
     vLayout2->addWidget(changeMultipleItemButton);
+    vLayout2->addWidget(addRowButton);
+    vLayout2->addWidget(addRowsButton);
+    vLayout2->addWidget(insertRowButton);
+    vLayout2->addWidget(insertRowsButton);
+    vLayout2->addWidget(removeRowButton);
 
     widget->show();
 
@@ -326,6 +346,16 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::changeMultipleItem);
     QObject::connect(changeMultipleRowsButton,&QPushButton::clicked,
                      modifier, &GraphModifier::changeMultipleRows);
+    QObject::connect(addRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::addRow);
+    QObject::connect(addRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::addRows);
+    QObject::connect(insertRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::insertRow);
+    QObject::connect(insertRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::insertRows);
+    QObject::connect(removeRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::removeRow);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);

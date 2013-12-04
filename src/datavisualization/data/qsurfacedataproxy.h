@@ -55,9 +55,20 @@ public:
 
     void setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item);
 
+    int addRow(QSurfaceDataRow *row);
+    int addRows(const QSurfaceDataArray &rows);
+
+    void insertRow(int rowIndex, QSurfaceDataRow *row);
+    void insertRows(int rowIndex, const QSurfaceDataArray &rows);
+
+    void removeRows(int rowIndex, int removeCount);
+
 signals:
     void arrayReset();
+    void rowsAdded(int startIndex, int count);
     void rowsChanged(int startIndex, int count);
+    void rowsRemoved(int startIndex, int count);
+    void rowsInserted(int startIndex, int count);
     void itemChanged(int rowIndex, int columnIndex);
     void seriesChanged(QSurface3DSeries *series);
 

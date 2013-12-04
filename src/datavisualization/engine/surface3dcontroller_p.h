@@ -101,7 +101,10 @@ public:
 
 public slots:
     void handleArrayReset();
+    void handleRowsAdded(int startIndex, int count);
     void handleRowsChanged(int startIndex, int count);
+    void handleRowsRemoved(int startIndex, int count);
+    void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
 
     // Renderer callback handlers

@@ -47,6 +47,11 @@ public:
     void setRow(int rowIndex, QSurfaceDataRow *row);
     void setRows(int rowIndex, const QSurfaceDataArray &rows);
     void setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item);
+    int addRow(QSurfaceDataRow *row);
+    int addRows(const QSurfaceDataArray &rows);
+    void insertRow(int rowIndex, QSurfaceDataRow *row);
+    void insertRows(int rowIndex, const QSurfaceDataArray &rows);
+    void removeRows(int rowIndex, int removeCount);
     void limitValues(QVector3D &minValues, QVector3D &maxValues) const;
 
     virtual void setSeries(QAbstract3DSeries *series);

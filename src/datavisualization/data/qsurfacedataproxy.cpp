@@ -172,6 +172,66 @@ void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDat
 }
 
 /*!
+ * Adds a new \a row to the end of array. The new \a row must have
+ * the same number of columns as the rows at the initial array.
+ *
+ * \return index of the added row.
+ */
+int QSurfaceDataProxy::addRow(QSurfaceDataRow *row)
+{
+    int addIndex = dptr()->addRow(row);
+    emit rowsAdded(addIndex, 1);
+    return addIndex;
+}
+
+/*!
+ * Adds new \a rows to the end of array. The new rows must have the same number of columns
+ * as the rows at the initial array.
+ *
+ * \return index of the first added row.
+ */
+int QSurfaceDataProxy::addRows(const QSurfaceDataArray &rows)
+{
+    int addIndex = dptr()->addRows(rows);
+    emit rowsAdded(addIndex, rows.size());
+    return addIndex;
+}
+
+/*!
+ * Inserts a new \a row into \a rowIndex.
+ * If rowIndex is equal to array size, rows are added to end of the array. The new \a row must have
+ * the same number of columns as the rows at the initial array.
+ */
+void QSurfaceDataProxy::insertRow(int rowIndex, QSurfaceDataRow *row)
+{
+    dptr()->insertRow(rowIndex, row);
+    emit rowsInserted(rowIndex, 1);
+}
+
+/*!
+ * Inserts new \a rows into \a rowIndex.
+ * If rowIndex is equal to array size, rows are added to end of the array. The new \a rows must have
+ * the same number of columns as the rows at the initial array.
+ */
+void QSurfaceDataProxy::insertRows(int rowIndex, const QSurfaceDataArray &rows)
+{
+    dptr()->insertRows(rowIndex, rows);
+    emit rowsInserted(rowIndex, rows.size());
+}
+
+/*!
+ * Removes \a removeCount rows staring at \a rowIndex. Attempting to remove rows past the end of the
+ * array does nothing.
+ */
+void QSurfaceDataProxy::removeRows(int rowIndex, int removeCount)
+{
+    if (rowIndex < rowCount() && removeCount >= 1) {
+        dptr()->removeRows(rowIndex, removeCount);
+        emit rowsRemoved(rowIndex, removeCount);
+    }
+}
+
+/*!
  * \return pointer to the data array.
  */
 const QSurfaceDataArray *QSurfaceDataProxy::array() const
@@ -276,9 +336,9 @@ void QSurfaceDataProxyPrivate::setRows(int rowIndex, const QSurfaceDataArray &ro
 {
     QSurfaceDataArray &dataArray = *m_dataArray;
     Q_ASSERT(rowIndex >= 0 && (rowIndex + rows.size()) <= dataArray.size());
-    Q_ASSERT(m_dataArray->at(rowIndex)->size() == rows.at(0)->size());
 
     for (int i = 0; i < rows.size(); i++) {
+        Q_ASSERT(m_dataArray->at(rowIndex)->size() == rows.at(i)->size());
         if (rows.at(i) != dataArray.at(rowIndex)) {
             clearRow(rowIndex);
             dataArray[rowIndex] = rows.at(i);
@@ -293,6 +353,52 @@ void QSurfaceDataProxyPrivate::setItem(int rowIndex, int columnIndex, const QSur
     QSurfaceDataRow &row = *(*m_dataArray)[rowIndex];
     Q_ASSERT(columnIndex < row.size());
     row[columnIndex] = item;
+}
+
+int QSurfaceDataProxyPrivate::addRow(QSurfaceDataRow *row)
+{
+    Q_ASSERT(m_dataArray->at(0)->size() == row->size());
+    int currentSize = m_dataArray->size();
+    m_dataArray->append(row);
+    return currentSize;
+}
+
+int QSurfaceDataProxyPrivate::addRows(const QSurfaceDataArray &rows)
+{
+    int currentSize = m_dataArray->size();
+    for (int i = 0; i < rows.size(); i++) {
+        Q_ASSERT(m_dataArray->at(0)->size() == rows.at(i)->size());
+        m_dataArray->append(rows.at(i));
+    }
+    return currentSize;
+}
+
+void QSurfaceDataProxyPrivate::insertRow(int rowIndex, QSurfaceDataRow *row)
+{
+    Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
+    Q_ASSERT(m_dataArray->at(0)->size() == row->size());
+    m_dataArray->insert(rowIndex, row);
+}
+
+void QSurfaceDataProxyPrivate::insertRows(int rowIndex, const QSurfaceDataArray &rows)
+{
+    Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
+
+    for (int i = 0; i < rows.size(); i++) {
+        Q_ASSERT(m_dataArray->at(0)->size() == rows.at(i)->size());
+        m_dataArray->insert(rowIndex++, rows.at(i));
+    }
+}
+
+void QSurfaceDataProxyPrivate::removeRows(int rowIndex, int removeCount)
+{
+    Q_ASSERT(rowIndex >= 0);
+    int maxRemoveCount = m_dataArray->size() - rowIndex;
+    removeCount = qMin(removeCount, maxRemoveCount);
+    for (int i = 0; i < removeCount; i++) {
+        clearRow(rowIndex);
+        m_dataArray->removeAt(rowIndex);
+    }
 }
 
 QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()

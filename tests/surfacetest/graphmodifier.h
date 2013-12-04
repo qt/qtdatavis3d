@@ -73,6 +73,11 @@ public:
     void changeItem();
     void changeMultipleItem();
     void changeMultipleRows();
+    void addRow();
+    void addRows();
+    void insertRow();
+    void insertRows();
+    void removeRow();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -101,6 +106,9 @@ private:
     float m_rangeZ;
     float m_minX;
     float m_minZ;
+    int m_addRowCounter;
+    int m_insertTestZPos;
+    int m_insertTestIndexPos;
     QTimer m_timer;
     QSurfaceDataArray *m_planeArray;
     QLabel *m_selectionInfoLabel;

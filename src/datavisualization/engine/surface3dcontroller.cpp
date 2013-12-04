@@ -379,6 +379,37 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
     }
 }
 
+void Surface3DController::handleRowsAdded(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Surface3DController::handleRowsInserted(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Surface3DController::handleRowsRemoved(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+
+    // Clear selection unless still valid
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+
+    emitNeedRender();
+}
+
 void Surface3DController::adjustValueAxisRange()
 {
     if (m_seriesList.size()) {
