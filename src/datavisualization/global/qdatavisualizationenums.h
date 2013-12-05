@@ -28,50 +28,10 @@ namespace QtDataVisualization {
 class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(CameraPreset)
     Q_ENUMS(ShadowQuality)
     Q_FLAGS(SelectionFlag SelectionFlags)
 
 public:
-    // TODO: Move to input handler (QTRD-2505)
-    enum InputState {
-        InputStateNone = 0,
-        InputStateOnScene,
-        InputStateOnOverview,
-        InputStateOnSlice,
-        InputStateRotating,
-        InputStateOnPinch
-    };
-
-    // TODO: Move to camera (QTRD-2505)
-    enum CameraPreset {
-        CameraPresetNone = -1,
-        CameraPresetFrontLow = 0,
-        CameraPresetFront,
-        CameraPresetFrontHigh,
-        CameraPresetLeftLow,
-        CameraPresetLeft,
-        CameraPresetLeftHigh,
-        CameraPresetRightLow,
-        CameraPresetRight,
-        CameraPresetRightHigh,
-        CameraPresetBehindLow,
-        CameraPresetBehind,
-        CameraPresetBehindHigh,
-        CameraPresetIsometricLeft,
-        CameraPresetIsometricLeftHigh,
-        CameraPresetIsometricRight,
-        CameraPresetIsometricRightHigh,
-        CameraPresetDirectlyAbove,
-        CameraPresetDirectlyAboveCW45,
-        CameraPresetDirectlyAboveCCW45,
-        CameraPresetFrontBelow,
-        CameraPresetLeftBelow,
-        CameraPresetRightBelow,
-        CameraPresetBehindBelow,
-        CameraPresetDirectlyBelow
-    };
-
     enum SelectionFlag {
         SelectionNone              = 0,
         SelectionItem              = 1,

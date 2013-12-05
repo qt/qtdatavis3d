@@ -32,6 +32,7 @@
 #include "q3dobject.h"
 #include "q3dcamera.h"
 #include "q3dscene.h"
+#include "q3dlight.h"
 #include "qabstract3dseries.h"
 #include "qbar3dseries.h"
 #include "qscatter3dseries.h"
@@ -39,6 +40,7 @@
 #include "declarativeseries_p.h"
 #include "q3dtheme.h"
 #include "declarativetheme_p.h"
+#include "qabstract3dinputhandler.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -59,6 +61,7 @@ QML_DECLARE_TYPE(Q3DValueAxis)
 QML_DECLARE_TYPE(Q3DScene)
 QML_DECLARE_TYPE(Q3DObject)
 QML_DECLARE_TYPE(Q3DCamera)
+QML_DECLARE_TYPE(Q3DLight)
 
 QML_DECLARE_TYPE(QAbstractDataProxy)
 QML_DECLARE_TYPE(QBarDataProxy)
@@ -82,6 +85,8 @@ QML_DECLARE_TYPE(ColorGradient)
 
 QML_DECLARE_TYPE(Q3DTheme)
 QML_DECLARE_TYPE(DeclarativeTheme3D)
+
+QML_DECLARE_TYPE(QAbstract3DInputHandler)
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

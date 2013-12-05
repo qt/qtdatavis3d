@@ -32,6 +32,7 @@ class Q3DCameraPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
 {
     Q_OBJECT
+    Q_ENUMS(CameraPreset)
     Q_PROPERTY(float xRotation READ xRotation WRITE setXRotation NOTIFY xRotationChanged)
     Q_PROPERTY(float yRotation READ yRotation WRITE setYRotation NOTIFY yRotationChanged)
     Q_PROPERTY(float minXRotation READ minXRotation NOTIFY minXRotationChanged)
@@ -40,11 +41,39 @@ class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_PROPERTY(float maxYRotation READ maxYRotation NOTIFY maxYRotationChanged)
     Q_PROPERTY(int zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(QMatrix4x4 viewMatrix READ viewMatrix WRITE setViewMatrix NOTIFY viewMatrixChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
+    Q_PROPERTY(CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
     Q_PROPERTY(bool viewMatrixAutoUpdateEnabled READ isViewMatrixAutoUpdateEnabled WRITE setViewMatrixAutoUpdateEnabled NOTIFY viewMatrixAutoUpdateChanged)
     Q_PROPERTY(bool wrapXRotation READ wrapXRotation WRITE setWrapXRotation NOTIFY wrapXRotationChanged)
     Q_PROPERTY(bool wrapYRotation READ wrapYRotation WRITE setWrapYRotation NOTIFY wrapYRotationChanged)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
+
+public:
+    enum CameraPreset {
+        CameraPresetNone = -1,
+        CameraPresetFrontLow = 0,
+        CameraPresetFront,
+        CameraPresetFrontHigh,
+        CameraPresetLeftLow,
+        CameraPresetLeft,
+        CameraPresetLeftHigh,
+        CameraPresetRightLow,
+        CameraPresetRight,
+        CameraPresetRightHigh,
+        CameraPresetBehindLow,
+        CameraPresetBehind,
+        CameraPresetBehindHigh,
+        CameraPresetIsometricLeft,
+        CameraPresetIsometricLeftHigh,
+        CameraPresetIsometricRight,
+        CameraPresetIsometricRightHigh,
+        CameraPresetDirectlyAbove,
+        CameraPresetDirectlyAboveCW45,
+        CameraPresetDirectlyAboveCCW45,
+        CameraPresetFrontBelow,
+        CameraPresetLeftBelow,
+        CameraPresetRightBelow,
+        CameraPresetBehindBelow,
+        CameraPresetDirectlyBelow
+    };
 
 public:
     Q3DCamera(QObject *parent = 0);
@@ -75,15 +104,15 @@ public:
     bool isViewMatrixAutoUpdateEnabled() const;
     void setViewMatrixAutoUpdateEnabled(bool isEnabled);
 
-    QDataVis::CameraPreset cameraPreset() const;
-    void setCameraPreset(QDataVis::CameraPreset preset);
+    CameraPreset cameraPreset() const;
+    void setCameraPreset(CameraPreset preset);
 
     int zoomLevel() const;
     void setZoomLevel(int zoomLevel);
 
-    void setBaseOrientation(const QVector3D &defaultPosition,
-                            const QVector3D &defaultTarget,
-                            const QVector3D &defaultUp);
+    Q_INVOKABLE void setBaseOrientation(const QVector3D &defaultPosition,
+                                        const QVector3D &defaultTarget,
+                                        const QVector3D &defaultUp);
 
     QVector3D calculatePositionRelativeToCamera(const QVector3D &relativePosition,
                                                 float fixedRotation,
@@ -99,7 +128,7 @@ signals:
     void maxYRotationChanged(float rotation);
     void zoomLevelChanged(int zoomLevel);
     void viewMatrixChanged(QMatrix4x4 viewMatrix);
-    void cameraPresetChanged(QDataVis::CameraPreset preset);
+    void cameraPresetChanged(CameraPreset preset);
     void viewMatrixAutoUpdateChanged(bool enabled);
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);

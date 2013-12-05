@@ -37,61 +37,6 @@
  */
 
 /*!
-    \enum QtDataVisualization::QDataVis::InputState
-
-    Predefined input states for mouse and touch based input handlers. All states are not valid with all input handlers.
-
-    \value InputStateNone
-           Default "no input received" state.
-    \value InputStateOnScene
-           Mouse or touch input received on the 3D scene.
-    \value InputStateOnOverview
-           Mouse or touch input received on the overview area.
-    \value InputStateOnSlice
-           Mouse or touch input received on the slice view area.
-    \value InputStateRotating
-           Rotation of the 3D geometry ongoing.
-    \value InputStateOnPinch
-           Pinch/punch multitouch input received.
-*/
-
-/*!
-    \enum QtDataVisualization::QDataVis::CameraPreset
-
-    Predefined positions for camera.
-
-    \value CameraPresetNone
-           Used to indicate a preset has not been set, or the scene has been rotated freely.
-    \value CameraPresetFrontLow
-    \value CameraPresetFront
-    \value CameraPresetFrontHigh
-    \value CameraPresetLeftLow
-    \value CameraPresetLeft
-    \value CameraPresetLeftHigh
-    \value CameraPresetRightLow
-    \value CameraPresetRight
-    \value CameraPresetRightHigh
-    \value CameraPresetBehindLow
-    \value CameraPresetBehind
-    \value CameraPresetBehindHigh
-    \value CameraPresetIsometricLeft
-    \value CameraPresetIsometricLeftHigh
-    \value CameraPresetIsometricRight
-    \value CameraPresetIsometricRightHigh
-    \value CameraPresetDirectlyAbove
-    \value CameraPresetDirectlyAboveCW45
-    \value CameraPresetDirectlyAboveCCW45
-    \value CameraPresetFrontBelow
-           In Q3DBars from CameraPresetFrontBelow onward these only work for graphs including negative
-           values. They act as Preset...Low for positive-only values.
-    \value CameraPresetLeftBelow
-    \value CameraPresetRightBelow
-    \value CameraPresetBehindBelow
-    \value CameraPresetDirectlyBelow
-           Acts as CameraPresetFrontLow for positive -only bars.
-*/
-
-/*!
     \enum QtDataVisualization::QDataVis::SelectionFlag
 
     Item selection modes. Values of this enumeration can be combined with OR operator.

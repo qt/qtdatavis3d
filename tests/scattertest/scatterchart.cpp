@@ -42,7 +42,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     font.setPointSize(m_fontSize);
     m_chart->theme()->setFont(font);
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_chart->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
     m_chart->setAxisY(new Q3DValueAxis);
     m_chart->setAxisZ(new Q3DValueAxis);
@@ -149,12 +149,12 @@ void ScatterDataModifier::changeStyle()
 
 void ScatterDataModifier::changePresetCamera()
 {
-    static int preset = QDataVis::CameraPresetFrontLow;
+    static int preset = Q3DCamera::CameraPresetFrontLow;
 
-    m_chart->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_chart->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
-    if (++preset > QDataVis::CameraPresetDirectlyAboveCCW45)
-        preset = QDataVis::CameraPresetFrontLow;
+    if (++preset > Q3DCamera::CameraPresetDirectlyAboveCCW45)
+        preset = Q3DCamera::CameraPresetFrontLow;
 }
 
 void ScatterDataModifier::changeTheme()

@@ -113,7 +113,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_graph->theme()->setFont(QFont("Impact", 20));
 
     // Set preset camera position
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [7]
 }
 

@@ -34,7 +34,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 {
     m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);

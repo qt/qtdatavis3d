@@ -20,15 +20,46 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
-   \class QAbstract3DInputHandler
-   \inmodule QtDataVisualization
-   \brief The base class for implementations of input handlers.
-   \since Qt Data Visualization 1.0
+ * \class QAbstract3DInputHandler
+ * \inmodule QtDataVisualization
+ * \brief The base class for implementations of input handlers.
+ * \since Qt Data Visualization 1.0
+ *
+ * QAbstract3DInputHandler is the base class that is subclassed by different input handling implementations
+ * that take input events and translate those to camera and light movements. Input handlers also translate
+ * raw input events to slicing and selection events in the scene.
+ */
 
-    QAbstract3DInputHandler is the base class that is subclassed by different input handling implementations
-    that take input events and translate those to camera and light movements. Input handlers also translate
-    raw input events to slicing and selection events in the scene.
-*/
+/*!
+ * \enum QAbstract3DInputHandler::InputState
+ *
+ * Predefined input states for mouse and touch based input handlers. All states are not valid
+ * with all input handlers.
+ *
+ * \value InputStateNone
+ *        Default "no input received" state.
+ * \value InputStateOnScene
+ *        Mouse or touch input received on the 3D scene.
+ * \value InputStateOnPrimaryView
+ *        Mouse or touch input received on the primary view area.
+ * \value InputStateOnSecondaryView
+ *        Mouse or touch input received on the secondary view area.
+ * \value InputStateRotating
+ *        Rotation of the 3D geometry ongoing.
+ * \value InputStatePinching
+ *        Pinch/punch multitouch input ongoing.
+ */
+
+/*!
+ * \qmltype AbstractInputHandler3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
+ * \instantiates QAbstract3DInputHandler
+ * \brief Base type for all QtDataVisualization input handlers.
+ *
+ * This type is uncreatable.
+ */
 
 /*!
  * Constructs the base class. An optional \a parent parameter can be given
@@ -112,12 +143,12 @@ void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
  * Current enumerated input state based on the processed input events.
  * When the state changes inputStateChanged() is emitted.
  */
-QDataVis::InputState QAbstract3DInputHandler::inputState()
+QAbstract3DInputHandler::InputState QAbstract3DInputHandler::inputState()
 {
     return d_ptr->m_inputState;
 }
 
-void QAbstract3DInputHandler::setInputState(QDataVis::InputState inputState)
+void QAbstract3DInputHandler::setInputState(InputState inputState)
 {
     if (inputState != d_ptr->m_inputState) {
         d_ptr->m_inputState = inputState;
@@ -201,7 +232,7 @@ QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputH
     q_ptr(q),
     m_prevDistance(0),
     m_previousInputPos(QPoint(0,0)),
-    m_inputState(QDataVis::InputStateNone),
+    m_inputState(QAbstract3DInputHandler::InputStateNone),
     m_inputPosition(QPoint(0,0)),
     m_scene(0)
 {

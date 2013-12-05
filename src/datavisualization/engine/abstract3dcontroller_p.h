@@ -295,7 +295,7 @@ public slots:
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
-    void handleInputStateChanged(QDataVis::InputState state);
+    void handleInputStateChanged(QAbstract3DInputHandler::InputState state);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);
     void handlePixelRatioChanged(float ratio);

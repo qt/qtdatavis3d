@@ -513,12 +513,12 @@ void GraphModifier::changeStyle()
 
 void GraphModifier::changePresetCamera()
 {
-    static int preset = QDataVis::CameraPresetFrontLow;
+    static int preset = Q3DCamera::CameraPresetFrontLow;
 
-    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
-    if (++preset > QDataVis::CameraPresetDirectlyBelow)
-        preset = QDataVis::CameraPresetFrontLow;
+    if (++preset > Q3DCamera::CameraPresetDirectlyBelow)
+        preset = Q3DCamera::CameraPresetFrontLow;
 }
 
 void GraphModifier::changeTheme()

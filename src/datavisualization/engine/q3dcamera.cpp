@@ -29,19 +29,192 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
-   \class Q3DCamera
-   \inmodule QtDataVisualization
-   \brief Representation of a camera in 3D space.
-   \since Qt Data Visualization 1.0
-
-    Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the data visualization.
-    The class offers simple methods for setting the orbit point in rotations, but allows also setting the 4x4 viewmatrix
-    directly in case a more customized camera behavior is needed.
-*/
+ * \class Q3DCamera
+ * \inmodule QtDataVisualization
+ * \brief Representation of a camera in 3D space.
+ * \since Qt Data Visualization 1.0
+ *
+ * Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the
+ * data visualization. The class offers simple methods for setting the orbit point in rotations,
+ * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
+ * needed.
+ */
 
 /*!
- * Constructs a new 3D camera with position set to origo, up direction facing towards the Y-axis and looking at origo by default. An
- * optional \a parent parameter can be given and is then passed to QObject constructor.
+ * \enum Q3DCamera::CameraPreset
+ *
+ * Predefined positions for camera.
+ *
+ * \value CameraPresetNone
+ *        Used to indicate a preset has not been set, or the scene has been rotated freely.
+ * \value CameraPresetFrontLow
+ * \value CameraPresetFront
+ * \value CameraPresetFrontHigh
+ * \value CameraPresetLeftLow
+ * \value CameraPresetLeft
+ * \value CameraPresetLeftHigh
+ * \value CameraPresetRightLow
+ * \value CameraPresetRight
+ * \value CameraPresetRightHigh
+ * \value CameraPresetBehindLow
+ * \value CameraPresetBehind
+ * \value CameraPresetBehindHigh
+ * \value CameraPresetIsometricLeft
+ * \value CameraPresetIsometricLeftHigh
+ * \value CameraPresetIsometricRight
+ * \value CameraPresetIsometricRightHigh
+ * \value CameraPresetDirectlyAbove
+ * \value CameraPresetDirectlyAboveCW45
+ * \value CameraPresetDirectlyAboveCCW45
+ * \value CameraPresetFrontBelow
+ *        In Q3DBars from CameraPresetFrontBelow onward these only work for graphs including negative
+ *        values. They act as Preset...Low for positive-only values.
+ * \value CameraPresetLeftBelow
+ * \value CameraPresetRightBelow
+ * \value CameraPresetBehindBelow
+ * \value CameraPresetDirectlyBelow
+ *        Acts as CameraPresetFrontLow for positive-only bars.
+ */
+
+/*!
+ * \qmltype Camera3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
+ * \instantiates Q3DCamera
+ * \brief Representation of a camera in 3D space.
+ *
+ * Camera3D represents a basic orbit around centerpoint 3D camera that is used when rendering the
+ * data visualization. The class offers simple methods for setting the orbit point in rotations,
+ * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
+ * needed.
+ */
+
+/*!
+ * \qmlproperty float Camera3D::xRotation
+ *
+ * This property contains the X-rotation angle of the camera around the target point in degrees
+ * starting from the current base position set by the setBaseOrientation method.
+ */
+
+/*!
+ * \qmlproperty float Camera3D::yRotation
+ *
+ * This property contains the Y-rotation angle of the camera around the target point in degrees
+ * starting from the current base position set by the setBaseOrientation method.
+ */
+
+/*!
+ * \qmlproperty float Camera3D::minXRotation
+ *
+ * This property contains the current minimum X-rotation for the camera.
+ * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, maxXRotation
+ */
+
+/*!
+ * \qmlproperty float Camera3D::minYRotation
+ *
+ * This property contains the current minimum Y-rotation for the camera.
+ * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, maxYRotation
+ */
+
+/*!
+ * \qmlproperty float Camera3D::maxXRotation
+ *
+ * This property contains the current maximum X-rotation for the camera.
+ * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, minXRotation
+ */
+
+/*!
+ * \qmlproperty float Camera3D::maxYRotation
+ *
+ * This property contains the current maximum Y-rotation for the camera.
+ * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, minYRotation
+ */
+
+/*!
+ * \qmlmethod void Camera3D::setBaseOrientation(vector3d basePosition, vector3d target, vector3d baseUp)
+ *
+ * Sets the base values for the camera that are used when calculating the camera position using the
+ * rotation values. The base position of the camera is defined by \a basePosition, expectation is
+ * that the x and y values are 0. Look at target point is defined by \a target and the camera
+ * rotates around it. Up direction for the camera is defined by \a baseUp, normally this is a
+ * vector with only y value set to 1.
+ */
+
+/*!
+ * \qmlproperty matrix4x4 Camera3D::viewMatrix
+ *
+ * This property contains the view matrix used in the 3D calculations. When the default orbiting
+ * camera behavior is sufficient, there is no need to touch this property. If the default
+ * behavior is insufficient, the view matrix can be set directly.
+ * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled
+ * property to \c false.
+ */
+
+/*!
+ * \qmlproperty bool Camera3D::viewMatrixAutoUpdateEnabled
+ *
+ * This property determines if view matrix is automatically updated each render cycle using the
+ * current base orientation and rotations. If set to \c false, no automatic recalculation is done and
+ * the view matrix can be set using the viewMatrix property.
+ */
+
+/*!
+ * \qmlproperty Camera3D.CameraPreset Camera3D::cameraPreset
+ *
+ * This property contains the currently active camera preset, which is one of
+ * \l{Q3DCamera::CameraPreset}{Camera3D.CameraPreset}. If no preset is active the value
+ * is \l{Q3DCamera::CameraPresetNone}{Camera3D.CameraPresetNone}.
+ * \note The base camera orientation set by setBaseOrientation will affect the presets as all
+ * calculations are based on those values.
+ */
+
+/*!
+ * \qmlproperty float Camera3D::zoomLevel
+ *
+ * This property contains the the camera zoom level in percentage. 100.0 means there is no zoom
+ * in or out set in the camera.
+ */
+
+/*!
+ * \qmlproperty bool Camera3D::wrapXRotation
+ *
+ * This property determines the behavior of the minimum and maximum limits in the X-rotation.
+ * By default the X-rotation wraps from minimum value to maximum and from maximum to minimum.
+ *
+ * If set to \c true the X-rotation of the camera is wrapped from minimum to maximum and from maximum
+ * to minimum. If set to \c false the X-rotation of the camera is limited to the sector determined by
+ * minimum and maximum values.
+ */
+
+/*!
+ * \qmlproperty bool Camera3D::wrapYRotation
+ *
+ * This property determines the behavior of the minimum and maximum limits in the Y-rotation.
+ * By default the Y-rotation is limited between the minimum and maximum values without any wrapping.
+ *
+ * If \c true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum
+ * to minimum. If \c false the Y-rotation of the camera is limited to the sector determined by minimum
+ * and maximum values.
+ */
+
+/*!
+ * Constructs a new 3D camera with position set to origin, up direction facing towards the Y-axis
+ * and looking at origin by default. An optional \a parent parameter can be given and is then passed
+ * to QObject constructor.
  */
 Q3DCamera::Q3DCamera(QObject *parent) :
     Q3DObject(parent),
@@ -97,8 +270,8 @@ void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 /*!
  * \property Q3DCamera::xRotation
  *
- * This property contains the X-rotation angle of the camera around the target point in degrees starting from
- * the current base position set by the setBaseOrientation() methods.
+ * This property contains the X-rotation angle of the camera around the target point in degrees
+ * starting from the current base position set by the setBaseOrientation() method.
  */
 float Q3DCamera::xRotation() const {
     return d_ptr->m_xRotation;
@@ -113,8 +286,8 @@ void Q3DCamera::setXRotation(float rotation)
 
     if (d_ptr->m_xRotation != rotation) {
         d_ptr->setXRotation(rotation);
-        if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
-            d_ptr->m_activePreset = QDataVis::CameraPresetNone;
+        if (d_ptr->m_activePreset != CameraPresetNone) {
+            d_ptr->m_activePreset = CameraPresetNone;
             setDirty(true);
         }
 
@@ -125,8 +298,8 @@ void Q3DCamera::setXRotation(float rotation)
 /*!
  * \property Q3DCamera::yRotation
  *
- * This property contains the Y-rotation angle of the camera around the target point in degrees starting from
- * the current base position set by the setBaseOrientation() methods.
+ * This property contains the Y-rotation angle of the camera around the target point in degrees
+ * starting from the current base position set by the setBaseOrientation() method.
  */
 float Q3DCamera::yRotation() const {
     return d_ptr->m_yRotation;
@@ -141,8 +314,8 @@ void Q3DCamera::setYRotation(float rotation)
 
     if (d_ptr->m_yRotation != rotation) {
         d_ptr->setYRotation(rotation);
-        if (d_ptr->m_activePreset != QDataVis::CameraPresetNone) {
-            d_ptr->m_activePreset = QDataVis::CameraPresetNone;
+        if (d_ptr->m_activePreset != CameraPresetNone) {
+            d_ptr->m_activePreset = CameraPresetNone;
             setDirty(true);
         }
 
@@ -154,7 +327,7 @@ void Q3DCamera::setYRotation(float rotation)
  * \property Q3DCamera::minXRotation
  *
  * This property contains the current minimum X-rotation for the camera.
- * The full circle range is [-180, 180] and the minimum value is limited to -180.
+ * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
  * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
  * \sa wrapXRotation, maxXRotation
@@ -164,9 +337,6 @@ float Q3DCamera::minXRotation() const
     return d_ptr->m_minXRotation;
 }
 
-/*!
- * \internal
- */
 void Q3DCamera::setMinXRotation(float minRotation)
 {
     minRotation = qBound(-180.0f, minRotation, 180.0f);
@@ -186,7 +356,7 @@ void Q3DCamera::setMinXRotation(float minRotation)
  * \property Q3DCamera::minYRotation
  *
  * This property contains the current minimum Y-rotation for the camera.
- * The full Y angle range is [-90,90] and the minimum value is limited to -90.
+ * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
  * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
  * \sa wrapYRotation, maxYRotation
@@ -196,9 +366,6 @@ float Q3DCamera::minYRotation() const
     return d_ptr->m_minYRotation;
 }
 
-/*!
- * \internal
- */
 void Q3DCamera::setMinYRotation(float minRotation)
 {
     minRotation = qBound(-90.0f, minRotation, 90.0f);
@@ -218,7 +385,7 @@ void Q3DCamera::setMinYRotation(float minRotation)
  * \property Q3DCamera::maxXRotation
  *
  * This property contains the current maximum X-rotation for the camera.
- * The full circle range is [-180,180] and the maximum value is limited to 180.
+ * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
  * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
  * \sa wrapXRotation, minXRotation
@@ -228,9 +395,6 @@ float Q3DCamera::maxXRotation() const
     return d_ptr->m_maxXRotation;
 }
 
-/*!
- * \internal
- */
 void Q3DCamera::setMaxXRotation(float maxRotation)
 {
     maxRotation = qBound(-180.0f, maxRotation, 180.0f);
@@ -251,7 +415,7 @@ void Q3DCamera::setMaxXRotation(float maxRotation)
  * \property Q3DCamera::maxYRotation
  *
  * This property contains the current maximum Y-rotation for the camera.
- * The full Y angle range is [-90,90] and the maximum value is limited to 90.
+ * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
  * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
  * \sa wrapYRotation, minYRotation
@@ -261,9 +425,6 @@ float Q3DCamera::maxYRotation() const
     return d_ptr->m_maxYRotation;
 }
 
-/*!
- * \internal
- */
 void Q3DCamera::setMaxYRotation(float maxRotation)
 {
     maxRotation = qBound(-90.0f, maxRotation, 90.0f);
@@ -281,10 +442,11 @@ void Q3DCamera::setMaxYRotation(float maxRotation)
 }
 
 /*!
- * Sets the base values for the camera that are used when calculating the camera position using the rotation values.
- * The base position of the camera is defined by \a basePosition, expectation is that the x and y values are 0.
- * Look at target point is defined by \a target and the camera rotates around it. Up direction for the camera is
- * defined by \a baseUp, normally this is a vector with only y values set to 1.
+ * Sets the base values for the camera that are used when calculating the camera position using the
+ * rotation values. The base position of the camera is defined by \a basePosition, expectation is
+ * that the x and y values are 0. Look at target point is defined by \a target and the camera
+ * rotates around it. Up direction for the camera is defined by \a baseUp, normally this is a
+ * vector with only y value set to 1.
  */
 void Q3DCamera::setBaseOrientation(const QVector3D &basePosition,
                                    const QVector3D &target,
@@ -303,9 +465,11 @@ void Q3DCamera::setBaseOrientation(const QVector3D &basePosition,
 /*!
  * \property Q3DCamera::viewMatrix
  *
- * This property contains the view matrix used in the 3D calculations. When the default orbiting camera behavior is sufficient,
- * there is no need to touch this property. But if the default behavior is insufficient, the view matrix can be set directly.
- * When setting the view matrix directly remember to set Q3DCamera::viewMatrixAutoUpdateEnabled to false.
+ * This property contains the view matrix used in the 3D calculations. When the default orbiting
+ * camera behavior is sufficient, there is no need to touch this property. If the default
+ * behavior is insufficient, the view matrix can be set directly.
+ * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled to
+ * \c false.
  */
 QMatrix4x4 Q3DCamera::viewMatrix() const
 {
@@ -324,9 +488,9 @@ void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
 /*!
  * \property Q3DCamera::viewMatrixAutoUpdateEnabled
  *
- * This property determines if view matrix is automatically updated each render cycle using the current base orientation and
- * rotations. If set to false, no automatic recalculation is done and the view matrix can be set using the
- * Q3DMatrix::viewMatrix property.
+ * This property determines if view matrix is automatically updated each render cycle using the
+ * current base orientation and rotations. If set to \c false, no automatic recalculation is done
+ * and the view matrix can be set using the viewMatrix property.
  */
 bool Q3DCamera::isViewMatrixAutoUpdateEnabled() const
 {
@@ -342,141 +506,141 @@ void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
 /*!
  * \property Q3DCamera::cameraPreset
  *
- * This property contains the currently active camera preset,
- * if no preset is active the value is QDataVis::CameraPresetNone.
+ * This property contains the currently active camera preset, if no preset is active the value
+ * is CameraPresetNone.
  * \note The base camera orientation set by setBaseOrientation() will affect
  * the presets as all calculations are based on those values.
  */
-QDataVis::CameraPreset Q3DCamera::cameraPreset() const
+Q3DCamera::CameraPreset Q3DCamera::cameraPreset() const
 {
     return d_ptr->m_activePreset;
 }
 
-void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
+void Q3DCamera::setCameraPreset(CameraPreset preset)
 {
     switch (preset) {
-    case QDataVis::CameraPresetFrontLow: {
+    case CameraPresetFrontLow: {
         setXRotation(0.0f);
         setYRotation(0.0f);
         break;
     }
-    case QDataVis::CameraPresetFront: {
+    case CameraPresetFront: {
         setXRotation(0.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetFrontHigh: {
+    case CameraPresetFrontHigh: {
         setXRotation(0.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetLeftLow: {
+    case CameraPresetLeftLow: {
         setXRotation(90.0f);
         setYRotation(0.0f);
         break;
     }
-    case QDataVis::CameraPresetLeft: {
+    case CameraPresetLeft: {
         setXRotation(90.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetLeftHigh: {
+    case CameraPresetLeftHigh: {
         setXRotation(90.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetRightLow: {
+    case CameraPresetRightLow: {
         setXRotation(-90.0f);
         setYRotation(0.0f);
         break;
     }
-    case QDataVis::CameraPresetRight: {
+    case CameraPresetRight: {
         setXRotation(-90.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetRightHigh: {
+    case CameraPresetRightHigh: {
         setXRotation(-90.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetBehindLow: {
+    case CameraPresetBehindLow: {
         setXRotation(180.0f);
         setYRotation(0.0f);
         break;
     }
-    case QDataVis::CameraPresetBehind: {
+    case CameraPresetBehind: {
         setXRotation(180.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetBehindHigh: {
+    case CameraPresetBehindHigh: {
         setXRotation(180.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetIsometricLeft: {
+    case CameraPresetIsometricLeft: {
         setXRotation(45.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetIsometricLeftHigh: {
+    case CameraPresetIsometricLeftHigh: {
         setXRotation(45.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetIsometricRight: {
+    case CameraPresetIsometricRight: {
         setXRotation(-45.0f);
         setYRotation(22.5f);
         break;
     }
-    case QDataVis::CameraPresetIsometricRightHigh: {
+    case CameraPresetIsometricRightHigh: {
         setXRotation(-45.0f);
         setYRotation(45.0f);
         break;
     }
-    case QDataVis::CameraPresetDirectlyAbove: {
+    case CameraPresetDirectlyAbove: {
         setXRotation(0.0f);
         setYRotation(90.0f);
         break;
     }
-    case QDataVis::CameraPresetDirectlyAboveCW45: {
+    case CameraPresetDirectlyAboveCW45: {
         setXRotation(-45.0f);
         setYRotation(90.0f);
         break;
     }
-    case QDataVis::CameraPresetDirectlyAboveCCW45: {
+    case CameraPresetDirectlyAboveCCW45: {
         setXRotation(45.0f);
         setYRotation(90.0f);
         break;
     }
-    case QDataVis::CameraPresetFrontBelow: {
+    case CameraPresetFrontBelow: {
         setXRotation(0.0f);
         setYRotation(-45.0f);
         break;
     }
-    case QDataVis::CameraPresetLeftBelow: {
+    case CameraPresetLeftBelow: {
         setXRotation(90.0f);
         setYRotation(-45.0f);
         break;
     }
-    case QDataVis::CameraPresetRightBelow: {
+    case CameraPresetRightBelow: {
         setXRotation(-90.0f);
         setYRotation(-45.0f);
         break;
     }
-    case QDataVis::CameraPresetBehindBelow: {
+    case CameraPresetBehindBelow: {
         setXRotation(180.0f);
         setYRotation(-45.0f);
         break;
     }
-    case QDataVis::CameraPresetDirectlyBelow: {
+    case CameraPresetDirectlyBelow: {
         setXRotation(0.0f);
         setYRotation(-90.0f);
         break;
     }
     default:
-        preset = QDataVis::CameraPresetNone;
+        preset = CameraPresetNone;
         break;
     }
 
@@ -490,8 +654,8 @@ void Q3DCamera::setCameraPreset(QDataVis::CameraPreset preset)
 /*!
  * \property Q3DCamera::zoomLevel
  *
- * This property contains the the camera zoom level in percentages.
- * 100% means there is no zoom in or out set in the camera.
+ * This property contains the the camera zoom level in percentage. \c 100.0f means there is no zoom
+ * in or out set in the camera.
  */
 int Q3DCamera::zoomLevel() const
 {
@@ -510,10 +674,12 @@ void Q3DCamera::setZoomLevel(int zoomLevel)
 /*!
  * Calculates and returns a position relative to the camera using the given parameters
  * and the current camera viewMatrix property.
- * \a relativePosition defines the relative 3D offset to the current camera position.
- * \a fixedRotation is optional, if given fixes rotation of the calculated point around the data visualization area to the given value in degrees.
- * \a distanceModifier is also optional, if given modifies the distance of the calculated point from the data visualization.
- * \return Calculated position relative to this camera's position.
+ * The relative 3D offset to the current camera position is defined in \a relativePosition.
+ * An optional fixed rotation of the calculated point around the data visualization area can be
+ * given in \a fixedRotation. The rotation is given in degrees.
+ * An optional \a distanceModifier modifies the distance of the calculated point from the data
+ * visualization.
+ * \return calculated position relative to this camera's position.
  */
 QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relativePosition,
                                                        float fixedRotation,
@@ -547,8 +713,9 @@ QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relative
  * This property determines the behavior of the minimum and maximum limits in the X-rotation.
  * By default the X-rotation wraps from minimum value to maximum and from maximum to minimum.
  *
- * If set to true the X-rotation of the camera is wrapped from minimum to maximum and from maximum to minimum.
- * If set to false the X-rotation of the camera is limited to the sector determined by minimum and maximum values.
+ * If set to \c true the X-rotation of the camera is wrapped from minimum to maximum and from
+ * maximum to minimum. If set to \c false the X-rotation of the camera is limited to the sector
+ * determined by minimum and maximum values.
  */
 bool Q3DCamera::wrapXRotation() const
 {
@@ -566,8 +733,9 @@ void Q3DCamera::setWrapXRotation(bool isEnabled)
  * This property determines the behavior of the minimum and maximum limits in the Y-rotation.
  * By default the Y-rotation is limited between the minimum and maximum values without any wrapping.
  *
- * If true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum to minimum.
- * If false the Y-rotation of the camera is limited to the sector determined by minimum and maximum values.
+ * If \c true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum to
+ * minimum. If \c false the Y-rotation of the camera is limited to the sector determined by minimum
+ * and maximum values.
  */
 bool Q3DCamera::wrapYRotation() const
 {
@@ -580,8 +748,10 @@ void Q3DCamera::setWrapYRotation(bool isEnabled)
 }
 
 /*!
- * Utility function that sets the camera rotations and distance.\a horizontal and \a vertical define the camera rotations to be used.
- * Optional \a zoom parameter can be given to set the zoom of the camera in range of 10-500%.
+ * Utility function that sets the camera rotations and distance.\a horizontal and \a vertical
+ * define the camera rotations to be used.
+ * Optional \a zoom parameter can be given to set the zoom percentage of the camera in range of
+ * \c{10.0f - 500.0f}.
  */
 void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
 {
@@ -602,7 +772,7 @@ Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     m_wrapXRotation(true),
     m_wrapYRotation(false),
     m_zoomLevel(100),
-    m_activePreset(QDataVis::CameraPresetNone)
+    m_activePreset(Q3DCamera::CameraPresetNone)
 {
 }
 

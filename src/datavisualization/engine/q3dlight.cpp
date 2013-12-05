@@ -23,16 +23,27 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
-   \class Q3DLight
-   \inmodule QtDataVisualization
-   \brief Representation of a light source in 3D space.
-   \since Qt Data Visualization 1.0
-
-    Q3DLight represents a monochrome non variable light source in 3D space.
-*/
+ * \class Q3DLight
+ * \inmodule QtDataVisualization
+ * \brief Representation of a light source in 3D space.
+ * \since Qt Data Visualization 1.0
+ *
+ * Q3DLight represents a monochrome non variable light source in 3D space.
+ */
 
 /*!
- * Constructs a new 3D light located at origo. An optional \a parent parameter can be given
+ * \qmltype Light3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
+ * \instantiates Q3DLight
+ * \brief Representation of a light source in 3D space.
+ *
+ * Light3D represents a monochrome non variable light source in 3D space.
+ */
+
+/*!
+ * Constructs a new 3D light located at origin. An optional \a parent parameter can be given
  * and is then passed to QObject constructor.
  */
 Q3DLight::Q3DLight(QObject *parent) :

@@ -53,6 +53,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                  QLatin1String("Trying to create uncreatable: QSurface3DSeries, use Surface3DSeries instead."));
     qmlRegisterUncreatableType<Q3DTheme>(uri, 1, 0, "Q3DTheme",
                                          QLatin1String("Trying to create uncreatable: Q3DTheme, use Theme3D instead."));
+    qmlRegisterUncreatableType<QAbstract3DInputHandler>(uri, 1, 0, "AbstractInputHandler3D",
+                                                        QLatin1String("Trying to create uncreatable: AbstractInputHandler3D."));
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
@@ -62,6 +64,7 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
 
     qmlRegisterType<Q3DCamera>(uri, 1, 0, "Camera3D");
+    qmlRegisterType<Q3DLight>(uri, 1, 0, "Light3D");
 
     qmlRegisterType<QItemModelBarDataProxy>(uri, 1, 0, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelScatterDataProxy>(uri, 1, 0, "ItemModelScatterDataProxy");

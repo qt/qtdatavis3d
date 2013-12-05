@@ -44,6 +44,90 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmltype Scene3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.0
+ * \ingroup datavisualization_qml
+ * \instantiates Q3DScene
+ * \brief Scene3D type provides description of the 3D scene being visualized.
+ *
+ * The 3D scene contains a single active camera and a single active light source.
+ * Visualized data is assumed to be at a fixed location.
+ *
+ * The 3D scene also keeps track of the viewport in which visualization rendering is done,
+ * the primary subviewport inside the viewport where the main 3D data visualization view resides
+ * and the secondary subviewport where the 2D sliced view of the data resides.
+ *
+ * Also the scene has flag for tracking if the secondary 2D slicing view is currently active or not.
+ * \note Not all visualizations support the secondary 2D slicing view.
+ */
+
+/*!
+ * \qmlproperty rect Scene3D::viewport
+ *
+ * This property contains the current viewport rectangle where all 3D rendering
+ * is targeted.
+ */
+
+/*!
+ * \qmlproperty rect Scene3D::primarySubViewport
+ *
+ * This property contains the current subviewport rectangle inside the viewport where the
+ * primary view of the data visualization is targeted to.
+ */
+
+/*!
+ * \qmlproperty rect Scene3D::secondarySubViewport
+ *
+ * This property contains the secondary viewport rectangle inside the viewport. The secondary
+ * viewport is used for drawing the 2D slice view in some visualizations.
+ */
+
+/*!
+ * \qmlproperty point Scene3D::selectionQueryPosition
+ *
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as selection. If this is set to value other than \c{(-1, -1)} the
+ * graph tries to select a data item at the given point within the primary viewport.
+ * After the rendering pass the property is returned to its default state of \c{(-1, -1)}.
+ */
+
+/*!
+ * \qmlproperty bool Scene3D::slicingActive
+ *
+ * This property contains whether 2D slicing view is currently active or not.
+ * \note Not all visualizations support the 2D slicing view.
+ */
+
+/*!
+ * \qmlproperty bool Scene3D::secondarySubviewOnTop
+ *
+ * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is
+ * drawn on top.
+ */
+
+/*!
+ * \qmlproperty Camera3D Scene3D::activeCamera
+ *
+ * This property contains the currently active camera in the 3D scene.
+ * When a Camera3D is set in the property it gets automatically added as child of the scene.
+ */
+
+/*!
+ * \qmlproperty Light3D Scene3D::activeLight
+ *
+ * This property contains the currently active light in the 3D scene.
+ * When a Light3D is set in the property it gets automatically added as child of the scene.
+ */
+
+/*!
+ * \qmlproperty float Scene3D::devicePixelRatio
+ *
+ * This property contains the current device pixel ratio that is used when mapping input
+ * coordinates to pixel coordinates.
+ */
+
+/*!
  * Constructs a basic scene with one light and one camera in it. An
  * optional \a parent parameter can be given and is then passed to QObject constructor.
  */
@@ -102,7 +186,7 @@ void Q3DScene::setViewportSize(int width, int height)
 /*!
  * \property Q3DScene::primarySubViewport
  *
- * This property contains the current main viewport rectangle inside the viewport where the
+ * This property contains the current subviewport rectangle inside the viewport where the
  * primary view of the data visualization is targeted to.
  */
 QRect Q3DScene::primarySubViewport() const
@@ -123,7 +207,7 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
  * Returns whether the given \a point resides inside the primary subview or not.
  * The method takes care of correctly mapping between OpenGL coordinates used in the
  * viewport definitions and the Qt event coordinate system used in the input system.
- * \return true if the point is inside the primary subview.
+ * \return \c true if the point is inside the primary subview.
  */
 bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
 {
@@ -142,7 +226,7 @@ bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
  * Returns whether the given \a point resides inside the secondary subview or not.
  * The method takes care of correctly mapping between OpenGL coordinates used in the
  * viewport definitions and the Qt event coordinate system used in the input system.
- * \return true if the point is inside the secondary subview.
+ * \return \c true if the point is inside the secondary subview.
  */
 bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 {
@@ -179,10 +263,11 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
 
 /*!
  * \property Q3DScene::selectionQueryPosition
+ *
  * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than Q3DScene()::invalidSelectionPoint() the
- * graph tries to select a data item at the given \a point within the main viewport.
- * After the rendering pass the property is returned to its default state of Q3DScene()::invalidSelectionPoint().
+ * by the scene as selection. If this is set to value other than invalidSelectionPoint() the
+ * graph tries to select a data item at the given \a point within the primary viewport.
+ * After the rendering pass the property is returned to its default state of invalidSelectionPoint().
  */
 void Q3DScene::setSelectionQueryPosition(const QPoint &point)
 {
@@ -232,7 +317,8 @@ void Q3DScene::setSlicingActive(bool isSlicing)
 /*!
  * \property Q3DScene::secondarySubviewOnTop
  *
- * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is drawn on top.
+ * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is
+ * drawn on top.
  */
 bool Q3DScene::isSecondarySubviewOnTop() const
 {
@@ -253,7 +339,8 @@ void Q3DScene::setSecondarySubviewOnTop(bool isSecondaryOnTop)
  * \property Q3DScene::activeCamera
  *
  * This property contains the currently active camera in the 3D scene.
- * When a new Q3DCamera objects is set in the property it gets automatically added as child of the scene.
+ * When a new Q3DCamera objects is set in the property it gets automatically added as child of
+ * the scene.
  */
 Q3DCamera *Q3DScene::activeCamera() const
 {
@@ -299,7 +386,8 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
  * \property Q3DScene::activeLight
  *
  * This property contains the currently active light in the 3D scene.
- * When a new Q3DLight objects is set in the property it gets automatically added as child of the scene.
+ * When a new Q3DLight objects is set in the property it gets automatically added as child of
+ * the scene.
  */
 Q3DLight *Q3DScene::activeLight() const
 {
@@ -341,9 +429,11 @@ void Q3DScene::setDevicePixelRatio(float pixelRatio)
 }
 
 /*!
- * Calculates and sets the light position relative to the currently active camera using the given parameters.
- * \a relativePosition defines the relative 3D offset to the current camera position.
- * Optional \a fixedRotation fixes the light rotation around the data visualization area to the given value in degrees.
+ * Calculates and sets the light position relative to the currently active camera using the given
+ * parameters.
+ * The relative 3D offset to the current camera position is defined in \a relativePosition.
+ * Optional \a fixedRotation fixes the light rotation around the data visualization area to the
+ * given value in degrees.
  * Optional \a distanceModifier modifies the distance of the light from the data visualization.
  */
 void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePosition,

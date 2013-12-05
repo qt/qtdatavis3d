@@ -952,11 +952,11 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
-void Abstract3DController::handleInputStateChanged(QDataVis::InputState state)
+void Abstract3DController::handleInputStateChanged(QAbstract3DInputHandler::InputState state)
 {
     // When in automatic slicing mode, input state change to overview disables slice mode
     if (m_selectionMode.testFlag(QDataVis::SelectionSlice)
-            && state == QDataVis::InputStateOnOverview) {
+            && state == QAbstract3DInputHandler::InputStateOnPrimaryView) {
         setSlicingActive(false);
     }
 

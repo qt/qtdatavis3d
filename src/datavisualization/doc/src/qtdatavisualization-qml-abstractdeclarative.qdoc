@@ -42,8 +42,8 @@
  */
 
 /*!
-  \qmlproperty AbstractGraph3D.CameraPreset AbstractGraph3D::cameraPreset
-  Camera preset.
+  \qmlproperty AbstractInputHandler3D AbstractGraph3D::inputHandler
+  Input handler. You can disable default input handlers by setting this property to \c null.
  */
 
 /*!

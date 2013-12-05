@@ -40,19 +40,6 @@
  */
 
 /*!
- * \qmlmethod void Bars3D::setBarColor(const QColor &baseColor, bool uniform)
- * Set bar color using your own color. \a baseColor sets the base color of a bar. The \a uniform
- * -flag is used to define if color needs to be uniform throughout bar's length, or will the colors
- * be applied by height, starting with dark at the bottom. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa AbstractGraph3D::theme
- *
- * \warning This method is subject to change.
- */
-
-/*!
  * \qmlproperty CategoryAxis3D Bars3D::rowAxis
  * A user-defined row axis.
  *
@@ -92,16 +79,6 @@
 /*!
  * \qmlproperty bool Bars3D::barSpacingRelative
  * Relative or absolute bar spacing.
- */
-
-/*!
- * \qmlproperty int Bars3D::rows
- * Row count of data window.
- */
-
-/*!
- * \qmlproperty int Bars3D::columns
- * Column count of data window.
  */
 
 /*!

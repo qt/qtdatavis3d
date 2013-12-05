@@ -78,7 +78,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->theme()->setFont(QFont("Century Gothic", 30));
 
     // Set camera position and zoom
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRightHigh);
     m_graph->scene()->activeCamera()->setZoomLevel(75);
 
     // Set window title

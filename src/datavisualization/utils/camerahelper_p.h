@@ -30,6 +30,7 @@
 #define CAMERAPOSITIONER_P_H
 
 #include "datavisualizationglobal_p.h"
+#include "q3dcamera.h"
 #include "q3dbars.h"
 #include <QObject>
 
@@ -82,7 +83,7 @@ public:
                                             GLfloat fixedRotation = 0.0f,
                                             GLfloat distanceModifier = 0.0f);
     void updateMousePos(const QPoint &mousePos);
-    void setCameraPreset(QDataVis::CameraPreset preset);
+    void setCameraPreset(Q3DCamera::CameraPreset preset);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

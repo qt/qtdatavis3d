@@ -71,7 +71,7 @@ public:
     bool m_wrapXRotation;
     bool m_wrapYRotation;
     int m_zoomLevel;
-    QDataVis::CameraPreset m_activePreset;
+    Q3DCamera::CameraPreset m_activePreset;
 
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
