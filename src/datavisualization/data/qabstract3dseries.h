@@ -32,7 +32,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_OBJECT
     Q_ENUMS(SeriesType)
     Q_ENUMS(Mesh)
-    Q_PROPERTY(SeriesType type READ type)
+    Q_PROPERTY(SeriesType type READ type CONSTANT)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
     Q_PROPERTY(Mesh mesh READ mesh WRITE setMesh NOTIFY meshChanged)

@@ -46,9 +46,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeScatter : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
+    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -72,7 +72,9 @@ public:
     Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
 signals:
-    void meshFileNameChanged(QString filename);
+    void axisXChanged(Q3DValueAxis *axis);
+    void axisYChanged(Q3DValueAxis *axis);
+    void axisZChanged(Q3DValueAxis *axis);
 
 protected:
     Scatter3DController *m_scatterController;

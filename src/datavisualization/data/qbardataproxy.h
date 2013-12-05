@@ -36,7 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
-    Q_PROPERTY(int rowCount READ rowCount)
+    Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
     Q_PROPERTY(QStringList rowLabels READ rowLabels WRITE setRowLabels NOTIFY rowLabelsChanged)
     Q_PROPERTY(QStringList columnLabels READ columnLabels WRITE setColumnLabels NOTIFY columnLabelsChanged)
     Q_PROPERTY(QBar3DSeries *series READ series NOTIFY seriesChanged)
@@ -88,6 +88,7 @@ signals:
     void rowsInserted(int startIndex, int count);
     void itemChanged(int rowIndex, int columnIndex);
 
+    void rowCountChanged(int count);
     void rowLabelsChanged();
     void columnLabelsChanged();
     void seriesChanged(QBar3DSeries *series);

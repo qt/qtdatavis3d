@@ -37,6 +37,14 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_barsController = new Bars3DController(boundingRect().toRect());
     AbstractDeclarative::setSharedController(m_barsController);
+
+    // TODO: Uncomment when doing QTRD-2669
+//    connect(m_barsController, &Bars3DController::rowAxisChanged,
+//            this, &DeclarativeBars::rowAxisChanged);
+//    connect(m_barsController, &Bars3DController::valueAxisChanged,
+//            this, &DeclarativeBars::valueAxisChanged);
+//    connect(m_barsController, &Bars3DController::columnAxisChanged,
+//            this, &DeclarativeBars::columnAxisChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()

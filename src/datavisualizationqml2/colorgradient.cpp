@@ -34,6 +34,7 @@ void ColorGradientStop::setPosition(qreal position)
 {
     m_position = position;
     updateGradient();
+    emit positionChanged(position);
 }
 
 QColor ColorGradientStop::color() const
@@ -45,6 +46,7 @@ void ColorGradientStop::setColor(const QColor &color)
 {
     m_color = color;
     updateGradient();
+    emit colorChanged(color);
 }
 
 void ColorGradientStop::updateGradient()

@@ -35,11 +35,11 @@ class QT_DATAVISUALIZATION_EXPORT Q3DAbstractAxis : public QObject
     Q_ENUMS(AxisOrientation)
     Q_ENUMS(AxisType)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(QStringList labels READ labels NOTIFY labelsChanged)
-    Q_PROPERTY(AxisOrientation orientation READ orientation)
-    Q_PROPERTY(AxisType type READ type)
-    Q_PROPERTY(float min READ min WRITE setMin NOTIFY rangeChanged)
-    Q_PROPERTY(float max READ max WRITE setMax NOTIFY rangeChanged)
+    Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)
+    Q_PROPERTY(AxisOrientation orientation READ orientation NOTIFY orientationChanged)
+    Q_PROPERTY(AxisType type READ type CONSTANT)
+    Q_PROPERTY(float min READ min WRITE setMin NOTIFY minChanged)
+    Q_PROPERTY(float max READ max WRITE setMax NOTIFY maxChanged)
     Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
 
 public:
@@ -63,25 +63,32 @@ protected:
 public:
     virtual ~Q3DAbstractAxis();
 
+    void setTitle(QString title);
     QString title() const;
+
+    void setLabels(const QStringList &labels);
     QStringList labels() const;
 
     AxisOrientation orientation() const;
     AxisType type() const;
 
+    void setMin(float min);
     float min() const;
+
+    void setMax(float max);
     float max() const;
+
+    void setAutoAdjustRange(bool autoAdjust);
     bool isAutoAdjustRange() const;
 
-    void setTitle(QString title);
     void setRange(float min, float max);
-    void setMin(float min);
-    void setMax(float max);
-    void setAutoAdjustRange(bool autoAdjust);
 
 signals:
     void titleChanged(QString newTitle);
     void labelsChanged();
+    void orientationChanged(AxisOrientation orientation);
+    void minChanged(float value);
+    void maxChanged(float value);
     void rangeChanged(float min, float max);
     void autoAdjustRangeChanged(bool autoAdjust);
 

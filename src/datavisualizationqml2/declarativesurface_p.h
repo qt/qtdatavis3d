@@ -48,9 +48,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeSurface : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
+    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
@@ -76,6 +76,11 @@ public:
     static void clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
     Q_INVOKABLE void addSeries(QSurface3DSeries *series);
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
+
+signals:
+    void axisXChanged(Q3DValueAxis *axis);
+    void axisYChanged(Q3DValueAxis *axis);
+    void axisZChanged(Q3DValueAxis *axis);
 
 protected:
     void handleGradientUpdate();

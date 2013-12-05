@@ -36,6 +36,14 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_scatterController = new Scatter3DController(boundingRect().toRect());
     setSharedController(m_scatterController);
+
+    // TODO: Uncomment when doing QTRD-2669
+//    connect(m_scatterController, &Scatter3DController::axisXChanged,
+//            this, &DeclarativeBars::axisXChanged);
+//    connect(m_scatterController, &Scatter3DController::axisYChanged,
+//            this, &DeclarativeBars::axisYChanged);
+//    connect(m_scatterController, &Scatter3DController::axisZChanged,
+//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()

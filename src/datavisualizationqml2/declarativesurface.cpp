@@ -38,6 +38,14 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_surfaceController = new Surface3DController(boundingRect().toRect());
     setSharedController(m_surfaceController);
+
+    // TODO: Uncomment when doing QTRD-2669
+//    connect(m_surfaceController, &Surface3DController::axisXChanged,
+//            this, &DeclarativeBars::axisXChanged);
+//    connect(m_surfaceController, &Surface3DController::axisYChanged,
+//            this, &DeclarativeBars::axisYChanged);
+//    connect(m_surfaceController, &Surface3DController::axisZChanged,
+//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()

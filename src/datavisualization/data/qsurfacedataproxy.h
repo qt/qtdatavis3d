@@ -34,8 +34,8 @@ class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
-    Q_PROPERTY(int rowCount READ rowCount)
-    Q_PROPERTY(int columnCount READ columnCount)
+    Q_PROPERTY(int rowCount READ rowCount NOTIFY rowCountChanged)
+    Q_PROPERTY(int columnCount READ columnCount NOTIFY columnCountChanged)
     Q_PROPERTY(QSurface3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
@@ -70,6 +70,9 @@ signals:
     void rowsRemoved(int startIndex, int count);
     void rowsInserted(int startIndex, int count);
     void itemChanged(int rowIndex, int columnIndex);
+
+    void rowCountChanged(int count);
+    void columnCountChanged(int count);
     void seriesChanged(QSurface3DSeries *series);
 
 protected:

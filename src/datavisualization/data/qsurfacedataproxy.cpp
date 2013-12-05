@@ -137,6 +137,8 @@ void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
         dptr()->resetArray(newArray);
     }
     emit arrayReset();
+    emit rowCountChanged(rowCount());
+    emit columnCountChanged(columnCount());
 }
 
 /*!
@@ -181,6 +183,7 @@ int QSurfaceDataProxy::addRow(QSurfaceDataRow *row)
 {
     int addIndex = dptr()->addRow(row);
     emit rowsAdded(addIndex, 1);
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -194,6 +197,7 @@ int QSurfaceDataProxy::addRows(const QSurfaceDataArray &rows)
 {
     int addIndex = dptr()->addRows(rows);
     emit rowsAdded(addIndex, rows.size());
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -206,6 +210,7 @@ void QSurfaceDataProxy::insertRow(int rowIndex, QSurfaceDataRow *row)
 {
     dptr()->insertRow(rowIndex, row);
     emit rowsInserted(rowIndex, 1);
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -217,6 +222,7 @@ void QSurfaceDataProxy::insertRows(int rowIndex, const QSurfaceDataArray &rows)
 {
     dptr()->insertRows(rowIndex, rows);
     emit rowsInserted(rowIndex, rows.size());
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -228,6 +234,7 @@ void QSurfaceDataProxy::removeRows(int rowIndex, int removeCount)
     if (rowIndex < rowCount() && removeCount >= 1) {
         dptr()->removeRows(rowIndex, removeCount);
         emit rowsRemoved(rowIndex, removeCount);
+        emit rowCountChanged(rowCount());
     }
 }
 

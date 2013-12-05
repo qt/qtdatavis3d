@@ -31,7 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstractDataProxy : public QObject
 {
     Q_OBJECT
     Q_ENUMS(DataType)
-    Q_PROPERTY(DataType type READ type)
+    Q_PROPERTY(DataType type READ type CONSTANT)
 
 public:
     enum DataType {

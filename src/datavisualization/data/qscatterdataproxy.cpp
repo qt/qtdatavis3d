@@ -109,6 +109,7 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
         dptr()->resetArray(newArray);
 
     emit arrayReset();
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -138,6 +139,7 @@ int QScatterDataProxy::addItem(const QScatterDataItem &item)
 {
     int addIndex = dptr()->addItem(item);
     emit itemsAdded(addIndex, 1);
+    emit itemCountChanged(itemCount());
     return addIndex;
 }
 
@@ -150,6 +152,7 @@ int QScatterDataProxy::addItems(const QScatterDataArray &items)
 {
     int addIndex = dptr()->addItems(items);
     emit itemsAdded(addIndex, items.size());
+    emit itemCountChanged(itemCount());
     return addIndex;
 }
 
@@ -161,6 +164,7 @@ void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
 {
     dptr()->insertItem(index, item);
     emit itemsInserted(index, 1);
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -170,6 +174,7 @@ void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
 {
     dptr()->insertItems(index, items);
     emit itemsInserted(index, items.size());
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -180,6 +185,7 @@ void QScatterDataProxy::removeItems(int index, int removeCount)
 {
     dptr()->removeItems(index, removeCount);
     emit itemsRemoved(index, removeCount);
+    emit itemCountChanged(itemCount());
 }
 
 /*!

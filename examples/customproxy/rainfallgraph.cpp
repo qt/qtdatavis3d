@@ -59,8 +59,8 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->valueAxis()->setTitle("rainfall");
     m_graph->valueAxis()->setLabelFormat("%d mm");
     m_graph->valueAxis()->setSegmentCount(5);
-    m_graph->rowAxis()->setCategoryLabels(m_years);
-    m_graph->columnAxis()->setCategoryLabels(months);
+    m_graph->rowAxis()->setLabels(m_years);
+    m_graph->columnAxis()->setLabels(months);
 
     // Set bar type to cylinder
     series->setMesh(QAbstract3DSeries::MeshCylinder);

@@ -33,7 +33,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
-    Q_PROPERTY(int itemCount READ itemCount)
+    Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
     Q_PROPERTY(QScatter3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
@@ -64,6 +64,8 @@ signals:
     void itemsChanged(int startIndex, int count);
     void itemsRemoved(int startIndex, int count);
     void itemsInserted(int startIndex, int count);
+
+    void itemCountChanged(int count);
     void seriesChanged(QScatter3DSeries *series);
 
 protected:
