@@ -473,8 +473,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     / itemScaler;
             if (itemSize == 0.0f)
                 itemSize = m_dotSizeScale;
+#if !defined(QT_OPENGL_ES_2)
             if (drawingPoints)
                 glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+#endif
             QVector3D modelScaler(itemSize, itemSize, itemSize);
 
             // Rebind selection shader if it has changed
@@ -614,8 +616,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 / itemScaler;
         if (itemSize == 0.0f)
             itemSize = m_dotSizeScale;
+#if !defined(QT_OPENGL_ES_2)
         if (drawingPoints)
             glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+#endif
         QVector3D modelScaler(itemSize, itemSize, itemSize);
 
         // Rebind selection shader if it has changed
