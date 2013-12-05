@@ -30,7 +30,7 @@ Item {
     // Custom labels for columns, since the data contains abbreviated month names.
     CategoryAxis3D {
         id: columnAxis
-        categoryLabels: ["January", "February", "March", "April", "May", "June",
+        labels: ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"]
     }
     ValueAxis3D {

@@ -87,7 +87,7 @@ Item {
             barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
-            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeftHigh
+            scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
             valueAxis: graphAxes.income
 

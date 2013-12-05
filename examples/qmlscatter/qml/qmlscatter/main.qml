@@ -166,10 +166,10 @@ Item {
         text: "Change Camera Placement"
         anchors.left: smoothToggle.right
         onClicked: {
-            if (scatterGraph.scene.activeCamera.cameraPreset === AbstractGraph3D.CameraPresetFront) {
-                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetIsometricRightHigh;
+            if (scatterGraph.scene.activeCamera.cameraPreset === Camera3D.CameraPresetFront) {
+                scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricRightHigh;
             } else {
-                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetFront;
+                scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetFront;
             }
         }
     }
