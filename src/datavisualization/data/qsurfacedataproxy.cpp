@@ -302,6 +302,47 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  * emit this signal yourself or the graph won't get updated.
  */
 
+/*!
+ * \fn void QSurfaceDataProxy::rowsAdded(int startIndex, int count)
+ *
+ * Emitted when rows have been added. Provides \a startIndex and \a count of rows added.
+ * If you add rows directly to the array without calling addRow() or addRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
+ */
+
+/*!
+ * \fn void QSurfaceDataProxy::rowsChanged(int startIndex, int count)
+ *
+ * Emitted when rows have changed. Provides \a startIndex and \a count of changed rows.
+ * If you change rows directly in the array without calling setRow() or setRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
+ */
+
+/*!
+ * \fn void QSurfaceDataProxy::rowsRemoved(int startIndex, int count)
+ *
+ * Emitted when rows have been removed. Provides \a startIndex and \a count of rows removed.
+ * Index is the current array size if rows were removed from the end of the array.
+ * If you remove rows directly from the array without calling removeRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
+ */
+
+/*!
+ * \fn void QSurfaceDataProxy::rowsInserted(int startIndex, int count)
+ *
+ * Emitted when rows have been inserted. Provides \a startIndex and \a count of inserted rows.
+ * If you insert rows directly into the array without calling insertRow() or insertRows(), you
+ * need to emit this signal yourself or the graph won't get updated.
+ */
+
+/*!
+ * \fn void QSurfaceDataProxy::itemChanged(int rowIndex, int columnIndex)
+ *
+ * Emitted when an item has changed. Provides \a rowIndex and \a columnIndex of changed item.
+ * If you change an item directly in the array without calling setItem(), you
+ * need to emit this signal yourself or the graph won't get updated.
+ */
+
 //
 //  QSurfaceDataProxyPrivate
 //
