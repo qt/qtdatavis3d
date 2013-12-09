@@ -283,7 +283,6 @@ int main(int argc, char **argv)
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
-    vLayout->addWidget(colorDialog, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);

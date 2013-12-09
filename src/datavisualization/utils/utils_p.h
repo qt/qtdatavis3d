@@ -53,6 +53,7 @@ public:
 
     static GLuint getNearestPowerOfTwo(GLuint value, GLuint &padding);
     static QVector3D vectorFromColor(const QColor &color);
+    static QColor colorFromVector(const QVector3D &colorVector);
     static void printText(QPainter *painter, const QString &text, const QSize &position,
                           bool absoluteCoords = true, float rotation = 0.0f, float scale = 1.0f);
     static QImage printTextToImage(const QFont &font,

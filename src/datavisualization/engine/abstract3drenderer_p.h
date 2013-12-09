@@ -68,17 +68,6 @@ protected:
 
     QDataVis::SelectionFlags m_cachedSelectionMode;
 
-    Q3DTheme::ColorStyle m_cachedColorStyle;
-    QColor m_cachedObjectColor;
-    QLinearGradient m_cachedObjectGradient;
-    GLuint m_objectGradientTexture;
-    QColor m_cachedSingleHighlightColor;
-    QLinearGradient m_cachedSingleHighlightGradient;
-    GLuint m_singleHighlightGradientTexture;
-    QColor m_cachedMultiHighlightColor;
-    QLinearGradient m_cachedMultiHighlightGradient;
-    GLuint m_multiHighlightGradientTexture;
-
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
@@ -123,6 +112,7 @@ public:
 #endif
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
+    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type);
     virtual void updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title);
@@ -131,15 +121,9 @@ public:
     virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
-    virtual void updateColorStyle(Q3DTheme::ColorStyle style);
-    virtual void updateObjectColor(const QColor &color);
-    virtual void updateObjectGradient(const QLinearGradient &gradient);
-    virtual void updateSingleHighlightColor(const QColor &color);
-    virtual void updateSingleHighlightGradient(const QLinearGradient &gradient);
-    virtual void updateMultiHighlightColor(const QColor &color);
-    virtual void updateMultiHighlightGradient(const QLinearGradient &gradient);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+    void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
@@ -157,8 +141,6 @@ protected:
     AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
 
     virtual void lowerShadowQuality();
-
-    void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

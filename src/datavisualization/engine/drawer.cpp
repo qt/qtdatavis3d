@@ -148,10 +148,14 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glDisableVertexAttribArray(shader->posAtt());
 
     // Release textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    if (depthTextureId) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    if (textureId) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)

@@ -23,7 +23,6 @@
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
-#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -38,7 +37,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
@@ -57,10 +55,6 @@ public:
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
-    void setGradient(const QLinearGradient &gradient);
-    QLinearGradient gradient() const;
-
-    void setGradientColorAt(qreal pos, const QColor &color);
 
     // Axes
     void setAxisX(Q3DValueAxis *axis);

@@ -34,8 +34,6 @@
 #include <QMouseEvent>
 #include <qmath.h>
 
-#include <QLinearGradient>
-
 #include <QDebug>
 
 static const int ID_TO_RGBA_MASK = 0xff;
@@ -95,7 +93,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
-      m_gradientTexture(0),
       m_selectionTexture(0),
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
@@ -113,7 +110,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_clickedPointId(invalidSelectionId),
       m_hasHeightAdjustmentChanged(true),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
-      m_selectedSeries(0)
+      m_selectedSeries(0),
+      m_uniformGradientTexture(0)
 {
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -129,6 +127,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
 
     initializeOpenGLFunctions();
     initializeOpenGL();
+
+    // Create initial uniform gradient
+    generateUniformGradient(m_uniformGradientTextureColor);
 }
 
 Surface3DRenderer::~Surface3DRenderer()
@@ -139,9 +140,9 @@ Surface3DRenderer::~Surface3DRenderer()
 
     m_textureHelper->deleteTexture(&m_depthTexture);
     m_textureHelper->deleteTexture(&m_depthModelTexture);
-    m_textureHelper->deleteTexture(&m_gradientTexture);
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->deleteTexture(&m_selectionResultTexture);
+    m_textureHelper->deleteTexture(&m_uniformGradientTexture);
 
     delete m_shader;
     delete m_depthShader;
@@ -282,6 +283,11 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
         updateFlatStatus(series->isFlatShadingEnabled());
         updateSurfaceGridStatus(series->isSurfaceGridEnabled());
+        QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
+        if (m_uniformGradientTextureColor != seriesColor)
+            generateUniformGradient(seriesColor);
+        if (m_selectionPointer)
+            m_selectionPointer->setHighlightColor(Utils::vectorFromColor(series->singleHighlightColor()));
     }
 }
 
@@ -634,8 +640,6 @@ void Surface3DRenderer::drawSlicedScene()
                                            m_cachedTheme->ambientLightStrength() * 2.0f);
 
             m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
-
-            surfaceShader->release();
         }
 
         // Draw surface grid
@@ -645,7 +649,6 @@ void Surface3DRenderer::drawSlicedScene()
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_sliceSurfaceObj);
-            m_surfaceGridShader->release();
 
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
@@ -739,9 +742,6 @@ void Surface3DRenderer::drawSlicedScene()
 
             linePos += lineStep;
         }
-
-        // Release line shader
-        lineShader->release();
     }
 
     // Draw axis labels
@@ -821,8 +821,8 @@ void Surface3DRenderer::drawSlicedScene()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    // Release label shader
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 }
 
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
@@ -957,9 +957,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
-        // Release depth shader
-        m_depthShader->release();
-
         // Revert to original viewport
         glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
                    m_mainViewPort.width(), m_mainViewPort.height());
@@ -980,7 +977,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
             m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
             glDisable(GL_TEXTURE_2D);
-            m_labelShader->release();
         }
 #endif
     }
@@ -1021,9 +1017,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                      1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-        // Release selection shader
-        m_selectionShader->release();
 
         // Put the RGBA value back to uint
 #if !defined(QT_OPENGL_ES_2)
@@ -1071,6 +1064,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
                                              m_cachedTheme->ambientLightStrength());
 
+            // TODO: Do properly when multiseries support implemented QTRD-2657
+            GLuint gradientTexture;
+            if (m_visibleSeriesList.at(0).colorStyle() == Q3DTheme::ColorStyleUniform)
+                gradientTexture = m_uniformGradientTexture;
+            else
+                gradientTexture = m_visibleSeriesList.at(0).baseGradientTexture();
+
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                 // Set shadow shader bindings
@@ -1080,7 +1080,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture, m_depthModelTexture);
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, gradientTexture, m_depthModelTexture);
             } else
 #endif
             {
@@ -1089,11 +1089,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                                  m_cachedTheme->lightStrength());
 
                 // Draw the object
-                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, m_gradientTexture);
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, gradientTexture);
             }
-
-            m_surfaceShader->release();
-
             glEnable(GL_CULL_FACE);
         }
 
@@ -1104,7 +1101,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             m_drawer->drawSurfaceGrid(m_surfaceGridShader, m_surfaceObj);
-            m_surfaceGridShader->release();
 
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
@@ -1175,9 +1171,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
         }
     }
-
-    // Release background shader
-    m_backgroundShader->release();
 
     // Draw grid lines
     QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
@@ -1502,9 +1495,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 linePos += lineStep;
             }
         }
-
-        // Release line shader
-        lineShader->release();
     }
 
     // Draw axis labels
@@ -1679,8 +1669,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
-    // Release label shader
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 
     // Selection handling
     if (m_selectionDirty) {
@@ -1708,20 +1698,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         m_selectionDirty = false;
     }
-}
-
-void Surface3DRenderer::updateSurfaceGradient(const QLinearGradient &gradient)
-{
-    if (m_gradientTexture) {
-        m_textureHelper->deleteTexture(&m_gradientTexture);
-        m_gradientTexture = 0;
-    }
-
-    QLinearGradient adjustedGradient = gradient;
-    adjustedGradient.setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
-    adjustedGradient.setFinalStop(0.0, 0.0);
-
-    m_gradientTexture = m_textureHelper->createGradientTexture(adjustedGradient);
 }
 
 // This one needs to be called when the data size changes
@@ -1809,11 +1785,6 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
     *g = (id >> 8) & ID_TO_RGBA_MASK;
     *b = (id >> 16) & ID_TO_RGBA_MASK;
     *a = (id >> 24) & ID_TO_RGBA_MASK;
-}
-
-void Surface3DRenderer::updateTextures()
-{
-    updateSurfaceGradient(m_cachedTheme->baseGradient());
 }
 
 void Surface3DRenderer::calculateSceneScalingFactors()
@@ -1954,6 +1925,7 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
     // TODO: Get pointer object from correct series once multiseries support implemented
     m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
+    m_selectionPointer->setHighlightColor(m_visibleSeriesList.at(0).singleHighlightColor());
     m_selectionPointer->updateScene(m_cachedScene);
 }
 
@@ -2049,6 +2021,11 @@ void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
+void Surface3DRenderer::updateTextures()
+{
+    // Do nothing, but required as it is pure virtual on parent
+}
+
 void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 {
     if (m_cachedIsSlicingActivated == isSlicing)
@@ -2098,6 +2075,7 @@ void Surface3DRenderer::loadLabelMesh()
 
 void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
+    // m_shader is used slice view surface only.
     if (m_shader)
         delete m_shader;
     m_shader = new ShaderHelper(this, vertexShader, fragmentShader);
@@ -2199,6 +2177,19 @@ void Surface3DRenderer::updateDepthBuffer()
                                                                   m_shadowQualityMultiplier);
         if (!m_depthTexture || !m_depthModelTexture)
             lowerShadowQuality();
+    }
+}
+
+void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
+{
+    if (m_visibleSeriesList.size()) {
+        // TODO: move uniform gradient to render cache when multiseries support implemented QTRD-2657
+        QColor newQColor = Utils::colorFromVector(newColor);
+        m_uniformGradientTextureColor = newColor;
+        QLinearGradient newGradient;
+        newGradient.setColorAt(0.0, newQColor);
+        newGradient.setColorAt(1.0, newQColor);
+        fixGradient(&newGradient, &m_uniformGradientTexture);
     }
 }
 #endif

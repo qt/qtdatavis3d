@@ -183,6 +183,9 @@ void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
  */
 void QScatterDataProxy::removeItems(int index, int removeCount)
 {
+    if (index >= dptr()->m_dataArray->size())
+        return;
+
     dptr()->removeItems(index, removeCount);
     emit itemsRemoved(index, removeCount);
     emit itemCountChanged(itemCount());

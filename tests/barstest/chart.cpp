@@ -119,6 +119,48 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
+    m_temperatureData->setBaseColor(Qt::red);
+    m_temperatureData->setSingleHighlightColor(Qt::cyan);
+    m_temperatureData->setMultiHighlightColor(Qt::magenta);
+    m_temperatureData2->setBaseColor(Qt::yellow);
+    m_genericData->setBaseColor(Qt::blue);
+
+    QLinearGradient barGradient1(0, 0, 1, 100);
+    barGradient1.setColorAt(1.0, Qt::red);
+    barGradient1.setColorAt(0.75001, Qt::red);
+    barGradient1.setColorAt(0.75, Qt::magenta);
+    barGradient1.setColorAt(0.50001, Qt::magenta);
+    barGradient1.setColorAt(0.50, Qt::blue);
+    barGradient1.setColorAt(0.25001, Qt::blue);
+    barGradient1.setColorAt(0.25, Qt::black);
+    barGradient1.setColorAt(0.0, Qt::black);
+
+    QLinearGradient barGradient2(0, 0, 1, 100);
+    barGradient2.setColorAt(1.0, Qt::red);
+    barGradient2.setColorAt(0.75, Qt::magenta);
+    barGradient2.setColorAt(0.50, Qt::blue);
+    barGradient2.setColorAt(0.25, Qt::black);
+    barGradient2.setColorAt(0.0, Qt::black);
+
+    QLinearGradient singleHighlightGradient(0, 0, 1, 100);
+    singleHighlightGradient.setColorAt(1.0, Qt::white);
+    singleHighlightGradient.setColorAt(0.75, Qt::lightGray);
+    singleHighlightGradient.setColorAt(0.50, Qt::gray);
+    singleHighlightGradient.setColorAt(0.25, Qt::darkGray);
+    singleHighlightGradient.setColorAt(0.0, Qt::black);
+
+    QLinearGradient multiHighlightGradient(0, 0, 1, 100);
+    multiHighlightGradient.setColorAt(1.0, Qt::lightGray);
+    multiHighlightGradient.setColorAt(0.75, Qt::gray);
+    multiHighlightGradient.setColorAt(0.50, Qt::darkGray);
+    multiHighlightGradient.setColorAt(0.25, Qt::black);
+    multiHighlightGradient.setColorAt(0.0, Qt::black);
+
+    m_temperatureData->setBaseGradient(barGradient1);
+    m_temperatureData2->setBaseGradient(barGradient2);
+    m_temperatureData->setSingleHighlightGradient(singleHighlightGradient);
+    m_temperatureData->setMultiHighlightGradient(multiHighlightGradient);
+
     m_graph->theme()->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.

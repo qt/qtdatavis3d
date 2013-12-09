@@ -60,6 +60,7 @@ private:
     QRect m_mainViewPort;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
+    ShaderHelper *m_dotGradientShader;
 #if defined(QT_OPENGL_ES_2)
     ShaderHelper *m_pointShader;
 #endif
@@ -108,6 +109,7 @@ protected:
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);

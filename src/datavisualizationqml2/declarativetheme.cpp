@@ -32,6 +32,19 @@ DeclarativeTheme3D::~DeclarativeTheme3D()
 {
 }
 
+QQmlListProperty<QObject> DeclarativeTheme3D::seriesChildren()
+{
+    return QQmlListProperty<QObject>(this, this, &DeclarativeTheme3D::appendSeriesChildren
+                                     , 0, 0, 0);
+}
+
+void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element)
+{
+    Q_UNUSED(list)
+    Q_UNUSED(element)
+    // Nothing to do, seriesChildren is there only to enable scoping gradient items in Theme3D item.
+}
+
 void DeclarativeTheme3D::handleBaseGradientUpdate()
 {
     if (m_baseGradient)

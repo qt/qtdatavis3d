@@ -66,21 +66,20 @@ Q3DTheme *ThemeManager::theme() const
 
 void ThemeManager::connectThemeSignals()
 {
-    // TODO: Rethink these once color api is added to series (QTRD-2200/2557)
     connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
-            m_controller, &Abstract3DController::setColorStyle);
+            m_controller, &Abstract3DController::handleThemeColorStyleChanged);
     connect(m_theme.data(), &Q3DTheme::baseColorChanged,
-            m_controller, &Abstract3DController::setBaseColor);
+            m_controller, &Abstract3DController::handleThemeBaseColorChanged);
     connect(m_theme.data(), &Q3DTheme::singleHighlightColorChanged,
-            m_controller, &Abstract3DController::setSingleHighlightColor);
+            m_controller, &Abstract3DController::handleThemeSingleHighlightColorChanged);
     connect(m_theme.data(), &Q3DTheme::multiHighlightColorChanged,
-            m_controller, &Abstract3DController::setMultiHighlightColor);
+            m_controller, &Abstract3DController::handleThemeMultiHighlightColorChanged);
     connect(m_theme.data(), &Q3DTheme::baseGradientChanged,
-            m_controller, &Abstract3DController::setBaseGradient);
+            m_controller, &Abstract3DController::handleThemeBaseGradientChanged);
     connect(m_theme.data(), &Q3DTheme::singleHighlightGradientChanged,
-            m_controller, &Abstract3DController::setSingleHighlightGradient);
+            m_controller, &Abstract3DController::handleThemeSingleHighlightGradientChanged);
     connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
-            m_controller, &Abstract3DController::setMultiHighlightGradient);
+            m_controller, &Abstract3DController::handleThemeMultiHighlightGradientChanged);
 
     connect(m_theme->d_ptr.data(), &Q3DThemePrivate::needRender,
             m_controller, &Abstract3DController::needRender);

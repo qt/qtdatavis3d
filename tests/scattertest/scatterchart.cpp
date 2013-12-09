@@ -272,7 +272,7 @@ void ScatterDataModifier::changeOne()
     if (!m_targetSeries)
         createAndAddSeries();
 
-    if (m_selectedItem >= 0 && m_targetSeries->dataProxy()->array()->size()) {
+    if (m_selectedItem >= 0 && m_selectedItem < m_targetSeries->dataProxy()->itemCount()) {
         QScatterDataItem item(randVector());
         m_targetSeries->dataProxy()->setItem(m_selectedItem, item);
         qDebug() << m_loopCounter << "Changed one, array size:" << m_targetSeries->dataProxy()->array()->size();
@@ -402,15 +402,15 @@ void ScatterDataModifier::handleSelectionChange(int index)
 
 void ScatterDataModifier::setGradient()
 {
-    QLinearGradient barGradient(0, 0, 1, 100);
-    barGradient.setColorAt(1.0, Qt::lightGray);
-    barGradient.setColorAt(0.75001, Qt::lightGray);
-    barGradient.setColorAt(0.75, Qt::blue);
-    barGradient.setColorAt(0.50001, Qt::blue);
-    barGradient.setColorAt(0.50, Qt::red);
-    barGradient.setColorAt(0.25001, Qt::red);
-    barGradient.setColorAt(0.25, Qt::yellow);
-    barGradient.setColorAt(0.0, Qt::yellow);
+    QLinearGradient baseGradient(0, 0, 1, 100);
+    baseGradient.setColorAt(1.0, Qt::lightGray);
+    baseGradient.setColorAt(0.75001, Qt::lightGray);
+    baseGradient.setColorAt(0.75, Qt::blue);
+    baseGradient.setColorAt(0.50001, Qt::blue);
+    baseGradient.setColorAt(0.50, Qt::red);
+    baseGradient.setColorAt(0.25001, Qt::red);
+    baseGradient.setColorAt(0.25, Qt::yellow);
+    baseGradient.setColorAt(0.0, Qt::yellow);
 
     QLinearGradient singleHighlightGradient(0, 0, 1, 100);
     singleHighlightGradient.setColorAt(1.0, Qt::lightGray);
@@ -419,19 +419,19 @@ void ScatterDataModifier::setGradient()
     singleHighlightGradient.setColorAt(0.25, Qt::yellow);
     singleHighlightGradient.setColorAt(0.0, Qt::white);
 
-    m_chart->setItemColor(Qt::green);
-    m_chart->setSingleHighlightColor(Qt::white);
+    m_targetSeries->setBaseColor(Qt::green);
+    m_targetSeries->setSingleHighlightColor(Qt::white);
 
-    m_chart->setItemGradient(barGradient);
-    m_chart->setSingleHighlightGradient(singleHighlightGradient);
+    m_targetSeries->setBaseGradient(baseGradient);
+    m_targetSeries->setSingleHighlightGradient(singleHighlightGradient);
 
-    Q3DTheme::ColorStyle oldStyle = m_chart->colorStyle();
+    Q3DTheme::ColorStyle oldStyle = m_targetSeries->colorStyle();
     if (oldStyle == Q3DTheme::ColorStyleUniform)
-        m_chart->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
     else if (oldStyle == Q3DTheme::ColorStyleObjectGradient)
-        m_chart->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     if (oldStyle == Q3DTheme::ColorStyleRangeGradient)
-        m_chart->setColorStyle(Q3DTheme::ColorStyleUniform);
+        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleUniform);
 }
 
 void ScatterDataModifier::addSeries()
@@ -494,6 +494,7 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
     series->setItemLabelFormat(QString("%1: @xLabel - @yLabel - @zLabel").arg(counter++));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
+    series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));
 
     QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
                      &ScatterDataModifier::handleSelectionChange);

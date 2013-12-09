@@ -41,7 +41,6 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
     m_scene(new Q3DScene()),
-    m_colorStyle(Q3DTheme::ColorStyleUniform),
     m_activeInputHandler(0),
     m_axisX(0),
     m_axisY(0),
@@ -95,12 +94,14 @@ void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 void Abstract3DController::addSeries(QAbstract3DSeries *series)
 {
     if (series && !m_seriesList.contains(series)) {
+        int oldSize = m_seriesList.size();
         m_seriesList.append(series);
         series->d_ptr->setController(this);
         QObject::connect(series, &QAbstract3DSeries::visibilityChanged,
                          this, &Abstract3DController::handleSeriesVisibilityChanged);
         if (series->isVisible())
             handleSeriesVisibilityChangedBySender(series);
+        series->d_ptr->resetToTheme(*m_themeManager->theme(), oldSize, false);
     }
 }
 
@@ -145,42 +146,6 @@ void Abstract3DController::synchDataToRenderer()
     m_renderer->updateScene(m_scene);
 
     m_renderer->updateTheme(m_themeManager->theme());
-
-    // TODO: Rethink these after color api has been moveed to series (QTRD-2200/2557)
-    if (m_changeTracker.colorStyleChanged) {
-        m_renderer->updateColorStyle(m_colorStyle);
-        m_changeTracker.colorStyleChanged = false;
-    }
-
-    if (m_changeTracker.objectColorChanged) {
-        m_renderer->updateObjectColor(m_objectColor);
-        m_changeTracker.objectColorChanged = false;
-    }
-
-    if (m_changeTracker.objectGradientChanged) {
-        m_renderer->updateObjectGradient(m_objectGradient);
-        m_changeTracker.objectGradientChanged = false;
-    }
-
-    if (m_changeTracker.singleHighlightColorChanged) {
-        m_renderer->updateSingleHighlightColor(m_singleHighlightColor);
-        m_changeTracker.singleHighlightColorChanged = false;
-    }
-
-    if (m_changeTracker.singleHighlightGradientChanged) {
-        m_renderer->updateSingleHighlightGradient(m_singleHighlightGradient);
-        m_changeTracker.singleHighlightGradientChanged = false;
-    }
-
-    if (m_changeTracker.multiHighlightColorChanged) {
-        m_renderer->updateMultiHighlightColor(m_multiHighlightColor);
-        m_changeTracker.multiHighlightColorChanged = false;
-    }
-
-    if (m_changeTracker.multiHighlightGradientChanged) {
-        m_renderer->updateMultiHighlightGradient(m_multiHighlightGradient);
-        m_changeTracker.multiHighlightGradientChanged = false;
-    }
 
     if (m_changeTracker.shadowQualityChanged) {
         m_renderer->updateShadowQuality(m_shadowQuality);
@@ -497,6 +462,90 @@ void Abstract3DController::handlePixelRatioChanged(float ratio)
     emitNeedRender();
 }
 
+void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle style)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.colorStyleOverride) {
+            series->setColorStyle(style);
+            series->d_ptr->m_themeTracker.colorStyleOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeBaseColorChanged(const QColor &color)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.baseColorOverride) {
+            series->setBaseColor(color);
+            series->d_ptr->m_themeTracker.baseColorOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeBaseGradientChanged(const QLinearGradient &gradient)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.baseGradientOverride) {
+            series->setBaseGradient(gradient);
+            series->d_ptr->m_themeTracker.baseGradientOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeSingleHighlightColorChanged(const QColor &color)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.singleHighlightColorOverride) {
+            series->setSingleHighlightColor(color);
+            series->d_ptr->m_themeTracker.singleHighlightColorOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.singleHighlightGradientOverride) {
+            series->setSingleHighlightGradient(gradient);
+            series->d_ptr->m_themeTracker.singleHighlightGradientOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeMultiHighlightColorChanged(const QColor &color)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.multiHighlightColorOverride) {
+            series->setMultiHighlightColor(color);
+            series->d_ptr->m_themeTracker.multiHighlightColorOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
+void Abstract3DController::handleThemeMultiHighlightGradientChanged(const QLinearGradient &gradient)
+{
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.multiHighlightGradientOverride) {
+            series->setMultiHighlightGradient(gradient);
+            series->d_ptr->m_themeTracker.multiHighlightGradientOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
+}
+
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
 {
     setAxisHelper(Q3DAbstractAxis::AxisOrientationX, axis, &m_axisX);
@@ -646,130 +695,15 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emitNeedRender();
 }
 
-void Abstract3DController::setColorStyle(Q3DTheme::ColorStyle style)
-{
-    if (style != m_colorStyle || m_changeTracker.themeChanged) {
-        Q3DTheme *theme = m_themeManager->theme();
-        if (style == Q3DTheme::ColorStyleUniform) {
-            setBaseColor(theme->baseColor());
-            setSingleHighlightColor(theme->singleHighlightColor());
-            setMultiHighlightColor(theme->multiHighlightColor());
-        } else {
-            setBaseGradient(theme->baseGradient());
-            setSingleHighlightGradient(theme->singleHighlightGradient());
-            setMultiHighlightGradient(theme->multiHighlightGradient());
-        }
-    }
-    if (style != m_colorStyle) {
-        m_colorStyle = style;
-        m_changeTracker.colorStyleChanged = true;
-        emitNeedRender();
-        emit colorStyleChanged(style);
-    }
-}
-
-Q3DTheme::ColorStyle Abstract3DController::colorStyle() const
-{
-    return m_colorStyle;
-}
-
-void Abstract3DController::setBaseColor(const QColor &color)
-{
-    if (color != m_objectColor) {
-        m_objectColor = color;
-        m_changeTracker.objectColorChanged = true;
-        emitNeedRender();
-        emit objectColorChanged(color);
-    }
-}
-
-QColor Abstract3DController::baseColor() const
-{
-    return m_objectColor;
-}
-
-void Abstract3DController::setBaseGradient(const QLinearGradient &gradient)
-{
-    if (gradient != m_objectGradient) {
-        m_objectGradient = gradient;
-        m_changeTracker.objectGradientChanged = true;
-        emitNeedRender();
-        emit objectGradientChanged(gradient);
-    }
-}
-
-QLinearGradient Abstract3DController::baseGradient() const
-{
-    return m_objectGradient;
-}
-
-void Abstract3DController::setSingleHighlightColor(const QColor &color)
-{
-    if (color != m_singleHighlightColor) {
-        m_singleHighlightColor = color;
-        m_changeTracker.singleHighlightColorChanged = true;
-        emitNeedRender();
-        emit singleHighlightColorChanged(color);
-    }
-}
-
-QColor Abstract3DController::singleHighlightColor() const
-{
-    return m_singleHighlightColor;
-}
-
-void Abstract3DController::setSingleHighlightGradient(const QLinearGradient &gradient)
-{
-    if (gradient != m_singleHighlightGradient) {
-        m_singleHighlightGradient = gradient;
-        m_changeTracker.singleHighlightGradientChanged = true;
-        emitNeedRender();
-        emit singleHighlightGradientChanged(gradient);
-    }
-}
-
-QLinearGradient Abstract3DController::singleHighlightGradient() const
-{
-    return m_singleHighlightGradient;
-}
-
-void Abstract3DController::setMultiHighlightColor(const QColor &color)
-{
-    if (color != m_multiHighlightColor) {
-        m_multiHighlightColor = color;
-        m_changeTracker.multiHighlightColorChanged = true;
-        emitNeedRender();
-        emit multiHighlightColorChanged(color);
-    }
-}
-
-QColor Abstract3DController::multiHighlightColor() const
-{
-    return m_multiHighlightColor;
-}
-
-void Abstract3DController::setMultiHighlightGradient(const QLinearGradient &gradient)
-{
-    if (gradient != m_multiHighlightGradient) {
-        m_multiHighlightGradient = gradient;
-        m_changeTracker.multiHighlightGradientChanged = true;
-        emitNeedRender();
-        emit multiHighlightGradientChanged(gradient);
-    }
-}
-
-QLinearGradient Abstract3DController::multiHighlightGradient() const
-{
-    return m_multiHighlightGradient;
-}
-
 void Abstract3DController::setTheme(Q3DTheme *theme)
 {
     if (theme != m_themeManager->theme()) {
         m_themeManager->setTheme(theme);
         m_changeTracker.themeChanged = true;
-        // TODO: Rethink this once color api has been moved to series (QTRD-2200/2557)
-        setColorStyle(theme->colorStyle());
+        // Reset all attached series to the new theme
+        for (int i = 0; i < m_seriesList.size(); i++)
+            m_seriesList.at(i)->d_ptr->resetToTheme(*theme, i, true);
+        markSeriesVisualsDirty();
         emit themeChanged(theme);
     }
 }

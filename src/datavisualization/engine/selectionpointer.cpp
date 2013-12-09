@@ -132,15 +132,12 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     m_pointShader->setUniformValue(m_pointShader->view(), viewMatrix);
     m_pointShader->setUniformValue(m_pointShader->model(), modelMatrix);
     m_pointShader->setUniformValue(m_pointShader->nModel(), itModelMatrix.inverted().transposed());
-    m_pointShader->setUniformValue(m_pointShader->color(),
-                                   Utils::vectorFromColor(m_cachedTheme->singleHighlightColor()));
+    m_pointShader->setUniformValue(m_pointShader->color(), m_highlightColor);
     m_pointShader->setUniformValue(m_pointShader->MVP(), MVPMatrix);
     m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme->ambientLightStrength());
     m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme->lightStrength() * 2.0f);
 
     m_drawer->drawObject(m_pointShader, m_pointObj);
-
-    m_pointShader->release();
 
     //
     // Draw the label
@@ -180,7 +177,8 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Draw the object
     m_drawer->drawObject(m_labelShader, m_labelObj, m_labelItem.textureId());
 
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
@@ -201,6 +199,11 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
 {
     m_cachedIsSlicingActivated = sliceActivated;
     m_autoScaleAdjustment = autoScaleAdjustment;
+}
+
+void SelectionPointer::setHighlightColor(QVector3D colorVector)
+{
+    m_highlightColor = colorVector;
 }
 
 void SelectionPointer::setLabel(const QString &label)

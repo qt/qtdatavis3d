@@ -67,6 +67,7 @@ public:
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
+    void setHighlightColor(QVector3D colorVector);
 
 private:
     void initializeOpenGL();
@@ -89,6 +90,7 @@ private:
     QString m_label;
     bool m_cachedIsSlicingActivated;
     GLfloat m_autoScaleAdjustment;
+    QVector3D m_highlightColor;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

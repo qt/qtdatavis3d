@@ -76,18 +76,11 @@ public:
 
     QQmlListProperty<ColorGradientStop> stops();
 
-Q_SIGNALS:
-    void updated();
-
-private:
     void doUpdate();
-
-private:
     QList<ColorGradientStop *> m_stops;
 
-    friend class ColorGradientStop;
-    friend class DeclarativeSurface;
-    friend class DeclarativeTheme3D;
+Q_SIGNALS:
+    void updated();
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

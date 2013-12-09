@@ -81,13 +81,6 @@ struct Abstract3DChangeBitField {
     bool axisZLabelFormatChanged       : 1;
     bool inputStateChanged             : 1;
     bool inputPositionChanged          : 1;
-    bool colorStyleChanged             : 1;
-    bool objectColorChanged            : 1;
-    bool objectGradientChanged         : 1;
-    bool singleHighlightColorChanged   : 1;
-    bool singleHighlightGradientChanged: 1;
-    bool multiHighlightColorChanged    : 1;
-    bool multiHighlightGradientChanged : 1;
 
     Abstract3DChangeBitField() :
         positionChanged(true),
@@ -118,15 +111,7 @@ struct Abstract3DChangeBitField {
         axisZSubSegmentCountChanged(true),
         axisXLabelFormatChanged(true),
         axisYLabelFormatChanged(true),
-        axisZLabelFormatChanged(true),
-        // Items that override values from theme default to false since we default to theme
-        colorStyleChanged(false),
-        objectColorChanged(false),
-        objectGradientChanged(false),
-        singleHighlightColorChanged(false),
-        singleHighlightGradientChanged(false),
-        multiHighlightColorChanged(false),
-        multiHighlightGradientChanged(false)
+        axisZLabelFormatChanged(true)
     {
     }
 };
@@ -161,13 +146,6 @@ private:
     QDataVis::SelectionFlags m_selectionMode;
     QDataVis::ShadowQuality m_shadowQuality;
     Q3DScene *m_scene;
-    Q3DTheme::ColorStyle m_colorStyle;
-    QColor m_objectColor;
-    QLinearGradient m_objectGradient;
-    QColor m_singleHighlightColor;
-    QLinearGradient m_singleHighlightGradient;
-    QColor m_multiHighlightColor;
-    QLinearGradient m_multiHighlightGradient;
 
 protected:
     QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
@@ -237,23 +215,6 @@ public:
     virtual void setTheme(Q3DTheme *theme);
     virtual Q3DTheme *theme() const;
 
-    // Properties from color api
-    // TODO: Rethink these after color api has been moveed to series (QTRD-2200/2557)
-    virtual void setColorStyle(Q3DTheme::ColorStyle style);
-    virtual Q3DTheme::ColorStyle colorStyle() const;
-    virtual void setBaseColor(const QColor &color);
-    virtual QColor baseColor() const;
-    virtual void setBaseGradient(const QLinearGradient &gradient);
-    virtual QLinearGradient baseGradient() const;
-    virtual void setSingleHighlightColor(const QColor &color);
-    virtual QColor singleHighlightColor() const;
-    virtual void setSingleHighlightGradient(const QLinearGradient &gradient);
-    virtual QLinearGradient singleHighlightGradient() const;
-    virtual void setMultiHighlightColor(const QColor &color);
-    virtual QColor multiHighlightColor() const;
-    virtual void setMultiHighlightGradient(const QLinearGradient &gradient);
-    virtual QLinearGradient multiHighlightGradient() const;
-
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;
 
@@ -300,6 +261,14 @@ public slots:
     void handleSeriesVisibilityChanged(bool visible);
     void handlePixelRatioChanged(float ratio);
 
+    void handleThemeColorStyleChanged(Q3DTheme::ColorStyle style);
+    void handleThemeBaseColorChanged(const QColor &color);
+    void handleThemeBaseGradientChanged(const QLinearGradient &gradient);
+    void handleThemeSingleHighlightColorChanged(const QColor &color);
+    void handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient);
+    void handleThemeMultiHighlightColorChanged(const QColor &color);
+    void handleThemeMultiHighlightGradientChanged(const QLinearGradient &gradient);
+
     // Renderer callback handlers
     void handleRequestShadowQuality(QDataVis::ShadowQuality quality);
 
@@ -309,13 +278,6 @@ signals:
     void themeChanged(Q3DTheme *theme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void needRender();
-    void colorStyleChanged(Q3DTheme::ColorStyle style);
-    void objectColorChanged(QColor color);
-    void objectGradientChanged(QLinearGradient gradient);
-    void singleHighlightColorChanged(QColor color);
-    void singleHighlightGradientChanged(QLinearGradient gradient);
-    void multiHighlightColorChanged(QColor color);
-    void multiHighlightGradientChanged(QLinearGradient gradient);
 
 protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);

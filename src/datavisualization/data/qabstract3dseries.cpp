@@ -91,6 +91,74 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Theme3D.ColorStyle Abstract3DSeries::colorStyle
+ *
+ * Sets the color \a style for the series.
+ * See \l{Theme3D::colorStyle}{Theme3D.colorStyle}
+ * documentation for more information.
+ */
+
+/*!
+ * \qmlproperty Color Abstract3DSeries::baseColor
+ *
+ * Sets the base \c color of the series.
+ * See \l{Theme3D::baseColor}{Theme3D.baseColor}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
+ * \qmlproperty ColorGradient Abstract3DSeries::baseGradient
+ *
+ * Sets the base \c gradient of the series.
+ * See \l{Theme3D::baseGradient}{Theme3D.baseGradient}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
+ * \qmlproperty Color Abstract3DSeries::singleHighlightColor
+ *
+ * Sets the single item highlight \c color of the series.
+ * See \l{Theme3D::singleHighlightColor}{Theme3D.singleHighlightColor}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
+ * \qmlproperty ColorGradient Abstract3DSeries::singleHighlightGradient
+ *
+ * Sets the single item highlight \c gradient of the series.
+ * See \l{Theme3D::singleHighlightGradient}{Theme3D.singleHighlightGradient}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
+ * \qmlproperty Color Abstract3DSeries::multiHighlightColor
+ *
+ * Sets the multiple item highlight \c color of the series.
+ * See \l{Theme3D::multiHighlightColor}{Theme3D.multiHighlightColor}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
+ * \qmlproperty ColorGradient Abstract3DSeries::multiHighlightGradient
+ *
+ * Sets the multiple item highlight \c gradient of the series.
+ * See \l{Theme3D::multiHighlightGradient}{Theme3D.multiHighlightGradient}
+ * documentation for more information.
+ *
+ * \sa colorStyle
+ */
+
+/*!
  * \enum QAbstract3DSeries::SeriesType
  *
  * Type of the series.
@@ -266,6 +334,158 @@ QString QAbstract3DSeries::userDefinedMesh() const
     return d_ptr->m_userDefinedMesh;
 }
 
+/*!
+ * \property QAbstract3DSeries::colorStyle
+ *
+ * Sets the color \a style for the series.
+ * See Q3DTheme::ColorStyle documentation for more information.
+ */
+void QAbstract3DSeries::setColorStyle(Q3DTheme::ColorStyle style)
+{
+    if (d_ptr->m_colorStyle != style) {
+        d_ptr->setColorStyle(style);
+        emit colorStyleChanged(style);
+    }
+    d_ptr->m_themeTracker.colorStyleOverride = true;
+}
+
+Q3DTheme::ColorStyle QAbstract3DSeries::colorStyle() const
+{
+    return d_ptr->m_colorStyle;
+}
+
+/*!
+ * \property QAbstract3DSeries::baseColor
+ *
+ * Sets the base \c color of the series.
+ * See Q3DTheme::baseColor documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setBaseColor(const QColor &color)
+{
+    if (d_ptr->m_baseColor != color) {
+        d_ptr->setBaseColor(color);
+        emit baseColorChanged(color);
+    }
+    d_ptr->m_themeTracker.baseColorOverride = true;
+}
+
+QColor QAbstract3DSeries::baseColor() const
+{
+    return d_ptr->m_baseColor;
+}
+
+/*!
+ * \property QAbstract3DSeries::baseGradient
+ *
+ * Sets the base \c gradient of the series.
+ * See Q3DTheme::baseGradient documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setBaseGradient(const QLinearGradient &gradient)
+{
+    if (d_ptr->m_baseGradient != gradient) {
+        d_ptr->setBaseGradient(gradient);
+        emit baseGradientChanged(gradient);
+    }
+    d_ptr->m_themeTracker.baseGradientOverride = true;
+}
+
+QLinearGradient QAbstract3DSeries::baseGradient() const
+{
+    return d_ptr->m_baseGradient;
+}
+
+/*!
+ * \property QAbstract3DSeries::singleHighlightColor
+ *
+ * Sets the single item highlight \c color of the series.
+ * See Q3DTheme::singleHighlightColor documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setSingleHighlightColor(const QColor &color)
+{
+    if (d_ptr->m_singleHighlightColor != color) {
+        d_ptr->setSingleHighlightColor(color);
+        emit singleHighlightColorChanged(color);
+    }
+    d_ptr->m_themeTracker.singleHighlightColorOverride = true;
+}
+
+QColor QAbstract3DSeries::singleHighlightColor() const
+{
+    return d_ptr->m_singleHighlightColor;
+}
+
+/*!
+ * \property QAbstract3DSeries::singleHighlightGradient
+ *
+ * Sets the single item highlight \c gradient of the series.
+ * See Q3DTheme::singleHighlightGradient documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    if (d_ptr->m_singleHighlightGradient != gradient) {
+        d_ptr->setSingleHighlightGradient(gradient);
+        emit singleHighlightGradientChanged(gradient);
+    }
+    d_ptr->m_themeTracker.singleHighlightGradientOverride = true;
+}
+
+QLinearGradient QAbstract3DSeries::singleHighlightGradient() const
+{
+    return d_ptr->m_singleHighlightGradient;
+}
+
+/*!
+ * \property QAbstract3DSeries::multiHighlightColor
+ *
+ * Sets the multiple item highlight \c color of the series.
+ * See Q3DTheme::multiHighlightColor documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setMultiHighlightColor(const QColor &color)
+{
+    if (d_ptr->m_multiHighlightColor != color) {
+        d_ptr->setMultiHighlightColor(color);
+        emit multiHighlightColorChanged(color);
+    }
+    d_ptr->m_themeTracker.multiHighlightColorOverride = true;
+}
+
+QColor QAbstract3DSeries::multiHighlightColor() const
+{
+    return d_ptr->m_multiHighlightColor;
+}
+
+/*!
+ * \property QAbstract3DSeries::multiHighlightGradient
+ *
+ * Sets the multiple item highlight \c gradient of the series.
+ * See Q3DTheme::multiHighlightGradient documentation for more information.
+ *
+ * \sa colorStyle
+ */
+void QAbstract3DSeries::setMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    if (d_ptr->m_multiHighlightGradient != gradient) {
+        d_ptr->setMultiHighlightGradient(gradient);
+        emit multiHighlightGradientChanged(gradient);
+    }
+    d_ptr->m_themeTracker.multiHighlightGradientOverride = true;
+}
+
+QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
+{
+    return d_ptr->m_multiHighlightGradient;
+}
+
 // QAbstract3DSeriesPrivate
 
 QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
@@ -348,6 +568,97 @@ void QAbstract3DSeriesPrivate::setUserDefinedMesh(const QString &meshFile)
     m_changeTracker.userDefinedMeshChanged = true;
     if (m_controller)
         m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setColorStyle(Q3DTheme::ColorStyle style)
+{
+    m_colorStyle = style;
+    m_changeTracker.colorStyleChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setBaseColor(const QColor &color)
+{
+    m_baseColor = color;
+    m_changeTracker.baseColorChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setBaseGradient(const QLinearGradient &gradient)
+{
+    m_baseGradient = gradient;
+    m_changeTracker.baseGradientChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setSingleHighlightColor(const QColor &color)
+{
+    m_singleHighlightColor = color;
+    m_changeTracker.singleHighlightColorChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setSingleHighlightGradient(const QLinearGradient &gradient)
+{
+    m_singleHighlightGradient = gradient;
+    m_changeTracker.singleHighlightGradientChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setMultiHighlightColor(const QColor &color)
+{
+    m_multiHighlightColor = color;
+    m_changeTracker.multiHighlightColorChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setMultiHighlightGradient(const QLinearGradient &gradient)
+{
+    m_multiHighlightGradient = gradient;
+    m_changeTracker.multiHighlightGradientChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force)
+{
+    // TODO: seriesIndex indicates which color from theme is required
+    Q_UNUSED(seriesIndex)
+
+    if (force || !m_themeTracker.colorStyleOverride) {
+        q_ptr->setColorStyle(theme.colorStyle());
+        m_themeTracker.colorStyleOverride = false;
+    }
+    if (force || !m_themeTracker.baseColorOverride) {
+        q_ptr->setBaseColor(theme.baseColor());
+        m_themeTracker.baseColorOverride = false;
+    }
+    if (force || !m_themeTracker.baseGradientOverride) {
+        q_ptr->setBaseGradient(theme.baseGradient());
+        m_themeTracker.baseGradientOverride = false;
+    }
+    if (force || !m_themeTracker.singleHighlightColorOverride) {
+        q_ptr->setSingleHighlightColor(theme.singleHighlightColor());
+        m_themeTracker.singleHighlightColorOverride = false;
+    }
+    if (force || !m_themeTracker.singleHighlightGradientOverride) {
+        q_ptr->setSingleHighlightGradient(theme.singleHighlightGradient());
+        m_themeTracker.singleHighlightGradientOverride = false;
+    }
+    if (force || !m_themeTracker.multiHighlightColorOverride) {
+        q_ptr->setMultiHighlightColor(theme.multiHighlightColor());
+        m_themeTracker.multiHighlightColorOverride = false;
+    }
+    if (force || !m_themeTracker.multiHighlightGradientOverride) {
+        q_ptr->setMultiHighlightGradient(theme.multiHighlightGradient());
+        m_themeTracker.multiHighlightGradientOverride = false;
+    }
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

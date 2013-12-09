@@ -33,7 +33,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QFont>
-#include <QLinearGradient>
 #include <QWindow>
 
 #include "datavisualizationglobal_p.h"
@@ -105,7 +104,6 @@ private:
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
-    GLuint m_gradientTexture;
     GLuint m_selectionTexture;
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
@@ -128,6 +126,8 @@ private:
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     const QSurface3DSeries *m_selectedSeries;
+    GLuint m_uniformGradientTexture;
+    QVector3D m_uniformGradientTextureColor;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -140,7 +140,6 @@ public:
     void updateScene(Q3DScene *scene);
     bool updateFlatStatus(bool enable);
     void updateSurfaceGridStatus(bool enable);
-    void updateSurfaceGradient(const QLinearGradient &gradient);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
 
@@ -185,6 +184,7 @@ private:
     void updateDepthBuffer();
 #endif
     void emitSelectedPointChanged(QPoint position);
+    void generateUniformGradient(const QVector3D newColor);
 
     Q_DISABLE_COPY(Surface3DRenderer)
 };

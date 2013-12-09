@@ -60,6 +60,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_yFlipped(false),
       m_updateLabels(false),
       m_barShader(0),
+      m_barGradientShader(0),
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
@@ -110,6 +111,7 @@ Bars3DRenderer::~Bars3DRenderer()
         delete m_sliceSelection;
     }
     delete m_barShader;
+    delete m_barGradientShader;
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
@@ -335,8 +337,6 @@ void Bars3DRenderer::drawSlicedScene()
             barPosYAdjustment = 0.2f; // Both -> translate to 0.0 + 0.2 for row/column labels
     }
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
-    QVector3D barHighlightColor(Utils::vectorFromColor(m_cachedSingleHighlightColor));
-    QVector3D rowHighlightColor(Utils::vectorFromColor(m_cachedMultiHighlightColor));
     bool rowMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionRow);
     bool itemMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionItem);
 
@@ -419,8 +419,6 @@ void Bars3DRenderer::drawSlicedScene()
                 m_drawer->drawObject(lineShader, m_gridLineObj);
             }
         }
-        // Release line shader
-        lineShader->release();
 
         // TODO: Make user controllable (QTRD-2546)
         if (sliceGridLabels) {
@@ -455,17 +453,10 @@ void Bars3DRenderer::drawSlicedScene()
             glDisable(GL_TEXTURE_2D);
             glDisable(GL_BLEND);
             glEnable(GL_DEPTH_TEST);
-
-            // Release label shader
-            m_labelShader->release();
         }
     }
 
     // Draw bars
-    // Bind bar shader
-    m_barShader->bind();
-
-    GLuint gradientTexture = 0;
     QVector3D modelMatrixScaler(m_scaleX, 0.0f, m_scaleZ);
     if (rowMode)
         modelMatrixScaler.setX(m_scaleX * m_seriesScale);
@@ -473,24 +464,72 @@ void Bars3DRenderer::drawSlicedScene()
         modelMatrixScaler.setZ(m_scaleZ * m_seriesScale);
 
     // Set common bar shader bindings
+    m_barShader->bind();
     m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
                                  m_cachedTheme->ambientLightStrength() * 2.0f);
-    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
-        m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
-        if (m_cachedColorStyle == Q3DTheme::ColorStyleObjectGradient)
-            m_barShader->setUniformValue(m_barShader->gradientHeight(), 0.5f);
+    m_barGradientShader->bind();
+    m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
+    m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
+    m_barGradientShader->setUniformValue(m_barGradientShader->lightS(), 0.5f);
+    m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
+                                         m_cachedTheme->ambientLightStrength() * 2.0f);
+    m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
 
-        gradientTexture = m_objectGradientTexture;
-    }
+    // Default to uniform shader
+    ShaderHelper *barShader = m_barShader;
+    barShader->bind();
+
+    int currentSeriesIndex = -1;
+    Q3DTheme::ColorStyle previousColorStyle = Q3DTheme::ColorStyleUniform;
+    Q3DTheme::ColorStyle colorStyle = Q3DTheme::ColorStyleUniform;
+    ObjectHelper *barObj = 0;
+    QVector3D barHighlightColor;
+    QVector3D rowHighlightColor;
+    GLuint barGradientTexture = 0;
+    GLuint rowGradientTexture = 0;
+    const SeriesRenderCache *currentSeries = 0;
+    bool colorStyleIsUniform = true;
 
     int stopBar = m_sliceSelection->size();
     for (int bar = 0; bar < stopBar; bar++) {
         BarRenderItem *item = m_sliceSelection->at(bar);
         if (!item)
             continue;
+
+        if (item->seriesIndex() != currentSeriesIndex) {
+            currentSeriesIndex = item->seriesIndex();
+            currentSeries = &(m_visibleSeriesList.at(currentSeriesIndex));
+            barObj = currentSeries->object();
+            colorStyle = currentSeries->colorStyle();
+            colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
+            if (colorStyleIsUniform) {
+                barHighlightColor = currentSeries->singleHighlightColor();
+                rowHighlightColor = currentSeries->multiHighlightColor();
+            } else {
+                barGradientTexture = currentSeries->singleHighlightGradientTexture();
+                rowGradientTexture = currentSeries->multiHighlightGradientTexture();
+            }
+
+            // Rebind shader if it has changed
+            if (colorStyleIsUniform != (previousColorStyle == Q3DTheme::ColorStyleUniform)) {
+                if (colorStyleIsUniform)
+                    barShader = m_barShader;
+                else
+                    barShader = m_barGradientShader;
+                barShader->bind();
+
+            }
+
+            if (!colorStyleIsUniform && (previousColorStyle != colorStyle)
+                    && (colorStyle == Q3DTheme::ColorStyleObjectGradient)) {
+                m_barGradientShader->setUniformValue(m_barGradientShader->gradientHeight(), 0.5f);
+            }
+
+            previousColorStyle = colorStyle;
+        }
 
         if (item->height() < 0)
             glCullFace(GL_FRONT);
@@ -520,42 +559,40 @@ void Bars3DRenderer::drawSlicedScene()
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
         QVector3D barColor;
-        // TODO: Get color from correct series
+        GLuint gradientTexture = 0;
+
         if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                 && m_visualSelectedBarPos.y() == item->position().y()) {
-            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
+            if (colorStyleIsUniform)
                 barColor = barHighlightColor;
             else
-                gradientTexture = m_singleHighlightGradientTexture;
+                gradientTexture = barGradientTexture;
         } else {
-            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
+            if (colorStyleIsUniform)
                 barColor = rowHighlightColor;
             else
-                gradientTexture = m_multiHighlightGradientTexture;
+                gradientTexture = rowGradientTexture;
         }
 
         if (item->height() != 0) {
             // Set shader bindings
-            m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-            m_barShader->setUniformValue(m_barShader->nModel(),
-                                         itModelMatrix.inverted().transposed());
-            m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-            if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform) {
-                m_barShader->setUniformValue(m_barShader->color(), barColor);
-            } else if (m_cachedColorStyle == Q3DTheme::ColorStyleRangeGradient) {
-                m_barShader->setUniformValue(m_barShader->gradientHeight(),
-                                             (qAbs(item->height()) / m_gradientFraction));
+            barShader->setUniformValue(barShader->model(), modelMatrix);
+            barShader->setUniformValue(barShader->nModel(),
+                                       itModelMatrix.inverted().transposed());
+            barShader->setUniformValue(barShader->MVP(), MVPMatrix);
+            if (colorStyleIsUniform) {
+                barShader->setUniformValue(barShader->color(), barColor);
+            } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                barShader->setUniformValue(barShader->gradientHeight(),
+                                           (qAbs(item->height()) / m_gradientFraction));
             }
 
             // Draw the object
-            m_drawer->drawObject(m_barShader,
-                                 m_visibleSeriesList.at(item->seriesIndex()).object(),
+            m_drawer->drawObject(barShader,
+                                 barObj,
                                  gradientTexture);
         }
     }
-
-    // Release bar shader
-    m_barShader->release();
 
     // Draw labels
     m_labelShader->bind();
@@ -662,8 +699,8 @@ void Bars3DRenderer::drawSlicedScene()
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
-    // Release label shader
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 }
 
 void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
@@ -784,15 +821,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Draw bars to depth buffer
         QVector3D shadowScaler(m_scaleX * m_seriesScale * 0.9f, 0.0f, m_scaleZ * 0.9f);
-        for (int row = startRow; row != stopRow; row += stepRow) {
-            for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                GLfloat shadowOffset = 0.0f;
-                float seriesPos = m_seriesStart;
-                for (int series = 0; series < seriesCount; series++) {
+        float seriesPos = m_seriesStart;
+        for (int series = 0; series < seriesCount; series++) {
+            ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
+            for (int row = startRow; row != stopRow; row += stepRow) {
+                for (int bar = startBar; bar != stopBar; bar += stepBar) {
+                    GLfloat shadowOffset = 0.0f;
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value())
                         continue;
-                    ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
                     // Set front face culling for negative valued bars and back face culling for
                     // positive valued bars to remove peter-panning issues
                     if (item.height() > 0) {
@@ -842,16 +879,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                     glDisableVertexAttribArray(m_depthShader->posAtt());
-                    seriesPos += m_seriesStep;
                 }
             }
+            seriesPos += m_seriesStep;
         }
 
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-        // Release depth shader
-        m_depthShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
@@ -865,7 +899,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
         glDisable(GL_TEXTURE_2D);
-        m_labelShader->release();
 #endif
         // Reset culling to normal
         glCullFace(GL_BACK);
@@ -889,16 +922,16 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white (= selectionSkipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-        for (int row = startRow; row != stopRow; row += stepRow) {
-            for (int bar = startBar; bar != stopBar; bar += stepBar) {
-                float seriesPos = m_seriesStart;
-                for (int series = 0; series < seriesCount; series++) {
+        float seriesPos = m_seriesStart;
+        for (int series = 0; series < seriesCount; series++) {
+            ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
+            for (int row = startRow; row != stopRow; row += stepRow) {
+                for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
                     if (!item.value()) {
                         seriesPos += m_seriesStep;
                         continue;
                     }
-                    ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
 
                     if (item.height() < 0)
                         glCullFace(GL_FRONT);
@@ -951,10 +984,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                     glDisableVertexAttribArray(m_selectionShader->posAtt());
-
-                    seriesPos += m_seriesStep;
                 }
             }
+            seriesPos += m_seriesStep;
         }
         glEnable(GL_DITHER);
 
@@ -964,9 +996,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         emit barClicked(selectionColorToArrayPosition(clickedColor), selectionColorToSeries(clickedColor));
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-        // Release selection shader
-        m_selectionShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         glCullFace(GL_BACK);
@@ -980,29 +1009,45 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj, m_selectionTexture);
         glDisable(GL_TEXTURE_2D);
-        m_labelShader->release();
 #endif
     }
 
     // Enable texturing
     glEnable(GL_TEXTURE_2D);
 
-    // Bind bar shader
-    m_barShader->bind();
-
+    ShaderHelper *barShader = 0;
     GLuint gradientTexture = 0;
+    Q3DTheme::ColorStyle previousColorStyle = Q3DTheme::ColorStyleUniform;
+    bool haveUniformColorSeries = false;
+    bool haveGradientSeries = false;
 
-    // Set common bar shader bindings
-    m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
-    m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-    m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme->ambientLightStrength());
-    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
-        m_barShader->setUniformValue(m_barShader->gradientMin(), 0.0f);
-        if (m_cachedColorStyle == Q3DTheme::ColorStyleObjectGradient)
-            m_barShader->setUniformValue(m_barShader->gradientHeight(), 0.5f);
+    for (int i = 0; i < seriesCount; i++) {
+        if (m_visibleSeriesList.at(i).colorStyle() == Q3DTheme::ColorStyleUniform)
+            haveUniformColorSeries = true;
+        else
+            haveGradientSeries = true;
+    }
 
-        gradientTexture = m_objectGradientTexture;
+    // Set unchanging shader bindings
+    if (haveGradientSeries) {
+        m_barGradientShader->bind();
+        m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
+        m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
+        m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
+                                             m_cachedTheme->ambientLightStrength());
+        m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
+    }
+
+    if (haveUniformColorSeries) {
+        m_barShader->bind();
+        m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
+        m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
+        m_barShader->setUniformValue(m_barShader->ambientS(),
+                                     m_cachedTheme->ambientLightStrength());
+        barShader = m_barShader;
+    } else {
+        barShader = m_barGradientShader;
+        previousColorStyle = Q3DTheme::ColorStyleRangeGradient;
     }
 
     if (m_selectionDirty) {
@@ -1029,10 +1074,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     // Draw bars
-    QVector3D barHighlightColor(Utils::vectorFromColor(m_cachedSingleHighlightColor));
-    QVector3D rowHighlightColor(Utils::vectorFromColor(m_cachedMultiHighlightColor));
-    QVector3D baseColor(Utils::vectorFromColor(m_cachedObjectColor));
-    QVector3D barColor = baseColor;
 
     GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
     GLfloat adjustedHighlightStrength = m_cachedTheme->highlightLightStrength() / 10.0f;
@@ -1040,13 +1081,45 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     bool barSelectionFound = false;
     BarRenderItem *selectedBar(0);
 
+    QVector3D baseColor;
+    QVector3D barColor;
     QVector3D modelScaler(m_scaleX * m_seriesScale, 0.0f, m_scaleZ);
     bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::invalidSelectionPosition());
-    for (int row = startRow; row != stopRow; row += stepRow) {
-        for (int bar = startBar; bar != stopBar; bar += stepBar) {
-            float seriesPos = m_seriesStart;
-            for (int series = 0; series < seriesCount; series++) {
-                ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
+    float seriesPos = m_seriesStart;
+    for (int series = 0; series < seriesCount; series++) {
+        const SeriesRenderCache &currentSeries = m_visibleSeriesList.at(series);
+        ObjectHelper *barObj = currentSeries.object();
+        Q3DTheme::ColorStyle colorStyle = currentSeries.colorStyle();
+        bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
+
+        // Rebind shader if it has changed
+        if (colorStyleIsUniform != (previousColorStyle == Q3DTheme::ColorStyleUniform)) {
+            if (colorStyleIsUniform)
+                barShader = m_barShader;
+            else
+                barShader = m_barGradientShader;
+            barShader->bind();
+        }
+
+        if (colorStyleIsUniform) {
+            baseColor = currentSeries.baseColor();
+        } else if ((previousColorStyle != colorStyle)
+                   && (colorStyle == Q3DTheme::ColorStyleObjectGradient)) {
+            m_barGradientShader->setUniformValue(m_barGradientShader->gradientHeight(), 0.5f);
+        }
+
+        // Always use base color when no selection mode
+        if (m_cachedSelectionMode == QDataVis::SelectionNone) {
+            if (colorStyleIsUniform)
+                barColor = baseColor;
+            else
+                gradientTexture = currentSeries.baseGradientTexture();
+        }
+
+        previousColorStyle = colorStyle;
+
+        for (int row = startRow; row != stopRow; row += stepRow) {
+            for (int bar = startBar; bar != stopBar; bar += stepBar) {
                 BarRenderItem &item = m_renderingArrays[series][row][bar];
 
                 if (item.height() < 0)
@@ -1072,12 +1145,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-
-                if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
-                    barColor = baseColor;
-                else
-                    gradientTexture = m_objectGradientTexture;
-
                 GLfloat lightStrength = m_cachedTheme->lightStrength();
                 GLfloat shadowLightStrength = adjustedLightStrength;
 
@@ -1088,10 +1155,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     switch (selectionType) {
                     case Bars3DController::SelectionItem: {
-                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
-                            barColor = barHighlightColor;
+                        if (colorStyleIsUniform)
+                            barColor = currentSeries.singleHighlightColor();
                         else
-                            gradientTexture = m_singleHighlightGradientTexture;
+                            gradientTexture = currentSeries.singleHighlightGradientTexture();
 
                         lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
@@ -1120,10 +1187,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     case Bars3DController::SelectionRow: {
                         // Current bar is on the same row as the selected bar
-                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
-                            barColor = rowHighlightColor;
+                        if (colorStyleIsUniform)
+                            barColor = currentSeries.multiHighlightColor();
                         else
-                            gradientTexture = m_multiHighlightGradientTexture;
+                            gradientTexture = currentSeries.multiHighlightGradientTexture();
 
                         lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
@@ -1141,10 +1208,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     case Bars3DController::SelectionColumn: {
                         // Current bar is on the same column as the selected bar
-                        if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform)
-                            barColor = rowHighlightColor;
+                        if (colorStyleIsUniform)
+                            barColor = currentSeries.multiHighlightColor();
                         else
-                            gradientTexture = m_multiHighlightGradientTexture;
+                            gradientTexture = currentSeries.multiHighlightGradientTexture();
 
                         lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
@@ -1168,53 +1235,53 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
                     case Bars3DController::SelectionNone: {
                         // Current bar is not selected, nor on a row or column
-                        // do nothing
+                        if (colorStyleIsUniform)
+                            barColor = baseColor;
+                        else
+                            gradientTexture = currentSeries.baseGradientTexture();
                         break;
                     }
                     }
                 }
 
-                // Skip drawing of 0 -height bars
+                // Skip drawing of 0-height bars
                 if (item.height() != 0) {
                     // Set shader bindings
-                    m_barShader->setUniformValue(m_barShader->model(), modelMatrix);
-                    m_barShader->setUniformValue(m_barShader->nModel(),
-                                                 itModelMatrix.transposed().inverted());
-                    m_barShader->setUniformValue(m_barShader->MVP(), MVPMatrix);
-                    if (m_cachedColorStyle == Q3DTheme::ColorStyleUniform) {
-                        m_barShader->setUniformValue(m_barShader->color(), barColor);
-                    } else if (m_cachedColorStyle == Q3DTheme::ColorStyleRangeGradient) {
-                        m_barShader->setUniformValue(m_barShader->gradientHeight(),
-                                                     qAbs(item.height()) / m_gradientFraction);
+                    barShader->setUniformValue(barShader->model(), modelMatrix);
+                    barShader->setUniformValue(barShader->nModel(),
+                                               itModelMatrix.transposed().inverted());
+                    barShader->setUniformValue(barShader->MVP(), MVPMatrix);
+                    if (colorStyleIsUniform) {
+                        barShader->setUniformValue(barShader->color(), barColor);
+                    } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                        barShader->setUniformValue(barShader->gradientHeight(),
+                                                   qAbs(item.height()) / m_gradientFraction);
                     }
 
 #if !defined(QT_OPENGL_ES_2)
                     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
                         // Set shadow shader bindings
                         QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        m_barShader->setUniformValue(m_barShader->shadowQ(), m_shadowQualityToShader);
-                        m_barShader->setUniformValue(m_barShader->depth(), depthMVPMatrix);
-                        m_barShader->setUniformValue(m_barShader->lightS(), shadowLightStrength);
+                        barShader->setUniformValue(barShader->shadowQ(), m_shadowQualityToShader);
+                        barShader->setUniformValue(barShader->depth(), depthMVPMatrix);
+                        barShader->setUniformValue(barShader->lightS(), shadowLightStrength);
 
                         // Draw the object
-                        m_drawer->drawObject(m_barShader, barObj, gradientTexture, m_depthTexture);
+                        m_drawer->drawObject(barShader, barObj, gradientTexture, m_depthTexture);
                     } else
 #endif
                     {
                         // Set shadowless shader bindings
-                        m_barShader->setUniformValue(m_barShader->lightS(), lightStrength);
+                        barShader->setUniformValue(barShader->lightS(), lightStrength);
 
                         // Draw the object
-                        m_drawer->drawObject(m_barShader, barObj, gradientTexture);
+                        m_drawer->drawObject(barShader, barObj, gradientTexture);
                     }
                 }
-                seriesPos += m_seriesStep;
             }
         }
+        seriesPos += m_seriesStep;
     }
-
-    // Release bar shader
-    m_barShader->release();
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1324,9 +1391,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
     }
-
-    // Release background shader
-    m_backgroundShader->release();
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
@@ -1553,8 +1617,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineHeight += heightStep;
             }
         }
-        // Release bar shader
-        lineShader->release();
     }
 
     // Bind label shader
@@ -1788,8 +1850,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
-    // Release label shader
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 
     m_selectionDirty = false;
 }
@@ -2096,6 +2158,14 @@ void Bars3DRenderer::initShaders(const QString &vertexShader, const QString &fra
         delete m_barShader;
     m_barShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_barShader->initialize();
+}
+
+void Bars3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+{
+    if (m_barGradientShader)
+        delete m_barGradientShader;
+    m_barGradientShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_barGradientShader->initialize();
 }
 
 void Bars3DRenderer::initSelectionShader()

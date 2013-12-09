@@ -34,9 +34,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since Qt Data Visualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
- * freely. The class provides configurable gradient texture to illustrate the height on the data. The
- * surface plotting includes also gridline that can be set on or off. The visual appearance of the
- * surface can be changed by controlling the smooth status.
+ * freely. The surface plotting includes also gridline that can be set on or off.
+ * The visual appearance of the surface can be changed by controlling the smooth status.
  *
  * The Q3DSurface supports selection by showing a highlighted ball on the data point where the user has clicked
  * with left mouse button (when default input handler is in use) or selected via QSurface3DSeries.
@@ -257,22 +256,6 @@ QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 }
 
 /*!
- * \property Q3DSurface::gradient
- *
- * The current surface gradient. Setting this property replaces the previous gradient with
- * the given \a gradient.
- */
-void Q3DSurface::setGradient(const QLinearGradient &gradient)
-{
-    d_ptr->m_shared->setGradient(gradient);
-}
-
-QLinearGradient Q3DSurface::gradient() const
-{
-    return d_ptr->m_shared->gradient();
-}
-
-/*!
  * \property Q3DSurface::scene
  *
  * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
@@ -389,15 +372,6 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
         retList.append(static_cast<Q3DValueAxis *>(axis));
 
     return retList;
-}
-
-/*!
- * Modifies the current surface gradient. Sets gradient color to \a color at \a pos.
- */
-// TODO: Surface gradient should use base color of series
-void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
-{
-    d_ptr->m_shared->setGradientColorAt(pos, color);
 }
 
 /////////////////// PRIVATE ///////////////////////////////////

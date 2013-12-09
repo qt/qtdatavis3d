@@ -44,6 +44,11 @@ QVector3D Utils::vectorFromColor(const QColor &color)
     return QVector3D(color.redF(), color.greenF(), color.blueF());
 }
 
+QColor Utils::colorFromVector(const QVector3D &colorVector)
+{
+    return QColor(colorVector.x(), colorVector.y(), colorVector.z());
+}
+
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
                                const QColor &txtColor, bool labelBackground,
                                bool borders, int maxLabelWidth)

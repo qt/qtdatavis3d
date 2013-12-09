@@ -313,7 +313,9 @@ void GraphModifier::gradientPressed()
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_graph->setGradient(gradient);
+    m_graph->seriesList().at(0)->setBaseGradient(gradient);
+    m_graph->seriesList().at(0)->setSingleHighlightColor(Qt::red);
+    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 }
 
 void GraphModifier::changeFont(const QFont &font)
@@ -403,7 +405,7 @@ void GraphModifier::changeSelectionMode(int mode)
 void GraphModifier::changeRow()
 {
     if (m_activeSample == GraphModifier::SqrtSin) {
-        qDebug() << "Generating new values to a row at randon pos";
+        qDebug() << "Generating new values to a row at random pos";
         float minX = -10.0f;
         float maxX = 10.0f;
         float minZ = -10.0f;
@@ -487,13 +489,13 @@ void GraphModifier::changeItem()
 
 void GraphModifier::changeMultipleRows()
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 30; i++)
         changeRow();
 }
 
 void GraphModifier::changeMultipleItem()
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 30; i++)
         changeItem();
 }
 

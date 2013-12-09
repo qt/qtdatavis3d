@@ -422,8 +422,8 @@ Q3DTheme::~Q3DTheme()
  */
 void Q3DTheme::setBaseColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.baseColorDirty = true;
     if (d_ptr->m_baseColor != color) {
-        d_ptr->m_dirtyBits.baseColorDirty = true;
         d_ptr->m_baseColor = color;
         emit baseColorChanged(color);
     }
@@ -441,8 +441,8 @@ QColor Q3DTheme::baseColor() const
  */
 void Q3DTheme::setBackgroundColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.backgroundColorDirty = true;
     if (d_ptr->m_backgroundColor != color) {
-        d_ptr->m_dirtyBits.backgroundColorDirty = true;
         d_ptr->m_backgroundColor = color;
         emit backgroundColorChanged(color);
         emit d_ptr->needRender();
@@ -461,8 +461,8 @@ QColor Q3DTheme::backgroundColor() const
  */
 void Q3DTheme::setWindowColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.windowColorDirty = true;
     if (d_ptr->m_windowColor != color) {
-        d_ptr->m_dirtyBits.windowColorDirty = true;
         d_ptr->m_windowColor = color;
         emit windowColorChanged(color);
         emit d_ptr->needRender();
@@ -481,8 +481,8 @@ QColor Q3DTheme::windowColor() const
  */
 void Q3DTheme::setLabelTextColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.labelTextColorDirty = true;
     if (d_ptr->m_textColor != color) {
-        d_ptr->m_dirtyBits.labelTextColorDirty = true;
         d_ptr->m_textColor = color;
         emit labelTextColorChanged(color);
         emit d_ptr->needRender();
@@ -501,8 +501,8 @@ QColor Q3DTheme::labelTextColor() const
  */
 void Q3DTheme::setLabelBackgroundColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.labelBackgroundColorDirty = true;
     if (d_ptr->m_textBackgroundColor != color) {
-        d_ptr->m_dirtyBits.labelBackgroundColorDirty = true;
         d_ptr->m_textBackgroundColor = color;
         emit labelBackgroundColorChanged(color);
         emit d_ptr->needRender();
@@ -521,8 +521,8 @@ QColor Q3DTheme::labelBackgroundColor() const
  */
 void Q3DTheme::setGridLineColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.gridLineColorDirty = true;
     if (d_ptr->m_gridLineColor != color) {
-        d_ptr->m_dirtyBits.gridLineColorDirty = true;
         d_ptr->m_gridLineColor = color;
         emit gridLineColorChanged(color);
         emit d_ptr->needRender();
@@ -542,8 +542,8 @@ QColor Q3DTheme::gridLineColor() const
  */
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.singleHighlightColorDirty = true;
     if (d_ptr->m_singleHighlightColor != color) {
-        d_ptr->m_dirtyBits.singleHighlightColorDirty = true;
         d_ptr->m_singleHighlightColor = color;
         emit singleHighlightColorChanged(color);
     }
@@ -562,8 +562,8 @@ QColor Q3DTheme::singleHighlightColor() const
  */
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.multiHighlightColorDirty = true;
     if (d_ptr->m_multiHighlightColor != color) {
-        d_ptr->m_dirtyBits.multiHighlightColorDirty = true;
         d_ptr->m_multiHighlightColor = color;
         emit multiHighlightColorChanged(color);
     }
@@ -583,8 +583,8 @@ QColor Q3DTheme::multiHighlightColor() const
  */
 void Q3DTheme::setLightColor(const QColor &color)
 {
+    d_ptr->m_dirtyBits.lightColorDirty = true;
     if (d_ptr->m_lightColor != color) {
-        d_ptr->m_dirtyBits.lightColorDirty = true;
         d_ptr->m_lightColor = color;
         emit lightColorChanged(color);
         emit d_ptr->needRender();
@@ -605,8 +605,8 @@ QColor Q3DTheme::lightColor() const
  */
 void Q3DTheme::setBaseGradient(const QLinearGradient &gradient)
 {
+    d_ptr->m_dirtyBits.baseGradientDirty = true;
     if (d_ptr->m_baseGradient != gradient) {
-        d_ptr->m_dirtyBits.baseGradientDirty = true;
         d_ptr->m_baseGradient = gradient;
         emit baseGradientChanged(gradient);
     }
@@ -625,8 +625,8 @@ QLinearGradient Q3DTheme::baseGradient() const
  */
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
+    d_ptr->m_dirtyBits.singleHighlightGradientDirty = true;
     if (d_ptr->m_singleHighlightGradient != gradient) {
-        d_ptr->m_dirtyBits.singleHighlightGradientDirty = true;
         d_ptr->m_singleHighlightGradient = gradient;
         emit singleHighlightGradientChanged(gradient);
     }
@@ -645,8 +645,8 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
  */
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
+    d_ptr->m_dirtyBits.multiHighlightGradientDirty = true;
     if (d_ptr->m_multiHighlightGradient != gradient) {
-        d_ptr->m_dirtyBits.multiHighlightGradientDirty = true;
         d_ptr->m_multiHighlightGradient = gradient;
         emit multiHighlightGradientChanged(gradient);
     }
@@ -664,10 +664,10 @@ QLinearGradient Q3DTheme::multiHighlightGradient() const
  */
 void Q3DTheme::setLightStrength(float strength)
 {
+    d_ptr->m_dirtyBits.lightStrengthDirty = true;
     if (strength < 0.0f || strength > 10.0f) {
         qWarning("Invalid value. Valid range for lightStrength is between 0.0f and 10.0f");
     } else if (d_ptr->m_lightStrength != strength) {
-        d_ptr->m_dirtyBits.lightStrengthDirty = true;
         d_ptr->m_lightStrength = strength;
         emit lightStrengthChanged(strength);
         emit d_ptr->needRender();
@@ -686,10 +686,10 @@ float Q3DTheme::lightStrength() const
  */
 void Q3DTheme::setAmbientLightStrength(float strength)
 {
+    d_ptr->m_dirtyBits.ambientLightStrengthDirty = true;
     if (strength < 0.0f || strength > 1.0f) {
         qWarning("Invalid value. Valid range for ambientLightStrength is between 0.0f and 1.0f");
     } else if (d_ptr->m_ambientLightStrength != strength) {
-        d_ptr->m_dirtyBits.ambientLightStrengthDirty = true;
         d_ptr->m_ambientLightStrength = strength;
         emit ambientLightStrengthChanged(strength);
         emit d_ptr->needRender();
@@ -708,10 +708,10 @@ float Q3DTheme::ambientLightStrength() const
  */
 void Q3DTheme::setHighlightLightStrength(float strength)
 {
+    d_ptr->m_dirtyBits.highlightLightStrengthDirty = true;
     if (strength < 0.0f || strength > 10.0f) {
         qWarning("Invalid value. Valid range for highlightLightStrength is between 0.0f and 10.0f");
     } else if (d_ptr->m_highlightLightStrength != strength) {
-        d_ptr->m_dirtyBits.highlightLightStrengthDirty = true;
         d_ptr->m_highlightLightStrength = strength;
         emit highlightLightStrengthChanged(strength);
         emit d_ptr->needRender();
@@ -730,8 +730,8 @@ float Q3DTheme::highlightLightStrength() const
  */
 void Q3DTheme::setLabelBorderEnabled(bool enabled)
 {
+    d_ptr->m_dirtyBits.labelBorderEnabledDirty = true;
     if (d_ptr->m_labelBorders != enabled) {
-        d_ptr->m_dirtyBits.labelBorderEnabledDirty = true;
         d_ptr->m_labelBorders = enabled;
         emit labelBorderEnabledChanged(enabled);
         emit d_ptr->needRender();
@@ -750,8 +750,8 @@ bool Q3DTheme::isLabelBorderEnabled() const
  */
 void Q3DTheme::setFont(const QFont &font)
 {
+    d_ptr->m_dirtyBits.fontDirty = true;
     if (d_ptr->m_font != font) {
-        d_ptr->m_dirtyBits.fontDirty = true;
         d_ptr->m_font = font;
         emit fontChanged(font);
         emit d_ptr->needRender();
@@ -770,8 +770,8 @@ QFont Q3DTheme::font() const
  */
 void Q3DTheme::setBackgroundEnabled(bool enabled)
 {
+    d_ptr->m_dirtyBits.backgroundEnabledDirty = true;
     if (d_ptr->m_backgoundEnabled != enabled) {
-        d_ptr->m_dirtyBits.backgroundEnabledDirty = true;
         d_ptr->m_backgoundEnabled = enabled;
         emit backgroundEnabledChanged(enabled);
         emit d_ptr->needRender();
@@ -790,8 +790,8 @@ bool Q3DTheme::isBackgroundEnabled() const
  */
 void Q3DTheme::setGridEnabled(bool enabled)
 {
+    d_ptr->m_dirtyBits.gridEnabledDirty = true;
     if (d_ptr->m_gridEnabled != enabled) {
-        d_ptr->m_dirtyBits.gridEnabledDirty = true;
         d_ptr->m_gridEnabled = enabled;
         emit gridEnabledChanged(enabled);
         emit d_ptr->needRender();
@@ -810,8 +810,8 @@ bool Q3DTheme::isGridEnabled() const
  */
 void Q3DTheme::setLabelBackgroundEnabled(bool enabled)
 {
+    d_ptr->m_dirtyBits.labelBackgroundEnabledDirty = true;
     if (d_ptr->m_labelBackground != enabled) {
-        d_ptr->m_dirtyBits.labelBackgroundEnabledDirty = true;
         d_ptr->m_labelBackground = enabled;
         emit labelBackgroundEnabledChanged(enabled);
         emit d_ptr->needRender();
@@ -830,8 +830,8 @@ bool Q3DTheme::isLabelBackgroundEnabled() const
  */
 void Q3DTheme::setColorStyle(ColorStyle style)
 {
+    d_ptr->m_dirtyBits.colorStyleDirty = true;
     if (d_ptr->m_colorStyle != style) {
-        d_ptr->m_dirtyBits.colorStyleDirty = true;
         d_ptr->m_colorStyle = style;
         emit colorStyleChanged(style);
     }
@@ -850,8 +850,8 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
  */
 void Q3DTheme::setType(Theme themeType)
 {
+    d_ptr->m_dirtyBits.themeIdDirty = true;
     if (d_ptr->m_themeId != themeType) {
-        d_ptr->m_dirtyBits.themeIdDirty = true;
         d_ptr->m_themeId = themeType;
         emit typeChanged(themeType);
     }

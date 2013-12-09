@@ -52,11 +52,6 @@ DeclarativeBars::~DeclarativeBars()
     delete m_barsController;
 }
 
-void DeclarativeBars::setBarColor(const QColor &baseColor)
-{
-    m_barsController->setBaseColor(baseColor);
-}
-
 Q3DCategoryAxis *DeclarativeBars::rowAxis() const
 {
     return static_cast<Q3DCategoryAxis *>(m_barsController->axisZ());

@@ -35,7 +35,6 @@
 #include "declarativesurface_p.h"
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
-#include "colorgradient_p.h"
 #include "qsurface3dseries.h"
 
 #include <QAbstractItemModel>
@@ -51,7 +50,6 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
     Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
-    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -66,9 +64,6 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    void setGradient(ColorGradient *gradient);
-    ColorGradient *gradient() const;
-
     QQmlListProperty<QSurface3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
     static int countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
@@ -82,14 +77,8 @@ signals:
     void axisYChanged(Q3DValueAxis *axis);
     void axisZChanged(Q3DValueAxis *axis);
 
-protected:
-    void handleGradientUpdate();
-
 private:
-    void setControllerGradient(const ColorGradient &gradient);
-
     Surface3DController *m_surfaceController;
-    ColorGradient *m_gradient; // Not owned
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

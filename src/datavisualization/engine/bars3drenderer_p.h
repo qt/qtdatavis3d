@@ -70,6 +70,7 @@ private:
     QRect m_sliceViewPort;
     bool m_updateLabels;
     ShaderHelper *m_barShader;
+    ShaderHelper *m_barGradientShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
@@ -135,6 +136,7 @@ signals:
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);

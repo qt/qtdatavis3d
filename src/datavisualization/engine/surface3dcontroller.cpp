@@ -45,9 +45,6 @@ Surface3DController::Surface3DController(QRect rect)
     setAxisX(0);
     setAxisY(0);
     setAxisZ(0);
-
-    // Set the default from the theme
-    m_userDefinedGradient = theme()->baseGradient();
 }
 
 Surface3DController::~Surface3DController()
@@ -76,11 +73,6 @@ void Surface3DController::synchDataToRenderer()
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
-    if (m_changeTracker.gradientColorChanged) {
-        m_renderer->updateSurfaceGradient(m_userDefinedGradient);
-        m_changeTracker.gradientColorChanged = false;
-    }
-
     if (m_changeTracker.rowsChanged) {
         m_renderer->updateRows(m_changedRows);
         m_changeTracker.rowsChanged = false;
@@ -175,27 +167,6 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
     }
 
     return surfaceSeriesList;
-}
-
-void Surface3DController::setGradient(const QLinearGradient &gradient)
-{
-    if (gradient != m_userDefinedGradient) {
-        m_userDefinedGradient = gradient;
-        m_changeTracker.gradientColorChanged = true;
-        emitNeedRender();
-    }
-}
-
-QLinearGradient Surface3DController::gradient() const
-{
-    return m_userDefinedGradient;
-}
-
-void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
-{
-    m_userDefinedGradient.setColorAt(pos, color);
-    m_changeTracker.gradientColorChanged = true;
-    emitNeedRender();
 }
 
 void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)

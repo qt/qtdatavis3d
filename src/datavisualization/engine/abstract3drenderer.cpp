@@ -40,10 +40,6 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::SelectionNone),
-      m_cachedColorStyle(Q3DTheme::ColorStyleUniform),
-      m_objectGradientTexture(0),
-      m_singleHighlightGradientTexture(0),
-      m_multiHighlightGradientTexture(0),
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
@@ -63,17 +59,12 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 Abstract3DRenderer::~Abstract3DRenderer()
 {
-    if (m_textureHelper) {
-        m_textureHelper->deleteTexture(&m_objectGradientTexture);
-        m_textureHelper->deleteTexture(&m_singleHighlightGradientTexture);
-        m_textureHelper->deleteTexture(&m_multiHighlightGradientTexture);
-    }
+    for (int i = 0; i < m_visibleSeriesList.size(); i++)
+        m_visibleSeriesList[i].cleanup(m_textureHelper);
 
     delete m_drawer;
     delete m_textureHelper;
     delete m_cachedScene;
-    for (int i = 0; i < m_visibleSeriesList.size(); i++)
-        delete m_visibleSeriesList.at(i).object();
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -153,6 +144,13 @@ void Abstract3DRenderer::updateInputPosition(const QPoint &position)
     m_inputPosition = position;
 }
 
+void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+{
+    // Do nothing by default
+    Q_UNUSED(vertexShader)
+    Q_UNUSED(fragmentShader)
+}
+
 void Abstract3DRenderer::updateBoundingRect(const QRect &boundingRect)
 {
     m_cachedBoundingRect = boundingRect;
@@ -210,34 +208,25 @@ void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        }
+        initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                            QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+        initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                    QStringLiteral(":/shaders/fragmentShadowNoTex"));
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
     } else {
-        if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnY"));
-        } else {
-            initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
-        }
+        initGradientShaders(QStringLiteral(":/shaders/vertex"),
+                            QStringLiteral(":/shaders/fragmentColorOnY"));
+        initShaders(QStringLiteral(":/shaders/vertex"),
+                    QStringLiteral(":/shaders/fragment"));
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                               QStringLiteral(":/shaders/fragment"));
     }
 #else
-    if (m_cachedColorStyle != Q3DTheme::ColorStyleUniform) {
-        initShaders(QStringLiteral(":/shaders/vertex"),
-                    QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    } else {
-        initShaders(QStringLiteral(":/shaders/vertex"),
-                    QStringLiteral(":/shaders/fragmentES2"));
-    }
+    initGradientShaders(QStringLiteral(":/shaders/vertex"),
+                        QStringLiteral(":/shaders/fragmentColorOnYES2"));
+    initShaders(QStringLiteral(":/shaders/vertex"),
+                QStringLiteral(":/shaders/fragmentES2"));
     initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                           QStringLiteral(":/shaders/fragmentES2"));
 #endif
@@ -320,49 +309,6 @@ void Abstract3DRenderer::updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation 
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
 
-void Abstract3DRenderer::updateColorStyle(Q3DTheme::ColorStyle style)
-{
-    bool changed = (m_cachedColorStyle != style);
-
-    m_cachedColorStyle = style;
-
-    if (changed)
-        reInitShaders();
-}
-
-void Abstract3DRenderer::updateObjectColor(const QColor &color)
-{
-    m_cachedObjectColor = color;
-}
-
-void Abstract3DRenderer::updateObjectGradient(const QLinearGradient &gradient)
-{
-    m_cachedObjectGradient = gradient;
-    fixGradient(&m_cachedObjectGradient, &m_objectGradientTexture);
-}
-
-void Abstract3DRenderer::updateSingleHighlightColor(const QColor &color)
-{
-    m_cachedSingleHighlightColor = color;
-}
-
-void Abstract3DRenderer::updateSingleHighlightGradient(const QLinearGradient &gradient)
-{
-    m_cachedSingleHighlightGradient = gradient;
-    fixGradient(&m_cachedSingleHighlightGradient, &m_singleHighlightGradientTexture);
-}
-
-void Abstract3DRenderer::updateMultiHighlightColor(const QColor &color)
-{
-    m_cachedMultiHighlightColor = color;
-}
-
-void Abstract3DRenderer::updateMultiHighlightGradient(const QLinearGradient &gradient)
-{
-    m_cachedMultiHighlightGradient = gradient;
-    fixGradient(&m_cachedMultiHighlightGradient, &m_multiHighlightGradientTexture);
-}
-
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
 {
     // Default implementation does nothing.
@@ -375,12 +321,20 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
 {
     int visibleCount = 0;
     if (updateVisibility) {
+        int oldSize = m_visibleSeriesList.size();
         foreach (QAbstract3DSeries *current, seriesList) {
             if (current->isVisible())
                 visibleCount++;
         }
 
-        if (visibleCount != m_visibleSeriesList.size())
+        // Clean up series caches that are about to be permanently deleted.
+        // Can't just use cache destructor, as resize will call that to all items.
+        if (visibleCount < oldSize) {
+            for (int i = visibleCount; i < oldSize; i++)
+                m_visibleSeriesList[i].cleanup(m_textureHelper);
+        }
+
+        if (visibleCount != oldSize)
             m_visibleSeriesList.resize(visibleCount);
 
         visibleCount = 0;

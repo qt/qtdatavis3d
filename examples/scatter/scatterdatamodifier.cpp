@@ -60,8 +60,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     series->setMesh(QAbstract3DSeries::MeshSphere);
     m_graph->addSeries(series);
     //! [2]
-
-    changeLabelStyle();
 }
 
 ScatterDataModifier::~ScatterDataModifier()

@@ -83,6 +83,14 @@ Item {
                 labelBorderEnabled: true
                 font.pointSize: 35
                 labelBackgroundEnabled: true
+                colorStyle: Theme3D.ColorStyleRangeGradient
+                singleHighlightGradient: customGradient
+
+                ColorGradient {
+                    id: customGradient
+                    ColorGradientStop { position: 1.0; color: "#FFFF00" }
+                    ColorGradientStop { position: 0.0; color: "#808000" }
+                }
             }
             barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)
@@ -94,6 +102,7 @@ Item {
             Bar3DSeries {
                 id: barSeries
                 itemLabelFormat: "Income for @colLabel, @rowLabel: @valueLabel"
+                baseGradient: barGradient
 
                 ItemModelBarDataProxy {
                     id: modelProxy
@@ -103,6 +112,12 @@ Item {
                     valueRole: "income"
                 }
 
+                ColorGradient {
+                    id: barGradient
+                    ColorGradientStop { position: 1.0; color: "#00FF00" }
+                    ColorGradientStop { position: 0.0; color: "#006000" }
+                }
+
                 onSelectedBarChanged: handleSelectionChange(barSeries, position)
             }
 
@@ -110,6 +125,7 @@ Item {
                 id: secondarySeries
                 visible: false
                 itemLabelFormat: "Expenses for @colLabel, @rowLabel: @valueLabel"
+                baseGradient: secondaryGradient
 
                 ItemModelBarDataProxy {
                     id: secondaryProxy
@@ -117,6 +133,12 @@ Item {
                     rowRole: "year"
                     columnRole: "month"
                     valueRole: "expenses"
+                }
+
+                ColorGradient {
+                    id: secondaryGradient
+                    ColorGradientStop { position: 1.0; color: "#FF0000" }
+                    ColorGradientStop { position: 0.0; color: "#600000" }
                 }
 
                 onSelectedBarChanged: handleSelectionChange(secondarySeries, position)

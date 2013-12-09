@@ -38,13 +38,18 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeTheme3D : public Q3DTheme
 {
     Q_OBJECT
+    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
+    Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
 public:
     DeclarativeTheme3D(QObject *parent = 0);
     virtual ~DeclarativeTheme3D();
+
+    QQmlListProperty<QObject> seriesChildren();
+    static void appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element);
 
     void setBaseGradient(ColorGradient *gradient);
     ColorGradient *baseGradient() const;

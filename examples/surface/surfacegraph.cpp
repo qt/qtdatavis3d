@@ -239,7 +239,8 @@ void SurfaceGraph::setBlackToYellowGradient()
     gr.setColorAt(0.67, Qt::red);
     gr.setColorAt(1.0, Qt::yellow);
 
-    m_graph->setGradient(gr);
+    m_graph->seriesList().at(0)->setBaseGradient(gr);
+    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     //! [7]
 }
 
@@ -251,6 +252,7 @@ void SurfaceGraph::setGreenToRedGradient()
     gr.setColorAt(0.8, Qt::red);
     gr.setColorAt(1.0, Qt::darkRed);
 
-    m_graph->setGradient(gr);
+    m_graph->seriesList().at(0)->setBaseGradient(gr);
+    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 }
 

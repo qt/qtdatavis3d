@@ -32,7 +32,6 @@
 #include "abstract3dcontroller_p.h"
 #include "datavisualizationglobal_p.h"
 
-#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -40,7 +39,6 @@ class Surface3DRenderer;
 class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
-    bool gradientColorChanged     : 1;
     bool smoothStatusChanged      : 1;
     bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
@@ -48,7 +46,6 @@ struct Surface3DChangeBitField {
     bool itemChanged              : 1;
 
     Surface3DChangeBitField() :
-        gradientColorChanged(false), // Set to false, as it is initially set in theme
         smoothStatusChanged(true),
         surfaceGridChanged(true),
         selectedPointChanged(true),
@@ -65,7 +62,6 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DControl
 private:
     Surface3DChangeBitField m_changeTracker;
     Surface3DRenderer *m_renderer;
-    QLinearGradient m_userDefinedGradient;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.
@@ -79,11 +75,6 @@ public:
 
     virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
-
-    void setGradient(const QLinearGradient &gradient);
-    QLinearGradient gradient() const;
-
-    void setGradientColorAt(qreal pos, const QColor &color);
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);

@@ -19,6 +19,8 @@
 #include "seriesrendercache_p.h"
 #include "objecthelper_p.h"
 #include "abstract3drenderer_p.h"
+#include "texturehelper_p.h"
+#include "utils_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -119,7 +121,50 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         }
     }
 
-    // TODO: Add other visual element extractions
+    if (seriesChanged || changeTracker.colorStyleChanged) {
+        m_colorStyle = series->colorStyle();
+        changeTracker.colorStyleChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.baseColorChanged) {
+        m_baseColor = Utils::vectorFromColor(series->baseColor());
+        changeTracker.baseColorChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.baseGradientChanged) {
+        renderer->fixGradient(&series->baseGradient(), &m_baseGradientTexture);
+        changeTracker.baseGradientChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.singleHighlightColorChanged) {
+        m_singleHighlightColor = Utils::vectorFromColor(series->singleHighlightColor());
+        changeTracker.singleHighlightColorChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.singleHighlightGradientChanged) {
+        renderer->fixGradient(&series->singleHighlightGradient(),
+                              &m_singleHighlightGradientTexture);
+        changeTracker.singleHighlightGradientChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.multiHighlightColorChanged) {
+        m_multiHighlightColor = Utils::vectorFromColor(series->multiHighlightColor());
+        changeTracker.multiHighlightColorChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.multiHighlightGradientChanged) {
+        renderer->fixGradient(&series->multiHighlightGradient(),
+                              &m_multiHighlightGradientTexture);
+        changeTracker.multiHighlightGradientChanged = false;
+    }
+}
+
+void SeriesRenderCache::cleanup(TextureHelper *texHelper)
+{
+    delete m_object;
+    texHelper->deleteTexture(&m_baseGradientTexture);
+    texHelper->deleteTexture(&m_singleHighlightGradientTexture);
+    texHelper->deleteTexture(&m_multiHighlightGradientTexture);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

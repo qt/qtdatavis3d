@@ -61,8 +61,6 @@ public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
-    Q_INVOKABLE void setBarColor(const QColor &baseColor); // TODO property (or more likely as part of data set)
-
     Q3DCategoryAxis *rowAxis() const;
     void setRowAxis(Q3DCategoryAxis *axis);
     Q3DValueAxis *valueAxis() const;
