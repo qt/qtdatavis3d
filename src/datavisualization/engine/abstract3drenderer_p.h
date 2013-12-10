@@ -123,7 +123,7 @@ public:
     virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
-    void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
+    void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.

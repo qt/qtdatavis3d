@@ -132,7 +132,8 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
     }
 
     if (seriesChanged || changeTracker.baseGradientChanged) {
-        renderer->fixGradient(&series->baseGradient(), &m_baseGradientTexture);
+        QLinearGradient gradient = series->baseGradient();
+        renderer->fixGradientAndGenerateTexture(&gradient, &m_baseGradientTexture);
         changeTracker.baseGradientChanged = false;
     }
 
@@ -142,8 +143,8 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
     }
 
     if (seriesChanged || changeTracker.singleHighlightGradientChanged) {
-        renderer->fixGradient(&series->singleHighlightGradient(),
-                              &m_singleHighlightGradientTexture);
+        QLinearGradient gradient = series->singleHighlightGradient();
+        renderer->fixGradientAndGenerateTexture(&gradient, &m_singleHighlightGradientTexture);
         changeTracker.singleHighlightGradientChanged = false;
     }
 
@@ -153,8 +154,8 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
     }
 
     if (seriesChanged || changeTracker.multiHighlightGradientChanged) {
-        renderer->fixGradient(&series->multiHighlightGradient(),
-                              &m_multiHighlightGradientTexture);
+        QLinearGradient gradient = series->multiHighlightGradient();
+        renderer->fixGradientAndGenerateTexture(&gradient, &m_multiHighlightGradientTexture);
         changeTracker.multiHighlightGradientChanged = false;
     }
 }

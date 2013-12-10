@@ -2189,7 +2189,7 @@ void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
         QLinearGradient newGradient;
         newGradient.setColorAt(0.0, newQColor);
         newGradient.setColorAt(1.0, newQColor);
-        fixGradient(&newGradient, &m_uniformGradientTexture);
+        fixGradientAndGenerateTexture(&newGradient, &m_uniformGradientTexture);
     }
 }
 #endif

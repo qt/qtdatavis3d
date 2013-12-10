@@ -928,10 +928,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             for (int row = startRow; row != stopRow; row += stepRow) {
                 for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
-                    if (!item.value()) {
-                        seriesPos += m_seriesStep;
+                    if (!item.value())
                         continue;
-                    }
 
                     if (item.height() < 0)
                         glCullFace(GL_FRONT);
