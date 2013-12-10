@@ -68,14 +68,14 @@ void ThemeManager::connectThemeSignals()
 {
     connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
             m_controller, &Abstract3DController::handleThemeColorStyleChanged);
-    connect(m_theme.data(), &Q3DTheme::baseColorChanged,
-            m_controller, &Abstract3DController::handleThemeBaseColorChanged);
+    connect(m_theme.data(), &Q3DTheme::baseColorsChanged,
+            m_controller, &Abstract3DController::handleThemeBaseColorsChanged);
     connect(m_theme.data(), &Q3DTheme::singleHighlightColorChanged,
             m_controller, &Abstract3DController::handleThemeSingleHighlightColorChanged);
     connect(m_theme.data(), &Q3DTheme::multiHighlightColorChanged,
             m_controller, &Abstract3DController::handleThemeMultiHighlightColorChanged);
-    connect(m_theme.data(), &Q3DTheme::baseGradientChanged,
-            m_controller, &Abstract3DController::handleThemeBaseGradientChanged);
+    connect(m_theme.data(), &Q3DTheme::baseGradientsChanged,
+            m_controller, &Abstract3DController::handleThemeBaseGradientsChanged);
     connect(m_theme.data(), &Q3DTheme::singleHighlightGradientChanged,
             m_controller, &Abstract3DController::handleThemeSingleHighlightGradientChanged);
     connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
@@ -92,14 +92,18 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     QColor color;
     QLinearGradient gradient;
 
+    // TODO: Add predefined colors & gradients to more than one series
+
     switch (type) {
     case Q3DTheme::ThemeQt: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0x80c342)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0x80c342)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
         setTextColor(QColor(QRgb(0x35322f)));
@@ -120,7 +124,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x42 * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0x80c342)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0x14 * 0.7);
         color.setGreen(0xaa * 0.7);
         color.setBlue(0xff * 0.7);
@@ -137,12 +143,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemePrimaryColors: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0xffe400)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0xffe400)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
         setTextColor(QColor(QRgb(0x000000)));
@@ -163,7 +171,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x00);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0xffe400)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0x27 * 0.7);
         color.setGreen(0xbe * 0.7);
         color.setBlue(0xee * 0.7);
@@ -180,12 +190,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeDigia: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0xcccccc)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0xcccccc)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0xffffff)));
         setWindowColor(QColor(QRgb(0xffffff)));
         setTextColor(QColor(QRgb(0x000000)));
@@ -206,7 +218,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0xcc * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0xcccccc)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0xfa * 0.7);
         color.setGreen(0x00);
         color.setBlue(0x00);
@@ -223,12 +237,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeStoneMoss: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0xbeb32b)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0xbeb32b)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0x4d4d4f)));
         setWindowColor(QColor(QRgb(0x4d4d4f)));
         setTextColor(QColor(QRgb(0xffffff)));
@@ -249,7 +265,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x2b * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0xbeb32b)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0xfb* 0.7);
         color.setGreen(0xf6 * 0.7);
         color.setBlue(0xd6 * 0.7);
@@ -266,12 +284,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeArmyBlue: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0x495f76)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0x495f76)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0xd5d6d7)));
         setWindowColor(QColor(QRgb(0xd5d6d7)));
         setTextColor(QColor(QRgb(0x000000)));
@@ -292,7 +312,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x76 * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0x495f76)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0x2a * 0.7);
         color.setGreen(0xa2 * 0.7);
         color.setBlue(0xf9 * 0.7);
@@ -309,12 +331,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeRetro: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0x533b23)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0x533b23)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0xe9e2ce)));
         setWindowColor(QColor(QRgb(0xe9e2ce)));
         setTextColor(QColor(QRgb(0x000000)));
@@ -335,7 +359,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x23 * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0x533b23)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0x8e * 0.7);
         color.setGreen(0xa3 * 0.7);
         color.setBlue(0x17 * 0.7);
@@ -352,12 +378,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeEbony: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0xffffff)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0xffffff)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0x000000)));
         setWindowColor(QColor(QRgb(0x000000)));
         setTextColor(QColor(QRgb(0xaeadac)));
@@ -378,7 +406,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0xff * 0.7);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0xffffff)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0xf5 * 0.7);
         color.setGreen(0xdc * 0.7);
         color.setBlue(0x0d * 0.7);
@@ -395,12 +425,14 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 
     case Q3DTheme::ThemeIsabelle: {
+        QList<QColor> baseColors;
+        baseColors.append(QColor(QRgb(0xf9d900)));
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
         setLabelBackgroundEnabled(true);
         setLightColor(Qt::white);
-        setBaseColor(QColor(QRgb(0xf9d900)));
+        setBaseColors(baseColors);
         setBackgroundColor(QColor(QRgb(0x000000)));
         setWindowColor(QColor(QRgb(0x000000)));
         setTextColor(QColor(QRgb(0xaeadac)));
@@ -421,7 +453,9 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         color.setBlue(0x00);
         gradient.setColorAt(0.0, color);
         gradient.setColorAt(1.0, QColor(QRgb(0xf9d900)));
-        setBaseGradient(gradient);
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(gradient);
+        setBaseGradients(baseGradients);
         color.setRed(0xff * 0.7);
         color.setGreen(0xf7 * 0.7);
         color.setBlue(0xcc * 0.7);
@@ -441,10 +475,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     }
 }
 
-void ThemeManager::setBaseColor(const QColor &color)
+void ThemeManager::setBaseColors(const QList<QColor> &colors)
 {
     if (!m_theme->d_ptr->m_dirtyBits.baseColorDirty)
-        m_theme->setBaseColor(color);
+        m_theme->setBaseColors(colors);
 }
 
 void ThemeManager::setBackgroundColor(const QColor &color)
@@ -495,10 +529,10 @@ void ThemeManager::setLightColor(const QColor &color)
         m_theme->setLightColor(color);
 }
 
-void ThemeManager::setBaseGradient(const QLinearGradient &gradient)
+void ThemeManager::setBaseGradients(const QList<QLinearGradient> &gradients)
 {
     if (!m_theme->d_ptr->m_dirtyBits.baseGradientDirty)
-        m_theme->setBaseGradient(gradient);
+        m_theme->setBaseGradients(gradients);
 }
 
 void ThemeManager::setSingleHighlightGradient(const QLinearGradient &gradient)

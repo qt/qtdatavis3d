@@ -51,16 +51,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *     \li Is the graph background drawn or not.
  *     \li true
  *   \row
- *     \li baseColor
- *     \li The color for the objects in the graph. The color in this property is used if colorStyle
- *         is ColorStyleUniform. This can be overridden by setting the baseColor explicitly in
- *         series.
- *     \li Qt::white
+ *     \li baseColors
+ *     \li List of colors for the objects in the graph. Colors are applied to series one by one.
+ *         If there are more series than colors, the color list is reused from the start.
+ *         The colors in this property are used if colorStyle is ColorStyleUniform. This can be
+ *         overridden by setting the baseColor explicitly in series.
+ *     \li Qt::black
  *   \row
- *     \li baseGradient
- *     \li The gradient for the objects in the graph. The gradient in this property is used if
- *         colorStyle is ColorStyleObjectGradient or ColorStyleRangeGradient. This can be overridden
- *         by setting the baseGradient explicitly in series.
+ *     \li baseGradients
+ *     \li List of gradients for the objects in the graph. Gradients are applied to series one by
+ *         one. If there are more series than gradients, the gradient list is reused from the start.
+ *         The gradients in this property are used if colorStyle is ColorStyleObjectGradient or
+ *         ColorStyleRangeGradient. This can be overridden by setting the baseGradient explicitly
+ *         in series.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li colorStyle
@@ -234,10 +237,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty Color Theme3D::baseColor
+ * \qmlproperty Color Theme3D::baseColors
  *
- * Color to be used for all the objects in the graph. Has no immediate effect if colorStyle is not
- * \c Theme3D.ColorStyleUniform.
+ * List of base colors to be used for all the objects in the graph, series by series. If there
+ * are more series than colors, color list wraps and starts again with the first color in the list.
+ * Has no immediate effect if colorStyle is not \c Theme3D.ColorStyleUniform.
  */
 
 /*!
@@ -293,10 +297,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty ColorGradient Theme3D::baseGradient
+ * \qmlproperty ColorGradient Theme3D::baseGradients
  *
- * Base gradient to be used for all the objects in the graph. Has no immediate effect if colorStyle
- * is \c Theme3D.ColorStyleUniform.
+ * List of base gradients to be used for all the objects in the graph, series by series. If there
+ * are more series than gradients, gradient list wraps and starts again with the first gradient in
+ * the list
+ * Has no immediate effect if colorStyle is \c Theme3D.ColorStyleUniform.
  */
 
 /*!
@@ -413,25 +419,30 @@ Q3DTheme::~Q3DTheme()
 }
 
 // TODO: Add needRenders if necessary after color api has been added to series (QTRD-2200/2557)
-// TODO: Basecolors as a list, containing one for each series?
 /*!
- * \property Q3DTheme::baseColor
+ * \property Q3DTheme::baseColors
  *
- * Color to be used for all the objects in the graph. Has no immediate effect if colorStyle is not
- * ColorStyleUniform.
+ * List of base colors to be used for all the objects in the graph, series by series. If there
+ * are more series than colors, color list wraps and starts again with the first color in the list.
+ * Has no immediate effect if colorStyle is not ColorStyleUniform.
  */
-void Q3DTheme::setBaseColor(const QColor &color)
+void Q3DTheme::setBaseColors(const QList<QColor> &colors)
 {
-    d_ptr->m_dirtyBits.baseColorDirty = true;
-    if (d_ptr->m_baseColor != color) {
-        d_ptr->m_baseColor = color;
-        emit baseColorChanged(color);
+    if (colors.size()) {
+        d_ptr->m_dirtyBits.baseColorDirty = true;
+        if (d_ptr->m_baseColors != colors) {
+            d_ptr->m_baseColors.clear();
+            d_ptr->m_baseColors = colors;
+            emit baseColorsChanged(colors);
+        }
+    } else {
+        d_ptr->m_baseColors.clear();
     }
 }
 
-QColor Q3DTheme::baseColor() const
+QList<QColor> Q3DTheme::baseColors() const
 {
-    return d_ptr->m_baseColor;
+    return d_ptr->m_baseColors;
 }
 
 /*!
@@ -596,25 +607,31 @@ QColor Q3DTheme::lightColor() const
     return d_ptr->m_lightColor;
 }
 
-// TODO: Surfacegradients as a list, containing one for each series?
 /*!
- * \property Q3DTheme::baseGradient
+ * \property Q3DTheme::baseGradients
  *
- * Base gradient to be used for all the objects in the graph. Has no immediate effect if colorStyle
- * is ColorStyleUniform.
+ * List of base gradients to be used for all the objects in the graph, series by series. If there
+ * are more series than gradients, gradient list wraps and starts again with the first gradient in
+ * the list
+ * Has no immediate effect if colorStyle is ColorStyleUniform.
  */
-void Q3DTheme::setBaseGradient(const QLinearGradient &gradient)
+void Q3DTheme::setBaseGradients(const QList<QLinearGradient> &gradients)
 {
-    d_ptr->m_dirtyBits.baseGradientDirty = true;
-    if (d_ptr->m_baseGradient != gradient) {
-        d_ptr->m_baseGradient = gradient;
-        emit baseGradientChanged(gradient);
+    if (gradients.size()) {
+        d_ptr->m_dirtyBits.baseGradientDirty = true;
+        if (d_ptr->m_baseGradients != gradients) {
+            d_ptr->m_baseGradients.clear();
+            d_ptr->m_baseGradients = gradients;
+            emit baseGradientsChanged(gradients);
+        }
+    } else {
+        d_ptr->m_baseGradients.clear();
     }
 }
 
-QLinearGradient Q3DTheme::baseGradient() const
+QList<QLinearGradient> Q3DTheme::baseGradients() const
 {
-    return d_ptr->m_baseGradient;
+    return d_ptr->m_baseGradients;
 }
 
 /*!
@@ -867,7 +884,6 @@ Q3DTheme::Theme Q3DTheme::type() const
 Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
     : QObject(0),
       m_themeId(theme_id),
-      m_baseColor(Qt::white),
       m_backgroundColor(Qt::black),
       m_windowColor(Qt::black),
       m_textColor(Qt::white),
@@ -876,9 +892,6 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
       m_singleHighlightColor(Qt::red),
       m_multiHighlightColor(Qt::blue),
       m_lightColor(Qt::white),
-      m_baseGradient(QLinearGradient(qreal(gradientTextureWidth),
-                                     qreal(gradientTextureHeight),
-                                     0.0, 0.0)),
       m_singleHighlightGradient(QLinearGradient(qreal(gradientTextureWidth),
                                                 qreal(gradientTextureHeight),
                                                 0.0, 0.0)),
@@ -896,6 +909,10 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
       m_labelBackground(true),
       q_ptr(q)
 {
+    m_baseColors.append(QColor(Qt::black));
+    m_baseGradients.append(QLinearGradient(qreal(gradientTextureWidth),
+                                           qreal(gradientTextureHeight),
+                                           0.0, 0.0));
 }
 
 Q3DThemePrivate::~Q3DThemePrivate()
@@ -947,12 +964,12 @@ bool Q3DThemePrivate::sync(Q3DThemePrivate &other)
         changed = true;
     }
     if (m_dirtyBits.baseColorDirty) {
-        other.q_ptr->setBaseColor(m_baseColor);
+        other.q_ptr->setBaseColors(m_baseColors);
         m_dirtyBits.baseColorDirty = false;
         changed = true;
     }
     if (m_dirtyBits.baseGradientDirty) {
-        other.q_ptr->setBaseGradient(m_baseGradient);
+        other.q_ptr->setBaseGradients(m_baseGradients);
         m_dirtyBits.baseGradientDirty = false;
         changed = true;
     }

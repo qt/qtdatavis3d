@@ -474,26 +474,32 @@ void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle sty
     markSeriesVisualsDirty();
 }
 
-void Abstract3DController::handleThemeBaseColorChanged(const QColor &color)
+void Abstract3DController::handleThemeBaseColorsChanged(const QList<QColor> &colors)
 {
+    int colorIdx = 0;
     // Set value for series that have not explicitly set this value
     foreach (QAbstract3DSeries *series, m_seriesList) {
         if (!series->d_ptr->m_themeTracker.baseColorOverride) {
-            series->setBaseColor(color);
+            series->setBaseColor(colors.at(colorIdx));
             series->d_ptr->m_themeTracker.baseColorOverride = false;
         }
+        if (++colorIdx >= colors.size())
+            colorIdx = 0;
     }
     markSeriesVisualsDirty();
 }
 
-void Abstract3DController::handleThemeBaseGradientChanged(const QLinearGradient &gradient)
+void Abstract3DController::handleThemeBaseGradientsChanged(const QList<QLinearGradient> &gradients)
 {
+    int gradientIdx = 0;
     // Set value for series that have not explicitly set this value
     foreach (QAbstract3DSeries *series, m_seriesList) {
         if (!series->d_ptr->m_themeTracker.baseGradientOverride) {
-            series->setBaseGradient(gradient);
+            series->setBaseGradient(gradients.at(gradientIdx));
             series->d_ptr->m_themeTracker.baseGradientOverride = false;
         }
+        if (++gradientIdx >= gradients.size())
+            gradientIdx = 0;
     }
     markSeriesVisualsDirty();
 }

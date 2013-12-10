@@ -2179,6 +2179,7 @@ void Surface3DRenderer::updateDepthBuffer()
             lowerShadowQuality();
     }
 }
+#endif
 
 void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
 {
@@ -2192,6 +2193,5 @@ void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
         fixGradientAndGenerateTexture(&newGradient, &m_uniformGradientTexture);
     }
 }
-#endif
 
 QT_DATAVISUALIZATION_END_NAMESPACE

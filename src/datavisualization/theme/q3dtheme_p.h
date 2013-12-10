@@ -105,7 +105,7 @@ public:
 
     Q3DThemeDirtyBitField m_dirtyBits;
 
-    QColor m_baseColor;
+    QList<QColor> m_baseColors;
     QColor m_backgroundColor;
     QColor m_windowColor;
     QColor m_textColor;
@@ -114,7 +114,7 @@ public:
     QColor m_singleHighlightColor;
     QColor m_multiHighlightColor;
     QColor m_lightColor;
-    QLinearGradient m_baseGradient;
+    QList<QLinearGradient> m_baseGradients;
     QLinearGradient m_singleHighlightGradient;
     QLinearGradient m_multiHighlightGradient;
     float m_lightStrength;

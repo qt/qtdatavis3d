@@ -102,7 +102,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty Color Abstract3DSeries::baseColor
  *
  * Sets the base \c color of the series.
- * See \l{Theme3D::baseColor}{Theme3D.baseColor}
+ * See \l{Theme3D::baseColors}{Theme3D.baseColors}
  * documentation for more information.
  *
  * \sa colorStyle
@@ -112,7 +112,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty ColorGradient Abstract3DSeries::baseGradient
  *
  * Sets the base \c gradient of the series.
- * See \l{Theme3D::baseGradient}{Theme3D.baseGradient}
+ * See \l{Theme3D::baseGradients}{Theme3D.baseGradients}
  * documentation for more information.
  *
  * \sa colorStyle
@@ -628,19 +628,21 @@ void QAbstract3DSeriesPrivate::setMultiHighlightGradient(const QLinearGradient &
 
 void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force)
 {
-    // TODO: seriesIndex indicates which color from theme is required
-    Q_UNUSED(seriesIndex)
-
+    int themeIndex = seriesIndex;
     if (force || !m_themeTracker.colorStyleOverride) {
         q_ptr->setColorStyle(theme.colorStyle());
         m_themeTracker.colorStyleOverride = false;
     }
     if (force || !m_themeTracker.baseColorOverride) {
-        q_ptr->setBaseColor(theme.baseColor());
+        if (theme.baseColors().size() <= seriesIndex)
+            themeIndex = seriesIndex % theme.baseColors().size();
+        q_ptr->setBaseColor(theme.baseColors().at(themeIndex));
         m_themeTracker.baseColorOverride = false;
     }
     if (force || !m_themeTracker.baseGradientOverride) {
-        q_ptr->setBaseGradient(theme.baseGradient());
+        if (theme.baseGradients().size() <= seriesIndex)
+            themeIndex = seriesIndex % theme.baseGradients().size();
+        q_ptr->setBaseGradient(theme.baseGradients().at(themeIndex));
         m_themeTracker.baseGradientOverride = false;
     }
     if (force || !m_themeTracker.singleHighlightColorOverride) {

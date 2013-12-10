@@ -48,7 +48,7 @@ public:
 protected:
     void connectThemeSignals();
     void useTheme(Q3DTheme::Theme type);
-    void setBaseColor(const QColor &color);
+    void setBaseColors(const QList<QColor> &colors);
     void setBackgroundColor(const QColor &color);
     void setWindowColor(const QColor &color);
     void setTextColor(const QColor &color);
@@ -57,7 +57,7 @@ protected:
     void setSingleHighlightColor(const QColor &color);
     void setMultiHighlightColor(const QColor &color);
     void setLightColor(const QColor &color);
-    void setBaseGradient(const QLinearGradient &gradient);
+    void setBaseGradients(const QList<QLinearGradient> &gradients);
     void setSingleHighlightGradient(const QLinearGradient &gradient);
     void setMultiHighlightGradient(const QLinearGradient &gradient);
     void setLightStrength(float strength);

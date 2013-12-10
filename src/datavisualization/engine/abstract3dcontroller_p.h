@@ -262,8 +262,8 @@ public slots:
     void handlePixelRatioChanged(float ratio);
 
     void handleThemeColorStyleChanged(Q3DTheme::ColorStyle style);
-    void handleThemeBaseColorChanged(const QColor &color);
-    void handleThemeBaseGradientChanged(const QLinearGradient &gradient);
+    void handleThemeBaseColorsChanged(const QList<QColor> &color);
+    void handleThemeBaseGradientsChanged(const QList<QLinearGradient> &gradient);
     void handleThemeSingleHighlightColorChanged(const QColor &color);
     void handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient);
     void handleThemeMultiHighlightColorChanged(const QColor &color);

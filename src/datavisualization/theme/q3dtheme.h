@@ -34,7 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_ENUMS(ColorStyle)
     Q_ENUMS(Theme)
     Q_PROPERTY(Theme type READ type WRITE setType NOTIFY typeChanged)
-    Q_PROPERTY(QColor baseColor READ baseColor WRITE setBaseColor NOTIFY baseColorChanged)
+    Q_PROPERTY(QList<QColor> baseColors READ baseColors WRITE setBaseColors NOTIFY baseColorsChanged)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
     Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor NOTIFY windowColorChanged)
     Q_PROPERTY(QColor labelTextColor READ labelTextColor WRITE setLabelTextColor NOTIFY labelTextColorChanged)
@@ -43,7 +43,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
     Q_PROPERTY(QColor lightColor READ lightColor WRITE setLightColor NOTIFY lightColorChanged) // TODO: Not used yet
-    Q_PROPERTY(QLinearGradient baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
+    Q_PROPERTY(QList<QLinearGradient> baseGradients READ baseGradients WRITE setBaseGradients NOTIFY baseGradientsChanged)
     Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_PROPERTY(float lightStrength READ lightStrength WRITE setLightStrength NOTIFY lightStrengthChanged)
@@ -84,8 +84,8 @@ public:
     void setType(Theme themeType);
     Theme type() const;
 
-    void setBaseColor(const QColor &color);
-    QColor baseColor() const;
+    void setBaseColors(const QList<QColor> &colors);
+    QList<QColor> baseColors() const;
 
     void setBackgroundColor(const QColor &color);
     QColor backgroundColor() const;
@@ -111,8 +111,8 @@ public:
     void setLightColor(const QColor &color);
     QColor lightColor() const;
 
-    void setBaseGradient(const QLinearGradient &gradient);
-    QLinearGradient baseGradient() const;
+    void setBaseGradients(const QList<QLinearGradient> &gradients);
+    QList<QLinearGradient> baseGradients() const;
 
     void setSingleHighlightGradient(const QLinearGradient &gradient);
     QLinearGradient singleHighlightGradient() const;
@@ -149,7 +149,7 @@ public:
 
 signals:
     void typeChanged(Theme themeType);
-    void baseColorChanged(QColor color);
+    void baseColorsChanged(QList<QColor> colors);
     void backgroundColorChanged(QColor color);
     void windowColorChanged(QColor color);
     void labelTextColorChanged(QColor color);
@@ -158,7 +158,7 @@ signals:
     void singleHighlightColorChanged(QColor color);
     void multiHighlightColorChanged(QColor color);
     void lightColorChanged(QColor color);
-    void baseGradientChanged(QLinearGradient gradient);
+    void baseGradientsChanged(QList<QLinearGradient> gradients);
     void singleHighlightGradientChanged(QLinearGradient gradient);
     void multiHighlightGradientChanged(QLinearGradient gradient);
     void lightStrengthChanged(float strength);

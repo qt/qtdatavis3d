@@ -736,7 +736,9 @@ void GraphModifier::useOwnTheme()
     theme->setGridEnabled(true);
     theme->setAmbientLightStrength(0.3f);
     theme->setBackgroundColor(QColor(QRgb(0x99ca53)));
-    theme->setBaseColor(QColor(QRgb(0x209fdf)));
+    QList<QColor> colors;
+    colors.append(QColor(QRgb(0x209fdf)));
+    theme->setBaseColors(colors);
     theme->setColorStyle(Q3DTheme::ColorStyleUniform);
     theme->setGridLineColor(QColor(QRgb(0x99ca53)));
     theme->setHighlightLightStrength(7.0f);
@@ -758,7 +760,9 @@ void GraphModifier::useOwnTheme()
 void GraphModifier::changeBaseColor(const QColor &color)
 {
     qDebug() << "base color changed to" << color;
-    m_graph->theme()->setBaseColor(color);
+    QList<QColor> colors;
+    colors.append(color);
+    m_graph->theme()->setBaseColors(colors);
 }
 
 void GraphModifier::setGradient()
@@ -787,7 +791,9 @@ void GraphModifier::setGradient()
     multiHighlightGradient.setColorAt(0.25, Qt::darkYellow);
     multiHighlightGradient.setColorAt(0.0, Qt::darkGray);
 
-    m_graph->theme()->setBaseGradient(barGradient);
+    QList<QLinearGradient> barGradients;
+    barGradients.append(barGradient);
+    m_graph->theme()->setBaseGradients(barGradients);
     m_graph->theme()->setSingleHighlightGradient(singleHighlightGradient);
     m_graph->theme()->setMultiHighlightGradient(multiHighlightGradient);
 

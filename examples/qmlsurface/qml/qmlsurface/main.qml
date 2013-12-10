@@ -54,7 +54,7 @@ Item {
                 font.family: "STCaiyun"
                 font.pointSize: 35
                 colorStyle: Theme3D.ColorStyleRangeGradient
-                baseGradient: surfaceGradient
+                baseGradients: [surfaceGradient]
             }
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow

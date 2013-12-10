@@ -41,6 +41,7 @@
 #include "q3dtheme.h"
 #include "declarativetheme_p.h"
 #include "qabstract3dinputhandler.h"
+#include "declarativecolor_p.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -82,6 +83,8 @@ QML_DECLARE_TYPE(DeclarativeSurface3DSeries)
 
 QML_DECLARE_TYPE(ColorGradientStop)
 QML_DECLARE_TYPE(ColorGradient)
+
+QML_DECLARE_TYPE(DeclarativeColor)
 
 QML_DECLARE_TYPE(Q3DTheme)
 QML_DECLARE_TYPE(DeclarativeTheme3D)
