@@ -52,7 +52,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_cachedRowCount(0),
       m_cachedColumnCount(0),
       m_selectedBar(0),
-      m_sliceSelection(0),
       m_sliceCache(0),
       m_sliceTitleItem(0),
       m_xFlipped(false),
@@ -106,10 +105,7 @@ Bars3DRenderer::~Bars3DRenderer()
     m_textureHelper->deleteTexture(&m_selectionTexture);
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
-    if (m_sliceSelection) {
-        m_sliceSelection->clear(); // Slice doesn't own its items
-        delete m_sliceSelection;
-    }
+
     delete m_barShader;
     delete m_barGradientShader;
     delete m_depthShader;
@@ -175,8 +171,7 @@ void Bars3DRenderer::updateData()
         // Force update for selection related items
         m_sliceCache = 0;
         m_sliceTitleItem = 0;
-        if (m_sliceSelection)
-            m_sliceSelection->clear();
+        m_sliceSelection.clear();
 
         m_cachedColumnCount = newColumns;
         m_cachedRowCount = newRows;
@@ -242,12 +237,6 @@ void Bars3DRenderer::updateData()
             dataRowIndex++;
         }
     }
-
-    m_renderColumns = updateSize;
-    if (m_renderingArrays.size())
-        m_renderRows = qMin((maxDataRowCount - minRow), newRows);
-    else
-        m_renderRows = 0;
 
     // Reset selected bar to update selection
     updateSelectedBar(m_selectedBarPos, m_selectedBarSeries);
@@ -493,9 +482,9 @@ void Bars3DRenderer::drawSlicedScene()
     const SeriesRenderCache *currentSeries = 0;
     bool colorStyleIsUniform = true;
 
-    int stopBar = m_sliceSelection->size();
-    for (int bar = 0; bar < stopBar; bar++) {
-        BarRenderItem *item = m_sliceSelection->at(bar);
+    int sliceItemCount = m_sliceSelection.size();
+    for (int bar = 0; bar < sliceItemCount; bar++) {
+        BarRenderItem *item = m_sliceSelection.at(bar);
         if (!item)
             continue;
 
@@ -615,15 +604,18 @@ void Bars3DRenderer::drawSlicedScene()
     QVector3D sliceValueRotation(0.0f, 0.0f, 90.0f);
     QVector3D sliceLabelRotation(0.0f, 0.0f, -45.0f);
 
-    // Labels in axis caches can be in inverted order depending in orientation
-    bool flipped = (m_xFlipped && rowMode) || (m_zFlipped && !rowMode);
+    for (int col = 0; col < sliceItemCount; col++) {
+        BarRenderItem *item = m_sliceSelection.at(col);
 
-    for (int col = 0; col < stopBar; col++) {
-        BarRenderItem *item = m_sliceSelection->at(col);
         // TODO: Make user controllable (QTRD-2546)
         if (!sliceGridLabels) {
             // Draw values
             if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0f)) {
+                // Create label texture if we need it
+                if (item->sliceLabel().isNull()) {
+                    item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(), item->value()));
+                    m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
+                }
                 m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
                                     valuePositionComp, sliceValueRotation, item->height(),
                                     m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
@@ -636,6 +628,11 @@ void Bars3DRenderer::drawSlicedScene()
             if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                     && m_visualSelectedBarPos.y() == item->position().y()
                     && item->seriesIndex() == m_visualSelectedBarSeriesIndex) {
+                // Create label texture if we need it
+                if (item->sliceLabel().isNull()) {
+                    item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(), item->value()));
+                    m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
+                }
                 m_drawer->drawLabel(*item, item->sliceLabelItem(), viewMatrix, projectionMatrix,
                                     valuePositionComp, sliceValueRotation, item->height(),
                                     m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
@@ -644,21 +641,17 @@ void Bars3DRenderer::drawSlicedScene()
         }
     }
 
-    int labelCount = m_sliceCache->labelItems().size();
+    int lastLabel = m_sliceCache->labelItems().size() - 1;
     int seriesCount = 1;
     if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
         seriesCount = m_visibleSeriesList.size();
-    int adjustment = flipped ? (m_sliceSelection->size() - (labelCount * seriesCount)) : 0;
 
-    for (int labelNo = 0; labelNo < labelCount; labelNo++) {
+    for (int labelNo = 0; labelNo <= lastLabel; labelNo++) {
         // Get labels from first series only
-        // Adjustment is used in flipped cases to fix label positioning in cases when there are
-        // more actual data rows in the slice than labeled rows
-        BarRenderItem *item = m_sliceSelection->at(labelNo * seriesCount + adjustment);
+        BarRenderItem *item = m_sliceSelection.at(labelNo);
         // TODO: Make user controllable (QTRD-2546)
         // Draw labels
-        int labelIndex = flipped ? m_sliceCache->labelItems().size() - 1 - labelNo : labelNo;
-        m_drawer->drawLabel(*item, *m_sliceCache->labelItems().at(labelIndex), viewMatrix,
+        m_drawer->drawLabel(*item, *m_sliceCache->labelItems().at(labelNo), viewMatrix,
                             projectionMatrix, positionComp, sliceLabelRotation,
                             item->height(), m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelBelow,
@@ -1048,27 +1041,24 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         previousColorStyle = Q3DTheme::ColorStyleRangeGradient;
     }
 
-    if (m_selectionDirty) {
-        if (m_cachedIsSlicingActivated) {
-            if (m_sliceSelection && m_sliceSelection->size()) {
-                // Slice doesn't own its items, no need to delete them - just clear
-                m_sliceSelection->clear();
-                int reserveAmount = 0;
-                if (rowMode)
-                    reserveAmount = m_renderColumns;
-                else
-                    reserveAmount = m_renderRows;
-                if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
-                    reserveAmount *= m_visibleSeriesList.size();
-                m_sliceSelection->reserve(reserveAmount);
-            }
-            // Set slice cache, i.e. axis cache from where slice labels are taken
-            if (rowMode)
-                m_sliceCache = &m_axisCacheX;
-            else
-                m_sliceCache = &m_axisCacheZ;
-            m_sliceTitleItem = 0;
-        }
+    if (m_selectionDirty && m_cachedIsSlicingActivated) {
+        // Slice doesn't own its items, no need to delete them - just clear
+        m_sliceSelection.clear();
+        int reserveAmount;
+        if (rowMode)
+            reserveAmount = m_cachedColumnCount;
+        else
+            reserveAmount = m_cachedRowCount;
+        if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+            reserveAmount *= m_visibleSeriesList.size();
+        m_sliceSelection.resize(reserveAmount);
+
+        // Set slice cache, i.e. axis cache from where slice labels are taken
+        if (rowMode)
+            m_sliceCache = &m_axisCacheX;
+        else
+            m_sliceCache = &m_axisCacheZ;
+        m_sliceTitleItem = 0;
     }
 
     // Draw bars
@@ -1115,6 +1105,16 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         previousColorStyle = colorStyle;
+        int sliceSeriesAdjust = 0;
+        if (m_selectionDirty && m_cachedIsSlicingActivated) {
+            int seriesMultiplier = 0;
+            if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+                seriesMultiplier = series;
+            if (rowMode)
+                sliceSeriesAdjust = seriesMultiplier * m_cachedColumnCount;
+            else
+                sliceSeriesAdjust = seriesMultiplier * m_cachedRowCount;
+        }
 
         for (int row = startRow; row != stopRow; row += stepRow) {
             for (int bar = startBar; bar != stopBar; bar += stepBar) {
@@ -1178,8 +1178,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             item.setTranslation(translation);
                             item.setPosition(QPoint(row, bar));
                             item.setSeriesIndex(series);
-                            m_sliceSelection->append(&item);
-                            barSelectionFound = true;
+                            if (rowMode)
+                                m_sliceSelection[sliceSeriesAdjust + bar] = &item;
+                            else
+                                m_sliceSelection[sliceSeriesAdjust + row] = &item;
                         }
                         break;
                     }
@@ -1195,11 +1197,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         if (m_cachedIsSlicingActivated) {
                             item.setTranslation(modelMatrix.column(3).toVector3D());
                             item.setPosition(QPoint(row, bar));
-                            if (m_selectionDirty && bar < m_renderColumns) {
+                            if (m_selectionDirty) {
                                 item.setSeriesIndex(series);
                                 if (!m_sliceTitleItem && m_axisCacheZ.labelItems().size() > row)
                                     m_sliceTitleItem = m_axisCacheZ.labelItems().at(row);
-                                m_sliceSelection->append(&item);
+                                m_sliceSelection[sliceSeriesAdjust + bar] = &item;
                             }
                         }
                         break;
@@ -1222,11 +1224,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             }
                             item.setTranslation(translation);
                             item.setPosition(QPoint(row, bar));
-                            if (m_selectionDirty && row < m_renderRows) {
+                            if (m_selectionDirty) {
                                 item.setSeriesIndex(series);
                                 if (!m_sliceTitleItem && m_axisCacheX.labelItems().size() > bar)
                                     m_sliceTitleItem = m_axisCacheX.labelItems().at(bar);
-                                m_sliceSelection->append(&item);
+                                m_sliceSelection[sliceSeriesAdjust + row] = &item;
                             }
                         }
                         break;
@@ -1771,16 +1773,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    // Handle slice and bar label generation
-    if (m_cachedIsSlicingActivated && m_selectionDirty) {
-        // Create label textures
-        for (int col = 0; col < m_sliceSelection->size(); col++) {
-            BarRenderItem *item = m_sliceSelection->at(col);
-            if (item->sliceLabel().isNull())
-                item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(), item->value()));
-            m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
-        }
-    } else if (barSelectionFound) {
+    // Handle selected bar label generation
+    if (barSelectionFound) {
         // Print value of selected bar
         glDisable(GL_DEPTH_TEST);
         // Draw the selection label
@@ -2118,9 +2112,6 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
         return;
 
     m_cachedIsSlicingActivated = isSlicing;
-
-    if (m_cachedIsSlicingActivated && !m_sliceSelection)
-        m_sliceSelection = new QList<BarRenderItem *>;
 
     setViewPorts();
 

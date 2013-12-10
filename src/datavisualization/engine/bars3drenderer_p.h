@@ -60,7 +60,7 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    QList<BarRenderItem *> *m_sliceSelection;
+    QVector<BarRenderItem *> m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     bool m_xFlipped;
@@ -98,8 +98,6 @@ private:
     GLfloat m_maxSceneSize;
     QPoint m_visualSelectedBarPos;
     int m_visualSelectedBarSeriesIndex;
-    int m_renderRows;
-    int m_renderColumns;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedBarPos;
     const QBar3DSeries *m_selectedBarSeries;
