@@ -179,12 +179,17 @@ void ScatterDataModifier::changeFont(const QFont &font)
     m_chart->theme()->setFont(newFont);
 }
 
-void ScatterDataModifier::changeFontSize(int fontsize)
+void ScatterDataModifier::changeFontSize(int fontSize)
 {
-    m_fontSize = fontsize;
+    m_fontSize = fontSize;
     QFont font = m_chart->theme()->font();
     font.setPointSize(m_fontSize);
     m_chart->theme()->setFont(font);
+}
+
+void ScatterDataModifier::changePointSize(int pointSize)
+{
+    m_targetSeries->setItemSize(0.01f *  float(pointSize));
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)

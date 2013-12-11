@@ -41,7 +41,8 @@ public:
     void changeTheme();
     void changeLabelStyle();
     void changeFont(const QFont &font);
-    void changeFontSize(int fontsize);
+    void changeFontSize(int fontSize);
+    void changePointSize(int pointSize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void start();

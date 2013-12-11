@@ -239,33 +239,110 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
 
 void Scatter3DController::adjustValueAxisRange()
 {
-    QVector3D minLimits;
-    QVector3D maxLimits;
-    if (m_seriesList.size()) {
-        const QScatterDataProxy *proxy = static_cast<QScatter3DSeries *>(m_seriesList.at(0))->dataProxy();
-        proxy->dptrc()->limitValues(minLimits, maxLimits);
-        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.x() != maxLimits.x())
-                valueAxis->dptr()->setRange(minLimits.x(), maxLimits.x());
-            else
-                valueAxis->dptr()->setRange(minLimits.x() - 1.0f, minLimits.x() + 1.0f); // Default to a valid range
+    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
+    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
+    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
+    bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
+    bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
+
+    if (adjustX || adjustY || adjustZ) {
+        float minValueX = 0.0f;
+        float maxValueX = 0.0f;
+        float minValueY = 0.0f;
+        float maxValueY = 0.0f;
+        float minValueZ = 0.0f;
+        float maxValueZ = 0.0f;
+        int seriesCount = m_seriesList.size();
+        for (int series = 0; series < seriesCount; series++) {
+            const QScatter3DSeries *scatterSeries =
+                    static_cast<QScatter3DSeries *>(m_seriesList.at(series));
+            const QScatterDataProxy *proxy = scatterSeries->dataProxy();
+            if (scatterSeries->isVisible() && proxy) {
+                QVector3D minLimits;
+                QVector3D maxLimits;
+                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                if (adjustX) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueX = minLimits.x();
+                        maxValueX = maxLimits.x();
+                    } else {
+                        minValueX = qMin(minValueX, minLimits.x());
+                        maxValueX = qMax(maxValueX, maxLimits.x());
+                    }
+                }
+                if (adjustY) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueY = minLimits.y();
+                        maxValueY = maxLimits.y();
+                    } else {
+                        minValueY = qMin(minValueY, minLimits.y());
+                        maxValueY = qMax(maxValueY, maxLimits.y());
+                    }
+                }
+                if (adjustZ) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueZ = minLimits.z();
+                        maxValueZ = maxLimits.z();
+                    } else {
+                        minValueZ = qMin(minValueZ, minLimits.z());
+                        maxValueZ = qMax(maxValueZ, maxLimits.z());
+                    }
+                }
+            }
         }
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.y() != maxLimits.y())
-                valueAxis->dptr()->setRange(minLimits.y(), maxLimits.y());
-            else
-                valueAxis->dptr()->setRange(minLimits.y() - 1.0f, minLimits.y() + 1.0f); // Default to a valid range
-        }
+        static const float adjustmentRatio = 20.0f;
+        static const float defaultAdjustment = 1.0f;
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.z() != maxLimits.z())
-                valueAxis->dptr()->setRange(minLimits.z(), maxLimits.z());
-            else
-                valueAxis->dptr()->setRange(minLimits.z() - 1.0f, minLimits.z() + 1.0f); // Default to a valid range
+        if (adjustX) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueX == maxValueX) {
+                if (adjustZ) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueZ == maxValueZ)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueZ - minValueZ) / adjustmentRatio;
+                } else {
+                    if (valueAxisZ)
+                        adjustment = qAbs(valueAxisZ->max() - valueAxisZ->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment);
+        }
+        if (adjustY) {
+            // If all points at same coordinate, need to default to some valid range
+            // Y-axis unit is not dependent on other axes, so simply adjust +-1.0f
+            float adjustment = 0.0f;
+            if (minValueY == maxValueY)
+                adjustment = defaultAdjustment;
+            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment);
+        }
+        if (adjustZ) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueZ == maxValueZ) {
+                if (adjustX) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueX == maxValueX)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueX - minValueX) / adjustmentRatio;
+                } else {
+                    if (valueAxisX)
+                        adjustment = qAbs(valueAxisX->max() - valueAxisX->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment);
         }
     }
 }

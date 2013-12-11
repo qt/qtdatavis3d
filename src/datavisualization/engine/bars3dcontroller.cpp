@@ -385,92 +385,90 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
 void Bars3DController::adjustAxisRanges()
 {
-    int seriesCount = m_seriesList.size();
-    if (seriesCount) {
-        Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
-        Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
-        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
+    Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
+    Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
+    Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
 
-        bool adjustZ = (categoryAxisZ && categoryAxisZ->isAutoAdjustRange());
-        bool adjustX = (categoryAxisX && categoryAxisX->isAutoAdjustRange());
-        bool adjustY = (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange());
+    bool adjustZ = (categoryAxisZ && categoryAxisZ->isAutoAdjustRange());
+    bool adjustX = (categoryAxisX && categoryAxisX->isAutoAdjustRange());
+    bool adjustY = (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange());
 
-        if (adjustZ || adjustX || adjustY) {
-            int maxRowCount = 1;
-            int maxColumnCount = 1;
-            float minValue = 0.0f;
-            float maxValue = 0.0f;
+    if (adjustZ || adjustX || adjustY) {
+        int maxRowCount = 1;
+        int maxColumnCount = 1;
+        float minValue = 0.0f;
+        float maxValue = 0.0f;
 
-            // First figure out row and column counts
-            if (adjustZ || adjustX) {
-                for (int series = 0; series < seriesCount; series++) {
-                    const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
-                    if (barSeries->isVisible()) {
-                        const QBarDataProxy *proxy = barSeries->dataProxy();
+        // First figure out row and column counts
+        int seriesCount = m_seriesList.size();
+        if (adjustZ || adjustX) {
+            for (int series = 0; series < seriesCount; series++) {
+                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                if (barSeries->isVisible()) {
+                    const QBarDataProxy *proxy = barSeries->dataProxy();
 
-                        if (adjustZ && proxy) {
-                            int rowCount = proxy->rowCount();
-                            if (rowCount)
-                                rowCount--;
+                    if (adjustZ && proxy) {
+                        int rowCount = proxy->rowCount();
+                        if (rowCount)
+                            rowCount--;
 
-                            maxRowCount = qMax(maxRowCount, rowCount);
+                        maxRowCount = qMax(maxRowCount, rowCount);
+                    }
+
+                    if (adjustX && proxy) {
+                        const QBarDataArray *array = proxy->array();
+                        int columnCount = 0;
+                        for (int i = 0; i < array->size(); i++) {
+                            if (columnCount < array->at(i)->size())
+                                columnCount = array->at(i)->size();
                         }
+                        if (columnCount)
+                            columnCount--;
 
-                        if (adjustX && proxy) {
-                            const QBarDataArray *array = proxy->array();
-                            int columnCount = 0;
-                            for (int i = 0; i < array->size(); i++) {
-                                if (columnCount < array->at(i)->size())
-                                    columnCount = array->at(i)->size();
-                            }
-                            if (columnCount)
-                                columnCount--;
+                        maxColumnCount = qMax(maxColumnCount, columnCount);
+                    }
+                }
+            }
+            // Call private implementations of setRange to avoid unsetting auto adjust flag
+            if (adjustZ)
+                categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount));
+            if (adjustX)
+                categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount));
+        }
 
-                            maxColumnCount = qMax(maxColumnCount, columnCount);
+        // Now that we know the row and column ranges, figure out the value axis range
+        if (adjustY) {
+            for (int series = 0; series < seriesCount; series++) {
+                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                if (barSeries->isVisible()) {
+                    const QBarDataProxy *proxy = barSeries->dataProxy();
+                    if (adjustY && proxy) {
+                        QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisZ->min(),
+                                                                                     categoryAxisZ->max(),
+                                                                                     categoryAxisX->min(),
+                                                                                     categoryAxisX->max());
+                        if (!series) {
+                            // First series initializes the values
+                            minValue = limits.first;
+                            maxValue = limits.second;
+                        } else {
+                            minValue = qMin(minValue, limits.first);
+                            maxValue = qMax(maxValue, limits.second);
                         }
                     }
                 }
-                // Call private implementations of setRange to avoid unsetting auto adjust flag
-                if (adjustZ)
-                    categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount));
-                if (adjustX)
-                    categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount));
             }
 
-            // Now that we know the row and column ranges, figure out the value axis range
-            if (adjustY) {
-                for (int series = 0; series < seriesCount; series++) {
-                    const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
-                    if (barSeries->isVisible()) {
-                        const QBarDataProxy *proxy = barSeries->dataProxy();
-                        if (adjustY && proxy) {
-                            QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisZ->min(),
-                                                                                         categoryAxisZ->max(),
-                                                                                         categoryAxisX->min(),
-                                                                                         categoryAxisX->max());
-                            if (!series) {
-                                // First series initializes the values
-                                minValue = limits.first;
-                                maxValue = limits.second;
-                            } else {
-                                minValue = qMin(minValue, limits.first);
-                                maxValue = qMax(maxValue, limits.second);
-                            }
-                        }
-                    }
-                }
-
-                if (maxValue < 0.0f)
-                    maxValue = 0.0f;
-                if (minValue > 0.0f)
-                    minValue = 0.0f;
-                if (minValue == 0.0f && maxValue == 0.0f) {
-                    // Only zero value values in data set, set range to something.
-                    minValue = 0.0f;
-                    maxValue = 1.0f;
-                }
-                valueAxis->dptr()->setRange(minValue, maxValue);
+            if (maxValue < 0.0f)
+                maxValue = 0.0f;
+            if (minValue > 0.0f)
+                minValue = 0.0f;
+            if (minValue == 0.0f && maxValue == 0.0f) {
+                // Only zero value values in data set, set range to something.
+                minValue = 0.0f;
+                maxValue = 1.0f;
             }
+            valueAxis->dptr()->setRange(minValue, maxValue);
         }
     }
 }

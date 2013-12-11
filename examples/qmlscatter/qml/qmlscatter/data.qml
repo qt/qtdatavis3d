@@ -1064,16 +1064,16 @@ Item {
         ListElement{ xPos: 8.0; yPos: -2.0; zPos: 4.0 }
         ListElement{ xPos: 7.8; yPos: -2.2; zPos: 5.0 }
         ListElement{ xPos: 7.6; yPos: -2.4; zPos: 4.5 }
-        ListElement{ xPos: 7.4; yPos: -2.6; zPos: 3.8 }
+        ListElement{ xPos: 9.4; yPos: -2.6; zPos: 3.8 }
         ListElement{ xPos: 7.2; yPos: -2.8; zPos: 4.8 }
-        ListElement{ xPos: 7.0; yPos: -2.3; zPos: 4.1 }
+        ListElement{ xPos: 9.0; yPos: -2.3; zPos: 4.1 }
         ListElement{ xPos: 6.9; yPos: -3.3; zPos: 4.9 }
         ListElement{ xPos: 6.7; yPos: -3.5; zPos: 3.5 }
         ListElement{ xPos: 6.5; yPos: -3.7; zPos: 3.3 }
         ListElement{ xPos: 6.3; yPos: -3.4; zPos: 3.7 }
         ListElement{ xPos: 7.9 ; yPos: -3.32 ; zPos: 2.48 }
         ListElement{ xPos: 6.2 ; yPos: -4.04 ; zPos: 3.4 }
-        ListElement{ xPos: 8.06 ; yPos: -4.6 ; zPos: 4.08 }
+        ListElement{ xPos: 9.06 ; yPos: -4.6 ; zPos: 4.08 }
         ListElement{ xPos: 5.98 ; yPos: -2.26 ; zPos: 2.82 }
         ListElement{ xPos: 5.46 ; yPos: -3.9 ; zPos: 3.2 }
         ListElement{ xPos: 8.14 ; yPos: -3.34 ; zPos: 3.42 }
@@ -1084,13 +1084,13 @@ Item {
         ListElement{ xPos: 8.64 ; yPos: -3.04 ; zPos: 2.62 }
         ListElement{ xPos: 7.82 ; yPos: -3.68 ; zPos: 2.96 }
         ListElement{ xPos: 7.1 ; yPos: -3.6 ; zPos: 4.22 }
-        ListElement{ xPos: 7.6 ; yPos: -3.88 ; zPos: 3.9 }
-        ListElement{ xPos: 7.46 ; yPos: -4.2 ; zPos: 3.32 }
+        ListElement{ xPos: 8.6 ; yPos: -3.88 ; zPos: 3.9 }
+        ListElement{ xPos: 8.46 ; yPos: -4.2 ; zPos: 3.32 }
         ListElement{ xPos: 6.98 ; yPos: -3.94 ; zPos: 3.1 }
         ListElement{ xPos: 7.36 ; yPos: -4.24 ; zPos: 1.72 }
-        ListElement{ xPos: 8.42 ; yPos: -4.52 ; zPos: 2.62 }
+        ListElement{ xPos: 9.42 ; yPos: -4.52 ; zPos: 2.62 }
         ListElement{ xPos: 6.04 ; yPos: -4.48 ; zPos: 2.74 }
-        ListElement{ xPos: 8.7 ; yPos: -3.92 ; zPos: 3.82 }
+        ListElement{ xPos: 10.0 ; yPos: -3.92 ; zPos: 3.82 }
         ListElement{ xPos: 6.76 ; yPos: -3.5 ; zPos: 2.92 }
         ListElement{ xPos: 7 ; yPos: -4.42 ; zPos: 2.62 }
         ListElement{ xPos: 5.32 ; yPos: -3.28 ; zPos: 3.34 }

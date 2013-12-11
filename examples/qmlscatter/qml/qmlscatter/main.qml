@@ -77,13 +77,6 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
             //! [6]
-            // TODO: Remove once QTRD-2605 is fixed
-            axisX.min: -10
-            axisX.max: 10
-            axisY.min: -5
-            axisY.max: 5
-            axisZ.min: -5
-            axisZ.max: 5
             //! [5]
             Scatter3DSeries {
                 id: scatterSeries

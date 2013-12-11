@@ -149,6 +149,12 @@ int main(int argc, char **argv)
     fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
+    QSlider *pointSizeSlider = new QSlider(Qt::Horizontal, widget);
+    pointSizeSlider->setTickInterval(1);
+    pointSizeSlider->setMinimum(1);
+    pointSizeSlider->setValue(30);
+    pointSizeSlider->setMaximum(100);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -176,6 +182,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust point size")));
+    vLayout->addWidget(pointSizeSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -183,6 +191,8 @@ int main(int argc, char **argv)
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::changeFontSize);
+    QObject::connect(pointSizeSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changePointSize);
 
     QObject::connect(styleButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeStyle);
