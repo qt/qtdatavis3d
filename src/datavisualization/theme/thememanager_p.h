@@ -48,6 +48,7 @@ public:
 protected:
     void connectThemeSignals();
     void useTheme(Q3DTheme::Theme type);
+    QLinearGradient createGradient(const QColor &color, float colorLevel);
     void setBaseColors(const QList<QColor> &colors);
     void setBackgroundColor(const QColor &color);
     void setWindowColor(const QColor &color);

@@ -21,6 +21,9 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+const float defaultBuiltInColorLevel = 0.7f; // for built-in gradient themes
+const float defaultColorLevel = 0.5f; // for built-in uniform themes
+
 ThemeManager::ThemeManager(Abstract3DController *controller)
     : m_theme(0),
       m_controller(controller)
@@ -89,15 +92,22 @@ void ThemeManager::connectThemeSignals()
 
 void ThemeManager::useTheme(Q3DTheme::Theme type)
 {
-    QColor color;
-    QLinearGradient gradient;
-
-    // TODO: Add predefined colors & gradients to more than one series
-
     switch (type) {
     case Q3DTheme::ThemeQt: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x80c342)));
+        baseColors.append(QColor(QRgb(0x60c342)));
+        baseColors.append(QColor(QRgb(0x40c342)));
+        baseColors.append(QColor(QRgb(0x20c342)));
+        baseColors.append(QColor(QRgb(0x00c342)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -116,35 +126,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(true);
         setColorStyle(Q3DTheme::ColorStyleUniform);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0x80 * 0.7);
-        color.setGreen(0xc3 * 0.7);
-        color.setBlue(0x42 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x80c342)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0x14 * 0.7);
-        color.setGreen(0xaa * 0.7);
-        color.setBlue(0xff * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x14aaff)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0x64 * 0.7);
-        color.setGreen(0x00);
-        color.setBlue(0xaa * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x6400aa)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0x14aaff)), defaultColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0x6400aa)), defaultColorLevel));
         break;
     }
 
     case Q3DTheme::ThemePrimaryColors: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xffe400)));
+        baseColors.append(QColor(QRgb(0xdfd400)));
+        baseColors.append(QColor(QRgb(0xbfc400)));
+        baseColors.append(QColor(QRgb(0x9fb400)));
+        baseColors.append(QColor(QRgb(0x7fa400)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -163,35 +165,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleUniform);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0xff * 0.7);
-        color.setGreen(0xe4 * 0.7);
-        color.setBlue(0x00);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xffe400)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0x27 * 0.7);
-        color.setGreen(0xbe * 0.7);
-        color.setBlue(0xee * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x27beee)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0xee * 0.7);
-        color.setGreen(0x14 * 0.7);
-        color.setBlue(0x14 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xee1414)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0x27beee)), defaultColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0xee1414)), defaultColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeDigia: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xcccccc)));
+        baseColors.append(QColor(QRgb(0xbbbbbb)));
+        baseColors.append(QColor(QRgb(0xaaaaaa)));
+        baseColors.append(QColor(QRgb(0x999999)));
+        baseColors.append(QColor(QRgb(0x888888)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultBuiltInColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -210,35 +204,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleObjectGradient);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0xcc * 0.7);
-        color.setGreen(0xcc * 0.7);
-        color.setBlue(0xcc * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xcccccc)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0xfa * 0.7);
-        color.setGreen(0x00);
-        color.setBlue(0x00);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xfa0000)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0x55 * 0.7);
-        color.setGreen(0x55 * 0.7);
-        color.setBlue(0x55 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x555555)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0xfa0000)), defaultBuiltInColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0x555555)), defaultBuiltInColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeStoneMoss: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xbeb32b)));
+        baseColors.append(QColor(QRgb(0xcec33b)));
+        baseColors.append(QColor(QRgb(0xded34b)));
+        baseColors.append(QColor(QRgb(0xeee35b)));
+        baseColors.append(QColor(QRgb(0xfef36b)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -257,35 +243,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(true);
         setColorStyle(Q3DTheme::ColorStyleUniform);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0xbe * 0.7);
-        color.setGreen(0xb3 * 0.7);
-        color.setBlue(0x2b * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xbeb32b)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0xfb* 0.7);
-        color.setGreen(0xf6 * 0.7);
-        color.setBlue(0xd6 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xfbf6d6)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0x44 * 0.7);
-        color.setGreen(0x2f * 0.7);
-        color.setBlue(0x20 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x442f20)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0xfbf6d6)), defaultColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0x442f20)), defaultColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeArmyBlue: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x495f76)));
+        baseColors.append(QColor(QRgb(0x495f86)));
+        baseColors.append(QColor(QRgb(0x495f96)));
+        baseColors.append(QColor(QRgb(0x495fa6)));
+        baseColors.append(QColor(QRgb(0x495fb6)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultBuiltInColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -304,35 +282,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleObjectGradient);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0x49 * 0.7);
-        color.setGreen(0x5f * 0.7);
-        color.setBlue(0x76 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x495f76)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0x2a * 0.7);
-        color.setGreen(0xa2 * 0.7);
-        color.setBlue(0xf9 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x2aa2f9)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0x10 * 0.7);
-        color.setGreen(0x37 * 0.7);
-        color.setBlue(0x53 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x103753)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0x2aa2f9)), defaultBuiltInColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0x103753)), defaultBuiltInColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeRetro: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x533b23)));
+        baseColors.append(QColor(QRgb(0x633b23)));
+        baseColors.append(QColor(QRgb(0x733b23)));
+        baseColors.append(QColor(QRgb(0x833b23)));
+        baseColors.append(QColor(QRgb(0x933b23)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultBuiltInColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultBuiltInColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -351,35 +321,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleObjectGradient);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0x53 * 0.7);
-        color.setGreen(0x3b * 0.7);
-        color.setBlue(0x23 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x533b23)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0x8e * 0.7);
-        color.setGreen(0xa3 * 0.7);
-        color.setBlue(0x17 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0x8ea317)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0xc2 * 0.7);
-        color.setGreen(0x57 * 0.7);
-        color.setBlue(0x08 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xc25708)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0x8ea317)), defaultBuiltInColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0xc25708)), defaultBuiltInColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeEbony: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xffffff)));
+        baseColors.append(QColor(QRgb(0xeeeeee)));
+        baseColors.append(QColor(QRgb(0xdddddd)));
+        baseColors.append(QColor(QRgb(0xcccccc)));
+        baseColors.append(QColor(QRgb(0xbbbbbb)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -398,35 +360,27 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleUniform);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0xff * 0.7);
-        color.setGreen(0xff * 0.7);
-        color.setBlue(0xff * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xffffff)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0xf5 * 0.7);
-        color.setGreen(0xdc * 0.7);
-        color.setBlue(0x0d * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xf5dc0d)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0x72 * 0.7);
-        color.setGreen(0x22 * 0.7);
-        color.setBlue(0x22 * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xd72222)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0xf5dc0d)), defaultColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0xd72222)), defaultColorLevel));
         break;
     }
 
     case Q3DTheme::ThemeIsabelle: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xf9d900)));
+        baseColors.append(QColor(QRgb(0xf9d910)));
+        baseColors.append(QColor(QRgb(0xf9d920)));
+        baseColors.append(QColor(QRgb(0xf9d930)));
+        baseColors.append(QColor(QRgb(0xf9d940)));
+
+        QList<QLinearGradient> baseGradients;
+        baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(1), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(2), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(3), defaultColorLevel));
+        baseGradients.append(createGradient(baseColors.at(4), defaultColorLevel));
+
         setBackgroundEnabled(true);
         setGridEnabled(true);
         setFont(QFont(QStringLiteral("Arial")));
@@ -445,34 +399,28 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setHighlightLightStrength(5.0f);
         setLabelBorderEnabled(false);
         setColorStyle(Q3DTheme::ColorStyleUniform);
-        gradient = QLinearGradient(qreal(gradientTextureWidth),
-                                   qreal(gradientTextureHeight),
-                                   0.0, 0.0);
-        color.setRed(0xf9 * 0.7);
-        color.setGreen(0xd9 * 0.7);
-        color.setBlue(0x00);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xf9d900)));
-        QList<QLinearGradient> baseGradients;
-        baseGradients.append(gradient);
         setBaseGradients(baseGradients);
-        color.setRed(0xff * 0.7);
-        color.setGreen(0xf7 * 0.7);
-        color.setBlue(0xcc * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xfff7cc)));
-        setSingleHighlightGradient(gradient);
-        color.setRed(0xde * 0.7);
-        color.setGreen(0x0a * 0.7);
-        color.setBlue(0x0a * 0.7);
-        gradient.setColorAt(0.0, color);
-        gradient.setColorAt(1.0, QColor(QRgb(0xde0a0a)));
-        setMultiHighlightGradient(gradient);
+        setSingleHighlightGradient(createGradient(QColor(QRgb(0xfff7cc)), defaultColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0xde0a0a)), defaultColorLevel));
         break;
     }
     default:
         break;
     }
+}
+
+QLinearGradient ThemeManager::createGradient(const QColor &color, float colorLevel)
+{
+    QColor startColor;
+    QLinearGradient gradient = QLinearGradient(qreal(gradientTextureWidth),
+                                               qreal(gradientTextureHeight),
+                                               0.0, 0.0);;
+    startColor.setRed(color.red() * colorLevel);
+    startColor.setGreen(color.green() * colorLevel);
+    startColor.setBlue(color.blue() * colorLevel);
+    gradient.setColorAt(0.0, startColor);
+    gradient.setColorAt(1.0, color);
+    return gradient;
 }
 
 void ThemeManager::setBaseColors(const QList<QColor> &colors)

@@ -23,7 +23,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 DeclarativeColor::DeclarativeColor(QObject *parent)
     : QObject(parent)
 {
+}
 
+void DeclarativeColor::setColor(const QColor &color)
+{
+    if (m_color != color) {
+        m_color = color;
+        emit colorChanged(color);
+    }
+}
+
+QColor DeclarativeColor::color() const
+{
+    return m_color;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

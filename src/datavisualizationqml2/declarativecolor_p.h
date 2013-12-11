@@ -31,17 +31,25 @@
 
 #include "datavisualizationglobal_p.h"
 #include <QColor>
-#include <QQmlListProperty>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class DeclarativeColor : public QObject, public QColor
+class DeclarativeColor : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:
     DeclarativeColor(QObject *parent = 0);
 
+    void setColor(const QColor &color);
+    QColor color() const;
+
+signals:
+    void colorChanged(QColor color);
+
+private:
+    QColor m_color;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

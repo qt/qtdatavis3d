@@ -22,9 +22,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 DeclarativeTheme3D::DeclarativeTheme3D(QObject *parent)
     : Q3DTheme(parent),
+      m_colors(QList<DeclarativeColor *>()),
       m_gradients(QList<ColorGradient *>()),
       m_singleHLGradient(0),
-      m_multiHLGradient(0)
+      m_multiHLGradient(0),
+      m_dummyGradients(false),
+      m_dummyColors(false)
 {
 }
 
@@ -34,8 +37,8 @@ DeclarativeTheme3D::~DeclarativeTheme3D()
 
 QQmlListProperty<QObject> DeclarativeTheme3D::seriesChildren()
 {
-    return QQmlListProperty<QObject>(this, this, &DeclarativeTheme3D::appendSeriesChildren
-                                     , 0, 0, 0);
+    return QQmlListProperty<QObject>(this, this, &DeclarativeTheme3D::appendSeriesChildren,
+                                     0, 0, 0);
 }
 
 void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element)
@@ -43,6 +46,44 @@ void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, Q
     Q_UNUSED(list)
     Q_UNUSED(element)
     // Nothing to do, seriesChildren is there only to enable scoping gradient items in Theme3D item.
+}
+
+void DeclarativeTheme3D::handleBaseColorUpdate()
+{
+    int colorCount = m_colors.size();
+    int changed = 0;
+    // Check which one changed
+    DeclarativeColor *color = qobject_cast<DeclarativeColor *>(QObject::sender());
+    for (int i = 0; i < colorCount; i++) {
+        if (color == m_colors.at(i)) {
+            changed = i;
+            break;
+        }
+    }
+    // Update the changed one from the list
+    QList<QColor> list = Q3DTheme::baseColors();
+    list[changed] = m_colors.at(changed)->color();
+    // Set the changed list
+    Q3DTheme::setBaseColors(list);
+}
+
+void DeclarativeTheme3D::handleBaseGradientUpdate()
+{
+    int gradientCount = m_gradients.size();
+    int changed = 0;
+    // Check which one changed
+    ColorGradient *gradient = qobject_cast<ColorGradient *>(QObject::sender());
+    for (int i = 0; i < gradientCount; i++) {
+        if (gradient == m_gradients.at(i)) {
+            changed = i;
+            break;
+        }
+    }
+    // Update the changed one from the list
+    QList<QLinearGradient> list = Q3DTheme::baseGradients();
+    list[changed] = convertGradient(gradient);
+    // Set the changed list
+    Q3DTheme::setBaseGradients(list);
 }
 
 void DeclarativeTheme3D::handleSingleHLGradientUpdate()
@@ -145,70 +186,147 @@ QLinearGradient DeclarativeTheme3D::convertGradient(ColorGradient *gradient)
     return newGradient;
 }
 
-//void DeclarativeTheme3D::addColor(const DeclarativeColor &color)
-//{
-//    QList<QColor> list = Q3DTheme::baseColors();
-//    list.append(color);
-//    Q3DTheme::setBaseColors(list);
-//}
+ColorGradient *DeclarativeTheme3D::convertGradient(const QLinearGradient &gradient)
+{
+    ColorGradient *newGradient = new ColorGradient(this);
+    QGradientStops stops = gradient.stops();
+    ColorGradientStop *qmlstop;
 
-//QList<DeclarativeColor> DeclarativeTheme3D::colorList() const
-//{
-//    return Q3DTheme::baseColors();
-//}
+    // Convert stops
+    for (int i = 0; i < stops.size(); i++) {
+        qmlstop = new ColorGradientStop(newGradient);
+        qmlstop->setColor(stops.at(i).second);
+        qmlstop->setPosition(stops.at(i).first);
+        newGradient->m_stops.append(qmlstop);
+    }
 
-//void DeclarativeTheme3D::clearColors()
-//{
-//    Q3DTheme::setBaseColors(QList<QColor>());
-//}
+    return newGradient;
+}
+
+void DeclarativeTheme3D::addColor(DeclarativeColor *color)
+{
+    clearDummyColors();
+    m_colors.append(color);
+    connect(color, &DeclarativeColor::colorChanged,
+            this, &DeclarativeTheme3D::handleBaseColorUpdate);
+    QList<QColor> list = Q3DTheme::baseColors();
+    list.append(color->color());
+    Q3DTheme::setBaseColors(list);
+}
+
+QList<DeclarativeColor *> DeclarativeTheme3D::colorList()
+{
+    if (m_colors.isEmpty()) {
+        // Create dummy ThemeColors from theme's gradients
+        m_dummyColors = true;
+        QList<QColor> list = Q3DTheme::baseColors();
+        foreach (QColor item, list) {
+            DeclarativeColor *color = new DeclarativeColor(this);
+            color->setColor(item);
+            m_colors.append(color);
+            connect(color, &DeclarativeColor::colorChanged,
+                    this, &DeclarativeTheme3D::handleBaseColorUpdate);
+        }
+    }
+    return m_colors;
+}
+
+void DeclarativeTheme3D::clearColors()
+{
+    clearDummyColors();
+    foreach (DeclarativeColor *item, m_colors)
+        disconnect(item, 0, this, 0);
+    m_colors.clear();
+    Q3DTheme::setBaseColors(QList<QColor>());
+}
+
+void DeclarativeTheme3D::clearDummyColors()
+{
+    if (m_dummyColors) {
+        foreach (DeclarativeColor *item, m_colors)
+            delete item;
+        m_colors.clear();
+        m_dummyColors = false;
+    }
+}
 
 void DeclarativeTheme3D::addGradient(ColorGradient *gradient)
 {
+    clearDummyGradients();
     m_gradients.append(gradient);
+    connect(gradient, &ColorGradient::updated,
+            this, &DeclarativeTheme3D::handleBaseGradientUpdate);
     QList<QLinearGradient> list = Q3DTheme::baseGradients();
     list.append(convertGradient(gradient));
     Q3DTheme::setBaseGradients(list);
 }
 
-QList<ColorGradient *> DeclarativeTheme3D::gradientList() const
+QList<ColorGradient *> DeclarativeTheme3D::gradientList()
 {
+    if (m_gradients.isEmpty()) {
+        // Create dummy ColorGradients from theme's gradients
+        m_dummyGradients = true;
+        QList<QLinearGradient> list = Q3DTheme::baseGradients();
+        foreach (QLinearGradient item, list) {
+            ColorGradient *gradient = convertGradient(item);
+            m_gradients.append(gradient);
+            connect(gradient, &ColorGradient::updated,
+                    this, &DeclarativeTheme3D::handleBaseGradientUpdate);
+        }
+    }
+
     return m_gradients;
 }
 
 void DeclarativeTheme3D::clearGradients()
 {
+    clearDummyGradients();
+    foreach (ColorGradient *item, m_gradients)
+        disconnect(item, 0, this, 0);
     m_gradients.clear();
     Q3DTheme::setBaseGradients(QList<QLinearGradient>());
 }
 
-//QQmlListProperty<DeclarativeColor> DeclarativeTheme3D::baseColors()
-//{
-//    return QQmlListProperty<DeclarativeColor>(this, this,
-//                                    &DeclarativeTheme3D::appendBaseColorsFunc,
-//                                    &DeclarativeTheme3D::countBaseColorsFunc,
-//                                    &DeclarativeTheme3D::atBaseColorsFunc,
-//                                    &DeclarativeTheme3D::clearBaseColorsFunc);
-//}
+void DeclarativeTheme3D::clearDummyGradients()
+{
+    if (m_dummyGradients) {
+        foreach (ColorGradient *item, m_gradients)
+            delete item;
+        m_gradients.clear();
+        m_dummyGradients = false;
+    }
+}
 
-//void DeclarativeTheme3D::appendBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list, DeclarativeColor *color)
-//{
-//    reinterpret_cast<DeclarativeTheme3D *>(list->data)->addColor(*color);
-//}
+QQmlListProperty<DeclarativeColor> DeclarativeTheme3D::baseColors()
+{
+    return QQmlListProperty<DeclarativeColor>(this, this,
+                                              &DeclarativeTheme3D::appendBaseColorsFunc,
+                                              &DeclarativeTheme3D::countBaseColorsFunc,
+                                              &DeclarativeTheme3D::atBaseColorsFunc,
+                                              &DeclarativeTheme3D::clearBaseColorsFunc);
+}
 
-//int DeclarativeTheme3D::countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
-//{
-//    return reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList().size();
-//}
+void DeclarativeTheme3D::appendBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                              DeclarativeColor *color)
+{
+    reinterpret_cast<DeclarativeTheme3D *>(list->data)->addColor(color);
+}
 
-//DeclarativeColor *DeclarativeTheme3D::atBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list, int index)
-//{
-//    return &(reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList()[index]);
-//}
+int DeclarativeTheme3D::countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
+{
+    return reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList().size();
+}
 
-//void DeclarativeTheme3D::clearBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
-//{
-//    reinterpret_cast<DeclarativeTheme3D *>(list->data)->clearGradients();
-//}
+DeclarativeColor *DeclarativeTheme3D::atBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                                       int index)
+{
+    return reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList().at(index);
+}
+
+void DeclarativeTheme3D::clearBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
+{
+    reinterpret_cast<DeclarativeTheme3D *>(list->data)->clearColors();
+}
 
 QQmlListProperty<ColorGradient> DeclarativeTheme3D::baseGradients()
 {

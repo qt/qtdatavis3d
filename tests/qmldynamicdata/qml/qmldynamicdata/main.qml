@@ -58,6 +58,16 @@ Item {
         }
     }
 
+    ThemeColor {
+        id: dynamicColor
+        ColorAnimation on color {
+            from: "red"
+            to: "yellow"
+            duration: 5000
+            loops: Animation.Infinite
+        }
+    }
+
     Item {
         id: dataView
         anchors.bottom: parent.bottom
@@ -68,7 +78,10 @@ Item {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
-            theme: Theme3D { type: Theme3D.ThemeDigia }
+            theme: Theme3D {
+                type: Theme3D.ThemeQt
+                baseColors: [dynamicColor]
+            }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             inputHandler: null
@@ -185,7 +198,7 @@ Item {
     NewButton {
         id: cameraToggle
         width: parent.width / 3
-        text: "Animate Camera"
+        text: "Pause Camera"
         anchors.left: shadowToggle.right
 
         onClicked: {

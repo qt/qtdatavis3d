@@ -73,8 +73,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 
     qmlRegisterType<ColorGradientStop>(uri, 1, 0, "ColorGradientStop");
     qmlRegisterType<ColorGradient>(uri, 1, 0, "ColorGradient");
-    qmlRegisterType<DeclarativeColor>(uri, 1, 0, "Color");
 
+    qmlRegisterType<DeclarativeColor>(uri, 1, 0, "ThemeColor");
     qmlRegisterType<DeclarativeTheme3D>(uri, 1, 0, "Theme3D");
 
     qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
