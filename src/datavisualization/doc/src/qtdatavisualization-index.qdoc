@@ -62,8 +62,8 @@
 
     \section1 Articles
     \list
-        \li \l{Qt Data Visualization Data Handling}{Data input}
-        \li \l{Qt Data Visualization Interacting with Data}{Interacting with visualized data}
+        \li \l{Qt Data Visualization Data Handling}{Data Handling}
+        \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
     \endlist
 
     \section1 References

@@ -114,3 +114,17 @@ for (int i = 0; i < 10; i++) {
 newProxy->resetArray(dataArray);
 graph->addSeries(new QBar3DSeries(newProxy));
 //! [10]
+
+//! [11]
+Q3DBars graph;
+QBar3DSeries *series = new QBar3DSeries;
+QLinearGradient barGradient(0, 0, 1, 100);
+barGradient.setColorAt(1.0, Qt::white);
+barGradient.setColorAt(0.0, Qt::black);
+
+series->setBaseGradient(barGradient);
+series->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+series->setMesh(QAbstract3DSeries::MeshCylinder);
+
+graph->addSeries(series);
+//! [11]
