@@ -72,44 +72,42 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_yearAxis->setTitle("Year");
     m_monthAxis->setTitle("Month");
 
-    m_graph->addAxis(m_temperatureAxis);
-    m_graph->addAxis(m_yearAxis);
-    m_graph->addAxis(m_monthAxis);
+    m_graph->setValueAxis(m_temperatureAxis);
+    m_graph->setRowAxis(m_yearAxis);
+    m_graph->setColumnAxis(m_monthAxis);
     //! [3]
 
+    //! [8]
     QBar3DSeries *series = new QBar3DSeries(m_primaryData);
     series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
-    series->setMesh(m_primaryStyle);
-    series->setMeshSmooth(m_smooth);
+    series->setMesh(QAbstract3DSeries::MeshBevelBar);
+    series->setMeshSmooth(false);
 
     QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
     series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
-    series2->setMesh(m_secondaryStyle);
-    series2->setMeshSmooth(m_smooth);
+    series2->setMesh(QAbstract3DSeries::MeshSphere);
+    series2->setMeshSmooth(false);
     series2->setVisible(false);
+    //! [8]
 
     //! [4]
     m_graph->addSeries(series);
     m_graph->addSeries(series2);
     //! [4]
 
+    //! [6]
     changePresetCamera();
+    //! [6]
+
+    //! [9]
     resetTemperatureData();
+    //! [9]
 }
 //! [0]
 
 GraphModifier::~GraphModifier()
 {
     delete m_graph;
-}
-
-void GraphModifier::start()
-{
-    //! [6]
-    m_graph->setValueAxis(m_temperatureAxis);
-    m_graph->setRowAxis(m_yearAxis);
-    m_graph->setColumnAxis(m_monthAxis);
-    //! [6]
 }
 
 void GraphModifier::resetTemperatureData()
@@ -175,12 +173,14 @@ void GraphModifier::changeStyle(int style)
 
 void GraphModifier::changePresetCamera()
 {
+    //! [10]
     static int preset = Q3DCamera::CameraPresetFront;
 
     m_graph->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
     if (++preset > Q3DCamera::CameraPresetDirectlyBelow)
         preset = Q3DCamera::CameraPresetFrontLow;
+    //! [10]
 }
 
 void GraphModifier::changeTheme(int theme)
@@ -194,7 +194,7 @@ void GraphModifier::changeTheme(int theme)
 
 void GraphModifier::changeLabelBackground()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isBackgroundEnabled());
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode(int selectionMode)

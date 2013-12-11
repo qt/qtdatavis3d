@@ -48,7 +48,6 @@ public:
     void setGridEnabled(int enabled);
     void setSmoothBars(int smooth);
     void setSeriesVisibility(int enabled);
-    void start();
 
 public slots:
     void changeStyle(int style);

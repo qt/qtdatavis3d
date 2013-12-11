@@ -30,14 +30,14 @@
 
     \image audiolevels-example.png
 
-    The interesting stuff happens in AudioLevels and AudioLevelsIODevice classes, so we
+    The interesting stuff happens in \c AudioLevels and \c AudioLevelsIODevice classes, so we
     concentrate on those and skip explaining the basic Q3DBars functionality - for that see
     \l{Bars Example}.
 
-    AudioLevelsIODevice subclasses QIODevice and is given as input device for QAudioInput
+    \c AudioLevelsIODevice subclasses QIODevice and is given as input device for QAudioInput
     class, so it receives microphone data.
 
-    In the header file for QAudioInput class we declare necessary members:
+    In the header file for \c AudioLevels class we declare necessary members:
 
     \snippet ../examples/audiolevels/audiolevels.h 0
 
@@ -45,7 +45,7 @@
 
     \snippet ../examples/audiolevels/audiolevels.cpp 0
 
-    In the header file for AudioLevelsIODevice class we store pointers to the data proxy and
+    In the header file for \c AudioLevelsIODevice class we store pointers to the data proxy and
     also the data array we give to the proxy, because we reuse the same array to keep memory
     reallocations to the minimum:
 
@@ -61,11 +61,11 @@
     byte from audio input is visualized. This is necessary to make the data readable, as it would
     otherwise make the graph scroll too fast.
 
-    In the AudioLevelsIODevice class constructor we initialize the data array:
+    In the \c AudioLevelsIODevice class constructor we initialize the data array:
 
     \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 0
 
-    The AudioLevelsIODevice::writeData function is called whenever there is new audio data
+    The \c AudioLevelsIODevice::writeData function is called whenever there is new audio data
     available to be visualized. There we move the old data along the rows and insert new
     data in the beginning of the rows:
 
@@ -75,11 +75,11 @@
     the existing data array, as this allows us to avoid any extra memory allocations in our
     application code. This also means the data array dimensions do not change, which further
     improves efficiency in the bar graph renderer.
-    Secondly, since the rows are QVectors of QBarDataItems, which do not allocate any data that needs
-    deletion, we can utilize memmove and memcpy functions to quickly move and copy data around.
+    Secondly, since each row is a QVector of bar data items, which do not allocate any data that needs
+    deletion, we can utilize \c memmove and \c memcpy functions to quickly move and copy data around.
 
     \note In the future versions of Qt Data Visualization, QBarDataItem might get extended so that
     it does allocate some memory to store other optional bar properties besides the value.
-    In use cases where those optional properties are used, using memmove and memcpy would lead to
+    In use cases where those optional properties are used, using \c memmove and \c memcpy would lead to
     memory leaks, so use them with care.
 */

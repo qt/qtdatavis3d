@@ -266,11 +266,8 @@
     \section1 Interacting with data
 
     You can interact with the rendered graph with either mouse or touch to rotate, zoom, or select
-    data. For the mouse controls, see Q3DInputHandler documentation, and for the touch controls,
-    see QTouch3DInputHandler documentation.
-
-    \note In the technology preview version, default input handlers cannot be replaced or even accessed
-    via the public API. This feature is planned for the final release.
+    data. For the default mouse controls, see Q3DInputHandler documentation, and for the default
+    touch controls, see QTouch3DInputHandler documentation.
 
     \section1 Data selection modes
 
