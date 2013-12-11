@@ -203,12 +203,14 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
     int startCol = column;
     if (startCol > 0)
         startCol--;
+    int rightCol = m_columns - 1;
+    int topRow = m_rows - 1;
 
     for (int i = startRow; i <= row; i++) {
         for (int j = startCol; j <= column; j++) {
             int p = i * m_columns + j;
-            if (i < m_rows) {
-                if (j < m_columns) {
+            if (i < topRow) {
+                if (j < rightCol) {
                     // One right and one up
                     m_normals[p] = normal(m_vertices.at(p),
                                           m_vertices.at(p + 1),
@@ -221,11 +223,11 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
                 }
             } else {
                 // Top most line, nothing above, must have different handling.
-                if (j < m_columns) {
+                if (j < rightCol) {
                     // Take from one down and one right. Read till second-to-last
                     m_normals[p] = normal(m_vertices.at(p),
-                                          m_vertices.at(j - m_columns),
-                                          m_vertices.at(j + 1));
+                                          m_vertices.at(p - m_columns),
+                                          m_vertices.at(p + 1));
                 } else {
                     // Top left corner. Take from one left and one down
                     m_normals[p] = normal(m_vertices.at(p),
@@ -446,6 +448,8 @@ void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowI
     if (p > 0)
         p -= doubleColumns;
     int rowLimit = (rowIndex + 1) * doubleColumns;
+    if (rowIndex == m_rows - 1)
+        rowLimit = rowIndex * doubleColumns; //Topmost row, no normals
     for (int row = p, upperRow = p + doubleColumns;
          row < rowLimit;
          row += doubleColumns, upperRow += doubleColumns) {
