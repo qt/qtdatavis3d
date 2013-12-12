@@ -165,7 +165,6 @@ int main(int argc, char **argv)
 
     //! [3]
     widget->show();
-    modifier->start();
     return app.exec();
     //! [3]
 }

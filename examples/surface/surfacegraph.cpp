@@ -104,6 +104,7 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
         m_graph->addSeries(m_sqrtSinSeries);
         //! [3]
 
+        //! [8]
         // Reset range sliders for Sqrt&Sin
         m_rangeMinX = sampleMin;
         m_rangeMinZ = sampleMin;
@@ -117,6 +118,7 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
         m_axisMinSliderZ->setValue(0);
         m_axisMaxSliderZ->setMaximum(sampleCountZ - 1);
         m_axisMaxSliderZ->setValue(sampleCountZ - 1);
+        //! [8]
     }
 }
 

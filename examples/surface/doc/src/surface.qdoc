@@ -30,8 +30,8 @@
         \li How to set up a basic QSurfaceDataProxy and set data for it.
         \li How to use QHeightMapSurfaceDataProxy for showing 3D height maps.
         \li Three different selection modes for studying the graph.
-        \li Axis range usage for selecting slices from the graph.
-        \li Theme usage on the surface graph.
+        \li Axis range usage for displaying selected portions of the graph.
+        \li Changing theme.
         \li How to set a custom surface gradient.
     \endlist
 
@@ -41,13 +41,13 @@
 
     \section1 Creating the application
 
-    First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface and a window container
+    First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface, and a window container
     for it:
 
     \snippet ../examples/surface/main.cpp 0
 
     The call to QWidget::createWindowContainer is required, as all data visualization types
-    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
+    (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
     as a widget any other way.
 
     Then we'll create horizontal and vertical layouts. We'll add the graph with the container and
@@ -62,39 +62,41 @@
 
     \section1 Setting up proxies and data
 
-    First we instantiate a new QSurfaceDataProxy:
+    First we instantiate a new QSurfaceDataProxy and attach it to a new QSurface3DSeries:
 
     \snippet ../examples/surface/surfacegraph.cpp 0
 
-    Then we fill it with a simple square root and sin wave data. This is done by
-    creating a new QSurfaceDataArray instance and adding QSurfaceDataRow elements.
-    The created QSurfaceDataArray is set to be a the data array for the QSurfaceDataProxy.
+    Then we fill the proxy with a simple square root and sin wave data. This is done by
+    creating a new \c QSurfaceDataArray instance and adding \c QSurfaceDataRow elements to it.
+    The created \c QSurfaceDataArray is set to be a the data array for the QSurfaceDataProxy.
 
     \snippet ../examples/surface/surfacegraph.cpp 1
 
     The height map is created by instantiating a QHeightMapSurfaceDataProxy with
-    a QImage containing the height data. The method setValueRanges is used to define
-    the value range of the map. In our example the map is from imaginary position of
+    a QImage containing the height data. The method QHeightMapSurfaceDataProxy::setValueRanges() is
+    used to define the value range of the map. In our example the map is from imaginary position of
     34.0\unicode 0x00B0 N - 40.0\unicode 0x00B0 N and 18.0\unicode 0x00B0 E - 24.0\unicode 0x00B0 E.
     These values are used to show and position the map to the axis.
 
     \snippet ../examples/surface/surfacegraph.cpp 2
 
     For demonstrating different proxies this example has two radio buttons which
-    the user can use to switch between active proxies. When the user selects the
-    Sqrt&Sin radio button the selected proxy is activated with the following
+    the user can use to switch between the series. When the user selects the
+    \c {Sqrt & Sin} radio button, the selected series is activated with the following
     code. First we set the decorative issues like enable the grid for the surface and
-    select the flat surface mode. Next lines define the axis label format and value
-    ranges. Since the algorithm studies the value variation between -8.0 and 8.0 we
-    set these values for X and Z coordinates. The value itself varies between 0.0 and
-    2.0. The method setActiveDataProxy sets the basic data proxy to be active.
+    select the flat shading mode. Next lines define the axis label format and value
+    ranges. The Y-value value of the function we use to generate the points varies between
+    0.0 and 2.0, but no individual point actually hits exactly those, so we set the Y-axis range
+    explicitly. The other axes we are happy to leave to automatically adjust their range to the
+    data, which is the default behavior. Finally we make sure the correct series is added to the
+    graph. We need to first remove the other series, since surface graphs only support a single
+    series at a time:
 
     \snippet ../examples/surface/surfacegraph.cpp 3
 
-    When the Height Map radio button is activated, the following code sets the proxy on.
-    First the surface grid is turned off and the smooth mode is activated. The axis label
-    format is set to show N and E letters and ranges are set to the imaginary coordinates.
-    Finally the height map proxy is set to be active.
+    When the \c{Height Map} radio button is activated, the following code sets the correct series active.
+    The axis label format is set to show N and E letters and ranges are set to the imaginary coordinates.
+    Auto adjusting Y-axis range is fine for our height map surface, so we ensure it is set.
 
     \snippet ../examples/surface/surfacegraph.cpp 4
 
@@ -110,14 +112,18 @@
 
     The example has four slider controls for adjusting the min and max values for X and Z
     axis. When selecting the proxy these sliders are adjusted so that one step on the slider
-    moves the range by one segment step. Finally the ranges are set for the graph like this:
+    moves the range by one segment step:
+
+    \snippet ../examples/surface/surfacegraph.cpp 8
+
+    The ranges are set for the axes like this:
 
     \snippet ../examples/surface/surfacegraph.cpp 5
 
     \section1 Themes
 
-    Q3Dsurface supports all the themes QtDatavisualization has. The example has a pull
-    down menu for selecting the theme. The following code snippet is connected to the
+    Q3DSurface supports all the themes Qt Data Visualization has. The example has a pull
+    down menu for selecting the theme. The following method is connected to the
     menu to activate the selected theme.
 
     \snippet ../examples/surface/surfacegraph.cpp 6
@@ -125,8 +131,9 @@
     \section1 Custom surface gradients
 
     The example demonstrates the custom surface gradients with two push buttons. The gradient
-    can be defined with QLinearGradient where the desired colors are set to positions. Following
-    snippet shows how to create an example gradient and set it to the graph.
+    can be defined with QLinearGradient where the desired colors are set to positions. The following
+    code shows how to create an example gradient and set it to the series. Note that you also need
+    to change the color style to Q3DTheme::ColorStyleRangeGradient to actually use the gradient.
 
     \snippet ../examples/surface/surfacegraph.cpp 7
 */

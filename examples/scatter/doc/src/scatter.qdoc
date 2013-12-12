@@ -38,13 +38,13 @@
 
     \section1 Creating the application
 
-    First, in main.cpp, we create a QApplication, instantiate Q3DScatter and a window container
+    First, in main.cpp, we create a QApplication, instantiate Q3DScatter, and a window container
     for it:
 
     \snippet ../examples/scatter/main.cpp 0
 
     The call to QWidget::createWindowContainer is required, as all data visualization types
-    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
+    (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
     as a widget any other way.
 
     Then we'll create horizontal and vertical layouts. We'll add the graph and the vertical
@@ -56,7 +56,7 @@
     \l {Using widgets to control the graph}
 
     Next, let's create another class to handle the data addition and other interaction with the
-    graph. Let's call it ScatterDataModifier (See \l {Setting up the graph} and
+    graph. Let's call it \c ScatterDataModifier (See \l {Setting up the graph} and
     \l {Adding data to the graph} for details):
 
     \snippet ../examples/scatter/main.cpp 2
@@ -67,7 +67,7 @@
 
     \section1 Setting up the graph
 
-    Let's set up some visual qualities for the graph in the constructor of the ScatterDataModifier
+    Let's set up some visual qualities for the graph in the constructor of the \c ScatterDataModifier
     class we instantiated in the application main:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 0
@@ -79,8 +79,8 @@
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 1
 
-    And finally we create a QScatterDataProxy, set a label format for it and set it as the active
-    proxy for the graph:
+    And finally we create a QScatterDataProxy and the associated QScatter3DSeries. We set custom label format
+    for the series and add it to the graph:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 2
 
@@ -88,21 +88,16 @@
 
     \section1 Adding data to the graph
 
-    In application main, we called \c {modifier->start()} after constructing all the necessary
-    objects. This is how it looks like:
+    The last thing we do in the \c ScatterDataModifier constructor is to add data to the graph:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 3
-
-    There is nothing in it except a call to another method. There is actually no need for a
-    separate \c start() method, but we keep it here in case we want to add some more functionality
-    in it that can be done only after all construction in application main is done.
 
     The actual data addition is done in \c addData() method. First we configure the axes we created
     in constructor:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 4
 
-    This could have been done in the ScatterDataModifier's constructor, but we added it here
+    This could have been done in the constructor of \c {ScatterDataModifier}, but we added it here
     to keep the constructor simpler and the axes configuration near the data.
 
     Next we create a data array:
@@ -149,7 +144,7 @@
         \li Dot style
         \li Theme
         \li Shadow quality
-        \li Font
+        \li Label font
     \endlist
 
     \section1 Example contents

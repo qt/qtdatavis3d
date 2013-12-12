@@ -57,9 +57,12 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);
     series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
-    series->setMesh(QAbstract3DSeries::MeshSphere);
     m_graph->addSeries(series);
     //! [2]
+
+    //! [3]
+    addData();
+    //! [3]
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -67,17 +70,10 @@ ScatterDataModifier::~ScatterDataModifier()
     delete m_graph;
 }
 
-//! [3]
-void ScatterDataModifier::start()
-{
-    addData();
-}
-//! [3]
-
 void ScatterDataModifier::addData()
 {
+    // Configure the axes according to the data
     //! [4]
-    // Add labels
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
