@@ -80,22 +80,28 @@ Item {
             //! [5]
             Scatter3DSeries {
                 id: scatterSeries
+                //! [5]
+                //! [10]
                 itemLabelFormat: "Series 1: X:@xLabel Y:@yLabel Z:@zLabel"
+                //! [10]
 
+                //! [11]
                 ItemModelScatterDataProxy {
                     itemModel: seriesOneData.model
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
                 }
+                //! [11]
             }
 
-            //! [5]
+            //! [12]
             Scatter3DSeries {
                 id: scatterSeriesTwo
                 itemLabelFormat: "Series 2: X:@xLabel Y:@yLabel Z:@zLabel"
                 itemSize: 0.1
                 mesh: Abstract3DSeries.MeshCube
+                //! [12]
 
                 ItemModelScatterDataProxy {
                     itemModel: seriesTwoData.modelTwo

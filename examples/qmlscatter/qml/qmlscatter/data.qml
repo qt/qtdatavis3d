@@ -20,11 +20,11 @@ import QtQuick 2.1
 import QtDataVisualization 1.0
 
 Item {
-    //! [3]
+    //! [1]
     property alias model: dataModel
-    //! [3]
     property alias modelTwo: dataModelTwo
     property alias modelThree: dataModelThree
+    //! [1]
 
     //! [0]
     ListModel {

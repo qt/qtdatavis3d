@@ -31,7 +31,9 @@
 
     \section1 Creating the application
 
-    The application main is created by creating a new Qt Quick 2 Application project in QtCreator:
+    The application main is created by creating a new Qt Quick Application project in QtCreator.
+    The dialog shown here is from QtCreator 3.0.0, and it may look a bit different in other
+    versions:
 
     \image qmlscatter-newproject.png
 
@@ -89,32 +91,35 @@
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 1
 
     Then we'll add another \c Item inside it, and call it \c dataView. This will be the item to hold
-    the \c Scatter3D graph. We'll anchor it to the parent bottom:
+    the Scatter3D graph. We'll anchor it to the parent bottom:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 9
 
-    Next we're ready to add the \c Scatter3D graph itself. We'll add it inside the \c dataView and
+    Next we're ready to add the Scatter3D graph itself. We'll add it inside the \c dataView and
     name it \c {scatterGraph}. Let's make it fill the \c {dataView}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 2
 
-    Now the graph is ready for use, but has no data. It also has the default proxy, axes, and visual
+    Now the graph is ready for use, but has no data. It also has the default axes and visual
     properties.
 
     Let's modify some visual properties first by adding the following inside \c {scatterGraph}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 3
 
-    We changed the font, theme, and shadow quality. We're happy with the other visual properties,
-    so we won't change them.
+    We added a built-in Theme3D and changed the font in it. We also changed the shadow quality.
+    We're happy with the other visual properties, so we won't change them.
 
     Then it's time to start feeding the graph some data.
 
     \section1 Adding data to the graph
 
-    Let's create a \c Data item inside the \c mainView and name it \c {graphData}:
+    Let's create a \c Data item inside the \c mainView and name it \c {seriesOneData}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 4
+
+    We'll add two more of these: \c seriesTwoData and \c seriesThreeData to add to the three series
+    we're going to have. They are added similarly as \c {seriesOneData}.
 
     This is the component that holds our data in \c {data.qml}. It has an \c Item as the main
     component.
@@ -125,37 +130,39 @@
     \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 0
     \dots
 
-    That itself doesn't do us much good, so we'll create a \c ScatterDataMapping and name it
-    \c {scatterMapping}:
+    We'll add two more of these for the other two series, and name them \c dataModelTwo and
+    \c {dataModelThree}.
+
+    Then we need to expose the data models to be usable from \c {main.qml}. We do this by defining
+    them as aliases in the main data component:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 1
 
-    In \c scatterMapping we need to define axis roles to match the roles in the \c ListElement
-    items of the \c {dataModel}.
-
-    We'll still need a data proxy, so we'll create a \c ItemModelScatterDataProxy and call it
-    \c {modelProxy}:
-
-    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 2
-
-    We set \c scatterMapping as the active mapping and \c dataModel as the item model.
-
-    We still need to expose the proxy to be usable from \c {main.qml}. We do this by defining it as
-    an alias in the main data component:
-
-    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 3
-
-    Now we can use the data from \c data.qml with \c scatterGraph in \c {main.qml}. We'll just set
-    \c proxy as the \c dataProxy for the graph:
+    Now we can use the data from \c data.qml with \c scatterGraph in \c {main.qml}. First we'll add
+    a Scatter3DSeries and call it \c {scatterSeries}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 5
 
-    We'll set up selection label format and the axes in \c scatterGraph as well:
+    Then we'll set up selection label format for the series:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 10
+
+    And finally the data for series one in a ItemModelScatterDataProxy. We set the data itself as
+    \c itemModel for the proxy:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 11
+
+    We'll add the other two series in the same way, but modify some series-specific details a bit:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 12
+    \dots
+
+    Then we'll modify the properties of the default axes in \c scatterGraph a bit:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 6
 
-    After that we'll add a few buttons to the \c mainView to control the graph. We'll only show one
-    as an example:
+    After that we'll just add a few buttons to the \c mainView to control the graph. We'll only
+    show one as an example:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 7
 
