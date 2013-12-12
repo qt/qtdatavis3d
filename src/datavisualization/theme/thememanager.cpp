@@ -96,10 +96,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeQt: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x80c342)));
-        baseColors.append(QColor(QRgb(0x60c342)));
-        baseColors.append(QColor(QRgb(0x40c342)));
-        baseColors.append(QColor(QRgb(0x20c342)));
-        baseColors.append(QColor(QRgb(0x00c342)));
+        baseColors.append(QColor(QRgb(0x328930)));
+        baseColors.append(QColor(QRgb(0x006325)));
+        baseColors.append(QColor(QRgb(0x35322f)));
+        baseColors.append(QColor(QRgb(0x5d5b59)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
