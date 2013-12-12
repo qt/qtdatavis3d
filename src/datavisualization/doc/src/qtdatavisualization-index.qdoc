@@ -32,9 +32,9 @@
         \li Uses OpenGL for rendering the data
         \li QML2 support
         \li Customizable axes for data - control viewable data window with axis ranges
-        \li Customizable input handling (upcoming feature - not supported in technology preview)
-        \li Customizable scene handling - full control of cameras and lights (upcoming feature -
-            not supported in technology preview)
+        \li Customizable input handling
+        \li Customizable scene handling - full control of viewports
+            (upcoming feature - not supported in technology preview)
         \li Customizable themes
     \endlist
 

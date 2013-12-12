@@ -61,7 +61,7 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low Soft"));
     shadowQuality->addItem(QStringLiteral("Medium Soft"));
     shadowQuality->addItem(QStringLiteral("High Soft"));
-    shadowQuality->setCurrentIndex(4);
+    shadowQuality->setCurrentIndex(2);
 
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);

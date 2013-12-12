@@ -33,16 +33,21 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_inputHandler(new CustomInputHandler())
 {
     m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
+    m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
 
+    m_graph->axisX()->setRange(-10.0f, 10.0f);
+    m_graph->axisY()->setRange(-5.0f, 5.0f);
+    m_graph->axisZ()->setRange(-5.0f, 5.0f);
+
     QScatter3DSeries *series = new QScatter3DSeries;
     series->setItemLabelFormat("@xLabel, @yLabel, @zLabel");
     series->setMesh(QAbstract3DSeries::MeshCube);
+    series->setItemSize(0.15f);
     m_graph->addSeries(series);
 
     //! [2]
