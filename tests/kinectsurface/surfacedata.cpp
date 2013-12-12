@@ -71,7 +71,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 
     // Initialize bars
     m_bars->setTheme(QDataVis::ThemeQt);
-    m_bars->setSelectionMode(QDataVis::SelectionModeNone);
+    m_bars->setSelectionMode(QDataVis::SelectionNone);
     m_bars->setGridVisible(false);
     m_bars->setBarType(QDataVis::MeshBars, true);
 #if 1

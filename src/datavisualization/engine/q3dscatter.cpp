@@ -224,7 +224,7 @@ Q3DTheme *Q3DScatter::theme() const
 /*!
  * \property Q3DScatter::selectionMode
  *
- * Sets item selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
+ * Sets item selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
  * \c QDataVis::SelectionItem by default.
  *
  * \note Only \c QDataVis::SelectionItem and \c QDataVis::SelectionNone are supported.

@@ -241,7 +241,7 @@ QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
 /*!
  * \property Q3DSurface::selectionMode
  *
- * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports
+ * Sets point selection \a mode to a combination of \c QDataVis::SelectionFlags. Surface supports
  * \c SelectionItem and \c SelectionSlice with either \c SelectionRow or \c SelectionColumn.
  * It is preset to \c SelectionItem by default.
  */

@@ -169,7 +169,6 @@ void GraphDataGenerator::setupModel()
     m_graph->rowAxis()->setTitle("Week of year");
     m_graph->columnAxis()->setTitle("Day of week");
     m_graph->valueAxis()->setTitle("Hours spent on the Internet");
-    m_graph->valueAxis()->setSegmentCount(5);
     m_graph->valueAxis()->setLabelFormat("%.1f h");
     //! [10]
 
@@ -262,7 +261,7 @@ int main(int argc, char **argv)
 
     //! [2]
     // Since we are dealing with QTableWidget, the model will already have data sorted properly
-    // in rows and columns, so we simply set useModelCategories property to true to utilize this.
+    // into rows and columns, so we simply set useModelCategories property to true to utilize this.
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model());
     proxy->setUseModelCategories(true);
     QBar3DSeries *series = new QBar3DSeries(proxy);

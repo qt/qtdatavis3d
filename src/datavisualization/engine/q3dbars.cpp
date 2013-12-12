@@ -303,8 +303,8 @@ Q3DTheme *Q3DBars::theme() const
 /*!
  * \property Q3DBars::selectionMode
  *
- * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
- * \c QDataVis::SelectionModeItem by default.
+ * Sets bar selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
+ * \c QDataVis::SelectionItem by default.
  */
 void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
 {
