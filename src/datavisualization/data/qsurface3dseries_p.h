@@ -46,14 +46,14 @@ public:
 
     void setSelectedPoint(const QPoint &position);
     void setFlatShadingEnabled(bool enabled);
-    void setSurfaceGridEnabled(bool enabled);
+    void setDrawMode(QSurface3DSeries::DrawFlags mode);
 
 private:
     QSurface3DSeries *qptr();
 
     QPoint m_selectedPoint;
     bool m_flatShadingEnabled;
-    bool m_surfaceGridEnabled;
+    QSurface3DSeries::DrawFlags m_drawMode;
 
 private:
     friend class QSurface3DSeries;

@@ -74,7 +74,7 @@ Item {
             Surface3DSeries {
                 id: surfaceSeries
                 flatShadingEnabled: false
-                surfaceGridEnabled: false
+                drawMode: Surface3DSeries.DrawSurface
 
                 ItemModelSurfaceDataProxy {
                     itemModel: surfaceData.model
@@ -94,7 +94,7 @@ Item {
     Surface3DSeries {
         id: heightSeries
         flatShadingEnabled: false
-        surfaceGridEnabled: false
+        drawMode: Surface3DSeries.DrawSurface
 
         HeightMapSurfaceDataProxy {
             heightMapFile: ":/heightmaps/image"
@@ -114,14 +114,14 @@ Item {
         text: "Show Surface Grid"
         //! [1]
         onClicked: {
-            if (surfaceSeries.surfaceGridEnabled === false) {
-                surfaceSeries.surfaceGridEnabled = true;
-                heightSeries.surfaceGridEnabled = true;
-                text = "Hide Surface Grid"
-            } else {
-                surfaceSeries.surfaceGridEnabled = false;
-                heightSeries.surfaceGridEnabled = false;
+            if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                heightSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
                 text = "Show Surface Grid"
+            } else {
+                surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                heightSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                text = "Hide Surface Grid"
             }
         }
         //! [1]
@@ -133,13 +133,13 @@ Item {
         width: surfaceGridToggle.width
         text: "Hide Surface"
         onClicked: {
-            if (surfaceSeries.visible === true) {
-                surfaceSeries.visible = false;
-                heightSeries.visible = false;
+            if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
+                surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
+                heightSeries.drawMode &= ~Surface3DSeries.DrawSurface;
                 text = "Show Surface"
             } else {
-                surfaceSeries.visible = true;
-                heightSeries.visible = true;
+                surfaceSeries.drawMode |= Surface3DSeries.DrawSurface;
+                heightSeries.drawMode |= Surface3DSeries.DrawSurface;
                 text = "Hide Surface"
             }
         }

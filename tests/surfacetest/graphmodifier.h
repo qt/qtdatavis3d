@@ -44,6 +44,7 @@ public:
     void toggleSmooth(bool enabled);
     void toggleSurfaceGrid(bool enable);
     void toggleSurface(bool enable);
+    void toggleSeriesVisible(bool enable);
     void toggleSqrtSin(bool enable);
     void togglePlane(bool enable);
     void setHeightMapData(bool enable);
@@ -113,6 +114,7 @@ private:
     QSurfaceDataArray *m_planeArray;
     QLabel *m_selectionInfoLabel;
     QSurface3DSeries *m_theSeries;
+    QSurface3DSeries::DrawFlags m_drawMode;
 };
 
 #endif

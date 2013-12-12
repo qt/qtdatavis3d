@@ -29,13 +29,21 @@ class QSurface3DSeriesPrivate;
 class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
+    Q_FLAGS(DrawFlag DrawFlags)
     Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_PROPERTY(bool flatShadingEnabled READ isFlatShadingEnabled WRITE setFlatShadingEnabled NOTIFY flatShadingEnabledChanged)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled NOTIFY surfaceGridEnabledChanged)
     Q_PROPERTY(bool flatShadingSupported READ isFlatShadingSupported NOTIFY flatShadingSupportedChanged)
+    Q_PROPERTY(QtDataVisualization::QSurface3DSeries::DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
 
 public:
+    enum DrawFlag {
+        DrawWireframe = 1,
+        DrawSurface = 2,
+        DrawSurfaceAndWireframe = DrawWireframe | DrawSurface
+    };
+    Q_DECLARE_FLAGS(DrawFlags, DrawFlag)
+
     explicit QSurface3DSeries(QObject *parent = 0);
     explicit QSurface3DSeries(QSurfaceDataProxy *dataProxy, QObject *parent = 0);
     virtual ~QSurface3DSeries();
@@ -50,8 +58,8 @@ public:
     void setFlatShadingEnabled(bool enabled);
     bool isFlatShadingEnabled() const;
 
-    void setSurfaceGridEnabled(bool enabled);
-    bool isSurfaceGridEnabled() const;
+    void setDrawMode(QSurface3DSeries::DrawFlags mode);
+    QSurface3DSeries::DrawFlags drawMode() const;
 
     bool isFlatShadingSupported() const;
 
@@ -61,6 +69,7 @@ signals:
     void flatShadingEnabledChanged(bool enable);
     void surfaceGridEnabledChanged(bool enable);
     void flatShadingSupportedChanged(bool enable);
+    void drawModeChanged(QSurface3DSeries::DrawFlags mode);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = 0);

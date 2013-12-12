@@ -52,7 +52,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_insertTestZPos(0),
       m_insertTestIndexPos(1),
       m_planeArray(0),
-      m_theSeries(new QSurface3DSeries)
+      m_theSeries(new QSurface3DSeries),
+      m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
@@ -80,12 +81,27 @@ void GraphModifier::toggleSmooth(bool enabled)
 void GraphModifier::toggleSurfaceGrid(bool enable)
 {
     qDebug() << "GraphModifier::toggleSurfaceGrid" << enable;
-    m_theSeries->setSurfaceGridEnabled(enable);
+    if (enable)
+        m_drawMode |= QSurface3DSeries::DrawWireframe;
+    else
+        m_drawMode &= ~QSurface3DSeries::DrawWireframe;
+
+    m_theSeries->setDrawMode(m_drawMode);
 }
 
 void GraphModifier::toggleSurface(bool enable)
 {
     qDebug() << "GraphModifier::toggleSurface" << enable;
+    if (enable)
+        m_drawMode |= QSurface3DSeries::DrawSurface;
+    else
+        m_drawMode &= ~QSurface3DSeries::DrawSurface;
+
+    m_theSeries->setDrawMode(m_drawMode);
+}
+
+void GraphModifier::toggleSeriesVisible(bool enable)
+{
     m_theSeries->setVisible(enable);
 }
 

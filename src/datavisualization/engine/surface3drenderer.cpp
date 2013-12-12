@@ -206,12 +206,9 @@ void Surface3DRenderer::updateData()
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        m_cachedSurfaceVisible = firstSeries->isVisible(); // TODO: To series visuals update?
-        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
-            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
-            if (dataProxy)
-                array = dataProxy->array();
-        }
+        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+        if (dataProxy)
+            array = dataProxy->array();
     }
 
     calculateSceneScalingFactors();
@@ -264,6 +261,9 @@ void Surface3DRenderer::updateData()
             delete m_dataArray.at(i);
         m_dataArray.clear();
         m_sampleSpace = QRect();
+
+        delete m_surfaceObj;
+        m_surfaceObj = 0;
     }
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
@@ -282,7 +282,11 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
         updateFlatStatus(series->isFlatShadingEnabled());
-        updateSurfaceGridStatus(series->isSurfaceGridEnabled());
+
+        QSurface3DSeries::DrawFlags drawMode = series->drawMode();
+        m_cachedSurfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
+        m_cachedSurfaceGridOn = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
+
         QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
         if (m_uniformGradientTextureColor != seriesColor)
             generateUniformGradient(seriesColor);

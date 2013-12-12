@@ -130,6 +130,19 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \enum QSurface3DSeries::DrawFlag
+ *
+ * Drawing mode of the surface. Values of this enumeration can be combined with OR operator.
+ *
+ * \value DrawWireframe
+ *        Only the grid is drawn.
+ * \value DrawSurface
+ *        Only the surface is drawn.
+ * \value DrawSurfaceAndWireframe
+ *        Both the surface and grid are drawn.
+ */
+
+/*!
  * Constructs QSurface3DSeries with the given \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QObject *parent) :
@@ -252,21 +265,21 @@ bool QSurface3DSeries::isFlatShadingSupported() const
 }
 
 /*!
- * \property QSurface3DSeries::surfaceGridEnabled
+ * \property QSurface3DSeries::drawMode
  *
- * Sets surface grid to \a enabled. It is preset to \c true by default.
+ * Sets the drawing \a mode to one of QSurface3DSeries::DrawFlag.
  */
-void QSurface3DSeries::setSurfaceGridEnabled(bool enabled)
+void QSurface3DSeries::setDrawMode(QSurface3DSeries::DrawFlags mode)
 {
-    if (dptr()->m_surfaceGridEnabled != enabled) {
-        dptr()->setSurfaceGridEnabled(enabled);
-        emit surfaceGridEnabledChanged(enabled);
+    if (dptr()->m_drawMode != mode) {
+        dptr()->setDrawMode(mode);
+        emit drawModeChanged(mode);
     }
 }
 
-bool QSurface3DSeries::isSurfaceGridEnabled() const
+QSurface3DSeries::DrawFlags QSurface3DSeries::drawMode() const
 {
-    return dptrc()->m_surfaceGridEnabled;
+    return dptrc()->m_drawMode;
 }
 
 /*!
@@ -291,7 +304,7 @@ QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_flatShadingEnabled(true),
-      m_surfaceGridEnabled(true)
+      m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
     m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
     m_mesh = QAbstract3DSeries::MeshSphere;
@@ -358,9 +371,9 @@ void QSurface3DSeriesPrivate::setFlatShadingEnabled(bool enabled)
         m_controller->markSeriesVisualsDirty();
 }
 
-void QSurface3DSeriesPrivate::setSurfaceGridEnabled(bool enabled)
+void QSurface3DSeriesPrivate::setDrawMode(QSurface3DSeries::DrawFlags mode)
 {
-    m_surfaceGridEnabled = enabled;
+    m_drawMode = mode;
     if (m_controller)
         m_controller->markSeriesVisualsDirty();
 }

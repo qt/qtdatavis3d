@@ -91,7 +91,7 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
 {
     if (enable) {
         //! [3]
-        m_sqrtSinSeries->setSurfaceGridEnabled(true);
+        m_sqrtSinSeries->setDrawMode(QSurface3DSeries::DrawSurfaceAndWireframe);
         m_sqrtSinSeries->setFlatShadingEnabled(true);
 
         m_graph->axisX()->setLabelFormat("%.2f");
@@ -124,7 +124,7 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
 {
     if (enable) {
         //! [4]
-        m_heightMapSeries->setSurfaceGridEnabled(false);
+        m_heightMapSeries->setDrawMode(QSurface3DSeries::DrawSurface);
         m_heightMapSeries->setFlatShadingEnabled(false);
 
         m_graph->axisX()->setLabelFormat("%.1f N");

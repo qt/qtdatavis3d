@@ -78,6 +78,10 @@ int main(int argc, char *argv[])
     surfaceCB->setText(QStringLiteral("Surface Visible"));
     surfaceCB->setChecked(true);
 
+    QCheckBox *seriesVisibleCB = new QCheckBox(widget);
+    seriesVisibleCB->setText(QStringLiteral("Series Visible"));
+    seriesVisibleCB->setChecked(true);
+
     //QCheckBox *sqrtSinCB = new QCheckBox(widget);
     QRadioButton *sqrtSinCB = new QRadioButton(widget);
     sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
@@ -247,6 +251,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
     vLayout->addWidget(surfaceCB);
+    vLayout->addWidget(seriesVisibleCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
     vLayout->addWidget(planeCB);
@@ -298,6 +303,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleSurfaceGrid);
     QObject::connect(surfaceCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleSurface);
+    QObject::connect(seriesVisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeriesVisible);
     QObject::connect(sqrtSinCB, &QRadioButton::toggled,
                      modifier, &GraphModifier::toggleSqrtSin);
     QObject::connect(planeCB, &QCheckBox::toggled,
