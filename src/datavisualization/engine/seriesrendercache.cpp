@@ -29,7 +29,10 @@ const QString smoothString(QStringLiteral("Smooth"));
 SeriesRenderCache::SeriesRenderCache()
     : m_series(0),
       m_object(0),
-      m_mesh(QAbstract3DSeries::MeshCube)
+      m_mesh(QAbstract3DSeries::MeshCube),
+      m_baseGradientTexture(0),
+      m_singleHighlightGradientTexture(0),
+      m_multiHighlightGradientTexture(0)
 {
 }
 

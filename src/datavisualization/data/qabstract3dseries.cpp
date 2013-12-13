@@ -496,7 +496,8 @@ QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstra
       m_visible(true),
       m_controller(0),
       m_mesh(QAbstract3DSeries::MeshCube),
-      m_meshSmooth(false)
+      m_meshSmooth(false),
+      m_colorStyle(Q3DTheme::ColorStyleUniform)
 {
 }
 

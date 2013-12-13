@@ -642,9 +642,6 @@ void Bars3DRenderer::drawSlicedScene()
     }
 
     int lastLabel = m_sliceCache->labelItems().size() - 1;
-    int seriesCount = 1;
-    if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
-        seriesCount = m_visibleSeriesList.size();
 
     for (int labelNo = 0; labelNo <= lastLabel; labelNo++) {
         // Get labels from first series only
