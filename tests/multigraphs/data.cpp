@@ -57,7 +57,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
     QSurface3DSeries *series1 = new QSurface3DSeries(new QHeightMapSurfaceDataProxy());
     series1->setFlatShadingEnabled(true);
-    series1->setSurfaceGridEnabled(false);
+    series1->setDrawMode(QSurface3DSeries::DrawSurface);
     series1->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     series1->setBaseGradient(gradient);
     m_surface->addSeries(series1);
@@ -104,6 +104,7 @@ Data::~Data()
         delete m_scatter;
     }
     delete m_widget;
+    delete m_scatterDataArray; // only portion of this array is set to graph
 }
 
 void Data::updateData()

@@ -65,6 +65,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_drawer;
     delete m_textureHelper;
     delete m_cachedScene;
+    delete m_cachedTheme;
 }
 
 void Abstract3DRenderer::initializeOpenGL()

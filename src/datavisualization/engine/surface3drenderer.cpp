@@ -290,8 +290,11 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
         if (m_uniformGradientTextureColor != seriesColor)
             generateUniformGradient(seriesColor);
-        if (m_selectionPointer)
+        if (m_selectionPointer) {
             m_selectionPointer->setHighlightColor(Utils::vectorFromColor(series->singleHighlightColor()));
+            // Make sure selection pointer object reference is still good
+            m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
+        }
     }
 }
 
@@ -996,7 +999,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
-        glClearColor(0, 0, 0, 0);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
 
@@ -1016,7 +1019,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glEnable(GL_DITHER);
 
-        GLubyte pixel[4] = {0};
+        GLubyte pixel[4] = {0, 0, 0, 0};
         glReadPixels(m_inputPosition.x(), m_cachedBoundingRect.height() - m_inputPosition.y(),
                      1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 

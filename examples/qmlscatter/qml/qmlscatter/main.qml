@@ -155,7 +155,7 @@ Item {
             id: smoothToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
-            text: "Use Smooth Dots"
+            text: "Use Smooth for Series One"
             onClicked: {
                 if (scatterSeries.meshSmooth === false) {
                     text = "Use Flat for Series One";

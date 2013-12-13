@@ -105,7 +105,7 @@ void ScatterDataModifier::start()
 
 void ScatterDataModifier::addData()
 {
-    QVector<QVector3D> *itemList = new QVector<QVector3D>();
+    QVector<QVector3D> itemList;
 
     // Read data items from the file to QVector
     QTextStream stream;
@@ -122,7 +122,7 @@ void ScatterDataModifier::addData()
                 qWarning() << "Invalid row read from data:" << line;
                 continue;
             }
-            itemList->append(QVector3D(
+            itemList.append(QVector3D(
                                  strList.at(0).trimmed().toFloat(),
                                  strList.at(1).trimmed().toFloat(),
                                  strList.at(2).trimmed().toFloat()));
@@ -133,10 +133,10 @@ void ScatterDataModifier::addData()
 
     // Add data from the QVector to datamodel
     QScatterDataArray *dataArray = new QScatterDataArray;
-    dataArray->resize(itemList->count());
+    dataArray->resize(itemList.count());
     QScatterDataItem *ptrToDataArray = &dataArray->first();
-    for (int i = 0; i < itemList->count(); i++) {
-        ptrToDataArray->setPosition(itemList->at(i));
+    for (int i = 0; i < itemList.count(); i++) {
+        ptrToDataArray->setPosition(itemList.at(i));
         ptrToDataArray++;
     }
 

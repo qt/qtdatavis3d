@@ -131,12 +131,10 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 
 QVector3D Utils::getSelection(QPoint mousepos, int height)
 {
-    QVector3D selectedColor;
-
     //#if defined(QT_OPENGL_ES_2)
     // This is the only one that works with ANGLE (ES 2.0)
     // Item count will be limited to 256*256*256
-    GLubyte pixel[4];
+    GLubyte pixel[4] = {255, 255, 255, 0};
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                  (void *)pixel);
 
@@ -155,7 +153,7 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     //             GL_RGB, GL_FLOAT, (void *)pixel3);
     //qDebug() << "rgba" << pixel3[0] << pixel3[1] << pixel3[2];// << pixel[3];
     //#endif
-    selectedColor = QVector3D(pixel[0], pixel[1], pixel[2]);
+    QVector3D selectedColor(pixel[0], pixel[1], pixel[2]);
     //qDebug() << selectedColor;
 
     return selectedColor;

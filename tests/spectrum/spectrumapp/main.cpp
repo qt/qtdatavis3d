@@ -97,8 +97,6 @@ MainApp::MainApp(Q3DBars *window)
     // Adjust camera position
     m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif
-    // Set color scheme
-    m_chart->setBarColor(QColor(Qt::red));
     // Disable selection
     m_chart->setSelectionMode(QDataVis::SelectionNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
@@ -107,6 +105,7 @@ MainApp::MainApp(Q3DBars *window)
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
     QBar3DSeries *series = new QBar3DSeries();
+    series->setBaseColor(QColor(Qt::red));
     series->setMesh(QAbstract3DSeries::MeshBar);
     m_chart->addSeries(series);
 }

@@ -227,7 +227,7 @@ Item {
             Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
-            text: "Switch to Item Model Series"
+            text: "Switch to Height Map Series"
             //! [3]
             onClicked: {
                 if (surfaceplot.seriesList[0] === heightSeries) {

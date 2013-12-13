@@ -80,6 +80,7 @@ Abstract3DController::~Abstract3DController()
     else
         delete m_renderer;
     delete m_scene;
+    delete m_themeManager;
 }
 
 /**

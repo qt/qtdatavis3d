@@ -302,7 +302,7 @@ void Bars3DRenderer::drawSlicedScene()
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
     projectionMatrix.perspective(40.0f, (GLfloat)m_sliceViewPort.width()
-                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 10.0f);
+                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
