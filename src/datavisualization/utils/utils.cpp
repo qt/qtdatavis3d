@@ -60,7 +60,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
-    if (maxLabelWidth && !labelBackground)
+    if (maxLabelWidth && labelBackground)
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
