@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.1
+import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
@@ -34,7 +35,7 @@ Item {
         id: dataView
         anchors.bottom: parent.bottom
         width: parent.width
-        height: parent.height - shadowToggle.height
+        height: parent.height - buttonLayout.height
 
         //! [0]
         Scatter3D {
@@ -153,45 +154,53 @@ Item {
     }
     //! [7]
 
-    NewButton {
-        id: shadowToggle
-        width: parent.width / 3 // We're adding 3 buttons and want to divide them equally
-        text: "Hide Shadows"
+    RowLayout {
+        id: buttonLayout
+        Layout.minimumHeight: shadowToggle.height
+        width: parent.width
         anchors.left: parent.left
+        spacing: 0
 
-        onClicked: {
-            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftMedium;
-                text = "Hide Shadows";
-            } else {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                text = "Show Shadows";
+        NewButton {
+            id: shadowToggle
+            Layout.fillHeight: true
+            Layout.minimumWidth: parent.width / 3 // 3 buttons divided equally in the layout
+            text: "Hide Shadows"
+
+            onClicked: {
+                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftMedium;
+                    text = "Hide Shadows";
+                } else {
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    text = "Show Shadows";
+                }
             }
         }
-    }
 
-    NewButton {
-        id: cameraToggle
-        width: parent.width / 3
-        text: "Animate Camera"
-        anchors.left: shadowToggle.right
+        NewButton {
+            id: cameraToggle
+            Layout.fillHeight: true
+            Layout.minimumWidth: parent.width / 3
+            text: "Animate Camera"
 
-        onClicked: {
-            cameraAnimationX.paused = !cameraAnimationX.paused;
-            cameraAnimationY.paused = cameraAnimationX.paused;
-            if (cameraAnimationX.paused) {
-                text = "Animate Camera";
-            } else {
-                text = "Pause Camera";
+            onClicked: {
+                cameraAnimationX.paused = !cameraAnimationX.paused;
+                cameraAnimationY.paused = cameraAnimationX.paused;
+                if (cameraAnimationX.paused) {
+                    text = "Animate Camera";
+                } else {
+                    text = "Pause Camera";
+                }
             }
         }
-    }
 
-    NewButton {
-        id: exitButton
-        width: parent.width / 3
-        text: "Quit"
-        anchors.left: cameraToggle.right
-        onClicked: Qt.quit(0);
+        NewButton {
+            id: exitButton
+            Layout.fillHeight: true
+            Layout.minimumWidth: parent.width / 3
+            text: "Quit"
+            onClicked: Qt.quit(0);
+        }
     }
 }

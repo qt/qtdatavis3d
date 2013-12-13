@@ -18,7 +18,6 @@
 
 import QtQuick 2.1
 import QtDataVisualization 1.0
-import QtQuick.XmlListModel 2.0
 
 Item {
     property alias model: dataModel

@@ -18,6 +18,7 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
+import QtQuick.Controls.Styles 1.0
 
 Item {
     id: newbutton
@@ -26,17 +27,25 @@ Item {
 
     signal clicked
 
-    height: 80
+    implicitWidth: buttonText.implicitWidth + 5
+    implicitHeight: buttonText.implicitHeight + 10
 
     Button {
+        id: buttonText
         width: parent.width
         height: parent.height
-        Text {
-            id: buttonText
-            wrapMode: Text.WordWrap
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            anchors.fill: parent
+
+        style: ButtonStyle {
+            label: Component {
+                Text {
+                    text: buttonText.text
+                    clip: true
+                    wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    anchors.fill: parent
+                }
+            }
         }
         onClicked: newbutton.clicked()
     }

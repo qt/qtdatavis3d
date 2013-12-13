@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.1
+import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
@@ -26,13 +27,16 @@ Item {
     height: 720
     visible: true
 
+    property int buttonMaximumWidth: surfaceGridToggle.width
+    property int buttonMinimumHeight: seriesToggle.height
+
     Data {
         id: surfaceData
     }
 
     Item {
         id: surfaceView
-        width: mainview.width - surfaceGridToggle.width
+        width: mainview.width - buttonLayout.width
         height: mainview.height
         anchors.right: mainview.right;
 
@@ -113,120 +117,132 @@ Item {
         }
     }
     //! [4]
-
-    NewButton {
-        id: surfaceGridToggle
+    ColumnLayout {
+        id: buttonLayout
         anchors.top: parent.top
         anchors.left: parent.left
-        width: 200
-        text: "Show Surface Grid"
-        //! [1]
-        onClicked: {
-            if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
-                surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                heightSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                text = "Show Surface Grid"
-            } else {
-                surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
-                heightSeries.drawMode |= Surface3DSeries.DrawWireframe;
-                text = "Hide Surface Grid"
-            }
-        }
-        //! [1]
-    }
+        spacing: 0
 
-    NewButton {
-        id: surfaceToggle
-        anchors.top: surfaceGridToggle.bottom
-        width: surfaceGridToggle.width
-        text: "Hide Surface"
-        //! [8]
-        onClicked: {
-            if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
-                surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
-                heightSeries.drawMode &= ~Surface3DSeries.DrawSurface;
-                text = "Show Surface"
-            } else {
-                surfaceSeries.drawMode |= Surface3DSeries.DrawSurface;
-                heightSeries.drawMode |= Surface3DSeries.DrawSurface;
-                text = "Hide Surface"
+        NewButton {
+            id: surfaceGridToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Show Surface Grid"
+            //! [1]
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                    heightSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                    text = "Show Surface Grid"
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                    heightSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                    text = "Hide Surface Grid"
+                }
             }
+            //! [1]
         }
-        //! [8]
-    }
 
-    NewButton {
-        id: flatShadingToggle
-        anchors.top: surfaceToggle.bottom
-        width: surfaceToggle.width
-        text: "Show Flat"
-        enabled: surfaceSeries.flatShadingSupported
-        //! [2]
-        onClicked: {
-            if (surfaceSeries.flatShadingEnabled === true) {
-                surfaceSeries.flatShadingEnabled = false;
-                heightSeries.flatShadingEnabled = false;
-                text = "Show Flat"
-            } else {
-                surfaceSeries.flatShadingEnabled = true;
-                heightSeries.flatShadingEnabled = true;
-                text = "Show Smooth"
+        NewButton {
+            id: surfaceToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Surface"
+            //! [8]
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
+                    heightSeries.drawMode &= ~Surface3DSeries.DrawSurface;
+                    text = "Show Surface"
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawSurface;
+                    heightSeries.drawMode |= Surface3DSeries.DrawSurface;
+                    text = "Hide Surface"
+                }
             }
+            //! [8]
         }
-        //! [2]
-    }
 
-    NewButton {
-        id: backgroundToggle
-        anchors.top: flatShadingToggle.bottom
-        width: flatShadingToggle.width
-        text: "Hide Background"
-        onClicked: {
-            if (surfaceplot.theme.backgroundEnabled === true) {
-                surfaceplot.theme.backgroundEnabled = false;
-                text = "Show Background"
-            } else {
-                surfaceplot.theme.backgroundEnabled = true;
-                text = "Hide Background"
-            }
-        }
-    }
+        NewButton {
+            id: flatShadingToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
 
-    NewButton {
-        id: gridToggle
-        anchors.top: backgroundToggle.bottom
-        width: backgroundToggle.width
-        text: "Hide Grid"
-        onClicked: {
-            if (surfaceplot.theme.gridEnabled === true) {
-                surfaceplot.theme.gridEnabled = false;
-                text = "Show Grid"
-            } else {
-                surfaceplot.theme.gridEnabled = true;
-                text = "Hide Grid"
+            text: "Show Flat"
+            enabled: surfaceSeries.flatShadingSupported
+            //! [2]
+            onClicked: {
+                if (surfaceSeries.flatShadingEnabled === true) {
+                    surfaceSeries.flatShadingEnabled = false;
+                    heightSeries.flatShadingEnabled = false;
+                    text = "Show Flat"
+                } else {
+                    surfaceSeries.flatShadingEnabled = true;
+                    heightSeries.flatShadingEnabled = true;
+                    text = "Show Smooth"
+                }
             }
+            //! [2]
         }
-    }
 
-    NewButton {
-        id: seriesToggle
-        anchors.top: gridToggle.bottom
-        width: gridToggle.width
-        text: "Switch to Item Model Series"
-        //! [3]
-        onClicked: {
-            if (surfaceplot.seriesList[0] === heightSeries) {
-                surfaceplot.axisY.max = 500.0
-                surfaceplot.seriesList = [surfaceSeries]
-                middleGradient.position = 0.25
-                text = "Switch to Height Map Series"
-            } else {
-                surfaceplot.axisY.max = 250.0
-                surfaceplot.seriesList = [heightSeries]
-                middleGradient.position = 0.50
-                text = "Switch to Item Model Series"
+        NewButton {
+            id: backgroundToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Background"
+            onClicked: {
+                if (surfaceplot.theme.backgroundEnabled === true) {
+                    surfaceplot.theme.backgroundEnabled = false;
+                    text = "Show Background"
+                } else {
+                    surfaceplot.theme.backgroundEnabled = true;
+                    text = "Hide Background"
+                }
             }
         }
-        //! [3]
+
+        NewButton {
+            id: gridToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Grid"
+            onClicked: {
+                if (surfaceplot.theme.gridEnabled === true) {
+                    surfaceplot.theme.gridEnabled = false;
+                    text = "Show Grid"
+                } else {
+                    surfaceplot.theme.gridEnabled = true;
+                    text = "Hide Grid"
+                }
+            }
+        }
+
+        NewButton {
+            id: seriesToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Switch to Item Model Series"
+            //! [3]
+            onClicked: {
+                if (surfaceplot.seriesList[0] === heightSeries) {
+                    surfaceplot.axisY.max = 500.0
+                    surfaceplot.seriesList = [surfaceSeries]
+                    middleGradient.position = 0.25
+                    text = "Switch to Height Map Series"
+                } else {
+                    surfaceplot.axisY.max = 250.0
+                    surfaceplot.seriesList = [heightSeries]
+                    middleGradient.position = 0.50
+                    text = "Switch to Item Model Series"
+                }
+            }
+            //! [3]
+        }
     }
 }
