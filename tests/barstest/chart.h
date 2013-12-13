@@ -78,6 +78,8 @@ public:
     void useOwnTheme();
     void changeBaseColor(const QColor &color);
     void changeColorStyle();
+    void showFiveSeries();
+    QBarDataArray *makeDummyData();
 
 public slots:
     void flipViews();
@@ -118,6 +120,11 @@ private:
     QBar3DSeries *m_temperatureData;
     QBar3DSeries *m_temperatureData2;
     QBar3DSeries *m_genericData;
+    QBar3DSeries *m_dummyData;
+    QBar3DSeries *m_dummyData2;
+    QBar3DSeries *m_dummyData3;
+    QBar3DSeries *m_dummyData4;
+    QBar3DSeries *m_dummyData5;
     Q3DValueAxis *m_currentAxis;
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;

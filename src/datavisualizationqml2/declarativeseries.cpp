@@ -66,7 +66,7 @@ static void connectSeriesGradient(QAbstract3DSeries *series, ColorGradient *newG
 
         int updatedIndex = newGradient->metaObject()->indexOfSignal("updated()");
         QMetaMethod updateFunction = newGradient->metaObject()->method(updatedIndex);
-        int handleIndex;
+        int handleIndex = -1;
         switch (type) {
         case GradientTypeBase:
             handleIndex = series->metaObject()->indexOfSlot("handleBaseGradientUpdate()");

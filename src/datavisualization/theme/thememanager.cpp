@@ -96,10 +96,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeQt: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x80c342)));
-        baseColors.append(QColor(QRgb(0x5caa15)));
         baseColors.append(QColor(QRgb(0x469835)));
-        baseColors.append(QColor(QRgb(0x328930)));
         baseColors.append(QColor(QRgb(0x006325)));
+        baseColors.append(QColor(QRgb(0x5caa15)));
+        baseColors.append(QColor(QRgb(0x328930)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
@@ -135,10 +135,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemePrimaryColors: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xffe400)));
-        baseColors.append(QColor(QRgb(0xfcc303)));
         baseColors.append(QColor(QRgb(0xfaa106)));
-        baseColors.append(QColor(QRgb(0xf7800a)));
         baseColors.append(QColor(QRgb(0xf45f0d)));
+        baseColors.append(QColor(QRgb(0xfcc303)));
+        baseColors.append(QColor(QRgb(0xf7800a)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
@@ -174,10 +174,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeDigia: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xcccccc)));
-        baseColors.append(QColor(QRgb(0xb9b9b9)));
         baseColors.append(QColor(QRgb(0xa6a6a6)));
-        baseColors.append(QColor(QRgb(0x939393)));
         baseColors.append(QColor(QRgb(0x808080)));
+        baseColors.append(QColor(QRgb(0xb9b9b9)));
+        baseColors.append(QColor(QRgb(0x939393)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
@@ -213,10 +213,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeStoneMoss: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xbeb32b)));
-        baseColors.append(QColor(QRgb(0xaa9e29)));
         baseColors.append(QColor(QRgb(0x978927)));
-        baseColors.append(QColor(QRgb(0x847426)));
         baseColors.append(QColor(QRgb(0x705f24)));
+        baseColors.append(QColor(QRgb(0xaa9e29)));
+        baseColors.append(QColor(QRgb(0x847426)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
@@ -252,10 +252,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeArmyBlue: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x495f76)));
-        baseColors.append(QColor(QRgb(0x607286)));
         baseColors.append(QColor(QRgb(0x768595)));
-        baseColors.append(QColor(QRgb(0x8c98a4)));
         baseColors.append(QColor(QRgb(0xa2abb4)));
+        baseColors.append(QColor(QRgb(0x607286)));
+        baseColors.append(QColor(QRgb(0x8c98a4)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
@@ -291,10 +291,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeRetro: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x533b23)));
-        baseColors.append(QColor(QRgb(0x6b563e)));
         baseColors.append(QColor(QRgb(0x83715a)));
-        baseColors.append(QColor(QRgb(0x9b8b75)));
         baseColors.append(QColor(QRgb(0xb3a690)));
+        baseColors.append(QColor(QRgb(0x6b563e)));
+        baseColors.append(QColor(QRgb(0x9b8b75)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
@@ -330,10 +330,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeEbony: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xffffff)));
-        baseColors.append(QColor(QRgb(0xd9d9d9)));
         baseColors.append(QColor(QRgb(0xb3b3b3)));
-        baseColors.append(QColor(QRgb(0x8c8c8c)));
         baseColors.append(QColor(QRgb(0x666666)));
+        baseColors.append(QColor(QRgb(0xd9d9d9)));
+        baseColors.append(QColor(QRgb(0x8c8c8c)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));
@@ -369,10 +369,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeIsabelle: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0xf9d900)));
-        baseColors.append(QColor(QRgb(0xf5b802)));
         baseColors.append(QColor(QRgb(0xf09603)));
-        baseColors.append(QColor(QRgb(0xec7605)));
         baseColors.append(QColor(QRgb(0xe85506)));
+        baseColors.append(QColor(QRgb(0xf5b802)));
+        baseColors.append(QColor(QRgb(0xec7605)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultColorLevel));

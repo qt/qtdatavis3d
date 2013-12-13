@@ -55,6 +55,11 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_temperatureData(new QBar3DSeries),
       m_temperatureData2(new QBar3DSeries),
       m_genericData(new QBar3DSeries),
+      m_dummyData(new QBar3DSeries),
+      m_dummyData2(new QBar3DSeries),
+      m_dummyData3(new QBar3DSeries),
+      m_dummyData4(new QBar3DSeries),
+      m_dummyData5(new QBar3DSeries),
       m_currentAxis(m_fixedRangeAxis),
       m_negativeValuesOn(false),
       m_useNullInputHandler(false),
@@ -270,6 +275,11 @@ void GraphModifier::releaseProxies()
         m_graph->removeSeries(m_temperatureData);
         m_graph->removeSeries(m_temperatureData2);
         m_graph->removeSeries(m_genericData);
+        m_graph->removeSeries(m_dummyData);
+        m_graph->removeSeries(m_dummyData2);
+        m_graph->removeSeries(m_dummyData3);
+        m_graph->removeSeries(m_dummyData4);
+        m_graph->removeSeries(m_dummyData5);
     } else {
         m_graph->addSeries(m_temperatureData);
         m_graph->addSeries(m_temperatureData2);
@@ -325,7 +335,6 @@ void GraphModifier::createMassiveArray()
 
 void GraphModifier::resetTemperatureData()
 {
-
     // Set up data
     static const float temp[7][12] = {
         {-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
@@ -643,6 +652,52 @@ void GraphModifier::changeShadowQuality(int quality)
     QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
+}
+
+void GraphModifier::showFiveSeries()
+{
+    releaseProxies();
+    releaseAxes();
+
+    m_dummyData->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
+    m_dummyData2->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
+    m_dummyData3->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
+    m_dummyData4->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
+    m_dummyData5->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
+
+    m_graph->addSeries(m_dummyData);
+    m_graph->addSeries(m_dummyData2);
+    m_graph->addSeries(m_dummyData3);
+    m_graph->addSeries(m_dummyData4);
+    m_graph->addSeries(m_dummyData5);
+}
+
+QBarDataArray *GraphModifier::makeDummyData()
+{
+    // Set up data
+    static const float temp[4][4] = {
+        {10.0f, 5.0f, 10.0f, 5.0f},
+        {5.0f, 10.0f, 5.0f, 10.0f},
+        {10.0f, 5.0f, 10.0f, 5.0f},
+        {5.0f, 10.0f, 5.0f, 10.0f}
+    };
+
+    // Create data rows
+    QBarDataArray *dataSet = new QBarDataArray;
+    QBarDataRow *dataRow;
+
+    dataSet->reserve(4);
+    for (int i = 0; i < 4; i++) {
+        dataRow = new QBarDataRow(4);
+        // Create data items
+        for (int j = 0; j < 4; j++) {
+            // Add data to rows
+            (*dataRow)[j].setValue(temp[i][j]);
+        }
+        // Add row to set
+        dataSet->append(dataRow);
+    }
+    return dataSet;
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)

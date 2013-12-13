@@ -131,6 +131,9 @@ int main(int argc, char **argv)
     flipViewsButton->setText(QStringLiteral("Flip views"));
     flipViewsButton->setEnabled(true);
 
+    QPushButton *showFiveSeriesButton = new QPushButton(widget);
+    showFiveSeriesButton->setText(QStringLiteral("Try 5 series"));
+    showFiveSeriesButton->setEnabled(true);
 
     QPushButton *changeColorStyleButton = new QPushButton(widget);
     changeColorStyleButton->setText(QStringLiteral("Change color style"));
@@ -271,6 +274,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeRowButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeRowsButton, 0, Qt::AlignTop);
     vLayout->addWidget(massiveArrayButton, 0, Qt::AlignTop);
+    vLayout->addWidget(showFiveSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -362,6 +366,7 @@ int main(int argc, char **argv)
     QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &GraphModifier::removeRow);
     QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &GraphModifier::removeRows);
     QObject::connect(massiveArrayButton, &QPushButton::clicked, modifier, &GraphModifier::createMassiveArray);
+    QObject::connect(showFiveSeriesButton, &QPushButton::clicked, modifier, &GraphModifier::showFiveSeries);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changeSelectionMode);
     QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
