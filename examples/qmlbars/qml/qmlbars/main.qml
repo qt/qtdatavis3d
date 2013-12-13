@@ -99,6 +99,7 @@ Item {
             columnAxis: graphAxes.column
             valueAxis: graphAxes.income
 
+            //! [3]
             Bar3DSeries {
                 id: barSeries
                 itemLabelFormat: "Income for @colLabel, @rowLabel: @valueLabel"
@@ -111,6 +112,7 @@ Item {
                     columnRole: "month"
                     valueRole: "income"
                 }
+                //! [3]
 
                 ColorGradient {
                     id: barGradient
@@ -121,6 +123,7 @@ Item {
                 onSelectedBarChanged: handleSelectionChange(barSeries, position)
             }
 
+            //! [4]
             Bar3DSeries {
                 id: secondarySeries
                 visible: false
@@ -134,6 +137,7 @@ Item {
                     columnRole: "month"
                     valueRole: "expenses"
                 }
+                //! [4]
 
                 ColorGradient {
                     id: secondaryGradient

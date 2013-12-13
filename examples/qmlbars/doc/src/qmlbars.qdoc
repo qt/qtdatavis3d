@@ -27,10 +27,9 @@
 
     \image qmlbars-example.png
 
-    TODO: **This example is no longer about remapping, as multiple series are used instead**
-    The interesting thing about this example is remapping the data, so we concentrate on that
-    and skip explaining the basic Bars3D functionality - for more detailed QML example documentation,
-    see \l{Qt Quick 2 Scatter Example}.
+    The interesting thing about this example is switching series and displaying more than one series
+    at once. We'll concentrate on those and skip explaining the basic Bars3D functionality - for
+    more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
     \section1 Data
 
@@ -38,17 +37,27 @@
     The data is defined in a list model in \c data.qml like this:
 
     \snippet ../examples/qmlbars/qml/qmlbars/data.qml 0
-    \dots 4
+    \dots
 
     Each data item has four roles: year, month, income, and expenses. Years and months are natural to
-    map to rows and columns of a bar chart, but we can only show either income or expenses as the value.
-    We choose to default to showing expenses when we initialize the mapping item:
+    map to rows and columns of a bar chart, but we can only show either income or expenses as the
+    value.
 
-    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 1
+    Now we need to add the data to the Bars3D graph. We will create two Bar3DSeries inside it,
+    starting with a series for the income:
 
-    Final piece we need for handling data is the proxy to bring the model and mapping together:
+    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 3
+    \dots
 
-    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 2
+    The data is attached to the \c itemModel property of the ItemModelBarDataProxy inside the
+    series.
+
+    Then we add another series for the expenses:
+
+    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 4
+    \dots
+
+    We use the \c visible property of the series to hide the second series for now.
 
     \section1 Custom axis labels
 
@@ -58,12 +67,12 @@
 
     \snippet ../examples/qmlbars/qml/qmlbars/axes.qml 0
 
-    \section1 Using mapping
+    \section1 Switching series
 
     In the \c main.qml, we set up the graph and various UI elements. There are three interesting
-    mapping related code blocks we want to highlight here. The first one shows how to change the
-    visualized data from expenses to income, and vice versa, by simply changing the value role on the
-    ItemModelBarDataProxy item:
+    code blocks we want to highlight here. The first one shows how to change the
+    visualized data between income, expenses, and both, by simply changing visibility of the two
+    series:
 
     \snippet ../examples/qmlbars/qml/qmlbars/main.qml 0
 
