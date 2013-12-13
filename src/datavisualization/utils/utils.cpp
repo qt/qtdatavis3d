@@ -46,7 +46,7 @@ QVector3D Utils::vectorFromColor(const QColor &color)
 
 QColor Utils::colorFromVector(const QVector3D &colorVector)
 {
-    return QColor(colorVector.x(), colorVector.y(), colorVector.z());
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f, colorVector.z() * 255.0f);
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
