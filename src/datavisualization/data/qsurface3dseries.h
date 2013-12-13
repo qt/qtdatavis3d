@@ -67,7 +67,6 @@ signals:
     void dataProxyChanged(QSurfaceDataProxy *proxy);
     void selectedPointChanged(QPoint position);
     void flatShadingEnabledChanged(bool enable);
-    void surfaceGridEnabledChanged(bool enable);
     void flatShadingSupportedChanged(bool enable);
     void drawModeChanged(QSurface3DSeries::DrawFlags mode);
 
