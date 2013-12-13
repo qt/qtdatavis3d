@@ -49,6 +49,7 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
+            //! [7]
             theme: Theme3D {
                 type: Theme3D.ThemeStoneMoss
                 font.family: "STCaiyun"
@@ -56,6 +57,7 @@ Item {
                 colorStyle: Theme3D.ColorStyleRangeGradient
                 baseGradients: [surfaceGradient]
             }
+            //! [7]
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
@@ -71,17 +73,21 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
 
+            //! [5]
             Surface3DSeries {
                 id: surfaceSeries
                 flatShadingEnabled: false
                 drawMode: Surface3DSeries.DrawSurface
 
                 ItemModelSurfaceDataProxy {
+                    //! [5]
+                    //! [6]
                     itemModel: surfaceData.model
                     rowRole: "longitude"
                     columnRole: "latitude"
                     valueRole: "height"
                 }
+                //! [6]
 
                 onFlatShadingSupportedChanged: {
                     flatShadingToggle.text = "Flat not supported"
@@ -91,6 +97,7 @@ Item {
     }
 
     // TODO: Kept outside until surface supports multiple added series (QTRD-2579)
+    //! [4]
     Surface3DSeries {
         id: heightSeries
         flatShadingEnabled: false
@@ -105,6 +112,7 @@ Item {
             maxXValue: 97
         }
     }
+    //! [4]
 
     NewButton {
         id: surfaceGridToggle
@@ -132,6 +140,7 @@ Item {
         anchors.top: surfaceGridToggle.bottom
         width: surfaceGridToggle.width
         text: "Hide Surface"
+        //! [8]
         onClicked: {
             if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
                 surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
@@ -143,6 +152,7 @@ Item {
                 text = "Hide Surface"
             }
         }
+        //! [8]
     }
 
     NewButton {
@@ -213,7 +223,7 @@ Item {
             } else {
                 surfaceplot.axisY.max = 250.0
                 surfaceplot.seriesList = [heightSeries]
-                middleGradient.position = 0.55
+                middleGradient.position = 0.50
                 text = "Switch to Item Model Series"
             }
         }
