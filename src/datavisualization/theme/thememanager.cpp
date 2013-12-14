@@ -173,11 +173,11 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
 
     case Q3DTheme::ThemeDigia: {
         QList<QColor> baseColors;
-        baseColors.append(QColor(QRgb(0xcccccc)));
-        baseColors.append(QColor(QRgb(0xa6a6a6)));
-        baseColors.append(QColor(QRgb(0x808080)));
-        baseColors.append(QColor(QRgb(0xb9b9b9)));
-        baseColors.append(QColor(QRgb(0x939393)));
+        baseColors.append(QColor(QRgb(0xdddddd)));
+        baseColors.append(QColor(QRgb(0xa0a0a0)));
+        baseColors.append(QColor(QRgb(0x626262)));
+        baseColors.append(QColor(QRgb(0xbebebe)));
+        baseColors.append(QColor(QRgb(0x818181)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
@@ -198,7 +198,7 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setTextBackgroundColor(QColor(0xff, 0xff, 0xff, 0x80));
         setGridLineColor(QColor(QRgb(0xd7d6d5)));
         setSingleHighlightColor(QColor(QRgb(0xfa0000)));
-        setMultiHighlightColor(QColor(QRgb(0x555555)));
+        setMultiHighlightColor(QColor(QRgb(0x333333)));
         setLightStrength(5.0f);
         setAmbientLightStrength(0.5f);
         setHighlightLightStrength(5.0f);
@@ -206,7 +206,7 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
         setColorStyle(Q3DTheme::ColorStyleObjectGradient);
         setBaseGradients(baseGradients);
         setSingleHighlightGradient(createGradient(QColor(QRgb(0xfa0000)), defaultBuiltInColorLevel));
-        setMultiHighlightGradient(createGradient(QColor(QRgb(0x555555)), defaultBuiltInColorLevel));
+        setMultiHighlightGradient(createGradient(QColor(QRgb(0x333333)), defaultBuiltInColorLevel));
         break;
     }
 
@@ -252,10 +252,10 @@ void ThemeManager::useTheme(Q3DTheme::Theme type)
     case Q3DTheme::ThemeArmyBlue: {
         QList<QColor> baseColors;
         baseColors.append(QColor(QRgb(0x495f76)));
-        baseColors.append(QColor(QRgb(0x768595)));
-        baseColors.append(QColor(QRgb(0xa2abb4)));
-        baseColors.append(QColor(QRgb(0x607286)));
-        baseColors.append(QColor(QRgb(0x8c98a4)));
+        baseColors.append(QColor(QRgb(0x81909f)));
+        baseColors.append(QColor(QRgb(0xbec5cd)));
+        baseColors.append(QColor(QRgb(0x687a8d)));
+        baseColors.append(QColor(QRgb(0xa3aeb9)));
 
         QList<QLinearGradient> baseGradients;
         baseGradients.append(createGradient(baseColors.at(0), defaultBuiltInColorLevel));
