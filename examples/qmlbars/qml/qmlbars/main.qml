@@ -18,7 +18,9 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
+import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
+import QtQuick.Window 2.0
 import "."
 
 Item {
@@ -26,6 +28,9 @@ Item {
     width: 1280
     height: 1024
     visible: true
+
+    property int buttonLayoutHeight: 180;
+    state: Screen.width < Screen.height ? "portrait" : "landscape"
 
     Data {
         id: graphData
@@ -68,9 +73,8 @@ Item {
 
     Item {
         id: dataView
-        width: parent.width - tableView.width
-        height: parent.height
-        anchors.right: parent.right;
+        anchors.right: mainview.right;
+        anchors.bottom: mainview.bottom
 
         Bars3D {
             id: testGraph
@@ -150,84 +154,14 @@ Item {
         }
     }
 
-    Button {
-        id: seriesToggle
-        anchors.bottom: parent.bottom
-        width: tableView.width
-        height: 60
-        text: "Show Expenses"
-        //! [0]
-        onClicked: {
-            if (!secondarySeries.visible) {
-                text = "Show Both"
-                testGraph.valueAxis = graphAxes.expenses
-                barSeries.visible = false
-                secondarySeries.visible = true
-            } else if (!barSeries.visible){
-                barSeries.visible = true
-                text = "Show Income"
-                testGraph.valueAxis = graphAxes.income
-            } else {
-                secondarySeries.visible = false
-                text = "Show Expenses"
-                testGraph.valueAxis = graphAxes.income
-            }
-        }
-        //! [0]
-    }
-
-    Button {
-        id: shadowToggle
-        anchors.bottom: seriesToggle.top
-        width: tableView.width
-        height: 60
-        text: "Hide Shadows"
-        onClicked: {
-            if (testGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
-                testGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
-                text = "Hide Shadows"
-            } else {
-                testGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                text = "Show Shadows"
-            }
-        }
-    }
-
-    Button {
-        id: dataToggle
-        anchors.bottom: shadowToggle.top
-        width: tableView.width
-        height: 60
-        text: "Show 2010 - 2012"
-        //! [1]
-        onClicked: {
-            if (testGraph.rowAxis.max !== 6) {
-                text = "Show 2010 - 2012"
-                modelProxy.autoRowCategories = true
-                secondaryProxy.autoRowCategories = true
-            } else {
-                text = "Show all years"
-                // Explicitly defining row categories, since we do not want to show data for
-                // all years in the model, just for the selected ones.
-                modelProxy.autoRowCategories = false
-                secondaryProxy.autoRowCategories = false
-                modelProxy.rowCategories = ["2010", "2011", "2012"]
-                secondaryProxy.rowCategories = ["2010", "2011", "2012"]
-            }
-        }
-        //! [1]
-    }
-
     TableView {
         id: tableView
-        x: 0
-        y: 0
-        width: 298
-        height: parent.height - seriesToggle.height - shadowToggle.height - dataToggle.height
-        TableViewColumn{ role: "year"  ; title: "Year" ; width: 80 }
-        TableViewColumn{ role: "month" ; title: "Month" ; width: 80 }
-        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: 60 }
-        TableViewColumn{ role: "income" ; title: "Income" ; width: 60 }
+        anchors.top: parent.top
+        anchors.left: parent.left
+        TableViewColumn{ role: "year"  ; title: "Year" ; width: tableView.width / 4 }
+        TableViewColumn{ role: "month" ; title: "Month" ; width: tableView.width / 4 }
+        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: tableView.width / 4 }
+        TableViewColumn{ role: "income" ; title: "Income" ; width: tableView.width / 4 }
         model: graphData.model
 
         //! [2]
@@ -243,4 +177,128 @@ Item {
         }
         //! [2]
     }
+
+    ColumnLayout {
+        id: controlLayout
+        spacing: 0
+
+        Button {
+            id: dataToggle
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Show 2010 - 2012"
+            clip: true
+            //! [1]
+            onClicked: {
+                if (testGraph.rowAxis.max !== 6) {
+                    text = "Show 2010 - 2012"
+                    modelProxy.autoRowCategories = true
+                    secondaryProxy.autoRowCategories = true
+                } else {
+                    text = "Show all years"
+                    // Explicitly defining row categories, since we do not want to show data for
+                    // all years in the model, just for the selected ones.
+                    modelProxy.autoRowCategories = false
+                    secondaryProxy.autoRowCategories = false
+                    modelProxy.rowCategories = ["2010", "2011", "2012"]
+                    secondaryProxy.rowCategories = ["2010", "2011", "2012"]
+                }
+            }
+            //! [1]
+        }
+
+        Button {
+            id: shadowToggle
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Hide Shadows"
+            clip: true
+            onClicked: {
+                if (testGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
+                    testGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
+                    text = "Hide Shadows"
+                } else {
+                    testGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    text = "Show Shadows"
+                }
+            }
+        }
+
+        Button {
+            id: seriesToggle
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Show Expenses"
+            clip: true
+            //! [0]
+            onClicked: {
+                if (!secondarySeries.visible) {
+                    text = "Show Both"
+                    testGraph.valueAxis = graphAxes.expenses
+                    barSeries.visible = false
+                    secondarySeries.visible = true
+                } else if (!barSeries.visible){
+                    barSeries.visible = true
+                    text = "Show Income"
+                    testGraph.valueAxis = graphAxes.income
+                } else {
+                    secondarySeries.visible = false
+                    text = "Show Expenses"
+                    testGraph.valueAxis = graphAxes.income
+                }
+            }
+            //! [0]
+        }
+    }
+
+    states: [
+        State  {
+            name: "landscape"
+            PropertyChanges {
+                target: dataView
+                width: mainview.width / 4 * 3
+                height: mainview.height
+            }
+            PropertyChanges  {
+                target: tableView
+                height: mainview.height - buttonLayoutHeight
+                anchors.right: dataView.left
+                anchors.left: mainview.left
+                anchors.bottom: undefined
+            }
+            PropertyChanges  {
+                target: controlLayout
+                width: mainview.width / 4
+                height: buttonLayoutHeight
+                anchors.top: tableView.bottom
+                anchors.bottom: mainview.bottom
+                anchors.left: mainview.left
+                anchors.right: dataView.left
+            }
+        },
+        State  {
+            name: "portrait"
+            PropertyChanges {
+                target: dataView
+                width: mainview.height / 4 * 3
+                height: mainview.width
+            }
+            PropertyChanges  {
+                target: tableView
+                height: mainview.width
+                anchors.right: controlLayout.left
+                anchors.left: mainview.left
+                anchors.bottom: dataView.top
+            }
+            PropertyChanges  {
+                target: controlLayout
+                width: mainview.height / 4
+                height: mainview.width / 4
+                anchors.top: mainview.top
+                anchors.bottom: dataView.top
+                anchors.left: undefined
+                anchors.right: mainview.right
+            }
+        }
+    ]
 }
