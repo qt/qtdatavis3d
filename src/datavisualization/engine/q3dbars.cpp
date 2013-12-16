@@ -55,7 +55,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \section1 How to construct a minimal Q3DBars graph
  *
- * First, construct an instance of Q3DBars:
+ * First, construct an instance of Q3DBars. Since we are running the graph as top level window
+ * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
+ * default:
  *
  * \snippet doc_src_q3dbars_construction.cpp 4
  *

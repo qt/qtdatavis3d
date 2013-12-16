@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     //! [0]
     Q3DSurface surface;
+    surface.setFlags(surface.flags() ^ Qt::FramelessWindowHint);
     //! [0]
     //! [1]
     QSurfaceDataArray *data = new QSurfaceDataArray;

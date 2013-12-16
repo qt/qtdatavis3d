@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     //! [0]
     Q3DScatter scatter;
+    scatter.setFlags(scatter.flags() ^ Qt::FramelessWindowHint);
     //! [0]
     //! [1]
     QScatter3DSeries *series = new QScatter3DSeries;

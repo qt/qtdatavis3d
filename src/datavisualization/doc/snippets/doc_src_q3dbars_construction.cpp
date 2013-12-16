@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     //! [4]
     Q3DBars bars;
+    bars.setFlags(bars.flags() ^ Qt::FramelessWindowHint);
     //! [4]
     //! [0]
     bars.rowAxis()->setRange(0, 4);

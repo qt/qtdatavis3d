@@ -55,7 +55,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \section1 How to construct a minimal Q3DSurface graph
  *
- * First, construct Q3DSurface:
+ * First, construct Q3DSurface. Since we are running the graph as top level window
+ * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
+ * default:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 0
  *
