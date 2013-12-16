@@ -69,8 +69,6 @@ private:
     bool m_cachedIsSlicingActivated;
 
     // Internal attributes purely related to how the scene is drawn with GL.
-    QRect m_mainViewPort;
-    QRect m_sliceViewPort;
     ShaderHelper *m_shader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
@@ -154,7 +152,6 @@ signals:
     void flatShadingSupportedChanged(bool supported);
 
 private:
-    void setViewPorts();
     void updateSliceDataModel(const QPoint &point);
     void updateShadowQuality(QDataVis::ShadowQuality quality);
     void updateTextures();
@@ -166,7 +163,6 @@ private:
     void loadSurfaceObj();
     void loadSliceSurfaceObj();
     void drawScene(GLuint defaultFboHandle);
-    void handleResize();
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);

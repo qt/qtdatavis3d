@@ -194,16 +194,6 @@ void Q3DSurface::wheelEvent(QWheelEvent *event)
     dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DSurface::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    dptr()->m_shared->setWidth(width());
-    dptr()->m_shared->setHeight(height());
-}
-
 Q3DSurfacePrivate *Q3DSurface::dptr()
 {
     return static_cast<Q3DSurfacePrivate *>(d_ptr.data());

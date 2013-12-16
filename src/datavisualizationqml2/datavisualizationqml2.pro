@@ -26,7 +26,6 @@ SOURCES += \
     abstractdeclarative.cpp \
     colorgradient.cpp \
     declarativeseries.cpp \
-    declarativerenderer.cpp \
     declarativetheme.cpp \
     declarativecolor.cpp
 
@@ -38,7 +37,6 @@ HEADERS += \
     abstractdeclarative_p.h \
     colorgradient_p.h \
     declarativeseries_p.h \
-    declarativerenderer_p.h \
     declarativetheme_p.h \
     declarativecolor_p.h
 

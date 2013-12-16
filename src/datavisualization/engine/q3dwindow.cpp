@@ -171,6 +171,18 @@ bool Q3DWindow::event(QEvent *event)
 /*!
  * \internal
  */
+void Q3DWindow::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+
+    Q3DScene *scene = d_ptr->m_visualController->scene();
+    scene->setWindowSize(QSize(width(), height()));
+    scene->setViewport(QRect(x(),y(),width(),height()));
+}
+
+/*!
+ * \internal
+ */
 void Q3DWindow::exposeEvent(QExposeEvent *event)
 {
     Q_UNUSED(event);

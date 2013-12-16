@@ -200,14 +200,6 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
     dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DBars::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    dptr()->m_shared->setSize(width(), height());
-}
 
 Q3DBarsPrivate *Q3DBars::dptr()
 {
@@ -217,24 +209,6 @@ Q3DBarsPrivate *Q3DBars::dptr()
 const Q3DBarsPrivate *Q3DBars::dptrc() const
 {
     return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
-}
-
-/*!
- * Sets window \a width.
- */
-void Q3DBars::setWidth(const int width)
-{
-    dptr()->m_shared->setWidth(width);
-    QWindow::setWidth(width);
-}
-
-/*!
- * Sets window \a height.
- */
-void Q3DBars::setHeight(const int height)
-{
-    dptr()->m_shared->setHeight(height);
-    QWindow::setHeight(height);
 }
 
 /*!

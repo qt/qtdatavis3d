@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "declarativesurface_p.h"
-#include "declarativerenderer_p.h"
 #include "q3dvalueaxis.h"
 #include "qitemmodelsurfacedataproxy.h"
 
@@ -27,7 +26,6 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_surfaceController(0)
 {
-    setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing

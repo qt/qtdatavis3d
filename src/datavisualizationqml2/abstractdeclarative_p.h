@@ -64,10 +64,15 @@ public:
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;
 
+    virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
+
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
     virtual QDataVis::ShadowQuality shadowQuality() const;
 
     void setSharedController(Abstract3DController *controller);
+    // Used to synch up data model from controller to renderer while main thread is locked
+    void synchDataToRenderer();
+    void render();
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -76,7 +81,9 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
-    virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    virtual void handleWindowChanged(QQuickWindow *win);
+    virtual void itemChange(ItemChange change, const ItemChangeData &value);
+    virtual void updateWindowParameters();
 
 signals:
     // Signals shadow quality changes.
@@ -89,8 +96,8 @@ signals:
 
 private:
     Abstract3DController *m_controller;
-    QSize m_initialisedSize;
-    qreal m_devicePixelRatio;
+    QRectF m_cachedGeometry;
+    bool m_isFirstRender;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -59,9 +59,6 @@ public:
 
     Q3DScene *scene() const;
 
-    void setWidth(const int width);
-    void setHeight(const int height);
-
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
@@ -87,7 +84,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent(QResizeEvent *event);
 
 private:
     Q3DScatterPrivate *dptr();

@@ -59,33 +59,6 @@ protected:
         SelectOnSlice
     };
 
-    bool m_hasNegativeValues;
-    Q3DTheme *m_cachedTheme;
-    Drawer *m_drawer;
-    QRect m_cachedBoundingRect;
-    QDataVis::ShadowQuality m_cachedShadowQuality;
-    GLfloat m_autoScaleAdjustment;
-
-    QDataVis::SelectionFlags m_cachedSelectionMode;
-
-    AxisRenderCache m_axisCacheX;
-    AxisRenderCache m_axisCacheY;
-    AxisRenderCache m_axisCacheZ;
-    TextureHelper *m_textureHelper;
-    Q3DBox m_boundingBox;
-
-    Q3DScene *m_cachedScene;
-    bool m_selectionDirty;
-    SelectionState m_selectionState;
-    QPoint m_inputPosition;
-    QVector<SeriesRenderCache> m_visibleSeriesList;
-
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
-
     QString generateValueLabel(const QString &format, float value);
 
 public:
@@ -95,9 +68,6 @@ public:
     virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
 
     virtual void render(GLuint defaultFboHandle);
-
-    virtual void updateBoundingRect(const QRect &boundingRect);
-    virtual void updatePosition(const QRect &boundingRect);
 
     virtual void updateTheme(Q3DTheme *theme);
     virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
@@ -141,6 +111,48 @@ protected:
     AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
 
     virtual void lowerShadowQuality();
+
+    void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
+
+    bool m_hasNegativeValues;
+    Q3DTheme *m_cachedTheme;
+    Drawer *m_drawer;
+    QRect m_viewport;
+    QDataVis::ShadowQuality m_cachedShadowQuality;
+    GLfloat m_autoScaleAdjustment;
+
+    QDataVis::SelectionFlags m_cachedSelectionMode;
+
+    Q3DTheme::ColorStyle m_cachedColorStyle;
+    QColor m_cachedObjectColor;
+    QLinearGradient m_cachedObjectGradient;
+    GLuint m_objectGradientTexture;
+    QColor m_cachedSingleHighlightColor;
+    QLinearGradient m_cachedSingleHighlightGradient;
+    GLuint m_singleHighlightGradientTexture;
+    QColor m_cachedMultiHighlightColor;
+    QLinearGradient m_cachedMultiHighlightGradient;
+    GLuint m_multiHighlightGradientTexture;
+
+    AxisRenderCache m_axisCacheX;
+    AxisRenderCache m_axisCacheY;
+    AxisRenderCache m_axisCacheZ;
+    TextureHelper *m_textureHelper;
+    Q3DBox m_boundingBox;
+
+    Q3DScene *m_cachedScene;
+    bool m_selectionDirty;
+    SelectionState m_selectionState;
+    QPoint m_inputPosition;
+    QVector<SeriesRenderCache> m_visibleSeriesList;
+    QRect m_primarySubViewport;
+    QRect m_secondarySubViewport;
+
+#ifdef DISPLAY_RENDER_SPEED
+    bool m_isFirstFrame;
+    QTime m_lastFrameTime;
+    GLint m_numFrames;
+#endif
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

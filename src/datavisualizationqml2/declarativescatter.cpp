@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "declarativescatter_p.h"
-#include "declarativerenderer_p.h"
 #include "qitemmodelscatterdataproxy.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -26,7 +25,6 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_scatterController(0)
 {
-    setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing

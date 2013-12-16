@@ -42,7 +42,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
-const int smallerVPSize = 5;
 
 const bool sliceGridLabels = true; // TODO: Make this user controllable (QTRD-2546)
 
@@ -138,10 +137,6 @@ void Bars3DRenderer::initializeOpenGL()
 
     // Load label mesh
     loadLabelMesh();
-
-    // Set view port
-    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
-               m_sliceViewPort.width(), m_sliceViewPort.height());
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
@@ -244,19 +239,6 @@ void Bars3DRenderer::updateData()
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    float devicePixelRatio = scene->devicePixelRatio();
-    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
-                                            m_mainViewPort.y() / devicePixelRatio,
-                                            m_mainViewPort.width() / devicePixelRatio,
-                                            m_mainViewPort.height() / devicePixelRatio);
-    QRect logicalSecondarySubViewport = QRect(m_sliceViewPort.x() / devicePixelRatio,
-                                              m_sliceViewPort.y() / devicePixelRatio,
-                                              m_sliceViewPort.width() / devicePixelRatio,
-                                              m_sliceViewPort.height() / devicePixelRatio);
-    scene->setPrimarySubViewport(logicalPrimarySubViewport);
-    scene->setSecondarySubViewport(logicalSecondarySubViewport);
-
     // TODO: See QTRD-2374
     if (m_hasNegativeValues)
         scene->activeCamera()->setMinYRotation(-90.0);
@@ -296,13 +278,15 @@ void Bars3DRenderer::drawSlicedScene()
     QVector3D lightPos;
 
     // Specify viewport
-    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
-               m_sliceViewPort.width(), m_sliceViewPort.height());
+    glViewport(m_secondarySubViewport.x(),
+               m_secondarySubViewport.y(),
+               m_secondarySubViewport.width(),
+               m_secondarySubViewport.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(40.0f, (GLfloat)m_sliceViewPort.width()
-                                 / (GLfloat)m_sliceViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(40.0f, (GLfloat)m_secondarySubViewport.width()
+                                 / (GLfloat)m_secondarySubViewport.height(), 0.1f, 100.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
@@ -712,13 +696,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
-    // Specify viewport
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width() / (GLfloat)m_primarySubViewport.height();
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Get the view matrix
@@ -792,8 +777,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
         // Depth viewport must always start from 0, 0, as it is rendered into a texture, not screen
         glViewport(0, 0,
-                   m_mainViewPort.width() * m_shadowQualityMultiplier,
-                   m_mainViewPort.height() * m_shadowQualityMultiplier);
+                   m_primarySubViewport.width() * m_shadowQualityMultiplier,
+                   m_primarySubViewport.height() * m_shadowQualityMultiplier);
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
@@ -894,8 +879,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glCullFace(GL_BACK);
 
         // Revert to original viewport
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-                   m_mainViewPort.width(), m_mainViewPort.height());
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
     }
 #endif
 
@@ -908,6 +895,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Draw bars to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+        glViewport(0, 0,
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
+
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white (= selectionSkipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
@@ -980,24 +971,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
-                                                     m_cachedBoundingRect.height());
+                                                     m_viewport.height());
         emit barClicked(selectionColorToArrayPosition(clickedColor), selectionColorToSeries(clickedColor));
 
+        // Revert to original render target and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-#if 0 // Use this if you want to see what is being drawn to the framebuffer
-        glCullFace(GL_BACK);
-        m_labelShader->bind();
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_TEXTURE_2D);
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.0f), zeroVector, upVector);
-        QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
-        m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-        m_drawer->drawObject(m_labelShader, m_labelObj, m_selectionTexture);
-        glDisable(GL_TEXTURE_2D);
-#endif
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
     }
 
     // Enable texturing
@@ -1845,16 +1827,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     m_selectionDirty = false;
 }
 
-void Bars3DRenderer::handleResize()
-{
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
-        return;
-
-    setViewPorts();
-
-    Abstract3DRenderer::handleResize();
-}
-
 void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)
 {
     // Convert ratio to QSizeF, as we need it in that format for autoscaling calculations
@@ -2110,8 +2082,6 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
 
-    setViewPorts();
-
     if (!m_cachedIsSlicingActivated)
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
 
@@ -2120,22 +2090,6 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 #endif
 
     m_selectionDirty = true;
-}
-
-void Bars3DRenderer::setViewPorts()
-{
-    // Update view ports
-    if (m_cachedIsSlicingActivated) {
-        m_mainViewPort = QRect(0,
-                               m_cachedBoundingRect.height()
-                               - (m_cachedBoundingRect.height() / smallerVPSize),
-                               m_cachedBoundingRect.width() / smallerVPSize,
-                               m_cachedBoundingRect.height() / smallerVPSize);
-        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    } else {
-        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-        m_sliceViewPort = QRect(0, 0, 0, 0);
-    }
 }
 
 void Bars3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -2170,10 +2124,10 @@ void Bars3DRenderer::initSelectionBuffer()
         m_selectionTexture = 0;
     }
 
-    if (m_cachedIsSlicingActivated || m_mainViewPort.size().isEmpty())
+    if (m_cachedIsSlicingActivated || m_primarySubViewport.size().isEmpty())
         return;
 
-    m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_primarySubViewport.size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 }
@@ -2195,11 +2149,11 @@ void Bars3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
         if (!m_depthTexture)

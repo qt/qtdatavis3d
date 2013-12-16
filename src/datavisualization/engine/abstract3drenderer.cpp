@@ -36,7 +36,6 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_hasNegativeValues(false),
       m_cachedTheme(new Q3DTheme()),
       m_drawer(new Drawer(m_cachedTheme)),
-      m_cachedBoundingRect(QRect(0, 0, 0, 0)),
       m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QDataVis::SelectionNone),
@@ -117,11 +116,11 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
         glDisable(GL_BLEND); // For QtQuick2 blending is enabled by default, but we don't want it to be
     }
 
-    glViewport(m_cachedScene->viewport().x(),
-               m_cachedScene->viewport().y(),
-               m_cachedScene->viewport().width(),
-               m_cachedScene->viewport().height());
-
+    // Clear the graph background to the theme color
+    glViewport(m_viewport.x(),
+               m_viewport.y(),
+               m_viewport.width(),
+               m_viewport.height());
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme->windowColor());
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -152,17 +151,6 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const 
     Q_UNUSED(fragmentShader)
 }
 
-void Abstract3DRenderer::updateBoundingRect(const QRect &boundingRect)
-{
-    m_cachedBoundingRect = boundingRect;
-    handleResize();
-}
-
-void Abstract3DRenderer::updatePosition(const QRect &boundingRect)
-{
-    m_cachedBoundingRect = boundingRect;
-}
-
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
@@ -182,6 +170,16 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
     updateInputPosition(QPoint(logicalPixelPosition.x() * devicePixelRatio,
                                logicalPixelPosition.y() * devicePixelRatio));
+
+    m_viewport = m_cachedScene->glViewport();
+    m_secondarySubViewport = m_cachedScene->glSecondarySubViewport();
+
+    if (m_primarySubViewport != m_cachedScene->glPrimarySubViewport()) {
+        // Resize of primary subviewport means resizing shadow and selection buffers
+        m_primarySubViewport = m_cachedScene->glPrimarySubViewport();
+        handleResize();
+    }
+
 
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
@@ -254,14 +252,15 @@ void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
 
 void Abstract3DRenderer::handleResize()
 {
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
+    if (m_primarySubViewport.width() == 0 || m_primarySubViewport.height() == 0)
         return;
+
     // Calculate zoom level based on aspect ratio
     GLfloat div;
     GLfloat zoomAdjustment;
-    div = qMin(m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-    zoomAdjustment = defaultRatio * ((m_cachedBoundingRect.width() / div)
-                                     / (m_cachedBoundingRect.height() / div));
+    div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
+    zoomAdjustment = defaultRatio * ((m_primarySubViewport.width() / div)
+                                     / (m_primarySubViewport.height() / div));
     m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 
     // Re-init selection buffer

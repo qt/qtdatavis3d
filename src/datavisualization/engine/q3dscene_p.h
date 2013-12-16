@@ -48,6 +48,7 @@ struct Q3DSceneChangeBitField {
     bool slicingActivatedChanged       : 1;
     bool devicePixelRatioChanged       : 1;
     bool selectionQueryPositionChanged : 1;
+    bool windowSizeChanged             : 1;
 
     Q3DSceneChangeBitField()
         : viewportChanged(true),
@@ -58,7 +59,8 @@ struct Q3DSceneChangeBitField {
           lightChanged(true),
           slicingActivatedChanged(true),
           devicePixelRatioChanged(true),
-          selectionQueryPositionChanged(false)
+          selectionQueryPositionChanged(false),
+          windowSizeChanged(true)
     {
     }
 };
@@ -84,6 +86,10 @@ public:
     bool m_isUnderSideCameraEnabled;
     bool m_isSlicingActive;
     QPoint m_selectionQueryPosition;
+    QSize m_windowSize;
+    QRect m_glViewport;
+    QRect m_glPrimarySubViewport;
+    QRect m_glSecondarySubViewport;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -50,11 +50,8 @@ class QAbstract3DSeries;
 class ThemeManager;
 
 struct Abstract3DChangeBitField {
-    bool positionChanged               : 1;
     bool zoomLevelChanged              : 1;
     bool themeChanged                  : 1;
-    bool boundingRectChanged           : 1;
-    bool sizeChanged                   : 1;
     bool shadowQualityChanged          : 1;
     bool selectionModeChanged          : 1;
     bool objFileChanged                : 1;
@@ -83,11 +80,8 @@ struct Abstract3DChangeBitField {
     bool inputPositionChanged          : 1;
 
     Abstract3DChangeBitField() :
-        positionChanged(true),
         zoomLevelChanged(true),
         themeChanged(true),
-        boundingRectChanged(true),
-        sizeChanged(true),
         shadowQualityChanged(true),
         selectionModeChanged(true),
         objFileChanged(true),
@@ -139,7 +133,6 @@ public:
 
 private:
     Abstract3DChangeBitField m_changeTracker;
-    QRect m_boundingRect;
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     ThemeManager *m_themeManager;
@@ -165,7 +158,7 @@ protected:
 
     QList<QAbstract3DSeries *> m_seriesList;
 
-    explicit Abstract3DController(QRect boundRect, QObject *parent = 0);
+    explicit Abstract3DController(QRect initialViewport, QObject *parent = 0);
     virtual ~Abstract3DController();
 
 public:
@@ -179,20 +172,6 @@ public:
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
     QList<QAbstract3DSeries *> seriesList();
-
-    // Size
-    virtual void setSize(const int width, const int height);
-    virtual void setBoundingRect(const QRect boundingRect);
-    virtual void setWidth(const int width);
-    virtual void setHeight(const int height);
-    virtual void setX(const int x);
-    virtual void setY(const int y);
-
-    virtual QRect primarySubViewport() const;
-    virtual void setPrimarySubViewport(const QRect &primarySubViewport);
-
-    virtual QRect secondarySubViewport() const;
-    virtual void setSecondarySubViewport(const QRect &secondarySubViewport);
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual Q3DAbstractAxis *axisX();

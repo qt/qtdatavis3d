@@ -140,8 +140,10 @@ void Scatter3DRenderer::initializeOpenGL()
     loadLabelMesh();
 
     // Set view port
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
@@ -213,14 +215,6 @@ void Scatter3DRenderer::updateData()
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    float devicePixelRatio = scene->devicePixelRatio();
-    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
-                                            m_mainViewPort.y() / devicePixelRatio,
-                                            m_mainViewPort.width() / devicePixelRatio,
-                                            m_mainViewPort.height() / devicePixelRatio);
-    scene->setPrimarySubViewport(logicalPrimarySubViewport);
-
     // TODO: See QTRD-2374
     scene->activeCamera()->setMinYRotation(-90.0f);
 
@@ -253,12 +247,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
     // Specify viewport
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width() / (GLfloat)m_primarySubViewport.height();
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Calculate view matrix
@@ -332,8 +328,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
         glViewport(0, 0,
-                   m_mainViewPort.width() * m_shadowQualityMultiplier,
-                   m_mainViewPort.height() * m_shadowQualityMultiplier);
+                   m_primarySubViewport.width() * m_shadowQualityMultiplier,
+                   m_primarySubViewport.height() * m_shadowQualityMultiplier);
 
         // Enable drawing to framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -431,8 +427,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glCullFace(GL_BACK);
 
         // Revert to original viewport
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-                   m_mainViewPort.width(), m_mainViewPort.height());
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
@@ -551,7 +549,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
-                                                     m_cachedBoundingRect.height());
+                                                     m_viewport.height());
         int clickedIndex = 0;
         QScatter3DSeries *clickedSeries = 0;
         selectionColorToSeriesAndIndex(clickedColor, clickedIndex, clickedSeries);
@@ -1544,17 +1542,6 @@ void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *se
     }
 }
 
-void Scatter3DRenderer::handleResize()
-{
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
-        return;
-
-    // Set view port
-    m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-
-    Abstract3DRenderer::handleResize();
-}
-
 void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
@@ -1699,10 +1686,10 @@ void Scatter3DRenderer::initSelectionBuffer()
         m_selectionTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
-    m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_primarySubViewport.size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 }
@@ -1724,11 +1711,11 @@ void Scatter3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
         if (!m_depthTexture)

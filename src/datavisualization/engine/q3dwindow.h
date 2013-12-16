@@ -49,6 +49,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void resizeEvent(QResizeEvent *event);
     void exposeEvent(QExposeEvent *event);
 
 private:

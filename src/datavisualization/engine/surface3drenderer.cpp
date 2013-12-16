@@ -523,19 +523,6 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 
 void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    float devicePixelRatio = scene->devicePixelRatio();
-    QRect logicalPrimarySubViewport = QRect(m_mainViewPort.x() / devicePixelRatio,
-                                            m_mainViewPort.y() / devicePixelRatio,
-                                            m_mainViewPort.width() / devicePixelRatio,
-                                            m_mainViewPort.height() / devicePixelRatio);
-    QRect logicalSecondarySubViewport = QRect(m_sliceViewPort.x() / devicePixelRatio,
-                                              m_sliceViewPort.y() / devicePixelRatio,
-                                              m_sliceViewPort.width() / devicePixelRatio,
-                                              m_sliceViewPort.height() / devicePixelRatio);
-    scene->setPrimarySubViewport(logicalPrimarySubViewport);
-    scene->setSecondarySubViewport(logicalSecondarySubViewport);
-
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
@@ -576,13 +563,15 @@ void Surface3DRenderer::drawSlicedScene()
     QVector3D lightPos;
 
     // Specify viewport
-    glViewport(m_sliceViewPort.x(), m_sliceViewPort.y(),
-               m_sliceViewPort.width(), m_sliceViewPort.height());
+    glViewport(m_secondarySubViewport.x(),
+               m_secondarySubViewport.y(),
+               m_secondarySubViewport.width(),
+               m_secondarySubViewport.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
 
-    GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    GLfloat aspect = (GLfloat)m_secondarySubViewport.width() / (GLfloat)m_secondarySubViewport.height();
     projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
                            -sliceUnits, sliceUnits, -1.0f, 4.0f);
 
@@ -835,15 +824,17 @@ void Surface3DRenderer::drawSlicedScene()
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Specify viewport
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
-                                 / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
+    projectionMatrix.perspective(45.0f, (GLfloat)m_primarySubViewport.width()
+                                 / (GLfloat)m_primarySubViewport.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->viewMatrix();
@@ -895,8 +886,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
         glViewport(0, 0,
-                   m_mainViewPort.width() * m_shadowQualityMultiplier,
-                   m_mainViewPort.height() * m_shadowQualityMultiplier);
+                   m_primarySubViewport.width() * m_shadowQualityMultiplier,
+                   m_primarySubViewport.height() * m_shadowQualityMultiplier);
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
@@ -910,8 +901,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
-        depthProjectionMatrix.perspective(10.0f, (GLfloat)m_mainViewPort.width()
-                                          / (GLfloat)m_mainViewPort.height(), 3.0f, 100.0f);
+        depthProjectionMatrix.perspective(10.0f, (GLfloat)m_primarySubViewport.width()
+                                          / (GLfloat)m_primarySubViewport.height(), 3.0f, 100.0f);
 #else
         // Use these for orthographic shadows
         depthProjectionMatrix.ortho(-2.0f * 2.0f, 2.0f * 2.0f,
@@ -965,8 +956,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Revert to original viewport
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-                   m_mainViewPort.width(), m_mainViewPort.height());
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
 
         // Reset culling to normal
         glEnable(GL_CULL_FACE);
@@ -1020,7 +1013,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_DITHER);
 
         GLubyte pixel[4] = {0, 0, 0, 0};
-        glReadPixels(m_inputPosition.x(), m_cachedBoundingRect.height() - m_inputPosition.y(),
+        glReadPixels(m_inputPosition.x(), m_viewport.height() - m_inputPosition.y(),
                      1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1761,7 +1754,7 @@ void Surface3DRenderer::initSelectionBuffer()
         m_selectionResultTexture = 0;
     }
 
-    m_selectionResultTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
+    m_selectionResultTexture = m_textureHelper->createSelectionTexture(m_primarySubViewport.size(),
                                                                        m_selectionFrameBuffer,
                                                                        m_selectionDepthBuffer);
 }
@@ -1885,16 +1878,6 @@ void Surface3DRenderer::loadGridLineMesh()
     m_gridLineObj->load();
 }
 
-void Surface3DRenderer::handleResize()
-{
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
-        return;
-
-    setViewPorts();
-
-    Abstract3DRenderer::handleResize();
-}
-
 void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
     int row = point.x();
@@ -1911,20 +1894,20 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
             pos = m_sliceSurfaceObj->vertexAt(column, 0);
             pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
             pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
-            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+            m_selectionPointer->updateBoundingRect(m_secondarySubViewport);
             m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
         } else if (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn)) {
             pos = m_sliceSurfaceObj->vertexAt(row, 0);
             pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
             pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
-            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
+            m_selectionPointer->updateBoundingRect(m_secondarySubViewport);
             m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
         }
     } else {
         pos = m_surfaceObj->vertexAt(column, row);
         pos *= QVector3D(m_surfaceScaleX, 1.0f, m_surfaceScaleZ);;
         pos += QVector3D(m_surfaceOffsetX, 0.0f, m_surfaceOffsetZ);
-        m_selectionPointer->updateBoundingRect(m_mainViewPort);
+        m_selectionPointer->updateBoundingRect(m_primarySubViewport);
         m_selectionPointer->updateSliceData(false, m_autoScaleAdjustment);
     }
 
@@ -2040,8 +2023,6 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
 
-    setViewPorts();
-
     if (!m_cachedIsSlicingActivated)
         initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
 
@@ -2050,26 +2031,6 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 #endif
 
     m_selectionDirty = true;
-}
-
-void Surface3DRenderer::setViewPorts()
-{
-    // Update view ports
-    if (m_cachedIsSlicingActivated) {
-        m_mainViewPort = QRect(0,
-                               m_cachedBoundingRect.height()
-                               - (m_cachedBoundingRect.height() / subViewDivider),
-                               m_cachedBoundingRect.width() / subViewDivider,
-                               m_cachedBoundingRect.height() / subViewDivider);
-        m_sliceViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-        if (m_selectionPointer)
-            m_selectionPointer->updateBoundingRect(m_sliceViewPort);
-    } else {
-        m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-        m_sliceViewPort = QRect(0, 0, 0, 0);
-        if (m_selectionPointer)
-            m_selectionPointer->updateBoundingRect(m_mainViewPort);
-    }
 }
 
 void Surface3DRenderer::loadLabelMesh()
@@ -2172,15 +2133,15 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_mainViewPort.size(),
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
-        m_textureHelper->fillDepthTexture(m_depthTexture, m_mainViewPort.size(), m_shadowQualityMultiplier, 1.0f);
-        m_depthModelTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
+        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(), m_shadowQualityMultiplier, 1.0f);
+        m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
                                                                   m_shadowQualityMultiplier);
         if (!m_depthTexture || !m_depthModelTexture)
             lowerShadowQuality();

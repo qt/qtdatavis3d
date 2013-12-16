@@ -66,8 +66,6 @@ private:
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
-    QRect m_mainViewPort;
-    QRect m_sliceViewPort;
     bool m_updateLabels;
     ShaderHelper *m_barShader;
     ShaderHelper *m_barGradientShader;
@@ -141,9 +139,7 @@ private:
 
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
-    void handleResize();
 
-    void setViewPorts();
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();

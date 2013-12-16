@@ -33,7 +33,7 @@ class Q3DScenePrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QRect viewport READ viewport WRITE setViewport NOTIFY viewportChanged)
+    Q_PROPERTY(QRect viewport READ viewport NOTIFY viewportChanged)
     Q_PROPERTY(QRect primarySubViewport READ primarySubViewport WRITE setPrimarySubViewport NOTIFY primarySubViewportChanged)
     Q_PROPERTY(QRect secondarySubViewport READ secondarySubViewport WRITE setSecondarySubViewport NOTIFY secondarySubViewportChanged)
     Q_PROPERTY(QPoint selectionQueryPosition READ selectionQueryPosition WRITE setSelectionQueryPosition NOTIFY selectionQueryPositionChanged)
@@ -48,8 +48,6 @@ public:
     ~Q3DScene();
 
     QRect viewport() const;
-    void setViewport(const QRect &viewport);
-    void setViewportSize(int width, int height);
 
     QRect primarySubViewport() const;
     void setPrimarySubViewport(const QRect &primarySubViewport);
@@ -81,7 +79,6 @@ public:
     Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
                                                       float fixedRotation = 0.0f,
                                                       float distanceModifier = 0.0f);
-
 signals:
     void viewportChanged(QRect viewport);
     void primarySubViewportChanged(QRect subViewport);
@@ -95,10 +92,30 @@ signals:
     void selectionQueryPositionChanged(const QPoint position);
 
 private:
+signals:
+    void windowSizeChanged(const QSize size);
+
+private:
+    void setViewport(const QRect &viewport);
+    void setViewportSize(int width, int height);
+    void setWindowSize(const QSize &size);
+    QSize windowSize() const;
+    void calculateSubViewports();
+    void updateGLViewport();
+    void updateGLSubViewports();
+
+
+    QRect glViewport();
+    QRect glPrimarySubViewport();
+    QRect glSecondarySubViewport();
+
     QScopedPointer<Q3DScenePrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DScene)
 
+    friend class AbstractDeclarative;
+    friend class Q3DWindow;
+    friend class Abstract3DController;
     friend class Q3DScenePrivate;
     friend class Abstract3DRenderer;
     friend class Bars3DRenderer;

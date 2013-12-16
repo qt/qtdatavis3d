@@ -17,17 +17,19 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
-#include "declarativerenderer_p.h"
 #include "q3dvalueaxis.h"
+#include <QThread>
+#include <QGuiApplication>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
-    m_initialisedSize(0, 0),
-    m_devicePixelRatio(1.0)
+    m_isFirstRender(true)
 {
+    connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
+    setAntialiasing(true);
 }
 
 AbstractDeclarative::~AbstractDeclarative()
@@ -83,32 +85,91 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::selectionModeChanged);
 }
 
-QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+void AbstractDeclarative::synchDataToRenderer()
 {
-    qreal devicePixelRatio = window()->devicePixelRatio();
+    m_controller->initializeOpenGL();
+    m_controller->synchDataToRenderer();
+}
 
-    // If old node exists and has right size and right device pixel ratio, reuse it.
-    if (oldNode && m_initialisedSize == boundingRect().size().toSize() && devicePixelRatio == m_devicePixelRatio) {
-        // Update bounding rectangle (that has same size as before).
-        static_cast<DeclarativeRenderer *>(oldNode)->setRect(boundingRect());
-        return oldNode;
+void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
+{
+    if (!window)
+        return;
+
+    // Disable clearing of the window as we render underneath
+    window->setClearBeforeRendering(false);
+
+    connect(window, &QQuickWindow::beforeSynchronizing, this,
+            &AbstractDeclarative::synchDataToRenderer, Qt::DirectConnection);
+    connect(window, &QQuickWindow::beforeRendering, this,
+            &AbstractDeclarative::render, Qt::DirectConnection);
+    connect(m_controller, &Abstract3DController::needRender, window,
+            &QQuickWindow::update);
+
+    updateWindowParameters();
+}
+
+void AbstractDeclarative::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+
+    m_cachedGeometry = newGeometry;
+
+    updateWindowParameters();
+}
+
+void AbstractDeclarative::itemChange(ItemChange change, const ItemChangeData & value)
+{
+    QQuickItem::itemChange(change, value);
+
+    updateWindowParameters();
+}
+
+void AbstractDeclarative::updateWindowParameters()
+{
+    // Update the device pixel ratio, window size and bounding box
+    QQuickWindow *win = window();
+    Q3DScene *scene = m_controller->scene();
+    if (win) {
+        if (win->devicePixelRatio() != scene->devicePixelRatio())
+            scene->setDevicePixelRatio(win->devicePixelRatio());
+
+        if (win->size() != scene->windowSize())
+            scene->setWindowSize(QSize(win->width(), win->height()));
+
+        QPointF point = QQuickItem::mapToScene(QPointF(m_cachedGeometry.x(), m_cachedGeometry.y()));
+        if (m_controller) {
+            scene->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
+        }
+
+    }
+}
+
+void AbstractDeclarative::render()
+{
+    // Needed to catch the window size change upon first render call
+    if (m_isFirstRender) {
+        m_isFirstRender = false;
+        updateWindowParameters();
     }
 
-    // Create a new render node when size changes or if there is no node yet
-    m_initialisedSize = boundingRect().size().toSize();
-    m_devicePixelRatio = devicePixelRatio;
+    // Clear the background as that is not done by default
+    glViewport(0, 0, window()->width(), window()->height());
+    QColor clearColor = window()->color();
+    glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    // Delete old node
-    if (oldNode)
-        delete oldNode;
+    // TODO: Store the state of these and restore before returning
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glDisable(GL_BLEND);
 
-    // Create a new one and set it's bounding rectangle
-    DeclarativeRenderer *node = new DeclarativeRenderer(window(), m_controller);
-    node->setDevicePixelRatio(float(m_devicePixelRatio));
-    node->setRect(boundingRect());
-    m_controller->scene()->setDevicePixelRatio(m_devicePixelRatio);
-    m_controller->setBoundingRect(boundingRect().toRect());
-    return node;
+    m_controller->render();
+
+    glEnable(GL_BLEND);
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const
@@ -135,21 +196,18 @@ void AbstractDeclarative::touchEvent(QTouchEvent *event)
 void AbstractDeclarative::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
     m_controller->mousePressEvent(event, mousePos);
 }
 
 void AbstractDeclarative::mouseReleaseEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
     m_controller->mouseReleaseEvent(event, mousePos);
 }
 
 void AbstractDeclarative::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
-    //mousePos.setY(height() - mousePos.y());
     m_controller->mouseMoveEvent(event, mousePos);
 }
 

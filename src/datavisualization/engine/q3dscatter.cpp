@@ -181,15 +181,6 @@ void Q3DScatter::wheelEvent(QWheelEvent *event)
     dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DScatter::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event);
-    dptr()->m_shared->setSize(width(), height());
-}
-
 Q3DScatterPrivate *Q3DScatter::dptr()
 {
     return static_cast<Q3DScatterPrivate *>(d_ptr.data());
@@ -198,24 +189,6 @@ Q3DScatterPrivate *Q3DScatter::dptr()
 const Q3DScatterPrivate *Q3DScatter::dptrc() const
 {
     return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
-}
-
-/*!
- * Sets window \a width.
- */
-void Q3DScatter::setWidth(const int width)
-{
-    dptr()->m_shared->setWidth(width);
-    QWindow::setWidth(width);
-}
-
-/*!
- * Sets window \a height.
- */
-void Q3DScatter::setHeight(const int height)
-{
-    dptr()->m_shared->setHeight(height);
-    QWindow::setHeight(height);
 }
 
 /*!

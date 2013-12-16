@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "declarativebars_p.h"
-#include "declarativerenderer_p.h"
 #include "q3dvalueaxis.h"
 #include "qitemmodelbardataproxy.h"
 
@@ -27,7 +26,6 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : AbstractDeclarative(parent),
       m_barsController(0)
 {
-    setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing
