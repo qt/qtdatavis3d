@@ -19,10 +19,6 @@ include($$PWD/axis/axis.pri)
 include($$PWD/data/data.pri)
 include($$PWD/input/input.pri)
 
-android {
-    CONFIG += static
-}
-
 OTHER_FILES += doc/qtdatavisualization.qdocconf \
                doc/src/* \
                doc/images/* \
