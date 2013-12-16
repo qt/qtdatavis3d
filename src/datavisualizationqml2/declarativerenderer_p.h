@@ -32,6 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include <abstract3dcontroller_p.h>
 #include <QSGSimpleTextureNode>
+#include <QPointer>
 
 class QOpenGLFramebufferObject;
 class QSGTexture;
@@ -57,7 +58,7 @@ private:
     QOpenGLFramebufferObject *m_fbo;
     QSGTexture *m_texture;
     QQuickWindow *m_window;
-    Abstract3DController *m_controller;
+    QPointer<Abstract3DController> m_controller;
     float m_devicePixelRatio;
 };
 

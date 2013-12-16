@@ -33,7 +33,7 @@ DeclarativeRenderer::DeclarativeRenderer(QQuickWindow *window, Abstract3DControl
             &DeclarativeRenderer::synchDataToRenderer, Qt::DirectConnection);
     connect(m_window, &QQuickWindow::beforeRendering, this,
             &DeclarativeRenderer::renderFBO, Qt::DirectConnection);
-    connect(m_controller, &Abstract3DController::needRender, m_window,
+    connect(m_controller.data(), &Abstract3DController::needRender, m_window,
             &QQuickWindow::update);
 }
 
@@ -45,8 +45,10 @@ DeclarativeRenderer::~DeclarativeRenderer()
 
 void DeclarativeRenderer::synchDataToRenderer()
 {
-    m_controller->initializeOpenGL();
-    m_controller->synchDataToRenderer();
+    if (m_controller) {
+        m_controller->initializeOpenGL();
+        m_controller->synchDataToRenderer();
+    }
 }
 
 void DeclarativeRenderer::setDevicePixelRatio(float devicePixelRatio )
@@ -56,38 +58,40 @@ void DeclarativeRenderer::setDevicePixelRatio(float devicePixelRatio )
 
 void DeclarativeRenderer::renderFBO()
 {
-    QSize size = rect().size().toSize();
-    size.setWidth(size.width() * m_devicePixelRatio);
-    size.setHeight(size.height() * m_devicePixelRatio);
+    if (m_controller) {
+        QSize size = rect().size().toSize();
+        size.setWidth(size.width() * m_devicePixelRatio);
+        size.setHeight(size.height() * m_devicePixelRatio);
 
-    // Create FBO
-    if (!m_fbo) {
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::Depth);
-        m_fbo = new QOpenGLFramebufferObject(size, format);
-        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+        // Create FBO
+        if (!m_fbo) {
+            QOpenGLFramebufferObjectFormat format;
+            format.setAttachment(QOpenGLFramebufferObject::Depth);
+            m_fbo = new QOpenGLFramebufferObject(size, format);
+            m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
 
-        setTexture(m_texture);
+            setTexture(m_texture);
 
-        // Flip texture
-        // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
-        QSize ts = m_texture->textureSize();
-        QRectF sourceRect(0, 0, ts.width(), ts.height());
-        float tmp = sourceRect.top();
-        sourceRect.setTop(sourceRect.bottom());
-        sourceRect.setBottom(tmp);
-        QSGGeometry *geometry = this->geometry();
-        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
-                                                m_texture->convertToNormalizedSourceRect(sourceRect));
-        markDirty(DirtyMaterial);
+            // Flip texture
+            // TODO: Can be gotten rid of once support for texture flipping becomes available (in Qt5.2)
+            QSize ts = m_texture->textureSize();
+            QRectF sourceRect(0, 0, ts.width(), ts.height());
+            float tmp = sourceRect.top();
+            sourceRect.setTop(sourceRect.bottom());
+            sourceRect.setBottom(tmp);
+            QSGGeometry *geometry = this->geometry();
+            QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
+                                                    m_texture->convertToNormalizedSourceRect(sourceRect));
+            markDirty(DirtyMaterial);
+        }
+
+        // Call the graph rendering function
+        m_fbo->bind();
+
+        m_controller->render(m_fbo->handle());
+
+        m_fbo->release();
     }
-
-    // Call the graph rendering function
-    m_fbo->bind();
-
-    m_controller->render(m_fbo->handle());
-
-    m_fbo->release();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE
