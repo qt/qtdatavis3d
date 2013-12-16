@@ -24,7 +24,6 @@
 #include "qscatter3dseries_p.h"
 
 #include <QMouseEvent>
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -79,21 +78,24 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D scatter graph.
+ * Constructs a new 3D scatter graph with optional \a parent window.
  */
-Q3DScatter::Q3DScatter()
-    : d_ptr(new Q3DScatterPrivate(this, geometry()))
+Q3DScatter::Q3DScatter(QWindow *parent)
+    : Q3DWindow(new Q3DScatterPrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+    dptr()->m_shared = new Scatter3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DScatter::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DScatter::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DScatter::themeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
+                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 /*!
@@ -110,7 +112,7 @@ Q3DScatter::~Q3DScatter()
  */
 void Q3DScatter::addSeries(QScatter3DSeries *series)
 {
-    d_ptr->m_shared->addSeries(series);
+    dptr()->m_shared->addSeries(series);
 }
 
 /*!
@@ -118,7 +120,7 @@ void Q3DScatter::addSeries(QScatter3DSeries *series)
  */
 void Q3DScatter::removeSeries(QScatter3DSeries *series)
 {
-    d_ptr->m_shared->removeSeries(series);
+    dptr()->m_shared->removeSeries(series);
 }
 
 /*!
@@ -126,7 +128,7 @@ void Q3DScatter::removeSeries(QScatter3DSeries *series)
  */
 QList<QScatter3DSeries *> Q3DScatter::seriesList()
 {
-    return d_ptr->m_shared->scatterSeriesList();
+    return dptr()->m_shared->scatterSeriesList();
 }
 
 /*!
@@ -134,7 +136,7 @@ QList<QScatter3DSeries *> Q3DScatter::seriesList()
  */
 void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -142,7 +144,7 @@ void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DScatter::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -150,7 +152,7 @@ void Q3DScatter::touchEvent(QTouchEvent *event)
  */
 void Q3DScatter::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -158,7 +160,7 @@ void Q3DScatter::mousePressEvent(QMouseEvent *event)
  */
 void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -166,7 +168,7 @@ void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -174,7 +176,7 @@ void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DScatter::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
 /*!
@@ -183,7 +185,17 @@ void Q3DScatter::wheelEvent(QWheelEvent *event)
 void Q3DScatter::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    d_ptr->m_shared->setSize(width(), height());
+    dptr()->m_shared->setSize(width(), height());
+}
+
+Q3DScatterPrivate *Q3DScatter::dptr()
+{
+    return static_cast<Q3DScatterPrivate *>(d_ptr.data());
+}
+
+const Q3DScatterPrivate *Q3DScatter::dptrc() const
+{
+    return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
 }
 
 /*!
@@ -191,7 +203,7 @@ void Q3DScatter::resizeEvent(QResizeEvent *event)
  */
 void Q3DScatter::setWidth(const int width)
 {
-    d_ptr->m_shared->setWidth(width);
+    dptr()->m_shared->setWidth(width);
     QWindow::setWidth(width);
 }
 
@@ -200,7 +212,7 @@ void Q3DScatter::setWidth(const int width)
  */
 void Q3DScatter::setHeight(const int height)
 {
-    d_ptr->m_shared->setHeight(height);
+    dptr()->m_shared->setHeight(height);
     QWindow::setHeight(height);
 }
 
@@ -213,12 +225,12 @@ void Q3DScatter::setHeight(const int height)
  */
 void Q3DScatter::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    dptr()->m_shared->setTheme(theme);
 }
 
 Q3DTheme *Q3DScatter::theme() const
 {
-    return d_ptr->m_shared->theme();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
@@ -231,12 +243,12 @@ Q3DTheme *Q3DScatter::theme() const
  */
 void Q3DScatter::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setSelectionMode(mode);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
 QDataVis::SelectionFlags Q3DScatter::selectionMode() const
 {
-    return d_ptr->m_shared->selectionMode();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -246,7 +258,7 @@ QDataVis::SelectionFlags Q3DScatter::selectionMode() const
  */
 Q3DScene *Q3DScatter::scene() const
 {
-    return d_ptr->m_shared->scene();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -261,12 +273,12 @@ Q3DScene *Q3DScatter::scene() const
  */
 void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    return d_ptr->m_shared->setShadowQuality(quality);
+    return dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -281,7 +293,7 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  */
 void Q3DScatter::setAxisX(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -289,7 +301,7 @@ void Q3DScatter::setAxisX(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -304,7 +316,7 @@ Q3DValueAxis *Q3DScatter::axisX() const
  */
 void Q3DScatter::setAxisY(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -312,7 +324,7 @@ void Q3DScatter::setAxisY(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -327,7 +339,7 @@ Q3DValueAxis *Q3DScatter::axisY() const
  */
 void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -335,7 +347,7 @@ void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -347,7 +359,7 @@ Q3DValueAxis *Q3DScatter::axisZ() const
  */
 void Q3DScatter::addAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -360,7 +372,7 @@ void Q3DScatter::addAxis(Q3DValueAxis *axis)
  */
 void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -370,7 +382,7 @@ void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
  */
 QList<Q3DValueAxis *> Q3DScatter::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
     QList<Q3DValueAxis *> retList;
     foreach (Q3DAbstractAxis *axis, abstractAxes)
         retList.append(static_cast<Q3DValueAxis *>(axis));
@@ -384,23 +396,24 @@ QList<Q3DValueAxis *> Q3DScatter::axes() const
  * This signal is emitted when shadow \a quality changes.
  */
 
-Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Scatter3DController(rect))
+Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
+    : Q3DWindowPrivate(q)
 {
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
-    qDebug() << "Destroying Q3DScatterPrivate";
     delete m_shared;
 }
 
 void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit q_ptr->shadowQualityChanged(quality);
+    emit qptr()->shadowQualityChanged(quality);
+}
+
+Q3DScatter *Q3DScatterPrivate::qptr()
+{
+    return static_cast<Q3DScatter *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

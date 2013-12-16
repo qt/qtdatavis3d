@@ -91,21 +91,22 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D surface graph.
+ * Constructs a new 3D surface graph with optional \a parent window.
  */
-Q3DSurface::Q3DSurface()
-    : d_ptr(new Q3DSurfacePrivate(this, geometry()))
+Q3DSurface::Q3DSurface(QWindow *parent)
+    : Q3DWindow(new Q3DSurfacePrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+    dptr()->m_shared = new Surface3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DSurface::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DSurface::themeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DSurface::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
 }
 
 /*!
@@ -122,7 +123,7 @@ Q3DSurface::~Q3DSurface()
  */
 void Q3DSurface::addSeries(QSurface3DSeries *series)
 {
-    d_ptr->m_shared->addSeries(series);
+    dptr()->m_shared->addSeries(series);
 }
 
 /*!
@@ -130,7 +131,7 @@ void Q3DSurface::addSeries(QSurface3DSeries *series)
  */
 void Q3DSurface::removeSeries(QSurface3DSeries *series)
 {
-    d_ptr->m_shared->removeSeries(series);
+    dptr()->m_shared->removeSeries(series);
 }
 
 /*!
@@ -140,7 +141,7 @@ void Q3DSurface::removeSeries(QSurface3DSeries *series)
  */
 QList<QSurface3DSeries *> Q3DSurface::seriesList()
 {
-    return d_ptr->m_shared->surfaceSeriesList();
+    return dptr()->m_shared->surfaceSeriesList();
 }
 
 /*!
@@ -148,7 +149,7 @@ QList<QSurface3DSeries *> Q3DSurface::seriesList()
  */
 void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -156,7 +157,7 @@ void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DSurface::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -164,7 +165,7 @@ void Q3DSurface::touchEvent(QTouchEvent *event)
  */
 void Q3DSurface::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -172,7 +173,7 @@ void Q3DSurface::mousePressEvent(QMouseEvent *event)
  */
 void Q3DSurface::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -180,7 +181,7 @@ void Q3DSurface::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -188,7 +189,7 @@ void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DSurface::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
 /*!
@@ -197,8 +198,18 @@ void Q3DSurface::wheelEvent(QWheelEvent *event)
 void Q3DSurface::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
+    dptr()->m_shared->setWidth(width());
+    dptr()->m_shared->setHeight(height());
+}
+
+Q3DSurfacePrivate *Q3DSurface::dptr()
+{
+    return static_cast<Q3DSurfacePrivate *>(d_ptr.data());
+}
+
+const Q3DSurfacePrivate *Q3DSurface::dptrc() const
+{
+    return static_cast<const Q3DSurfacePrivate *>(d_ptr.data());
 }
 
 /*!
@@ -210,12 +221,12 @@ void Q3DSurface::resizeEvent(QResizeEvent *event)
  */
 void Q3DSurface::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    dptr()->m_shared->setTheme(theme);
 }
 
 Q3DTheme *Q3DSurface::theme() const
 {
-    return d_ptr->m_shared->theme();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
@@ -230,12 +241,12 @@ Q3DTheme *Q3DSurface::theme() const
  */
 void Q3DSurface::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    return d_ptr->m_shared->setShadowQuality(quality);
+    return dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -247,12 +258,12 @@ QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
  */
 void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setSelectionMode(mode);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
 QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 {
-    return d_ptr->m_shared->selectionMode();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -262,7 +273,7 @@ QDataVis::SelectionFlags Q3DSurface::selectionMode() const
  */
 Q3DScene *Q3DSurface::scene() const
 {
-    return d_ptr->m_shared->scene();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -277,7 +288,7 @@ Q3DScene *Q3DSurface::scene() const
  */
 void Q3DSurface::setAxisX(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -285,7 +296,7 @@ void Q3DSurface::setAxisX(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -300,7 +311,7 @@ Q3DValueAxis *Q3DSurface::axisX() const
  */
 void Q3DSurface::setAxisY(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -308,7 +319,7 @@ void Q3DSurface::setAxisY(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -323,7 +334,7 @@ Q3DValueAxis *Q3DSurface::axisY() const
  */
 void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -331,7 +342,7 @@ void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -343,7 +354,7 @@ Q3DValueAxis *Q3DSurface::axisZ() const
  */
 void Q3DSurface::addAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -356,7 +367,7 @@ void Q3DSurface::addAxis(Q3DValueAxis *axis)
  */
 void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -366,7 +377,7 @@ void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
  */
 QList<Q3DValueAxis *> Q3DSurface::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
     QList<Q3DValueAxis *> retList;
     foreach (Q3DAbstractAxis *axis, abstractAxes)
         retList.append(static_cast<Q3DValueAxis *>(axis));
@@ -376,15 +387,19 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
 
 /////////////////// PRIVATE ///////////////////////////////////
 
-Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Surface3DController(rect))
+Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
+    : Q3DWindowPrivate(q)
 {
 }
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
     delete m_shared;
+}
+
+Q3DSurface *Q3DSurfacePrivate::qptr()
+{
+    return static_cast<Q3DSurface *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

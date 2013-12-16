@@ -26,26 +26,29 @@
 //
 // We mean it.
 
-#ifndef Q3DSCATTER_p_H
-#define Q3DSCATTER_p_H
+#ifndef Q3DSCATTER_P_H
+#define Q3DSCATTER_P_H
 
 #include "scatter3dcontroller_p.h"
 #include "qdatavisualizationenums.h"
+#include "q3dwindow_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DScatter;
 
-class Q3DScatterPrivate : public QObject
+class Q3DScatterPrivate : public Q3DWindowPrivate
 {
+    Q_OBJECT
 public:
-    Q3DScatterPrivate(Q3DScatter *q, QRect rect);
+    Q3DScatterPrivate(Q3DScatter *q);
     ~Q3DScatterPrivate();
 
     // Used to detect when shadow quality changes autonomously due to e.g. resizing.
     void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
-    Q3DScatter *q_ptr;
+    Q3DScatter *qptr();
+
     Scatter3DController *m_shared;
 };
 

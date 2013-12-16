@@ -40,8 +40,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
-    explicit Q3DSurface();
-    ~Q3DSurface();
+    explicit Q3DSurface(QWindow *parent = 0);
+    virtual ~Q3DSurface();
 
     void addSeries(QSurface3DSeries *series);
     void removeSeries(QSurface3DSeries *series);
@@ -84,7 +84,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DSurfacePrivate> d_ptr;
+    Q3DSurfacePrivate *dptr();
+    const Q3DSurfacePrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DSurface)
 };
 

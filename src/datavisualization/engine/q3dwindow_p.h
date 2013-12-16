@@ -26,10 +26,12 @@
 //
 // We mean it.
 
-#ifndef Q3DWINDOW_p_H
-#define Q3DWINDOW_p_H
+#ifndef Q3DWINDOW_P_H
+#define Q3DWINDOW_P_H
 
 #include "datavisualizationglobal_p.h"
+
+#include <QObject>
 
 class QOpenGLContext;
 class QOpenGLPaintDevice;
@@ -39,11 +41,21 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class Q3DWindow;
 class Abstract3DController;
 
-class Q3DWindowPrivate
+class Q3DWindowPrivate : public QObject
 {
+    Q_OBJECT
 public:
     Q3DWindowPrivate(Q3DWindow *q);
     ~Q3DWindowPrivate();
+
+    void render();
+
+    void setVisualController(Abstract3DController *controller);
+    void handleDevicePixelRatioChange();
+
+public slots:
+    void renderLater();
+    void renderNow();
 
 public:
     Q3DWindow *q_ptr;

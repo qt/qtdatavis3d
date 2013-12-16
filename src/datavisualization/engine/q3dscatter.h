@@ -44,8 +44,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
-    explicit Q3DScatter();
-    ~Q3DScatter();
+    explicit Q3DScatter(QWindow *parent = 0);
+    virtual ~Q3DScatter();
 
     void addSeries(QScatter3DSeries *series);
     void removeSeries(QScatter3DSeries *series);
@@ -90,7 +90,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DScatterPrivate> d_ptr;
+    Q3DScatterPrivate *dptr();
+    const Q3DScatterPrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DScatter)
 };
 

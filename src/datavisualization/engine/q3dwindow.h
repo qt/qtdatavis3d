@@ -37,8 +37,9 @@ class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLF
 {
     Q_OBJECT
 
+protected:
+    explicit Q3DWindow(Q3DWindowPrivate *d, QWindow *parent = 0);
 public:
-    explicit Q3DWindow(QWindow *parent = 0);
     virtual ~Q3DWindow();
 
     void addInputHandler(QAbstract3DInputHandler *inputHandler);
@@ -46,18 +47,9 @@ public:
     void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     QAbstract3DInputHandler *activeInputHandler();
 
-protected slots:
-    void renderLater();
-    void renderNow();
-
 protected:
-    // TODO: Move to private unnecessarily exposed functionality when doing QTRD-2213
-    virtual void render();
-
     bool event(QEvent *event);
     void exposeEvent(QExposeEvent *event);
-    void setVisualController(Abstract3DController *controller);
-    void handleDevicePixelRatioChange();
 
 private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;

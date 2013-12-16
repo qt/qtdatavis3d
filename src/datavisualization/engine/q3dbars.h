@@ -46,8 +46,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
-    explicit Q3DBars();
-    ~Q3DBars();
+    explicit Q3DBars(QWindow *parent = 0);
+    virtual ~Q3DBars();
 
     void addSeries(QBar3DSeries *series);
     void removeSeries(QBar3DSeries *series);
@@ -105,7 +105,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DBarsPrivate> d_ptr;
+    Q3DBarsPrivate *dptr();
+    const Q3DBarsPrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DBars)
 };
 

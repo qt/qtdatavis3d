@@ -26,7 +26,6 @@
 
 #include <QMouseEvent>
 
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -95,21 +94,24 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D bar graph.
+ * Constructs a new 3D bar graph with optional \a parent window.
  */
-Q3DBars::Q3DBars()
-    : d_ptr(new Q3DBarsPrivate(this, geometry()))
+Q3DBars::Q3DBars(QWindow *parent)
+    : Q3DWindow(new Q3DBarsPrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::selectionModeChanged, this,
+    dptr()->m_shared = new Bars3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DBars::selectionModeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::shadowQualityChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::shadowQualityChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::themeChanged, this,
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
                      &Q3DBars::themeChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
+                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 /*!
@@ -129,7 +131,7 @@ Q3DBars::~Q3DBars()
  */
 void Q3DBars::addSeries(QBar3DSeries *series)
 {
-    d_ptr->m_shared->addSeries(series);
+    dptr()->m_shared->addSeries(series);
 }
 
 /*!
@@ -137,7 +139,7 @@ void Q3DBars::addSeries(QBar3DSeries *series)
  */
 void Q3DBars::removeSeries(QBar3DSeries *series)
 {
-    d_ptr->m_shared->removeSeries(series);
+    dptr()->m_shared->removeSeries(series);
 }
 
 /*!
@@ -145,7 +147,7 @@ void Q3DBars::removeSeries(QBar3DSeries *series)
  */
 QList<QBar3DSeries *> Q3DBars::seriesList()
 {
-    return d_ptr->m_shared->barSeriesList();
+    return dptr()->m_shared->barSeriesList();
 }
 
 /*!
@@ -153,7 +155,7 @@ QList<QBar3DSeries *> Q3DBars::seriesList()
  */
 void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -161,7 +163,7 @@ void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DBars::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -169,7 +171,7 @@ void Q3DBars::touchEvent(QTouchEvent *event)
  */
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -177,7 +179,7 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -185,7 +187,7 @@ void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -193,7 +195,7 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DBars::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
 /*!
@@ -202,7 +204,17 @@ void Q3DBars::wheelEvent(QWheelEvent *event)
 void Q3DBars::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    d_ptr->m_shared->setSize(width(), height());
+    dptr()->m_shared->setSize(width(), height());
+}
+
+Q3DBarsPrivate *Q3DBars::dptr()
+{
+    return static_cast<Q3DBarsPrivate *>(d_ptr.data());
+}
+
+const Q3DBarsPrivate *Q3DBars::dptrc() const
+{
+    return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
 }
 
 /*!
@@ -210,7 +222,7 @@ void Q3DBars::resizeEvent(QResizeEvent *event)
  */
 void Q3DBars::setWidth(const int width)
 {
-    d_ptr->m_shared->setWidth(width);
+    dptr()->m_shared->setWidth(width);
     QWindow::setWidth(width);
 }
 
@@ -219,7 +231,7 @@ void Q3DBars::setWidth(const int width)
  */
 void Q3DBars::setHeight(const int height)
 {
-    d_ptr->m_shared->setHeight(height);
+    dptr()->m_shared->setHeight(height);
     QWindow::setHeight(height);
 }
 
@@ -232,14 +244,14 @@ void Q3DBars::setHeight(const int height)
 void Q3DBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
-        d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        dptr()->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
         emit barThicknessChanged(thicknessRatio);
     }
 }
 
 float Q3DBars::barThickness()
 {
-    return d_ptr->m_shared->barThickness();
+    return dptr()->m_shared->barThickness();
 }
 
 /*!
@@ -253,14 +265,14 @@ float Q3DBars::barThickness()
 void Q3DBars::setBarSpacing(QSizeF spacing)
 {
     if (spacing != barSpacing()) {
-        d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
         emit barSpacingChanged(spacing);
     }
 }
 
 QSizeF Q3DBars::barSpacing()
 {
-    return d_ptr->m_shared->barSpacing();
+    return dptr()->m_shared->barSpacing();
 }
 
 /*!
@@ -273,14 +285,14 @@ QSizeF Q3DBars::barSpacing()
 void Q3DBars::setBarSpacingRelative(bool relative)
 {
     if (relative != isBarSpacingRelative()) {
-        d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
         emit barSpacingRelativeChanged(relative);
     }
 }
 
 bool Q3DBars::isBarSpacingRelative()
 {
-    return d_ptr->m_shared->isBarSpecRelative();
+    return dptr()->m_shared->isBarSpecRelative();
 }
 
 /*!
@@ -292,12 +304,12 @@ bool Q3DBars::isBarSpacingRelative()
  */
 void Q3DBars::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    dptr()->m_shared->setTheme(theme);
 }
 
 Q3DTheme *Q3DBars::theme() const
 {
-    return d_ptr->m_shared->theme();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
@@ -308,12 +320,12 @@ Q3DTheme *Q3DBars::theme() const
  */
 void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setSelectionMode(mode);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
 QDataVis::SelectionFlags Q3DBars::selectionMode() const
 {
-    return d_ptr->m_shared->selectionMode();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -323,7 +335,7 @@ QDataVis::SelectionFlags Q3DBars::selectionMode() const
  */
 Q3DScene *Q3DBars::scene() const
 {
-    return d_ptr->m_shared->scene();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -338,12 +350,12 @@ Q3DScene *Q3DBars::scene() const
  */
 void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    d_ptr->m_shared->setShadowQuality(quality);
+    dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -357,7 +369,7 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  */
 void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -365,7 +377,7 @@ void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DCategoryAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -379,7 +391,7 @@ Q3DCategoryAxis *Q3DBars::rowAxis() const
  */
 void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -387,7 +399,7 @@ void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DCategoryAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -402,7 +414,7 @@ Q3DCategoryAxis *Q3DBars::columnAxis() const
  */
 void Q3DBars::setValueAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -410,7 +422,7 @@ void Q3DBars::setValueAxis(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DBars::valueAxis() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -422,7 +434,7 @@ Q3DValueAxis *Q3DBars::valueAxis() const
  */
 void Q3DBars::addAxis(Q3DAbstractAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -435,7 +447,7 @@ void Q3DBars::addAxis(Q3DAbstractAxis *axis)
  */
 void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -445,15 +457,12 @@ void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
  */
 QList<Q3DAbstractAxis *> Q3DBars::axes() const
 {
-    return d_ptr->m_shared->axes();
+    return dptrc()->m_shared->axes();
 }
 
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Bars3DController(rect))
+Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
+    : Q3DWindowPrivate(q)
 {
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
@@ -463,7 +472,12 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
 
 void Q3DBarsPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit q_ptr->shadowQualityChanged(quality);
+    emit qptr()->shadowQualityChanged(quality);
+}
+
+Q3DBars *Q3DBarsPrivate::qptr()
+{
+    return static_cast<Q3DBars *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

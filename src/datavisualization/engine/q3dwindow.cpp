@@ -37,7 +37,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since Qt Data Visualization 1.0
  *
  * This class creates a QWindow and provides render loop for visualization types inheriting it.
- * \warning This class is not intended to be used directly by developers.
+ *
+ * You should not need to use this class directly, but one of its subclasses instead.
  *
  * \note Q3DWindow sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
  * graph windows as standalone windows with regular window frame, clear this flag after constructing
@@ -52,13 +53,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs Q3DWindow with \a parent. It creates a QWindow and an OpenGL context. It also sets
- * surface format and initializes OpenGL functions for use.
+ * \internal
  */
-Q3DWindow::Q3DWindow(QWindow *parent)
+Q3DWindow::Q3DWindow(Q3DWindowPrivate *d, QWindow *parent)
     : QWindow(parent),
-      d_ptr(new Q3DWindowPrivate(this))
+      d_ptr(d)
 {
+    d_ptr->m_context = new QOpenGLContext(this);
+
     setFlags(flags() | Qt::FramelessWindowHint);
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
@@ -90,7 +92,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
-    renderLater();
+    d_ptr->renderLater();
 }
 
 /*!
@@ -98,26 +100,6 @@ Q3DWindow::Q3DWindow(QWindow *parent)
  */
 Q3DWindow::~Q3DWindow()
 {
-}
-
-/*!
- * \internal
- */
-void Q3DWindow::setVisualController(Abstract3DController *controller)
-{
-    d_ptr->m_visualController = controller;
-}
-
-/*!
- * \internal
- */
-void Q3DWindow::handleDevicePixelRatioChange()
-{
-    if (QWindow::devicePixelRatio() == d_ptr->m_devicePixelRatio || !d_ptr->m_visualController)
-        return;
-
-    d_ptr->m_devicePixelRatio = QWindow::devicePixelRatio();
-    d_ptr->m_visualController->scene()->setDevicePixelRatio(d_ptr->m_devicePixelRatio);
 }
 
 /*!
@@ -169,33 +151,11 @@ QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
 /*!
  * \internal
  */
-void Q3DWindow::render()
-{
-    handleDevicePixelRatioChange();
-    d_ptr->m_visualController->synchDataToRenderer();
-    d_ptr->m_visualController->render();
-}
-
-
-/*!
- * \internal
- */
-void Q3DWindow::renderLater()
-{
-    if (!d_ptr->m_updatePending) {
-        d_ptr->m_updatePending = true;
-        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
-    }
-}
-
-/*!
- * \internal
- */
 bool Q3DWindow::event(QEvent *event)
 {
     switch (event->type()) {
     case QEvent::UpdateRequest:
-        renderNow();
+        d_ptr->renderNow();
         return true;
     case QEvent::TouchBegin:
     case QEvent::TouchCancel:
@@ -216,30 +176,13 @@ void Q3DWindow::exposeEvent(QExposeEvent *event)
     Q_UNUSED(event);
 
     if (isExposed())
-        renderNow();
-}
-
-/*!
- * \internal
- */
-void Q3DWindow::renderNow()
-{
-    if (!isExposed())
-        return;
-
-    d_ptr->m_updatePending = false;
-
-    d_ptr->m_context->makeCurrent(this);
-
-    render();
-
-    d_ptr->m_context->swapBuffers(this);
+        d_ptr->renderNow();
 }
 
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
-    : q_ptr(q),
+    : QObject(0),
+      q_ptr(q),
       m_updatePending(false),
-      m_context(new QOpenGLContext(q)),
       m_visualController(0),
       m_devicePixelRatio(1.f)
 {
@@ -247,6 +190,49 @@ Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
 
 Q3DWindowPrivate::~Q3DWindowPrivate()
 {
+}
+
+void Q3DWindowPrivate::render()
+{
+    handleDevicePixelRatioChange();
+    m_visualController->synchDataToRenderer();
+    m_visualController->render();
+}
+
+void Q3DWindowPrivate::renderLater()
+{
+    if (!m_updatePending) {
+        m_updatePending = true;
+        QCoreApplication::postEvent(q_ptr, new QEvent(QEvent::UpdateRequest));
+    }
+}
+
+void Q3DWindowPrivate::renderNow()
+{
+    if (!q_ptr->isExposed())
+        return;
+
+    m_updatePending = false;
+
+    m_context->makeCurrent(q_ptr);
+
+    render();
+
+    m_context->swapBuffers(q_ptr);
+}
+
+void Q3DWindowPrivate::setVisualController(Abstract3DController *controller)
+{
+    m_visualController = controller;
+}
+
+void Q3DWindowPrivate::handleDevicePixelRatioChange()
+{
+    if (q_ptr->devicePixelRatio() == m_devicePixelRatio || !m_visualController)
+        return;
+
+    m_devicePixelRatio = q_ptr->devicePixelRatio();
+    m_visualController->scene()->setDevicePixelRatio(m_devicePixelRatio);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

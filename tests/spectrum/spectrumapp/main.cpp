@@ -198,6 +198,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("QtDataVisualization spectrum analyzer");
 
     Q3DBars window;
+    window.setFlags(window.flags() ^ Qt::FramelessWindowHint);
     window.resize(1024, 768);
     window.show();
 
