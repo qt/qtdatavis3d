@@ -578,6 +578,36 @@ void GraphModifier::changeTheme()
 
     m_graph->setTheme(new Q3DTheme((Q3DTheme::Theme)theme));
 
+    switch (theme) {
+        case Q3DTheme::ThemeQt:
+            qDebug() << __FUNCTION__ << "ThemeQt";
+            break;
+        case Q3DTheme::ThemePrimaryColors:
+            qDebug() << __FUNCTION__ << "ThemePrimaryColors";
+            break;
+        case Q3DTheme::ThemeDigia:
+            qDebug() << __FUNCTION__ << "ThemeDigia";
+            break;
+        case Q3DTheme::ThemeStoneMoss:
+            qDebug() << __FUNCTION__ << "ThemeStoneMoss";
+            break;
+        case Q3DTheme::ThemeArmyBlue:
+            qDebug() << __FUNCTION__ << "ThemeArmyBlue";
+            break;
+        case Q3DTheme::ThemeRetro:
+            qDebug() << __FUNCTION__ << "ThemeRetro";
+            break;
+        case Q3DTheme::ThemeEbony:
+            qDebug() << __FUNCTION__ << "ThemeEbony";
+            break;
+        case Q3DTheme::ThemeIsabelle:
+            qDebug() << __FUNCTION__ << "ThemeIsabelle";
+            break;
+        default:
+            qDebug() << __FUNCTION__ << "Unknown theme";
+            break;
+    }
+
     if (++theme > Q3DTheme::ThemeIsabelle)
         theme = Q3DTheme::ThemeQt;
 }
@@ -658,6 +688,7 @@ void GraphModifier::showFiveSeries()
 {
     releaseProxies();
     releaseAxes();
+    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn | QDataVis::SelectionMultiSeries);
 
     m_dummyData->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
     m_dummyData2->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
@@ -669,7 +700,11 @@ void GraphModifier::showFiveSeries()
     m_graph->addSeries(m_dummyData2);
     m_graph->addSeries(m_dummyData3);
     m_graph->addSeries(m_dummyData4);
-    m_graph->addSeries(m_dummyData5);
+
+    // Toggle between four and five series
+    static int count = 0;
+    if (++count % 2)
+        m_graph->addSeries(m_dummyData5);
 }
 
 QBarDataArray *GraphModifier::makeDummyData()
