@@ -224,10 +224,6 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
         m_hasHeightAdjustmentChanged = false;
     }
 
-    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with m_cachedScene->activeCamera(), a bit above it (as set in defaultLightPos))
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
-
     Abstract3DRenderer::updateScene(scene);
 }
 
@@ -259,7 +255,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = activeCamera->viewMatrix();
-
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
     int seriesCount = m_visibleSeriesList.size();

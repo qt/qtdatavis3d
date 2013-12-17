@@ -157,7 +157,6 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
         yRotation -= mouseMoveY;
         scene()->activeCamera()->setXRotation(xRotation);
         scene()->activeCamera()->setYRotation(yRotation);
-        scene()->activeCamera()->d_ptr->updateViewMatrix(1.0f);
 
         setPreviousInputPos(inputPosition());
         setInputPosition(mousePos);

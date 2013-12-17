@@ -49,6 +49,9 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
     m_graph->theme()->setGridEnabled(true);
     m_graph->theme()->setBackgroundEnabled(false);
+    QFont font = m_graph->theme()->font();
+    font.setPointSize(10);
+    m_graph->theme()->setFont(font);
     QBar3DSeries *series = new QBar3DSeries;
     series->setMesh(QAbstract3DSeries::MeshBar);
     m_graph->addSeries(series);

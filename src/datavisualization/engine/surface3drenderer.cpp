@@ -531,9 +531,6 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
         m_hasHeightAdjustmentChanged = false;
     }
 
-    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
-
     Abstract3DRenderer::updateScene(scene);
 
     if (m_selectionPointer)

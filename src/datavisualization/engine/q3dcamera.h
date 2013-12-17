@@ -147,6 +147,7 @@ private:
 
     friend class Q3DCameraPrivate;
     friend class Q3DScenePrivate;
+    friend class Abstract3DRenderer;
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;

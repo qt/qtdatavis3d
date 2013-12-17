@@ -177,7 +177,7 @@ void Q3DWindow::resizeEvent(QResizeEvent *event)
 
     Q3DScene *scene = d_ptr->m_visualController->scene();
     scene->d_ptr->setWindowSize(QSize(width(), height()));
-    scene->d_ptr->setViewport(QRect(x(), y(), width(), height()));
+    scene->d_ptr->setViewport(QRect(0, 0, width(), height()));
 }
 
 /*!

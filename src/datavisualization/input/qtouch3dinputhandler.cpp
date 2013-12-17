@@ -203,7 +203,6 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
         yRotation -= mouseMoveY;
         camera->setXRotation(xRotation);
         camera->setYRotation(yRotation);
-        camera->d_ptr->updateViewMatrix(1.0f);
 
         q_ptr->setPreviousInputPos(inputPos.toPoint());
         q_ptr->setInputPosition(position.toPoint());

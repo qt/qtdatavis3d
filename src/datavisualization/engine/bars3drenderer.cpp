@@ -253,10 +253,6 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
         m_hasHeightAdjustmentChanged = false;
     }
 
-    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with camera, a bit above it (as set in defaultLightPos))
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
-
     Abstract3DRenderer::updateScene(scene);
 
     updateSlicingActive(scene->isSlicingActive());
