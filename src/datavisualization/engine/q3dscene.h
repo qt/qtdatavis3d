@@ -88,27 +88,9 @@ signals:
     void activeCameraChanged(const Q3DCamera *camera);
     void activeLightChanged(const Q3DLight *light);
     void devicePixelRatioChanged(float pixelRatio);
-    void needRender();
     void selectionQueryPositionChanged(const QPoint position);
 
 private:
-signals:
-    void windowSizeChanged(const QSize size);
-
-private:
-    void setViewport(const QRect &viewport);
-    void setViewportSize(int width, int height);
-    void setWindowSize(const QSize &size);
-    QSize windowSize() const;
-    void calculateSubViewports();
-    void updateGLViewport();
-    void updateGLSubViewports();
-
-
-    QRect glViewport();
-    QRect glPrimarySubViewport();
-    QRect glSecondarySubViewport();
-
     QScopedPointer<Q3DScenePrivate> d_ptr;
 
     Q_DISABLE_COPY(Q3DScene)

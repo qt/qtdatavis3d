@@ -65,14 +65,31 @@ struct Q3DSceneChangeBitField {
     }
 };
 
-class Q3DScenePrivate
+class QT_DATAVISUALIZATION_EXPORT Q3DScenePrivate : public QObject
 {
+    Q_OBJECT
 public:
     Q3DScenePrivate(Q3DScene *q);
     ~Q3DScenePrivate();
 
     void sync(Q3DScenePrivate &other);
 
+    void setViewport(const QRect &viewport);
+    void setViewportSize(int width, int height);
+    void setWindowSize(const QSize &size);
+    QSize windowSize() const;
+    void calculateSubViewports();
+    void updateGLViewport();
+    void updateGLSubViewports();
+
+    QRect glViewport();
+    QRect glPrimarySubViewport();
+    QRect glSecondarySubViewport();
+
+signals:
+    void needRender();
+
+public:
     Q3DScene *q_ptr;
     Q3DSceneChangeBitField m_changeTracker;
 

@@ -134,14 +134,13 @@ void AbstractDeclarative::updateWindowParameters()
         if (win->devicePixelRatio() != scene->devicePixelRatio())
             scene->setDevicePixelRatio(win->devicePixelRatio());
 
-        if (win->size() != scene->windowSize())
-            scene->setWindowSize(QSize(win->width(), win->height()));
+        if (win->size() != scene->d_ptr->windowSize())
+            scene->d_ptr->setWindowSize(QSize(win->width(), win->height()));
 
         QPointF point = QQuickItem::mapToScene(QPointF(m_cachedGeometry.x(), m_cachedGeometry.y()));
         if (m_controller) {
-            scene->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
+            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
         }
-
     }
 }
 

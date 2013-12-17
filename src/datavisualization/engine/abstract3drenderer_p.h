@@ -123,17 +123,6 @@ protected:
 
     QDataVis::SelectionFlags m_cachedSelectionMode;
 
-    Q3DTheme::ColorStyle m_cachedColorStyle;
-    QColor m_cachedObjectColor;
-    QLinearGradient m_cachedObjectGradient;
-    GLuint m_objectGradientTexture;
-    QColor m_cachedSingleHighlightColor;
-    QLinearGradient m_cachedSingleHighlightGradient;
-    GLuint m_singleHighlightGradientTexture;
-    QColor m_cachedMultiHighlightColor;
-    QLinearGradient m_cachedMultiHighlightGradient;
-    GLuint m_multiHighlightGradientTexture;
-
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;

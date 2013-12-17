@@ -20,13 +20,13 @@
 #include "q3dwindow_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler_p.h"
-#include <QGuiApplication>
+#include "q3dscene_p.h"
 
+#include <QGuiApplication>
 #include <QOpenGLContext>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
 
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -176,8 +176,8 @@ void Q3DWindow::resizeEvent(QResizeEvent *event)
     Q_UNUSED(event);
 
     Q3DScene *scene = d_ptr->m_visualController->scene();
-    scene->setWindowSize(QSize(width(), height()));
-    scene->setViewport(QRect(x(),y(),width(),height()));
+    scene->d_ptr->setWindowSize(QSize(width(), height()));
+    scene->d_ptr->setViewport(QRect(x(), y(), width(), height()));
 }
 
 /*!

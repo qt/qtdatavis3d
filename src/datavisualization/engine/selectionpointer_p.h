@@ -51,7 +51,7 @@ class Theme;
 class Drawer;
 class Q3DCamera;
 
-class QT_DATAVISUALIZATION_EXPORT SelectionPointer : public QObject, protected QOpenGLFunctions
+class SelectionPointer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 

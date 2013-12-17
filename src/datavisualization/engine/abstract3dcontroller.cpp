@@ -29,6 +29,7 @@
 #include "qtouch3dinputhandler.h"
 #include "qabstract3dseries_p.h"
 #include "thememanager_p.h"
+#include "q3dscene_p.h"
 
 #include <QThread>
 
@@ -53,7 +54,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, QObject *paren
     // Set initial theme
     setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
 
-    m_scene->setViewport(initialViewport);
+    m_scene->d_ptr->setViewport(initialViewport);
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);
@@ -67,10 +68,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, QObject *paren
             &Abstract3DController::handleInputStateChanged);
     connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
             &Abstract3DController::handleInputPositionChanged);
-    connect(m_scene, &Q3DScene::needRender, this,
+    connect(m_scene->d_ptr.data(), &Q3DScenePrivate::needRender, this,
             &Abstract3DController::emitNeedRender);
-    connect(m_scene, &Q3DScene::devicePixelRatioChanged, this,
-            &Abstract3DController::handlePixelRatioChanged);
 }
 
 Abstract3DController::~Abstract3DController()
@@ -355,13 +354,6 @@ void Abstract3DController::wheelEvent(QWheelEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->wheelEvent(event);
-}
-
-void Abstract3DController::handlePixelRatioChanged(float ratio)
-{
-    Q_UNUSED(ratio);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle style)

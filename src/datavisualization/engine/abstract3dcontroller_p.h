@@ -34,7 +34,7 @@
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
-#include "q3dscene.h"
+#include "q3dscene_p.h"
 #include "q3dbox.h"
 
 #include <QObject>
@@ -238,7 +238,6 @@ public slots:
     void handleInputStateChanged(QAbstract3DInputHandler::InputState state);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);
-    void handlePixelRatioChanged(float ratio);
 
     void handleThemeColorStyleChanged(Q3DTheme::ColorStyle style);
     void handleThemeBaseColorsChanged(const QList<QColor> &color);

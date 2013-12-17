@@ -171,12 +171,12 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     updateInputPosition(QPoint(logicalPixelPosition.x() * devicePixelRatio,
                                logicalPixelPosition.y() * devicePixelRatio));
 
-    m_viewport = m_cachedScene->glViewport();
-    m_secondarySubViewport = m_cachedScene->glSecondarySubViewport();
+    m_viewport = m_cachedScene->d_ptr->glViewport();
+    m_secondarySubViewport = m_cachedScene->d_ptr->glSecondarySubViewport();
 
-    if (m_primarySubViewport != m_cachedScene->glPrimarySubViewport()) {
+    if (m_primarySubViewport != m_cachedScene->d_ptr->glPrimarySubViewport()) {
         // Resize of primary subviewport means resizing shadow and selection buffers
-        m_primarySubViewport = m_cachedScene->glPrimarySubViewport();
+        m_primarySubViewport = m_cachedScene->d_ptr->glPrimarySubViewport();
         handleResize();
     }
 

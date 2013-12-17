@@ -25,17 +25,15 @@ int main(int argc, char *argv[])
 
     QtQuick2ApplicationViewer viewer;
 
+#if !defined(QT_OPENGL_ES_2)
     // Enable antialiasing
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
-#if !defined(QT_OPENGL_ES_2)
     surfaceFormat.setSamples(8);
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
-#else
-    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
-#endif
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     viewer.setFormat(surfaceFormat);
+#endif
 
 #ifdef Q_OS_ANDROID
     viewer.addImportPath(QString::fromLatin1("assets:/qml"));
