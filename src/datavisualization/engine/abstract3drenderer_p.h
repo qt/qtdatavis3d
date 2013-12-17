@@ -136,6 +136,7 @@ protected:
     QVector<SeriesRenderCache> m_visibleSeriesList;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
+    float m_devicePixelRatio;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

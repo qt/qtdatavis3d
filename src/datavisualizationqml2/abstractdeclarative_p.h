@@ -97,7 +97,6 @@ signals:
 private:
     Abstract3DController *m_controller;
     QRectF m_cachedGeometry;
-    bool m_isFirstRender;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

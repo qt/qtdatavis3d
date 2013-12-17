@@ -42,7 +42,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
-      m_selectionState(SelectNone)
+      m_selectionState(SelectNone),
+      m_devicePixelRatio(1.0f)
     #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -166,11 +167,6 @@ void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
 {
-    float devicePixelRatio = scene->devicePixelRatio();
-    QPoint logicalPixelPosition = scene->selectionQueryPosition();
-    updateInputPosition(QPoint(logicalPixelPosition.x() * devicePixelRatio,
-                               logicalPixelPosition.y() * devicePixelRatio));
-
     m_viewport = scene->d_ptr->glViewport();
     m_secondarySubViewport = scene->d_ptr->glSecondarySubViewport();
 
@@ -180,9 +176,18 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
         handleResize();
     }
 
+    if (m_devicePixelRatio != scene->devicePixelRatio()) {
+        m_devicePixelRatio = scene->devicePixelRatio();
+        handleResize();
+    }
+
     scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with m_cachedScene->activeCamera(), a bit above it (as set in defaultLightPos))
+    // Set light position (rotate light with activeCamera, a bit above it (as set in defaultLightPos))
     scene->setLightPositionRelativeToCamera(defaultLightPos);
+
+    QPoint logicalPixelPosition = scene->selectionQueryPosition();
+    updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
+                               logicalPixelPosition.y() * m_devicePixelRatio));
 
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);

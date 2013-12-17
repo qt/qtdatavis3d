@@ -20,13 +20,13 @@
 #include "q3dvalueaxis.h"
 #include <QThread>
 #include <QGuiApplication>
+#include <QSGSimpleRectNode>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
-    m_controller(0),
-    m_isFirstRender(true)
+    m_controller(0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(true);
@@ -121,7 +121,6 @@ void AbstractDeclarative::geometryChanged(const QRectF &newGeometry, const QRect
 void AbstractDeclarative::itemChange(ItemChange change, const ItemChangeData & value)
 {
     QQuickItem::itemChange(change, value);
-
     updateWindowParameters();
 }
 
@@ -131,11 +130,15 @@ void AbstractDeclarative::updateWindowParameters()
     QQuickWindow *win = window();
     Q3DScene *scene = m_controller->scene();
     if (win) {
-        if (win->devicePixelRatio() != scene->devicePixelRatio())
+        if (win->devicePixelRatio() != scene->devicePixelRatio()) {
             scene->setDevicePixelRatio(win->devicePixelRatio());
+            win->update();
+        }
 
-        if (win->size() != scene->d_ptr->windowSize())
+        if (win->size() != scene->d_ptr->windowSize()) {
             scene->d_ptr->setWindowSize(QSize(win->width(), win->height()));
+            win->update();
+        }
 
         QPointF point = QQuickItem::mapToScene(QPointF(m_cachedGeometry.x(), m_cachedGeometry.y()));
         if (m_controller) {
@@ -146,11 +149,7 @@ void AbstractDeclarative::updateWindowParameters()
 
 void AbstractDeclarative::render()
 {
-    // Needed to catch the window size change upon first render call
-    if (m_isFirstRender) {
-        m_isFirstRender = false;
-        updateWindowParameters();
-    }
+    updateWindowParameters();
 
     // Clear the background as that is not done by default
     glViewport(0, 0, window()->width(), window()->height());
@@ -189,7 +188,7 @@ void AbstractDeclarative::mouseDoubleClickEvent(QMouseEvent *event)
 void AbstractDeclarative::touchEvent(QTouchEvent *event)
 {
     m_controller->touchEvent(event);
-    update();
+    window()->update();
 }
 
 void AbstractDeclarative::mousePressEvent(QMouseEvent *event)
