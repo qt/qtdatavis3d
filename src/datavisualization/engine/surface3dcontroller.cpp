@@ -23,6 +23,8 @@
 #include "q3dvalueaxis_p.h"
 #include "q3dcategoryaxis.h"
 #include "qsurfacedataproxy_p.h"
+#include "qsurface3dseries_p.h"
+#include "shaderhelper_p.h"
 
 #include <QMatrix4x4>
 
@@ -33,20 +35,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Surface3DController::Surface3DController(QRect rect)
     : Abstract3DController(rect),
       m_renderer(0),
-      m_isSmoothSurfaceEnabled(false),
-      m_isSurfaceGridEnabled(true)
+      m_selectedPoint(invalidSelectionPosition()),
+      m_selectedSeries(0),
+      m_flatShadingSupported(true)
 {
-    setActiveDataProxy(0);
-
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
     setAxisX(0);
     setAxisY(0);
     setAxisZ(0);
-
-    // Set the default from the theme
-    m_userDefinedGradient = theme().m_surfaceGradient;
 }
 
 Surface3DController::~Surface3DController()
@@ -62,38 +60,34 @@ void Surface3DController::initializeOpenGL()
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
+    QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
+                     &Surface3DController::handlePointClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
 void Surface3DController::synchDataToRenderer()
 {
-    Abstract3DController::synchDataToRenderer();
-
     if (!isInitialized())
         return;
 
+    Abstract3DController::synchDataToRenderer();
+
     // Notify changes to renderer
-    if (m_changeTracker.gradientColorChanged) {
-        m_renderer->updateSurfaceGradient(m_userDefinedGradient);
-        m_changeTracker.gradientColorChanged = false;
+    if (m_changeTracker.rowsChanged) {
+        m_renderer->updateRows(m_changedRows);
+        m_changeTracker.rowsChanged = false;
+        m_changedRows.clear();
     }
 
-    if (m_changeTracker.smoothStatusChanged) {
-        bool oldSmoothStatus = m_isSmoothSurfaceEnabled;
-        m_isSmoothSurfaceEnabled = m_renderer->updateSmoothStatus(m_isSmoothSurfaceEnabled);
-        m_changeTracker.smoothStatusChanged = false;
-        if (oldSmoothStatus != m_isSmoothSurfaceEnabled)
-            emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
+    if (m_changeTracker.itemChanged) {
+        m_renderer->updateItem(m_changedItems);
+        m_changeTracker.itemChanged = false;
+        m_changedItems.clear();
     }
 
-    if (m_changeTracker.surfaceGridChanged) {
-        m_renderer->updateSurfaceGridStatus(m_isSurfaceGridEnabled);
-        m_changeTracker.surfaceGridChanged = false;
-    }
-
-    if (m_isDataDirty) {
-        m_renderer->updateDataModel(static_cast<QSurfaceDataProxy *>(m_data));
-        m_isDataDirty = false;
+    if (m_changeTracker.selectedPointChanged) {
+        m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
+        m_changeTracker.selectedPointChanged = false;
     }
 }
 
@@ -107,132 +101,392 @@ void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstr
 
 void Surface3DController::handleAxisRangeChangedBySender(QObject *sender)
 {
-    scene()->setSlicingActive(false);
     Abstract3DController::handleAxisRangeChangedBySender(sender);
+
+    // Update selected point - may be moved offscreen
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-void Surface3DController::setSmoothSurface(bool enable)
+void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
-    bool changed = m_isSmoothSurfaceEnabled != enable;
-    m_isSmoothSurfaceEnabled = enable;
-    m_changeTracker.smoothStatusChanged = true;
-    emitNeedRender();
+    Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
-    if (changed)
-        emit smoothSurfaceEnabledChanged(m_isSmoothSurfaceEnabled);
+    // Visibility changes may require disabling/enabling slicing,
+    // so just reset selection to ensure everything is still valid.
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-bool Surface3DController::smoothSurface()
+QPoint Surface3DController::invalidSelectionPosition()
 {
-    return m_isSmoothSurfaceEnabled;
+    static QPoint invalidSelectionPoint(-1, -1);
+    return invalidSelectionPoint;
 }
 
-void Surface3DController::setSurfaceGrid(bool enable)
+bool Surface3DController::isFlatShadingSupported()
 {
-    m_isSurfaceGridEnabled = enable;
-    m_changeTracker.surfaceGridChanged = true;
-    emitNeedRender();
+    return m_flatShadingSupported;
 }
 
-bool Surface3DController::surfaceGrid()
+void Surface3DController::addSeries(QAbstract3DSeries *series)
 {
-    return m_isSurfaceGridEnabled;
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeSurface);
+
+    if (!m_seriesList.size()) {
+        Abstract3DController::addSeries(series);
+
+        adjustValueAxisRange();
+    } else {
+        qWarning("Surface graph only supports a single series.");
+    }
+
+    QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
+    if (surfaceSeries->selectedPoint() != invalidSelectionPosition())
+        setSelectedPoint(surfaceSeries->selectedPoint(), surfaceSeries);
 }
 
-void Surface3DController::setGradient(const QLinearGradient &gradient)
+void Surface3DController::removeSeries(QAbstract3DSeries *series)
 {
-    m_userDefinedGradient = gradient;
-    m_userDefinedGradient.setStart(2, 1024);
-    m_userDefinedGradient.setFinalStop(0, 0);
-    m_changeTracker.gradientColorChanged = true;
-    emitNeedRender();
+    if (series && series->d_ptr->m_controller == this) {
+        Abstract3DController::removeSeries(series);
+
+        if (m_selectedSeries == series)
+            setSelectedPoint(invalidSelectionPosition(), 0);
+
+        adjustValueAxisRange();
+    }
 }
 
-QLinearGradient Surface3DController::gradient() const
+QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
 {
-    return m_userDefinedGradient;
+    QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
+    QList<QSurface3DSeries *> surfaceSeriesList;
+    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+        QSurface3DSeries *surfaceSeries = qobject_cast<QSurface3DSeries *>(abstractSeries);
+        if (surfaceSeries)
+            surfaceSeriesList.append(surfaceSeries);
+    }
+
+    return surfaceSeriesList;
 }
 
-void Surface3DController::setGradientColorAt(qreal pos, const QColor &color)
+void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    m_userDefinedGradient.setColorAt(pos, color);
-    m_changeTracker.gradientColorChanged = true;
-    emitNeedRender();
-}
-
-void Surface3DController::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    if (!(mode == QDataVis::SelectionModeNone || mode == QDataVis::SelectionModeItem
-          || mode == QDataVis::SelectionModeSliceRow
-          || mode == QDataVis::SelectionModeSliceColumn)) {
+    // Currently surface only supports row and column modes when also slicing
+    if ((mode.testFlag(QDataVis::SelectionRow) || mode.testFlag(QDataVis::SelectionColumn))
+            && !mode.testFlag(QDataVis::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
+    } else if (mode.testFlag(QDataVis::SelectionSlice)
+               && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+        qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
+    } else {
+        QDataVis::SelectionFlags oldMode = selectionMode();
+
+        Abstract3DController::setSelectionMode(mode);
+
+        if (mode != oldMode) {
+            // Refresh selection upon mode change to ensure slicing is correctly updated
+            // according to series the visibility.
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+
+            // Special case: Always deactivate slicing when changing away from slice
+            // automanagement, as this can't be handled in setSelectedBar.
+            if (!mode.testFlag(QDataVis::SelectionSlice)
+                    && oldMode.testFlag(QDataVis::SelectionSlice)) {
+                scene()->setSlicingActive(false);
+            }
+        }
     }
-    // Disable zoom if selection mode changes
-    setSlicingActive(false);
-    Abstract3DController::setSelectionMode(mode);
 }
 
-
-void Surface3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
+void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSeries *series)
 {
-    // Setting null proxy indicates default proxy
-    if (!proxy) {
-        proxy = new QSurfaceDataProxy;
-        proxy->d_ptr->setDefaultProxy(true);
+    // If the selection targets non-existent point, clear selection instead.
+    QPoint pos = position;
+
+    // Series may already have been removed, so check it before setting the selection.
+    if (!m_seriesList.contains(series))
+        series = 0;
+
+    const QSurfaceDataProxy *proxy = 0;
+    if (series)
+        proxy = series->dataProxy();
+
+    if (!proxy)
+        pos = invalidSelectionPosition();
+
+    if (pos != invalidSelectionPosition()) {
+        int maxRow = proxy->rowCount() - 1;
+        int maxCol = proxy->columnCount() - 1;
+
+        if (pos.x() < 0 || pos.x() > maxRow || pos.y() < 0 || pos.y() > maxCol)
+            pos = invalidSelectionPosition();
     }
 
-    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeSurface);
+    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+        if (pos == invalidSelectionPosition() || !series->isVisible()) {
+            scene()->setSlicingActive(false);
+        } else {
+            // If the selected point is outside data window, or there is no selected point, disable slicing
+            // TODO: (QTRD-2351) This logic doesn't match the renderer logic for non straight surfaces,
+            // but that logic needs to change anyway, so this is good for now.
+            float axisMinX = m_axisX->min();
+            float axisMaxX = m_axisX->max();
+            float axisMinZ = m_axisZ->min();
+            float axisMaxZ = m_axisZ->max();
 
-    Abstract3DController::setActiveDataProxy(proxy);
+            QSurfaceDataItem item = proxy->array()->at(pos.x())->at(pos.y());
+            if (item.x() < axisMinX || item.x() > axisMaxX
+                    || item.z() < axisMinZ || item.z() > axisMaxZ) {
+                scene()->setSlicingActive(false);
+            } else {
+                scene()->setSlicingActive(true);
+            }
+        }
+        emitNeedRender();
+    }
 
-    QSurfaceDataProxy *surfaceDataProxy = static_cast<QSurfaceDataProxy *>(m_data);
+    if (pos != m_selectedPoint) {
+        m_selectedPoint = pos;
+        m_selectedSeries = series;
+        m_changeTracker.selectedPointChanged = true;
 
-    QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::arrayReset,
-                     this, &Surface3DController::handleArrayReset);
+        // Clear selection from other series and finally set new selection to the specified series
+        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+            QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(otherSeries);
+            if (surfaceSeries != m_selectedSeries)
+                surfaceSeries->dptr()->setSelectedPoint(invalidSelectionPosition());
+        }
+        if (m_selectedSeries)
+            m_selectedSeries->dptr()->setSelectedPoint(m_selectedPoint);
 
-    scene()->setSlicingActive(false);
-    adjustValueAxisRange();
-    m_isDataDirty = true;
-    emitNeedRender();
+        emitNeedRender();
+    }
 }
 
 void Surface3DController::handleArrayReset()
 {
-    scene()->setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
+    // Clear selection unless still valid
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+    emitNeedRender();
+}
+
+void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DSeries *series)
+{
+    setSelectedPoint(position, series);
+    // TODO: pass clicked to parent. (QTRD-2517)
+    // TODO: Also hover needed? (QTRD-2131)
+}
+
+void Surface3DController::handleFlatShadingSupportedChange(bool supported)
+{
+    // Handle renderer flat surface support indicator signal. This happens exactly once per renderer.
+    if (m_flatShadingSupported != supported) {
+        m_flatShadingSupported = supported;
+        // Emit the change for all added surfaces
+        foreach (QAbstract3DSeries *series, m_seriesList) {
+            QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
+            emit surfaceSeries->flatShadingSupportedChanged(m_flatShadingSupported);
+        }
+    }
+}
+
+void Surface3DController::handleRowsChanged(int startIndex, int count)
+{
+    QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
+    if (m_changedRows.size() == 0)
+        m_changedRows.reserve(sender->rowCount());
+
+    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+        // Change is for the visible series, put the change to queue
+        int oldChangeCount = m_changedRows.size();
+        for (int i = 0; i < count; i++) {
+            bool newItem = true;
+            int candidate = startIndex + i;
+            for (int i = 0; i < oldChangeCount; i++) {
+                if (m_changedRows.at(i) == candidate) {
+                    newItem = false;
+                    break;
+                }
+            }
+            if (newItem)
+                m_changedRows.append(candidate);
+        }
+        if (m_changedRows.size()) {
+            m_changeTracker.rowsChanged = true;
+
+            adjustValueAxisRange();
+            // Clear selection unless still valid
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+            emitNeedRender();
+        }
+    }
+}
+
+void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
+{
+    QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
+    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+        // Change is for the visible series, put the change to queue
+        bool newItem = true;
+        QPoint candidate(columnIndex, rowIndex);
+        foreach (QPoint item, m_changedItems) {
+            if (item == candidate) {
+                newItem = false;
+                break;
+            }
+        }
+        if (newItem) {
+            m_changedItems.append(candidate);
+            m_changeTracker.itemChanged = true;
+
+            adjustValueAxisRange();
+            // Clear selection unless still valid
+            setSelectedPoint(m_selectedPoint, m_selectedSeries);
+            emitNeedRender();
+        }
+    }
+}
+
+void Surface3DController::handleRowsAdded(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Surface3DController::handleRowsInserted(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Surface3DController::handleRowsRemoved(int startIndex, int count)
+{
+    Q_UNUSED(startIndex)
+    Q_UNUSED(count)
+    adjustValueAxisRange();
+    m_isDataDirty = true;
+
+    // Clear selection unless still valid
+    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+
     emitNeedRender();
 }
 
 void Surface3DController::adjustValueAxisRange()
 {
-    if (m_data) {
-        QVector3D minLimits;
-        QVector3D maxLimits;
-        static_cast<QSurfaceDataProxy *>(m_data)->dptr()->limitValues(minLimits, maxLimits);
-        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.x() != maxLimits.x())
-                valueAxis->dptr()->setRange(minLimits.x(), maxLimits.x());
-            else
-                valueAxis->dptr()->setRange(minLimits.x() - 1.0f, minLimits.x() + 1.0f); // Default to some valid range
+    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
+    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
+    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
+    bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
+    bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
+
+    if (adjustX || adjustY || adjustZ) {
+        float minValueX = 0.0f;
+        float maxValueX = 0.0f;
+        float minValueY = 0.0f;
+        float maxValueY = 0.0f;
+        float minValueZ = 0.0f;
+        float maxValueZ = 0.0f;
+        int seriesCount = m_seriesList.size();
+        for (int series = 0; series < seriesCount; series++) {
+            const QSurface3DSeries *surfaceSeries =
+                    static_cast<QSurface3DSeries *>(m_seriesList.at(series));
+            const QSurfaceDataProxy *proxy = surfaceSeries->dataProxy();
+            if (surfaceSeries->isVisible() && proxy) {
+                QVector3D minLimits;
+                QVector3D maxLimits;
+                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                if (adjustX) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueX = minLimits.x();
+                        maxValueX = maxLimits.x();
+                    } else {
+                        minValueX = qMin(minValueX, minLimits.x());
+                        maxValueX = qMax(maxValueX, maxLimits.x());
+                    }
+                }
+                if (adjustY) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueY = minLimits.y();
+                        maxValueY = maxLimits.y();
+                    } else {
+                        minValueY = qMin(minValueY, minLimits.y());
+                        maxValueY = qMax(maxValueY, maxLimits.y());
+                    }
+                }
+                if (adjustZ) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueZ = minLimits.z();
+                        maxValueZ = maxLimits.z();
+                    } else {
+                        minValueZ = qMin(minValueZ, minLimits.z());
+                        maxValueZ = qMax(maxValueZ, maxLimits.z());
+                    }
+                }
+            }
         }
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.y() != maxLimits.y())
-                valueAxis->dptr()->setRange(minLimits.y(), maxLimits.y());
-            else
-                valueAxis->dptr()->setRange(minLimits.y() - 1.0f, minLimits.y() + 1.0f); // Default to some valid range
-        }
+        static const float adjustmentRatio = 20.0f;
+        static const float defaultAdjustment = 1.0f;
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (minLimits.z() != maxLimits.z())
-                valueAxis->dptr()->setRange(minLimits.z(), maxLimits.z());
-            else
-                valueAxis->dptr()->setRange(minLimits.z() - 1.0f, minLimits.z() + 1.0f); // Default to some valid range
+        if (adjustX) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueX == maxValueX) {
+                if (adjustZ) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueZ == maxValueZ)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueZ - minValueZ) / adjustmentRatio;
+                } else {
+                    if (valueAxisZ)
+                        adjustment = qAbs(valueAxisZ->max() - valueAxisZ->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment);
+        }
+        if (adjustY) {
+            // If all points at same coordinate, need to default to some valid range
+            // Y-axis unit is not dependent on other axes, so simply adjust +-1.0f
+            float adjustment = 0.0f;
+            if (minValueY == maxValueY)
+                adjustment = defaultAdjustment;
+            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment);
+        }
+        if (adjustZ) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueZ == maxValueZ) {
+                if (adjustX) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueX == maxValueX)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueX - minValueX) / adjustmentRatio;
+                } else {
+                    if (valueAxisX)
+                        adjustment = qAbs(valueAxisX->max() - valueAxisX->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment);
         }
     }
 }

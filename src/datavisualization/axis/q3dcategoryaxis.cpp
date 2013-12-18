@@ -49,10 +49,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty list CategoryAxis3D::categoryLabels
+ * \qmlproperty list CategoryAxis3D::labels
+ *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
  * remaining ones do not have a label. If category labels are not defined explicitly, labels are
- * generated from the data row and column labels.
+ * generated from the data row (or column) labels.
+ *
+ * \note If the graph has multiple visible series and category labels are not defined explicitly,
+ * changing the rows (or columns) on any of the attached series will regenerate the labels.
  */
 
 /*!
@@ -61,6 +65,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Q3DCategoryAxis::Q3DCategoryAxis(QObject *parent) :
     Q3DAbstractAxis(new Q3DCategoryAxisPrivate(this), parent)
 {
+    connect(this, &Q3DCategoryAxis::labelsChanged, this, &Q3DAbstractAxis::labelsChanged);
 }
 
 /*!
@@ -71,22 +76,21 @@ Q3DCategoryAxis::~Q3DCategoryAxis()
 }
 
 /*!
- * \property Q3DCategoryAxis::categoryLabels
+ * \property Q3DCategoryAxis::labels
  *
  * Defines labels for axis applied to categories. If there are fewer labels than categories, the
  * remaining ones do not have a label. If category labels are not defined explicitly, labels are
- * generated from the data row and column labels.
+ * generated from the data row (or column) labels.
  *
- * \note CategoryLabels actually reads/writes the Q3DAbstractAxis::labels property,
- * which is read only there. Since subclass cannot have property with same name,
- * this partially duplicate property is necessary.
+ * \note If the graph has multiple visible series and category labels are not defined explicitly,
+ * changing the rows (or columns) on any of the attached series will regenerate the labels.
  */
-QStringList Q3DCategoryAxis::categoryLabels() const
+QStringList Q3DCategoryAxis::labels() const
 {
-    return labels();
+    return Q3DAbstractAxis::labels();
 }
 
-void Q3DCategoryAxis::setCategoryLabels(const QStringList &labels)
+void Q3DCategoryAxis::setLabels(const QStringList &labels)
 {
     dptr()->m_labelsExplicitlySet = !labels.isEmpty();
     bool labelsFromData = false;

@@ -35,7 +35,7 @@
 #include "declarativesurface_p.h"
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
-#include "colorgradient_p.h"
+#include "qsurface3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -47,20 +47,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeSurface : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
-    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled NOTIFY smoothSurfaceEnabledChanged)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
-    Q_PROPERTY(ColorGradient *gradient READ gradient WRITE setGradient)
+    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
     ~DeclarativeSurface();
-
-    QSurfaceDataProxy *dataProxy() const;
-    void setDataProxy(QSurfaceDataProxy *dataProxy);
 
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);
@@ -69,30 +64,21 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    void setSmoothSurfaceEnabled(bool enabled);
-    bool isSmoothSurfaceEnabled() const;
-
-    void setSurfaceGridEnabled(bool enabled);
-    bool isSurfaceGridEnabled() const;
-
-    void setGradient(ColorGradient *gradient);
-    ColorGradient *gradient() const;
+    QQmlListProperty<QSurface3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
+    static QSurface3DSeries *atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
+    Q_INVOKABLE void addSeries(QSurface3DSeries *series);
+    Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
 signals:
-    void smoothSurfaceEnabledChanged(bool enabled);
-
-protected:
-    void handleGradientUpdate();
-
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    void axisXChanged(Q3DValueAxis *axis);
+    void axisYChanged(Q3DValueAxis *axis);
+    void axisZChanged(Q3DValueAxis *axis);
 
 private:
-    Surface3DController *m_shared;
-
-    void setControllerGradient(const ColorGradient &gradient);
-
-    QSize m_initialisedSize;
-    ColorGradient *m_gradient; // Not owned
+    Surface3DController *m_surfaceController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

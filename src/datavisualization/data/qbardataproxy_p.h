@@ -56,6 +56,8 @@ public:
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount,
                                         int columnCount) const;
 
+    virtual void setSeries(QAbstract3DSeries *series);
+
 private:
     QBarDataProxy *qptr();
     void clearRow(int rowIndex);

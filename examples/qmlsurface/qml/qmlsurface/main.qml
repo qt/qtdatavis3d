@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.1
+import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
@@ -26,13 +27,16 @@ Item {
     height: 720
     visible: true
 
+    property int buttonMaximumWidth: surfaceGridToggle.width
+    property int buttonMinimumHeight: seriesToggle.height
+
     Data {
         id: surfaceData
     }
 
     Item {
         id: surfaceView
-        width: mainview.width - surfaceGridToggle.width
+        width: mainview.width - buttonLayout.width
         height: mainview.height
         anchors.right: mainview.right;
 
@@ -40,7 +44,7 @@ Item {
         ColorGradient {
             id: surfaceGradient
             ColorGradientStop { position: 0.0; color: "darkslategray" }
-            ColorGradientStop { id: middleGradient; position: 0.55; color: "peru" }
+            ColorGradientStop { id: middleGradient; position: 0.25; color: "peru" }
             ColorGradientStop { position: 1.0; color: "red" }
         }
         //! [0]
@@ -49,17 +53,20 @@ Item {
             id: surfaceplot
             width: surfaceView.width
             height: surfaceView.height
-            theme: AbstractGraph3D.ThemeStoneMoss
+            //! [7]
+            theme: Theme3D {
+                type: Theme3D.ThemeStoneMoss
+                font.family: "STCaiyun"
+                font.pointSize: 35
+                colorStyle: Theme3D.ColorStyleRangeGradient
+                baseGradients: [surfaceGradient]
+            }
+            //! [7]
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionModeSliceRow
-            smoothSurfaceEnabled: true
-            surfaceGridEnabled: false
-            font.family: "STCaiyun"
-            font.pointSize: 35
-            scene.activeCamera.cameraPreset: AbstractGraph3D.CameraPresetIsometricLeft
-            dataProxy: surfaceData.heightProxy
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
+            scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisY.min: 0.0
-            axisY.max: 250.0
+            axisY.max: 500.0
             axisX.segmentCount: 10
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%i"
@@ -69,107 +76,173 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
-            gradient: surfaceGradient
 
-            // Since flat is not supported on all platforms, and changes back to smooth
-            // asynchronously on those platforms, handle button text on changed
-            // signal handler rather than when we set the value.
-            onSmoothSurfaceEnabledChanged: {
-                if (enabled === true) {
-                    smoothSurfaceToggle.text = "Show Flat"
-                } else {
-                    smoothSurfaceToggle.text = "Show Smooth"
+            //! [5]
+            Surface3DSeries {
+                id: surfaceSeries
+                flatShadingEnabled: false
+                drawMode: Surface3DSeries.DrawSurface
+
+                ItemModelSurfaceDataProxy {
+                    //! [5]
+                    //! [6]
+                    itemModel: surfaceData.model
+                    rowRole: "longitude"
+                    columnRole: "latitude"
+                    valueRole: "height"
+                }
+                //! [6]
+
+                onFlatShadingSupportedChanged: {
+                    flatShadingToggle.text = "Flat not supported"
                 }
             }
         }
     }
 
-    NewButton {
-        id: surfaceGridToggle
+    // TODO: Kept outside until surface supports multiple added series (QTRD-2579)
+    //! [4]
+    Surface3DSeries {
+        id: heightSeries
+        flatShadingEnabled: false
+        drawMode: Surface3DSeries.DrawSurface
+
+        HeightMapSurfaceDataProxy {
+            heightMapFile: ":/heightmaps/image"
+            // We don't want the default data values set by heightmap proxy.
+            minZValue: 30
+            maxZValue: 60
+            minXValue: 67
+            maxXValue: 97
+        }
+    }
+    //! [4]
+    ColumnLayout {
+        id: buttonLayout
         anchors.top: parent.top
         anchors.left: parent.left
-        width: 200
-        text: "Show Surface Grid"
-        //! [1]
-        onClicked: {
-            if (surfaceplot.surfaceGridEnabled === false) {
-                surfaceplot.surfaceGridEnabled = true;
-                text = "Hide Surface Grid"
-            } else {
-                surfaceplot.surfaceGridEnabled = false;
-                text = "Show Surface Grid"
-            }
-        }
-        //! [1]
-    }
+        spacing: 0
 
-    NewButton {
-        id: smoothSurfaceToggle
-        anchors.top: surfaceGridToggle.bottom
-        width: surfaceGridToggle.width
-        text: "Show Flat"
-        //! [2]
-        onClicked: {
-            if (surfaceplot.smoothSurfaceEnabled === true) {
-                surfaceplot.smoothSurfaceEnabled = false;
-            } else {
-                surfaceplot.smoothSurfaceEnabled = true;
+        NewButton {
+            id: surfaceGridToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Show Surface Grid"
+            //! [1]
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                    heightSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                    text = "Show Surface Grid"
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                    heightSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                    text = "Hide Surface Grid"
+                }
             }
+            //! [1]
         }
-        //! [2]
-    }
 
-    NewButton {
-        id: backgroundToggle
-        anchors.top: smoothSurfaceToggle.bottom
-        width: smoothSurfaceToggle.width
-        text: "Hide Background"
-        onClicked: {
-            if (surfaceplot.backgroundVisible === true) {
-                surfaceplot.backgroundVisible = false;
-                text = "Show Background"
-            } else {
-                surfaceplot.backgroundVisible = true;
-                text = "Hide Background"
+        NewButton {
+            id: surfaceToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Surface"
+            //! [8]
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
+                    heightSeries.drawMode &= ~Surface3DSeries.DrawSurface;
+                    text = "Show Surface"
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawSurface;
+                    heightSeries.drawMode |= Surface3DSeries.DrawSurface;
+                    text = "Hide Surface"
+                }
             }
+            //! [8]
         }
-    }
 
-    NewButton {
-        id: gridToggle
-        anchors.top: backgroundToggle.bottom
-        width: backgroundToggle.width
-        text: "Hide Grid"
-        onClicked: {
-            if (surfaceplot.gridVisible === true) {
-                surfaceplot.gridVisible = false;
-                text = "Show Grid"
-            } else {
-                surfaceplot.gridVisible = true;
-                text = "Hide Grid"
-            }
-        }
-    }
+        NewButton {
+            id: flatShadingToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
 
-    NewButton {
-        id: proxyToggle
-        anchors.top: gridToggle.bottom
-        width: gridToggle.width
-        text: "Switch to Item Model Proxy"
-        //! [3]
-        onClicked: {
-            if (surfaceplot.dataProxy === surfaceData.heightProxy) {
-                surfaceplot.axisY.max = 500.0
-                surfaceplot.dataProxy = surfaceData.proxy
-                middleGradient.position = 0.25
-                text = "Switch to Height Map Proxy"
-            } else {
-                surfaceplot.axisY.max = 250.0
-                surfaceplot.dataProxy = surfaceData.heightProxy
-                middleGradient.position = 0.55
-                text = "Switch to Item Model Proxy"
+            text: "Show Flat"
+            enabled: surfaceSeries.flatShadingSupported
+            //! [2]
+            onClicked: {
+                if (surfaceSeries.flatShadingEnabled === true) {
+                    surfaceSeries.flatShadingEnabled = false;
+                    heightSeries.flatShadingEnabled = false;
+                    text = "Show Flat"
+                } else {
+                    surfaceSeries.flatShadingEnabled = true;
+                    heightSeries.flatShadingEnabled = true;
+                    text = "Show Smooth"
+                }
+            }
+            //! [2]
+        }
+
+        NewButton {
+            id: backgroundToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Background"
+            onClicked: {
+                if (surfaceplot.theme.backgroundEnabled === true) {
+                    surfaceplot.theme.backgroundEnabled = false;
+                    text = "Show Background"
+                } else {
+                    surfaceplot.theme.backgroundEnabled = true;
+                    text = "Hide Background"
+                }
             }
         }
-        //! [3]
+
+        NewButton {
+            id: gridToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Hide Grid"
+            onClicked: {
+                if (surfaceplot.theme.gridEnabled === true) {
+                    surfaceplot.theme.gridEnabled = false;
+                    text = "Show Grid"
+                } else {
+                    surfaceplot.theme.gridEnabled = true;
+                    text = "Hide Grid"
+                }
+            }
+        }
+
+        NewButton {
+            id: seriesToggle
+            Layout.maximumWidth: buttonMaximumWidth
+            Layout.fillWidth: true
+            Layout.minimumHeight: buttonMinimumHeight
+            text: "Switch to Height Map Series"
+            //! [3]
+            onClicked: {
+                if (surfaceplot.seriesList[0] === heightSeries) {
+                    surfaceplot.axisY.max = 500.0
+                    surfaceplot.seriesList = [surfaceSeries]
+                    middleGradient.position = 0.25
+                    text = "Switch to Height Map Series"
+                } else {
+                    surfaceplot.axisY.max = 250.0
+                    surfaceplot.seriesList = [heightSeries]
+                    middleGradient.position = 0.50
+                    text = "Switch to Item Model Series"
+                }
+            }
+            //! [3]
+        }
     }
 }

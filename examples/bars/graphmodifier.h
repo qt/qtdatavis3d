@@ -20,6 +20,8 @@
 #define GRAPHMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
+#include <QtDataVisualization/qbardataproxy.h>
+#include <QtDataVisualization/qabstract3dseries.h>
 
 #include <QFont>
 #include <QDebug>
@@ -37,7 +39,7 @@ public:
 
     void resetTemperatureData();
     void changePresetCamera();
-    void changeLabelStyle();
+    void changeLabelBackground();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
     void rotateX(int rotation);
@@ -45,7 +47,7 @@ public:
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void setSmoothBars(int smooth);
-    void start();
+    void setSeriesVisibility(int enabled);
 
 public slots:
     void changeStyle(int style);
@@ -56,23 +58,29 @@ public slots:
 
 signals:
     void shadowQualityChanged(int quality);
+    void backgroundEnabledChanged(bool enabled);
+    void gridEnabledChanged(bool enabled);
+    void fontChanged(QFont font);
+    void fontSizeChanged(int size);
 
 private:
     Q3DBars *m_graph;
-    qreal m_xRotation;
-    qreal m_yRotation;
+    float m_xRotation;
+    float m_yRotation;
     int m_fontSize;
     int m_segments;
     int m_subSegments;
-    qreal m_minval;
-    qreal m_maxval;
+    float m_minval;
+    float m_maxval;
     QStringList m_months;
     QStringList m_years;
     Q3DValueAxis *m_temperatureAxis;
     Q3DCategoryAxis *m_yearAxis;
     Q3DCategoryAxis *m_monthAxis;
-    QBarDataProxy *m_temperatureData;
-    QDataVis::MeshStyle m_style;
+    QBarDataProxy *m_primaryData;
+    QBarDataProxy *m_secondaryData;
+    QAbstract3DSeries::Mesh m_primaryStyle;
+    QAbstract3DSeries::Mesh m_secondaryStyle;
     bool m_smooth;
 };
 

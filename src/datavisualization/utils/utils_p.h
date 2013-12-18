@@ -53,22 +53,23 @@ public:
 
     static GLuint getNearestPowerOfTwo(GLuint value, GLuint &padding);
     static QVector3D vectorFromColor(const QColor &color);
+    static QColor colorFromVector(const QVector3D &colorVector);
     static void printText(QPainter *painter, const QString &text, const QSize &position,
-                          bool absoluteCoords = true, qreal rotation = 0, qreal scale = 1.0f);
+                          bool absoluteCoords = true, float rotation = 0.0f, float scale = 1.0f);
     static QImage printTextToImage(const QFont &font,
                                    const QString &text,
                                    const QColor &bgrColor,
                                    const QColor &txtColor,
-                                   QDataVis::LabelStyle style,
+                                   bool labelBackground,
                                    bool borders = false,
                                    int maxLabelWidth = 0);
     static QVector3D getSelection(QPoint mousepos, int height);
 
     static ParamType findFormatParamType(const QString &format);
-    static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
+    static QString formatLabel(const QByteArray &format, ParamType paramType, float value);
     static QString defaultLabelFormat();
 
-    static qreal wrapValue(qreal value, qreal min, qreal max);
+    static float wrapValue(float value, float min, float max);
 
 private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);

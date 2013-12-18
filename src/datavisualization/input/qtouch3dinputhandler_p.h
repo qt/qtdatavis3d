@@ -33,7 +33,7 @@ public:
     QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q);
     ~QTouch3DInputHandlerPrivate();
 
-    void handlePinchZoom(qreal distance);
+    void handlePinchZoom(float distance);
     void handleTapAndHold();
     void handleSelection(const QPointF &position);
     void handleRotation(const QPointF &position);

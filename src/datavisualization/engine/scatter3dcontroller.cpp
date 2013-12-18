@@ -22,6 +22,7 @@
 #include "q3dabstractaxis_p.h"
 #include "q3dvalueaxis_p.h"
 #include "qscatterdataproxy_p.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <qmath.h>
@@ -31,13 +32,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 Scatter3DController::Scatter3DController(QRect boundRect)
     : Abstract3DController(boundRect),
       m_renderer(0),
-      m_selectedItemIndex(noSelectionIndex())
+      m_selectedItem(invalidSelectionIndex()),
+      m_selectedItemSeries(0)
 {
-    // Default object type; specific to scatter
-    setObjectType(QDataVis::MeshStyleSpheres, false);
-
-    setActiveDataProxy(new QScatterDataProxy);
-
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
     //       functions implemented by subclasses.
@@ -60,8 +57,8 @@ void Scatter3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Scatter3DRenderer::selectedItemIndexChanged, this,
-                     &Scatter3DController::handleSelectedItemIndexChanged, Qt::QueuedConnection);
+    QObject::connect(m_renderer, &Scatter3DRenderer::itemClicked, this,
+                     &Scatter3DController::handleItemClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -73,61 +70,59 @@ void Scatter3DController::synchDataToRenderer()
         return;
 
     // Notify changes to renderer
-    if (m_changeTracker.slicingActiveChanged) {
-        // TODO: Add notification.
-        m_changeTracker.slicingActiveChanged = false;
-    }
-
-    if (m_changeTracker.selectedItemIndexChanged) {
-        m_renderer->updateSelectedItemIndex(m_selectedItemIndex);
-        m_changeTracker.selectedItemIndexChanged = false;
-    }
-
-    if (m_isDataDirty) {
-        m_renderer->updateDataModel(static_cast<QScatterDataProxy *>(m_data));
-        m_isDataDirty = false;
+    if (m_changeTracker.selectedItemChanged) {
+        m_renderer->updateSelectedItem(m_selectedItem, m_selectedItemSeries);
+        m_changeTracker.selectedItemChanged = false;
     }
 }
 
-
-void Scatter3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
+void Scatter3DController::addSeries(QAbstract3DSeries *series)
 {
-    // Setting null proxy indicates default proxy
-    if (!proxy) {
-        proxy = new QScatterDataProxy;
-        proxy->d_ptr->setDefaultProxy(true);
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeScatter);
+
+    bool firstAdded = !m_seriesList.size();
+
+    Abstract3DController::addSeries(series);
+
+    if (firstAdded)
+        adjustValueAxisRange();
+
+    QScatter3DSeries *scatterSeries =  static_cast<QScatter3DSeries *>(series);
+    if (scatterSeries->selectedItem() != invalidSelectionIndex())
+        setSelectedItem(scatterSeries->selectedItem(), scatterSeries);
+}
+
+void Scatter3DController::removeSeries(QAbstract3DSeries *series)
+{
+    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
+
+    Abstract3DController::removeSeries(series);
+
+    if (m_selectedItemSeries == series)
+        setSelectedItem(invalidSelectionIndex(), 0);
+
+    if (firstRemoved)
+        adjustValueAxisRange();
+}
+
+QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
+{
+    QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
+    QList<QScatter3DSeries *> scatterSeriesList;
+    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+        QScatter3DSeries *scatterSeries = qobject_cast<QScatter3DSeries *>(abstractSeries);
+        if (scatterSeries)
+            scatterSeriesList.append(scatterSeries);
     }
 
-    Q_ASSERT(proxy->type() == QAbstractDataProxy::DataTypeScatter);
-
-    Abstract3DController::setActiveDataProxy(proxy);
-
-    QScatterDataProxy *scatterDataProxy = static_cast<QScatterDataProxy *>(m_data);
-
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::arrayReset,
-                     this, &Scatter3DController::handleArrayReset);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsAdded,
-                     this, &Scatter3DController::handleItemsAdded);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsChanged,
-                     this, &Scatter3DController::handleItemsChanged);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsRemoved,
-                     this, &Scatter3DController::handleItemsRemoved);
-    QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsInserted,
-                     this, &Scatter3DController::handleItemsInserted);
-
-    adjustValueAxisRange();
-    setSelectedItemIndex(noSelectionIndex());
-    setSlicingActive(false);
-    m_isDataDirty = true;
-    emitNeedRender();
+    return scatterSeriesList;
 }
 
 void Scatter3DController::handleArrayReset()
 {
-    setSlicingActive(false);
     adjustValueAxisRange();
     m_isDataDirty = true;
-    setSelectedItemIndex(noSelectionIndex());
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
     emitNeedRender();
 }
 
@@ -158,8 +153,10 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     // TODO should dirty only affected values?
     adjustValueAxisRange();
     m_isDataDirty = true;
-    if (startIndex >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
-        setSelectedItemIndex(noSelectionIndex());
+
+    // Clear selection unless it is still valid
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
+
     emitNeedRender();
 }
 
@@ -173,13 +170,12 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     emitNeedRender();
 }
 
-void Scatter3DController::handleSelectedItemIndexChanged(int index)
+void Scatter3DController::handleItemClicked(int index, QScatter3DSeries *series)
 {
-    if (index != m_selectedItemIndex) {
-        m_selectedItemIndex = index;
-        emit selectedItemIndexChanged(index);
-        emitNeedRender();
-    }
+    setSelectedItem(index, series);
+
+    // TODO: pass clicked to parent. (QTRD-2517)
+    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -190,80 +186,163 @@ void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
     adjustValueAxisRange();
 }
 
-void Scatter3DController::setObjectType(QDataVis::MeshStyle style, bool smooth)
+void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
 {
-    QString objFile;
-    if (style == QDataVis::MeshStyleSpheres) {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/sphereSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/sphere");
-    } else {
-        if (smooth)
-            objFile = QStringLiteral(":/defaultMeshes/dotSmooth");
-        else
-            objFile = QStringLiteral(":/defaultMeshes/dot");
-    }
-    Abstract3DController::setMeshFileName(objFile);
+    Abstract3DController::handleAxisRangeChangedBySender(sender);
+
+    // Update selected index - may be moved offscreen
+    setSelectedItem(m_selectedItem, m_selectedItemSeries);
 }
 
-void Scatter3DController::setSelectionMode(QDataVis::SelectionMode mode)
+void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    if (mode > QDataVis::SelectionModeItem) {
-        qWarning("Unsupported selection mode.");
+    // We only support single item selection mode and no selection mode
+    if (mode != QDataVis::SelectionItem && mode != QDataVis::SelectionNone) {
+        qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }
-    // Disable zoom if selection mode changes
-    setSlicingActive(false);
+
     Abstract3DController::setSelectionMode(mode);
 }
 
-void Scatter3DController::setSelectedItemIndex(int index)
+void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
 {
-    // TODO If items not within axis ranges are culled from drawing, should they be
-    // TODO unselectable as well?
-    if (index < 0 || index >= static_cast<QScatterDataProxy *>(m_data)->itemCount())
-        index = noSelectionIndex();
+    const QScatterDataProxy *proxy = 0;
 
-    if (index != m_selectedItemIndex) {
-        m_selectedItemIndex = index;
-        m_changeTracker.selectedItemIndexChanged = true;
-        emit selectedItemIndexChanged(index);
+    // Series may already have been removed, so check it before setting the selection.
+    if (!m_seriesList.contains(series))
+        series = 0;
+
+    if (series)
+        proxy = series->dataProxy();
+
+    if (!proxy || index < 0 || index >= proxy->itemCount())
+        index = invalidSelectionIndex();
+
+    if (index != m_selectedItem || series != m_selectedItemSeries) {
+        m_selectedItem = index;
+        m_selectedItemSeries = series;
+        m_changeTracker.selectedItemChanged = true;
+
+        // Clear selection from other series and finally set new selection to the specified series
+        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+            QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(otherSeries);
+            if (scatterSeries != m_selectedItemSeries)
+                scatterSeries->dptr()->setSelectedItem(invalidSelectionIndex());
+        }
+        if (m_selectedItemSeries)
+            m_selectedItemSeries->dptr()->setSelectedItem(m_selectedItem);
+
         emitNeedRender();
     }
 }
 
-int Scatter3DController::selectedItemIndex() const
-{
-    return m_selectedItemIndex;
-}
-
 void Scatter3DController::adjustValueAxisRange()
 {
-    if (m_data) {
-        QVector3D limits = static_cast<QScatterDataProxy *>(m_data)->dptr()->limitValues();
-        Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisX);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.x() > 0)
-                valueAxis->dptr()->setRange(-limits.x(), limits.x());
-            else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
+    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
+    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
+    bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
+    bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
+
+    if (adjustX || adjustY || adjustZ) {
+        float minValueX = 0.0f;
+        float maxValueX = 0.0f;
+        float minValueY = 0.0f;
+        float maxValueY = 0.0f;
+        float minValueZ = 0.0f;
+        float maxValueZ = 0.0f;
+        int seriesCount = m_seriesList.size();
+        for (int series = 0; series < seriesCount; series++) {
+            const QScatter3DSeries *scatterSeries =
+                    static_cast<QScatter3DSeries *>(m_seriesList.at(series));
+            const QScatterDataProxy *proxy = scatterSeries->dataProxy();
+            if (scatterSeries->isVisible() && proxy) {
+                QVector3D minLimits;
+                QVector3D maxLimits;
+                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                if (adjustX) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueX = minLimits.x();
+                        maxValueX = maxLimits.x();
+                    } else {
+                        minValueX = qMin(minValueX, minLimits.x());
+                        maxValueX = qMax(maxValueX, maxLimits.x());
+                    }
+                }
+                if (adjustY) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueY = minLimits.y();
+                        maxValueY = maxLimits.y();
+                    } else {
+                        minValueY = qMin(minValueY, minLimits.y());
+                        maxValueY = qMax(maxValueY, maxLimits.y());
+                    }
+                }
+                if (adjustZ) {
+                    if (!series) {
+                        // First series initializes the values
+                        minValueZ = minLimits.z();
+                        maxValueZ = maxLimits.z();
+                    } else {
+                        minValueZ = qMin(minValueZ, minLimits.z());
+                        maxValueZ = qMax(maxValueZ, maxLimits.z());
+                    }
+                }
+            }
         }
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.y() > 0)
-                valueAxis->dptr()->setRange(-limits.y(), limits.y());
-            else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
-        }
+        static const float adjustmentRatio = 20.0f;
+        static const float defaultAdjustment = 1.0f;
 
-        valueAxis = static_cast<Q3DValueAxis *>(m_axisZ);
-        if (valueAxis && valueAxis->isAutoAdjustRange()) {
-            if (limits.z() > 0)
-                valueAxis->dptr()->setRange(-limits.z(), limits.z());
-            else
-                valueAxis->dptr()->setRange(-1.0, 1.0); // Only zero value values in data set, set range to default.
+        if (adjustX) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueX == maxValueX) {
+                if (adjustZ) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueZ == maxValueZ)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueZ - minValueZ) / adjustmentRatio;
+                } else {
+                    if (valueAxisZ)
+                        adjustment = qAbs(valueAxisZ->max() - valueAxisZ->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment);
+        }
+        if (adjustY) {
+            // If all points at same coordinate, need to default to some valid range
+            // Y-axis unit is not dependent on other axes, so simply adjust +-1.0f
+            float adjustment = 0.0f;
+            if (minValueY == maxValueY)
+                adjustment = defaultAdjustment;
+            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment);
+        }
+        if (adjustZ) {
+            // If all points at same coordinate, need to default to some valid range
+            float adjustment = 0.0f;
+            if (minValueZ == maxValueZ) {
+                if (adjustX) {
+                    // X and Z are linked to have similar unit size, so choose the valid range based on it
+                    if (minValueX == maxValueX)
+                        adjustment = defaultAdjustment;
+                    else
+                        adjustment = qAbs(maxValueX - minValueX) / adjustmentRatio;
+                } else {
+                    if (valueAxisX)
+                        adjustment = qAbs(valueAxisX->max() - valueAxisX->min()) / adjustmentRatio;
+                    else
+                        adjustment = defaultAdjustment;
+                }
+            }
+            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment);
         }
     }
 }

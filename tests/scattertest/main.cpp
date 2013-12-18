@@ -30,6 +30,8 @@
 #include <QLabel>
 #include <QScreen>
 #include <QFontDatabase>
+#include <QLinearGradient>
+#include <QPainter>
 
 int main(int argc, char **argv)
 {
@@ -68,6 +70,9 @@ int main(int argc, char **argv)
     QPushButton *clearButton = new QPushButton(widget);
     clearButton->setText(QStringLiteral("Clear chart"));
 
+    QPushButton *resetButton = new QPushButton(widget);
+    resetButton->setText(QStringLiteral("Reset axes"));
+
     QPushButton *addOneButton = new QPushButton(widget);
     addOneButton->setText(QStringLiteral("Add item"));
 
@@ -95,8 +100,28 @@ int main(int argc, char **argv)
     QPushButton *setSelectedItemButton = new QPushButton(widget);
     setSelectedItemButton->setText(QStringLiteral("Select/deselect item 3"));
 
+    QPushButton *addSeriesButton = new QPushButton(widget);
+    addSeriesButton->setText(QStringLiteral("Add Series"));
+
+    QPushButton *removeSeriesButton = new QPushButton(widget);
+    removeSeriesButton->setText(QStringLiteral("Remove Series"));
+
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
+
+    QLinearGradient grBtoY(0, 0, 100, 0);
+    grBtoY.setColorAt(1.0, Qt::black);
+    grBtoY.setColorAt(0.67, Qt::blue);
+    grBtoY.setColorAt(0.33, Qt::red);
+    grBtoY.setColorAt(0.0, Qt::yellow);
+    QPixmap pm(100, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grBtoY));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 100, 24);
+    QPushButton *gradientBtoYPB = new QPushButton(widget);
+    gradientBtoYPB->setIcon(QIcon(pm));
+    gradientBtoYPB->setIconSize(QSize(100, 24));
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -114,7 +139,7 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("Low Soft"));
     shadowQuality->addItem(QStringLiteral("Medium Soft"));
     shadowQuality->addItem(QStringLiteral("High Soft"));
-    shadowQuality->setCurrentIndex(3);
+    shadowQuality->setCurrentIndex(0);
 
     QFontComboBox *fontList = new QFontComboBox(widget);
 
@@ -124,11 +149,18 @@ int main(int argc, char **argv)
     fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
+    QSlider *pointSizeSlider = new QSlider(Qt::Horizontal, widget);
+    pointSizeSlider->setTickInterval(1);
+    pointSizeSlider->setMinimum(1);
+    pointSizeSlider->setValue(30);
+    pointSizeSlider->setMaximum(100);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(clearButton, 0, Qt::AlignTop);
+    vLayout->addWidget(resetButton, 0, Qt::AlignTop);
     vLayout->addWidget(addOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(addBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(insertOneButton, 0, Qt::AlignTop);
@@ -138,7 +170,10 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
+    vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(removeSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -147,6 +182,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust point size")));
+    vLayout->addWidget(pointSizeSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -154,6 +191,8 @@ int main(int argc, char **argv)
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::changeFontSize);
+    QObject::connect(pointSizeSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changePointSize);
 
     QObject::connect(styleButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeStyle);
@@ -161,6 +200,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(clearButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::clear);
+    QObject::connect(resetButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::resetAxes);
     QObject::connect(addOneButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::addOne);
     QObject::connect(addBunchButton, &QPushButton::clicked, modifier,
@@ -179,8 +220,14 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::removeBunch);
     QObject::connect(setSelectedItemButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::selectItem);
+    QObject::connect(addSeriesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::addSeries);
+    QObject::connect(removeSeriesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::removeSeries);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
+    QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeTheme);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
@@ -190,11 +237,6 @@ int main(int argc, char **argv)
                      SLOT(changeShadowQuality(int)));
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(chart, &Q3DScatter::shadowQualityChanged, modifier,
-                     &ScatterDataModifier::shadowQualityUpdatedByVisual);
-    QObject::connect(chart, &Q3DScatter::selectedItemIndexChanged, modifier,
-                     &ScatterDataModifier::handleSelectionChange);
-
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
 

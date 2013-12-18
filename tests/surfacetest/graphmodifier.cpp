@@ -19,10 +19,13 @@
 #include "graphmodifier.h"
 #include <QtDataVisualization/Q3DValueAxis>
 #include <QtDataVisualization/QSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/Q3DTheme>
 
 #include <qmath.h>
 #include <QLinearGradient>
 #include <QDebug>
+#include <QComboBox>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
@@ -45,16 +48,23 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_rangeZ(16.0),
       m_minX(-8.0),
       m_minZ(-8.0),
-      m_planeArray(0)
+      m_addRowCounter(m_zCount),
+      m_insertTestZPos(0),
+      m_insertTestIndexPos(1),
+      m_planeArray(0),
+      m_theSeries(new QSurface3DSeries),
+      m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
     m_graph->setAxisX(new Q3DValueAxis);
     m_graph->setAxisY(new Q3DValueAxis);
     m_graph->setAxisZ(new Q3DValueAxis);
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
+    m_graph->addSeries(m_theSeries);
     changeStyle();
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
+    connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
 }
 
 GraphModifier::~GraphModifier()
@@ -65,13 +75,34 @@ GraphModifier::~GraphModifier()
 void GraphModifier::toggleSmooth(bool enabled)
 {
     qDebug() << "GraphModifier::toggleSmooth " << enabled;
-    m_graph->setSmoothSurfaceEnabled(enabled);
+    m_theSeries->setFlatShadingEnabled(enabled);
 }
 
 void GraphModifier::toggleSurfaceGrid(bool enable)
 {
     qDebug() << "GraphModifier::toggleSurfaceGrid" << enable;
-    m_graph->setSurfaceGridEnabled(enable);
+    if (enable)
+        m_drawMode |= QSurface3DSeries::DrawWireframe;
+    else
+        m_drawMode &= ~QSurface3DSeries::DrawWireframe;
+
+    m_theSeries->setDrawMode(m_drawMode);
+}
+
+void GraphModifier::toggleSurface(bool enable)
+{
+    qDebug() << "GraphModifier::toggleSurface" << enable;
+    if (enable)
+        m_drawMode |= QSurface3DSeries::DrawSurface;
+    else
+        m_drawMode &= ~QSurface3DSeries::DrawSurface;
+
+    m_theSeries->setDrawMode(m_drawMode);
+}
+
+void GraphModifier::toggleSeriesVisible(bool enable)
+{
+    m_theSeries->setVisible(enable);
 }
 
 void GraphModifier::toggleSqrtSin(bool enable)
@@ -79,10 +110,10 @@ void GraphModifier::toggleSqrtSin(bool enable)
     if (enable) {
         qDebug() << "Create Sqrt&Sin surface, (" << m_xCount << ", " << m_zCount << ")";
 
-        float minX = -10.0;
-        float maxX = 10.0;
-        float minZ = -10.0;
-        float maxZ = 10.0;
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
 
@@ -90,9 +121,11 @@ void GraphModifier::toggleSqrtSin(bool enable)
         dataArray->reserve(m_zCount);
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            // Keep values within range bounds, since just adding step can cause minor drift due
+            // to the rounding errors.
+            float z = qMin(maxZ, (i * stepZ + minZ));
             for (float j = 0; j < m_xCount; j++) {
-                float x = j * stepX + minX;
-                float z = i * stepZ + minZ;
+                float x = qMin(maxX, (j * stepX + minX));
                 float R = qSqrt(x * x + z * z) + 0.01f;
                 float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
                 (*newRow)[j].setPosition(QVector3D(x, y, z));
@@ -127,16 +160,17 @@ void GraphModifier::togglePlane(bool enable)
         m_graph->axisZ()->setLabelFormat("%.2f");
 
         m_planeArray->reserve(m_zCount);
-        float minX = -10.0;
-        float maxX = 20.0;
-        float minZ = -10.0;
-        float maxZ = 10.0;
+        float minX = -10.0f;
+        float maxX = 20.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
 #ifdef WONKY_PLANE
         float halfZ = m_zCount / 2;
         float wonkyFactor = 0.01f;
         float maxStepX = 0.0f;
+        float add = 0.0f;
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
             if (i < halfZ) {
@@ -145,20 +179,32 @@ void GraphModifier::togglePlane(bool enable)
             } else {
                 stepX -= wonkyFactor;
             }
+            add = 0.0f;
             for (float j = 0; j < m_xCount; j++) {
                 (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f,
-                                                   i * stepZ + minZ));
+                                                   i * stepZ + minZ + add));
+                add += 0.5f;
 
             }
             *m_planeArray << newRow;
         }
 
-        resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, m_xCount * maxStepX + minZ);
+        resetArrayAndSliders(m_planeArray, minZ, maxZ + add, minX, m_xCount * maxStepX + minX);
 #else
         for (float i = 0; i < m_zCount; i++) {
             QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-            for (float j = 0; j < m_xCount; j++)
-                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, i * stepZ + minZ));
+            // Keep values within range bounds, since just adding step can cause minor drift due
+            // to the rounding errors.
+            float zVal;
+            if (i == (m_zCount - 1))
+                zVal = maxZ;
+            else
+                zVal = i * stepZ + minZ;
+
+            float j = 0;
+            for (; j < m_xCount - 1; j++)
+                (*newRow)[j].setPosition(QVector3D(j * stepX + minX, -0.04f, zVal));
+            (*newRow)[j].setPosition(QVector3D(maxX, -0.04f, zVal));
 
             *m_planeArray << newRow;
         }
@@ -283,29 +329,47 @@ void GraphModifier::gradientPressed()
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_graph->setGradient(gradient);
+    m_graph->seriesList().at(0)->setBaseGradient(gradient);
+    m_graph->seriesList().at(0)->setSingleHighlightColor(Qt::red);
+    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 }
 
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void GraphModifier::changeStyle()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+}
 
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
+void GraphModifier::selectButtonClicked()
+{
+    QSurfaceDataProxy *proxy = m_theSeries->dataProxy();
+    int row = rand() % proxy->rowCount();
+    int col = rand() % proxy->columnCount();
 
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_theSeries->setSelectedPoint(QPoint(row, col));
+}
+
+void GraphModifier::selectedPointChanged(const QPoint &point)
+{
+    QString labelText = QStringLiteral("Selected row: %1, column: %2").arg(point.x()).arg(point.y());
+    m_selectionInfoLabel->setText(labelText);
 }
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+}
+
+
+void GraphModifier::flipViews()
+{
+    m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
 }
 
 void GraphModifier::timeout()
@@ -326,17 +390,17 @@ void GraphModifier::timeout()
     }
 
     // Reset same array to make it redraw
-    m_graph->activeDataProxy()->resetArray(m_planeArray);
+    m_theSeries->dataProxy()->resetArray(m_planeArray);
 }
 
-void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX, qreal maxX)
+void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);
     m_axisMinSliderZ->setValue(minZ);
     m_axisRangeSliderX->setValue(maxX - minX);
     m_axisRangeSliderZ->setValue(maxZ - minZ);
 
-    m_graph->activeDataProxy()->resetArray(array);
+    m_theSeries->dataProxy()->resetArray(array);
 }
 
 void GraphModifier::changeShadowQuality(int quality)
@@ -347,27 +411,287 @@ void GraphModifier::changeShadowQuality(int quality)
 
 void GraphModifier::changeSelectionMode(int mode)
 {
-    switch (mode) {
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        int flags = comboBox->itemData(mode).toInt();
+        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+    }
+}
+
+void GraphModifier::changeRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values to a row at random pos";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float i = float(rand() % m_zCount);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = qMin(maxZ, (i * stepZ + minZ));
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+
+        m_theSeries->dataProxy()->setRow(int(i), newRow);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::changeRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values to 3 rows from random pos";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float start = float(rand() % (m_zCount - 3));
+
+        QSurfaceDataArray dataArray;
+
+        for (float i = start; i < (start + 3.0f); i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = qMin(maxZ, (i * stepZ + minZ));
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+        }
+
+        m_theSeries->dataProxy()->setRows(int(start), dataArray);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::changeItem()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Generating new values for an item at random pos";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+        float i = float(rand() % m_zCount);
+        float j = float(rand() % m_xCount);
+
+        float x = qMin(maxX, (j * stepX + minX));
+        float z = qMin(maxZ, (i * stepZ + minZ));
+        float R = qSqrt(x * x + z * z) + 0.01f;
+        float y = (qSin(R) / R + 0.24f) * 1.61f + 1.2f;
+        QSurfaceDataItem newItem(QVector3D(x, y, z));
+
+        m_theSeries->dataProxy()->setItem(int(i), int(j), newItem);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::changeMultipleRows()
+{
+    for (int i = 0; i < 30; i++)
+        changeRow();
+}
+
+void GraphModifier::changeMultipleItem()
+{
+    for (int i = 0; i < 30; i++)
+        changeItem();
+}
+
+void GraphModifier::addRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Adding a new row";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = float(m_addRowCounter) * stepZ + minZ;
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+        m_addRowCounter++;
+
+        m_theSeries->dataProxy()->addRow(newRow);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::addRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Adding few new row";
+
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataArray dataArray;
+
+        for (int i = 0; i < 3; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = m_addRowCounter * stepZ + minZ;
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.0f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+            m_addRowCounter++;
+        }
+
+        m_theSeries->dataProxy()->addRows(dataArray);
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::insertRow()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Inserting a row";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = qMin(maxZ, (float(m_insertTestZPos) * stepZ + minZ + (stepZ / 2.0f)));
+        for (float j = 0; j < m_xCount; j++) {
+            float x = qMin(maxX, (j * stepX + minX));
+            float R = qSqrt(x * x + z * z) + 0.01f;
+            float y = (qSin(R) / R + 0.24f) * 1.61f + 1.3f;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+        m_insertTestZPos++;
+
+        m_theSeries->dataProxy()->insertRow(m_insertTestIndexPos, newRow);
+        m_insertTestIndexPos += 2;
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::insertRows()
+{
+    if (m_activeSample == GraphModifier::SqrtSin) {
+        qDebug() << "Inserting 3 rows";
+        float minX = -10.0f;
+        float maxX = 10.0f;
+        float minZ = -10.0f;
+        float maxZ = 10.0f;
+        float stepX = (maxX - minX) / float(m_xCount - 1);
+        float stepZ = (maxZ - minZ) / float(m_zCount - 1);
+
+        QSurfaceDataArray dataArray;
+        for (int i = 0; i < 3; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+            float z = qMin(maxZ, (float(m_insertTestZPos) * stepZ + minZ + i * (stepZ / 4.0f)));
+            for (float j = 0; j < m_xCount; j++) {
+                float x = qMin(maxX, (j * stepX + minX));
+                float R = qSqrt(x * x + z * z) + 0.01f;
+                float y = (qSin(R) / R + 0.24f) * 1.61f + 1.3f;
+                (*newRow)[j].setPosition(QVector3D(x, y, z));
+            }
+            dataArray.append(newRow);
+        }
+        m_insertTestZPos++;
+
+        m_theSeries->dataProxy()->insertRows(m_insertTestIndexPos, dataArray);
+        m_insertTestIndexPos += 4;
+    } else {
+        qDebug() << "Change row function active only for SqrtSin";
+    }
+}
+
+void GraphModifier::removeRow()
+{
+    qDebug() << "Remove an arbitrary row";
+    int row = rand() % m_zCount;
+    m_theSeries->dataProxy()->removeRows(row, 1);
+    m_zCount--;
+}
+
+void GraphModifier::changeMesh()
+{
+    static int model = 0;
+    switch (model) {
     case 0:
-        qDebug() << "QDataVis::SelectionModeNone";
-        m_graph->setSelectionMode(QDataVis::SelectionModeNone);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCylinder);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 1:
-        qDebug() << "QDataVis::SelectionModeItem";
-        m_graph->setSelectionMode(QDataVis::SelectionModeItem);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCylinder);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     case 2:
-        qDebug() << "QDataVis::SelectionModeSliceRow";
-        m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCone);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
         break;
     case 3:
-        qDebug() << "QDataVis::SelectionModeSliceColumn";
-        m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn);
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCone);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
-    default:
-        qDebug() << __FUNCTION__ << " Unsupported selection mode.";
+    case 4:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
+        break;
+    case 5:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
+        break;
+    case 6:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshPyramid);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
+        break;
+    case 7:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshPyramid);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
+        break;
+    case 8:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBevelBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(false);
+        break;
+    case 9:
+        m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshBevelBar);
+        m_graph->seriesList().at(0)->setMeshSmooth(true);
         break;
     }
+    model++;
+    if (model > 9)
+        model = 0;
 }
 
 void GraphModifier::updateSamples()
@@ -385,4 +709,3 @@ void GraphModifier::updateSamples()
         break;
     }
 }
-

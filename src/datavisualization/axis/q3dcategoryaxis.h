@@ -28,14 +28,17 @@ class Q3DCategoryAxisPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DCategoryAxis : public Q3DAbstractAxis
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList categoryLabels READ categoryLabels WRITE setCategoryLabels)
+    Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)
 
 public:
     explicit Q3DCategoryAxis(QObject *parent = 0);
     virtual ~Q3DCategoryAxis();
 
-    QStringList categoryLabels() const;
-    void setCategoryLabels(const QStringList &labels);
+    void setLabels(const QStringList &labels);
+    QStringList labels() const;
+
+signals:
+    void labelsChanged();
 
 protected:
     Q3DCategoryAxisPrivate *dptr();

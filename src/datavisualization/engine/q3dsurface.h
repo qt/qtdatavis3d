@@ -23,61 +23,38 @@
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
-#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
 class Q3DValueAxis;
-class QSurfaceDataProxy;
+class QSurface3DSeries;
+class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
-    Q_PROPERTY(QtDataVisualization::QDataVis::Theme theme READ theme WRITE setTheme)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(bool smoothSurfaceEnabled READ isSmoothSurfaceEnabled WRITE setSmoothSurfaceEnabled)
-    Q_PROPERTY(bool surfaceGridEnabled READ isSurfaceGridEnabled WRITE setSurfaceGridEnabled)
-    Q_PROPERTY(QLinearGradient gradient READ gradient WRITE setGradient)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
-    explicit Q3DSurface();
-    ~Q3DSurface();
+    explicit Q3DSurface(QWindow *parent = 0);
+    virtual ~Q3DSurface();
 
-    void setGridVisible(bool visible);
-    bool isGridVisible() const;
+    void addSeries(QSurface3DSeries *series);
+    void removeSeries(QSurface3DSeries *series);
+    QList<QSurface3DSeries *> seriesList();
 
-    void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible() const;
-
-    void setTheme(QDataVis::Theme theme);
-    QDataVis::Theme theme() const;
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
 
-    void setSmoothSurfaceEnabled(bool enabled);
-    bool isSmoothSurfaceEnabled() const;
-
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode() const;
-    void setSurfaceGridEnabled(bool enabled);
-    bool isSurfaceGridEnabled() const;
-
-    void setGradient(const QLinearGradient &gradient);
-    QLinearGradient gradient() const;
-
-    void setGradientColorAt(qreal pos, const QColor &color);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    QDataVis::SelectionFlags selectionMode() const;
 
     // Axes
     void setAxisX(Q3DValueAxis *axis);
@@ -90,19 +67,12 @@ public:
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
 
-    void setActiveDataProxy(QSurfaceDataProxy *proxy);
-    QSurfaceDataProxy *activeDataProxy() const;
-    void addDataProxy(QSurfaceDataProxy *proxy);
-    void releaseDataProxy(QSurfaceDataProxy *proxy);
-    QList<QSurfaceDataProxy *> dataProxies() const;
-
-    void setFont(const QFont &font);
-    QFont font() const;
-
     Q3DScene *scene() const;
 
-    void setLabelStyle(QDataVis::LabelStyle style);
-    QDataVis::LabelStyle labelStyle() const;
+signals:
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void themeChanged(Q3DTheme *theme);
+    void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -111,10 +81,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DSurfacePrivate> d_ptr;
+    Q3DSurfacePrivate *dptr();
+    const Q3DSurfacePrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DSurface)
 };
 

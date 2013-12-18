@@ -155,125 +155,125 @@ QPointF CameraHelper::getCameraRotations()
     return rotations;
 }
 
-void CameraHelper::setCameraPreset(QDataVis::CameraPreset preset)
+void CameraHelper::setCameraPreset(Q3DCamera::CameraPreset preset)
 {
     switch (preset) {
-    case QDataVis::CameraPresetFrontLow: {
+    case Q3DCamera::CameraPresetFrontLow: {
         qDebug("CameraPresetFrontLow");
         CameraHelper::setCameraRotation(QPointF(0.0f, 0.0f));
         break;
     }
-    case QDataVis::CameraPresetFront: {
+    case Q3DCamera::CameraPresetFront: {
         qDebug("CameraPresetFront");
         CameraHelper::setCameraRotation(QPointF(0.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetFrontHigh: {
+    case Q3DCamera::CameraPresetFrontHigh: {
         qDebug("CameraPresetFrontHigh");
         CameraHelper::setCameraRotation(QPointF(0.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetLeftLow: {
+    case Q3DCamera::CameraPresetLeftLow: {
         qDebug("CameraPresetLeftLow");
         CameraHelper::setCameraRotation(QPointF(90.0f, 0.0f));
         break;
     }
-    case QDataVis::CameraPresetLeft: {
+    case Q3DCamera::CameraPresetLeft: {
         qDebug("CameraPresetLeft");
         CameraHelper::setCameraRotation(QPointF(90.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetLeftHigh: {
+    case Q3DCamera::CameraPresetLeftHigh: {
         qDebug("CameraPresetLeftHigh");
         CameraHelper::setCameraRotation(QPointF(90.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetRightLow: {
+    case Q3DCamera::CameraPresetRightLow: {
         qDebug("CameraPresetRightLow");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 0.0f));
         break;
     }
-    case QDataVis::CameraPresetRight: {
+    case Q3DCamera::CameraPresetRight: {
         qDebug("CameraPresetRight");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetRightHigh: {
+    case Q3DCamera::CameraPresetRightHigh: {
         qDebug("CameraPresetRightHigh");
         CameraHelper::setCameraRotation(QPointF(-90.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetBehindLow: {
+    case Q3DCamera::CameraPresetBehindLow: {
         qDebug("CameraPresetBehindLow");
         CameraHelper::setCameraRotation(QPointF(180.0f, 0.0f));
         break;
     }
-    case QDataVis::CameraPresetBehind: {
+    case Q3DCamera::CameraPresetBehind: {
         qDebug("CameraPresetBehind");
         CameraHelper::setCameraRotation(QPointF(180.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetBehindHigh: {
+    case Q3DCamera::CameraPresetBehindHigh: {
         qDebug("CameraPresetBehindHigh");
         CameraHelper::setCameraRotation(QPointF(180.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetIsometricLeft: {
+    case Q3DCamera::CameraPresetIsometricLeft: {
         qDebug("CameraPresetIsometricLeft");
         CameraHelper::setCameraRotation(QPointF(45.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetIsometricLeftHigh: {
+    case Q3DCamera::CameraPresetIsometricLeftHigh: {
         qDebug("CameraPresetIsometricLeftHigh");
         CameraHelper::setCameraRotation(QPointF(45.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetIsometricRight: {
+    case Q3DCamera::CameraPresetIsometricRight: {
         qDebug("CameraPresetIsometricRight");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 22.5f));
         break;
     }
-    case QDataVis::CameraPresetIsometricRightHigh: {
+    case Q3DCamera::CameraPresetIsometricRightHigh: {
         qDebug("CameraPresetIsometricRightHigh");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 45.0f));
         break;
     }
-    case QDataVis::CameraPresetDirectlyAbove: {
+    case Q3DCamera::CameraPresetDirectlyAbove: {
         qDebug("CameraPresetDirectlyAbove");
         CameraHelper::setCameraRotation(QPointF(0.0f, 90.0f));
         break;
     }
-    case QDataVis::CameraPresetDirectlyAboveCW45: {
+    case Q3DCamera::CameraPresetDirectlyAboveCW45: {
         qDebug("CameraPresetDirectlyAboveCW45");
         CameraHelper::setCameraRotation(QPointF(-45.0f, 90.0f));
         break;
     }
-    case QDataVis::CameraPresetDirectlyAboveCCW45: {
+    case Q3DCamera::CameraPresetDirectlyAboveCCW45: {
         qDebug("CameraPresetDirectlyAboveCCW45");
         CameraHelper::setCameraRotation(QPointF(45.0f, 90.0f));
         break;
     }
-    case QDataVis::CameraPresetFrontBelow: {
+    case Q3DCamera::CameraPresetFrontBelow: {
         qDebug("CameraPresetFrontBelow");
         CameraHelper::setCameraRotation(QPointF(0.0f, -45.0f));
         break;
     }
-    case QDataVis::CameraPresetLeftBelow: {
+    case Q3DCamera::CameraPresetLeftBelow: {
         qDebug("CameraPresetLeftBelow");
         CameraHelper::setCameraRotation(QPointF(90.0f, -45.0f));
         break;
     }
-    case QDataVis::CameraPresetRightBelow: {
+    case Q3DCamera::CameraPresetRightBelow: {
         qDebug("CameraPresetRightBelow");
         CameraHelper::setCameraRotation(QPointF(-90.0f, -45.0f));
         break;
     }
-    case QDataVis::CameraPresetBehindBelow: {
+    case Q3DCamera::CameraPresetBehindBelow: {
         qDebug("CameraPresetBehindBelow");
         CameraHelper::setCameraRotation(QPointF(180.0f, -45.0f));
         break;
     }
-    case QDataVis::CameraPresetDirectlyBelow: {
+    case Q3DCamera::CameraPresetDirectlyBelow: {
         qDebug("CameraPresetDirectlyBelow");
         CameraHelper::setCameraRotation(QPointF(0.0f, -90.0f));
         break;

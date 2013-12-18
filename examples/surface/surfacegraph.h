@@ -22,6 +22,7 @@
 #include <QtDataVisualization/Q3DSurface>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
 #include <QtWidgets/QSlider>
 
 using namespace QtDataVisualization;
@@ -33,14 +34,16 @@ public:
     explicit SurfaceGraph(Q3DSurface *surface);
     ~SurfaceGraph();
 
-    void enableHeightMapModel();
-    void enableSqrtSinModel();
+    void enableHeightMapModel(bool enable);
+    void enableSqrtSinModel(bool enable);
 
     //! [0]
-    void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionModeNone); }
-    void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionModeItem); }
-    void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow); }
-    void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn); }
+    void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionNone); }
+    void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionItem); }
+    void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionItemAndRow
+                                                          | QDataVis::SelectionSlice); }
+    void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn
+                                                             | QDataVis::SelectionSlice); }
     //! [0]
 
     void setBlackToYellowGradient();
@@ -62,21 +65,23 @@ public slots:
 private:
     Q3DSurface *m_graph;
     QHeightMapSurfaceDataProxy *m_heightMapProxy;
-    QSurfaceDataProxy *sqrtSinProxy;
+    QSurfaceDataProxy *m_sqrtSinProxy;
+    QSurface3DSeries *m_heightMapSeries;
+    QSurface3DSeries *m_sqrtSinSeries;
 
     QSlider *m_axisMinSliderX;
     QSlider *m_axisMaxSliderX;
     QSlider *m_axisMinSliderZ;
     QSlider *m_axisMaxSliderZ;
-    qreal m_rangeMinX;
-    qreal m_rangeMinZ;
-    qreal m_stepX;
-    qreal m_stepZ;
+    float m_rangeMinX;
+    float m_rangeMinZ;
+    float m_stepX;
+    float m_stepZ;
     int m_heightMapWidth;
     int m_heightMapHeight;
 
-    void setAxisXRange(qreal min, qreal max);
-    void setAxisZRange(qreal min, qreal max);
+    void setAxisXRange(float min, float max);
+    void setAxisZRange(float min, float max);
     void fillSqrtSinProxy();
 };
 

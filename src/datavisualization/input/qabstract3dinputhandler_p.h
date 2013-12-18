@@ -53,7 +53,7 @@ public:
     GLfloat m_defaultYRotation;
 
 private:
-    QDataVis::InputState m_inputState;
+    QAbstract3DInputHandler::InputState m_inputState;
     QPoint m_inputPosition;
     QRect m_mainViewPort;
 

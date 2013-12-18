@@ -35,6 +35,7 @@
 #include "declarativescatter_p.h"
 #include "q3dvalueaxis.h"
 #include "qscatterdataproxy.h"
+#include "qscatter3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -45,24 +46,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeScatter : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
-    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX)
-    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY)
-    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle objectType READ objectType WRITE setObjectType)
-    Q_PROPERTY(bool objectSmoothingEnabled READ isObjectSmoothingEnabled WRITE setObjectSmoothingEnabled)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat)
-    Q_ENUMS(QtDataVisualization::QDataVis::MeshStyle)
+    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);
     ~DeclarativeScatter();
-
-    Q_INVOKABLE void setObjectColor(const QColor &baseColor, bool uniform = true);
-
-    QScatterDataProxy *dataProxy() const;
-    void setDataProxy(QScatterDataProxy *dataProxy);
 
     Q3DValueAxis *axisX() const;
     void setAxisX(Q3DValueAxis *axis);
@@ -71,21 +63,21 @@ public:
     Q3DValueAxis *axisZ() const;
     void setAxisZ(Q3DValueAxis *axis);
 
-    void setObjectType(QDataVis::MeshStyle style);
-    QDataVis::MeshStyle objectType() const;
+    QQmlListProperty<QScatter3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
+    static QScatter3DSeries *atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
+    Q_INVOKABLE void addSeries(QScatter3DSeries *series);
+    Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
-    void setObjectSmoothingEnabled(bool enabled);
-    bool isObjectSmoothingEnabled() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
+signals:
+    void axisXChanged(Q3DValueAxis *axis);
+    void axisYChanged(Q3DValueAxis *axis);
+    void axisZChanged(Q3DValueAxis *axis);
 
 protected:
-    Scatter3DController *m_shared;
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
-
-private:
-    QSize m_initialisedSize;
+    Scatter3DController *m_scatterController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

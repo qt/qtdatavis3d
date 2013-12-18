@@ -18,6 +18,7 @@
 
 #include "qabstractdataproxy.h"
 #include "qabstractdataproxy_p.h"
+#include "qabstract3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -46,14 +47,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \qmlproperty AbstractDataProxy.DataType AbstractDataProxy::type
  * The type of the proxy.
- */
-
-/*!
- * \qmlproperty string AbstractDataProxy::itemLabelFormat
- *
- * Label format for data items in this proxy. This format is used for single item labels,
- * for example, when an item is selected. How the format is interpreted depends on proxy type. See
- * each proxy class documentation for more information.
  */
 
 /*!
@@ -97,42 +90,13 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
     return d_ptr->m_type;
 }
 
-/*!
- * \property QAbstractDataProxy::itemLabelFormat
- *
- * Sets label \a format for data items in this proxy. This format is used for single item labels,
- * for example, when an item is selected. How the format is interpreted depends on proxy type. See
- * each proxy class documentation for more information.
- *
- * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy
- */
-void QAbstractDataProxy::setItemLabelFormat(const QString &format)
-{
-    d_ptr->setItemLabelFormat(format);
-    emit itemLabelFormatChanged();
-}
-
-/*!
- * \return label format for data items in this proxy.
- */
-QString QAbstractDataProxy::itemLabelFormat() const
-{
-    return d_ptr->m_itemLabelFormat;
-}
-
-/*!
- * \fn void QAbstractDataProxy::itemLabelFormatChanged()
- *
- * Emitted when label format changes.
- */
-
 // QAbstractDataProxyPrivate
 
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
     : QObject(0),
       q_ptr(q),
       m_type(type),
-      m_isDefaultProxy(false)
+      m_series(0)
 {
 }
 
@@ -140,9 +104,10 @@ QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
 {
 }
 
-void QAbstractDataProxyPrivate::setItemLabelFormat(const QString &format)
+void QAbstractDataProxyPrivate::setSeries(QAbstract3DSeries *series)
 {
-    m_itemLabelFormat = format;
+    setParent(series);
+    m_series = series;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

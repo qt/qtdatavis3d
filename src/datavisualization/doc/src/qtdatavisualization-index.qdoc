@@ -32,10 +32,10 @@
         \li Uses OpenGL for rendering the data
         \li QML2 support
         \li Customizable axes for data - control viewable data window with axis ranges
-        \li Customizable input handling (upcoming feature - not supported in technology preview)
-        \li Customizable scene handling - full control of cameras and lights (upcoming feature -
-            not supported in technology preview)
-        \li Customizable themes (upcoming feature - not supported in technology preview)
+        \li Customizable input handling
+        \li Customizable scene handling - full control of viewports
+            (upcoming feature - not fully supported in alpha)
+        \li Customizable themes
     \endlist
 
     \section1 Getting Started
@@ -62,8 +62,8 @@
 
     \section1 Articles
     \list
-        \li \l{Qt Data Visualization Data Handling}{Data input}
-        \li \l{Qt Data Visualization Interacting with Data}{Interacting with visualized data}
+        \li \l{Qt Data Visualization Data Handling}{Data Handling}
+        \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
     \endlist
 
     \section1 References

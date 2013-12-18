@@ -42,42 +42,71 @@ struct Q3DSceneChangeBitField {
     bool viewportChanged               : 1;
     bool primarySubViewportChanged     : 1;
     bool secondarySubViewportChanged   : 1;
+    bool subViewportOrderChanged       : 1;
     bool cameraChanged                 : 1;
     bool lightChanged                  : 1;
     bool slicingActivatedChanged       : 1;
     bool devicePixelRatioChanged       : 1;
+    bool selectionQueryPositionChanged : 1;
+    bool windowSizeChanged             : 1;
 
     Q3DSceneChangeBitField()
         : viewportChanged(true),
           primarySubViewportChanged(true),
           secondarySubViewportChanged(true),
+          subViewportOrderChanged(true),
           cameraChanged(true),
           lightChanged(true),
           slicingActivatedChanged(true),
-          devicePixelRatioChanged(true)
+          devicePixelRatioChanged(true),
+          selectionQueryPositionChanged(false),
+          windowSizeChanged(true)
     {
     }
 };
 
-class Q3DScenePrivate
+class QT_DATAVISUALIZATION_EXPORT Q3DScenePrivate : public QObject
 {
+    Q_OBJECT
 public:
     Q3DScenePrivate(Q3DScene *q);
     ~Q3DScenePrivate();
 
     void sync(Q3DScenePrivate &other);
 
+    void setViewport(const QRect &viewport);
+    void setViewportSize(int width, int height);
+    void setWindowSize(const QSize &size);
+    QSize windowSize() const;
+    void calculateSubViewports();
+    void updateGLViewport();
+    void updateGLSubViewports();
+
+    QRect glViewport();
+    QRect glPrimarySubViewport();
+    QRect glSecondarySubViewport();
+
+signals:
+    void needRender();
+
+public:
     Q3DScene *q_ptr;
     Q3DSceneChangeBitField m_changeTracker;
 
     QRect m_viewport;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
-    qreal m_devicePixelRatio;
+    bool m_isSecondarySubviewOnTop;
+    float m_devicePixelRatio;
     Q3DCamera *m_camera;
     Q3DLight *m_light;
     bool m_isUnderSideCameraEnabled;
     bool m_isSlicingActive;
+    QPoint m_selectionQueryPosition;
+    QSize m_windowSize;
+    QRect m_glViewport;
+    QRect m_glPrimarySubViewport;
+    QRect m_glSecondarySubViewport;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

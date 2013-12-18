@@ -44,8 +44,13 @@ QVector3D Utils::vectorFromColor(const QColor &color)
     return QVector3D(color.redF(), color.greenF(), color.blueF());
 }
 
+QColor Utils::colorFromVector(const QVector3D &colorVector)
+{
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f, colorVector.z() * 255.0f);
+}
+
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
-                               const QColor &txtColor, QDataVis::LabelStyle style,
+                               const QColor &txtColor, bool labelBackground,
                                bool borders, int maxLabelWidth)
 {
     GLuint paddingWidth = 20;
@@ -55,7 +60,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
-    if (maxLabelWidth && QDataVis::LabelStyleTransparent != style)
+    if (maxLabelWidth && labelBackground)
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
@@ -74,7 +79,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
     //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
-    if (QDataVis::LabelStyleTransparent == style)
+    if (!labelBackground)
         labelSize = QSize(valueStrWidth, valueStrHeight);
     else
         labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
@@ -90,8 +95,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
     painter.setFont(valueFont);
-    switch (style) {
-    case QDataVis::LabelStyleTransparent: {
+    if (!labelBackground) {
         painter.setPen(txtColor);
 #if defined(Q_OS_ANDROID)
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
@@ -105,9 +109,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
 #endif
-        break;
-    }
-    case QDataVis::LabelStyleFromTheme: {
+    } else {
         painter.setBrush(QBrush(bgrColor));
         if (borders) {
             painter.setPen(QPen(QBrush(txtColor), 5, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
@@ -123,39 +125,16 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          valueStrWidth, valueStrHeight,
                          Qt::AlignCenter | Qt::AlignVCenter,
                          text);
-        break;
-    }
-    case QDataVis::LabelStyleOpaque: {
-        QColor labelColor = QColor(bgrColor);
-        labelColor.setAlphaF(1.0);
-        painter.setBrush(QBrush(labelColor));
-        if (borders) {
-            painter.setPen(QPen(QBrush(txtColor), 7, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-            painter.drawRect(7, 7, labelSize.width() - 14, labelSize.height() - 14);
-        } else {
-            painter.setPen(labelColor);
-            painter.drawRect(0, 0, labelSize.width(), labelSize.height());
-        }
-        painter.setPen(txtColor);
-        painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
-                         (labelSize.height() - valueStrHeight) / 2.0f,
-                         valueStrWidth, valueStrHeight,
-                         Qt::AlignCenter | Qt::AlignVCenter,
-                         text);
-        break;
-    }
     }
     return image;
 }
 
 QVector3D Utils::getSelection(QPoint mousepos, int height)
 {
-    QVector3D selectedColor;
-
     //#if defined(QT_OPENGL_ES_2)
     // This is the only one that works with ANGLE (ES 2.0)
     // Item count will be limited to 256*256*256
-    GLubyte pixel[4];
+    GLubyte pixel[4] = {255, 255, 255, 0};
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                  (void *)pixel);
 
@@ -174,7 +153,7 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     //             GL_RGB, GL_FLOAT, (void *)pixel3);
     //qDebug() << "rgba" << pixel3[0] << pixel3[1] << pixel3[2];// << pixel[3];
     //#endif
-    selectedColor = QVector3D(pixel[0], pixel[1], pixel[2]);
+    QVector3D selectedColor(pixel[0], pixel[1], pixel[2]);
     //qDebug() << selectedColor;
 
     return selectedColor;
@@ -219,7 +198,7 @@ Utils::ParamType Utils::findFormatParamType(const QString &format)
     return ParamTypeUnknown;
 }
 
-QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
+QString Utils::formatLabel(const QByteArray &format, ParamType paramType, float value)
 {
     switch (paramType) {
     case ParamTypeInt:
@@ -239,7 +218,7 @@ QString Utils::defaultLabelFormat()
     return defaultFormat;
 }
 
-qreal Utils::wrapValue(qreal value, qreal min, qreal max)
+float Utils::wrapValue(float value, float min, float max)
 {
     if (value > max) {
         value = min + (value - max);

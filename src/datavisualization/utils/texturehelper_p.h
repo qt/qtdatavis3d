@@ -32,6 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QOpenGLFunctions>
 #include <QRgb>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -43,13 +44,16 @@ class TextureHelper : protected QOpenGLFunctions
 
     // Ownership of created texture is transferred to caller
     GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
-                           bool convert = true, bool smoothScale = true);
+                           bool convert = true, bool smoothScale = true, bool clampY = false);
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    GLuint createGradientTexture(const QLinearGradient &gradient);
 #if !defined(QT_OPENGL_ES_2)
+    GLuint createDepthTexture(const QSize &size, GLuint textureSize);
     // Returns depth texture and inserts generated framebuffer to parameter
-    GLuint createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize = 1);
+    GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
+    void fillDepthTexture(GLuint texture, const QSize &size, GLuint textureSize, GLfloat value);
 #endif
     void deleteTexture(const GLuint *texture);
 

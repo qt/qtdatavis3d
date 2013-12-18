@@ -32,21 +32,25 @@
 #include "abstract3dcontroller_p.h"
 #include "datavisualizationglobal_p.h"
 
-#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Surface3DRenderer;
+class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
-    bool gradientColorChanged     : 1;
     bool smoothStatusChanged      : 1;
     bool surfaceGridChanged       : 1;
+    bool selectedPointChanged     : 1;
+    bool rowsChanged              : 1;
+    bool itemChanged              : 1;
 
     Surface3DChangeBitField() :
-        gradientColorChanged(true),
         smoothStatusChanged(true),
-        surfaceGridChanged(true)
+        surfaceGridChanged(true),
+        selectedPointChanged(true),
+        rowsChanged(false),
+        itemChanged(false)
     {
     }
 };
@@ -57,43 +61,47 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DControl
 
 private:
     Surface3DChangeBitField m_changeTracker;
-
-    // Rendering
     Surface3DRenderer *m_renderer;
-    bool m_isSmoothSurfaceEnabled;
-    bool m_isSurfaceGridEnabled;
-    QLinearGradient m_userDefinedGradient;
+    QPoint m_selectedPoint;
+    QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
+                                        // single series selection cases.
+    bool m_flatShadingSupported;
+    QVector<QPoint> m_changedItems;
+    QVector<int> m_changedRows;
 
 public:
     explicit Surface3DController(QRect rect);
     ~Surface3DController();
 
-    void initializeOpenGL();
+    virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
 
-    void setSmoothSurface(bool enable);
-    bool smoothSurface();
-
-    void setSurfaceGrid(bool enable);
-    bool surfaceGrid();
-
-    void setGradient(const QLinearGradient &gradient);
-    QLinearGradient gradient() const;
-
-    void setGradientColorAt(qreal pos, const QColor &color);
-
-    void setSelectionMode(QDataVis::SelectionMode mode);
-
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+
+    static QPoint invalidSelectionPosition();
+    bool isFlatShadingSupported();
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QSurface3DSeries *> surfaceSeriesList();
 
 public slots:
     void handleArrayReset();
+    void handleRowsAdded(int startIndex, int count);
+    void handleRowsChanged(int startIndex, int count);
+    void handleRowsRemoved(int startIndex, int count);
+    void handleRowsInserted(int startIndex, int count);
+    void handleItemChanged(int rowIndex, int columnIndex);
 
-signals:
-    void smoothSurfaceEnabledChanged(bool enable);
+    // Renderer callback handlers
+    void handlePointClicked(const QPoint &position, QSurface3DSeries *series);
+
+    void handleFlatShadingSupportedChange(bool supported);
 
 private:
     void adjustValueAxisRange();

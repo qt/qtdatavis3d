@@ -39,16 +39,23 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 // Constants used in several files
 // Distance from camera to origin
-const GLfloat cameraDistance = 6.0f;
+static const GLfloat cameraDistance = 6.0f;
 // Size of font to be used in label texture rendering. Doesn't affect the actual font size.
-const int textureFontSize = 50;
-const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
+static const int textureFontSize = 50;
+static const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
+static const float gridLineOffset = 0.0001f; // Offset for lifting grid lines off background
 // Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
 // y position is added to the minimum height (or can be thought to be that much above or below the camera)
-const QVector3D defaultLightPos(0.0f, 0.5f, 0.0f);
-const QVector3D zeroVector(0.0f, 0.0f, 0.0f);
-const QVector3D upVector(0.0f, 1.0f, 0.0f);
-const QVector3D cameraDistanceVector(0.0f, 0.0f, cameraDistance);
+static const QVector3D defaultLightPos(0.0f, 0.5f, 0.0f);
+static const QVector3D zeroVector(0.0f, 0.0f, 0.0f);
+static const QVector3D upVector(0.0f, 1.0f, 0.0f);
+static const QVector3D cameraDistanceVector(0.0f, 0.0f, cameraDistance);
+
+// Skip color == selection texture's background color
+static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);
+static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
+static const GLfloat gradientTextureHeight = 1024.0f;
+static const GLfloat gradientTextureWidth = 2.0f;
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 

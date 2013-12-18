@@ -197,7 +197,7 @@ Q3DValueAxisPrivate::~Q3DValueAxisPrivate()
 {
 }
 
-void Q3DValueAxisPrivate::setRange(qreal min, qreal max)
+void Q3DValueAxisPrivate::setRange(float min, float max)
 {
     bool dirty = (min != m_min || max != m_max);
 
@@ -207,7 +207,7 @@ void Q3DValueAxisPrivate::setRange(qreal min, qreal max)
         emitLabelsChanged();
 }
 
-void Q3DValueAxisPrivate::setMin(qreal min)
+void Q3DValueAxisPrivate::setMin(float min)
 {
     bool dirty = (min != m_min);
 
@@ -217,7 +217,7 @@ void Q3DValueAxisPrivate::setMin(qreal min)
         emitLabelsChanged();
 }
 
-void Q3DValueAxisPrivate::setMax(qreal max)
+void Q3DValueAxisPrivate::setMax(float max)
 {
     bool dirty = (max != m_max);
 
@@ -244,14 +244,14 @@ void Q3DValueAxisPrivate::updateLabels()
     newLabels.reserve(m_segmentCount + 1);
 
     // First label is at axis min, which is an extra segment
-    qreal segmentStep = (m_max - m_min) / m_segmentCount;
+    float segmentStep = (m_max - m_min) / m_segmentCount;
 
     QString formatString(m_labelFormat);
     Utils::ParamType paramType = Utils::findFormatParamType(formatString);
     QByteArray formatArray = formatString.toUtf8();
 
     for (int i = 0; i < m_segmentCount; i++) {
-        qreal value = m_min + (segmentStep * i);
+        float value = m_min + (segmentStep * i);
         newLabels.append(Utils::formatLabel(formatArray, paramType, value));
     }
 

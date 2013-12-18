@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     QGroupBox *modelGroupBox = new QGroupBox(QStringLiteral("Model"));
 
     QRadioButton *sqrtSinModelRB = new QRadioButton(widget);
-    sqrtSinModelRB->setText(QStringLiteral("Sqrt&Sin"));
+    sqrtSinModelRB->setText(QStringLiteral("Sqrt && Sin"));
     sqrtSinModelRB->setChecked(false);
 
     QRadioButton *heightMapModelRB = new QRadioButton(widget);

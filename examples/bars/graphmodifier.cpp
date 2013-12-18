@@ -22,7 +22,10 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QTime>
+#include <QComboBox>
 
 QT_DATAVISUALIZATION_USE_NAMESPACE
 
@@ -31,27 +34,29 @@ const QString celsiusString = QString(QChar(0xB0)) + "C";
 //! [0]
 GraphModifier::GraphModifier(Q3DBars *bargraph)
     : m_graph(bargraph),
-      m_xRotation(0.0),
-      m_yRotation(0.0),
+      m_xRotation(0.0f),
+      m_yRotation(0.0f),
       m_fontSize(30),
       m_segments(4),
       m_subSegments(3),
-      m_minval(-20.0),
-      m_maxval(20.0),
+      m_minval(-20.0f),
+      m_maxval(20.0f),
       //! [1]
       m_temperatureAxis(new Q3DValueAxis),
       m_yearAxis(new Q3DCategoryAxis),
       m_monthAxis(new Q3DCategoryAxis),
-      m_temperatureData(new QBarDataProxy),
+      m_primaryData(new QBarDataProxy),
+      m_secondaryData(new QBarDataProxy),
       //! [1]
-      m_style(QDataVis::MeshStyleBevelBars),
+      m_primaryStyle(QAbstract3DSeries::MeshBevelBar),
+      m_secondaryStyle(QAbstract3DSeries::MeshSphere),
       m_smooth(false)
 {
     //! [2]
-    m_graph->setBackgroundVisible(false);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
-    m_graph->setFont(QFont("Times New Roman", m_fontSize));
-    m_graph->setLabelStyle(QDataVis::LabelStyleFromTheme);
+    m_graph->theme()->setBackgroundEnabled(false);
+    m_graph->theme()->setFont(QFont("Times New Roman", m_fontSize));
+    m_graph->theme()->setLabelBackgroundEnabled(true);
     //! [2]
 
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
@@ -67,19 +72,36 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_yearAxis->setTitle("Year");
     m_monthAxis->setTitle("Month");
 
-    m_graph->addAxis(m_temperatureAxis);
-    m_graph->addAxis(m_yearAxis);
-    m_graph->addAxis(m_monthAxis);
+    m_graph->setValueAxis(m_temperatureAxis);
+    m_graph->setRowAxis(m_yearAxis);
+    m_graph->setColumnAxis(m_monthAxis);
     //! [3]
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("@valueTitle for @colLabel @rowLabel: @valueLabel"));
+    //! [8]
+    QBar3DSeries *series = new QBar3DSeries(m_primaryData);
+    series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
+    series->setMesh(QAbstract3DSeries::MeshBevelBar);
+    series->setMeshSmooth(false);
+
+    QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
+    series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
+    series2->setMesh(QAbstract3DSeries::MeshSphere);
+    series2->setMeshSmooth(false);
+    series2->setVisible(false);
+    //! [8]
 
     //! [4]
-    m_graph->addDataProxy(m_temperatureData);
+    m_graph->addSeries(series);
+    m_graph->addSeries(series2);
     //! [4]
 
+    //! [6]
     changePresetCamera();
+    //! [6]
+
+    //! [9]
     resetTemperatureData();
+    //! [9]
 }
 //! [0]
 
@@ -88,101 +110,114 @@ GraphModifier::~GraphModifier()
     delete m_graph;
 }
 
-void GraphModifier::start()
-{
-    //! [6]
-    m_graph->setActiveDataProxy(m_temperatureData);
-
-    m_graph->setValueAxis(m_temperatureAxis);
-    m_graph->setRowAxis(m_yearAxis);
-    m_graph->setColumnAxis(m_monthAxis);
-    //! [6]
-}
-
 void GraphModifier::resetTemperatureData()
 {
     //! [5]
     // Set up data
-    static const qreal temp[7][12] = {
-        {-6.7, -11.7, -9.7, 3.3, 9.2, 14.0, 16.3, 17.8, 10.2, 2.1, -2.6, -0.3},    // 2006
-        {-6.8, -13.3, 0.2, 1.5, 7.9, 13.4, 16.1, 15.5, 8.2, 5.4, -2.6, -0.8},      // 2007
-        {-4.2, -4.0, -4.6, 1.9, 7.3, 12.5, 15.0, 12.8, 7.6, 5.1, -0.9, -1.3},      // 2008
-        {-7.8, -8.8, -4.2, 0.7, 9.3, 13.2, 15.8, 15.5, 11.2, 0.6, 0.7, -8.4},      // 2009
-        {-14.4, -12.1, -7.0, 2.3, 11.0, 12.6, 18.8, 13.8, 9.4, 3.9, -5.6, -13.0},  // 2010
-        {-9.0, -15.2, -3.8, 2.6, 8.3, 15.9, 18.6, 14.9, 11.1, 5.3, 1.8, -0.2},     // 2011
-        {-8.7, -11.3, -2.3, 0.4, 7.5, 12.2, 16.4, 14.1, 9.2, 3.1, 0.3, -12.1}      // 2012
+    static const float tempOulu[7][12] = {
+        {-6.7f, -11.7f, -9.7f, 3.3f, 9.2f, 14.0f, 16.3f, 17.8f, 10.2f, 2.1f, -2.6f, -0.3f},    // 2006
+        {-6.8f, -13.3f, 0.2f, 1.5f, 7.9f, 13.4f, 16.1f, 15.5f, 8.2f, 5.4f, -2.6f, -0.8f},      // 2007
+        {-4.2f, -4.0f, -4.6f, 1.9f, 7.3f, 12.5f, 15.0f, 12.8f, 7.6f, 5.1f, -0.9f, -1.3f},      // 2008
+        {-7.8f, -8.8f, -4.2f, 0.7f, 9.3f, 13.2f, 15.8f, 15.5f, 11.2f, 0.6f, 0.7f, -8.4f},      // 2009
+        {-14.4f, -12.1f, -7.0f, 2.3f, 11.0f, 12.6f, 18.8f, 13.8f, 9.4f, 3.9f, -5.6f, -13.0f},  // 2010
+        {-9.0f, -15.2f, -3.8f, 2.6f, 8.3f, 15.9f, 18.6f, 14.9f, 11.1f, 5.3f, 1.8f, -0.2f},     // 2011
+        {-8.7f, -11.3f, -2.3f, 0.4f, 7.5f, 12.2f, 16.4f, 14.1f, 9.2f, 3.1f, 0.3f, -12.1f}      // 2012
     };
 
-    // Create data array
+    static const float tempHelsinki[7][12] = {
+        {-3.7f, -7.8f, -5.4f, 3.4f, 10.7f, 15.4f, 18.6f, 18.7f, 14.3f, 8.5f, 2.9f, 4.1f},      // 2006
+        {-1.2f, -7.5f, 3.1f, 5.5f, 10.3f, 15.9f, 17.4f, 17.9f, 11.2f, 7.3f, 1.1f, 0.5f},       // 2007
+        {-0.6f, 1.2f, 0.2f, 6.3f, 10.2f, 13.8f, 18.1f, 15.1f, 10.1f, 9.4f, 2.5f, 0.4f},        // 2008
+        {-2.9f, -3.5f, -0.9f, 4.7f, 10.9f, 14.0f, 17.4f, 16.8f, 13.2f, 4.1f, 2.6f, -2.3f},     // 2009
+        {-10.2f, -8.0f, -1.9f, 6.6f, 11.3f, 14.5f, 21.0f, 18.8f, 12.6f, 6.1f, -0.5f, -7.3f},   // 2010
+        {-4.4f, -9.1f, -2.0f, 5.5f, 9.9f, 15.6f, 20.8f, 17.8f, 13.4f, 8.9f, 3.6f, 1.5f},       // 2011
+        {-3.5f, -3.2f, -0.7f, 4.0f, 11.1f, 13.4f, 17.3f, 15.8f, 13.1f, 6.4f, 4.1f, -5.1f}      // 2012
+    };
+
+    // Create data arrays
     QBarDataArray *dataSet = new QBarDataArray;
+    QBarDataArray *dataSet2 = new QBarDataArray;
     QBarDataRow *dataRow;
+    QBarDataRow *dataRow2;
 
     dataSet->reserve(m_years.size());
     for (int year = 0; year < m_years.size(); year++) {
         // Create a data row
         dataRow = new QBarDataRow(m_months.size());
+        dataRow2 = new QBarDataRow(m_months.size());
         for (int month = 0; month < m_months.size(); month++) {
             // Add data to the row
-            (*dataRow)[month].setValue(temp[year][month]);
+            (*dataRow)[month].setValue(tempOulu[year][month]);
+            (*dataRow2)[month].setValue(tempHelsinki[year][month]);
         }
         // Add the row to the set
         dataSet->append(dataRow);
+        dataSet2->append(dataRow2);
     }
 
     // Add data to the graph (the graph assumes ownership of it)
-    m_temperatureData->resetArray(dataSet, m_years, m_months);
+    m_primaryData->resetArray(dataSet, m_years, m_months);
+    m_secondaryData->resetArray(dataSet2, m_years, m_months);
     //! [5]
 }
 
 void GraphModifier::changeStyle(int style)
 {
-    m_style = QDataVis::MeshStyle(style);
-    m_graph->setBarType(m_style, m_smooth);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        m_primaryStyle = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        if (m_graph->seriesList().size())
+            m_graph->seriesList().at(0)->setMesh(m_primaryStyle);
+    }
 }
 
 void GraphModifier::changePresetCamera()
 {
-    static int preset = QDataVis::CameraPresetFront;
+    //! [10]
+    static int preset = Q3DCamera::CameraPresetFront;
 
-    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
-    if (++preset > QDataVis::CameraPresetDirectlyBelow)
-        preset = QDataVis::CameraPresetFrontLow;
+    if (++preset > Q3DCamera::CameraPresetDirectlyBelow)
+        preset = Q3DCamera::CameraPresetFrontLow;
+    //! [10]
 }
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
+    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
+    emit fontChanged(m_graph->theme()->font());
+    emit fontSizeChanged(m_graph->theme()->font().pointSize());
 }
 
-void GraphModifier::changeLabelStyle()
+void GraphModifier::changeLabelBackground()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode(int selectionMode)
 {
-    m_graph->setSelectionMode((QDataVis::SelectionMode)selectionMode);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        int flags = comboBox->itemData(selectionMode).toInt();
+        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+    }
 }
 
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
-    newFont.setPointSize(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_graph->font();
+    QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->setFont(font);
+    m_graph->theme()->setFont(font);
 }
 
 void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -215,16 +250,31 @@ void GraphModifier::rotateY(int rotation)
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible((bool)enabled);
+    m_graph->theme()->setBackgroundEnabled(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible((bool)enabled);
+    m_graph->theme()->setGridEnabled(bool(enabled));
 }
 
 void GraphModifier::setSmoothBars(int smooth)
 {
     m_smooth = bool(smooth);
-    m_graph->setBarType(m_style, m_smooth);
+    if (m_graph->seriesList().size()) {
+        m_graph->seriesList().at(0)->setMeshSmooth(m_smooth);
+        m_graph->seriesList().at(1)->setMeshSmooth(m_smooth);
+    }
+}
+
+void GraphModifier::setSeriesVisibility(int enabled)
+{
+    m_graph->seriesList().at(1)->setVisible(bool(enabled));
+    if (enabled) {
+        m_graph->setBarThickness(2.0f);
+        m_graph->setBarSpacing(QSizeF(1.0, 3.0));
+    } else {
+        m_graph->setBarThickness(1.0f);
+        m_graph->setBarSpacing(QSizeF(1.0, 1.0));
+    }
 }

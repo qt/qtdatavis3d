@@ -27,25 +27,20 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 typedef QVector<QScatterDataItem> QScatterDataArray;
 
 class QScatterDataProxyPrivate;
+class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 
-    Q_PROPERTY(int itemCount READ itemCount)
+    Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
+    Q_PROPERTY(QScatter3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
     explicit QScatterDataProxy(QObject *parent = 0);
     virtual ~QScatterDataProxy();
 
-    // TODO: Replace first part of class description in docs with this once all TODOs are done:
-    /*
-    * QScatterDataProxy handles adding, inserting, changing and removing data items.
-    * QScatterDataProxy is optimized to use cases where the only defining characteristics of an
-    * individual scatter item are it's position and size. Modifying other data that might be
-    * added in the future such as color requires allocating additional data object for the bar.
-    */
-
+    QScatter3DSeries *series();
     int itemCount() const;
     const QScatterDataArray *array() const;
     const QScatterDataItem *itemAt(int index) const;
@@ -69,6 +64,9 @@ signals:
     void itemsChanged(int startIndex, int count);
     void itemsRemoved(int startIndex, int count);
     void itemsInserted(int startIndex, int count);
+
+    void itemCountChanged(int count);
+    void seriesChanged(QScatter3DSeries *series);
 
 protected:
     explicit QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent = 0);

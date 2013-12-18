@@ -27,8 +27,8 @@
 
     \list
         \li Create an application with Q3DBars and some widgets
-        \li Use QBarDataProxy to set data to the graph
-        \li Adjust some graph properties using widget controls
+        \li Use QBar3DSeries and QBarDataProxy to set data to the graph
+        \li Adjust some graph and series properties using widget controls
     \endlist
 
     It also demonstrates how having negative bar values affects the graph.
@@ -57,7 +57,7 @@
     \l {Using widgets to control the graph}
 
     Next, let's create another class to handle the data addition and other interaction with the
-    graph. Let's call it GraphModifier (See \l {Setting up the graph} and
+    graph. Let's call it \c GraphModifier (See \l {Setting up the graph} and
     \l {Adding data to the graph} for details):
 
     \snippet ../examples/bars/main.cpp 2
@@ -68,7 +68,7 @@
 
     \section1 Setting up the graph
 
-    Let's set up the graph in the constructor of the GraphModifier class we instantiated in the
+    Let's set up the graph in the constructor of the \c GraphModifier class we instantiated in the
     application main:
 
     \snippet ../examples/bars/graphmodifier.cpp 0
@@ -84,14 +84,29 @@
 
     \snippet ../examples/bars/graphmodifier.cpp 2
 
-    We're also setting up the axes and adding them to the graph. Notice that we're not setting them
-    active yet:
+    We're also setting up the axes and setting them to the graph as active axes:
 
     \snippet ../examples/bars/graphmodifier.cpp 3
 
-    And add the proxy. Note that we're not setting it active yet, but just adding it:
+    Next we create two series for the graph, giving each one a data proxy. Here we also initialize
+    some of the visual properties of the series. Note that the second series is initially not visible:
+
+    \snippet ../examples/bars/graphmodifier.cpp 8
+
+    The series need to be added to the graph to show them:
 
     \snippet ../examples/bars/graphmodifier.cpp 4
+
+    Finally, we set the camera angle by calling the same method the camera angle change button
+    in the UI uses to cycle through various camera angles:
+
+    \snippet ../examples/bars/graphmodifier.cpp 6
+
+    There you can see that the camera is controlled via the scene object of the graph:
+
+    \snippet ../examples/bars/graphmodifier.cpp 10
+
+    For more information about using scene and cameras, see Q3DScene and Q3DCamera.
 
     That concludes setting up the graph.
 
@@ -99,41 +114,35 @@
 
     At the end of the constructor there's a call:
 
-    \code resetTemperatureData(); \endcode
+    \snippet ../examples/bars/graphmodifier.cpp 9
 
-    The method is used to add data to the proxy:
+    This method is used to add data to the proxies of the two series:
 
     \snippet ../examples/bars/graphmodifier.cpp 5
 
-    Now the data is in the proxy, but not in the graph. We have not set the proxy active yet.
-
-    In application main, we called \c {modifier->start()} after constructing all the necessary
-    objects. This is what is done in it:
-
-    \snippet ../examples/bars/graphmodifier.cpp 6
-
-    Finally we set the proxy and the axes active. Now our graph has the data and is ready to be
-    used.
+    Now the series have data to show.
 
     \section1 Using widgets to control the graph
 
     There isn't much interaction yet, so let's continue by adding some widgets back in the
-    application main. Let's just focus on two:
+    application main. Let's just focus on two as an example:
 
     \snippet ../examples/bars/main.cpp 4
 
-    We can use these to rotate the graph using slider widgets instead of just using the mouse or
+    We can use these slider widgets to rotate the graph instead of just using the mouse or
     touch.
 
     Let's add them to the vertical layout we created earlier:
 
     \snippet ../examples/bars/main.cpp 5
 
-    Then we'll connect them to methods in GraphModifier:
+    Then we'll connect them to methods in \c GraphModifier:
 
     \snippet ../examples/bars/main.cpp 6
 
-    Here are the methods in GraphModifier the signals were connected to:
+    Here are the methods in \c GraphModifier the signals were connected to. The camera
+    is controlled via the scene object. This time we specify the actual camera position
+    along the orbit around the center point, instead of specifying a preset camera angle:
 
     \snippet ../examples/bars/graphmodifier.cpp 7
 
@@ -148,6 +157,7 @@
         \li Background visibility
         \li Grid visibility
         \li Bar shading smoothness
+        \li Visibility of the second bar series
         \li Bar style
         \li Selection mode
         \li Theme

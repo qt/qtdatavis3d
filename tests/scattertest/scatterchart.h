@@ -20,6 +20,7 @@
 #define SCATTERDATAMODIFIER_H
 
 #include <QtDataVisualization/q3dscatter.h>
+#include <QtDataVisualization/qscatter3dseries.h>
 
 #include <QFont>
 #include <QDebug>
@@ -40,7 +41,8 @@ public:
     void changeTheme();
     void changeLabelStyle();
     void changeFont(const QFont &font);
-    void changeFontSize(int fontsize);
+    void changeFontSize(int fontSize);
+    void changePointSize(int pointSize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void start();
@@ -49,6 +51,7 @@ public slots:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void clear();
+    void resetAxes();
     void addOne();
     void addBunch();
     void insertOne();
@@ -61,17 +64,23 @@ public slots:
     void startStopTimer();
     void selectItem();
     void handleSelectionChange(int index);
+    void setGradient();
+    void addSeries();
+    void removeSeries();
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
     QVector3D randVector();
+    QScatter3DSeries *createAndAddSeries();
+
     Q3DScatter *m_chart;
     int m_fontSize;
     QTimer m_timer;
     int m_loopCounter;
     int m_selectedItem;
+    QScatter3DSeries *m_targetSeries;
 };
 
 #endif

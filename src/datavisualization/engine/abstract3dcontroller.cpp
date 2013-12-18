@@ -27,21 +27,19 @@
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
+#include "qabstract3dseries_p.h"
+#include "thememanager_p.h"
+#include "q3dscene_p.h"
 
 #include <QThread>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
+Abstract3DController::Abstract3DController(QRect initialViewport, QObject *parent) :
     QObject(parent),
-    m_boundingRect(boundRect.x(), boundRect.y(), boundRect.width(), boundRect.height()),
-    m_theme(),
-    m_font(QFont(QStringLiteral("Arial"))),
-    m_selectionMode(QDataVis::SelectionModeItem),
+    m_themeManager(new ThemeManager(this)),
+    m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
-    m_labelStyle(QDataVis::LabelStyleTransparent),
-    m_isBackgroundEnabled(true),
-    m_isGridEnabled(true),
     m_scene(new Q3DScene()),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -49,10 +47,14 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_data(0),
+    m_isSeriesVisibilityDirty(true),
+    m_isSeriesVisualsDirty(true),
     m_renderPending(false)
 {
-    m_theme.useTheme(QDataVis::ThemeQt);
+    // Set initial theme
+    setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+
+    m_scene->d_ptr->setViewport(initialViewport);
 
     // Populate the scene
     m_scene->activeLight()->setPosition(defaultLightPos);
@@ -63,8 +65,10 @@ Abstract3DController::Abstract3DController(QRect boundRect, QObject *parent) :
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
     connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
-            &Abstract3DController::emitNeedRender);
-    connect(m_scene, &Q3DScene::needRender, this,
+            &Abstract3DController::handleInputStateChanged);
+    connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
+            &Abstract3DController::handleInputPositionChanged);
+    connect(m_scene->d_ptr.data(), &Q3DScenePrivate::needRender, this,
             &Abstract3DController::emitNeedRender);
 }
 
@@ -76,46 +80,62 @@ Abstract3DController::~Abstract3DController()
     else
         delete m_renderer;
     delete m_scene;
+    delete m_themeManager;
 }
 
+/**
+ * @brief setRenderer Sets the renderer to be used. isInitialized returns true from this point onwards.
+ * @param renderer Renderer to be used.
+ */
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
     m_renderer = renderer;
 }
 
+void Abstract3DController::addSeries(QAbstract3DSeries *series)
+{
+    if (series && !m_seriesList.contains(series)) {
+        int oldSize = m_seriesList.size();
+        m_seriesList.append(series);
+        series->d_ptr->setController(this);
+        QObject::connect(series, &QAbstract3DSeries::visibilityChanged,
+                         this, &Abstract3DController::handleSeriesVisibilityChanged);
+        if (series->isVisible())
+            handleSeriesVisibilityChangedBySender(series);
+        series->d_ptr->resetToTheme(*m_themeManager->theme(), oldSize, false);
+    }
+}
+
+void Abstract3DController::removeSeries(QAbstract3DSeries *series)
+{
+    if (series && series->d_ptr->m_controller == this) {
+        m_seriesList.removeAll(series);
+        QObject::disconnect(series, &QAbstract3DSeries::visibilityChanged,
+                            this, &Abstract3DController::handleSeriesVisibilityChanged);
+        series->d_ptr->setController(0);
+        m_isDataDirty = true;
+        m_isSeriesVisibilityDirty = true;
+        emitNeedRender();
+    }
+}
+
+QList<QAbstract3DSeries *> Abstract3DController::seriesList()
+{
+    return m_seriesList;
+}
+
+/**
+ * @brief synchDataToRenderer Called on the render thread while main GUI thread is blocked before rendering.
+ */
 void Abstract3DController::synchDataToRenderer()
 {
     // If we don't have a renderer, don't do anything
     if (!m_renderer)
         return;
 
-    if (m_changeTracker.boundingRectChanged || m_changeTracker.sizeChanged) {
-        m_renderer->updateBoundingRect(m_boundingRect);
-        m_changeTracker.boundingRectChanged = false;
-        m_changeTracker.sizeChanged = false;
-    }
-
-    if (m_changeTracker.positionChanged) {
-        m_renderer->updatePosition(m_boundingRect);
-        m_changeTracker.positionChanged = false;
-    }
-
     m_renderer->updateScene(m_scene);
 
-    if (m_changeTracker.themeChanged) {
-        m_renderer->updateTheme(m_theme);
-        m_changeTracker.themeChanged = false;
-    }
-
-    if (m_changeTracker.fontChanged) {
-        m_renderer->updateFont(m_font);
-        m_changeTracker.fontChanged = false;
-    }
-
-    if (m_changeTracker.labelStyleChanged) {
-        m_renderer->updateLabelStyle(m_labelStyle);
-        m_changeTracker.labelStyleChanged = false;
-    }
+    m_renderer->updateTheme(m_themeManager->theme());
 
     if (m_changeTracker.shadowQualityChanged) {
         m_renderer->updateShadowQuality(m_shadowQuality);
@@ -125,21 +145,6 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.selectionModeChanged) {
         m_renderer->updateSelectionMode(m_selectionMode);
         m_changeTracker.selectionModeChanged = false;
-    }
-
-    if (m_changeTracker.objFileChanged) {
-        m_renderer->updateMeshFileName(m_objFile);
-        m_changeTracker.objFileChanged = false;
-    }
-
-    if (m_changeTracker.gridEnabledChanged) {
-        m_renderer->updateGridEnabled(m_isGridEnabled);
-        m_changeTracker.gridEnabledChanged = false;
-    }
-
-    if (m_changeTracker.backgroundEnabledChanged) {
-        m_renderer->updateBackgroundEnabled(m_isBackgroundEnabled);
-        m_changeTracker.backgroundEnabledChanged = false;
     }
 
     if (m_changeTracker.axisXTypeChanged) {
@@ -284,6 +289,19 @@ void Abstract3DController::synchDataToRenderer()
                                               valueAxisZ->labelFormat());
         }
     }
+
+    if (m_isSeriesVisibilityDirty || m_isSeriesVisualsDirty) {
+        m_renderer->updateSeries(m_seriesList, m_isSeriesVisibilityDirty);
+        m_isSeriesVisibilityDirty = false;
+        m_isSeriesVisualsDirty = false;
+    }
+
+    if (m_isDataDirty) {
+        // Series list supplied above in updateSeries() is used to access the data,
+        // so no data needs to be passed in updateData()
+        m_renderer->updateData();
+        m_isDataDirty = false;
+    }
 }
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
@@ -306,156 +324,126 @@ void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseDoubleClickEvent(event);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::touchEvent(QTouchEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->touchEvent(event);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mousePressEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseReleaseEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->mouseMoveEvent(event, mousePos);
-
-    emitNeedRender();
 }
 
 void Abstract3DController::wheelEvent(QWheelEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->wheelEvent(event);
-
-    emitNeedRender();
 }
 
-void Abstract3DController::setSize(const int width, const int height)
+void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle style)
 {
-    m_boundingRect.setWidth(width);
-    m_boundingRect.setHeight(height);
-    m_scene->setViewportSize(width, height);
-
-    m_changeTracker.boundingRectChanged = true;
-    emitNeedRender();
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.colorStyleOverride) {
+            series->setColorStyle(style);
+            series->d_ptr->m_themeTracker.colorStyleOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
 }
 
-const QSize Abstract3DController::size()
+void Abstract3DController::handleThemeBaseColorsChanged(const QList<QColor> &colors)
 {
-    return m_boundingRect.size();
+    int colorIdx = 0;
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.baseColorOverride) {
+            series->setBaseColor(colors.at(colorIdx));
+            series->d_ptr->m_themeTracker.baseColorOverride = false;
+        }
+        if (++colorIdx >= colors.size())
+            colorIdx = 0;
+    }
+    markSeriesVisualsDirty();
 }
 
-const QRect Abstract3DController::boundingRect()
+void Abstract3DController::handleThemeBaseGradientsChanged(const QList<QLinearGradient> &gradients)
 {
-    return m_boundingRect;
+    int gradientIdx = 0;
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.baseGradientOverride) {
+            series->setBaseGradient(gradients.at(gradientIdx));
+            series->d_ptr->m_themeTracker.baseGradientOverride = false;
+        }
+        if (++gradientIdx >= gradients.size())
+            gradientIdx = 0;
+    }
+    markSeriesVisualsDirty();
 }
 
-void Abstract3DController::setBoundingRect(const QRect boundingRect)
+void Abstract3DController::handleThemeSingleHighlightColorChanged(const QColor &color)
 {
-    m_boundingRect = boundingRect;
-    m_scene->setViewport(boundingRect);
-
-    m_changeTracker.boundingRectChanged = true;
-    emitNeedRender();
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.singleHighlightColorOverride) {
+            series->setSingleHighlightColor(color);
+            series->d_ptr->m_themeTracker.singleHighlightColorOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
 }
 
-void Abstract3DController::setWidth(const int width)
+void Abstract3DController::handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient)
 {
-    m_boundingRect.setWidth(width);
-    m_scene->setViewportSize(width, m_scene->viewport().height());
-
-    m_changeTracker.sizeChanged = true;
-    emitNeedRender();
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.singleHighlightGradientOverride) {
+            series->setSingleHighlightGradient(gradient);
+            series->d_ptr->m_themeTracker.singleHighlightGradientOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
 }
 
-int Abstract3DController::width()
+void Abstract3DController::handleThemeMultiHighlightColorChanged(const QColor &color)
 {
-    return m_boundingRect.width();
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.multiHighlightColorOverride) {
+            series->setMultiHighlightColor(color);
+            series->d_ptr->m_themeTracker.multiHighlightColorOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
 }
 
-void Abstract3DController::setHeight(const int height)
+void Abstract3DController::handleThemeMultiHighlightGradientChanged(const QLinearGradient &gradient)
 {
-    m_boundingRect.setHeight(height);
-    m_scene->setViewportSize(m_scene->viewport().width(), height);
-
-    m_changeTracker.sizeChanged = true;
-    emitNeedRender();
-}
-
-int Abstract3DController::height()
-{
-    return m_boundingRect.height();
-}
-
-void Abstract3DController::setX(const int x)
-{
-    m_boundingRect.setX(x);
-
-    m_changeTracker.positionChanged = true;
-    emitNeedRender();
-}
-
-int Abstract3DController::x()
-{
-    return m_boundingRect.x();
-}
-
-void Abstract3DController::setY(const int y)
-{
-    m_boundingRect.setY(y);
-
-    m_changeTracker.positionChanged = true;
-    emitNeedRender();
-}
-
-int Abstract3DController::y()
-{
-    return m_boundingRect.y();
-}
-
-QRect Abstract3DController::primarySubViewport() const
-{
-    return m_scene->primarySubViewport();
-}
-
-void Abstract3DController::setPrimarySubViewport(const QRect &primarySubViewport)
-{
-    m_scene->setPrimarySubViewport(primarySubViewport);
-}
-
-QRect Abstract3DController::secondarySubViewport() const
-{
-    return m_scene->secondarySubViewport();
-}
-
-void Abstract3DController::setSecondarySubViewport(const QRect &secondarySubViewport)
-{
-    m_scene->setSecondarySubViewport(secondarySubViewport);
-}
-
-void Abstract3DController::updateDevicePixelRatio(qreal ratio)
-{
-    m_scene->setDevicePixelRatio(ratio);
+    // Set value for series that have not explicitly set this value
+    foreach (QAbstract3DSeries *series, m_seriesList) {
+        if (!series->d_ptr->m_themeTracker.multiHighlightGradientOverride) {
+            series->setMultiHighlightGradient(gradient);
+            series->d_ptr->m_themeTracker.multiHighlightGradientOverride = false;
+        }
+    }
+    markSeriesVisualsDirty();
 }
 
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
@@ -530,64 +518,6 @@ void Abstract3DController::releaseAxis(Q3DAbstractAxis *axis)
 QList<Q3DAbstractAxis *> Abstract3DController::axes() const
 {
     return m_axes;
-}
-
-QAbstractDataProxy *Abstract3DController::activeDataProxy() const
-{
-    return m_data;
-}
-
-void Abstract3DController::addDataProxy(QAbstractDataProxy *proxy)
-{
-    Q_ASSERT(proxy);
-    Abstract3DController *owner = qobject_cast<Abstract3DController *>(proxy->parent());
-    if (owner != this) {
-        Q_ASSERT_X(!owner, "addDataProxy", "Proxy already attached to a graph.");
-        proxy->setParent(this);
-    }
-    if (!m_dataProxies.contains(proxy))
-        m_dataProxies.append(proxy);
-}
-
-void Abstract3DController::releaseDataProxy(QAbstractDataProxy *proxy)
-{
-    if (proxy && m_dataProxies.contains(proxy)) {
-        // Clear the default status from released default proxies
-        if (proxy->d_ptr->isDefaultProxy())
-            proxy->d_ptr->setDefaultProxy(false);
-
-        // If the proxy is in use, replace it with a temporary one
-        if (m_data == proxy)
-            setActiveDataProxy(0);
-
-        m_dataProxies.removeAll(proxy);
-        proxy->setParent(0);
-    }
-}
-
-QList<QAbstractDataProxy *> Abstract3DController::dataProxies() const
-{
-    return m_dataProxies;
-}
-
-void Abstract3DController::setActiveDataProxy(QAbstractDataProxy *proxy)
-{
-    // If existing proxy is the default proxy, delete it
-    if (m_data) {
-        if (m_data->d_ptr->isDefaultProxy()) {
-            m_dataProxies.removeAll(m_data);
-            delete m_data;
-        } else {
-            // Disconnect the old proxy from use
-            QObject::disconnect(m_data, 0, this, 0);
-        }
-    }
-
-    // Assume ownership and activate
-    addDataProxy(proxy);
-    m_data = proxy;
-    m_isDataDirty = true;
-    emitNeedRender();
 }
 
 void Abstract3DController::addInputHandler(QAbstract3DInputHandler *inputHandler)
@@ -665,110 +595,55 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emitNeedRender();
 }
 
-void Abstract3DController::setObjectColor(const QColor &baseColor, bool uniform)
+void Abstract3DController::setTheme(Q3DTheme *theme)
 {
-    m_theme.m_baseColor = baseColor;
-    m_theme.m_uniformColor = uniform;
-
-    m_changeTracker.themeChanged = true;
-    emitNeedRender();
+    if (theme != m_themeManager->theme()) {
+        m_themeManager->setTheme(theme);
+        m_changeTracker.themeChanged = true;
+        // Reset all attached series to the new theme
+        for (int i = 0; i < m_seriesList.size(); i++)
+            m_seriesList.at(i)->d_ptr->resetToTheme(*theme, i, true);
+        markSeriesVisualsDirty();
+        emit themeChanged(theme);
+    }
 }
 
-QColor Abstract3DController::objectColor() const
+Q3DTheme *Abstract3DController::theme() const
 {
-    return m_theme.m_baseColor;
+    return m_themeManager->theme();
 }
 
-void Abstract3DController::setTheme(QDataVis::Theme theme)
+void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    m_theme.useTheme(theme);
-
-    m_changeTracker.themeChanged = true;
-    emitNeedRender();
+    if (mode != m_selectionMode) {
+        m_selectionMode = mode;
+        m_changeTracker.selectionModeChanged = true;
+        emit selectionModeChanged(mode);
+        emitNeedRender();
+    }
 }
 
-Theme Abstract3DController::theme()
-{
-    return m_theme;
-}
-
-void Abstract3DController::setFont(const QFont &font)
-{
-    m_font = font;
-
-    m_changeTracker.fontChanged = true;
-    emitNeedRender();
-}
-
-QFont Abstract3DController::font()
-{
-    return m_font;
-}
-
-void Abstract3DController::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    m_selectionMode = mode;
-    m_changeTracker.selectionModeChanged = true;
-    emitNeedRender();
-}
-
-QDataVis::SelectionMode Abstract3DController::selectionMode()
+QDataVis::SelectionFlags Abstract3DController::selectionMode() const
 {
     return m_selectionMode;
 }
 
 void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    m_shadowQuality = quality;
-
-    m_changeTracker.shadowQualityChanged = true;
-    emit shadowQualityChanged(m_shadowQuality);
-    emitNeedRender();
+    if (quality != m_shadowQuality) {
+        m_shadowQuality = quality;
+        m_changeTracker.shadowQualityChanged = true;
+        emit shadowQualityChanged(m_shadowQuality);
+        emitNeedRender();
+    }
 }
 
-QDataVis::ShadowQuality Abstract3DController::shadowQuality()
+QDataVis::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
 }
 
-void Abstract3DController::setLabelStyle(QDataVis::LabelStyle style)
-{
-    m_labelStyle = style;
-
-    m_changeTracker.labelStyleChanged = true;
-    emitNeedRender();
-}
-
-QDataVis::LabelStyle Abstract3DController::labelStyle()
-{
-    return m_labelStyle;
-}
-
-void Abstract3DController::setBackgroundEnabled(bool enable)
-{
-    m_isBackgroundEnabled = enable;
-    m_changeTracker.backgroundEnabledChanged = true;
-    emitNeedRender();
-}
-
-bool Abstract3DController::backgroundEnabled()
-{
-    return m_isBackgroundEnabled;
-}
-
-void Abstract3DController::setGridEnabled(bool enable)
-{
-    m_isGridEnabled = enable;
-    m_changeTracker.gridEnabledChanged = true;
-    emitNeedRender();
-}
-
-bool Abstract3DController::gridEnabled()
-{
-    return m_isGridEnabled;
-}
-
-bool Abstract3DController::isSlicingActive()
+bool Abstract3DController::isSlicingActive() const
 {
     return m_scene->isSlicingActive();
 }
@@ -779,37 +654,21 @@ void Abstract3DController::setSlicingActive(bool isSlicing)
     emitNeedRender();
 }
 
-QDataVis::InputState Abstract3DController::inputState()
-{
-    if (m_activeInputHandler)
-        return m_activeInputHandler->inputState();
-    else
-        return QDataVis::InputStateNone;
-}
-
-QPoint Abstract3DController::inputPosition()
-{
-    if (m_activeInputHandler)
-        return m_activeInputHandler->inputPosition();
-    else
-        return QPoint(0,0);
-}
-
-void Abstract3DController::setMeshFileName(const QString &fileName)
-{
-    m_objFile = fileName;
-    m_changeTracker.objFileChanged = true;
-    emitNeedRender();
-}
-
-QString Abstract3DController::meshFileName()
-{
-    return m_objFile;
-}
-
 Q3DScene *Abstract3DController::scene()
 {
     return m_scene;
+}
+
+void Abstract3DController::markDataDirty()
+{
+    m_isDataDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::markSeriesVisualsDirty()
+{
+    m_isSeriesVisualsDirty = true;
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
@@ -849,7 +708,7 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
     emitNeedRender();
 }
 
-void Abstract3DController::handleAxisRangeChanged(qreal min, qreal max)
+void Abstract3DController::handleAxisRangeChanged(float min, float max)
 {
     Q_UNUSED(min)
     Q_UNUSED(max)
@@ -927,6 +786,38 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
+void Abstract3DController::handleInputStateChanged(QAbstract3DInputHandler::InputState state)
+{
+    // When in automatic slicing mode, input state change to overview disables slice mode
+    if (m_selectionMode.testFlag(QDataVis::SelectionSlice)
+            && state == QAbstract3DInputHandler::InputStateOnPrimaryView) {
+        setSlicingActive(false);
+    }
+
+    m_changeTracker.inputStateChanged = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::handleInputPositionChanged(const QPoint &position)
+{
+    Q_UNUSED(position)
+
+    m_changeTracker.inputPositionChanged = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
+{
+    Q_UNUSED(visible)
+
+    handleSeriesVisibilityChangedBySender(sender());
+}
+
+void Abstract3DController::handleRequestShadowQuality(QDataVis::ShadowQuality quality)
+{
+    setShadowQuality(quality);
+}
+
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
 {
     // Label format changing needs to dirty the data so that labels are reset.
@@ -942,6 +833,15 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
+{
+    Q_UNUSED(sender)
+
+    m_isDataDirty = true;
+    m_isSeriesVisibilityDirty = true;
     emitNeedRender();
 }
 
@@ -1024,12 +924,7 @@ Q3DAbstractAxis *Abstract3DController::createDefaultAxis(Q3DAbstractAxis::AxisOr
 Q3DValueAxis *Abstract3DController::createDefaultValueAxis()
 {
     // Default value axis has single segment, empty label format, and auto scaling
-    // TODO: Grid should be also hidden, but that is not currently controlled by axis
     Q3DValueAxis *defaultAxis = new Q3DValueAxis;
-    defaultAxis->setSegmentCount(1);
-    defaultAxis->setSubSegmentCount(1);
-    defaultAxis->setAutoAdjustRange(true);
-    defaultAxis->setLabelFormat(QString());
     defaultAxis->d_ptr->setDefaultAxis(true);
 
     return defaultAxis;
@@ -1038,9 +933,7 @@ Q3DValueAxis *Abstract3DController::createDefaultValueAxis()
 Q3DCategoryAxis *Abstract3DController::createDefaultCategoryAxis()
 {
     // Default category axis has no labels
-    // TODO: Grid should be also hidden, but that is not currently controlled by axis.
     Q3DCategoryAxis *defaultAxis = new Q3DCategoryAxis;
-    defaultAxis->setAutoAdjustRange(true);
     defaultAxis->d_ptr->setDefaultAxis(true);
     return defaultAxis;
 }

@@ -35,8 +35,7 @@ ScatterItemModelHandler::~ScatterItemModelHandler()
 // Resolve entire item model into QScatterDataArray.
 void ScatterItemModelHandler::resolveModel()
 {
-    QItemModelScatterDataMapping *mapping = static_cast<QItemModelScatterDataMapping *>(m_activeMapping);
-    if (m_itemModel.isNull() || !mapping) {
+    if (m_itemModel.isNull()) {
         m_proxy->resetArray(0);
         m_proxyArray = 0;
         return;
@@ -45,9 +44,9 @@ void ScatterItemModelHandler::resolveModel()
     static const int noRoleIndex = -1;
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
-    const int xPosRole = roleHash.key(mapping->xPosRole().toLatin1(), noRoleIndex);
-    const int yPosRole = roleHash.key(mapping->yPosRole().toLatin1(), noRoleIndex);
-    const int zPosRole = roleHash.key(mapping->zPosRole().toLatin1(), noRoleIndex);
+    const int xPosRole = roleHash.key(m_proxy->xPosRole().toLatin1(), noRoleIndex);
+    const int yPosRole = roleHash.key(m_proxy->yPosRole().toLatin1(), noRoleIndex);
+    const int zPosRole = roleHash.key(m_proxy->zPosRole().toLatin1(), noRoleIndex);
     const int columnCount = m_itemModel->columnCount();
     const int rowCount = m_itemModel->rowCount();
     const int totalCount = rowCount * columnCount;

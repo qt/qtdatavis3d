@@ -48,13 +48,14 @@ public:
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
 
-    //inline void setSize(qreal size);
-    //inline qreal size() const { return m_size; }
+    // TODO: Will we ever support item specific size? If not, remove.
+    //inline void setSize(float size);
+    //inline float size() const { return m_size; }
 
 protected:
     QVector3D m_position;
     bool m_visible;
-    //qreal m_size; // TODO in case we need a fourth variable that adjusts scatter item size
+    //float m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
     friend class QScatterDataItem;
 };

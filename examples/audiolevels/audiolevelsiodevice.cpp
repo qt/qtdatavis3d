@@ -75,11 +75,11 @@ qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
     for (int i = newDataSize - 1; i >= newDataStartIndex; i--) {
         // Add 0.01 to the value to avoid gaps in the graph (i.e. zero height bars).
         // Also, scale to 0...100
-        qreal value = qreal(quint8(data[resolution * i]) - 128) / 1.28 + 0.01;
+        float value = float(quint8(data[resolution * i]) - 128) / 1.28f + 0.01f;
         (*m_array->at(middleRow))[index].setValue(value);
         // Insert a fractional value into front half of the rows.
         for (int j = 1; j <= middleRow; j++) {
-            qreal fractionalValue = value / qreal(j + 1);
+            float fractionalValue = value / float(j + 1);
             (*m_array->at(middleRow - j))[index].setValue(fractionalValue);
         }
         index++;

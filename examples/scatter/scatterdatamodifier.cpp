@@ -21,7 +21,11 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qscatter3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <qmath.h>
+#include <QComboBox>
+
 using namespace QtDataVisualization;
 
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
@@ -31,17 +35,16 @@ const int numberOfItems = 3600;
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_fontSize(40.0f),
-      m_style(QDataVis::MeshStyleSpheres),
+      m_style(QAbstract3DSeries::MeshSphere),
       m_smooth(true)
 {
     //! [0]
-    QFont font = m_graph->font();
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeEbony));
+    QFont font = m_graph->theme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->setFont(font);
-    m_graph->setObjectType(QDataVis::MeshStyleSpheres, true);
-    m_graph->setTheme(QDataVis::ThemeEbony);
+    m_graph->theme()->setFont(font);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [0]
 
     //! [1]
@@ -52,11 +55,14 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
 
     //! [2]
     QScatterDataProxy *proxy = new QScatterDataProxy;
-    proxy->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
-    m_graph->setActiveDataProxy(proxy);
+    QScatter3DSeries *series = new QScatter3DSeries(proxy);
+    series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
+    m_graph->addSeries(series);
     //! [2]
 
-    changeLabelStyle();
+    //! [3]
+    addData();
+    //! [3]
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -64,23 +70,16 @@ ScatterDataModifier::~ScatterDataModifier()
     delete m_graph;
 }
 
-//! [3]
-void ScatterDataModifier::start()
-{
-    addData();
-}
-//! [3]
-
 void ScatterDataModifier::addData()
 {
+    // Configure the axes according to the data
     //! [4]
-    // Add labels
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
-    m_graph->axisX()->setRange(-30.0, 30.0);
-    m_graph->axisY()->setRange(-1.0, 1.0);
-    m_graph->axisZ()->setRange(-30.0, 30.0);
+    m_graph->axisX()->setRange(-30.0f, 30.0f);
+    m_graph->axisY()->setRange(-1.0f, 1.0f);
+    m_graph->axisZ()->setRange(-30.0f, 30.0f);
     //! [4]
 
     //! [5]
@@ -99,7 +98,7 @@ void ScatterDataModifier::addData()
     float limit = qSqrt(numberOfItems) / 2.0f;
     for (float i = -limit; i < limit; i++) {
         for (float j = -limit; j < limit; j++) {
-            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0)), j));
+            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0f)), j));
             ptrToDataArray++;
         }
     }
@@ -107,53 +106,56 @@ void ScatterDataModifier::addData()
 #endif
 
     //! [7]
-    m_graph->activeDataProxy()->resetArray(dataArray);
+    m_graph->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     //! [7]
 }
 
 //! [8]
 void ScatterDataModifier::changeStyle(int style)
 {
-    m_style = QDataVis::MeshStyle(style + 5); // skip unsupported mesh types
-    m_graph->setObjectType(m_style, m_smooth);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    if (comboBox) {
+        m_style = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        if (m_graph->seriesList().size())
+            m_graph->seriesList().at(0)->setMesh(m_style);
+    }
 }
 
 void ScatterDataModifier::setSmoothDots(int smooth)
 {
     m_smooth = bool(smooth);
-    m_graph->setObjectType(m_style, m_smooth);
+    QScatter3DSeries *series = m_graph->seriesList().at(0);
+    series->setMeshSmooth(m_smooth);
 }
 
 void ScatterDataModifier::changeTheme(int theme)
 {
-    m_graph->setTheme((QDataVis::Theme)theme);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
+    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
+    emit fontChanged(m_graph->theme()->font());
 }
 
 void ScatterDataModifier::changePresetCamera()
 {
-    static int preset = QDataVis::CameraPresetFrontLow;
+    static int preset = Q3DCamera::CameraPresetFrontLow;
 
-    m_graph->scene()->activeCamera()->setCameraPreset((QDataVis::CameraPreset)preset);
+    m_graph->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
-    if (++preset > QDataVis::CameraPresetDirectlyBelow)
-        preset = QDataVis::CameraPresetFrontLow;
+    if (++preset > Q3DCamera::CameraPresetDirectlyBelow)
+        preset = Q3DCamera::CameraPresetFrontLow;
 }
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    static int style = QDataVis::LabelStyleFromTheme;
-
-    m_graph->setLabelStyle((QDataVis::LabelStyle)style);
-
-    if (++style > QDataVis::LabelStyleTransparent)
-        style = QDataVis::LabelStyleOpaque;
+    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->setFont(newFont);
+    m_graph->theme()->setFont(newFont);
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -170,12 +172,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->setBackgroundVisible((bool)enabled);
+    m_graph->theme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_graph->setGridVisible((bool)enabled);
+    m_graph->theme()->setGridEnabled((bool)enabled);
 }
 //! [8]
 

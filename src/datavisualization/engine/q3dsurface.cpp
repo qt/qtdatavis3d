@@ -21,6 +21,7 @@
 #include "q3dvalueaxis.h"
 #include "qsurfacedataproxy.h"
 #include "q3dcamera.h"
+#include "qsurface3dseries_p.h"
 
 #include <QMouseEvent>
 
@@ -33,17 +34,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since Qt Data Visualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
- * freely. The class provides configurable gradient texture to illustrate the height on the data. The
- * surface plotting includes also gridline that can be set on or off. The visual appearance of the
- * surface can be changed by controlling the smooth status.
+ * freely. The surface plotting includes also gridline that can be set on or off.
+ * The visual appearance of the surface can be changed by controlling the smooth status.
  *
  * The Q3DSurface supports selection by showing a highlighted ball on the data point where the user has clicked
- * with left mouse button (when default input handler is in use). The selection pointer is accompanied with
- * a label which in default case shows the value of the data point and the coordinates of the point.
+ * with left mouse button (when default input handler is in use) or selected via QSurface3DSeries.
+ * The selection pointer is accompanied with a label which in default case shows the value of the
+ * data point and the coordinates of the point.
  *
  * The value range and the label format shown on the axis can be controlled through Q3DValueAxis.
- * The Q3DSurface supports only a grid with fixed steps, so when setting ranges set a value that matches
- * the grid step. To calculate the steps divide the whole data range with the number of segments.
  *
  * To rotate the graph, hold down the right mouse button and move the mouse. Zooming is done using mouse
  * wheel. Both assume the default input handler is in use.
@@ -52,13 +51,13 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: if no data proxy is set explicitly, Q3DSurface creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DSurface supports only single series at a time.
  *
  * \section1 How to construct a minimal Q3DSurface graph
  *
- * First, construct Q3DSurface:
+ * First, construct Q3DSurface. Since we are running the graph as top level window
+ * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
+ * default:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 0
  *
@@ -70,7 +69,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dsurface_construction.cpp 2
  *
- * For the active data proxy set pointer of the data element:
+ * Create a new series and set data to it:
  *
  * \snippet doc_src_q3dsurface_construction.cpp 3
  *
@@ -94,22 +93,57 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D surface window.
+ * Constructs a new 3D surface graph with optional \a parent window.
  */
-Q3DSurface::Q3DSurface()
-    : d_ptr(new Q3DSurfacePrivate(this, geometry()))
+Q3DSurface::Q3DSurface(QWindow *parent)
+    : Q3DWindow(new Q3DSurfacePrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    dptr()->m_shared = new Surface3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DSurface::selectionModeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DSurface::themeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DSurface::shadowQualityChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
 }
 
 /*!
- *  Destroys the 3D surface window.
+ *  Destroys the 3D surface graph.
  */
 Q3DSurface::~Q3DSurface()
 {
+}
+
+/*!
+ * Adds the \a series to the graph.
+ *
+ * \note The surface graph currently supports only a single series at a time.
+ */
+void Q3DSurface::addSeries(QSurface3DSeries *series)
+{
+    dptr()->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DSurface::removeSeries(QSurface3DSeries *series)
+{
+    dptr()->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ *
+ * \note The surface graph currently supports only a single series at a time.
+ */
+QList<QSurface3DSeries *> Q3DSurface::seriesList()
+{
+    return dptr()->m_shared->surfaceSeriesList();
 }
 
 /*!
@@ -117,7 +151,7 @@ Q3DSurface::~Q3DSurface()
  */
 void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -125,7 +159,7 @@ void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DSurface::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -133,7 +167,7 @@ void Q3DSurface::touchEvent(QTouchEvent *event)
  */
 void Q3DSurface::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -141,7 +175,7 @@ void Q3DSurface::mousePressEvent(QMouseEvent *event)
  */
 void Q3DSurface::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -149,7 +183,7 @@ void Q3DSurface::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -157,66 +191,34 @@ void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DSurface::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DSurface::resizeEvent(QResizeEvent *event)
+Q3DSurfacePrivate *Q3DSurface::dptr()
 {
-    Q_UNUSED(event);
-    d_ptr->m_shared->setWidth(width());
-    d_ptr->m_shared->setHeight(height());
+    return static_cast<Q3DSurfacePrivate *>(d_ptr.data());
 }
 
-/*!
- * \property Q3DSurface::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DSurface::setGridVisible(bool visible)
+const Q3DSurfacePrivate *Q3DSurface::dptrc() const
 {
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DSurface::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DSurface::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DSurface::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DSurface::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
+    return static_cast<const Q3DSurfacePrivate *>(d_ptr.data());
 }
 
 /*!
  * \property Q3DSurface::theme
  *
- * A predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects label colors, text color, background color, window color and
- * grid color. Lighting is also adjusted by themes.
- *
- * \preliminary
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
-void Q3DSurface::setTheme(QDataVis::Theme theme)
+void Q3DSurface::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setTheme(theme);
+    dptr()->m_shared->setTheme(theme);
 }
 
-QDataVis::Theme Q3DSurface::theme() const
+Q3DTheme *Q3DSurface::theme() const
 {
-    return d_ptr->m_shared->theme().theme();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
@@ -231,93 +233,29 @@ QDataVis::Theme Q3DSurface::theme() const
  */
 void Q3DSurface::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    return d_ptr->m_shared->setShadowQuality(quality);
+    return dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
-}
-
-/*!
- * \property Q3DSurface::smoothSurfaceEnabled
- *
- * Sets surface smoothing to \a enabled. It is preset to \c false by default.
- * When enabled the normals on the surface are interpolated making edges looking round. If turned
- * off the normals are kept same on a triangle making the color of the triangle solid. This makes
- * the data more readable from the model.
- */
-void Q3DSurface::setSmoothSurfaceEnabled(bool enabled)
-{
-    d_ptr->m_shared->setSmoothSurface(enabled);
-}
-
-bool Q3DSurface::isSmoothSurfaceEnabled() const
-{
-    return d_ptr->m_shared->smoothSurface();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
  * \property Q3DSurface::selectionMode
  *
- * Sets point selection \a mode to one of \c QDataVis::SelectionMode. Surface supports SelectionModeItem,
- * SelectionModeSliceRow and SelectionModeSliceColumn. It is preset to \c QDataVis::SelectionModeItem by default.
+ * Sets point selection \a mode to a combination of \c QDataVis::SelectionFlags. Surface supports
+ * \c SelectionItem and \c SelectionSlice with either \c SelectionRow or \c SelectionColumn.
+ * It is preset to \c SelectionItem by default.
  */
-void Q3DSurface::setSelectionMode(QDataVis::SelectionMode mode)
+void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setSelectionMode(mode);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode Q3DSurface::selectionMode() const
+QDataVis::SelectionFlags Q3DSurface::selectionMode() const
 {
-    return d_ptr->m_shared->selectionMode();
-}
-
-
-/*!
- * \property Q3DSurface::surfaceGridEnabled
- *
- * Sets surface grid to \a enabled. It is preset to \c true by default.
- */
-void Q3DSurface::setSurfaceGridEnabled(bool enabled)
-{
-    d_ptr->m_shared->setSurfaceGrid(enabled);
-}
-
-bool Q3DSurface::isSurfaceGridEnabled() const
-{
-    return d_ptr->m_shared->surfaceGrid();
-}
-
-/*!
- * \property Q3DSurface::gradient
- *
- * The current surface gradient. Setting this property replaces the previous gradient with
- * the given \a gradient.
- */
-void Q3DSurface::setGradient(const QLinearGradient &gradient)
-{
-    d_ptr->m_shared->setGradient(gradient);
-}
-
-QLinearGradient Q3DSurface::gradient() const
-{
-    return d_ptr->m_shared->gradient();
-}
-
-/*!
- * \property Q3DSurface::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DSurface::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DSurface::font() const
-{
-    return d_ptr->m_shared->font();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -327,23 +265,7 @@ QFont Q3DSurface::font() const
  */
 Q3DScene *Q3DSurface::scene() const
 {
-    return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DSurface::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DSurface::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DSurface::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -358,7 +280,7 @@ QDataVis::LabelStyle Q3DSurface::labelStyle() const
  */
 void Q3DSurface::setAxisX(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -366,7 +288,7 @@ void Q3DSurface::setAxisX(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -381,7 +303,7 @@ Q3DValueAxis *Q3DSurface::axisX() const
  */
 void Q3DSurface::setAxisY(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -389,7 +311,7 @@ void Q3DSurface::setAxisY(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -404,7 +326,7 @@ Q3DValueAxis *Q3DSurface::axisY() const
  */
 void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -412,7 +334,7 @@ void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -424,7 +346,7 @@ Q3DValueAxis *Q3DSurface::axisZ() const
  */
 void Q3DSurface::addAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -437,7 +359,7 @@ void Q3DSurface::addAxis(Q3DValueAxis *axis)
  */
 void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -447,7 +369,7 @@ void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
  */
 QList<Q3DValueAxis *> Q3DSurface::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
     QList<Q3DValueAxis *> retList;
     foreach (Q3DAbstractAxis *axis, abstractAxes)
         retList.append(static_cast<Q3DValueAxis *>(axis));
@@ -455,88 +377,21 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
     return retList;
 }
 
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DSurface::setActiveDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QSurfaceDataProxy *Q3DSurface::activeDataProxy() const
-{
-    return static_cast<QSurfaceDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DSurface::addDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DSurface::releaseDataProxy(QSurfaceDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QSurfaceDataProxy *> Q3DSurface::dataProxies() const
-{
-    QList<QSurfaceDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QSurfaceDataProxy *>(proxy));
-
-    return retList;
-}
-
-
-/*!
- * Modifies the current surface gradient. Sets gradient color to \a color at \a pos.
- */
-void Q3DSurface::setGradientColorAt(qreal pos, const QColor &color)
-{
-    d_ptr->m_shared->setGradientColorAt(pos, color);
-}
-
 /////////////////// PRIVATE ///////////////////////////////////
 
-Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Surface3DController(rect))
+Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
+    : Q3DWindowPrivate(q)
 {
 }
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
     delete m_shared;
+}
+
+Q3DSurface *Q3DSurfacePrivate::qptr()
+{
+    return static_cast<Q3DSurface *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

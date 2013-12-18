@@ -29,6 +29,9 @@
 #include <QLabel>
 #include <QScreen>
 #include <QFontDatabase>
+#include <QLinearGradient>
+#include <QPainter>
+#include <QColorDialog>
 
 int main(int argc, char **argv)
 {
@@ -124,6 +127,38 @@ int main(int argc, char **argv)
     releaseProxiesButton->setText(QStringLiteral("Release all proxies"));
     releaseProxiesButton->setEnabled(true);
 
+    QPushButton *flipViewsButton = new QPushButton(widget);
+    flipViewsButton->setText(QStringLiteral("Flip views"));
+    flipViewsButton->setEnabled(true);
+
+    QPushButton *showFiveSeriesButton = new QPushButton(widget);
+    showFiveSeriesButton->setText(QStringLiteral("Try 5 series"));
+    showFiveSeriesButton->setEnabled(true);
+
+    QPushButton *changeColorStyleButton = new QPushButton(widget);
+    changeColorStyleButton->setText(QStringLiteral("Change color style"));
+    changeColorStyleButton->setEnabled(true);
+
+    QPushButton *ownThemeButton = new QPushButton(widget);
+    ownThemeButton->setText(QStringLiteral("Use own theme"));
+    ownThemeButton->setEnabled(true);
+
+    QColorDialog *colorDialog = new QColorDialog(widget);
+
+    QLinearGradient grBtoY(0, 0, 100, 0);
+    grBtoY.setColorAt(1.0, Qt::black);
+    grBtoY.setColorAt(0.67, Qt::blue);
+    grBtoY.setColorAt(0.33, Qt::red);
+    grBtoY.setColorAt(0.0, Qt::yellow);
+    QPixmap pm(100, 24);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grBtoY));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 100, 24);
+    QPushButton *gradientBtoYPB = new QPushButton(widget);
+    gradientBtoYPB->setIcon(QIcon(pm));
+    gradientBtoYPB->setIconSize(QSize(100, 24));
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -183,17 +218,33 @@ int main(int argc, char **argv)
     sampleSliderZ->setEnabled(false);
 
     QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
-    minSliderX->setTickInterval(1);
+    minSliderX->setTickInterval(10);
+    minSliderX->setTickPosition(QSlider::TicksBelow);
     minSliderX->setMinimum(0);
     minSliderX->setValue(0);
     minSliderX->setMaximum(200);
     minSliderX->setEnabled(false);
     QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
-    minSliderZ->setTickInterval(1);
+    minSliderZ->setTickInterval(10);
+    minSliderZ->setTickPosition(QSlider::TicksAbove);
     minSliderZ->setMinimum(0);
     minSliderZ->setValue(0);
     minSliderZ->setMaximum(200);
     minSliderZ->setEnabled(false);
+    QSlider *minSliderY = new QSlider(Qt::Horizontal, widget);
+    minSliderY->setTickInterval(10);
+    minSliderY->setTickPosition(QSlider::TicksBelow);
+    minSliderY->setMinimum(-100);
+    minSliderY->setValue(0);
+    minSliderY->setMaximum(100);
+    minSliderY->setEnabled(false);
+    QSlider *maxSliderY = new QSlider(Qt::Horizontal, widget);
+    maxSliderY->setTickInterval(10);
+    maxSliderY->setTickPosition(QSlider::TicksAbove);
+    maxSliderY->setMinimum(-50);
+    maxSliderY->setValue(100);
+    maxSliderY->setMaximum(200);
+    maxSliderY->setEnabled(false);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
     fontSizeSlider->setTickInterval(1);
@@ -223,6 +274,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeRowButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeRowsButton, 0, Qt::AlignTop);
     vLayout->addWidget(massiveArrayButton, 0, Qt::AlignTop);
+    vLayout->addWidget(showFiveSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -232,6 +284,10 @@ int main(int argc, char **argv)
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
+    vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
+    vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -248,6 +304,8 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window minimums")), 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -260,7 +318,7 @@ int main(int argc, char **argv)
 
     widget->show();
 
-    GraphModifier *modifier = new GraphModifier(widgetchart);
+    GraphModifier *modifier = new GraphModifier(widgetchart, colorDialog);
 
     QObject::connect(rotationSliderX, &QSlider::valueChanged, modifier, &GraphModifier::rotateX);
     QObject::connect(rotationSliderY, &QSlider::valueChanged, modifier, &GraphModifier::rotateY);
@@ -280,16 +338,15 @@ int main(int argc, char **argv)
                      &GraphModifier::setMinX);
     QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
                      &GraphModifier::setMinZ);
+    QObject::connect(minSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setMinY);
+    QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setMaxY);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
     QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(widgetchart, &Q3DBars::shadowQualityChanged, modifier,
-                     &GraphModifier::shadowQualityUpdatedByVisual);
-    QObject::connect(widgetchart, &Q3DBars::selectedBarPosChanged, modifier,
-                     &GraphModifier::handleSelectionChange);
-
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
 
@@ -309,6 +366,7 @@ int main(int argc, char **argv)
     QObject::connect(removeRowButton, &QPushButton::clicked, modifier, &GraphModifier::removeRow);
     QObject::connect(removeRowsButton, &QPushButton::clicked, modifier, &GraphModifier::removeRows);
     QObject::connect(massiveArrayButton, &QPushButton::clicked, modifier, &GraphModifier::createMassiveArray);
+    QObject::connect(showFiveSeriesButton, &QPushButton::clicked, modifier, &GraphModifier::showFiveSeries);
     QObject::connect(selectionButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changeSelectionMode);
     QObject::connect(setSelectedBarButton, &QPushButton::clicked, modifier,
@@ -320,6 +378,17 @@ int main(int argc, char **argv)
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseProxies);
 
+    QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::flipViews);
+    QObject::connect(changeColorStyleButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::changeColorStyle);
+    QObject::connect(ownThemeButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::useOwnTheme);
+    QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
+                     &GraphModifier::changeBaseColor);
+    QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
+                     &GraphModifier::setGradient);
+
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
 
@@ -327,6 +396,9 @@ int main(int argc, char **argv)
                      &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setGridEnabled);
+
+    QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setUseNullInputHandler);
 
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderX,
                      &QSlider::setEnabled);
@@ -364,6 +436,10 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderX,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderZ,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, minSliderY,
+                     &QSlider::setEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged, maxSliderY,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);

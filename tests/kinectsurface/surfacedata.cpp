@@ -45,21 +45,21 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setSelectionMode(QDataVis::SelectionModeNone);
+    m_surface->setSelectionMode(QDataVis::SelectionNone);
     m_surface->setGridVisible(false);
     m_surface->setGradient(gradient);
     m_surface->axisY()->setMax(255);
     m_surface->setSurfaceGridEnabled(false);
     m_surface->setBackgroundVisible(false);
-    m_surface->setSmoothSurfaceEnabled(false);
+    m_surface->setFlatShadingEnabled(true);
     m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
     m_surface->setCameraPosition(0.0, 90.0, 105);
 
     // Initialize scatter
     m_scatter->setTheme(QDataVis::ThemeStoneMoss);
-    m_scatter->setSelectionMode(QDataVis::SelectionModeNone);
+    m_scatter->setSelectionMode(QDataVis::SelectionNone);
     m_scatter->setGridVisible(false);
-    m_scatter->setObjectType(QDataVis::MeshStyleDots, false);
+    m_scatter->setObjectType(QDataVis::MeshDots, false);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_scatter->setCameraPosition(0.0, 85.0, 110);
     m_scatter->axisY()->setMin(-128);
@@ -71,9 +71,9 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 
     // Initialize bars
     m_bars->setTheme(QDataVis::ThemeQt);
-    m_bars->setSelectionMode(QDataVis::SelectionModeNone);
+    m_bars->setSelectionMode(QDataVis::SelectionNone);
     m_bars->setGridVisible(false);
-    m_bars->setBarType(QDataVis::MeshStyleBars, true);
+    m_bars->setBarType(QDataVis::MeshBars, true);
 #if 1
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
 #else
@@ -98,7 +98,7 @@ SurfaceData::~SurfaceData()
         delete m_scatter;
         delete m_bars;
         delete m_surface;
-    } else if (m_mode == MeshStyleBars) {
+    } else if (m_mode == MeshBars) {
         delete m_scatter;
         delete m_surface;
         delete m_bars;
@@ -201,7 +201,7 @@ void SurfaceData::setResolution(int selection)
         m_scatter->axisZ()->setMax(m_resolution.height() / 2);
         m_scatterDataArray = new QScatterDataArray;
         m_scatterDataArray->resize(m_resolution.width() * m_resolution.height());
-    } else if (m_mode == MeshStyleBars) {
+    } else if (m_mode == MeshBars) {
         m_resize = true;
         m_resolution /= 4;
         m_barDataArray = new QBarDataArray;

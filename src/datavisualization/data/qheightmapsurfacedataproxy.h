@@ -31,12 +31,12 @@ class QT_DATAVISUALIZATION_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDa
 {
     Q_OBJECT
 
-    Q_PROPERTY(QImage heightMap READ heightMap WRITE setHeightMap)
-    Q_PROPERTY(QString heightMapFile READ heightMapFile WRITE setHeightMapFile)
-    Q_PROPERTY(float minXValue READ minXValue WRITE setMinXValue)
-    Q_PROPERTY(float maxXValue READ maxXValue WRITE setMaxXValue)
-    Q_PROPERTY(float minZValue READ minZValue WRITE setMinZValue)
-    Q_PROPERTY(float maxZValue READ maxZValue WRITE setMaxZValue)
+    Q_PROPERTY(QImage heightMap READ heightMap WRITE setHeightMap NOTIFY heightMapChanged)
+    Q_PROPERTY(QString heightMapFile READ heightMapFile WRITE setHeightMapFile NOTIFY heightMapFileChanged)
+    Q_PROPERTY(float minXValue READ minXValue WRITE setMinXValue NOTIFY minXValueChanged)
+    Q_PROPERTY(float maxXValue READ maxXValue WRITE setMaxXValue NOTIFY maxXValueChanged)
+    Q_PROPERTY(float minZValue READ minZValue WRITE setMinZValue NOTIFY minZValueChanged)
+    Q_PROPERTY(float maxZValue READ maxZValue WRITE setMaxZValue NOTIFY maxZValueChanged)
 
 public:
     explicit QHeightMapSurfaceDataProxy(QObject *parent = 0);
@@ -45,7 +45,6 @@ public:
 
     void setHeightMap(const QImage &image);
     QImage heightMap() const;
-
     void setHeightMapFile(const QString &filename);
     QString heightMapFile() const;
 
@@ -58,6 +57,14 @@ public:
     float minZValue() const;
     void setMaxZValue(float max);
     float maxZValue() const;
+
+signals:
+    void heightMapChanged(QImage image);
+    void heightMapFileChanged(QString filename);
+    void minXValueChanged(float value);
+    void maxXValueChanged(float value);
+    void minZValueChanged(float value);
+    void maxZValueChanged(float value);
 
 protected:
     explicit QHeightMapSurfaceDataProxy(QHeightMapSurfaceDataProxyPrivate *d, QObject *parent = 0);

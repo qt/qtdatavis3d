@@ -90,22 +90,25 @@ void ShaderHelper::initialize()
     m_colorUniform = m_program->uniformLocation("color_mdl");
     m_textureUniform = m_program->uniformLocation("textureSampler");
     m_shadowUniform = m_program->uniformLocation("shadowMap");
-
+    m_gradientMinUniform = m_program->uniformLocation("gradMin");
+    m_gradientHeightUniform = m_program->uniformLocation("gradHeight");
     m_initialized = true;
 }
 
 bool ShaderHelper::testCompile()
 {
     bool result = true;
+
     // Discard warnings, we only need the result
     QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
     if (m_program)
         delete m_program;
-    m_program = new QOpenGLShaderProgram(m_caller);
+    m_program = new QOpenGLShaderProgram();
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, m_vertexShaderFile))
         result = false;
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
         result = false;
+
     // Restore actual message handler
     qInstallMessageHandler(handler);
     return result;
@@ -228,6 +231,20 @@ GLuint ShaderHelper::shadow()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_shadowUniform;
+}
+
+GLuint ShaderHelper::gradientMin()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_gradientMinUniform;
+}
+
+GLuint ShaderHelper::gradientHeight()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_gradientHeightUniform;
 }
 
 GLuint ShaderHelper::posAtt()

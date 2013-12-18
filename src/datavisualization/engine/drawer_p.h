@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dbars.h"
-#include "theme_p.h"
+#include "q3dtheme.h"
 #include "labelitem_p.h"
 #include "abstractrenderitem_p.h"
 #include <QFont>
@@ -63,28 +63,28 @@ public:
     };
 
 public:
-    explicit Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style);
+    explicit Drawer(Q3DTheme *theme);
     ~Drawer();
 
     void initializeOpenGL();
 
-    void setTheme(const Theme &theme);
-    Theme theme() const;
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
     void setFont(const QFont &font);
     QFont font() const;
-    void setStyle(QDataVis::LabelStyle style);
+    void setLabelBackground(bool enabled);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
+    void drawPoint(ShaderHelper *shader);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   QDataVis::SelectionMode mode, ShaderHelper *shader, ObjectHelper *object,
-                   const Q3DCamera *camera,
-                   bool useDepth = false, bool rotateAlong = false,
+                   QDataVis::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
+                   const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter);
+                   Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
 
     void generateSelectionLabelTexture(AbstractRenderItem *item);
     void generateLabelItem(LabelItem &item, const QString &text, int widestLabel = 0);
@@ -93,10 +93,11 @@ Q_SIGNALS:
     void drawerChanged();
 
 private:
-    Theme m_theme;
+    Q3DTheme *m_theme;
     QFont m_font;
-    QDataVis::LabelStyle m_style;
+    bool m_labelBackground;
     TextureHelper *m_textureHelper;
+    GLuint m_pointbuffer;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

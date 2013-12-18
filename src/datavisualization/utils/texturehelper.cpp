@@ -20,6 +20,7 @@
 #include "utils_p.h"
 
 #include <QImage>
+#include <QPainter>
 
 #include <QDebug>
 
@@ -35,7 +36,7 @@ TextureHelper::~TextureHelper()
 }
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,
-                                      bool convert, bool smoothScale)
+                                      bool convert, bool smoothScale, bool clampY)
 {
     if (image.isNull())
         return 0;
@@ -73,6 +74,8 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
+    if (clampY)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureId;
 }
@@ -152,8 +155,20 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     return textureid;
 }
 
+GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
+{
+    QImage image(QSize(int(gradientTextureWidth), int(gradientTextureHeight)),
+                 QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(gradient));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, int(gradientTextureWidth), int(gradientTextureHeight));
+
+    return create2DTexture(image, false, true, false, true);
+}
+
 #if !defined(QT_OPENGL_ES_2)
-GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 {
     GLuint depthtextureid;
 
@@ -167,8 +182,17 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
-                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    return depthtextureid;
+}
+#endif
+
+#if !defined(QT_OPENGL_ES_2)
+GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+{
+    GLuint depthtextureid = createDepthTexture(size, textureSize);
 
     // Create frame buffer
     if (!frameBuffer)
@@ -195,6 +219,23 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint &frameBuffer,
 }
 #endif
 
+#if !defined(QT_OPENGL_ES_2)
+void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize, GLfloat value)
+{
+    int nItems = size.width() * textureSize * size.height() * textureSize;
+    GLfloat *bits = new GLfloat[nItems];
+    for (int i = 0; i < nItems; i++)
+        bits[i] = value;
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
+                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, bits);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    delete[] bits;
+}
+#endif
+
 void TextureHelper::deleteTexture(const GLuint *texture)
 {
     glDeleteTextures(1, texture);
@@ -216,8 +257,8 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
     if (dstImage.size() != srcImage.size()) {
         int target_width = dstImage.width();
         int target_height = dstImage.height();
-        qreal sx = target_width / qreal(srcImage.width());
-        qreal sy = target_height / qreal(srcImage.height());
+        float sx = target_width / float(srcImage.width());
+        float sy = target_height / float(srcImage.height());
 
         quint32 *dest = (quint32 *) dstImage.scanLine(0); // NB! avoid detach here
         uchar *srcPixels = (uchar *) srcImage.scanLine(srcImage.height() - 1);

@@ -23,6 +23,8 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
@@ -36,18 +38,23 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
       m_audioInput(0)
 {
     // Set up the graph
-    m_graph->setBarThickness(0.5);
+    m_graph->setBarThickness(0.5f);
     m_graph->setBarSpacing(QSizeF(0.0, 1.0));
-    m_graph->setGridVisible(true);
-    m_graph->setBackgroundVisible(false);
-    m_graph->valueAxis()->setRange(-100.0, 100.0);
+    m_graph->valueAxis()->setRange(-100.0f, 100.0f);
     m_graph->valueAxis()->setSegmentCount(20);
     m_graph->valueAxis()->setLabelFormat(QStringLiteral("%d%%"));
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->setSelectionMode(QDataVis::SelectionModeNone);
-    m_graph->scene()->activeCamera()->setCameraPosition(-25.0, 10.0, 190.0);
-    m_graph->setTheme(QDataVis::ThemeIsabelle);
-    m_graph->setBarType(QDataVis::MeshStyleBars);
+    m_graph->setSelectionMode(QDataVis::SelectionNone);
+    m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_graph->theme()->setGridEnabled(true);
+    m_graph->theme()->setBackgroundEnabled(false);
+    QFont font = m_graph->theme()->font();
+    font.setPointSize(10);
+    m_graph->theme()->setFont(font);
+    QBar3DSeries *series = new QBar3DSeries;
+    series->setMesh(QAbstract3DSeries::MeshBar);
+    m_graph->addSeries(series);
 
     //! [0]
     QAudioFormat formatAudio;
@@ -67,7 +74,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_audioInput->setBufferSize(1024);
 #endif
 
-    m_device = new AudioLevelsIODevice(m_graph->activeDataProxy(), this);
+    m_device = new AudioLevelsIODevice(m_graph->seriesList().at(0)->dataProxy(), this);
     m_device->open(QIODevice::WriteOnly);
 
     m_audioInput->start(m_device);

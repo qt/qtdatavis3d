@@ -25,6 +25,8 @@
 #include <QtDataVisualization/q3dcategoryaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QGuiApplication>
 #include <QAudio>
@@ -72,9 +74,9 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->rowAxis()->setMax(SpectrumNumBands * 2);
     m_chart->columnAxis()->setMax(SpectrumNumBands - 1);
     // Disable grid
-    m_chart->setGridVisible(false);
+    m_chart->theme()->setGridEnabled(false);
     // Disable auto-scaling of height by defining explicit range
-    m_chart->valueAxis()->setRange(0.0, 1.0);
+    m_chart->valueAxis()->setRange(0.0f, 1.0f);
     // Disable shadows
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
 #if USE_CONES
@@ -83,30 +85,29 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->setBarThickness(1.25);
     m_chart->setBarSpacing(QSizeF(0.2, -0.75));
     // Set bar type, smooth cones
-    m_chart->setBarType(QDataVis::MeshStyleCones, true);
+    m_chart->setBarType(QDataVis::MeshCones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpacing)
-    m_chart->setCameraPosition(10.0f, 5.0f, 70);
+    m_chart->setCameraPosition(10.0f, 5.0f, 70.0f);
 #else
     // Set bar specifications; make them twice as wide as they're deep
-    m_chart->setBarThickness(2.0);
+    m_chart->setBarThickness(2.0f);
     m_chart->setBarSpacing(QSizeF(0.0, 0.0));
     // Set bar type, flat bars
-    m_chart->setBarType(QDataVis::MeshStyleBars, false);
     // Adjust camera position
-    m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75);
+    m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif
-    // Set color scheme
-    m_chart->setBarColor(QColor(Qt::red), false);
     // Disable selection
-    m_chart->setSelectionMode(QDataVis::SelectionModeNone);
+    m_chart->setSelectionMode(QDataVis::SelectionNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);
     QObject::connect(m_restartTimer, &QTimer::timeout, this, &MainApp::restart);
 
-    QBarDataProxy *proxy = new QBarDataProxy;
-    m_chart->setActiveDataProxy(proxy);
+    QBar3DSeries *series = new QBar3DSeries();
+    series->setBaseColor(QColor(Qt::red));
+    series->setMesh(QAbstract3DSeries::MeshBar);
+    m_chart->addSeries(series);
 }
 
 MainApp::~MainApp()
@@ -140,10 +141,10 @@ void MainApp::spectrumChanged(qint64 position, qint64 length, const FrequencySpe
     for ( ; i != end; ++i) {
         const FrequencySpectrum::Element e = *i;
         if (e.frequency >= m_lowFreq && e.frequency < m_highFreq) {
-            (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), qreal(e.amplitude)));
+            (*data)[barIndex(e.frequency)].setValue(qMax(data->at(barIndex(e.frequency)).value(), float(e.amplitude)));
         }
     }
-    static_cast<QBarDataProxy *>(m_chart->activeDataProxy())->insertRow(0, data);
+    m_chart->seriesList().at(0)->dataProxy()->insertRow(0, data);
 }
 
 void MainApp::stateChanged(QAudio::Mode mode, QAudio::State state)
@@ -197,6 +198,7 @@ int main(int argc, char *argv[])
     app.setApplicationName("QtDataVisualization spectrum analyzer");
 
     Q3DBars window;
+    window.setFlags(window.flags() ^ Qt::FramelessWindowHint);
     window.resize(1024, 768);
     window.show();
 

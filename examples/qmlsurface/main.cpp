@@ -30,6 +30,16 @@ int main(int argc, char *argv[])
 
     QtQuick2ApplicationViewer viewer;
 
+#if !defined(QT_OPENGL_ES_2)
+    // Enable antialiasing
+    QSurfaceFormat surfaceFormat;
+    surfaceFormat.setDepthBufferSize(24);
+    surfaceFormat.setSamples(8);
+    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
+    surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    viewer.setFormat(surfaceFormat);
+#endif
+
 #ifdef Q_OS_ANDROID
     viewer.addImportPath(QString::fromLatin1("assets:/qml"));
     viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),

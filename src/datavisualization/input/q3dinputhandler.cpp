@@ -91,16 +91,17 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
     if (Qt::LeftButton == event->button()) {
         if (scene()->isSlicingActive()) {
             if (scene()->isPointInPrimarySubView(mousePos)) {
-                setInputState(QDataVis::InputStateOnOverview);
+                setInputState(InputStateOnPrimaryView);
             } else if (scene()->isPointInSecondarySubView(mousePos)) {
-                setInputState(QDataVis::InputStateOnSlice);
+                setInputState(InputStateOnSecondaryView);
             } else {
-                setInputState(QDataVis::InputStateNone);
+                setInputState(InputStateNone);
             }
         } else {
-            setInputState(QDataVis::InputStateOnScene);
+            setInputState(InputStateOnScene);
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
+            scene()->setSelectionQueryPosition(mousePos);
         }
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
@@ -108,7 +109,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
     } else if (Qt::RightButton == event->button()) {
         // disable rotating when in slice view
         if (!scene()->isSlicingActive())
-            setInputState(QDataVis::InputStateRotating);
+            setInputState(InputStateRotating);
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
@@ -125,11 +126,11 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 #if defined (Q_OS_ANDROID)
     Q_UNUSED(mousePos);
 #else
-    if (QDataVis::InputStateRotating == inputState()) {
+    if (InputStateRotating == inputState()) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
-    setInputState(QDataVis::InputStateNone);
+    setInputState(InputStateNone);
 #endif
 }
 
@@ -143,10 +144,10 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 #if defined (Q_OS_ANDROID)
     Q_UNUSED(mousePos);
 #else
-    if (QDataVis::InputStateRotating == inputState()) {
+    if (InputStateRotating == inputState()) {
         // Calculate mouse movement since last frame
-        qreal xRotation = scene()->activeCamera()->xRotation();
-        qreal yRotation = scene()->activeCamera()->yRotation();
+        float xRotation = scene()->activeCamera()->xRotation();
+        float yRotation = scene()->activeCamera()->yRotation();
         float mouseMoveX = float(inputPosition().x() - mousePos.x())
                 / (scene()->viewport().width() / rotationSpeed);
         float mouseMoveY = float(inputPosition().y() - mousePos.y())
@@ -156,7 +157,6 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
         yRotation -= mouseMoveY;
         scene()->activeCamera()->setXRotation(xRotation);
         scene()->activeCamera()->setYRotation(yRotation);
-        scene()->activeCamera()->d_ptr->updateViewMatrix(1.0f);
 
         setPreviousInputPos(inputPosition());
         setInputPosition(mousePos);

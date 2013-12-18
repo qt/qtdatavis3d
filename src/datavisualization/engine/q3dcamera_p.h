@@ -44,14 +44,14 @@ public:
 
     void sync(Q3DCamera &other);
 
-    void setXRotation(qreal rotation);
-    void setYRotation(qreal rotation);
-    void setMinXRotation(qreal rotation);
-    void setMinYRotation(qreal rotation);
-    void setMaxXRotation(qreal rotation);
-    void setMaxYRotation(qreal rotation);
+    void setXRotation(float rotation);
+    void setYRotation(float rotation);
+    void setMinXRotation(float rotation);
+    void setMinYRotation(float rotation);
+    void setMaxXRotation(float rotation);
+    void setMaxYRotation(float rotation);
 
-    void updateViewMatrix(qreal zoomAdjustment);
+    void updateViewMatrix(float zoomAdjustment);
 
 public:
     Q3DCamera *q_ptr;
@@ -71,7 +71,7 @@ public:
     bool m_wrapXRotation;
     bool m_wrapYRotation;
     int m_zoomLevel;
-    QDataVis::CameraPreset m_activePreset;
+    Q3DCamera::CameraPreset m_activePreset;
 
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;

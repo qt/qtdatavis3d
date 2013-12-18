@@ -25,6 +25,7 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <QMouseEvent>
@@ -46,25 +47,28 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat labelMargin = 0.05f;
-// TODO: Make margin modifiable?
-const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
+const GLfloat defaultMinSize = 0.01f;
+const GLfloat defaultMaxSize = 0.1f;
+const GLfloat defaultMargin = 1.0f + defaultMaxSize; // Default margin for background
+const GLfloat itemScaler = 3.0f;
 const GLfloat gridLineWidth = 0.005f;
-static QVector3D selectionSkipColor = QVector3D(255, 255, 255); // Selection texture's background color
 
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : Abstract3DRenderer(controller),
-      m_controller(controller),
       m_selectedItem(0),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
       m_updateLabels(false),
       m_dotShader(0),
+      m_dotGradientShader(0),
+      #if defined(QT_OPENGL_ES_2)
+      m_pointShader(0),
+      #endif
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
-      m_dotObj(0),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -78,11 +82,15 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
-      m_selection(selectionSkipColor),
-      m_previousSelection(selectionSkipColor),
+      m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedItemTotalIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedItemSeriesIndex(Scatter3DController::invalidSelectionIndex()),
+      m_selectedSeries(0),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
-      m_hasHeightAdjustmentChanged(true)
+      m_hasHeightAdjustmentChanged(true),
+      m_backgroundMargin(defaultMargin),
+      m_maxItemSize(0.0f)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -96,11 +104,11 @@ Scatter3DRenderer::~Scatter3DRenderer()
     m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
     m_textureHelper->deleteTexture(&m_bgrTexture);
     delete m_dotShader;
+    delete m_dotGradientShader;
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_labelShader;
-    delete m_dotObj;
     delete m_backgroundObj;
     delete m_gridLineObj;
     delete m_labelObj;
@@ -111,14 +119,15 @@ void Scatter3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
-    handleShadowQualityChange();
-
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
 
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
     initDepthShader();
+#else
+    // Init point shader
+    initPointShader();
 #endif
 
     // Init selection shader
@@ -131,52 +140,81 @@ void Scatter3DRenderer::initializeOpenGL()
     loadLabelMesh();
 
     // Set view port
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
 }
 
-void Scatter3DRenderer::updateDataModel(QScatterDataProxy *dataProxy)
+void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
+                                     bool updateVisibility)
 {
-    const QScatterDataArray &dataArray = *dataProxy->array();
+    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+
+    int seriesCount = m_visibleSeriesList.size();
+    float maxItemSize = 0.0f;
+    float itemSize = 0.0f;
+
+    for (int series = 0; series < seriesCount; series++) {
+        itemSize = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize();
+        if (maxItemSize < itemSize)
+            maxItemSize = itemSize;
+    }
+    m_backgroundMargin = defaultMargin;
+    m_maxItemSize = maxItemSize;
+    if (maxItemSize > defaultMaxSize)
+        m_backgroundMargin += maxItemSize / itemScaler;
+}
+
+void Scatter3DRenderer::updateData()
+{
+    int seriesCount = m_visibleSeriesList.size();
     calculateSceneScalingFactors();
-    int dataSize = dataArray.size();
     float minX = float(m_axisCacheX.min());
     float maxX = float(m_axisCacheX.max());
     float minY = float(m_axisCacheY.min());
     float maxY = float(m_axisCacheY.max());
     float minZ = float(m_axisCacheZ.min());
     float maxZ = float(m_axisCacheZ.max());
+    int totalDataSize = 0;
 
-    if (dataSize != m_renderItemArray.size())
-        m_renderItemArray.resize(dataSize);
-    for (int i = 0; i < dataSize ; i++) {
-        QVector3D dotPos = dataArray.at(i).position();
-        // TODO: Check if this still works always when ranges are no longer required to be zero centered
-        // TODO: qreal -> float conversion for axis min/max may cause issues like in surface
-        if ((dotPos.x() >= minX && dotPos.x() <= maxX )
-                && (dotPos.y() >= minY && dotPos.y() <= maxY)
-                && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
-            m_renderItemArray[i].setPosition(dotPos);
-            m_renderItemArray[i].setVisible(true);
-            calculateTranslation(m_renderItemArray[i]);
-        } else {
-            m_renderItemArray[i].setVisible(false);
+    if (m_renderingArrays.size() != seriesCount)
+        m_renderingArrays.resize(seriesCount);
+
+    for (int series = 0; series < seriesCount; series++) {
+        QScatterDataProxy *dataProxy =
+                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->dataProxy();
+        const QScatterDataArray &dataArray = *dataProxy->array();
+        int dataSize = dataArray.size();
+        totalDataSize += dataSize;
+
+        if (dataSize != m_renderingArrays.at(series).size())
+            m_renderingArrays[series].resize(dataSize);
+
+        for (int i = 0; i < dataSize; i++) {
+            QVector3D dotPos = dataArray.at(i).position();
+            if ((dotPos.x() >= minX && dotPos.x() <= maxX )
+                    && (dotPos.y() >= minY && dotPos.y() <= maxY)
+                    && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
+                m_renderingArrays[series][i].setPosition(dotPos);
+                m_renderingArrays[series][i].setVisible(true);
+                calculateTranslation(m_renderingArrays[series][i]);
+            } else {
+                m_renderingArrays[series][i].setVisible(false);
+            }
         }
     }
-    m_dotSizeScale = (GLfloat)qBound(0.01, (2.0 / qSqrt((qreal)dataSize)), 0.1);
-    m_selectedItem = 0;
+    m_dotSizeScale = GLfloat(qBound(defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))),
+                                    defaultMaxSize));
 
-    Abstract3DRenderer::updateDataModel(dataProxy);
+    updateSelectedItem(m_selectedItemIndex, m_selectedSeries);
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: Move these to more suitable place e.g. controller should be controlling the viewports.
-    scene->setPrimarySubViewport(m_mainViewPort);
-
     // TODO: See QTRD-2374
     scene->activeCamera()->setMinYRotation(-90.0f);
 
@@ -185,10 +223,6 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
         scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         m_hasHeightAdjustmentChanged = false;
     }
-
-    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with m_cachedScene->activeCamera(), a bit above it (as set in defaultLightPos))
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
 
     Abstract3DRenderer::updateScene(scene);
 }
@@ -209,18 +243,21 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
     // Specify viewport
-    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-               m_mainViewPort.width(), m_mainViewPort.height());
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width() / (GLfloat)m_primarySubViewport.height();
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Calculate view matrix
     QMatrix4x4 viewMatrix = activeCamera->viewMatrix();
-
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
+
+    int seriesCount = m_visibleSeriesList.size();
 
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
@@ -249,25 +286,36 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         backgroundRotation = 0.0f;
 
     // Get light position from the scene
-    QVector3D lightPos =  m_cachedScene->activeLight()->position();
+    QVector3D lightPos = m_cachedScene->activeLight()->position();
 
-    // Map adjustment direction to model matrix scaling
-    // TODO: Let's use these for testing the autoscaling of dots based on their number
-    GLfloat heightMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat widthMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat depthMultiplier = m_dotSizeScale; //1.0f;
-    GLfloat heightScaler = 0.0f;
-    GLfloat widthScaler = 0.0f;
-    GLfloat depthScaler = 0.0f;
-    QVector3D modelScaler(widthMultiplier + widthScaler,
-                          heightMultiplier + heightScaler,
-                          depthMultiplier + depthScaler);
     // Introduce regardless of shadow quality to simplify logic
     QMatrix4x4 depthViewMatrix;
     QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
+    // Check if we have any series with points
+    bool havePointSeries = false;
+    bool haveMeshSeries = false;
+    bool haveUniformColorMeshSeries = false;
+    bool haveGradientMeshSeries = false;
+    for (int i = 0; i < seriesCount; i++) {
+        if (m_visibleSeriesList.at(i).mesh() == QAbstract3DSeries::MeshPoint) {
+            havePointSeries = true;
+        } else {
+            haveMeshSeries = true;
+            if (m_visibleSeriesList.at(i).colorStyle() == Q3DTheme::ColorStyleUniform)
+                haveUniformColorMeshSeries = true;
+            else
+                haveGradientMeshSeries = true;
+        }
+    }
+
 #if !defined(QT_OPENGL_ES_2)
+    if (havePointSeries) {
+        glEnable(GL_POINT_SMOOTH);
+        glEnable(GL_PROGRAM_POINT_SIZE);
+    }
+
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
@@ -275,8 +323,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
         glViewport(0, 0,
-                   m_mainViewPort.width() * m_shadowQualityMultiplier,
-                   m_mainViewPort.height() * m_shadowQualityMultiplier);
+                   m_primarySubViewport.width() * m_shadowQualityMultiplier,
+                   m_primarySubViewport.height() * m_shadowQualityMultiplier);
 
         // Enable drawing to framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -310,40 +358,61 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw dots to depth buffer
-        for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
-            const ScatterRenderItem &item = m_renderItemArray.at(dot);
-            if (!item.isVisible())
-                continue;
+        for (int series = 0; series < seriesCount; series++) {
+            ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
+            bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
+            // TODO: Accessing series directly during rendering
+            float itemSize =
+                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
+                    / itemScaler;
+            if (itemSize == 0.0f)
+                itemSize = m_dotSizeScale;
+            if (drawingPoints) {
+                // Scale points based on shadow quality for shadows, not by zoom level
+                glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
+            }
+            QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-            modelMatrix.translate(item.translation());
-            modelMatrix.scale(modelScaler);
-            //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-            //                            heightMultiplier * item.size() + heightScaler,
-            //                            depthMultiplier * item.size() + depthScaler));
+            for (int dot = 0; dot < m_renderingArrays.at(series).size(); dot++) {
+                const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
+                if (!item.isVisible())
+                    continue;
 
-            MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
 
-            m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
+                modelMatrix.translate(item.translation());
+                if (!drawingPoints)
+                    modelMatrix.scale(modelScaler);
 
-            // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(m_depthShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, m_dotObj->vertexBuf());
-            glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+                MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
-            // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_dotObj->elementBuf());
+                m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
 
-            // Draw the triangles
-            glDrawElements(GL_TRIANGLES, m_dotObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+                if (drawingPoints) {
+                    m_drawer->drawPoint(m_depthShader);
+                } else {
+                    // 1st attribute buffer : vertices
+                    glEnableVertexAttribArray(m_depthShader->posAtt());
+                    glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
+                    glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                          (void *)0);
 
-            // Free buffers
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                    // Index buffer
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
 
-            glDisableVertexAttribArray(m_depthShader->posAtt());
+                    // Draw the triangles
+                    glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
+                                   (void *)0);
+
+                    // Free buffers
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                    glDisableVertexAttribArray(m_depthShader->posAtt());
+                }
+            }
         }
 
         // Disable drawing to framebuffer (= enable drawing to screen)
@@ -352,12 +421,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Reset culling to normal
         glCullFace(GL_BACK);
 
-        // Release depth shader
-        m_depthShader->release();
-
         // Revert to original viewport
-        glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
-                   m_mainViewPort.width(), m_mainViewPort.height());
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
@@ -370,16 +438,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
         glDisable(GL_TEXTURE_2D);
-        m_labelShader->release();
 #endif
     }
+
+    ShaderHelper *pointSelectionShader = m_selectionShader;
+#else
+    ShaderHelper *pointSelectionShader = m_pointShader;
 #endif
+    ShaderHelper *selectionShader = m_selectionShader;
 
     // Skip selection mode drawing if we have no selection mode
-    if (m_cachedSelectionMode > QDataVis::SelectionModeNone) {
-        // Bind selection shader
-        m_selectionShader->bind();
-
+    if (m_cachedSelectionMode > QDataVis::SelectionNone
+            && SelectOnScene == m_selectionState && seriesCount > 0) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
@@ -387,61 +457,100 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
 
-        int arraySize = m_renderItemArray.size();
-        if (arraySize > 0xfffffe) // Max possible different selection colors, 0xffffff being skipColor
-            qFatal("Too many objects");
+        int arraySize = 0;
+        int totalArraySize = 0;
+        int dotNo = 0;
 
-        for (int dot = 0; dot < arraySize; dot++) {
-            const ScatterRenderItem &item = m_renderItemArray.at(dot);
-            if (!item.isVisible())
-                continue;
+        // Init previous to opposite of first to ensure we change binding for first series
+        bool previousDrawingPoints = (m_visibleSeriesList.at(0).mesh() != QAbstract3DSeries::MeshPoint);
+        for (int series = 0; series < seriesCount; series++) {
+            ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
+            bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
+            // TODO: Accessing series directly during rendering
+            float itemSize =
+                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
+                    / itemScaler;
+            if (itemSize == 0.0f)
+                itemSize = m_dotSizeScale;
+#if !defined(QT_OPENGL_ES_2)
+            if (drawingPoints)
+                glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+#endif
+            QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-            modelMatrix.translate(item.translation());
-            modelMatrix.scale(modelScaler);
-            //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-            //                            heightMultiplier * item.size() + heightScaler,
-            //                            depthMultiplier * item.size() + depthScaler));
+            // Rebind selection shader if it has changed
+            if (drawingPoints != previousDrawingPoints) {
+                previousDrawingPoints = drawingPoints;
+                if (drawingPoints)
+                    selectionShader = pointSelectionShader;
+                else
+                    selectionShader = m_selectionShader;
 
-            MVPMatrix = projectionViewMatrix * modelMatrix;
+                selectionShader->bind();
+            }
+            arraySize = m_renderingArrays.at(series).size();
+            totalArraySize += arraySize;
 
-            QVector3D dotColor = indexToSelectionColor(dot);
-            dotColor /= 255.0f;
+            if (totalArraySize > 0xfffffe) // Max possible different selection colors, 0xffffff being skipColor
+                qFatal("Too many objects");
 
-            m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
-            m_selectionShader->setUniformValue(m_selectionShader->color(), dotColor);
+            for (int dot = 0; dot < arraySize; dot++) {
+                const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
+                if (!item.isVisible())
+                    continue;
 
-            // 1st attribute buffer : vertices
-            glEnableVertexAttribArray(m_selectionShader->posAtt());
-            glBindBuffer(GL_ARRAY_BUFFER, m_dotObj->vertexBuf());
-            glVertexAttribPointer(m_selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
 
-            // Index buffer
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_dotObj->elementBuf());
+                modelMatrix.translate(item.translation());
+                if (!drawingPoints)
+                    modelMatrix.scale(modelScaler);
 
-            // Draw the triangles
-            glDrawElements(GL_TRIANGLES, m_dotObj->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+                MVPMatrix = projectionViewMatrix * modelMatrix;
 
-            // Free buffers
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                QVector3D dotColor = indexToSelectionColor(dotNo);
+                dotColor /= 255.0f;
 
-            glDisableVertexAttribArray(m_selectionShader->posAtt());
+                selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
+                selectionShader->setUniformValue(selectionShader->color(), dotColor);
+
+                if (drawingPoints) {
+                    m_drawer->drawPoint(selectionShader);
+                } else {
+                    // 1st attribute buffer : vertices
+                    glEnableVertexAttribArray(selectionShader->posAtt());
+                    glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
+                    glVertexAttribPointer(selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                          (void *)0);
+
+                    // Index buffer
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
+
+                    // Draw the triangles
+                    glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
+                                   (void *)0);
+
+                    // Free buffers
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                    glDisableVertexAttribArray(selectionShader->posAtt());
+                }
+                dotNo++;
+            }
         }
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        if (QDataVis::InputStateOnScene == m_controller->inputState()) {
-            m_selection = Utils::getSelection(m_controller->inputPosition(),
-                                              m_cachedBoundingRect.height());
-        }
+        QVector3D clickedColor = Utils::getSelection(m_inputPosition,
+                                                     m_viewport.height());
+        int clickedIndex = 0;
+        QScatter3DSeries *clickedSeries = 0;
+        selectionColorToSeriesAndIndex(clickedColor, clickedIndex, clickedSeries);
+        emit itemClicked(clickedIndex, clickedSeries);
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-        // Release selection shader
-        m_selectionShader->release();
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         m_labelShader->bind();
@@ -454,114 +563,189 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
         m_drawer->drawObject(m_labelShader, m_labelObj, m_selectionTexture);
         glDisable(GL_TEXTURE_2D);
-        m_labelShader->release();
 #endif
     }
-
-    // Bind dot shader
-    m_dotShader->bind();
-
-    // Set unchanging shader bindings
-    m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
-    m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
-    m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme.m_ambientStrength);
-
-    // Enable texture
-    glEnable(GL_TEXTURE_2D);
 
     // Draw dots
+    ShaderHelper *dotShader = 0;
+    GLuint gradientTexture = 0;
     bool dotSelectionFound = false;
-    int selectedIndex;
-    if (m_selection == selectionSkipColor) {
-        selectedIndex = Scatter3DController::noSelectionIndex();
-    } else {
-        selectedIndex = int(m_selection.x())
-                + (int(m_selection.y()) << 8)
-                + (int(m_selection.z()) << 16);
-    }
-
-    if (m_selection != m_previousSelection) {
-        emit selectedItemIndexChanged(selectedIndex);
-        m_previousSelection = m_selection;
-    }
-
     ScatterRenderItem *selectedItem(0);
+    int dotNo = 0;
+    QVector3D baseColor;
+    QVector3D dotColor;
 
-    QVector3D baseColor = Utils::vectorFromColor(m_cachedTheme.m_baseColor);
+    bool previousDrawingPoints = false;
+    Q3DTheme::ColorStyle previousMeshColorStyle = Q3DTheme::ColorStyleUniform;
+    if (haveMeshSeries) {
+        // Set unchanging shader bindings
+        if (haveGradientMeshSeries) {
+            m_dotGradientShader->bind();
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->lightP(), lightPos);
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->view(), viewMatrix);
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->ambientS(), m_cachedTheme->ambientLightStrength());
+        }
+        if (haveUniformColorMeshSeries) {
+            m_dotShader->bind();
+            m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
+            m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
+            m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme->ambientLightStrength());
+            dotShader = m_dotShader;
+        } else {
+            dotShader = m_dotGradientShader;
+            previousMeshColorStyle = Q3DTheme::ColorStyleRangeGradient;
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.0f);
+        }
+        glEnable(GL_TEXTURE_2D);
+    } else {
+        dotShader = pointSelectionShader;
+        previousDrawingPoints = true;
+        dotShader->bind();
+    }
 
-    for (int dot = 0; dot < m_renderItemArray.size(); dot++) {
-        ScatterRenderItem &item = m_renderItemArray[dot];
-        if (!item.isVisible())
-            continue;
+    for (int series = 0; series < seriesCount; series++) {
+        const SeriesRenderCache &currentSeries = m_visibleSeriesList.at(series);
+        ObjectHelper *dotObj = currentSeries.object();
+        bool drawingPoints = (currentSeries.mesh() == QAbstract3DSeries::MeshPoint);
+        Q3DTheme::ColorStyle colorStyle = currentSeries.colorStyle();
+        bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
+        bool useColor = colorStyleIsUniform || drawingPoints;
 
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 MVPMatrix;
-        QMatrix4x4 itModelMatrix;
-
-        modelMatrix.translate(item.translation());
-        modelMatrix.scale(modelScaler);
-        //modelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-        //                            heightMultiplier * item.size() + heightScaler,
-        //                            depthMultiplier * item.size() + depthScaler));
-        itModelMatrix.scale(modelScaler);
-        //itModelMatrix.scale(QVector3D(widthMultiplier * item.size() + widthScaler,
-        //                              heightMultiplier * item.size() + heightScaler,
-        //                              depthMultiplier * item.size() + depthScaler));
-
-#ifdef SHOW_DEPTH_TEXTURE_SCENE
-        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
-#else
-        MVPMatrix = projectionViewMatrix * modelMatrix;
+        // TODO: Accessing series directly during rendering
+        float itemSize =
+                static_cast<QScatter3DSeries *>(currentSeries.series())->itemSize()
+                / itemScaler;
+        if (itemSize == 0.0f)
+            itemSize = m_dotSizeScale;
+#if !defined(QT_OPENGL_ES_2)
+        if (drawingPoints)
+            glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
 #endif
+        QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-#if 0
-        QVector3D heightColor =
-                Utils::vectorFromColor(m_cachedTheme.m_heightColor) * item.translation().y();
-
-        QVector3D dotColor = baseColor + heightColor;
-#else
-        QVector3D dotColor = baseColor;
-#endif
-
-        GLfloat lightStrength = m_cachedTheme.m_lightStrength;
-        if (m_cachedSelectionMode > QDataVis::SelectionModeNone && (selectedIndex == dot)) {
-            dotColor = Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor);
-            lightStrength = m_cachedTheme.m_highlightLightStrength;
-            // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
-            selectedItem = &item;
-            dotSelectionFound = true;
+        // Rebind shader if it has changed
+        if (drawingPoints != previousDrawingPoints
+                || (!drawingPoints &&
+                    (colorStyleIsUniform != (previousMeshColorStyle == Q3DTheme::ColorStyleUniform)))) {
+            previousDrawingPoints = drawingPoints;
+            if (drawingPoints) {
+                dotShader = pointSelectionShader;
+            } else {
+                if (colorStyleIsUniform)
+                    dotShader = m_dotShader;
+                else
+                    dotShader = m_dotGradientShader;
+            }
+            dotShader->bind();
         }
 
-        // Set shader bindings
-        m_dotShader->setUniformValue(m_dotShader->model(), modelMatrix);
-        m_dotShader->setUniformValue(m_dotShader->nModel(),
-                                     itModelMatrix.inverted().transposed());
-        m_dotShader->setUniformValue(m_dotShader->MVP(), MVPMatrix);
-        m_dotShader->setUniformValue(m_dotShader->color(), dotColor);
+        if (!drawingPoints && !colorStyleIsUniform && previousMeshColorStyle != colorStyle) {
+            if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
+                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientMin(), 0.0f);
+                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.5f);
+            } else {
+                // Each ball is of uniform color according to its Y-coordinate
+                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.0f);
+            }
+        }
+
+        if (!drawingPoints)
+            previousMeshColorStyle = colorStyle;
+
+        if (useColor) {
+            baseColor = currentSeries.baseColor();
+            dotColor = baseColor;
+        }
+
+        int seriesSize = m_renderingArrays.at(series).size();
+        for (int dot = 0; dot < seriesSize; dot++) {
+            ScatterRenderItem &item = m_renderingArrays[series][dot];
+            if (!item.isVisible())
+                continue;
+
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 MVPMatrix;
+            QMatrix4x4 itModelMatrix;
+
+            modelMatrix.translate(item.translation());
+            if (!drawingPoints) {
+                modelMatrix.scale(modelScaler);
+                itModelMatrix.scale(modelScaler);
+            }
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+            MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+#else
+            MVPMatrix = projectionViewMatrix * modelMatrix;
+#endif
+
+            if (useColor)
+                dotColor = baseColor;
+            else
+                gradientTexture = currentSeries.baseGradientTexture();
+
+            GLfloat lightStrength = m_cachedTheme->lightStrength();
+            if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
+                if (useColor)
+                    dotColor = currentSeries.singleHighlightColor();
+                else
+                    gradientTexture = currentSeries.singleHighlightGradientTexture();
+                lightStrength = m_cachedTheme->highlightLightStrength();
+                // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
+                selectedItem = &item;
+                dotSelectionFound = true;
+            }
+
+            if (!drawingPoints) {
+                // Set shader bindings
+                dotShader->setUniformValue(dotShader->model(), modelMatrix);
+                dotShader->setUniformValue(dotShader->nModel(),
+                                           itModelMatrix.inverted().transposed());
+            }
+            dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
+            if (useColor) {
+                dotShader->setUniformValue(dotShader->color(), dotColor);
+            } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                dotShader->setUniformValue(dotShader->gradientMin(),
+                                           (item.position().y() + 1.0f) / 2.0f);
+            }
+#if !defined(QT_OPENGL_ES_2)
+            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (!drawingPoints) {
+                    // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                    dotShader->setUniformValue(dotShader->shadowQ(), m_shadowQualityToShader);
+                    dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
+                    dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
+
+                    // Draw the object
+                    m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
+                } else {
+                    // Draw the object
+                    m_drawer->drawPoint(dotShader);
+                }
+            } else
+#endif
+            {
+                if (!drawingPoints) {
+                    // Set shadowless shader bindings
+                    dotShader->setUniformValue(dotShader->lightS(), lightStrength);
+                    // Draw the object
+                    m_drawer->drawObject(dotShader, dotObj, gradientTexture);
+                } else {
+                    // Draw the object
+                    m_drawer->drawPoint(dotShader);
+                }
+            }
+            dotNo++;
+        }
+    }
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-            // Set shadow shader bindings
-            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-            m_dotShader->setUniformValue(m_dotShader->shadowQ(), m_shadowQualityToShader);
-            m_dotShader->setUniformValue(m_dotShader->depth(), depthMVPMatrix);
-            m_dotShader->setUniformValue(m_dotShader->lightS(), lightStrength / 10.0f);
-
-            // Draw the object
-            m_drawer->drawObject(m_dotShader, m_dotObj, 0, m_depthTexture);
-        } else
-#endif
-        {
-            // Set shadowless shader bindings
-            m_dotShader->setUniformValue(m_dotShader->lightS(), lightStrength);
-
-            // Draw the object
-            m_drawer->drawObject(m_dotShader, m_dotObj);
-        }
+    if (havePointSeries) {
+        glDisable(GL_POINT_SMOOTH);
+        glDisable(GL_PROGRAM_POINT_SIZE);
     }
-
-    // Release dot shader
-    m_dotShader->release();
+#endif
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -569,19 +753,23 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glCullFace(GL_BACK);
 
     // Draw background
-    if (m_cachedIsBackgroundEnabled && m_backgroundObj) {
+    if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        QVector3D bgScale((aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                          backgroundMargin,
-                          (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+        GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+        GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height()) / m_scaleFactor;
+        if (m_maxItemSize > xScale)
+            xScale = m_maxItemSize;
+        if (m_maxItemSize > zScale)
+            zScale = m_maxItemSize;
+        QVector3D bgScale(xScale, m_backgroundMargin, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-        QVector3D bgScale((aspectRatio * backgroundMargin),
-                          backgroundMargin,
-                          (aspectRatio * backgroundMargin));
+        QVector3D bgScale((aspectRatio * m_backgroundMargin),
+                          m_backgroundMargin,
+                          (aspectRatio * m_backgroundMargin));
 #endif
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
@@ -598,7 +786,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme.m_backgroundColor);
+        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -609,7 +797,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme.m_ambientStrength * 2.0f);
+                                            m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
@@ -619,7 +807,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 m_shadowQualityToShader);
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength / 10.0f);
+                                                m_cachedTheme->lightStrength() / 10.0f);
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
@@ -628,15 +816,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme.m_lightStrength);
+                                                m_cachedTheme->lightStrength());
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
         }
     }
-
-    // Release background shader
-    m_backgroundShader->release();
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
@@ -650,37 +835,54 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         axisCacheMax = &m_axisCacheX;
 #endif
 
-    if (m_cachedIsGridEnabled && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
 
         // Bind line shader
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme.m_gridLine);
+        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme.m_ambientStrength);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
-                                        m_cachedTheme.m_lightStrength / 20.0f);
+                                        m_cachedTheme->lightStrength() / 20.0f);
         } else
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme.m_lightStrength / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
         }
+
+        QQuaternion lineYRotation = QQuaternion();
+        QQuaternion lineXRotation = QQuaternion();
+
+        if (m_xFlipped)
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+        else
+            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+
+        if (m_yFlipped)
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+        else
+            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+
+        GLfloat yFloorLinePosition = -m_backgroundMargin + gridLineOffset;
+        if (m_yFlipped)
+            yFloorLinePosition = -yFloorLinePosition;
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheZ.subSegmentStep();
-            GLfloat linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
+            GLfloat linePos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z()); // Start line
             int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
 #else
             GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
@@ -689,11 +891,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            QVector3D gridLineScaler(
-                        (aspectRatio * backgroundMargin * m_areaSize.width()) / m_scaleFactor,
-                        gridLineWidth, gridLineWidth);
+            GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+            if (m_maxItemSize > xScale)
+                xScale = m_maxItemSize;
+            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            QVector3D gridLineScaler((aspectRatio * backgroundMargin),
+            QVector3D gridLineScaler((aspectRatio * m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
 
@@ -702,19 +905,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(0.0f, backgroundMargin, linePos / m_scaleFactor);
-                else
-                    modelMatrix.translate(0.0f, -backgroundMargin, linePos / m_scaleFactor);
+                modelMatrix.translate(0.0f, yFloorLinePosition, linePos / m_scaleFactor);
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -741,13 +938,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
 
             // Side wall lines
-            gridLineScaler = QVector3D(gridLineWidth, backgroundMargin, gridLineWidth);
+            gridLineScaler = QVector3D(gridLineWidth, m_backgroundMargin, gridLineWidth);
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
-                    / m_scaleFactor;
-            linePos = -aspectRatio * m_axisCacheZ.min(); // Start line
+            GLfloat lineXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
+                    / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineXTrans)
+                lineXTrans = m_maxItemSize - gridLineOffset;
+            linePos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z()); // Start line
 #else
-            GLfloat lineXTrans = aspectRatio * backgroundMargin;
+            GLfloat lineXTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor; // Start line
 #endif
             if (!m_xFlipped)
@@ -759,8 +958,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(lineXTrans, 0.0f, linePos / m_scaleFactor);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -792,17 +995,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheX.subSegmentStep();
-            GLfloat linePos = aspectRatio * m_axisCacheX.min();
+            GLfloat linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
             int lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
-            QVector3D gridLineScaler(
-                        gridLineWidth, gridLineWidth,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+            GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height()) / m_scaleFactor;
+            if (m_maxItemSize > zScale)
+                zScale = m_maxItemSize;
+            QVector3D gridLineScaler(gridLineWidth, gridLineWidth, zScale);
 #else
             GLfloat lineStep = aspectRatio * axisCacheMax->subSegmentStep();
             GLfloat linePos = -aspectRatio * m_scaleFactor;
             int lastSegment = axisCacheMax->subSegmentCount() * axisCacheMax->segmentCount();
             QVector3D gridLineScaler(gridLineWidth, gridLineWidth,
-                                     aspectRatio * backgroundMargin);
+                                     aspectRatio * m_backgroundMargin);
 #endif
 
             for (int segment = 0; segment <= lastSegment; segment++) {
@@ -810,18 +1014,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                if (m_yFlipped)
-                    modelMatrix.translate(linePos / m_scaleFactor, backgroundMargin, 0.0f);
-                else
-                    modelMatrix.translate(linePos / m_scaleFactor, -backgroundMargin, 0.0f);
+                modelMatrix.translate(linePos / m_scaleFactor, yFloorLinePosition, 0.0f);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
-                // If we're viewing from below, grid line object must be flipped
-                if (m_yFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                    itModelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
-                }
+                modelMatrix.rotate(lineXRotation);
+                itModelMatrix.rotate(lineXRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -849,17 +1048,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             // Back wall lines
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                    / m_scaleFactor;
-            linePos = aspectRatio * m_axisCacheX.min();
+            GLfloat lineZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineZTrans)
+                lineZTrans = m_maxItemSize - gridLineOffset;
+            linePos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
 #else
-            GLfloat lineZTrans = aspectRatio * backgroundMargin;
+            GLfloat lineZTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             linePos = -aspectRatio * m_scaleFactor;
 #endif
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
-            gridLineScaler = QVector3D(gridLineWidth, backgroundMargin, gridLineWidth);
+            gridLineScaler = QVector3D(gridLineWidth, m_backgroundMargin, gridLineWidth);
 
             for (int segment = 0; segment <= lastSegment; segment++) {
                 QMatrix4x4 modelMatrix;
@@ -867,8 +1068,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 itModelMatrix;
 
                 modelMatrix.translate(linePos / m_scaleFactor, 0.0f, lineZTrans);
+
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -899,18 +1106,21 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         if (m_axisCacheY.segmentCount() > 0) {
             // Back wall
             GLfloat lineStep = m_axisCacheY.subSegmentStep();
-            GLfloat linePos = m_axisCacheY.min();
+            GLfloat linePos = m_axisCacheY.min() - m_translationOffset.y();
             int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
-                    / m_scaleFactor;
-            QVector3D gridLineScaler(
-                        (aspectRatio * backgroundMargin * m_areaSize.width() / m_scaleFactor),
-                        gridLineWidth, gridLineWidth);
+            GLfloat lineZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
+                    / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineZTrans)
+                lineZTrans = m_maxItemSize - gridLineOffset;
+            GLfloat xScale = (aspectRatio * m_backgroundMargin * m_areaSize.width()) / m_scaleFactor;
+            if (m_maxItemSize > xScale)
+                xScale = m_maxItemSize;
+            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineZTrans = aspectRatio * backgroundMargin;
-            QVector3D gridLineScaler((aspectRatio * backgroundMargin),
+            GLfloat lineZTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
+            QVector3D gridLineScaler((aspectRatio * m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
             if (!m_zFlipped)
@@ -925,6 +1135,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                if (m_zFlipped) {
+                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -951,18 +1166,22 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
 
             // Side wall
-            linePos = m_axisCacheY.min();
+            linePos = m_axisCacheY.min() - m_translationOffset.y();
             lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+            GLfloat lineXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
+                    / m_scaleFactor - gridLineOffset;
+            if (m_maxItemSize > lineXTrans)
+                lineXTrans = m_maxItemSize - gridLineOffset;
+            GLfloat zScale = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                     / m_scaleFactor;
-            gridLineScaler = QVector3D(
-                        gridLineWidth, gridLineWidth,
-                        (aspectRatio * backgroundMargin * m_areaSize.height()) / m_scaleFactor);
+            if (m_maxItemSize > zScale)
+                zScale = m_maxItemSize;
+            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineXTrans = aspectRatio * backgroundMargin;
+            GLfloat lineXTrans = aspectRatio * m_backgroundMargin - gridLineOffset;
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth,
-                                       aspectRatio * backgroundMargin);
+                                       aspectRatio * m_backgroundMargin);
 #endif
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -976,6 +1195,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
+
+                modelMatrix.rotate(lineYRotation);
+                itModelMatrix.rotate(lineYRotation);
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1001,9 +1223,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 linePos += lineStep;
             }
         }
-
-        // Release line shader
-        lineShader->release();
     }
 
     // Draw axis labels
@@ -1015,23 +1234,26 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POLYGON_OFFSET_FILL);
 
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheZ.segmentStep();
-        GLfloat labelPos = -aspectRatio * m_axisCacheZ.min();
+        GLfloat labelPos = -aspectRatio * (m_axisCacheZ.min() - m_translationOffset.z());
         int lastSegment = m_axisCacheZ.segmentCount();
-        GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+        GLfloat labelXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                 / m_scaleFactor + labelMargin;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize + labelMargin;
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = aspectRatio * m_scaleFactor;
         int lastSegment = axisCacheMax->segmentCount();
-        GLfloat labelXTrans = aspectRatio * backgroundMargin + labelMargin;
+        GLfloat labelXTrans = aspectRatio * m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
-        GLfloat labelYTrans = -backgroundMargin;
+        GLfloat labelYTrans = -m_backgroundMargin;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 0.0f;
         GLfloat rotLabelZ = 0.0f;
@@ -1057,6 +1279,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
                 labelTrans.setZ(labelPos / m_scaleFactor);
 
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
 #ifndef USE_UNIFORM_SCALING
@@ -1078,18 +1302,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     if (m_axisCacheX.segmentCount() > 0) {
 #ifndef USE_UNIFORM_SCALING
         GLfloat posStep = aspectRatio * m_axisCacheX.segmentStep();
-        GLfloat labelPos = aspectRatio * m_axisCacheX.min();
+        GLfloat labelPos = aspectRatio * (m_axisCacheX.min() - m_translationOffset.x());
         int lastSegment = m_axisCacheX.segmentCount();
-        GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+        GLfloat labelZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                 / m_scaleFactor + labelMargin;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize + labelMargin;
 #else
         GLfloat posStep = aspectRatio * axisCacheMax->segmentStep();
         GLfloat labelPos = -aspectRatio * m_scaleFactor;
         int lastSegment = axisCacheMax->segmentCount();
-        GLfloat labelZTrans = aspectRatio * backgroundMargin + labelMargin;
+        GLfloat labelZTrans = aspectRatio * m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
-        GLfloat labelYTrans = -backgroundMargin;
+        GLfloat labelYTrans = -m_backgroundMargin;
         GLfloat rotLabelX = -90.0f;
         GLfloat rotLabelY = 90.0f;
         GLfloat rotLabelZ = 0.0f;
@@ -1115,6 +1341,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
                 labelTrans.setX(labelPos / m_scaleFactor);
 
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+
                 // Draw the label here
                 m_dummyRenderItem.setTranslation(labelTrans);
 #ifndef USE_UNIFORM_SCALING
@@ -1135,15 +1363,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
         GLfloat posStep = m_axisCacheY.segmentStep();
-        GLfloat labelPos = m_axisCacheY.min();
+        GLfloat labelPos = m_axisCacheY.min() - m_translationOffset.y();
         int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat labelXTrans = (aspectRatio * backgroundMargin * m_areaSize.width())
+        GLfloat labelXTrans = (aspectRatio * m_backgroundMargin * m_areaSize.width())
                 / m_scaleFactor;
-        GLfloat labelZTrans = (aspectRatio * backgroundMargin * m_areaSize.height())
+        GLfloat labelZTrans = (aspectRatio * m_backgroundMargin * m_areaSize.height())
                 / m_scaleFactor;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize;
 #else // ..and this if we want uniform scaling based on largest dimension
-        GLfloat labelXTrans = aspectRatio * backgroundMargin;
+        GLfloat labelXTrans = aspectRatio * m_backgroundMargin;
         GLfloat labelZTrans = labelXTrans;
 #endif
         // Back wall init
@@ -1185,6 +1417,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
                 const GLfloat labelYTrans = labelPos / m_heightNormalizer;
 
+                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+
                 // Back wall
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
@@ -1205,6 +1439,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             labelPos += posStep;
         }
     }
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Handle selection clearing and selection label drawing
     if (!dotSelectionFound) {
@@ -1225,7 +1460,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 static const QString yLabelTag(QStringLiteral("@yLabel"));
                 static const QString zLabelTag(QStringLiteral("@zLabel"));
 
-                labelText = itemLabelFormat();
+                labelText = m_visibleSeriesList[m_selectedItemSeriesIndex].itemLabelFormat();
 
                 labelText.replace(xTitleTag, m_axisCacheX.title());
                 labelText.replace(yTitleTag, m_axisCacheY.title());
@@ -1274,34 +1509,31 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
-    // Release label shader
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
+
+    m_selectionDirty = false;
 }
 
-void Scatter3DRenderer::updateSelectedItemIndex(int index)
+void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *series)
 {
-    if (index == Scatter3DController::noSelectionIndex())
-        m_selection = selectionSkipColor;
-    else
-        m_selection = indexToSelectionColor(index);
-}
+    m_selectionDirty = true;
+    m_selectedSeries = series;
+    m_selectedItemIndex = Scatter3DController::invalidSelectionIndex();
+    m_selectedItemTotalIndex = Scatter3DController::invalidSelectionIndex();
+    m_selectedItemSeriesIndex = Scatter3DController::invalidSelectionIndex();
 
-void Scatter3DRenderer::handleResize()
-{
-    if (m_cachedBoundingRect.width() == 0 || m_cachedBoundingRect.height() == 0)
-        return;
-
-    // Set view port
-    m_mainViewPort = QRect(0, 0, m_cachedBoundingRect.width(), m_cachedBoundingRect.height());
-
-    Abstract3DRenderer::handleResize();
-}
-
-void Scatter3DRenderer::updateBackgroundEnabled(bool enable)
-{
-    if (enable != m_cachedIsBackgroundEnabled) {
-        Abstract3DRenderer::updateBackgroundEnabled(enable);
-        loadMeshFile(); // Load changed dot type
+    if (!m_renderingArrays.isEmpty() && index != Scatter3DController::invalidSelectionIndex()) {
+        int totalIndex = 0;
+        for (int i = 0; i < m_visibleSeriesList.size(); i++) {
+            if (m_visibleSeriesList.at(i).series() == series) {
+                m_selectedItemSeriesIndex = i;
+                m_selectedItemIndex = index;
+                m_selectedItemTotalIndex = index + totalIndex;
+                break;
+            }
+            totalIndex += m_renderingArrays.at(i).size();
+        }
     }
 }
 
@@ -1347,15 +1579,6 @@ void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
 #endif
 }
 
-void Scatter3DRenderer::loadMeshFile()
-{
-    QString objectFileName = m_cachedObjFile;
-    if (m_dotObj)
-        delete m_dotObj;
-    m_dotObj = new ObjectHelper(objectFileName);
-    m_dotObj->load();
-}
-
 void Scatter3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
@@ -1368,7 +1591,7 @@ void Scatter3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
         delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/bar"));
+    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_gridLineObj->load();
 }
 
@@ -1376,7 +1599,7 @@ void Scatter3DRenderer::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_labelObj->load();
 }
 
@@ -1386,37 +1609,44 @@ void Scatter3DRenderer::updateTextures()
     m_updateLabels = true;
 }
 
+void Scatter3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
+{
+    // Load full version of meshes that have it available
+    if (mesh != QAbstract3DSeries::MeshSphere
+            && mesh != QAbstract3DSeries::MeshMinimal
+            && mesh != QAbstract3DSeries::MeshPoint) {
+        fileName.append(QStringLiteral("Full"));
+    }
+}
+
 void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation,
-                                        qreal min, qreal max)
+                                        float min, float max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 }
 
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
-    // Origin should be in the center of scene, ie. both positive and negative values are drawn
-    // above background
-
     // We need to normalize translations
-    GLfloat xTrans = (aspectRatio * item.position().x()) / m_scaleFactor;
-    GLfloat zTrans = -(aspectRatio * item.position().z()) / m_scaleFactor;
-    GLfloat yTrans = item.position().y() / m_heightNormalizer;
+    GLfloat xTrans = (aspectRatio * (item.position().x() - m_translationOffset.x()))
+            / m_scaleFactor;
+    GLfloat zTrans = -(aspectRatio * (item.position().z() - m_translationOffset.z()))
+            / m_scaleFactor;
+    GLfloat yTrans = (item.position().y() - m_translationOffset.y()) / m_heightNormalizer;
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans));
-    //qDebug() << item.translation();
 }
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
-    m_heightNormalizer = (GLfloat)qMax(qAbs(m_axisCacheY.max()), qAbs(m_axisCacheY.min()));
-    m_areaSize.setHeight(qMax(qAbs(m_axisCacheZ.max()), qAbs(m_axisCacheZ.min())));
-    m_areaSize.setWidth(qMax(qAbs(m_axisCacheX.max()), qAbs(m_axisCacheX.min())));
+    m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
+    m_areaSize.setHeight((m_axisCacheZ.max() - m_axisCacheZ.min()) / 2.0f);
+    m_areaSize.setWidth((m_axisCacheX.max() - m_axisCacheX.min()) / 2.0f);
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    //qDebug() << m_heightNormalizer << m_areaSize << m_scaleFactor << m_axisCacheY.max() << m_axisCacheX.max() << m_axisCacheZ.max();
-}
 
-QRect Scatter3DRenderer::mainViewPort()
-{
-    return m_mainViewPort;
+    // Calculate translation offsets
+    m_translationOffset = QVector3D((m_axisCacheX.max() + m_axisCacheX.min()) / 2.0f,
+                                    (m_axisCacheY.max() + m_axisCacheY.min()) / 2.0f,
+                                    (m_axisCacheZ.max() + m_axisCacheZ.min()) / 2.0f);
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -1427,12 +1657,20 @@ void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &
     m_dotShader->initialize();
 }
 
+void Scatter3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+{
+    if (m_dotGradientShader)
+        delete m_dotGradientShader;
+    m_dotGradientShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_dotGradientShader->initialize();
+}
+
 void Scatter3DRenderer::initSelectionShader()
 {
     if (m_selectionShader)
         delete m_selectionShader;
-    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSelection"),
-                                         QStringLiteral(":/shaders/fragmentSelection"));
+    m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPlainColor"),
+                                         QStringLiteral(":/shaders/fragmentPlainColor"));
     m_selectionShader->initialize();
 }
 
@@ -1443,10 +1681,10 @@ void Scatter3DRenderer::initSelectionBuffer()
         m_selectionTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
-    m_selectionTexture = m_textureHelper->createSelectionTexture(m_mainViewPort.size(),
+    m_selectionTexture = m_textureHelper->createSelectionTexture(m_primarySubViewport.size(),
                                                                  m_selectionFrameBuffer,
                                                                  m_selectionDepthBuffer);
 }
@@ -1468,51 +1706,25 @@ void Scatter3DRenderer::updateDepthBuffer()
         m_depthTexture = 0;
     }
 
-    if (m_mainViewPort.size().isEmpty())
+    if (m_primarySubViewport.size().isEmpty())
         return;
 
     if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTexture(m_mainViewPort.size(),
-                                                             m_depthFrameBuffer,
-                                                             m_shadowQualityMultiplier);
-        if (!m_depthTexture) {
-            switch (m_cachedShadowQuality) {
-            case QDataVis::ShadowQualityHigh:
-                qWarning("Creating high quality shadows failed. Changing to medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityMedium);
-                updateShadowQuality(QDataVis::ShadowQualityMedium);
-                break;
-            case QDataVis::ShadowQualityMedium:
-                qWarning("Creating medium quality shadows failed. Changing to low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityLow);
-                updateShadowQuality(QDataVis::ShadowQualityLow);
-                break;
-            case QDataVis::ShadowQualityLow:
-                qWarning("Creating low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
-                updateShadowQuality(QDataVis::ShadowQualityNone);
-                break;
-            case QDataVis::ShadowQualitySoftHigh:
-                qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
-                updateShadowQuality(QDataVis::ShadowQualitySoftMedium);
-                break;
-            case QDataVis::ShadowQualitySoftMedium:
-                qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualitySoftLow);
-                updateShadowQuality(QDataVis::ShadowQualitySoftLow);
-                break;
-            case QDataVis::ShadowQualitySoftLow:
-                qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-                (void)m_controller->setShadowQuality(QDataVis::ShadowQualityNone);
-                updateShadowQuality(QDataVis::ShadowQualityNone);
-                break;
-            default:
-                // You'll never get here
-                break;
-            }
-        }
+        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
+                                                                        m_depthFrameBuffer,
+                                                                        m_shadowQualityMultiplier);
+        if (!m_depthTexture)
+            lowerShadowQuality();
     }
+}
+#else
+void Scatter3DRenderer::initPointShader()
+{
+    if (m_pointShader)
+        delete m_pointShader;
+    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPointES2"),
+                                     QStringLiteral(":/shaders/fragmentPlainColor"));
+    m_pointShader->initialize();
 }
 #endif
 
@@ -1540,6 +1752,28 @@ QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
     GLubyte dotIdxBlue = (index & 0xff0000) >> 16;
 
     return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
+}
+
+void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series)
+{
+    if (color != selectionSkipColor) {
+        index = int(color.x())
+                + (int(color.y()) << 8)
+                + (int(color.z()) << 16);
+        // Find the series and adjust the index accordingly
+        for (int i = 0; i < m_renderingArrays.size(); i++) {
+            if (index < m_renderingArrays.at(i).size()) {
+                series = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(i).series());
+                return; // Valid found and already set to return parameters, so we can return
+            } else {
+                index -= m_renderingArrays.at(i).size();
+            }
+        }
+    }
+
+    // No valid match found
+    index = Scatter3DController::invalidSelectionIndex();
+    series = 0;
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

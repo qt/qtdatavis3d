@@ -17,20 +17,14 @@
 ****************************************************************************/
 
 #include "declarativescatter_p.h"
-#include "declarativescatterrenderer_p.h"
 #include "qitemmodelscatterdataproxy.h"
-#include "theme_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-const QString smoothString(QStringLiteral("Smooth"));
-
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
-      m_shared(0),
-      m_initialisedSize(0, 0)
+      m_scatterController(0)
 {
-    setFlags(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::AllButtons);
 
     // TODO: These seem to have no effect; find a way to activate anti-aliasing
@@ -38,131 +32,95 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_shared = new Scatter3DController(boundingRect().toRect());
-    setSharedController(m_shared);
-    m_shared->setActiveDataProxy(new QItemModelScatterDataProxy);
+    m_scatterController = new Scatter3DController(boundingRect().toRect());
+    setSharedController(m_scatterController);
+
+    // TODO: Uncomment when doing QTRD-2669
+//    connect(m_scatterController, &Scatter3DController::axisXChanged,
+//            this, &DeclarativeBars::axisXChanged);
+//    connect(m_scatterController, &Scatter3DController::axisYChanged,
+//            this, &DeclarativeBars::axisYChanged);
+//    connect(m_scatterController, &Scatter3DController::axisZChanged,
+//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
 {
-    delete m_shared;
-}
-
-QSGNode *DeclarativeScatter::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-    // If old node exists and has right size, reuse it.
-    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
-        // Update bounding rectangle (that has same size as before).
-        static_cast<DeclarativeScatterRenderer *>( oldNode )->setRect(boundingRect());
-        return oldNode;
-    }
-
-    // Create a new render node when size changes or if there is no node yet
-    m_initialisedSize = boundingRect().size().toSize();
-
-    // Delete old node
-    if (oldNode)
-        delete oldNode;
-
-    // Create a new one and set it's bounding rectangle
-    DeclarativeScatterRenderer *node = new DeclarativeScatterRenderer(window(), m_shared);
-    node->setRect(boundingRect());
-    m_shared->setBoundingRect(boundingRect().toRect());
-    return node;
-}
-
-void DeclarativeScatter::setObjectColor(const QColor &baseColor, bool uniform)
-{
-    m_shared->setObjectColor(baseColor, uniform);
-}
-
-QScatterDataProxy *DeclarativeScatter::dataProxy() const
-{
-    return static_cast<QScatterDataProxy *>(m_shared->activeDataProxy());
-}
-
-void DeclarativeScatter::setDataProxy(QScatterDataProxy *dataProxy)
-{
-    m_shared->setActiveDataProxy(dataProxy);
+    delete m_scatterController;
 }
 
 Q3DValueAxis *DeclarativeScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisX());
 }
 
 void DeclarativeScatter::setAxisX(Q3DValueAxis *axis)
 {
-    m_shared->setAxisX(axis);
+    m_scatterController->setAxisX(axis);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisY());
 }
 
 void DeclarativeScatter::setAxisY(Q3DValueAxis *axis)
 {
-    m_shared->setAxisY(axis);
+    m_scatterController->setAxisY(axis);
 }
 
 Q3DValueAxis *DeclarativeScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(m_scatterController->axisZ());
 }
 
 void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
 {
-    m_shared->setAxisZ(axis);
+    m_scatterController->setAxisZ(axis);
 }
 
-void DeclarativeScatter::setObjectType(QDataVis::MeshStyle style)
+QQmlListProperty<QScatter3DSeries> DeclarativeScatter::seriesList()
 {
-    QString objFile = m_shared->meshFileName();
-    bool smooth = objFile.endsWith(smoothString);
-    m_shared->setObjectType(style, smooth);
+    return QQmlListProperty<QScatter3DSeries>(this, this,
+                                          &DeclarativeScatter::appendSeriesFunc,
+                                          &DeclarativeScatter::countSeriesFunc,
+                                          &DeclarativeScatter::atSeriesFunc,
+                                          &DeclarativeScatter::clearSeriesFunc);
 }
 
-QDataVis::MeshStyle DeclarativeScatter::objectType() const
+void DeclarativeScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series)
 {
-    QString objFile = m_shared->meshFileName();
-    if (objFile.contains("/sphere"))
-        return QDataVis::MeshStyleSpheres;
-    else
-        return QDataVis::MeshStyleDots;
+    reinterpret_cast<DeclarativeScatter *>(list->data)->addSeries(series);
 }
 
-void DeclarativeScatter::setObjectSmoothingEnabled(bool enabled)
+int DeclarativeScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
-    QString objFile = m_shared->meshFileName();
-    if (objFile.endsWith(smoothString)) {
-        if (enabled)
-            return; // Already smooth; do nothing
-        else // Rip Smooth off the end
-            objFile.resize(objFile.indexOf(smoothString));
-    } else {
-        if (!enabled) // Already flat; do nothing
-            return;
-        else // Append Smooth to the end
-            objFile.append(smoothString);
-    }
-    m_shared->setMeshFileName(objFile);
+    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().size();
 }
 
-bool DeclarativeScatter::isObjectSmoothingEnabled() const
+QScatter3DSeries *DeclarativeScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index)
 {
-    QString objFile = m_shared->meshFileName();
-    return objFile.endsWith(smoothString);
+    return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
 }
 
-void DeclarativeScatter::setMeshFileName(const QString &objFileName)
+void DeclarativeScatter::clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
-    m_shared->setMeshFileName(objFileName);
+    DeclarativeScatter *declScatter = reinterpret_cast<DeclarativeScatter *>(list->data);
+    QList<QScatter3DSeries *> realList = declScatter->m_scatterController->scatterSeriesList();
+    int count = realList.size();
+    for (int i = 0; i < count; i++)
+        declScatter->removeSeries(realList.at(i));
 }
 
-QString DeclarativeScatter::meshFileName() const
+void DeclarativeScatter::addSeries(QScatter3DSeries *series)
 {
-    return m_shared->meshFileName();
+    m_scatterController->addSeries(series);
+}
+
+void DeclarativeScatter::removeSeries(QScatter3DSeries *series)
+{
+    m_scatterController->removeSeries(series);
+    series->setParent(this); // Reparent as removing will leave series parentless
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

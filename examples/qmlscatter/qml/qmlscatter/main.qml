@@ -18,6 +18,7 @@
 
 //! [0]
 import QtQuick 2.1
+import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 //! [0]
@@ -30,9 +31,17 @@ Item {
 
     //! [4]
     Data {
-        id: graphData
+        id: seriesOneData
     }
     //! [4]
+
+    Data {
+        id: seriesTwoData
+    }
+
+    Data {
+        id: seriesThreeData
+    }
 
     //! [8]
     //! [9]
@@ -41,7 +50,7 @@ Item {
         anchors.bottom: parent.bottom
         //! [9]
         width: parent.width
-        height: parent.height - shadowToggle.height
+        height: parent.height - buttonLayout.height
         //! [8]
 
         //! [2]
@@ -51,16 +60,14 @@ Item {
             height: dataView.height
             //! [2]
             //! [3]
-            font.family: "Lucida Handwriting"
-            font.pointSize: 40
-            theme: AbstractGraph3D.ThemeIsabelle
+            theme: Theme3D {
+                type: Theme3D.ThemeIsabelle
+                font.family: "Lucida Handwriting"
+                font.pointSize: 40
+            }
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
-            //! [5]
-            dataProxy: graphData.proxy
-            //! [5]
             //! [6]
-            itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
             axisX.segmentCount: 3
             axisX.subSegmentCount: 2
             axisX.labelFormat: "%.2f"
@@ -71,91 +78,151 @@ Item {
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%.2f"
             //! [6]
-        }
-    }
+            //! [5]
+            Scatter3DSeries {
+                id: scatterSeries
+                //! [5]
+                //! [10]
+                itemLabelFormat: "Series 1: X:@xLabel Y:@yLabel Z:@zLabel"
+                //! [10]
 
-    //! [7]
-    NewButton {
-        id: shadowToggle
-        width: parent.width / 6 // We're adding 6 buttons and want to divide them equally
-        text: "Hide Shadows"
-        onClicked: {
-            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
-                text = "Hide Shadows";
-            } else {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                text = "Show Shadows";
+                //! [11]
+                ItemModelScatterDataProxy {
+                    itemModel: seriesOneData.model
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
+                //! [11]
             }
-        }
-    }
-    //! [7]
 
-    NewButton {
-        id: smoothToggle
-        width: parent.width / 6
-        text: "Use Smooth Dots"
-        anchors.left: shadowToggle.right
-        onClicked: {
-            if (scatterGraph.objectSmoothingEnabled === false) {
-                text = "Use Flat Dots";
-                scatterGraph.objectSmoothingEnabled = true;
-            } else {
-                text = "Use Smooth Dots"
-                scatterGraph.objectSmoothingEnabled = false;
+            //! [12]
+            Scatter3DSeries {
+                id: scatterSeriesTwo
+                itemLabelFormat: "Series 2: X:@xLabel Y:@yLabel Z:@zLabel"
+                itemSize: 0.1
+                mesh: Abstract3DSeries.MeshCube
+                //! [12]
+
+                ItemModelScatterDataProxy {
+                    itemModel: seriesTwoData.modelTwo
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
             }
-        }
-    }
+            Scatter3DSeries {
+                id: scatterSeriesThree
+                itemLabelFormat: "Series 3: X:@xLabel Y:@yLabel Z:@zLabel"
+                itemSize: 0.2
+                mesh: Abstract3DSeries.MeshMinimal
 
-    NewButton {
-        id: cameraToggle
-        width: parent.width / 6
-        text: "Change Camera Placement"
-        anchors.left: smoothToggle.right
-        onClicked: {
-            if (scatterGraph.scene.activeCamera.cameraPreset === AbstractGraph3D.CameraPresetFront) {
-                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetIsometricRightHigh;
-            } else {
-                scatterGraph.scene.activeCamera.cameraPreset = AbstractGraph3D.CameraPresetFront;
-            }
-        }
-    }
-
-    NewButton {
-        id: themeToggle
-        width: parent.width / 6
-        text: "Change Theme"
-        anchors.left: cameraToggle.right
-        onClicked: {
-            if (scatterGraph.theme === AbstractGraph3D.ThemeArmyBlue) {
-                scatterGraph.theme = AbstractGraph3D.ThemeIsabelle;
-            } else {
-                scatterGraph.theme = AbstractGraph3D.ThemeArmyBlue;
+                ItemModelScatterDataProxy {
+                    itemModel: seriesThreeData.modelThree
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
             }
         }
     }
 
-    NewButton {
-        id: backgroundToggle
-        width: parent.width / 6
-        text: "Hide Background"
-        anchors.left: themeToggle.right
-        onClicked: {
-            if (scatterGraph.backgroundVisible === true) {
-                scatterGraph.backgroundVisible = false;
-                text = "Show Background";
-            } else {
-                scatterGraph.backgroundVisible = true;
-                text = "Hide Background";
+    RowLayout {
+        id: buttonLayout
+        Layout.minimumHeight: cameraToggle.height
+        width: parent.width
+        anchors.left: parent.left
+        spacing: 0
+        //! [7]
+        NewButton {
+            id: shadowToggle
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Hide Shadows"
+            onClicked: {
+                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
+                    text = "Hide Shadows";
+                } else {
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    text = "Show Shadows";
+                }
             }
         }
-    }
+        //! [7]
 
-    NewButton {
-        id: exitButton
-        width: parent.width / 6
-        text: "Quit"
-        anchors.left: backgroundToggle.right
-        onClicked: Qt.quit(0);
+        NewButton {
+            id: smoothToggle
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Use Smooth for Series One"
+            onClicked: {
+                if (scatterSeries.meshSmooth === false) {
+                    text = "Use Flat for Series One";
+                    scatterSeries.meshSmooth = true;
+                } else {
+                    text = "Use Smooth for Series One"
+                    scatterSeries.meshSmooth = false;
+                }
+            }
+        }
+
+        NewButton {
+            id: cameraToggle
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Change Camera Placement"
+            onClicked: {
+                if (scatterGraph.scene.activeCamera.cameraPreset === Camera3D.CameraPresetFront) {
+                    scatterGraph.scene.activeCamera.cameraPreset =
+                            Camera3D.CameraPresetIsometricRightHigh;
+                } else {
+                    scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetFront;
+                }
+            }
+        }
+
+        NewButton {
+            id: themeToggle
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Change Theme"
+            onClicked: {
+                if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
+                    // Ownership of the theme is transferred and old theme is destroyed when setting
+                    // a new one, so we need to create them dynamically
+                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
+                        Theme3D {type: Theme3D.ThemeIsabelle; font.family: "Lucida Handwriting";
+                        font.pointSize: 40}', parent);
+                } else {
+                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
+                        Theme3D {type: Theme3D.ThemeArmyBlue}', parent);
+                }
+            }
+        }
+
+        NewButton {
+            id: backgroundToggle
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Hide Background"
+            onClicked: {
+                if (scatterGraph.theme.backgroundEnabled === true) {
+                    scatterGraph.theme.backgroundEnabled = false;
+                    text = "Show Background";
+                } else {
+                    scatterGraph.theme.backgroundEnabled = true;
+                    text = "Hide Background";
+                }
+            }
+        }
+
+        NewButton {
+            id: exitButton
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Quit"
+            onClicked: Qt.quit(0);
+        }
     }
 }

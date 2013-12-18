@@ -28,82 +28,23 @@ namespace QtDataVisualization {
 class QT_DATAVISUALIZATION_EXPORT QDataVis : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(MeshStyle)
-    Q_ENUMS(CameraPreset)
-    Q_ENUMS(Theme)
-    Q_ENUMS(SelectionMode)
     Q_ENUMS(ShadowQuality)
-    Q_ENUMS(LabelStyle)
+    Q_FLAGS(SelectionFlag SelectionFlags)
 
 public:
-    enum InputState {
-        InputStateNone = 0,
-        InputStateOnScene,
-        InputStateOnOverview,
-        InputStateOnSlice,
-        InputStateRotating,
-        InputStateOnPinch
+    enum SelectionFlag {
+        SelectionNone              = 0,
+        SelectionItem              = 1,
+        SelectionRow               = 2,
+        SelectionItemAndRow        = SelectionItem | SelectionRow,
+        SelectionColumn            = 4,
+        SelectionItemAndColumn     = SelectionItem | SelectionColumn,
+        SelectionRowAndColumn      = SelectionRow | SelectionColumn,
+        SelectionItemRowAndColumn  = SelectionItem | SelectionRow | SelectionColumn,
+        SelectionSlice             = 8,
+        SelectionMultiSeries       = 16
     };
-
-    enum MeshStyle {
-        MeshStyleBars = 0,
-        MeshStylePyramids,
-        MeshStyleCones,
-        MeshStyleCylinders,
-        MeshStyleBevelBars,
-        MeshStyleSpheres,
-        MeshStyleDots
-    };
-
-    enum CameraPreset {
-        CameraPresetNone = -1,
-        CameraPresetFrontLow = 0,
-        CameraPresetFront,
-        CameraPresetFrontHigh,
-        CameraPresetLeftLow,
-        CameraPresetLeft,
-        CameraPresetLeftHigh,
-        CameraPresetRightLow,
-        CameraPresetRight,
-        CameraPresetRightHigh,
-        CameraPresetBehindLow,
-        CameraPresetBehind,
-        CameraPresetBehindHigh,
-        CameraPresetIsometricLeft,
-        CameraPresetIsometricLeftHigh,
-        CameraPresetIsometricRight,
-        CameraPresetIsometricRightHigh,
-        CameraPresetDirectlyAbove,
-        CameraPresetDirectlyAboveCW45,
-        CameraPresetDirectlyAboveCCW45,
-        CameraPresetFrontBelow,
-        CameraPresetLeftBelow,
-        CameraPresetRightBelow,
-        CameraPresetBehindBelow,
-        CameraPresetDirectlyBelow
-    };
-
-    enum Theme {
-        ThemeDefault = -1,
-        ThemeQt,
-        ThemePrimaryColors,
-        ThemeDigia,
-        ThemeStoneMoss,
-        ThemeArmyBlue,
-        ThemeRetro,
-        ThemeEbony,
-        ThemeIsabelle
-    };
-
-    enum SelectionMode {
-        SelectionModeNone = 0,
-        SelectionModeItem,
-        SelectionModeItemAndRow,
-        SelectionModeItemAndColumn,
-        SelectionModeItemRowAndColumn,
-        SelectionModeSliceRow,
-        SelectionModeSliceColumn
-    };
+    Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
 
     enum ShadowQuality {
         ShadowQualityNone = 0,
@@ -114,13 +55,9 @@ public:
         ShadowQualitySoftMedium,
         ShadowQualitySoftHigh
     };
-
-    enum LabelStyle {
-        LabelStyleOpaque = 0,
-        LabelStyleFromTheme,
-        LabelStyleTransparent
-    };
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QDataVis::SelectionFlags)
 }
 
 #endif

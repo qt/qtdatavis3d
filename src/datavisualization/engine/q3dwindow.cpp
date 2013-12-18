@@ -19,13 +19,14 @@
 #include "q3dwindow.h"
 #include "q3dwindow_p.h"
 #include "abstract3dcontroller_p.h"
-#include <QGuiApplication>
+#include "qabstract3dinputhandler_p.h"
+#include "q3dscene_p.h"
 
+#include <QGuiApplication>
 #include <QOpenGLContext>
 #include <QOpenGLPaintDevice>
 #include <QPainter>
 
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -36,19 +37,31 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since Qt Data Visualization 1.0
  *
  * This class creates a QWindow and provides render loop for visualization types inheriting it.
- * \warning This class is not intended to be used directly by developers.
+ *
+ * You should not need to use this class directly, but one of its subclasses instead.
+ *
+ * \note Q3DWindow sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
+ * graph windows as standalone windows with regular window frame, clear this flag after constructing
+ * the graph. For example:
+ *
+ * \code
+ *  Q3DBars *graphWindow = new Q3DBars;
+ *  graphWindow->setFlags(graphWindow->flags() ^ Qt::FramelessWindowHint);
+ * \endcode
  *
  * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
 
 /*!
- * Constructs Q3DWindow with \a parent. It creates a QWindow and an OpenGL context. It also sets
- * surface format and initializes OpenGL functions for use.
+ * \internal
  */
-Q3DWindow::Q3DWindow(QWindow *parent)
+Q3DWindow::Q3DWindow(Q3DWindowPrivate *d, QWindow *parent)
     : QWindow(parent),
-      d_ptr(new Q3DWindowPrivate(this))
+      d_ptr(d)
 {
+    d_ptr->m_context = new QOpenGLContext(this);
+
+    setFlags(flags() | Qt::FramelessWindowHint);
     setSurfaceType(QWindow::OpenGLSurface);
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
@@ -67,7 +80,6 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     d_ptr->m_context->create();
     d_ptr->m_context->makeCurrent(this);
 
-    qDebug() << "initializeOpenGLFunctions()";
     initializeOpenGLFunctions();
 
     const GLubyte *version = glGetString(GL_VERSION);
@@ -80,7 +92,7 @@ Q3DWindow::Q3DWindow(QWindow *parent)
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
-    renderLater();
+    d_ptr->renderLater();
 }
 
 /*!
@@ -91,46 +103,49 @@ Q3DWindow::~Q3DWindow()
 }
 
 /*!
- * \internal
+ * Adds the given \a inputHandler to the graph. The input handlers added via addInputHandler
+ * are not taken in to use directly. Only the ownership of the a\ inputHandler is given to the graph.
+ * The \a inputHandler must not be null or already added to another graph.
+ *
+ * \sa releaseInputHandler(), setActiveInputHandler()
  */
-void Q3DWindow::setVisualController(Abstract3DController *controller)
+void Q3DWindow::addInputHandler(QAbstract3DInputHandler *inputHandler)
 {
-    d_ptr->m_visualController = controller;
+    d_ptr->m_visualController->addInputHandler(inputHandler);
 }
 
 /*!
- * \internal
+ * Releases the ownership of the \a inputHandler back to the caller, if it was added to this graph.
+ * If the released \a inputHandler is in use there will be no input handler active after this call.
+ *
+ * If the default input handler is released and added back later, it behaves as any other input handler would.
+ *
+ * \sa addInputHandler(), setActiveInputHandler()
  */
-void Q3DWindow::handleDevicePixelRatioChange()
+void Q3DWindow::releaseInputHandler(QAbstract3DInputHandler *inputHandler)
 {
-    if (QWindow::devicePixelRatio() == d_ptr->m_devicePixelRatio || !d_ptr->m_visualController)
-        return;
-
-    // Device pixel ratio changed, resize accordingly and inform the scene
-    d_ptr->m_devicePixelRatio = QWindow::devicePixelRatio();
-    d_ptr->m_visualController->updateDevicePixelRatio(d_ptr->m_devicePixelRatio);
-
+    d_ptr->m_visualController->releaseInputHandler(inputHandler);
 }
 
 /*!
- * \internal
+ * Sets the active \a inputHandler. Implicitly calls addInputHandler() to transfer ownership of
+ * the \a inputHandler to this graph.
+ *
+ * If the \a inputHandler is null, no input handler will be active after this call.
+ *
+ * \sa addInputHandler(), releaseInputHandler()
  */
-void Q3DWindow::render()
+void Q3DWindow::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
 {
-    handleDevicePixelRatioChange();
-    d_ptr->m_visualController->synchDataToRenderer();
-    d_ptr->m_visualController->render();
+    d_ptr->m_visualController->setActiveInputHandler(inputHandler);
 }
 
 /*!
- * \internal
+ * \return currently active input handler.
  */
-void Q3DWindow::renderLater()
+QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
 {
-    if (!d_ptr->m_updatePending) {
-        d_ptr->m_updatePending = true;
-        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
-    }
+    return d_ptr->m_visualController->activeInputHandler();
 }
 
 /*!
@@ -140,7 +155,7 @@ bool Q3DWindow::event(QEvent *event)
 {
     switch (event->type()) {
     case QEvent::UpdateRequest:
-        renderNow();
+        d_ptr->renderNow();
         return true;
     case QEvent::TouchBegin:
     case QEvent::TouchCancel:
@@ -156,35 +171,30 @@ bool Q3DWindow::event(QEvent *event)
 /*!
  * \internal
  */
-void Q3DWindow::exposeEvent(QExposeEvent *event)
+void Q3DWindow::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
 
-    if (isExposed())
-        renderNow();
+    Q3DScene *scene = d_ptr->m_visualController->scene();
+    scene->d_ptr->setWindowSize(QSize(width(), height()));
+    scene->d_ptr->setViewport(QRect(0, 0, width(), height()));
 }
 
 /*!
  * \internal
  */
-void Q3DWindow::renderNow()
+void Q3DWindow::exposeEvent(QExposeEvent *event)
 {
-    if (!isExposed())
-        return;
+    Q_UNUSED(event);
 
-    d_ptr->m_updatePending = false;
-
-    d_ptr->m_context->makeCurrent(this);
-
-    render();
-
-    d_ptr->m_context->swapBuffers(this);
+    if (isExposed())
+        d_ptr->renderNow();
 }
 
 Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
-    : q_ptr(q),
+    : QObject(0),
+      q_ptr(q),
       m_updatePending(false),
-      m_context(new QOpenGLContext(q)),
       m_visualController(0),
       m_devicePixelRatio(1.f)
 {
@@ -192,6 +202,49 @@ Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
 
 Q3DWindowPrivate::~Q3DWindowPrivate()
 {
+}
+
+void Q3DWindowPrivate::render()
+{
+    handleDevicePixelRatioChange();
+    m_visualController->synchDataToRenderer();
+    m_visualController->render();
+}
+
+void Q3DWindowPrivate::renderLater()
+{
+    if (!m_updatePending) {
+        m_updatePending = true;
+        QCoreApplication::postEvent(q_ptr, new QEvent(QEvent::UpdateRequest));
+    }
+}
+
+void Q3DWindowPrivate::renderNow()
+{
+    if (!q_ptr->isExposed())
+        return;
+
+    m_updatePending = false;
+
+    m_context->makeCurrent(q_ptr);
+
+    render();
+
+    m_context->swapBuffers(q_ptr);
+}
+
+void Q3DWindowPrivate::setVisualController(Abstract3DController *controller)
+{
+    m_visualController = controller;
+}
+
+void Q3DWindowPrivate::handleDevicePixelRatioChange()
+{
+    if (q_ptr->devicePixelRatio() == m_devicePixelRatio || !m_visualController)
+        return;
+
+    m_devicePixelRatio = q_ptr->devicePixelRatio();
+    m_visualController->scene()->setDevicePixelRatio(m_devicePixelRatio);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

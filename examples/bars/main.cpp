@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     //! [1]
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu, Finland (2006-2012)"));
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2006-2012)"));
 
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
@@ -73,24 +73,51 @@ int main(int argc, char **argv)
     smoothCheckBox->setChecked(false);
 
     QComboBox *barStyleList = new QComboBox(widget);
-    barStyleList->addItem(QStringLiteral("Bars"));
-    barStyleList->addItem(QStringLiteral("Pyramids"));
-    barStyleList->addItem(QStringLiteral("Cones"));
-    barStyleList->addItem(QStringLiteral("Cylinders"));
-    barStyleList->addItem(QStringLiteral("Beveled Bars"));
+    barStyleList->addItem(QStringLiteral("Bar"), int(QAbstract3DSeries::MeshBar));
+    barStyleList->addItem(QStringLiteral("Pyramid"), int(QAbstract3DSeries::MeshPyramid));
+    barStyleList->addItem(QStringLiteral("Cone"), int(QAbstract3DSeries::MeshCone));
+    barStyleList->addItem(QStringLiteral("Cylinder"), int(QAbstract3DSeries::MeshCylinder));
+    barStyleList->addItem(QStringLiteral("Bevel bar"), int(QAbstract3DSeries::MeshBevelBar));
+    barStyleList->addItem(QStringLiteral("Sphere"), int(QAbstract3DSeries::MeshSphere));
     barStyleList->setCurrentIndex(4);
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
     QComboBox *selectionModeList = new QComboBox(widget);
-    selectionModeList->addItem(QStringLiteral("None"));
-    selectionModeList->addItem(QStringLiteral("Bar"));
-    selectionModeList->addItem(QStringLiteral("Bar and Row"));
-    selectionModeList->addItem(QStringLiteral("Bar and Column"));
-    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"));
-    selectionModeList->addItem(QStringLiteral("Slice into Row"));
-    selectionModeList->addItem(QStringLiteral("Slice into Column"));
+    selectionModeList->addItem(QStringLiteral("None"),
+                               int(QDataVis::SelectionNone));
+    selectionModeList->addItem(QStringLiteral("Bar"),
+                               int(QDataVis::SelectionItem));
+    selectionModeList->addItem(QStringLiteral("Row"),
+                               int(QDataVis::SelectionRow));
+    selectionModeList->addItem(QStringLiteral("Bar and Row"),
+                               int(QDataVis::SelectionItemAndRow));
+    selectionModeList->addItem(QStringLiteral("Column"),
+                               int(QDataVis::SelectionColumn));
+    selectionModeList->addItem(QStringLiteral("Bar and Column"),
+                               int(QDataVis::SelectionItemAndColumn));
+    selectionModeList->addItem(QStringLiteral("Row and Column"),
+                               int(QDataVis::SelectionRowAndColumn));
+    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"),
+                               int(QDataVis::SelectionItemRowAndColumn));
+    selectionModeList->addItem(QStringLiteral("Slice into Row"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionRow));
+    selectionModeList->addItem(QStringLiteral("Slice into Row and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow));
+    selectionModeList->addItem(QStringLiteral("Slice into Column"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
+    selectionModeList->addItem(QStringLiteral("Slice into Column and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
+    selectionModeList->addItem(QStringLiteral("Multi: Bar, Row, Col"),
+                               int(QDataVis::SelectionItemRowAndColumn
+                                   | QDataVis::SelectionMultiSeries));
+    selectionModeList->addItem(QStringLiteral("Multi, Slice: Row, Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow
+                                   | QDataVis::SelectionMultiSeries));
+    selectionModeList->addItem(QStringLiteral("Multi, Slice: Col, Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn
+                                   | QDataVis::SelectionMultiSeries));
     selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
@@ -100,6 +127,10 @@ int main(int argc, char **argv)
     QCheckBox *gridCheckBox = new QCheckBox(widget);
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
+
+    QCheckBox *seriesCheckBox = new QCheckBox(widget);
+    seriesCheckBox->setText(QStringLiteral("Show second series"));
+    seriesCheckBox->setChecked(false);
 
     //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
@@ -146,7 +177,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
-    vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
+    vLayout->addWidget(smoothCheckBox);
+    vLayout->addWidget(seriesCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
     vLayout->addWidget(barStyleList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
@@ -170,7 +202,7 @@ int main(int argc, char **argv)
     //! [6]
 
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::changeLabelStyle);
+                     &GraphModifier::changeLabelBackground);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);
 
@@ -180,6 +212,13 @@ int main(int argc, char **argv)
                      &GraphModifier::setGridEnabled);
     QObject::connect(smoothCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setSmoothBars);
+    QObject::connect(seriesCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setSeriesVisibility);
+
+    QObject::connect(modifier, &GraphModifier::backgroundEnabledChanged,
+                     backgroundCheckBox, &QCheckBox::setChecked);
+    QObject::connect(modifier, &GraphModifier::gridEnabledChanged,
+                     gridCheckBox, &QCheckBox::setChecked);
 
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));
@@ -203,9 +242,13 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
 
+    QObject::connect(modifier, &GraphModifier::fontSizeChanged, fontSizeSlider,
+                     &QSlider::setValue);
+    QObject::connect(modifier, &GraphModifier::fontChanged, fontList,
+                     &QFontComboBox::setCurrentFont);
+
     //! [3]
     widget->show();
-    modifier->start();
     return app.exec();
     //! [3]
 }

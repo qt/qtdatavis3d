@@ -36,15 +36,7 @@
 
   See \l{Qt Quick 2 Surface Example} for more thorough usage example.
 
-  \sa ItemModelSurfaceDataProxy, Bars3D, Scatter3D, {Qt Data Visualization C++ Classes}
- */
-
-/*!
-  \qmlproperty SurfaceDataProxy Surface3D::dataProxy
-  The active data proxy.
-
-  If a proxy is not given, a temporary default proxy is created and activated.
-  This temporary proxy is destroyed if another proxy is explicitly set active via this property.
+  \sa Surface3DSeries, ItemModelSurfaceDataProxy, Bars3D, Scatter3D, {Qt Data Visualization C++ Classes}
  */
 
 /*!
@@ -75,16 +67,26 @@
  */
 
 /*!
-  \qmlproperty bool Surface3D::smoothSurfaceEnabled
-  The smoothing of surface. If false, the shading of the surface is flat.
- */
-
-/*!
-  \qmlproperty bool Surface3D::surfaceGridEnabled
-  The surface grid visibility. If false, no surface grid is drawn.
- */
-
 /*!
   \qmlproperty ColorGradient Surface3D::gradient
   The current surface gradient. Setting this property replaces the previous gradient.
+ */
+
+/*!
+ * \qmlproperty list<QSurface3DSeries> Surface3D::seriesList
+ * This property holds the series of the graph.
+ * By default, this property contains an empty list.
+ * To set the series, either use the addSeries() function or define them as children of the graph.
+ * \note The surface graph currently supports only a single series at a time.
+ */
+
+/*!
+ * \qmlmethod void Surface3D::addSeries(QSurface3DSeries *series)
+ * Adds the \a series to the graph.
+ * \note The surface graph currently supports only a single series at a time.
+ */
+
+/*!
+ * \qmlmethod void Surface3D::removeSeries(QSurface3DSeries *series)
+ * Remove the \a series from the graph.
  */

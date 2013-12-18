@@ -29,12 +29,22 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \since Qt Data Visualization 1.0
  *
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
- * for Q3DScatter. It maps roles defined in QItemModelScatterDataMapping to roles in the model.
+ * for Q3DScatter. It maps roles of QAbstractItemModel to the XYZ-values of Q3DScatter points.
  *
  * The data is resolved asynchronously whenever the mapping or the model changes.
  * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
  *
- * /sa {Qt Data Visualization Data Handling}
+ * Mapping ignores rows and columns of the QAbstractItemModel and treats
+ * all items equally. It requires the model to provide at least three roles for the data items
+ * that can be mapped to X, Y, and Z-values for the scatter points.
+ *
+ * For example, assume that you have a custom QAbstractItemModel for storing various measurements
+ * done on material samples, providing data for roles such as "density", "hardness", and
+ * "conductivity". You could visualize these properties on a scatter graph using this proxy:
+ *
+ * \snippet doc_src_qtdatavisualization.cpp 4
+ *
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!
@@ -51,11 +61,13 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * The data is resolved asynchronously whenever the mapping or the model changes.
  * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
  *
+ * For more details, see QItemModelScatterDataProxy documentation.
+ *
  * Usage example:
  *
  * \snippet doc_src_qmldatavisualization.cpp 8
  *
- * \sa ScatterDataProxy, ScatterDataMapping, {Qt Data Visualization Data Handling}
+ * \sa ScatterDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
@@ -64,29 +76,59 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty list ItemModelScatterDataProxy::activeMapping
- * The active mapping. Modifying a mapping that is set to the proxy will trigger data set
- * re-resolving.
+ * \qmlproperty string ItemModelScatterDataProxy::xPosRole
+ * The X position role of the mapping.
  */
 
 /*!
- * Constructs QItemModelScatterDataProxy.
+ * \qmlproperty string ItemModelScatterDataProxy::yPosRole
+ * The Y position role of the mapping.
  */
-QItemModelScatterDataProxy::QItemModelScatterDataProxy() :
-    QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this))
+
+/*!
+ * \qmlproperty string ItemModelScatterDataProxy::zPosRole
+ * The Z position role of the mapping.
+ */
+
+/*!
+ * Constructs QItemModelScatterDataProxy with optional \a parent.
+ */
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(QObject *parent)
+    : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
+    dptr()->connectItemModelHandler();
 }
 
 /*!
- * Constructs QItemModelScatterDataProxy with \a itemModel and \a mapping. Does not take ownership
- * of the model or the mapping, but does connect to them to listen for changes.
+ * Constructs QItemModelScatterDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
+ * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
-                                                       QItemModelScatterDataMapping *mapping) :
-    QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this))
+                                                       QObject *parent)
+    : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
-    dptr()->m_itemModelHandler->setActiveMapping(mapping);
+    dptr()->connectItemModelHandler();
+}
+
+/*!
+ * Constructs QItemModelScatterDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
+ * ownership of the \a itemModel, as typically item models are owned by other controls.
+ * The xPosRole property is set to \a xPosRole, yPosRole property to \a yPosRole, and zPosRole property
+ * to \a zPosRole.
+ */
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+                                                       const QString &xPosRole,
+                                                       const QString &yPosRole,
+                                                       const QString &zPosRole,
+                                                       QObject *parent)
+    : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
+{
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
+    dptr()->m_xPosRole = xPosRole;
+    dptr()->m_yPosRole = yPosRole;
+    dptr()->m_zPosRole = zPosRole;
+    dptr()->connectItemModelHandler();
 }
 
 /*!
@@ -113,50 +155,68 @@ const QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 }
 
 /*!
- * \property QItemModelScatterDataProxy::activeMapping
+ * \property QItemModelScatterDataProxy::xPosRole
  *
- * Defines the data mapping. The proxy takes ownership of the \a mapping.
- * Modifying a mapping that is set to the proxy will trigger data set re-resolving.
+ * Defines the X position role for the mapping.
  */
-void QItemModelScatterDataProxy::setActiveMapping(QItemModelScatterDataMapping *mapping)
+void QItemModelScatterDataProxy::setXPosRole(const QString &role)
 {
-    dptr()->m_itemModelHandler->setActiveMapping(mapping);
+    if (dptr()->m_xPosRole != role) {
+        dptr()->m_xPosRole = role;
+        emit xPosRoleChanged(role);
+    }
 }
 
-QItemModelScatterDataMapping *QItemModelScatterDataProxy::activeMapping() const
+QString QItemModelScatterDataProxy::xPosRole() const
 {
-    return static_cast<QItemModelScatterDataMapping *>(dptrc()->m_itemModelHandler->activeMapping());
-}
-
-/*!
- * Transfers the ownership of the \a mapping to this proxy. The mapping is not taken to use yet.
- * \sa setActiveMapping(), releaseMapping()
- */
-void QItemModelScatterDataProxy::addMapping(QItemModelScatterDataMapping *mapping)
-{
-    dptr()->m_itemModelHandler->addMapping(mapping);
+    return dptrc()->m_xPosRole;
 }
 
 /*!
- * Releases the ownership of the \a mapping back to the caller. If the mapping was the currently
- * active one, no mapping remains active after this call.
+ * \property QItemModelScatterDataProxy::yPosRole
+ *
+ * Defines the Y position role for the mapping.
  */
-void QItemModelScatterDataProxy::releaseMapping(QItemModelScatterDataMapping *mapping)
+void QItemModelScatterDataProxy::setYPosRole(const QString &role)
 {
-    dptr()->m_itemModelHandler->releaseMapping(mapping);
+    if (dptr()->m_yPosRole != role) {
+        dptr()->m_yPosRole = role;
+        emit yPosRoleChanged(role);
+    }
+}
+
+QString QItemModelScatterDataProxy::yPosRole() const
+{
+    return dptrc()->m_yPosRole;
 }
 
 /*!
- * \return list of mappings owned by the proxy.
+ * \property QItemModelScatterDataProxy::zPosRole
+ *
+ * Defines the Z position role for the mapping.
  */
-QList<QItemModelScatterDataMapping *> QItemModelScatterDataProxy::mappings() const
+void QItemModelScatterDataProxy::setZPosRole(const QString &role)
 {
-    QList<QItemModelScatterDataMapping *> retList;
-    QList<QAbstractDataMapping *> abstractList = dptrc()->m_itemModelHandler->mappings();
-    foreach (QAbstractDataMapping *mapping, abstractList)
-        retList.append(static_cast<QItemModelScatterDataMapping *>(mapping));
+    if (dptr()->m_zPosRole != role) {
+        dptr()->m_zPosRole = role;
+        emit zPosRoleChanged(role);
+    }
+}
 
-    return retList;
+QString QItemModelScatterDataProxy::zPosRole() const
+{
+    return dptrc()->m_zPosRole;
+}
+
+/*!
+ * Changes \a xPosRole, \a yPosRole and \a zPosRole mapping.
+ */
+void QItemModelScatterDataProxy::remap(const QString &xPosRole, const QString &yPosRole,
+                                       const QString &zPosRole)
+{
+    setXPosRole(xPosRole);
+    setYPosRole(yPosRole);
+    setZPosRole(zPosRole);
 }
 
 /*!
@@ -173,6 +233,18 @@ QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptr()
 const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() const
 {
     return static_cast<const QItemModelScatterDataProxyPrivate *>(d_ptr.data());
+}
+
+void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
+{
+    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
+                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
 // QItemModelScatterDataProxyPrivate

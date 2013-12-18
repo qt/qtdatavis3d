@@ -1,6 +1,6 @@
--------------------------------------------------
-Qt Data Visualization 0.1.0 (Techonology preview)
--------------------------------------------------
+-----------------------------------
+Qt Data Visualization 1.0.0 (alpha)
+-----------------------------------
 
 Qt Data Visualization module provides multiple graph types to visualize data in 3D space
 both with C++ and Qt Quick 2.
@@ -8,8 +8,11 @@ both with C++ and Qt Quick 2.
 System Requirements
 ===================
 
-- Qt 5.1 or newer
+- Qt 5.2 or newer
 - OpenGL 2.1 or newer (recommended) or OpenGL ES2 (reduced feature set)
+
+Platform specific recommendations:
+- Mac: OSX 10.8 recommended
 
 Building
 ========
@@ -19,7 +22,7 @@ Configure the project with qmake:
 After running qmake, build the project with make:
     (Linux) make
     (Windows with MinGw) mingw32-make
-    (Visual Studio) nmake
+    (Windows with Visual Studio) nmake
     (OSX) make
 
 The above generates the default makefiles for your configuration, which is typically
@@ -70,18 +73,16 @@ Please refer to the generated documentation for more information:
 Known Issues
 ============
 
-The technology preview version is still missing some features entirely, while some
-others may be only partially implemented. Here are some known issues:
-
-- Scatter graphs can only show zero centered axis ranges properly.
-- Value axis range of a bar graph with negative values need to be zero
-  centered to display properly.
-- Selection API is missing for surface graphs.
-- Shadows do not work for surface graphs.
-- Mac: Graphs drawn half the size on Retina displays.
 - Using multiple graphs in one application crashes on application shutdown
   unless the last graph to have active context is deleted last.
 - Android doesn't support both widgets and OpenGL simultaneously, so only
   the Qt Quick 2 API is usable in practice in Android.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
+- Surfaces with non-straight rows and columns do not always render properly.
+- Wrong item can end up selected if you do mouse selection and data removes/inserts
+  simultaneously due to the asynchronous nature of mouse selection handling.
+- Q3DLight class (and Light3D QML item) are currently not usable for anything.
+- Q3DScene::secondarySubviewOnTop property has currently no effect.
+- The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
+- Scatter "point" meshes do not support gradients, they always use the base color.

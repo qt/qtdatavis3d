@@ -20,25 +20,8 @@ import QtQuick 2.1
 import QtDataVisualization 1.0
 
 Item {
-    property alias mapping: valueMapping
     property alias model: dataModel
-    property alias proxy: modelProxy
 
-    //! [1]
-    BarDataMapping {
-        id: valueMapping
-        rowRole: "year"
-        columnRole: "month"
-        valueRole: "expenses"
-    }
-    //! [1]
-    //! [2]
-    ItemModelBarDataProxy {
-        id: modelProxy
-        activeMapping: valueMapping
-        itemModel: dataModel
-    }
-    //! [2]
     //! [0]
     ListModel {
         id: dataModel

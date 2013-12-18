@@ -21,8 +21,10 @@
 
 #include <QtDataVisualization/Q3DSurface>
 #include <QtDataVisualization/QSurfaceDataProxy>
+#include <QtDataVisualization/QSurface3DSeries>
 #include <QSlider>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -41,6 +43,8 @@ public:
 
     void toggleSmooth(bool enabled);
     void toggleSurfaceGrid(bool enable);
+    void toggleSurface(bool enable);
+    void toggleSeriesVisible(bool enable);
     void toggleSqrtSin(bool enable);
     void togglePlane(bool enable);
     void setHeightMapData(bool enable);
@@ -61,16 +65,31 @@ public:
     void gradientPressed();
     void changeFont(const QFont &font);
     void changeStyle();
+    void selectButtonClicked();
+    void setSelectionInfoLabel(QLabel *label) {m_selectionInfoLabel = label; }
+    void selectedPointChanged(const QPoint &point);
+    void changeRow();
+    void changeRows();
+    void changeMesh();
+    void changeItem();
+    void changeMultipleItem();
+    void changeMultipleRows();
+    void addRow();
+    void addRows();
+    void insertRow();
+    void insertRows();
+    void removeRow();
 
 public slots:
     void changeShadowQuality(int quality);
     void changeTheme(int theme);
+    void flipViews();
     void changeSelectionMode(int mode);
     void timeout();
 
 private:
-    void resetArrayAndSliders(QSurfaceDataArray *array, qreal minZ, qreal maxZ, qreal minX,
-                              qreal maxX);
+    void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
+                              float maxX);
 
     Q3DSurface *m_graph;
     QSlider *m_gridSliderX;
@@ -84,12 +103,18 @@ private:
     int m_zCount;
     int m_activeSample;
     int m_fontSize;
-    qreal m_rangeX;
-    qreal m_rangeZ;
-    qreal m_minX;
-    qreal m_minZ;
+    float m_rangeX;
+    float m_rangeZ;
+    float m_minX;
+    float m_minZ;
+    int m_addRowCounter;
+    int m_insertTestZPos;
+    int m_insertTestIndexPos;
     QTimer m_timer;
     QSurfaceDataArray *m_planeArray;
+    QLabel *m_selectionInfoLabel;
+    QSurface3DSeries *m_theSeries;
+    QSurface3DSeries::DrawFlags m_drawMode;
 };
 
 #endif

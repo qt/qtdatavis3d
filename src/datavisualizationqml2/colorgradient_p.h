@@ -39,8 +39,8 @@ class ColorGradientStop : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(qreal position READ position WRITE setPosition)
-    Q_PROPERTY(QColor color READ color WRITE setColor)
+    Q_PROPERTY(qreal position READ position WRITE setPosition NOTIFY positionChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:
     ColorGradientStop(QObject *parent = 0);
@@ -50,6 +50,10 @@ public:
 
     QColor color() const;
     void setColor(const QColor &color);
+
+signals:
+    void positionChanged(qreal position);
+    void colorChanged(QColor color);
 
 private:
     void updateGradient();
@@ -72,17 +76,11 @@ public:
 
     QQmlListProperty<ColorGradientStop> stops();
 
-Q_SIGNALS:
-    void updated();
-
-private:
     void doUpdate();
-
-private:
     QList<ColorGradientStop *> m_stops;
 
-    friend class ColorGradientStop;
-    friend class DeclarativeSurface;
+Q_SIGNALS:
+    void updated();
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -22,6 +22,8 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -76,12 +78,8 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [5]
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between them
-    m_graph->setBarThickness(1.0);
+    m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
-
-    // Set bar type to flat pyramids
-    m_graph->setBarType(QDataVis::MeshStylePyramids, false);
-
     //! [5]
 
 #ifndef USE_STATIC_DATA
@@ -90,7 +88,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_graph->setSelectionMode(QDataVis::SelectionModeItemRowAndColumn);
+    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
     m_graph->rowAxis()->setCategoryLabels(QStringList(QString()));
@@ -101,10 +99,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [6]
 
     // Set selection mode to slice row
-    m_graph->setSelectionMode(QDataVis::SelectionModeSliceRow);
-
-    // Set font
-    m_graph->setFont(QFont("Impact", 20));
+    m_graph->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
 
     //! [6]
 #endif
@@ -112,10 +107,13 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [7]
 
     // Set theme
-    m_graph->setTheme(QDataVis::ThemeDigia);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
+
+    // Set font
+    m_graph->theme()->setFont(QFont("Impact", 20));
 
     // Set preset camera position
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [7]
 }
 
@@ -159,11 +157,11 @@ void GraphDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    qreal hours[5][7] = {{2.0, 1.0, 3.0, 0.2, 1.0, 5.0, 10.0},     // week 1
-                         {0.5, 1.0, 3.0, 1.0, 2.0, 2.0, 3.0},      // week 2
-                         {1.0, 1.0, 2.0, 1.0, 4.0, 4.0, 4.0},      // week 3
-                         {0.0, 1.0, 0.0, 0.0, 2.0, 2.0, 0.3},      // week 4
-                         {3.0, 3.0, 6.0, 2.0, 2.0, 1.0, 1.0}};     // week 5
+    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 10.0f},     // week 1
+                         {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
+                         {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
+                         {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
+                         {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
     //! [9]
 
     // Add labels
@@ -171,7 +169,6 @@ void GraphDataGenerator::setupModel()
     m_graph->rowAxis()->setTitle("Week of year");
     m_graph->columnAxis()->setTitle("Day of week");
     m_graph->valueAxis()->setTitle("Hours spent on the Internet");
-    m_graph->valueAxis()->setSegmentCount(5);
     m_graph->valueAxis()->setLabelFormat("%.1f h");
     //! [10]
 
@@ -203,7 +200,7 @@ void GraphDataGenerator::addRow()
     for (int i = 0; i < m_columnCount; i++) {
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
-            ((qreal)i / (qreal)m_columnCount) / 2.0 + (qreal)(rand() % 30) / 100.0);
+            ((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
     }
     m_tableWidget->resizeColumnsToContents();
 }
@@ -222,7 +219,7 @@ void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
 {
     Q_UNUSED(previousRow)
     Q_UNUSED(previousColumn)
-    m_graph->setSelectedBarPos(QPoint(currentRow, currentColumn));
+    m_graph->seriesList().at(0)->setSelectedBar(QPoint(currentRow, currentColumn));
 }
 //! [14]
 
@@ -264,16 +261,17 @@ int main(int argc, char **argv)
 
     //! [2]
     // Since we are dealing with QTableWidget, the model will already have data sorted properly
-    // in rows and columns, so create a mapping to utilize this.
-    QItemModelBarDataMapping *mapping = new QItemModelBarDataMapping;
-    mapping->setUseModelCategories(true);
-    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model(), mapping);
-    graph->setActiveDataProxy(proxy);
+    // into rows and columns, so we simply set useModelCategories property to true to utilize this.
+    QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy(tableWidget->model());
+    proxy->setUseModelCategories(true);
+    QBar3DSeries *series = new QBar3DSeries(proxy);
+    series->setMesh(QAbstract3DSeries::MeshPyramid);
+    graph->addSeries(series);
     //! [2]
 
     //! [3]
     GraphDataGenerator generator(graph, tableWidget);
-    QObject::connect(graph, &Q3DBars::selectedBarPosChanged, &generator,
+    QObject::connect(series, &QBar3DSeries::selectedBarChanged, &generator,
                      &GraphDataGenerator::selectFromTable);
     QObject::connect(tableWidget, &QTableWidget::currentCellChanged, &generator,
                      &GraphDataGenerator::selectedFromTable);

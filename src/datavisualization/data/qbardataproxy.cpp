@@ -18,6 +18,7 @@
 
 #include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
+#include "qbar3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -42,32 +43,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * row manipulation methods provide an alternate versions that don't affect the row labels.
  * This enables the option of having row labels that relate to the position of the data in the
  * array rather than the data itself.
- *
- * QBarDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
- * \table
- *   \row
- *     \li @rowTitle      \li Title from row axis
- *   \row
- *     \li @colTitle      \li Title from column axis
- *   \row
- *     \li @valueTitle    \li Title from value axis
- *   \row
- *     \li @rowIdx        \li Visible row index
- *   \row
- *     \li @colIdx        \li Visible Column index
- *   \row
- *     \li @rowLabel      \li Label from row axis
- *   \row
- *     \li @colLabel      \li Label from column axis
- *   \row
- *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li %<format spec> \li Item value in specified format.
- * \endtable
- *
- * For example:
- * \snippet doc_src_qtdatavisualization.cpp 1
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -110,6 +85,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Bar3DSeries BarDataProxy::series
+ *
+ * The series this proxy is attached to.
+ */
+
+/*!
  * Constructs QBarDataProxy with the given \a parent.
  */
 QBarDataProxy::QBarDataProxy(QObject *parent) :
@@ -133,11 +114,22 @@ QBarDataProxy::~QBarDataProxy()
 }
 
 /*!
+ * \property QBarDataProxy::series
+ *
+ *  The series this proxy is attached to.
+ */
+QBar3DSeries *QBarDataProxy::series()
+{
+    return static_cast<QBar3DSeries *>(d_ptr->series());
+}
+
+/*!
  * Clears the existing array and row and column labels.
  */
 void QBarDataProxy::resetArray()
 {
     resetArray(0, QStringList(), QStringList());
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -151,6 +143,7 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray)
 {
     dptr()->resetArray(newArray, 0, 0);
     emit arrayReset();
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -165,10 +158,11 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLa
 {
     dptr()->resetArray(newArray, &rowLabels, &columnLabels);
     emit arrayReset();
+    emit rowCountChanged(rowCount());
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with \a row. The \a row can be
+ * Changes existing rows by replacing a row at \a rowIndex with a new \a row. The \a row can be
  * the same as the existing row already stored at the \a rowIndex.
  * Existing row labels are not affected.
  */
@@ -230,6 +224,7 @@ int QBarDataProxy::addRow(QBarDataRow *row)
 {
     int addIndex = dptr()->addRow(row, 0);
     emit rowsAdded(addIndex, 1);
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -242,6 +237,7 @@ int QBarDataProxy::addRow(QBarDataRow *row, const QString &label)
 {
     int addIndex = dptr()->addRow(row, &label);
     emit rowsAdded(addIndex, 1);
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -255,6 +251,7 @@ int QBarDataProxy::addRows(const QBarDataArray &rows)
 {
     int addIndex = dptr()->addRows(rows, 0);
     emit rowsAdded(addIndex, rows.size());
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -267,6 +264,7 @@ int QBarDataProxy::addRows(const QBarDataArray &rows, const QStringList &labels)
 {
     int addIndex = dptr()->addRows(rows, &labels);
     emit rowsAdded(addIndex, rows.size());
+    emit rowCountChanged(rowCount());
     return addIndex;
 }
 
@@ -281,6 +279,7 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row)
 {
     dptr()->insertRow(rowIndex, row, 0);
     emit rowsInserted(rowIndex, 1);
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -291,6 +290,7 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row, const QString &lab
 {
     dptr()->insertRow(rowIndex, row, &label);
     emit rowsInserted(rowIndex, 1);
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -304,6 +304,7 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows)
 {
     dptr()->insertRows(rowIndex, rows, 0);
     emit rowsInserted(rowIndex, rows.size());
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -314,6 +315,7 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows, const QS
 {
     dptr()->insertRows(rowIndex, rows, &labels);
     emit rowsInserted(rowIndex, rows.size());
+    emit rowCountChanged(rowCount());
 }
 
 /*!
@@ -328,6 +330,7 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount, bool removeLabels)
     if (rowIndex < rowCount() && removeCount >= 1) {
         dptr()->removeRows(rowIndex, removeCount, removeLabels);
         emit rowsRemoved(rowIndex, removeCount);
+        emit rowCountChanged(rowCount());
     }
 }
 
@@ -482,7 +485,6 @@ QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
       m_dataArray(new QBarDataArray)
 {
-    m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
 }
 
 QBarDataProxyPrivate::~QBarDataProxyPrivate()
@@ -693,7 +695,7 @@ QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endR
             endColumn = qMin(endColumn, row->size() - 1);
             for (int j = startColumn; j <= endColumn; j++) {
                 const QBarDataItem &item = m_dataArray->at(i)->at(j);
-                qreal itemValue = item.value();
+                float itemValue = item.value();
                 if (limits.second < itemValue)
                     limits.second = itemValue;
                 if (limits.first > itemValue)
@@ -702,6 +704,13 @@ QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endR
         }
     }
     return limits;
+}
+
+void QBarDataProxyPrivate::setSeries(QAbstract3DSeries *series)
+{
+    QAbstractDataProxyPrivate::setSeries(series);
+    QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(series);
+    emit qptr()->seriesChanged(barSeries);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

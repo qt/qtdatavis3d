@@ -20,11 +20,13 @@
 #define CHARTMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
-
+#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtDataVisualization/qbar3dseries.h>
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
 #include <QPointer>
+#include <QColorDialog>
 
 using namespace QtDataVisualization;
 
@@ -32,7 +34,7 @@ class GraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphModifier(Q3DBars *barchart);
+    explicit GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog);
     ~GraphModifier();
 
     void resetTemperatureData();
@@ -64,6 +66,8 @@ public:
     void setSampleCountZ(int samples);
     void setMinX(int min);
     void setMinZ(int min);
+    void setMinY(int min);
+    void setMaxY(int max);
     void start();
     void restart(bool dynamicData);
     void selectBar();
@@ -71,32 +75,41 @@ public:
     void releaseAxes();
     void releaseProxies();
     void createMassiveArray();
+    void useOwnTheme();
+    void changeBaseColor(const QColor &color);
+    void changeColorStyle();
+    void showFiveSeries();
+    QBarDataArray *makeDummyData();
 
 public slots:
+    void flipViews();
+    void setGradient();
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);
+    void setUseNullInputHandler(bool useNull);
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
-    Q3DBars *m_chart;
+    Q3DBars *m_graph;
+    QColorDialog *m_colorDialog;
     int m_columnCount;
     int m_rowCount;
-    qreal m_xRotation;
-    qreal m_yRotation;
+    float m_xRotation;
+    float m_yRotation;
     bool m_static;
-    qreal m_barSpacingX;
-    qreal m_barSpacingZ;
+    float m_barSpacingX;
+    float m_barSpacingZ;
     int m_fontSize;
     int m_segments;
     int m_subSegments;
-    qreal m_minval;
-    qreal m_maxval;
+    float m_minval;
+    float m_maxval;
     QStringList m_months;
     QStringList m_years;
-    QPoint m_selectedBarPos;
+    QPoint m_selectedBar;
     Q3DValueAxis *m_autoAdjustingAxis;
     Q3DValueAxis *m_fixedRangeAxis;
     Q3DValueAxis *m_temperatureAxis;
@@ -104,9 +117,18 @@ private:
     Q3DCategoryAxis *m_monthAxis;
     Q3DCategoryAxis *m_genericRowAxis;
     Q3DCategoryAxis *m_genericColumnAxis;
-    QBarDataProxy *m_temperatureData;
-    QBarDataProxy *m_genericData;
+    QBar3DSeries *m_temperatureData;
+    QBar3DSeries *m_temperatureData2;
+    QBar3DSeries *m_genericData;
+    QBar3DSeries *m_dummyData;
+    QBar3DSeries *m_dummyData2;
+    QBar3DSeries *m_dummyData3;
+    QBar3DSeries *m_dummyData4;
+    QBar3DSeries *m_dummyData5;
     Q3DValueAxis *m_currentAxis;
+    bool m_negativeValuesOn;
+    bool m_useNullInputHandler;
+    QAbstract3DInputHandler *m_defaultInputHandler;
 };
 
 #endif

@@ -51,7 +51,7 @@ class Theme;
 class Drawer;
 class Q3DCamera;
 
-class QT_DATAVISUALIZATION_EXPORT SelectionPointer : public QObject, protected QOpenGLFunctions
+class SelectionPointer : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
 
@@ -59,29 +59,29 @@ public:
     explicit SelectionPointer(Drawer *drawer);
     ~SelectionPointer();
 
-    void initializeOpenGL();
     void render(GLuint defaultFboHandle = 0);
     void setPosition(QVector3D position);
-    void setLabel(QString label);
+    void setLabel(const QString &label);
+    void setPointerObject(ObjectHelper *object);
     void handleDrawerChange();
     void updateBoundingRect(QRect rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
+    void setHighlightColor(QVector3D colorVector);
 
 private:
+    void initializeOpenGL();
     void initShaders();
     void loadLabelMesh();
-    void loadPointMesh();
 
 private:
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
     ObjectHelper *m_labelObj;
-    ObjectHelper *m_pointObj;
+    ObjectHelper *m_pointObj; // Not owned
     TextureHelper *m_textureHelper;
-    bool m_isInitialized;
-    Theme m_cachedTheme;
-    QDataVis::LabelStyle m_labelStyle;
+    Q3DTheme *m_cachedTheme;
+    bool m_labelBackground;
     LabelItem m_labelItem;
     Drawer *m_drawer;
     QRect m_mainViewPort;
@@ -90,6 +90,7 @@ private:
     QString m_label;
     bool m_cachedIsSlicingActivated;
     GLfloat m_autoScaleAdjustment;
+    QVector3D m_highlightColor;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -36,6 +36,7 @@
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
 #include "qbardataproxy.h"
+#include "qbar3dseries.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -47,27 +48,18 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeBars : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy)
-    Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis)
-    Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis)
-    Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis)
-    Q_PROPERTY(QtDataVisualization::QDataVis::MeshStyle barType READ barType WRITE setBarType)
-    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
-    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
-    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
-    Q_PROPERTY(bool barSmoothingEnabled READ isBarSmoothingEnabled WRITE setBarSmoothingEnabled)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QPointF selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
-    Q_ENUMS(QtDataVisualization::QDataVis::MeshStyle)
+    Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
+    Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
+    Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
+    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
+    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
+    Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
+    Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
-
-    Q_INVOKABLE void setBarColor(const QColor &baseColor, bool uniform = true);
-
-    QBarDataProxy *dataProxy() const;
-    void setDataProxy(QBarDataProxy *dataProxy);
 
     Q3DCategoryAxis *rowAxis() const;
     void setRowAxis(Q3DCategoryAxis *axis);
@@ -76,8 +68,8 @@ public:
     Q3DCategoryAxis *columnAxis() const;
     void setColumnAxis(Q3DCategoryAxis *axis);
 
-    void setBarThickness(qreal thicknessRatio);
-    qreal barThickness() const;
+    void setBarThickness(float thicknessRatio);
+    float barThickness() const;
 
     void setBarSpacing(QSizeF spacing);
     QSizeF barSpacing() const;
@@ -85,27 +77,25 @@ public:
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative() const;
 
-    void setBarType(QDataVis::MeshStyle style);
-    QDataVis::MeshStyle barType() const;
-
-    void setBarSmoothingEnabled(bool enabled);
-    bool isBarSmoothingEnabled() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
-
-    void setSelectedBarPos(const QPointF &position);
-    QPointF selectedBarPos() const;
+    QQmlListProperty<QBar3DSeries> seriesList();
+    static void appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series);
+    static int countSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
+    static QBar3DSeries *atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, int index);
+    static void clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
+    Q_INVOKABLE void addSeries(QBar3DSeries *series);
+    Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
 signals:
-    void selectedBarPosChanged(const QPointF &position);
-
-protected:
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    void rowAxisChanged(Q3DCategoryAxis *axis);
+    void valueAxisChanged(Q3DValueAxis *axis);
+    void columnAxisChanged(Q3DCategoryAxis *axis);
+    void barThicknessChanged(float thicknessRatio);
+    void barSpacingChanged(QSizeF spacing);
+    void barSpacingRelativeChanged(bool relative);
+    void meshFileNameChanged(QString filename);
 
 private:
-    Bars3DController *m_shared;
-    QSize m_initialisedSize;
+    Bars3DController *m_barsController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

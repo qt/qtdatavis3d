@@ -2,7 +2,7 @@ include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
 
 project             = QtDataVisualization
 description         = Qt Data Visualization Reference Documentation
-version             = 0.1.0
+version             = 1.0.0
 
 exampledirs += ../../../examples \
                snippets
@@ -18,14 +18,14 @@ depends += qtcore \
 qhp.projects                            = qtdatavisualization
 
 qhp.qtdatavisualization.file            = qtdatavisualization.qhp
-qhp.qtdatavisualization.namespace       = com.digia.qtdatavisualization.010
+qhp.qtdatavisualization.namespace       = com.digia.qtdatavisualization.100
 qhp.qtdatavisualization.virtualFolder   = qtdatavisualization
 qhp.qtdatavisualization.indexTitle      = Qt Data Visualization
 qhp.qtdatavisualization.indexRoot       =
 
-qhp.qtdatavisualization.filterAttributes                        = qtdatavisualization 0.1.0 qtrefdoc
-qhp.qtdatavisualization.customFilters.Qt.name                   = QtDataVisualization 0.1.0
-qhp.qtdatavisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 0.1.0
+qhp.qtdatavisualization.filterAttributes                        = qtdatavisualization 1.0.0 qtrefdoc
+qhp.qtdatavisualization.customFilters.Qt.name                   = QtDataVisualization 1.0.0
+qhp.qtdatavisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 1.0.0
 qhp.qtdatavisualization.subprojects                             = gettingstarted examples classes types
 qhp.qtdatavisualization.subprojects.gettingstarted.title        = Getting Started
 qhp.qtdatavisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started

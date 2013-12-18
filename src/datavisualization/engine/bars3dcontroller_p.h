@@ -37,17 +37,17 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Bars3DRenderer;
-class QBarDataProxy;
+class QBar3DSeries;
 
 struct Bars3DChangeBitField {
     bool slicingActiveChanged     : 1;
     bool barSpecsChanged          : 1;
-    bool selectedBarPosChanged    : 1;
+    bool selectedBarChanged       : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
         barSpecsChanged(true),
-        selectedBarPosChanged(true)
+        selectedBarChanged(true)
     {
     }
 };
@@ -60,7 +60,9 @@ private:
     Bars3DChangeBitField m_changeTracker;
 
     // Interaction
-    QPoint m_selectedBarPos;     // Points to row & column in data window.
+    QPoint m_selectedBar;     // Points to row & column in data window.
+    QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
+                                       // single series selection cases.
 
     // Look'n'feel
     bool m_isBarSpecRelative;
@@ -74,7 +76,7 @@ public:
     explicit Bars3DController(QRect rect);
     ~Bars3DController();
 
-    void initializeOpenGL();
+    virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
@@ -87,23 +89,20 @@ public:
     QSizeF barSpacing();
     bool isBarSpecRelative();
 
-    // bar type; bars (=cubes), pyramids, cones, cylinders, etc.
-    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
-
-    // Change selection mode; single bar, bar and row, bar and column, or all
-    void setSelectionMode(QDataVis::SelectionMode mode);
-
-    void setSelectedBarPos(const QPoint &position);
-    QPoint selectedBarPos() const;
-
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectedBar(const QPoint &position, QBar3DSeries *series);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
-    static QPoint noSelectionPoint();
+    static QPoint invalidSelectionPosition();
 
     virtual void setAxisX(Q3DAbstractAxis *axis);
     virtual void setAxisZ(Q3DAbstractAxis *axis);
+
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
 
@@ -117,16 +116,15 @@ public slots:
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
 
-    void handleSelectedBarPosChanged(const QPoint &position);
-
-signals:
-    void selectedBarPosChanged(QPoint position);
+    // Renderer callback handlers
+    void handleBarClicked(const QPoint &position, QBar3DSeries *series);
 
 protected:
     virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
 
 private:
     void adjustAxisRanges();
+    void adjustSelectionPosition(QPoint &pos, const QBar3DSeries *series);
 
     Q_DISABLE_COPY(Bars3DController)
 

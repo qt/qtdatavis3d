@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "graphmodifier.h"
+#include <QtDataVisualization/q3dtheme.h>
 
 #include <QApplication>
 #include <QWidget>
@@ -43,13 +44,15 @@ int main(int argc, char *argv[])
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
     vLayout->setAlignment(Qt::AlignTop);
+    vLayout2->setAlignment(Qt::AlignTop);
 
     Q3DSurface *surfaceGraph = new Q3DSurface();
     QSize screenSize = surfaceGraph->screen()->size();
 
     // Set to default, should be same as the initial on themeList
-    surfaceGraph->setTheme(QDataVis::Theme(initialTheme));
+    surfaceGraph->setTheme(new Q3DTheme(Q3DTheme::Theme(initialTheme)));
 
     QWidget *container = QWidget::createWindowContainer(surfaceGraph);
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
@@ -61,14 +64,23 @@ int main(int argc, char *argv[])
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     QCheckBox *smoothCB = new QCheckBox(widget);
-    smoothCB->setText(QStringLiteral("Smooth "));
-    smoothCB->setChecked(surfaceGraph->isSmoothSurfaceEnabled());
+    smoothCB->setText(QStringLiteral("Flat Surface"));
+    smoothCB->setChecked(true);
 
     QCheckBox *surfaceGridCB = new QCheckBox(widget);
     surfaceGridCB->setText(QStringLiteral("Surface Grid"));
     surfaceGridCB->setChecked(true);
+
+    QCheckBox *surfaceCB = new QCheckBox(widget);
+    surfaceCB->setText(QStringLiteral("Surface Visible"));
+    surfaceCB->setChecked(true);
+
+    QCheckBox *seriesVisibleCB = new QCheckBox(widget);
+    seriesVisibleCB->setText(QStringLiteral("Series Visible"));
+    seriesVisibleCB->setChecked(true);
 
     //QCheckBox *sqrtSinCB = new QCheckBox(widget);
     QRadioButton *sqrtSinCB = new QRadioButton(widget);
@@ -146,6 +158,9 @@ int main(int argc, char *argv[])
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
+    QPushButton *meshButton = new QPushButton(widget);
+    meshButton->setText(QStringLiteral("Change pointer mesh"));
+
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
@@ -157,25 +172,86 @@ int main(int argc, char *argv[])
     themeList->addItem(QStringLiteral("Isabelle"));
     themeList->setCurrentIndex(initialTheme);
 
-//    QComboBox *shadowQuality = new QComboBox(widget);
-//    shadowQuality->addItem(QStringLiteral("None"));
-//    shadowQuality->addItem(QStringLiteral("Low"));
-//    shadowQuality->addItem(QStringLiteral("Medium"));
-//    shadowQuality->addItem(QStringLiteral("High"));
-//    shadowQuality->addItem(QStringLiteral("Low Soft"));
-//    shadowQuality->addItem(QStringLiteral("Medium Soft"));
-//    shadowQuality->addItem(QStringLiteral("High Soft"));
-//    shadowQuality->setCurrentIndex(3);
+    QComboBox *shadowQuality = new QComboBox(widget);
+    shadowQuality->addItem(QStringLiteral("None"));
+    shadowQuality->addItem(QStringLiteral("Low"));
+    shadowQuality->addItem(QStringLiteral("Medium"));
+    shadowQuality->addItem(QStringLiteral("High"));
+    shadowQuality->addItem(QStringLiteral("Low Soft"));
+    shadowQuality->addItem(QStringLiteral("Medium Soft"));
+    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->setCurrentIndex(3);
+
     QComboBox *selectionMode = new QComboBox(widget);
-    selectionMode->addItem(QStringLiteral("SelectionModeNone"));
-    selectionMode->addItem(QStringLiteral("SelectionModeItem"));
-    selectionMode->addItem(QStringLiteral("SelectionModeSliceRow"));
-    selectionMode->addItem(QStringLiteral("SelectionModeSliceColumn"));
+    selectionMode->addItem(QStringLiteral("None"),
+                               int(QDataVis::SelectionNone));
+    selectionMode->addItem(QStringLiteral("Item"),
+                               int(QDataVis::SelectionItem));
+    selectionMode->addItem(QStringLiteral("Row"),
+                               int(QDataVis::SelectionRow));
+    selectionMode->addItem(QStringLiteral("Item and Row"),
+                               int(QDataVis::SelectionItemAndRow));
+    selectionMode->addItem(QStringLiteral("Column"),
+                               int(QDataVis::SelectionColumn));
+    selectionMode->addItem(QStringLiteral("Item and Column"),
+                               int(QDataVis::SelectionItemAndColumn));
+    selectionMode->addItem(QStringLiteral("Row and Column"),
+                               int(QDataVis::SelectionRowAndColumn));
+    selectionMode->addItem(QStringLiteral("Item, Row and Column"),
+                               int(QDataVis::SelectionItemRowAndColumn));
+    selectionMode->addItem(QStringLiteral("Slice into Row"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionRow));
+    selectionMode->addItem(QStringLiteral("Slice into Row and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow));
+    selectionMode->addItem(QStringLiteral("Slice into Column"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
+    selectionMode->addItem(QStringLiteral("Slice into Column and Item"),
+                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
     selectionMode->setCurrentIndex(1);
+
+    QPushButton *selectButton = new QPushButton(widget);
+    selectButton->setText(QStringLiteral("Select random point"));
+
+    QPushButton *flipViewsButton = new QPushButton(widget);
+    flipViewsButton->setText(QStringLiteral("Flip Views"));
+
+    QLabel *selectionInfoLabel = new QLabel(widget);
+
+    QPushButton *changeRowButton = new QPushButton(widget);
+    changeRowButton->setText(QStringLiteral("Change a row"));
+
+    QPushButton *changeRowsButton = new QPushButton(widget);
+    changeRowsButton->setText(QStringLiteral("Change 3 rows"));
+
+    QPushButton *changeItemButton = new QPushButton(widget);
+    changeItemButton->setText(QStringLiteral("Change item"));
+
+    QPushButton *changeMultipleItemButton = new QPushButton(widget);
+    changeMultipleItemButton->setText(QStringLiteral("Change many items"));
+
+    QPushButton *changeMultipleRowsButton = new QPushButton(widget);
+    changeMultipleRowsButton->setText(QStringLiteral("Change many rows"));
+
+    QPushButton *addRowButton = new QPushButton(widget);
+    addRowButton->setText(QStringLiteral("Add a row"));
+
+    QPushButton *addRowsButton = new QPushButton(widget);
+    addRowsButton->setText(QStringLiteral("Add 3 rows"));
+
+    QPushButton *insertRowButton = new QPushButton(widget);
+    insertRowButton->setText(QStringLiteral("Insert a row"));
+
+    QPushButton *insertRowsButton = new QPushButton(widget);
+    insertRowsButton->setText(QStringLiteral("Insert 3 rows"));
+
+    QPushButton *removeRowButton = new QPushButton(widget);
+    removeRowButton->setText(QStringLiteral("Remove a row"));
 
     // Add controls to the layout
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
+    vLayout->addWidget(surfaceCB);
+    vLayout->addWidget(seriesVisibleCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
     vLayout->addWidget(planeCB);
@@ -194,12 +270,27 @@ int main(int argc, char *argv[])
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(labelButton);
+    vLayout->addWidget(meshButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout->addWidget(themeList);
-//    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-//    vLayout->addWidget(shadowQuality);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
     vLayout->addWidget(selectionMode);
+    vLayout->addWidget(selectButton);
+    vLayout->addWidget(selectionInfoLabel);
+    vLayout->addWidget(flipViewsButton);
+
+    vLayout2->addWidget(changeRowButton);
+    vLayout2->addWidget(changeRowsButton);
+    vLayout2->addWidget(changeMultipleRowsButton);
+    vLayout2->addWidget(changeItemButton);
+    vLayout2->addWidget(changeMultipleItemButton);
+    vLayout2->addWidget(addRowButton);
+    vLayout2->addWidget(addRowsButton);
+    vLayout2->addWidget(insertRowButton);
+    vLayout2->addWidget(insertRowsButton);
+    vLayout2->addWidget(removeRowButton);
 
     widget->show();
 
@@ -210,6 +301,10 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleSmooth);
     QObject::connect(surfaceGridCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleSurfaceGrid);
+    QObject::connect(surfaceCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurface);
+    QObject::connect(seriesVisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeriesVisible);
     QObject::connect(sqrtSinCB, &QRadioButton::toggled,
                      modifier, &GraphModifier::toggleSqrtSin);
     QObject::connect(planeCB, &QCheckBox::toggled,
@@ -236,12 +331,38 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::changeFont);
     QObject::connect(labelButton, &QPushButton::clicked,
                      modifier, &GraphModifier::changeStyle);
+    QObject::connect(meshButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::changeMesh);
     QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeTheme(int)));
-//    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
-//                     modifier, SLOT(changeShadowQuality(int)));
+    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)),
+                     modifier, SLOT(changeShadowQuality(int)));
     QObject::connect(selectionMode, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeSelectionMode(int)));
+    QObject::connect(selectButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::selectButtonClicked);
+    QObject::connect(flipViewsButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::flipViews);
+    QObject::connect(changeRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeRow);
+    QObject::connect(changeRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeRows);
+    QObject::connect(changeItemButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeItem);
+    QObject::connect(changeMultipleItemButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeMultipleItem);
+    QObject::connect(changeMultipleRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::changeMultipleRows);
+    QObject::connect(addRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::addRow);
+    QObject::connect(addRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::addRows);
+    QObject::connect(insertRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::insertRow);
+    QObject::connect(insertRowsButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::insertRows);
+    QObject::connect(removeRowButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::removeRow);
 
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);
@@ -250,7 +371,9 @@ int main(int argc, char *argv[])
     modifier->setAxisMinSliderX(axisMinSliderX);
     modifier->setAxisMinSliderZ(axisMinSliderZ);
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
+    modifier->setSelectionInfoLabel(selectionInfoLabel);
     sqrtSinCB->setChecked(true);
+    shadowQuality->setCurrentIndex(3);
 
     return app.exec();
 }

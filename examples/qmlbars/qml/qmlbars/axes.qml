@@ -31,7 +31,7 @@ Item {
     //! [0]
     CategoryAxis3D {
         id: columnAxis
-        categoryLabels: ["January", "February", "March", "April", "May", "June",
+        labels: ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"]
     }
     //! [0]

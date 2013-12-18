@@ -41,17 +41,22 @@ StaticLibInitializer staticLibInitializer;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Drawer::Drawer(const Theme &theme, const QFont &font, QDataVis::LabelStyle style)
+// Vertex array buffer for point
+const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
+
+Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
-      m_font(font),
-      m_style(style),
-      m_textureHelper(0)
+      m_font(theme->font()),
+      m_labelBackground(theme->isLabelBackgroundEnabled()),
+      m_textureHelper(0),
+      m_pointbuffer(0)
 {
 }
 
 Drawer::~Drawer()
 {
     delete m_textureHelper;
+    glDeleteBuffers(1, &m_pointbuffer);
 }
 
 void Drawer::initializeOpenGL()
@@ -62,19 +67,23 @@ void Drawer::initializeOpenGL()
     }
 }
 
-void Drawer::setTheme(const Theme &theme)
+void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
+    m_font = m_theme->font();
+    m_labelBackground = m_theme->isLabelBackgroundEnabled();
     emit drawerChanged();
 }
 
-Theme Drawer::theme() const
+Q3DTheme *Drawer::theme() const
 {
     return m_theme;
 }
 
 void Drawer::setFont(const QFont &font)
 {
+    // We need to be able to override theme's font for drawer
+    // TODO: (or do we?)
     m_font = font;
     emit drawerChanged();
 }
@@ -84,9 +93,11 @@ QFont Drawer::font() const
     return m_font;
 }
 
-void Drawer::setStyle(QDataVis::LabelStyle style)
+void Drawer::setLabelBackground(bool enabled)
 {
-    m_style = style;
+    // We need to be able to override theme's label background for drawer
+    // TODO: (or do we?)
+    m_labelBackground = enabled;
     emit drawerChanged();
 }
 
@@ -137,10 +148,14 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glDisableVertexAttribArray(shader->posAtt());
 
     // Release textures
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    if (depthTextureId) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    if (textureId) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
@@ -163,14 +178,36 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
     glDisableVertexAttribArray(shader->posAtt());
 }
 
+void Drawer::drawPoint(ShaderHelper *shader)
+{
+    // Generate vertex buffer for point if it does not exist
+    if (!m_pointbuffer) {
+        glGenBuffers(1, &m_pointbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(point_data), point_data, GL_STATIC_DRAW);
+    }
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the point
+    glDrawArrays(GL_POINTS, 0, 1);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat itemHeight, QDataVis::SelectionMode mode,
+                       GLfloat itemHeight, QDataVis::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
-                       const Q3DCamera *camera,
-                       bool useDepth, bool rotateAlong,
-                       LabelPosition position, Qt::AlignmentFlag alignment)
+                       const Q3DCamera *camera, bool useDepth, bool rotateAlong,
+                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
 {
     // Draw label
     if (!labelItem.textureId())
@@ -277,7 +314,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (QDataVis::SelectionModeSliceColumn == mode)
+        else if (mode.testFlag(QDataVis::SelectionColumn) && isSlicing)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 
@@ -285,21 +322,17 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     modelMatrix.translate(xPosition + xAlignment, yPosition + yAlignment, zPosition + zAlignment);
 
     // Rotate
-    // TODO: We should convert rotations to use quaternions to avoid rotation order problems
-    //QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-    //QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-    //QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-    //QQuaternion rotQuaternion = rotQuatX + rotQuatY + rotQuatZ;
-    //modelMatrix.rotate(rotQuaternion);
-    modelMatrix.rotate(rotation.y(), 0.0f, 1.0f, 0.0f);
-    modelMatrix.rotate(rotation.z(), 0.0f, 0.0f, 1.0f);
-    modelMatrix.rotate(rotation.x(), 1.0f, 0.0f, 0.0f);
+    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
+    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
+    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
+    QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
+    modelMatrix.rotate(rotQuaternion);
 
     if (useDepth && !rotateAlong) {
-        qreal yComp = qreal(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
+        float yComp = float(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
         // Apply negative camera rotations to keep labels facing camera
-        qreal camRotationX = camera->xRotation();
-        qreal camRotationY = camera->yRotation();
+        float camRotationX = camera->xRotation();
+        float camRotationY = camera->yRotation();
         modelMatrix.rotate(-camRotationX, 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotationY - yComp, 1.0f, 0.0f, 0.0f);
     }
@@ -335,10 +368,10 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
         // Print label into a QImage using QPainter
         QImage label = Utils::printTextToImage(m_font,
                                                text,
-                                               m_theme.m_textBackgroundColor,
-                                               m_theme.m_textColor,
-                                               m_style,
-                                               m_theme.m_labelBorders,
+                                               m_theme->labelBackgroundColor(),
+                                               m_theme->labelTextColor(),
+                                               m_labelBackground,
+                                               m_theme->isLabelBorderEnabled(),
                                                widestLabel);
 
         // Set label size

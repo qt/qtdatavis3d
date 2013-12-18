@@ -48,6 +48,19 @@ public:
                    GLfloat yMin, bool changeGeometry);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
                          GLfloat yMin, bool changeGeometry);
+    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex,
+                         GLfloat yRange, GLfloat yMin);
+    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow,
+                         GLfloat yRange, GLfloat yMin);
+    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row,
+                          int column, GLfloat yRange, GLfloat yMin);
+    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row,
+                          int column, GLfloat yRange, GLfloat yMin);
+    void createSmoothIndices(int x, int y, int endX, int endY);
+    void createCoarseIndices(int x, int y, int columns, int rows);
+    void createSmoothGridlineIndices(int x, int y, int endX, int endY);
+    void createCoarseGridlineIndices(int x, int y, int endX, int endY);
+    void uploadBuffers();
     GLuint gridElementBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
@@ -56,7 +69,7 @@ private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                        const QVector<QVector3D> &normals, const GLint *indices,
-                       const GLint *gridIndices, bool changeGeometry);
+                       bool changeGeometry);
 
 private:
     enum SurfaceType {

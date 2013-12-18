@@ -40,13 +40,21 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QSurfaceDataProxy>(uri, 1, 0, "SurfaceDataProxy",
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
-                                                  QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+                                                    QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
-                                                  QLatin1String("Trying to create uncreatable: Scene3D."));
-
-    qmlRegisterType<QItemModelBarDataMapping>(uri, 1, 0, "BarDataMapping");
-    qmlRegisterType<QItemModelScatterDataMapping>(uri, 1, 0, "ScatterDataMapping");
-    qmlRegisterType<QItemModelSurfaceDataMapping>(uri, 1, 0, "SurfaceDataMapping");
+                                         QLatin1String("Trying to create uncreatable: Scene3D."));
+    qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
+                                                  QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
+    qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",
+                                             QLatin1String("Trying to create uncreatable: QBar3DSeries, use Bar3DSeries instead."));
+    qmlRegisterUncreatableType<QScatter3DSeries>(uri, 1, 0, "QScatter3DSeries",
+                                                 QLatin1String("Trying to create uncreatable: QScatter3DSeries, use Scatter3DSeries instead."));
+    qmlRegisterUncreatableType<QSurface3DSeries>(uri, 1, 0, "QSurface3DSeries",
+                                                 QLatin1String("Trying to create uncreatable: QSurface3DSeries, use Surface3DSeries instead."));
+    qmlRegisterUncreatableType<Q3DTheme>(uri, 1, 0, "Q3DTheme",
+                                         QLatin1String("Trying to create uncreatable: Q3DTheme, use Theme3D instead."));
+    qmlRegisterUncreatableType<QAbstract3DInputHandler>(uri, 1, 0, "AbstractInputHandler3D",
+                                                        QLatin1String("Trying to create uncreatable: AbstractInputHandler3D."));
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
@@ -56,6 +64,7 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
 
     qmlRegisterType<Q3DCamera>(uri, 1, 0, "Camera3D");
+    qmlRegisterType<Q3DLight>(uri, 1, 0, "Light3D");
 
     qmlRegisterType<QItemModelBarDataProxy>(uri, 1, 0, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelScatterDataProxy>(uri, 1, 0, "ItemModelScatterDataProxy");
@@ -64,6 +73,13 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
 
     qmlRegisterType<ColorGradientStop>(uri, 1, 0, "ColorGradientStop");
     qmlRegisterType<ColorGradient>(uri, 1, 0, "ColorGradient");
+
+    qmlRegisterType<DeclarativeColor>(uri, 1, 0, "ThemeColor");
+    qmlRegisterType<DeclarativeTheme3D>(uri, 1, 0, "Theme3D");
+
+    qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
+    qmlRegisterType<DeclarativeScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
+    qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

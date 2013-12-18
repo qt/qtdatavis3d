@@ -35,54 +35,74 @@
 
     This example shows two methods to set data to surface graph, using the HeightMapSurfaceDataProxy
     and ItemModelSurfaceDataProxy. First we go through setting the data using the height map specific
-    data proxy. It is done with the code snippet below. The \c heightMapFile property specifies the image
-    file containing the height data. The value properties defines the minimum and maximum values for
-    surface area width and depth. This example shows the terrain around Tycho crater at imaginary
-    position from 67 to 97 and from 30 to 60. Note that on the graph the scale on the Y dimension
-    exaggerates the height.
+    data proxy. It is done with the code snippet below. The proxy itself is contained in a
+    Surface3DSeries. Inside the HeightMapSurfaceDataProxy the \c heightMapFile specifies the
+    image file containing the height data. The value properties in the proxy define the minimum
+    and maximum values for surface area width and depth. This example shows the terrain around Tycho
+    crater at imaginary position from 67 to 97 and from 30 to 60. Note that on the graph the scale
+    on the Y dimension exaggerates the height.
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 4
+
+    The other method to set surface data used in this example is with model mapping. We do that by
+    first defining a \c ListModel containing the data for the surface:
 
     \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 0
-
-    The other method to set surface data used in this example is with model mapping. We do that by first
-    defining a ListModel containing the data for the surface:
-
-    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 1
     \dots 4
 
-    Then we set up a SurfaceDataMapping which maps the roles for columns, rows and values. In this
-    example the row holds values for longitude, column for latitude and the value is for height.
+    Then we set up a Surface3DSeries with a ItemModelSurfaceDataProxy:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 2
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 5
+    \dots
 
-    The ItemModelSurfaceDataProxy is created to tie the model and the mapping together.
+    We add the actual data to the \c itemModel of the ItemModelSurfaceDataProxy. We also define the
+    roles for columns, rows and values. In this example the row holds values for longitude, column
+    for latitude and the value is for height.
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 3
+    \dots 0
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 6
 
     \section1 Showing data
 
     In the \c main.qml, we set up the Surface3D element to show the data and various UI elements
-    to illustrate few interesting features. First is the surface gradient, which can be defined
-    as seen in this code snippet. With the \c ColorGradient we set example colors from position 0.0 to
-    1.0. This element is set for \c gradient property in Surface3D.
+    to illustrate few interesting features.
+
+    First is the gradient to be used for the surface, which can be defined as seen in the following
+    snippet. With the ColorGradient we set example colors from position 0.0 to 1.0.
 
     \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 0
 
-    Other interesting features can be controlled with buttons. The first button is to toggle on and off
-    the surface grid, for which use the following code.
+    This element is set into the \c baseGradients property in the \c theme used in Surface3D:
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 7
+
+    Other interesting features can be controlled with buttons.
+
+    The first button is to toggle on and off the surface grid, for which we use the following code:
 
     \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 1
 
-    Second button is for surface smooth status, which is controlled with this code.
+    Second button is for surface shading mode, which is controlled with this code:
 
     \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 2
 
-    Third and fourth buttons are for controlling background features. The last button is for switching
-    between HeightMapSurfaceDataProxy and ItemModelSurfaceDataProxy, for which we use the following
-    code. We also set the maximum value to 500 in model proxy to make the surface flatter and
-    250 on height map proxy to show exaggerated height. At the same time the color position
-    on the gradient is modified.
+    Third button is for series visibility, which is controlled with this code:
+
+    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 8
+
+    Notice that the \c drawMode and \c flatShadingEnable properties are set for both series.
+
+    Fourth and fifth buttons are for controlling background features.
+
+    The last button is for switching between the two series, one of which uses
+    HeightMapSurfaceDataProxy and the other one ItemModelSurfaceDataProxy. For this we use the
+    following code:
 
     \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 3
+
+    We also set the maximum value to 500 in model proxy to make the surface flatter and
+    250 on height map proxy to show exaggerated height. At the same time the middle color position
+    on the gradient is modified to match the value range change.
 
     \section1 Example contents
 */

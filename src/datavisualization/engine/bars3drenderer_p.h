@@ -51,9 +51,6 @@ class QT_DATAVISUALIZATION_EXPORT Bars3DRenderer : public Abstract3DRenderer
     Q_OBJECT
 
 private:
-    // TODO: Filter to the set of attributes to be moved to the model object.
-    Bars3DController *m_controller;
-
     // Cached state based on emitted signals from the controller
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;
@@ -63,21 +60,19 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    QList<BarRenderItem *> *m_sliceSelection;
+    QVector<BarRenderItem *> m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
-    QRect m_mainViewPort;
-    QRect m_sliceViewPort;
     bool m_updateLabels;
     ShaderHelper *m_barShader;
+    ShaderHelper *m_barGradientShader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_barObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -90,7 +85,8 @@ private:
     GLfloat m_shadowQualityToShader;
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
-    GLfloat m_yAdjustment;
+    GLfloat m_gradientFraction;
+    GLfloat m_negativeBackgroundAdjustment;
     GLfloat m_rowWidth;
     GLfloat m_columnDepth;
     GLfloat m_maxDimension;
@@ -98,55 +94,52 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
-    QVector3D m_selection;
-    QVector3D m_previousSelection;
-    int m_renderRows;
-    int m_renderColumns;
-
+    QPoint m_visualSelectedBarPos;
+    int m_visualSelectedBarSeriesIndex;
     bool m_hasHeightAdjustmentChanged;
+    QPoint m_selectedBarPos;
+    const QBar3DSeries *m_selectedBarSeries;
     BarRenderItem m_dummyBarRenderItem;
-
-    BarRenderItemArray m_renderItemArray;
+    QVector<BarRenderItemArray> m_renderingArrays;
+    bool m_noZeroInRange;
+    float m_seriesScale;
+    float m_seriesStep;
+    float m_seriesStart;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
-    void updateDataModel(QBarDataProxy *dataProxy);
+    void updateData();
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
-    QRect mainViewPort();
-
 protected:
     virtual void initializeOpenGL();
-    virtual void loadMeshFile();
 
 public slots:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
-    void updateSelectionMode(QDataVis::SelectionMode newMode);
     void updateSlicingActive(bool isSlicing);
-    void updateBackgroundEnabled(bool enable);
-    void updateSelectedBarPos(const QPoint &position);
+    void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
 
 signals:
-    void selectedBarPosChanged(QPoint position);
+    void barClicked(QPoint position, QBar3DSeries *series);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
+    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
-    void drawSlicedScene(const LabelItem &xLabel, const LabelItem &yLabel, const LabelItem &zLabel);
+    void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
-    void handleResize();
 
-    void setViewPorts();
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
@@ -160,7 +153,9 @@ private:
 #endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
-    Abstract3DController::SelectionType isSelected(GLint row, GLint bar);
+    Abstract3DController::SelectionType isSelected(int row, int bar, int seriesIndex);
+    QPoint selectionColorToArrayPosition(const QVector3D &selectionColor);
+    QBar3DSeries *selectionColorToSeries(const QVector3D &selectionColor);
 
     Q_DISABLE_COPY(Bars3DRenderer)
 

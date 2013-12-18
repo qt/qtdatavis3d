@@ -18,6 +18,7 @@
 
 #include "qscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
+#include "qscatter3dseries_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -31,29 +32,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
  *
- * QScatterDataProxy supports the following format tags for QAbstractDataProxy::setItemLabelFormat():
- * \table
- *   \row
- *     \li @xTitle    \li Title from X axis
- *   \row
- *     \li @yTitle    \li Title from Y axis
- *   \row
- *     \li @zTitle    \li Title from Z axis
- *   \row
- *     \li @xLabel    \li Item value formatted using the same format the X axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @yLabel    \li Item value formatted using the same format the Y axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- *   \row
- *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
- * \endtable
- *
- * For example:
- * \snippet doc_src_qtdatavisualization.cpp 2
- *
- * /sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Data Visualization Data Handling}
  */
 
 /*!
@@ -80,6 +59,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty Scatter3DSeries ScatterDataProxy::series
+ *
+ * The series this proxy is attached to.
+ */
+
+/*!
  * Constructs QScatterDataProxy with the given \a parent.
  */
 QScatterDataProxy::QScatterDataProxy(QObject *parent) :
@@ -103,6 +88,16 @@ QScatterDataProxy::~QScatterDataProxy()
 }
 
 /*!
+ * \property QScatterDataProxy::series
+ *
+ *  The series this proxy is attached to.
+ */
+QScatter3DSeries *QScatterDataProxy::series()
+{
+    return static_cast<QScatter3DSeries *>(d_ptr->series());
+}
+
+/*!
  * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
  * different from the existing array. If it's the same array, this just triggers arrayReset()
  * signal.
@@ -114,6 +109,7 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
         dptr()->resetArray(newArray);
 
     emit arrayReset();
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -143,6 +139,7 @@ int QScatterDataProxy::addItem(const QScatterDataItem &item)
 {
     int addIndex = dptr()->addItem(item);
     emit itemsAdded(addIndex, 1);
+    emit itemCountChanged(itemCount());
     return addIndex;
 }
 
@@ -155,6 +152,7 @@ int QScatterDataProxy::addItems(const QScatterDataArray &items)
 {
     int addIndex = dptr()->addItems(items);
     emit itemsAdded(addIndex, items.size());
+    emit itemCountChanged(itemCount());
     return addIndex;
 }
 
@@ -166,6 +164,7 @@ void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
 {
     dptr()->insertItem(index, item);
     emit itemsInserted(index, 1);
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -175,6 +174,7 @@ void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
 {
     dptr()->insertItems(index, items);
     emit itemsInserted(index, items.size());
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -183,8 +183,12 @@ void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
  */
 void QScatterDataProxy::removeItems(int index, int removeCount)
 {
+    if (index >= dptr()->m_dataArray->size())
+        return;
+
     dptr()->removeItems(index, removeCount);
     emit itemsRemoved(index, removeCount);
+    emit itemCountChanged(itemCount());
 }
 
 /*!
@@ -277,7 +281,6 @@ QScatterDataProxyPrivate::QScatterDataProxyPrivate(QScatterDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeScatter),
       m_dataArray(new QScatterDataArray)
 {
-    m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
 }
 
 QScatterDataProxyPrivate::~QScatterDataProxyPrivate()
@@ -346,22 +349,63 @@ void QScatterDataProxyPrivate::removeItems(int index, int removeCount)
     m_dataArray->remove(index, removeCount);
 }
 
-QVector3D QScatterDataProxyPrivate::limitValues()
+void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
 {
-    QVector3D limits;
-    for (int i = 0; i < m_dataArray->size(); i++) {
-        const QScatterDataItem &item = m_dataArray->at(i);
-        float xValue = qAbs(item.position().x());
-        if (limits.x() < xValue)
-            limits.setX(xValue);
-        float yValue = qAbs(item.position().y());
-        if (limits.y() < yValue)
-            limits.setY(yValue);
-        float zValue = qAbs(item.position().z());
-        if (limits.z() < zValue)
-            limits.setZ(zValue);
+    if (m_dataArray->isEmpty())
+        return;
+
+    const QVector3D &firstPos = m_dataArray->at(0).position();
+
+    float minX = firstPos.x();
+    float maxX = minX;
+    float minY = firstPos.y();
+    float maxY = minY;
+    float minZ = firstPos.z();
+    float maxZ = minZ;
+
+    if (m_dataArray->size() > 1) {
+        for (int i = 1; i < m_dataArray->size(); i++) {
+            const QVector3D &pos = m_dataArray->at(i).position();
+
+            float value = pos.x();
+            if (minX > value)
+                minX = value;
+            if (maxX < value)
+                maxX = value;
+
+            value = pos.y();
+            if (minY > value)
+                minY = value;
+            if (maxY < value)
+                maxY = value;
+
+            value = pos.z();
+            if (minZ > value)
+                minZ = value;
+            if (maxZ < value)
+                maxZ = value;
+        }
     }
-    return limits;
+
+    minValues.setX(minX);
+    minValues.setY(minY);
+    minValues.setZ(minZ);
+
+    maxValues.setX(maxX);
+    maxValues.setY(maxY);
+    maxValues.setZ(maxZ);
+}
+
+void QScatterDataProxyPrivate::setSeries(QAbstract3DSeries *series)
+{
+    QAbstractDataProxyPrivate::setSeries(series);
+    QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(series);
+    emit qptr()->seriesChanged(scatterSeries);
+}
+
+QScatterDataProxy *QScatterDataProxyPrivate::qptr()
+{
+    return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

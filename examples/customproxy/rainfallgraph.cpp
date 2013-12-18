@@ -21,6 +21,8 @@
 #include <QtDataVisualization/q3dvalueaxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QGuiApplication>
 #include <QFont>
 #include <QDebug>
@@ -39,13 +41,14 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_columnCount = m_numericMonths.size();
 
     m_proxy = new VariantBarDataProxy;
-    m_graph->setActiveDataProxy(m_proxy);
+    QBar3DSeries *series = new QBar3DSeries(m_proxy);
+    m_graph->addSeries(series);
 
     updateYearsList(2000, 2012);
 
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
-    m_graph->setBarThickness(1.0);
+    m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
 
     // Set axis labels and titles
@@ -56,26 +59,26 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     m_graph->valueAxis()->setTitle("rainfall");
     m_graph->valueAxis()->setLabelFormat("%d mm");
     m_graph->valueAxis()->setSegmentCount(5);
-    m_graph->rowAxis()->setCategoryLabels(m_years);
-    m_graph->columnAxis()->setCategoryLabels(months);
+    m_graph->rowAxis()->setLabels(m_years);
+    m_graph->columnAxis()->setLabels(months);
 
     // Set bar type to cylinder
-    m_graph->setBarType(QDataVis::MeshStyleCylinders, false);
+    series->setMesh(QAbstract3DSeries::MeshCylinder);
 
     // Set shadows to medium
     m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
 
-    // Set font
-    m_graph->setFont(QFont("Century Gothic", 30));
-
     // Set selection mode to bar and column
-    m_graph->setSelectionMode(QDataVis::SelectionModeSliceColumn);
+    m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
 
     // Set theme
-    m_graph->setTheme(QDataVis::ThemeArmyBlue);
+    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeArmyBlue));
+
+    // Set font to theme
+    m_graph->theme()->setFont(QFont("Century Gothic", 30));
 
     // Set camera position and zoom
-    m_graph->scene()->activeCamera()->setCameraPreset(QDataVis::CameraPresetIsometricRightHigh);
+    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRightHigh);
     m_graph->scene()->activeCamera()->setZoomLevel(75);
 
     // Set window title

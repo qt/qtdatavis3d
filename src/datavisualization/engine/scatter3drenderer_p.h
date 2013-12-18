@@ -52,25 +52,21 @@ class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
     Q_OBJECT
 
 private:
-    // TODO: Filter to the set of attributes to be moved to the model object.
-    // * All GL rendering only related attribs should be moved out of this public set.
-    // * All attribs that are modifiable from QML need to e in this set.
-
-    Scatter3DController *m_controller;
-
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
     bool m_xFlipped;
     bool m_zFlipped;
     bool m_yFlipped;
-    QRect m_mainViewPort;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
+    ShaderHelper *m_dotGradientShader;
+#if defined(QT_OPENGL_ES_2)
+    ShaderHelper *m_pointShader;
+#endif
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_dotObj;
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
@@ -84,37 +80,40 @@ private:
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
-    QVector3D m_selection;
-    QVector3D m_previousSelection;
+    int m_selectedItemIndex;
+    int m_selectedItemTotalIndex;
+    int m_selectedItemSeriesIndex;
+    const QScatter3DSeries *m_selectedSeries;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
-
+    QVector3D m_translationOffset;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-
-    ScatterRenderItemArray m_renderItemArray;
+    QVector<ScatterRenderItemArray> m_renderingArrays;
+    GLfloat m_backgroundMargin;
+    GLfloat m_maxItemSize;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateDataModel(QScatterDataProxy *dataProxy);
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
+    void updateData();
     void updateScene(Q3DScene *scene);
-    void render(GLuint defaultFboHandle);
 
-    QRect mainViewPort();
+    void render(GLuint defaultFboHandle);
 
 protected:
     virtual void initializeOpenGL();
-    virtual void loadMeshFile();
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
     virtual void updateTextures();
+    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawScene(GLuint defaultFboHandle);
-    void handleResize();
 
     void loadBackgroundMesh();
     void loadGridLineMesh();
@@ -126,6 +125,8 @@ private:
 #if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
     void updateDepthBuffer();
+#else
+    void initPointShader();
 #endif
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
@@ -135,19 +136,17 @@ private:
     friend class ScatterRenderItem;
 
 public slots:
-    void updateBackgroundEnabled(bool enable);
-
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, qreal min, qreal max);
+    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
 
-    void updateSelectedItemIndex(int index);
+    void updateSelectedItem(int index, const QScatter3DSeries *series);
 
 signals:
-    void selectionUpdated(QVector3D selection);
-    void selectedItemIndexChanged(int index);
+    void itemClicked(int index, QScatter3DSeries *series);
 
 private:
     QVector3D indexToSelectionColor(GLint index);
+    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

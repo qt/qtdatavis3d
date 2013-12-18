@@ -24,8 +24,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AxisRenderCache::AxisRenderCache()
     : m_type(Q3DAbstractAxis::AxisTypeNone),
-      m_min(0.0),
-      m_max(10.0),
+      m_min(0.0f),
+      m_max(10.0f),
       m_segmentCount(5),
       m_subSegmentCount(1),
       m_font(QFont(QStringLiteral("Arial"))),
@@ -58,8 +58,8 @@ void AxisRenderCache::setType(Q3DAbstractAxis::AxisType type)
     // If type is set, it means completely new axis instance, so clear all old data
     m_labels.clear();
     m_title.clear();
-    m_min = 0.0;
-    m_max = 10.0;
+    m_min = 0.0f;
+    m_max = 10.0f;
     m_segmentCount = 5;
     m_subSegmentCount = 1;
     m_labelFormat.clear();
@@ -109,13 +109,13 @@ void AxisRenderCache::setLabels(const QStringList &labels)
     }
 }
 
-void AxisRenderCache::setMin(qreal min)
+void AxisRenderCache::setMin(float min)
 {
     m_min = min;
     updateSegmentStep();
 }
 
-void AxisRenderCache::setMax(qreal max)
+void AxisRenderCache::setMax(float max)
 {
     m_max = max;
     updateSegmentStep();

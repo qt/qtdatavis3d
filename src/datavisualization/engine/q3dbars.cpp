@@ -21,12 +21,11 @@
 #include "bars3dcontroller_p.h"
 #include "q3dvalueaxis.h"
 #include "q3dcategoryaxis.h"
-#include "qbardataproxy.h"
 #include "q3dcamera.h"
+#include "qbar3dseries_p.h"
 
 #include <QMouseEvent>
 
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -46,28 +45,30 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: If no data proxy is set explicitly, Q3DBars creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DBars supports more than one series visible at the same time. It is not necessary for all series
+ * to have the same amount of rows and columns.
+ * Row and column labels are taken from the first added series, unless explicitly defined to
+ * row and column axes.
  *
- * Methods are provided for changing bar types, themes, bar selection modes and so on. See the
+ * Methods are provided for changing themes, bar selection modes and so on. See the
  * methods for more detailed descriptions.
  *
  * \section1 How to construct a minimal Q3DBars graph
  *
- * First, construct an instance of Q3DBars:
+ * First, construct an instance of Q3DBars. Since we are running the graph as top level window
+ * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
+ * default:
  *
  * \snippet doc_src_q3dbars_construction.cpp 4
  *
  * After constructing Q3DBars, you can set the data window by changing the range on the row and
  * column axes. It is not mandatory, as data window will default to showing all of the data in
- * the data proxy. If the amount of data is large, it is usually preferable to show just a
+ * the series. If the amount of data is large, it is usually preferable to show just a
  * portion of it. For the example, let's set the data window to show first five rows and columns:
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
  *
- * Now Q3DBars is ready to receive data to be rendered. Add one row of 5 qreals into the data
- * set:
+ * Now Q3DBars is ready to receive data to be rendered. Create a series with one row of 5 values:
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
  *
@@ -95,24 +96,60 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D bar window.
+ * Constructs a new 3D bar graph with optional \a parent window.
  */
-Q3DBars::Q3DBars()
-    : d_ptr(new Q3DBarsPrivate(this, geometry()))
+Q3DBars::Q3DBars(QWindow *parent)
+    : Q3DWindow(new Q3DBarsPrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Bars3DController::selectedBarPosChanged, this,
-                     &Q3DBars::selectedBarPosChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    dptr()->m_shared = new Bars3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DBars::selectionModeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DBars::shadowQualityChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DBars::themeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
+                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 /*!
- *  Destroys the 3D bar window.
+ * Destroys the 3D bar graph.
  */
 Q3DBars::~Q3DBars()
 {
+}
+
+/*!
+ * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
+ * so the rows and columns of all series must match for the visualized data to be meaningful.
+ * If the graph has multiple visible series, only the first one added will
+ * generate the row or column labels on the axes in cases where the labels are not explicitly set
+ * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
+ */
+void Q3DBars::addSeries(QBar3DSeries *series)
+{
+    dptr()->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DBars::removeSeries(QBar3DSeries *series)
+{
+    dptr()->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ */
+QList<QBar3DSeries *> Q3DBars::seriesList()
+{
+    return dptr()->m_shared->barSeriesList();
 }
 
 /*!
@@ -120,7 +157,7 @@ Q3DBars::~Q3DBars()
  */
 void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -128,7 +165,7 @@ void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DBars::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -136,7 +173,7 @@ void Q3DBars::touchEvent(QTouchEvent *event)
  */
 void Q3DBars::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -144,7 +181,7 @@ void Q3DBars::mousePressEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -152,7 +189,7 @@ void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DBars::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -160,34 +197,18 @@ void Q3DBars::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DBars::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DBars::resizeEvent(QResizeEvent *event)
+
+Q3DBarsPrivate *Q3DBars::dptr()
 {
-    Q_UNUSED(event);
-    d_ptr->m_shared->setSize(width(), height());
+    return static_cast<Q3DBarsPrivate *>(d_ptr.data());
 }
 
-/*!
- * Sets window \a width.
- */
-void Q3DBars::setWidth(const int width)
+const Q3DBarsPrivate *Q3DBars::dptrc() const
 {
-    d_ptr->m_shared->setWidth(width);
-    QWindow::setWidth(width);
-}
-
-/*!
- * Sets window \a height.
- */
-void Q3DBars::setHeight(const int height)
-{
-    d_ptr->m_shared->setHeight(height);
-    QWindow::setHeight(height);
+    return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
 }
 
 /*!
@@ -196,14 +217,17 @@ void Q3DBars::setHeight(const int height)
  * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
  * makes them twice as deep as they are wide. It is preset to \c 1.0 by default.
  */
-void Q3DBars::setBarThickness(qreal thicknessRatio)
+void Q3DBars::setBarThickness(float thicknessRatio)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+    if (thicknessRatio != barThickness()) {
+        dptr()->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        emit barThicknessChanged(thicknessRatio);
+    }
 }
 
-qreal Q3DBars::barThickness()
+float Q3DBars::barThickness()
 {
-    return d_ptr->m_shared->barThickness();
+    return dptr()->m_shared->barThickness();
 }
 
 /*!
@@ -216,12 +240,15 @@ qreal Q3DBars::barThickness()
  */
 void Q3DBars::setBarSpacing(QSizeF spacing)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+    if (spacing != barSpacing()) {
+        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+        emit barSpacingChanged(spacing);
+    }
 }
 
 QSizeF Q3DBars::barSpacing()
 {
-    return d_ptr->m_shared->barSpacing();
+    return dptr()->m_shared->barSpacing();
 }
 
 /*!
@@ -233,112 +260,48 @@ QSizeF Q3DBars::barSpacing()
  */
 void Q3DBars::setBarSpacingRelative(bool relative)
 {
-    d_ptr->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+    if (relative != isBarSpacingRelative()) {
+        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+        emit barSpacingRelativeChanged(relative);
+    }
 }
 
 bool Q3DBars::isBarSpacingRelative()
 {
-    return d_ptr->m_shared->isBarSpecRelative();
+    return dptr()->m_shared->isBarSpecRelative();
 }
 
 /*!
- * Sets the bar \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
- * \c QDataVis::MeshStyleBars by default. A \a smooth flag can be used to set shading to smooth.
- * It is \c false by default.
+ * \property Q3DBars::theme
  *
- * \sa setMeshFileName()
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
-void Q3DBars::setBarType(QDataVis::MeshStyle style, bool smooth)
+void Q3DBars::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setBarType(style, smooth);
+    dptr()->m_shared->setTheme(theme);
 }
 
-/*!
- * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects bar colors, label colors, text color, background color, window color and
- * grid color. Lighting is also adjusted by themes.
- *
- * \sa setBarColor()
- *
- * \preliminary
- */
-void Q3DBars::setTheme(QDataVis::Theme theme)
+Q3DTheme *Q3DBars::theme() const
 {
-    d_ptr->m_shared->setTheme(theme);
-}
-
-/*!
- * Set bar color using your own color. \a baseColor sets the base color of a bar. The \a uniform
- * -flag is used to define if color needs to be uniform throughout bar's length, or will the colors
- * be applied by height, starting with dark at the bottom. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa setTheme()
- *
- * \preliminary
- */
-void Q3DBars::setBarColor(const QColor &baseColor, bool uniform)
-{
-    d_ptr->m_shared->setObjectColor(baseColor, uniform);
-}
-
-/*!
- * \return bar color in use.
- */
-QColor Q3DBars::barColor() const
-{
-    return d_ptr->m_shared->objectColor();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
  * \property Q3DBars::selectionMode
  *
- * Sets bar selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
- * \c QDataVis::SelectionModeItem by default.
+ * Sets bar selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
+ * \c QDataVis::SelectionItem by default.
  */
-void Q3DBars::setSelectionMode(QDataVis::SelectionMode mode)
+void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setSelectionMode(mode);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
-QDataVis::SelectionMode Q3DBars::selectionMode() const
+QDataVis::SelectionFlags Q3DBars::selectionMode() const
 {
-    return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DBars::meshFileName
- *
- * Override bar type with a mesh object located in \a objFileName.
- * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
- * It also needs to be in triangles.
- *
- * \sa setBarType()
- */
-void Q3DBars::setMeshFileName(const QString &objFileName)
-{
-    d_ptr->m_shared->setMeshFileName(objFileName);
-}
-
-QString Q3DBars::meshFileName() const
-{
-    return d_ptr->m_shared->meshFileName();
-}
-
-/*!
- * \property Q3DBars::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DBars::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DBars::font() const
-{
-    return d_ptr->m_shared->font();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -348,70 +311,7 @@ QFont Q3DBars::font() const
  */
 Q3DScene *Q3DBars::scene() const
 {
-    return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DBars::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DBars::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DBars::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
-}
-
-/*!
- * \property Q3DBars::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DBars::setGridVisible(bool visible)
-{
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DBars::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DBars::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DBars::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DBars::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
-}
-
-/*!
- * \property Q3DBars::selectedBarPos
- *
- * Selects a bar in a \a position. The position is the position in data window.
- * Only one bar can be selected at a time.
- * To clear selection, specify an illegal \a position, e.g. (-1, -1).
- */
-void Q3DBars::setSelectedBarPos(const QPoint &position)
-{
-    d_ptr->m_shared->setSelectedBarPos(position);
-}
-
-QPoint Q3DBars::selectedBarPos() const
-{
-    return d_ptr->m_shared->selectedBarPos();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -426,12 +326,12 @@ QPoint Q3DBars::selectedBarPos() const
  */
 void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    d_ptr->m_shared->setShadowQuality(quality);
+    dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DBars::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -445,7 +345,7 @@ QDataVis::ShadowQuality Q3DBars::shadowQuality() const
  */
 void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -453,7 +353,7 @@ void Q3DBars::setRowAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DCategoryAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -467,7 +367,7 @@ Q3DCategoryAxis *Q3DBars::rowAxis() const
  */
 void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -475,7 +375,7 @@ void Q3DBars::setColumnAxis(Q3DCategoryAxis *axis)
  */
 Q3DCategoryAxis *Q3DBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DCategoryAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -490,7 +390,7 @@ Q3DCategoryAxis *Q3DBars::columnAxis() const
  */
 void Q3DBars::setValueAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -498,7 +398,7 @@ void Q3DBars::setValueAxis(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DBars::valueAxis() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -510,7 +410,7 @@ Q3DValueAxis *Q3DBars::valueAxis() const
  */
 void Q3DBars::addAxis(Q3DAbstractAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -523,7 +423,7 @@ void Q3DBars::addAxis(Q3DAbstractAxis *axis)
  */
 void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -533,77 +433,12 @@ void Q3DBars::releaseAxis(Q3DAbstractAxis *axis)
  */
 QList<Q3DAbstractAxis *> Q3DBars::axes() const
 {
-    return d_ptr->m_shared->axes();
+    return dptrc()->m_shared->axes();
 }
 
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DBars::setActiveDataProxy(QBarDataProxy *proxy)
+Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
+    : Q3DWindowPrivate(q)
 {
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QBarDataProxy *Q3DBars::activeDataProxy() const
-{
-    return static_cast<QBarDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DBars::addDataProxy(QBarDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DBars::releaseDataProxy(QBarDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QBarDataProxy *> Q3DBars::dataProxies() const
-{
-    QList<QBarDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QBarDataProxy *>(proxy));
-
-    return retList;
-}
-
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Bars3DController(rect))
-{
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
@@ -613,7 +448,12 @@ Q3DBarsPrivate::~Q3DBarsPrivate()
 
 void Q3DBarsPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit q_ptr->shadowQualityChanged(quality);
+    emit qptr()->shadowQualityChanged(quality);
+}
+
+Q3DBars *Q3DBarsPrivate::qptr()
+{
+    return static_cast<Q3DBars *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

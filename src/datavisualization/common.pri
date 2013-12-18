@@ -6,4 +6,5 @@ INCLUDEPATH += $$PWD/engine \
                $$PWD/utils \
                $$PWD/axis \
                $$PWD/data \
-               $$PWD/input
+               $$PWD/input \
+               $$PWD/theme

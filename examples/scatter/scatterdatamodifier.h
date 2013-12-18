@@ -20,6 +20,7 @@
 #define SCATTERDATAMODIFIER_H
 
 #include <QtDataVisualization/q3dscatter.h>
+#include <QtDataVisualization/qabstract3dseries.h>
 #include <QtGui/QFont>
 
 using namespace QtDataVisualization;
@@ -49,13 +50,16 @@ public slots:
     void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
 
 signals:
+    void backgroundEnabledChanged(bool enabled);
+    void gridEnabledChanged(bool enabled);
     void shadowQualityChanged(int quality);
+    void fontChanged(QFont font);
 
 private:
     QVector3D randVector();
     Q3DScatter *m_graph;
     int m_fontSize;
-    QDataVis::MeshStyle m_style;
+    QAbstract3DSeries::Mesh m_style;
     bool m_smooth;
 };
 

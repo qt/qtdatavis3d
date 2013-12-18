@@ -51,6 +51,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \qmlproperty list AbstractAxis3D::labels
  * Defines the labels for the axis.
+ * \note Setting this property for ValueAxis3D does nothing, as it generates labels automatically.
  */
 
 /*!
@@ -124,27 +125,6 @@ Q3DAbstractAxis::~Q3DAbstractAxis()
 }
 
 /*!
- * \property Q3DAbstractAxis::title
- *
- * Defines the title for the axis.
- */
-QString Q3DAbstractAxis::title() const
-{
-    return d_ptr->m_title;
-}
-
-/*!
- * \property Q3DAbstractAxis::labels
- *
- * Defines the labels for the axis.
- */
-QStringList Q3DAbstractAxis::labels() const
-{
-    d_ptr->updateLabels();
-    return d_ptr->m_labels;
-}
-
-/*!
  * \property Q3DAbstractAxis::orientation
  *
  * Defines the orientation of the axis, one of \c Q3DAbstractAxis::AxisOrientation.
@@ -164,6 +144,11 @@ Q3DAbstractAxis::AxisType Q3DAbstractAxis::type() const
     return d_ptr->m_type;
 }
 
+/*!
+ * \property Q3DAbstractAxis::title
+ *
+ * Defines the title for the axis.
+ */
 void Q3DAbstractAxis::setTitle(QString title)
 {
     if (d_ptr->m_title != title) {
@@ -172,12 +157,34 @@ void Q3DAbstractAxis::setTitle(QString title)
     }
 }
 
+QString Q3DAbstractAxis::title() const
+{
+    return d_ptr->m_title;
+}
+
+/*!
+ * \property Q3DAbstractAxis::labels
+ *
+ * Defines the labels for the axis.
+ * \note Setting this property for Q3DValueAxis does nothing, as it generates labels automatically.
+ */
+void Q3DAbstractAxis::setLabels(const QStringList &labels)
+{
+    Q_UNUSED(labels)
+}
+
+QStringList Q3DAbstractAxis::labels() const
+{
+    d_ptr->updateLabels();
+    return d_ptr->m_labels;
+}
+
 /*!
  * Sets value range of the axis from \a min to \a max.
  * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
  * \note For Q3DCategoryAxis this specifies the index range of rows or columns to show.
  */
-void Q3DAbstractAxis::setRange(qreal min, qreal max)
+void Q3DAbstractAxis::setRange(float min, float max)
 {
     d_ptr->setRange(min, max);
     setAutoAdjustRange(false);
@@ -191,7 +198,7 @@ void Q3DAbstractAxis::setRange(qreal min, qreal max)
  * valid.
  * \note For Q3DCategoryAxis this specifies the index of the first row or column to show.
  */
-void Q3DAbstractAxis::setMin(qreal min)
+void Q3DAbstractAxis::setMin(float min)
 {
     d_ptr->setMin(min);
     setAutoAdjustRange(false);
@@ -205,18 +212,18 @@ void Q3DAbstractAxis::setMin(qreal min)
  * valid.
  * \note For Q3DCategoryAxis this specifies the index of the last row or column to show.
  */
-void Q3DAbstractAxis::setMax(qreal max)
+void Q3DAbstractAxis::setMax(float max)
 {
     d_ptr->setMax(max);
     setAutoAdjustRange(false);
 }
 
-qreal Q3DAbstractAxis::min() const
+float Q3DAbstractAxis::min() const
 {
     return d_ptr->m_min;
 }
 
-qreal Q3DAbstractAxis::max() const
+float Q3DAbstractAxis::max() const
 {
     return d_ptr->m_max;
 }
@@ -241,6 +248,12 @@ bool Q3DAbstractAxis::isAutoAdjustRange() const
     return d_ptr->m_autoAdjust;
 }
 
+/*!
+ * \fn Q3DAbstractAxis::rangeChanged(float min, float max)
+ *
+ * Emits range \a min and \a max values when range changes.
+ */
+
 // Q3DAbstractAxisPrivate
 
 Q3DAbstractAxisPrivate::Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAxis::AxisType type)
@@ -249,8 +262,8 @@ Q3DAbstractAxisPrivate::Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAx
       m_orientation(Q3DAbstractAxis::AxisOrientationNone),
       m_type(type),
       m_isDefaultAxis(false),
-      m_min(0.0),
-      m_max(10.0),
+      m_min(0.0f),
+      m_max(10.0f),
       m_autoAdjust(true),
       m_onlyPositiveValues(false),
       m_allowMinMaxSame(false)
@@ -263,10 +276,12 @@ Q3DAbstractAxisPrivate::~Q3DAbstractAxisPrivate()
 
 void Q3DAbstractAxisPrivate::setOrientation(Q3DAbstractAxis::AxisOrientation orientation)
 {
-    if (m_orientation == Q3DAbstractAxis::AxisOrientationNone)
+    if (m_orientation == Q3DAbstractAxis::AxisOrientationNone) {
         m_orientation = orientation;
-    else
+        emit q_ptr->orientationChanged(orientation);
+    } else {
         Q_ASSERT("Attempted to reset axis orientation.");
+    }
 }
 
 void Q3DAbstractAxisPrivate::updateLabels()
@@ -274,38 +289,39 @@ void Q3DAbstractAxisPrivate::updateLabels()
     // Default implementation does nothing
 }
 
-void Q3DAbstractAxisPrivate::setRange(qreal min, qreal max)
+void Q3DAbstractAxisPrivate::setRange(float min, float max)
 {
     bool adjusted = false;
     if (m_onlyPositiveValues) {
-        if (min < 0.0) {
-            min = 0.0;
+        if (min < 0.0f) {
+            min = 0.0f;
             adjusted = true;
         }
-        if (max < 0.0) {
-            max = 0.0;
+        if (max < 0.0f) {
+            max = 0.0f;
             adjusted = true;
         }
     }
     // If min >= max, we adjust ranges so that
-    // m_max becomes (min + 1.0)
+    // m_max becomes (min + 1.0f)
     // as axes need some kind of valid range.
-    bool dirty = false;
+    bool minDirty = false;
+    bool maxDirty = false;
     if (m_min != min) {
         m_min = min;
-        dirty = true;
+        minDirty = true;
     }
     if (m_max != max || min > max || (!m_allowMinMaxSame && min == max)) {
         if (min > max || (!m_allowMinMaxSame && min == max)) {
-            m_max = min + 1.0;
+            m_max = min + 1.0f;
             adjusted = true;
         } else {
             m_max = max;
         }
-        dirty = true;
+        maxDirty = true;
     }
 
-    if (dirty) {
+    if (minDirty || maxDirty) {
         if (adjusted) {
             qWarning() << "Warning: Tried to set invalid range for axis."
                           " Range automatically adjusted to a valid one:"
@@ -313,49 +329,60 @@ void Q3DAbstractAxisPrivate::setRange(qreal min, qreal max)
         }
         emit q_ptr->rangeChanged(m_min, m_max);
     }
+
+    if (minDirty)
+        emit q_ptr->minChanged(m_min);
+    if (maxDirty)
+        emit q_ptr->maxChanged(m_max);
 }
 
-void Q3DAbstractAxisPrivate::setMin(qreal min)
+void Q3DAbstractAxisPrivate::setMin(float min)
 {
     if (m_onlyPositiveValues) {
-        if (min < 0.0) {
-            min = 0.0;
+        if (min < 0.0f) {
+            min = 0.0f;
             qWarning() << "Warning: Tried to set negative minimum for an axis that only supports"
                           " positive values:" << min;
         }
     }
 
     if (m_min != min) {
+        bool maxChanged = false;
         if (min > m_max || (!m_allowMinMaxSame && min == m_max)) {
-            qreal oldMax = m_max;
-            m_max = min + 1.0;
+            float oldMax = m_max;
+            m_max = min + 1.0f;
             qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
                           " value axis. Maximum automatically adjusted to a valid one:"
                        << oldMax <<  "-->" << m_max;
+            maxChanged = true;
         }
         m_min = min;
 
         emit q_ptr->rangeChanged(m_min, m_max);
+        emit q_ptr->minChanged(m_min);
+        if (maxChanged)
+            emit q_ptr->maxChanged(m_max);
     }
 }
 
-void Q3DAbstractAxisPrivate::setMax(qreal max)
+void Q3DAbstractAxisPrivate::setMax(float max)
 {
     if (m_onlyPositiveValues) {
-        if (max < 0.0) {
-            max = 0.0;
+        if (max < 0.0f) {
+            max = 0.0f;
             qWarning() << "Warning: Tried to set negative maximum for an axis that only supports"
                           " positive values:" << max;
         }
     }
 
     if (m_max != max) {
+        bool minChanged = false;
         if (m_min > max || (!m_allowMinMaxSame && m_min == max)) {
-            qreal oldMin = m_min;
-            m_min = max - 1.0;
-            if (m_onlyPositiveValues && m_min < 0.0) {
-                m_min = 0.0;
-                if (!m_allowMinMaxSame && max == 0.0) {
+            float oldMin = m_min;
+            m_min = max - 1.0f;
+            if (m_onlyPositiveValues && m_min < 0.0f) {
+                m_min = 0.0f;
+                if (!m_allowMinMaxSame && max == 0.0f) {
                     m_min = oldMin;
                     qWarning() << "Unable to set maximum value to zero.";
                     return;
@@ -364,9 +391,13 @@ void Q3DAbstractAxisPrivate::setMax(qreal max)
             qWarning() << "Warning: Tried to set maximum to equal or smaller than minimum for"
                           " value axis. Minimum automatically adjusted to a valid one:"
                        << oldMin <<  "-->" << m_min;
+            minChanged = true;
         }
         m_max = max;
         emit q_ptr->rangeChanged(m_min, m_max);
+        emit q_ptr->maxChanged(m_max);
+        if (minChanged)
+            emit q_ptr->minChanged(m_min);
     }
 }
 

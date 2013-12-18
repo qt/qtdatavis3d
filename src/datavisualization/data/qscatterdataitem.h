@@ -45,9 +45,6 @@ public:
     inline float y() const { return m_position.y(); }
     inline float z() const { return m_position.z(); }
 
-    //void setSize(qreal size);
-    //qreal size() const;
-
 protected:
     virtual void createExtraData();
 
@@ -55,7 +52,6 @@ protected:
 
 private:
     QVector3D m_position;
-    //qreal m_size;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

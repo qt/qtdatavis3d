@@ -47,8 +47,8 @@ public:
     inline const QPoint &position() const { return m_position; }
 
     // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(qreal value);
-    inline qreal value() const { return m_value; }
+    inline void setValue(float value);
+    inline float value() const { return m_value; }
 
     // Normalized bar height
     inline void setHeight(GLfloat height) { m_height = height; }
@@ -61,17 +61,23 @@ public:
     void setSliceLabel(const QString &label);
     QString &sliceLabel(); // Formats label if not previously formatted
 
+    // Series index in visual series that this item belongs to.
+    // This is only utilized by slicing, so it may not be up to date on all items.
+    inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
+    inline int seriesIndex() { return m_seriesIndex; }
+
 protected:
-    qreal m_value;
+    float m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;
     QString m_sliceLabel;
     LabelItem *m_sliceLabelItem;
+    int m_seriesIndex;
 
     friend class QBarDataItem;
 };
 
-void BarRenderItem::setValue(qreal value)
+void BarRenderItem::setValue(float value)
 {
     m_value = value;
      // Force reformatting on next access by setting label string to null string

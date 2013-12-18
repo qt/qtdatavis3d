@@ -22,7 +22,9 @@
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -30,61 +32,32 @@ class Q3DScatterPrivate;
 class LabelItem;
 class Q3DValueAxis;
 class Q3DCategoryAxis;
-class QScatterDataProxy;
+class QScatter3DSeries;
+class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(int selectedItemIndex READ selectedItemIndex WRITE setSelectedItemIndex NOTIFY selectedItemIndexChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
 
 public:
-    explicit Q3DScatter();
-    ~Q3DScatter();
+    explicit Q3DScatter(QWindow *parent = 0);
+    virtual ~Q3DScatter();
 
-    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
+    void addSeries(QScatter3DSeries *series);
+    void removeSeries(QScatter3DSeries *series);
+    QList<QScatter3DSeries *> seriesList();
 
-    void setTheme(QDataVis::Theme theme);
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
 
-    void setObjectColor(const QColor &baseColor, bool uniform = true);
-    QColor objectColor() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
-
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode() const;
-
-    void setFont(const QFont &font);
-    QFont font() const;
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    QDataVis::SelectionFlags selectionMode() const;
 
     Q3DScene *scene() const;
-
-    void setLabelStyle(QDataVis::LabelStyle style);
-    QDataVis::LabelStyle labelStyle() const;
-
-    void setGridVisible(bool visible);
-    bool isGridVisible() const;
-
-    void setWidth(const int width);
-    void setHeight(const int height);
-
-    void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible() const;
-
-    void setSelectedItemIndex(int index);
-    int selectedItemIndex() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
@@ -99,15 +72,10 @@ public:
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
 
-    void setActiveDataProxy(QScatterDataProxy *proxy);
-    QScatterDataProxy *activeDataProxy() const;
-    void addDataProxy(QScatterDataProxy *proxy);
-    void releaseDataProxy(QScatterDataProxy *proxy);
-    QList<QScatterDataProxy *> dataProxies() const;
-
 signals:
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void selectedItemIndexChanged(int index);
+    void themeChanged(Q3DTheme* theme);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -116,10 +84,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DScatterPrivate> d_ptr;
+    Q3DScatterPrivate *dptr();
+    const Q3DScatterPrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DScatter)
 };
 

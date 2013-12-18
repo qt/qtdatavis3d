@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     //! [0]
     Q3DSurface surface;
+    surface.setFlags(surface.flags() ^ Qt::FramelessWindowHint);
     //! [0]
     //! [1]
     QSurfaceDataArray *data = new QSurfaceDataArray;
@@ -41,7 +42,9 @@ int main(int argc, char **argv)
     //! [2]
 
     //! [3]
-    surface.activeDataProxy()->resetArray(data);
+    QSurface3DSeries *series = new QSurface3DSeries;
+    series->dataProxy()->resetArray(data);
+    surface.addSeries(series);
     //! [3]
     //! [4]
     surface.show();

@@ -29,16 +29,14 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();
-    QBarDataItem(qreal value);
+    QBarDataItem(float value);
     QBarDataItem(const QBarDataItem &other);
     ~QBarDataItem();
 
     QBarDataItem &operator=(const QBarDataItem &other);
 
-    void setValue(qreal value) { m_value = value; }
-    qreal value() const { return m_value; }
-
-    // TODO Set color, label format, ...?
+    void setValue(float value) { m_value = value; }
+    float value() const { return m_value; }
 
 protected:
     virtual void createExtraData();
@@ -46,7 +44,7 @@ protected:
     QBarDataItemPrivate *d_ptr;
 
 private:
-    qreal m_value;
+    float m_value;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -57,8 +57,6 @@ void ObjectHelper::load()
     if (!loadOk)
         qFatal("loading failed");
 
-    //qDebug() << "vertex count" << vertices.size();;
-
     // Index vertices
     QVector<unsigned short> indices;
     QVector<QVector3D> indexed_vertices;
@@ -68,7 +66,6 @@ void ObjectHelper::load()
                             indexed_normals);
 
     m_indexCount = indices.size();
-    //qDebug() << "index count" << m_indexCount;
 
     glGenBuffers(1, &m_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);

@@ -22,6 +22,7 @@ QT += datavisualization
 contains(TARGET, qml.*) {
     uri = QtDataVisualization
     lib_name = datavisualizationqml2
+    vis_lib_name = DataVisualization
 
     uri_replaced = $$replace(uri, \\., $$QMAKE_DIR_SEP)
     make_qmldir_path = $$DESTDIR/$$uri_replaced
@@ -57,6 +58,7 @@ contains(TARGET, qml.*) {
         } else {
             # linux, android
             src_lib = lib$${lib_name}.so
+            vis_src_lib = lib$${vis_lib_name}.so
         }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib
@@ -73,6 +75,9 @@ contains(TARGET, qml.*) {
         android_qmldir.path = /assets/qml/$$uri_replaced
         android_qmlplugin.files = $$copy_lib.target
         android_qmlplugin.path = $$target.path
+        vis_lib_dir = $$OUT_PWD/../../lib/$$vis_src_lib
+        vis_lib_formatted = $$replace(vis_lib_dir, /, $$QMAKE_DIR_SEP)
+        ANDROID_EXTRA_LIBS = $$vis_lib_formatted
         INSTALLS += android_qmldir android_qmlplugin
     }
 }

@@ -46,24 +46,19 @@ Item {
             width: dataView.width
             height: dataView.height
             shadowQuality: Bars3D.ShadowQualityMedium
-            selectionMode: Bars3D.SelectionModeItem
-            font.pointSize: 35
-            theme: Bars3D.ThemeRetro
-            labelStyle: Bars3D.LabelStyleFromTheme
-            dataProxy: chartData.proxy
+            selectionMode: Bars3D.SelectionItem
+            theme: Theme3D {
+                type: Theme3D.ThemeDigia
+                font.pointSize: 35
+                labelBackgroundEnabled: true
+            }
+            seriesList: [chartData.series]
             barThickness: 0.5
             barSpacing: Qt.size(0.5, 0.5)
             barSpacingRelative: false
 
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
-            itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
-
-            onSelectedBarPosChanged: {
-                // Set camControlArea current row to selected bar
-                var rowRole = chartData.proxy.rowLabels[position.x];
-                var colRole = chartData.proxy.columnLabels[position.y];
-            }
 
             // Bind UI controls to the camera
             scene.activeCamera.wrapXRotation: false
@@ -71,6 +66,30 @@ Item {
             scene.activeCamera.yRotation: camControlArea.yValue
             scene.activeCamera.zoomLevel: zoomSlider.value
             inputHandler: null
+        }
+
+        MouseArea {
+            id: inputArea
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            property bool selectionOn: false
+
+            onPressed: {
+                if (mouse.button == Qt.LeftButton)
+                    selectionOn = true;
+                    testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+            }
+
+            onReleased: {
+                if (mouse.button == Qt.LeftButton)
+                    selectionOn = false;
+            }
+
+            onPositionChanged: {
+                if (selectionOn) {
+                    testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+                }
+            }
         }
     }
 
@@ -101,12 +120,12 @@ Item {
         width: camControlArea.width
         text: "Show Income"
         onClicked: {
-            if (chartData.mapping.valueRole === "expenses") {
-                chartData.mapping.valueRole = "income"
+            if (chartData.proxy.valueRole === "expenses") {
+                chartData.proxy.valueRole = "income"
                 text = "Show Expenses"
                 testChart.valueAxis = chartAxes.income
             } else {
-                chartData.mapping.valueRole = "expenses"
+                chartData.proxy.valueRole = "expenses"
                 text = "Show Income"
                 testChart.valueAxis = chartAxes.expenses
             }
@@ -119,11 +138,11 @@ Item {
         width: camControlArea.width
         text: "Hide Shadows"
         onClicked: {
-            if (testChart.shadowQuality == Bars3D.ShadowQualityNone) {
-                testChart.shadowQuality = Bars3D.ShadowQualityMedium;
+            if (testChart.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
+                testChart.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
                 text = "Hide Shadows"
             } else {
-                testChart.shadowQuality = Bars3D.ShadowQualityNone;
+                testChart.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                 text = "Show Shadows"
             }
         }
@@ -137,13 +156,13 @@ Item {
         onClicked: {
             if (testChart.rowAxis.max !== 6) {
                 text = "Show 2010 - 2012"
-                chartData.mapping.autoRowCategories = true
+                chartData.proxy.autoRowCategories = true
             } else {
                 text = "Show all years"
                 // Explicitly defining row categories, since we do not want to show data for
                 // all years in the model, just for the selected ones.
-                chartData.mapping.autoRowCategories = false
-                chartData.mapping.rowCategories = ["2010", "2011", "2012"]
+                chartData.proxy.autoRowCategories = false
+                chartData.proxy.rowCategories = ["2010", "2011", "2012"]
             }
         }
     }

@@ -38,14 +38,13 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Scatter3DRenderer;
 class QScatterDataProxy;
+class QScatter3DSeries;
 
 struct Scatter3DChangeBitField {
-    bool slicingActiveChanged     : 1;
-    bool selectedItemIndexChanged : 1;
+    bool selectedItemChanged : 1;
 
     Scatter3DChangeBitField() :
-        slicingActiveChanged(true),
-        selectedItemIndexChanged(true)
+        selectedItemChanged(true)
     {
     }
 };
@@ -59,29 +58,30 @@ private:
 
     // Rendering
     Scatter3DRenderer *m_renderer;
-    int m_selectedItemIndex;
+    int m_selectedItem;
+    QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
+                                            // in single series selection cases.
 
 public:
     explicit Scatter3DController(QRect rect);
     ~Scatter3DController();
 
-    void initializeOpenGL();
-
-    // Object type
-    void setObjectType(QDataVis::MeshStyle style, bool smooth = false);
+    virtual void initializeOpenGL();
 
     // Change selection mode
-    void setSelectionMode(QDataVis::SelectionMode mode);
+    void setSelectionMode(QDataVis::SelectionFlags mode);
 
-    void setSelectedItemIndex(int index);
-    int selectedItemIndex() const;
-    static inline int noSelectionIndex() { return -1; }
-
-    virtual void setActiveDataProxy(QAbstractDataProxy *proxy);
+    void setSelectedItem(int index, QScatter3DSeries *series);
+    static inline int invalidSelectionIndex() { return -1; }
 
     void synchDataToRenderer();
 
+    virtual void addSeries(QAbstract3DSeries *series);
+    virtual void removeSeries(QAbstract3DSeries *series);
+    virtual QList<QScatter3DSeries *> scatterSeriesList();
+
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisRangeChangedBySender(QObject *sender);
 
 public slots:
     void handleArrayReset();
@@ -89,10 +89,9 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
-    void handleSelectedItemIndexChanged(int index);
 
-signals:
-    void selectedItemIndexChanged(int index);
+    // Renderer callback handlers
+    void handleItemClicked(int index, QScatter3DSeries *series);
 
 private:
     void adjustValueAxisRange();

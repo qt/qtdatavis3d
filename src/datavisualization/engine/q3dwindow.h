@@ -31,26 +31,26 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DWindowPrivate;
 class Abstract3DController;
+class QAbstract3DInputHandler;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
 
+protected:
+    explicit Q3DWindow(Q3DWindowPrivate *d, QWindow *parent = 0);
 public:
-    explicit Q3DWindow(QWindow *parent = 0);
     virtual ~Q3DWindow();
 
-protected slots:
-    void renderLater();
-    void renderNow();
+    void addInputHandler(QAbstract3DInputHandler *inputHandler);
+    void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
+    void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
+    QAbstract3DInputHandler *activeInputHandler();
 
 protected:
-    virtual void render();
-
     bool event(QEvent *event);
+    void resizeEvent(QResizeEvent *event);
     void exposeEvent(QExposeEvent *event);
-    void setVisualController(Abstract3DController *controller);
-    void handleDevicePixelRatioChange();
 
 private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;

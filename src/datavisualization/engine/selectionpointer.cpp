@@ -43,9 +43,8 @@ SelectionPointer::SelectionPointer(Drawer *drawer)
       m_labelObj(0),
       m_pointObj(0),
       m_textureHelper(0),
-      m_isInitialized(false),
       m_cachedTheme(drawer->theme()),
-      m_labelStyle(QDataVis::LabelStyleFromTheme),
+      m_labelBackground(false),
       m_drawer(drawer),
       m_cachedScene(0)
 {
@@ -60,27 +59,18 @@ SelectionPointer::~SelectionPointer()
     delete m_labelShader;
     delete m_pointShader;
     delete m_labelObj;
-    delete m_pointObj;
     delete m_textureHelper;
 }
 
 void SelectionPointer::initializeOpenGL()
 {
-    if (m_isInitialized)
-        return;
-
     initializeOpenGLFunctions();
 
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
     initShaders();
-
     loadLabelMesh();
-    loadPointMesh();
-
-    // Set initialized -flag
-    m_isInitialized = true;
 }
 
 void SelectionPointer::updateScene(Q3DScene *scene)
@@ -142,15 +132,12 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     m_pointShader->setUniformValue(m_pointShader->view(), viewMatrix);
     m_pointShader->setUniformValue(m_pointShader->model(), modelMatrix);
     m_pointShader->setUniformValue(m_pointShader->nModel(), itModelMatrix.inverted().transposed());
-    m_pointShader->setUniformValue(m_pointShader->color(),
-                                   Utils::vectorFromColor(m_cachedTheme.m_highlightBarColor));
+    m_pointShader->setUniformValue(m_pointShader->color(), m_highlightColor);
     m_pointShader->setUniformValue(m_pointShader->MVP(), MVPMatrix);
-    m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme.m_ambientStrength);
-    m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme.m_lightStrength * 2.0f);
+    m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme->ambientLightStrength());
+    m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme->lightStrength() * 2.0f);
 
     m_drawer->drawObject(m_pointShader, m_pointObj);
-
-    m_pointShader->release();
 
     //
     // Draw the label
@@ -162,8 +149,8 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     modelMatrixLabel.translate(m_position + labelAlign);
 
     // Position the label towards the camera
-    qreal camRotationsX = camera->xRotation();
-    qreal camRotationsY = camera->yRotation();
+    float camRotationsX = camera->xRotation();
+    float camRotationsY = camera->yRotation();
     if (!m_cachedIsSlicingActivated) {
         modelMatrixLabel.rotate(-camRotationsX, 0.0f, 1.0f, 0.0f);
         modelMatrixLabel.rotate(-camRotationsY, 1.0f, 0.0f, 0.0f);
@@ -190,7 +177,8 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Draw the object
     m_drawer->drawObject(m_labelShader, m_labelObj, m_labelItem.textureId());
 
-    m_labelShader->release();
+    // Release shader
+    glUseProgram(0);
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
@@ -213,11 +201,20 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setLabel(QString label)
+void SelectionPointer::setHighlightColor(QVector3D colorVector)
+{
+    m_highlightColor = colorVector;
+}
+
+void SelectionPointer::setLabel(const QString &label)
 {
     m_label = label;
-
     m_drawer->generateLabelItem(m_labelItem, m_label);
+}
+
+void SelectionPointer::setPointerObject(ObjectHelper *object)
+{
+    m_pointObj = object;
 }
 
 void SelectionPointer::handleDrawerChange()
@@ -247,7 +244,7 @@ void SelectionPointer::initShaders()
     m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragment"));
 #else
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexES2"),
+    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                      QStringLiteral(":/shaders/fragmentES2"));
 #endif
     m_pointShader->initialize();
@@ -258,16 +255,8 @@ void SelectionPointer::loadLabelMesh()
 {
     if (m_labelObj)
         delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/label"));
+    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_labelObj->load();
-}
-
-void SelectionPointer::loadPointMesh()
-{
-    if (m_pointObj)
-        delete m_pointObj;
-    m_pointObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/sphereSmooth"));
-    m_pointObj->load();
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

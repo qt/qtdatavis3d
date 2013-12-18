@@ -21,7 +21,9 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
+#include <QLinearGradient>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -29,40 +31,33 @@ class Q3DBarsPrivate;
 class Q3DAbstractAxis;
 class Q3DCategoryAxis;
 class Q3DValueAxis;
-class QBarDataProxy;
 class Q3DScene;
+class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionMode selectionMode READ selectionMode WRITE setSelectionMode)
-    Q_PROPERTY(QtDataVisualization::QDataVis::LabelStyle labelStyle READ labelStyle WRITE setLabelStyle)
+    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(qreal barThickness READ barThickness WRITE setBarThickness)
-    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing)
-    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative)
-    Q_PROPERTY(QString meshFileName READ meshFileName WRITE setMeshFileName)
-    Q_PROPERTY(QFont font READ font WRITE setFont)
-    Q_PROPERTY(bool gridVisible READ isGridVisible WRITE setGridVisible)
-    Q_PROPERTY(bool backgroundVisible READ isBackgroundVisible WRITE setBackgroundVisible)
-    Q_PROPERTY(QPoint selectedBarPos READ selectedBarPos WRITE setSelectedBarPos NOTIFY selectedBarPosChanged)
+    Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
+    Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
+    Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
+    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
-    Q_ENUMS(QtDataVisualization::QDataVis::SelectionMode)
-    Q_ENUMS(QtDataVisualization::QDataVis::ShadowQuality)
-    Q_ENUMS(QtDataVisualization::QDataVis::LabelStyle)
-    Q_ENUMS(QtDataVisualization::QDataVis::CameraPreset)
-
 public:
-    explicit Q3DBars();
-    ~Q3DBars();
+    explicit Q3DBars(QWindow *parent = 0);
+    virtual ~Q3DBars();
 
-    void setBarType(QDataVis::MeshStyle style, bool smooth = false);
+    void addSeries(QBar3DSeries *series);
+    void removeSeries(QBar3DSeries *series);
+    QList<QBar3DSeries *> seriesList();
 
-    void setTheme(QDataVis::Theme theme);
+    void setTheme(Q3DTheme *theme);
+    Q3DTheme *theme() const;
 
-    void setBarThickness(qreal thicknessRatio);
-    qreal barThickness();
+    void setBarThickness(float thicknessRatio);
+    float barThickness();
 
     void setBarSpacing(QSizeF spacing);
     QSizeF barSpacing();
@@ -70,34 +65,10 @@ public:
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative();
 
-    void setBarColor(const QColor &baseColor, bool uniform = true);
-    QColor barColor() const;
-
-    void setMeshFileName(const QString &objFileName);
-    QString meshFileName() const;
-
-    void setSelectionMode(QDataVis::SelectionMode mode);
-    QDataVis::SelectionMode selectionMode() const;
-
-    void setFont(const QFont &font);
-    QFont font() const;
+    void setSelectionMode(QDataVis::SelectionFlags mode);
+    QDataVis::SelectionFlags selectionMode() const;
 
     Q3DScene *scene() const;
-
-    void setLabelStyle(QDataVis::LabelStyle style);
-    QDataVis::LabelStyle labelStyle() const;
-
-    void setGridVisible(bool visible);
-    bool isGridVisible() const;
-
-    void setWidth(const int width);
-    void setHeight(const int height);
-
-    void setBackgroundVisible(bool visible);
-    bool isBackgroundVisible() const;
-
-    void setSelectedBarPos(const QPoint &position);
-    QPoint selectedBarPos() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
@@ -112,15 +83,13 @@ public:
     void releaseAxis(Q3DAbstractAxis *axis);
     QList<Q3DAbstractAxis *> axes() const;
 
-    void setActiveDataProxy(QBarDataProxy *proxy);
-    QBarDataProxy *activeDataProxy() const;
-    void addDataProxy(QBarDataProxy *proxy);
-    void releaseDataProxy(QBarDataProxy *proxy);
-    QList<QBarDataProxy *> dataProxies() const;
-
 signals:
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void selectedBarPosChanged(QPoint position);
+    void barThicknessChanged(float thicknessRatio);
+    void barSpacingChanged(QSizeF spacing);
+    void barSpacingRelativeChanged(bool relative);
+    void themeChanged(Q3DTheme *theme);
 
 protected:
 
@@ -130,10 +99,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void resizeEvent(QResizeEvent *event);
 
 private:
-    QScopedPointer<Q3DBarsPrivate> d_ptr;
+    Q3DBarsPrivate *dptr();
+    const Q3DBarsPrivate *dptrc() const;
     Q_DISABLE_COPY(Q3DBars)
 };
 

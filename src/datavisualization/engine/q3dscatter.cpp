@@ -20,11 +20,10 @@
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
 #include "q3dvalueaxis.h"
-#include "qscatterdataproxy.h"
 #include "q3dcamera.h"
+#include "qscatter3dseries_p.h"
 
 #include <QMouseEvent>
-#include <QDebug>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -44,20 +43,20 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Data proxies work similarly: if no data proxy is set explicitly, Q3DScatter creates a default
- * proxy. If any other proxy is set as active data proxy later, the default proxy and all data
- * added to it is destroyed.
+ * Q3DScatter supports more than one series visible at the same time.
  *
- * Methods are provided for changing item styles, themes, item selection modes and so on. See the
+ * Methods are provided for changing themes, item selection modes and so on. See the
  * methods for more detailed descriptions.
  *
  * \section1 How to construct a minimal Q3DScatter graph
  *
- * First, construct Q3DScatter:
+ * First, construct Q3DScatter. Since we are running the graph as top level window
+ * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
+ * default:
  *
  * \snippet doc_src_q3dscatter_construction.cpp 0
  *
- * Now Q3DScatter is ready to receive data to be rendered. Add one set of 3 QVector3D items:
+ * Now Q3DScatter is ready to receive data to be rendered. Add one series of 3 QVector3D items:
  *
  * \snippet doc_src_q3dscatter_construction.cpp 1
  *
@@ -81,24 +80,57 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D scatter window.
+ * Constructs a new 3D scatter graph with optional \a parent window.
  */
-Q3DScatter::Q3DScatter()
-    : d_ptr(new Q3DScatterPrivate(this, geometry()))
+Q3DScatter::Q3DScatter(QWindow *parent)
+    : Q3DWindow(new Q3DScatterPrivate(this), parent)
 {
-    setVisualController(d_ptr->m_shared);
-    d_ptr->m_shared->initializeOpenGL();
-    QObject::connect(d_ptr->m_shared, &Scatter3DController::selectedItemIndexChanged, this,
-                     &Q3DScatter::selectedItemIndexChanged);
-    QObject::connect(d_ptr->m_shared, &Abstract3DController::needRender, this,
-                     &Q3DWindow::renderLater);
+    dptr()->m_shared = new Scatter3DController(geometry());
+    d_ptr->setVisualController(dptr()->m_shared);
+    dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
+                     &Q3DScatter::selectionModeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
+                     &Q3DScatter::shadowQualityChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
+                     &Q3DScatter::themeChanged);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
+                     &Q3DWindowPrivate::renderLater);
+    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
+                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 /*!
- *  Destroys the 3D scatter window.
+ * Destroys the 3D scatter graph.
  */
 Q3DScatter::~Q3DScatter()
 {
+}
+
+/*!
+ * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
+ * axes. If the newly added series has specified a selected item, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
+ */
+void Q3DScatter::addSeries(QScatter3DSeries *series)
+{
+    dptr()->m_shared->addSeries(series);
+}
+
+/*!
+ * Removes the \a series from the graph.
+ */
+void Q3DScatter::removeSeries(QScatter3DSeries *series)
+{
+    dptr()->m_shared->removeSeries(series);
+}
+
+/*!
+ * \return list of series added to this graph.
+ */
+QList<QScatter3DSeries *> Q3DScatter::seriesList()
+{
+    return dptr()->m_shared->scatterSeriesList();
 }
 
 /*!
@@ -106,7 +138,7 @@ Q3DScatter::~Q3DScatter()
  */
 void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseDoubleClickEvent(event);
+    dptr()->m_shared->mouseDoubleClickEvent(event);
 }
 
 /*!
@@ -114,7 +146,7 @@ void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void Q3DScatter::touchEvent(QTouchEvent *event)
 {
-    d_ptr->m_shared->touchEvent(event);
+    dptr()->m_shared->touchEvent(event);
 }
 
 /*!
@@ -122,7 +154,7 @@ void Q3DScatter::touchEvent(QTouchEvent *event)
  */
 void Q3DScatter::mousePressEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mousePressEvent(event, event->pos());
+    dptr()->m_shared->mousePressEvent(event, event->pos());
 }
 
 /*!
@@ -130,7 +162,7 @@ void Q3DScatter::mousePressEvent(QMouseEvent *event)
  */
 void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseReleaseEvent(event, event->pos());
+    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
 }
 
 /*!
@@ -138,7 +170,7 @@ void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
  */
 void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
 {
-    d_ptr->m_shared->mouseMoveEvent(event, event->pos());
+    dptr()->m_shared->mouseMoveEvent(event, event->pos());
 }
 
 /*!
@@ -146,134 +178,52 @@ void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
  */
 void Q3DScatter::wheelEvent(QWheelEvent *event)
 {
-    d_ptr->m_shared->wheelEvent(event);
+    dptr()->m_shared->wheelEvent(event);
 }
 
-/*!
- * \internal
- */
-void Q3DScatter::resizeEvent(QResizeEvent *event)
+Q3DScatterPrivate *Q3DScatter::dptr()
 {
-    Q_UNUSED(event);
-    d_ptr->m_shared->setSize(width(), height());
+    return static_cast<Q3DScatterPrivate *>(d_ptr.data());
 }
 
-/*!
- * Sets window \a width.
- */
-void Q3DScatter::setWidth(const int width)
+const Q3DScatterPrivate *Q3DScatter::dptrc() const
 {
-    d_ptr->m_shared->setWidth(width);
-    QWindow::setWidth(width);
+    return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
 }
 
 /*!
- * Sets window \a height.
- */
-void Q3DScatter::setHeight(const int height)
-{
-    d_ptr->m_shared->setHeight(height);
-    QWindow::setHeight(height);
-}
-
-/*!
- * Sets the item \a style to one of the values in \c QDataVis::MeshStyle. It is preset to
- * \c QDataVis::MeshStyleSpheres by default. A \a smooth flag can be used to set shading to smooth.
- * It is \c false by default.
+ * \property Q3DScatter::theme
  *
- * \sa setMeshFileName()
+ * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
+ * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
+ * it, and the modifications take effect immediately.
  */
-void Q3DScatter::setObjectType(QDataVis::MeshStyle style, bool smooth)
+void Q3DScatter::setTheme(Q3DTheme *theme)
 {
-    d_ptr->m_shared->setObjectType(style, smooth);
+    dptr()->m_shared->setTheme(theme);
 }
 
-/*!
- * Sets a predefined \a theme from \c QDataVis::Theme. It is preset to \c QDataVis::ThemeQt by
- * default. Theme affects bar colors, label colors, text color, background color, window color and
- * grid color. Lighting is also adjusted by themes.
- *
- * \sa setObjectColor()
- *
- * \preliminary
- */
-void Q3DScatter::setTheme(QDataVis::Theme theme)
+Q3DTheme *Q3DScatter::theme() const
 {
-    d_ptr->m_shared->setTheme(theme);
-}
-
-/*!
- * Set item color using your own colors. \a baseColor sets the base color of a item. The \a uniform
- * -flag is used to define if color needs to be uniform throughout item's length, or will the colors
- * be applied by height. It is \c true by default.
- *
- * Calling this method overrides colors from theme.
- *
- * \sa setTheme()
- *
- * \preliminary
- */
-void Q3DScatter::setObjectColor(const QColor &baseColor, bool uniform)
-{
-    d_ptr->m_shared->setObjectColor(baseColor, uniform);
-}
-
-/*!
- * \return item color in use.
- */
-QColor Q3DScatter::objectColor() const
-{
-    return d_ptr->m_shared->objectColor();
+    return dptrc()->m_shared->theme();
 }
 
 /*!
  * \property Q3DScatter::selectionMode
  *
- * Sets item selection \a mode to one of \c QDataVis::SelectionMode. It is preset to
- * \c QDataVis::SelectionModeItem by default.
- */
-void Q3DScatter::setSelectionMode(QDataVis::SelectionMode mode)
-{
-    d_ptr->m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionMode Q3DScatter::selectionMode() const
-{
-    return d_ptr->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DScatter::meshFileName
+ * Sets item selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
+ * \c QDataVis::SelectionItem by default.
  *
- * Override item type with a mesh object located in \a objFileName.
- * \note Object needs to be in Wavefront obj format and include vertices, normals and UVs.
- * It also needs to be in triangles.
- *
- * \sa setObjectType()
+ * \note Only \c QDataVis::SelectionItem and \c QDataVis::SelectionNone are supported.
  */
-void Q3DScatter::setMeshFileName(const QString &objFileName)
+void Q3DScatter::setSelectionMode(QDataVis::SelectionFlags mode)
 {
-    d_ptr->m_shared->setMeshFileName(objFileName);
+    dptr()->m_shared->setSelectionMode(mode);
 }
 
-QString Q3DScatter::meshFileName() const
+QDataVis::SelectionFlags Q3DScatter::selectionMode() const
 {
-    return d_ptr->m_shared->meshFileName();
-}
-
-/*!
- * \property Q3DScatter::font
- *
- * Sets the \a font for labels. It is preset to \c Arial by default.
- */
-void Q3DScatter::setFont(const QFont &font)
-{
-    d_ptr->m_shared->setFont(font);
-}
-
-QFont Q3DScatter::font() const
-{
-    return d_ptr->m_shared->font();
+    return dptrc()->m_shared->selectionMode();
 }
 
 /*!
@@ -283,69 +233,7 @@ QFont Q3DScatter::font() const
  */
 Q3DScene *Q3DScatter::scene() const
 {
-    return d_ptr->m_shared->scene();
-}
-
-/*!
- * \property Q3DScatter::labelStyle
- *
- * Sets label \a style to one of \c QDataVis::LabelStyle. It is preset to
- * \c QDataVis::LabelStyleFromTheme by default.
- */
-void Q3DScatter::setLabelStyle(QDataVis::LabelStyle style)
-{
-    d_ptr->m_shared->setLabelStyle(style);
-}
-
-QDataVis::LabelStyle Q3DScatter::labelStyle() const
-{
-    return d_ptr->m_shared->labelStyle();
-}
-
-/*!
- * \property Q3DScatter::gridVisible
- *
- * Sets grid visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DScatter::setGridVisible(bool visible)
-{
-    d_ptr->m_shared->setGridEnabled(visible);
-}
-
-bool Q3DScatter::isGridVisible() const
-{
-    return d_ptr->m_shared->gridEnabled();
-}
-
-/*!
- * \property Q3DScatter::backgroundVisible
- *
- * Sets background visibility to \a visible. It is preset to \c true by default.
- */
-void Q3DScatter::setBackgroundVisible(bool visible)
-{
-    d_ptr->m_shared->setBackgroundEnabled(visible);
-}
-
-bool Q3DScatter::isBackgroundVisible() const
-{
-    return d_ptr->m_shared->backgroundEnabled();
-}
-
-/*!
- * \property Q3DScatter::selectedItemIndex
- *
- * Selects an item in the \a index. Only one item can be selected at a time.
- * To clear selection, specify an illegal \a index, e.g. -1.
- */
-void Q3DScatter::setSelectedItemIndex(int index)
-{
-    d_ptr->m_shared->setSelectedItemIndex(index);
-}
-
-int Q3DScatter::selectedItemIndex() const
-{
-    return d_ptr->m_shared->selectedItemIndex();
+    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -360,12 +248,12 @@ int Q3DScatter::selectedItemIndex() const
  */
 void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
 {
-    return d_ptr->m_shared->setShadowQuality(quality);
+    return dptr()->m_shared->setShadowQuality(quality);
 }
 
 QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
 {
-    return d_ptr->m_shared->shadowQuality();
+    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -380,7 +268,7 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  */
 void Q3DScatter::setAxisX(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisX(axis);
+    dptr()->m_shared->setAxisX(axis);
 }
 
 /*!
@@ -388,7 +276,7 @@ void Q3DScatter::setAxisX(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisX());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -403,7 +291,7 @@ Q3DValueAxis *Q3DScatter::axisX() const
  */
 void Q3DScatter::setAxisY(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisY(axis);
+    dptr()->m_shared->setAxisY(axis);
 }
 
 /*!
@@ -411,7 +299,7 @@ void Q3DScatter::setAxisY(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisY());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -426,7 +314,7 @@ Q3DValueAxis *Q3DScatter::axisY() const
  */
 void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->setAxisZ(axis);
+    dptr()->m_shared->setAxisZ(axis);
 }
 
 /*!
@@ -434,7 +322,7 @@ void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
  */
 Q3DValueAxis *Q3DScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(d_ptr->m_shared->axisZ());
+    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -446,7 +334,7 @@ Q3DValueAxis *Q3DScatter::axisZ() const
  */
 void Q3DScatter::addAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->addAxis(axis);
+    dptr()->m_shared->addAxis(axis);
 }
 
 /*!
@@ -459,7 +347,7 @@ void Q3DScatter::addAxis(Q3DValueAxis *axis)
  */
 void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
 {
-    d_ptr->m_shared->releaseAxis(axis);
+    dptr()->m_shared->releaseAxis(axis);
 }
 
 /*!
@@ -469,72 +357,10 @@ void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
  */
 QList<Q3DValueAxis *> Q3DScatter::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = d_ptr->m_shared->axes();
+    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
     QList<Q3DValueAxis *> retList;
     foreach (Q3DAbstractAxis *axis, abstractAxes)
         retList.append(static_cast<Q3DValueAxis *>(axis));
-
-    return retList;
-}
-
-/*!
- * Sets the active data \a proxy. Implicitly calls addDataProxy() to transfer ownership of
- * the \a proxy to this graph.
- *
- * If the \a proxy is null, a temporary default proxy is created and activated.
- * This temporary proxy is destroyed if another \a proxy is set explicitly active via this method.
- *
- * \sa addDataProxy(), releaseDataProxy()
- */
-void Q3DScatter::setActiveDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->setActiveDataProxy(proxy);
-}
-
-/*!
- * \return active data proxy.
- */
-QScatterDataProxy *Q3DScatter::activeDataProxy() const
-{
-    return static_cast<QScatterDataProxy *>(d_ptr->m_shared->activeDataProxy());
-}
-
-/*!
- * Adds data \a proxy to the graph. The proxies added via addDataProxy are not yet taken to use,
- * addDataProxy is simply used to give the ownership of the data \a proxy to the graph.
- * The \a proxy must not be null or added to another graph.
- *
- * \sa releaseDataProxy(), setActiveDataProxy()
- */
-void Q3DScatter::addDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->addDataProxy(proxy);
-}
-
-/*!
- * Releases the ownership of the data \a proxy back to the caller, if it is added to this graph.
- * If the released \a proxy is in use, a new empty default proxy is created and taken to use.
- *
- * If the default \a proxy is released and added back later, it behaves as any other proxy would.
- *
- * \sa addDataProxy(), setActiveDataProxy()
- */
-void Q3DScatter::releaseDataProxy(QScatterDataProxy *proxy)
-{
-    d_ptr->m_shared->releaseDataProxy(proxy);
-}
-
-/*!
- * \return list of all added data proxies.
- *
- * \sa addDataProxy()
- */
-QList<QScatterDataProxy *> Q3DScatter::dataProxies() const
-{
-    QList<QScatterDataProxy *> retList;
-    QList<QAbstractDataProxy *> abstractList = d_ptr->m_shared->dataProxies();
-    foreach (QAbstractDataProxy *proxy, abstractList)
-        retList.append(static_cast<QScatterDataProxy *>(proxy));
 
     return retList;
 }
@@ -545,23 +371,24 @@ QList<QScatterDataProxy *> Q3DScatter::dataProxies() const
  * This signal is emitted when shadow \a quality changes.
  */
 
-Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q, QRect rect)
-    : q_ptr(q),
-      m_shared(new Scatter3DController(rect))
+Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
+    : Q3DWindowPrivate(q)
 {
-    QObject::connect(m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
-    qDebug() << "Destroying Q3DScatterPrivate";
     delete m_shared;
 }
 
 void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
 {
-    emit q_ptr->shadowQualityChanged(quality);
+    emit qptr()->shadowQualityChanged(quality);
+}
+
+Q3DScatter *Q3DScatterPrivate::qptr()
+{
+    return static_cast<Q3DScatter *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE
