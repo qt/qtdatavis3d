@@ -988,6 +988,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             && m_visibleSeriesList.size() > 0) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+        glViewport(0,
+                   0,
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
+
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
@@ -1024,6 +1029,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         emit pointClicked(QPoint(selectionIdToSurfacePoint(selectionId)),
                           static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series()));
+
+        // Revert to original viewport
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
     }
 
     // Draw the surface
