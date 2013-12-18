@@ -182,7 +182,7 @@ Item {
             id: cameraToggle
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3
-            text: "Animate Camera"
+            text: "Pause Camera"
 
             onClicked: {
                 cameraAnimationX.paused = !cameraAnimationX.paused;
