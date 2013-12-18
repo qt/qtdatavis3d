@@ -1,6 +1,6 @@
----------------------------------------------------
-Qt Data Visualization 1.0.0 (Techonology preview 2)
----------------------------------------------------
+-----------------------------------
+Qt Data Visualization 1.0.0 (alpha)
+-----------------------------------
 
 Qt Data Visualization module provides multiple graph types to visualize data in 3D space
 both with C++ and Qt Quick 2.

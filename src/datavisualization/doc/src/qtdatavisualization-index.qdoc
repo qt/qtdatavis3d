@@ -34,7 +34,7 @@
         \li Customizable axes for data - control viewable data window with axis ranges
         \li Customizable input handling
         \li Customizable scene handling - full control of viewports
-            (upcoming feature - not supported in technology preview)
+            (upcoming feature - not fully supported in alpha)
         \li Customizable themes
     \endlist
 
