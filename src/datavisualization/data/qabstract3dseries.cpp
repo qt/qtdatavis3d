@@ -503,7 +503,6 @@ QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstra
 
 QAbstract3DSeriesPrivate::~QAbstract3DSeriesPrivate()
 {
-    delete m_dataProxy;
 }
 
 QAbstractDataProxy *QAbstract3DSeriesPrivate::dataProxy() const
