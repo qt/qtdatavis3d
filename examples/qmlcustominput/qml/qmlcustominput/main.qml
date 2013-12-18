@@ -44,7 +44,7 @@ Item {
             width: dataView.width
             height: dataView.height
             theme: Theme3D { type: Theme3D.ThemeDigia }
-            shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
+            shadowQuality: AbstractGraph3D.ShadowQualityMedium
             scene.activeCamera.yRotation: 30.0
             //! [1]
             inputHandler: null
