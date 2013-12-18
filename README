@@ -11,8 +11,8 @@ System Requirements
 - Qt 5.2 or newer
 - OpenGL 2.1 or newer (recommended) or OpenGL ES2 (reduced feature set)
 
-Platform specific requirements:
-- Mac: OSX 10.8 or newer
+Platform specific recommendations:
+- Mac: OSX 10.8 recommended
 
 Building
 ========
@@ -86,4 +86,3 @@ Known Issues
 - Q3DScene::secondarySubviewOnTop property has currently no effect.
 - The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
 - Scatter "point" meshes do not support gradients, they always use the base color.
-- In Mac OSX 10.7 rendering only works in QML.
