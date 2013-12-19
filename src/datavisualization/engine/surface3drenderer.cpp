@@ -264,9 +264,10 @@ void Surface3DRenderer::updateData()
 
         delete m_surfaceObj;
         m_surfaceObj = 0;
-
+#if !defined(QT_OPENGL_ES_2)
         m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
                                           m_shadowQualityMultiplier, 1.0f);
+#endif
     }
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
@@ -288,10 +289,12 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 
         QSurface3DSeries::DrawFlags drawMode = series->drawMode();
         m_cachedSurfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
+#if !defined(QT_OPENGL_ES_2)
         if (!m_cachedSurfaceVisible) {
             m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
                                               m_shadowQualityMultiplier, 1.0f);
         }
+#endif
         m_cachedSurfaceGridOn = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
 
         QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
