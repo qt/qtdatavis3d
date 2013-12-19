@@ -25,7 +25,6 @@ Item {
     id: mainview
     width: 1280
     height: 720
-    visible: true
 
     property int buttonMaximumWidth: surfaceGridToggle.width
     property int buttonMinimumHeight: seriesToggle.height

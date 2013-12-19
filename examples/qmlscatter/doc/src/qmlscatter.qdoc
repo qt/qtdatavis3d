@@ -86,9 +86,14 @@
     The last \c import just imports all the qml files in the same directory as our \c {main.qml},
     because that's where \c newbutton.qml and \c data.qml are.
 
-    Then we create our main \c Item, call it \c mainView and set it visible:
+    Then we create our main \c Item and call it \c mainView:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 1
+
+    \note The Qt Creator application wizard will set a \c Rectangle item as the main item, which
+    is opaque white by default. This doesn't work for us, because the graphs are rendered behind the other
+    QML elements. We change the main item type to \c Item, which is invisible. This way the graph is
+    not covered by the main item.
 
     Then we'll add another \c Item inside it, and call it \c dataView. This will be the item to hold
     the Scatter3D graph. We'll anchor it to the parent bottom:

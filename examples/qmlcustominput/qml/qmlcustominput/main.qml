@@ -25,7 +25,6 @@ Item {
     id: mainView
     width: 1280
     height: 720
-    visible: true
 
     Data {
         id: graphData
