@@ -264,6 +264,9 @@ void Surface3DRenderer::updateData()
 
         delete m_surfaceObj;
         m_surfaceObj = 0;
+
+        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                          m_shadowQualityMultiplier, 1.0f);
     }
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
@@ -285,6 +288,10 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 
         QSurface3DSeries::DrawFlags drawMode = series->drawMode();
         m_cachedSurfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
+        if (!m_cachedSurfaceVisible) {
+            m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                              m_shadowQualityMultiplier, 1.0f);
+        }
         m_cachedSurfaceGridOn = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
 
         QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
@@ -304,11 +311,9 @@ void Surface3DRenderer::updateRows(const QVector<int> &rows)
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
-            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
-            if (dataProxy)
-                array = dataProxy->array();
-        }
+        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+        if (dataProxy)
+            array = dataProxy->array();
     }
 
     if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
@@ -346,11 +351,9 @@ void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
-            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
-            if (dataProxy)
-                array = dataProxy->array();
-        }
+        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+        if (dataProxy)
+            array = dataProxy->array();
     }
 
     if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
