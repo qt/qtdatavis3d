@@ -34,10 +34,12 @@ AbstractObjectHelper::AbstractObjectHelper()
 
 AbstractObjectHelper::~AbstractObjectHelper()
 {
-    glDeleteBuffers(1, &m_vertexbuffer);
-    glDeleteBuffers(1, &m_uvbuffer);
-    glDeleteBuffers(1, &m_normalbuffer);
-    glDeleteBuffers(1, &m_elementbuffer);
+    if (QOpenGLContext::currentContext()) {
+        glDeleteBuffers(1, &m_vertexbuffer);
+        glDeleteBuffers(1, &m_uvbuffer);
+        glDeleteBuffers(1, &m_normalbuffer);
+        glDeleteBuffers(1, &m_elementbuffer);
+    }
 }
 
 GLuint AbstractObjectHelper::vertexBuf()

@@ -134,16 +134,17 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
 
 Surface3DRenderer::~Surface3DRenderer()
 {
-    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
-    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+    if (QOpenGLContext::currentContext()) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
 
-    m_textureHelper->deleteTexture(&m_depthTexture);
-    m_textureHelper->deleteTexture(&m_depthModelTexture);
-    m_textureHelper->deleteTexture(&m_selectionTexture);
-    m_textureHelper->deleteTexture(&m_selectionResultTexture);
-    m_textureHelper->deleteTexture(&m_uniformGradientTexture);
-
+        m_textureHelper->deleteTexture(&m_depthTexture);
+        m_textureHelper->deleteTexture(&m_depthModelTexture);
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_textureHelper->deleteTexture(&m_selectionResultTexture);
+        m_textureHelper->deleteTexture(&m_uniformGradientTexture);
+    }
     delete m_shader;
     delete m_depthShader;
     delete m_backgroundShader;

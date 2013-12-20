@@ -39,7 +39,8 @@ SurfaceObject::SurfaceObject()
 
 SurfaceObject::~SurfaceObject()
 {
-    glDeleteBuffers(1, &m_gridElementbuffer);
+    if (QOpenGLContext::currentContext())
+        glDeleteBuffers(1, &m_gridElementbuffer);
 }
 
 void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
