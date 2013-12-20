@@ -37,10 +37,10 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_selectedItem(-1),
       m_targetSeries(0)
 {
-    m_chart->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
-    QFont font = m_chart->theme()->font();
+    m_chart->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
+    QFont font = m_chart->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_chart->theme()->setFont(font);
+    m_chart->activeTheme()->setFont(font);
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_chart->setAxisX(new Q3DValueAxis);
@@ -161,7 +161,10 @@ void ScatterDataModifier::changeTheme()
 {
     static int theme = Q3DTheme::ThemeQt;
 
-    m_chart->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    Q3DTheme *currentTheme = m_chart->activeTheme();
+    m_chart->releaseTheme(currentTheme);
+    delete currentTheme;
+    m_chart->setActiveTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
 
     if (++theme > Q3DTheme::ThemeIsabelle)
         theme = Q3DTheme::ThemeQt;
@@ -169,22 +172,22 @@ void ScatterDataModifier::changeTheme()
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    m_chart->theme()->setLabelBackgroundEnabled(!m_chart->theme()->isLabelBackgroundEnabled());
+    m_chart->activeTheme()->setLabelBackgroundEnabled(!m_chart->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_chart->theme()->setFont(newFont);
+    m_chart->activeTheme()->setFont(newFont);
 }
 
 void ScatterDataModifier::changeFontSize(int fontSize)
 {
     m_fontSize = fontSize;
-    QFont font = m_chart->theme()->font();
+    QFont font = m_chart->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_chart->theme()->setFont(font);
+    m_chart->activeTheme()->setFont(font);
 }
 
 void ScatterDataModifier::changePointSize(int pointSize)
@@ -470,12 +473,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->theme()->setBackgroundEnabled((bool)enabled);
+    m_chart->activeTheme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_chart->theme()->setGridEnabled((bool)enabled);
+    m_chart->activeTheme()->setGridEnabled((bool)enabled);
 }
 
 QVector3D ScatterDataModifier::randVector()

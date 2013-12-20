@@ -92,6 +92,10 @@ Q3DWindow::Q3DWindow(Q3DWindowPrivate *d, QWindow *parent)
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
+
+    QObject::connect(d_ptr->m_visualController, &Abstract3DController::activeThemeChanged, this,
+                     &Q3DWindow::activeThemeChanged);
+
     d_ptr->renderLater();
 }
 
@@ -146,6 +150,62 @@ void Q3DWindow::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
 QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
 {
     return d_ptr->m_visualController->activeInputHandler();
+}
+
+/*!
+ * Adds the given \a theme to the graph. The themes added via addTheme are not taken in to use
+ * directly. Only the ownership of the a\ theme is given to the graph.
+ * The \a theme must not be null or already added to another graph.
+ *
+ * \sa releaseTheme(), setActiveTheme()
+ */
+void Q3DWindow::addTheme(Q3DTheme *theme)
+{
+    d_ptr->m_visualController->addTheme(theme);
+}
+
+/*!
+ * Releases the ownership of the \a theme back to the caller, if it was added to this graph.
+ * If the released \a theme is in use, a new default theme will be created and set active.
+ *
+ * If the default theme is released and added back later, it behaves as any other theme would.
+ *
+ * \sa addTheme(), setActiveTheme()
+ */
+void Q3DWindow::releaseTheme(Q3DTheme *theme)
+{
+    d_ptr->m_visualController->releaseTheme(theme);
+}
+
+/*!
+ * \property Q3DWindow::activeTheme
+ *
+ * The active \a theme to be used for the graph. Implicitly calls addTheme() to transfer ownership
+ * of the \a theme to this graph.
+ * If the \a theme is null, a temporary default theme is created. This temporary theme is destroyed
+ * if any theme is explicitly set later.
+ * Properties of the \a theme can be modified even after setting it, and the modifications take
+ * effect immediately.
+ */
+void Q3DWindow::setActiveTheme(Q3DTheme *theme)
+{
+    d_ptr->m_visualController->setActiveTheme(theme);
+}
+
+
+Q3DTheme *Q3DWindow::activeTheme() const
+{
+    return d_ptr->m_visualController->activeTheme();
+}
+
+/*!
+ * \return list of all added themes.
+ *
+ * \sa addTheme()
+ */
+QList<Q3DTheme *> Q3DWindow::themes() const
+{
+    return d_ptr->m_visualController->themes();
 }
 
 /*!

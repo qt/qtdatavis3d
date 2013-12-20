@@ -25,7 +25,7 @@ const float defaultBuiltInColorLevel = 0.7f; // for built-in gradient themes
 const float defaultColorLevel = 0.5f; // for built-in uniform themes
 
 ThemeManager::ThemeManager(Abstract3DController *controller)
-    : m_theme(0),
+    : m_activeTheme(0),
       m_controller(controller)
 {
 }
@@ -34,60 +34,105 @@ ThemeManager::~ThemeManager()
 {
 }
 
-void ThemeManager::setTheme(Q3DTheme *theme)
+void ThemeManager::addTheme(Q3DTheme *theme)
 {
-    if (!theme)
-        return;
+    Q_ASSERT(theme);
+    ThemeManager *owner = qobject_cast<ThemeManager *>(theme->parent());
+    if (owner != this) {
+        Q_ASSERT_X(!owner, "addTheme", "Theme already attached to a graph.");
+        theme->setParent(this);
+    }
+    if (!m_themes.contains(theme))
+        m_themes.append(theme);
+}
 
-    if (m_theme.data() != theme) {
-        // Disconnect old theme signal connections
-        if (m_theme) {
-            disconnect(m_theme->d_ptr.data(), 0, m_controller, 0);
-            disconnect(m_theme.data(), 0, m_controller, 0);
-            disconnect(m_theme.data(), 0, this, 0);
-        }
+void ThemeManager::releaseTheme(Q3DTheme *theme)
+{
+    if (theme && m_themes.contains(theme)) {
+        // Clear the default status from released default theme
+        if (theme->d_ptr->isDefaultTheme())
+            theme->d_ptr->setDefaultTheme(false);
 
-        m_theme.reset(theme);
+        // If the axis is in use, replace it with a temporary one
+        if (theme == m_activeTheme)
+            setActiveTheme(0);
 
-        Q3DTheme::Theme type = m_theme->type();
-
-        if (type != Q3DTheme::ThemeUserDefined) {
-            useTheme(type);
-            // Reset all bits to dirty for sync
-            m_theme->d_ptr->resetDirtyBits();
-        }
-
-        // Connect signals from new one
-        connectThemeSignals();
+        m_themes.removeAll(theme);
+        theme->setParent(0);
     }
 }
 
-Q3DTheme *ThemeManager::theme() const
+void ThemeManager::setActiveTheme(Q3DTheme *theme)
 {
-    return m_theme.data();
+    // Setting null theme indicates using default theme
+    if (!theme) {
+        theme = new Q3DTheme;
+        theme->d_ptr->setDefaultTheme(true);
+    }
+
+    // If the old theme is default theme, delete it
+    Q3DTheme *oldTheme = m_activeTheme;
+    if (oldTheme) {
+        if (oldTheme->d_ptr->isDefaultTheme()) {
+            m_themes.removeAll(oldTheme);
+            delete oldTheme;
+            oldTheme = 0;
+        } else {
+            // Disconnect the old theme from use
+            disconnect(m_activeTheme->d_ptr.data(), 0, m_controller, 0);
+            disconnect(m_activeTheme, 0, m_controller, 0);
+            disconnect(m_activeTheme, 0, this, 0);
+        }
+    }
+
+    // Assume ownership
+    addTheme(theme);
+
+    m_activeTheme = theme;
+
+    Q3DTheme::Theme type = m_activeTheme->type();
+
+    if (type != Q3DTheme::ThemeUserDefined)
+        useTheme(type);
+
+    // Reset all bits to dirty for sync
+    m_activeTheme->d_ptr->resetDirtyBits();
+
+    // Connect signals from new one
+    connectThemeSignals();
+}
+
+Q3DTheme *ThemeManager::activeTheme() const
+{
+    return m_activeTheme;
+}
+
+QList<Q3DTheme *> ThemeManager::themes() const
+{
+    return m_themes;
 }
 
 void ThemeManager::connectThemeSignals()
 {
-    connect(m_theme.data(), &Q3DTheme::colorStyleChanged,
+    connect(m_activeTheme, &Q3DTheme::colorStyleChanged,
             m_controller, &Abstract3DController::handleThemeColorStyleChanged);
-    connect(m_theme.data(), &Q3DTheme::baseColorsChanged,
+    connect(m_activeTheme, &Q3DTheme::baseColorsChanged,
             m_controller, &Abstract3DController::handleThemeBaseColorsChanged);
-    connect(m_theme.data(), &Q3DTheme::singleHighlightColorChanged,
+    connect(m_activeTheme, &Q3DTheme::singleHighlightColorChanged,
             m_controller, &Abstract3DController::handleThemeSingleHighlightColorChanged);
-    connect(m_theme.data(), &Q3DTheme::multiHighlightColorChanged,
+    connect(m_activeTheme, &Q3DTheme::multiHighlightColorChanged,
             m_controller, &Abstract3DController::handleThemeMultiHighlightColorChanged);
-    connect(m_theme.data(), &Q3DTheme::baseGradientsChanged,
+    connect(m_activeTheme, &Q3DTheme::baseGradientsChanged,
             m_controller, &Abstract3DController::handleThemeBaseGradientsChanged);
-    connect(m_theme.data(), &Q3DTheme::singleHighlightGradientChanged,
+    connect(m_activeTheme, &Q3DTheme::singleHighlightGradientChanged,
             m_controller, &Abstract3DController::handleThemeSingleHighlightGradientChanged);
-    connect(m_theme.data(), &Q3DTheme::multiHighlightGradientChanged,
+    connect(m_activeTheme, &Q3DTheme::multiHighlightGradientChanged,
             m_controller, &Abstract3DController::handleThemeMultiHighlightGradientChanged);
 
-    connect(m_theme->d_ptr.data(), &Q3DThemePrivate::needRender,
+    connect(m_activeTheme->d_ptr.data(), &Q3DThemePrivate::needRender,
             m_controller, &Abstract3DController::needRender);
 
-    connect(m_theme.data(), &Q3DTheme::typeChanged, this, &ThemeManager::useTheme);
+    connect(m_activeTheme, &Q3DTheme::typeChanged, this, &ThemeManager::useTheme);
 }
 
 void ThemeManager::useTheme(Q3DTheme::Theme type)
@@ -425,128 +470,128 @@ QLinearGradient ThemeManager::createGradient(const QColor &color, float colorLev
 
 void ThemeManager::setBaseColors(const QList<QColor> &colors)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.baseColorDirty)
-        m_theme->setBaseColors(colors);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.baseColorDirty)
+        m_activeTheme->setBaseColors(colors);
 }
 
 void ThemeManager::setBackgroundColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.backgroundColorDirty)
-        m_theme->setBackgroundColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.backgroundColorDirty)
+        m_activeTheme->setBackgroundColor(color);
 }
 
 void ThemeManager::setWindowColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.windowColorDirty)
-        m_theme->setWindowColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.windowColorDirty)
+        m_activeTheme->setWindowColor(color);
 }
 
 void ThemeManager::setTextColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.labelTextColorDirty)
-        m_theme->setLabelTextColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.labelTextColorDirty)
+        m_activeTheme->setLabelTextColor(color);
 }
 
 void ThemeManager::setTextBackgroundColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.labelBackgroundColorDirty)
-        m_theme->setLabelBackgroundColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.labelBackgroundColorDirty)
+        m_activeTheme->setLabelBackgroundColor(color);
 }
 
 void ThemeManager::setGridLineColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.gridLineColorDirty)
-        m_theme->setGridLineColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.gridLineColorDirty)
+        m_activeTheme->setGridLineColor(color);
 }
 
 void ThemeManager::setSingleHighlightColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.singleHighlightColorDirty)
-        m_theme->setSingleHighlightColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.singleHighlightColorDirty)
+        m_activeTheme->setSingleHighlightColor(color);
 }
 
 void ThemeManager::setMultiHighlightColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.multiHighlightColorDirty)
-        m_theme->setMultiHighlightColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.multiHighlightColorDirty)
+        m_activeTheme->setMultiHighlightColor(color);
 }
 
 void ThemeManager::setLightColor(const QColor &color)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.lightColorDirty)
-        m_theme->setLightColor(color);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.lightColorDirty)
+        m_activeTheme->setLightColor(color);
 }
 
 void ThemeManager::setBaseGradients(const QList<QLinearGradient> &gradients)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.baseGradientDirty)
-        m_theme->setBaseGradients(gradients);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.baseGradientDirty)
+        m_activeTheme->setBaseGradients(gradients);
 }
 
 void ThemeManager::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.singleHighlightGradientDirty)
-        m_theme->setSingleHighlightGradient(gradient);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.singleHighlightGradientDirty)
+        m_activeTheme->setSingleHighlightGradient(gradient);
 }
 
 void ThemeManager::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.multiHighlightGradientDirty)
-        m_theme->setMultiHighlightGradient(gradient);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.multiHighlightGradientDirty)
+        m_activeTheme->setMultiHighlightGradient(gradient);
 }
 
 void ThemeManager::setLightStrength(float strength)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.lightStrengthDirty)
-        m_theme->setLightStrength(strength);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.lightStrengthDirty)
+        m_activeTheme->setLightStrength(strength);
 }
 
 void ThemeManager::setAmbientLightStrength(float strength)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.ambientLightStrengthDirty)
-        m_theme->setAmbientLightStrength(strength);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.ambientLightStrengthDirty)
+        m_activeTheme->setAmbientLightStrength(strength);
 }
 
 void ThemeManager::setHighlightLightStrength(float strength)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.highlightLightStrengthDirty)
-        m_theme->setHighlightLightStrength(strength);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.highlightLightStrengthDirty)
+        m_activeTheme->setHighlightLightStrength(strength);
 }
 
 void ThemeManager::setLabelBorderEnabled(bool enabled)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.labelBorderEnabledDirty)
-        m_theme->setLabelBorderEnabled(enabled);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.labelBorderEnabledDirty)
+        m_activeTheme->setLabelBorderEnabled(enabled);
 }
 
 void ThemeManager::setFont(const QFont &font)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.fontDirty)
-        m_theme->setFont(font);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.fontDirty)
+        m_activeTheme->setFont(font);
 }
 
 void ThemeManager::setBackgroundEnabled(bool enabled)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.backgroundEnabledDirty)
-        m_theme->setBackgroundEnabled(enabled);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.backgroundEnabledDirty)
+        m_activeTheme->setBackgroundEnabled(enabled);
 }
 
 void ThemeManager::setGridEnabled(bool enabled)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.gridEnabledDirty)
-        m_theme->setGridEnabled(enabled);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.gridEnabledDirty)
+        m_activeTheme->setGridEnabled(enabled);
 }
 
 void ThemeManager::setLabelBackgroundEnabled(bool enabled)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty)
-        m_theme->setLabelBackgroundEnabled(enabled);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty)
+        m_activeTheme->setLabelBackgroundEnabled(enabled);
 }
 
 void ThemeManager::setColorStyle(Q3DTheme::ColorStyle style)
 {
-    if (!m_theme->d_ptr->m_dirtyBits.colorStyleDirty)
-        m_theme->setColorStyle(style);
+    if (!m_activeTheme->d_ptr->m_dirtyBits.colorStyleDirty)
+        m_activeTheme->setColorStyle(style);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

@@ -74,7 +74,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->rowAxis()->setMax(SpectrumNumBands * 2);
     m_chart->columnAxis()->setMax(SpectrumNumBands - 1);
     // Disable grid
-    m_chart->theme()->setGridEnabled(false);
+    m_chart->activeTheme()->setGridEnabled(false);
     // Disable auto-scaling of height by defining explicit range
     m_chart->valueAxis()->setRange(0.0f, 1.0f);
     // Disable shadows

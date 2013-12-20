@@ -46,12 +46,12 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
     m_graph->setSelectionMode(QDataVis::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
-    m_graph->theme()->setGridEnabled(true);
-    m_graph->theme()->setBackgroundEnabled(false);
-    QFont font = m_graph->theme()->font();
+    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_graph->activeTheme()->setGridEnabled(true);
+    m_graph->activeTheme()->setBackgroundEnabled(false);
+    QFont font = m_graph->activeTheme()->font();
     font.setPointSize(10);
-    m_graph->theme()->setFont(font);
+    m_graph->activeTheme()->setFont(font);
     QBar3DSeries *series = new QBar3DSeries;
     series->setMesh(QAbstract3DSeries::MeshBar);
     m_graph->addSeries(series);

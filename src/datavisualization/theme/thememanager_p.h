@@ -42,8 +42,11 @@ public:
     ThemeManager(Abstract3DController *controller);
     ~ThemeManager();
 
-    void setTheme(Q3DTheme *theme);
-    Q3DTheme *theme() const;
+    void addTheme(Q3DTheme *theme);
+    void releaseTheme(Q3DTheme *theme);
+    void setActiveTheme(Q3DTheme *theme);
+    Q3DTheme *activeTheme() const;
+    QList<Q3DTheme *> themes() const;
 
 protected:
     void connectThemeSignals();
@@ -72,7 +75,8 @@ protected:
     void setColorStyle(Q3DTheme::ColorStyle style);
 
 private:
-    QScopedPointer<Q3DTheme> m_theme;
+    Q3DTheme *m_activeTheme;
+    QList<Q3DTheme *> m_themes; // List of all added themes
     Abstract3DController *m_controller;
 };
 

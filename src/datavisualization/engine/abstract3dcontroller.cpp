@@ -52,7 +52,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, QObject *paren
     m_renderPending(false)
 {
     // Set initial theme
-    setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+    setActiveTheme(new Q3DTheme(Q3DTheme::ThemeQt));
 
     m_scene->d_ptr->setViewport(initialViewport);
 
@@ -102,7 +102,7 @@ void Abstract3DController::addSeries(QAbstract3DSeries *series)
                          this, &Abstract3DController::handleSeriesVisibilityChanged);
         if (series->isVisible())
             handleSeriesVisibilityChangedBySender(series);
-        series->d_ptr->resetToTheme(*m_themeManager->theme(), oldSize, false);
+        series->d_ptr->resetToTheme(*m_themeManager->activeTheme(), oldSize, false);
     }
 }
 
@@ -135,7 +135,7 @@ void Abstract3DController::synchDataToRenderer()
 
     m_renderer->updateScene(m_scene);
 
-    m_renderer->updateTheme(m_themeManager->theme());
+    m_renderer->updateTheme(m_themeManager->activeTheme());
 
     if (m_changeTracker.shadowQualityChanged) {
         m_renderer->updateShadowQuality(m_shadowQuality);
@@ -595,22 +595,43 @@ void Abstract3DController::setZoomLevel(int zoomLevel)
     emitNeedRender();
 }
 
-void Abstract3DController::setTheme(Q3DTheme *theme)
+void Abstract3DController::addTheme(Q3DTheme *theme)
 {
-    if (theme != m_themeManager->theme()) {
-        m_themeManager->setTheme(theme);
+    m_themeManager->addTheme(theme);
+}
+
+void Abstract3DController::releaseTheme(Q3DTheme *theme)
+{
+    Q3DTheme *oldTheme = m_themeManager->activeTheme();
+
+    m_themeManager->releaseTheme(theme);
+
+    if (oldTheme != m_themeManager->activeTheme())
+        emit activeThemeChanged(m_themeManager->activeTheme());
+}
+QList<Q3DTheme *> Abstract3DController::themes() const
+{
+    return m_themeManager->themes();
+}
+
+void Abstract3DController::setActiveTheme(Q3DTheme *theme)
+{
+    if (theme != m_themeManager->activeTheme()) {
+        m_themeManager->setActiveTheme(theme);
         m_changeTracker.themeChanged = true;
+        // Default theme can be created by theme manager, so ensure we have correct theme
+        Q3DTheme *newActiveTheme = m_themeManager->activeTheme();
         // Reset all attached series to the new theme
         for (int i = 0; i < m_seriesList.size(); i++)
-            m_seriesList.at(i)->d_ptr->resetToTheme(*theme, i, true);
+            m_seriesList.at(i)->d_ptr->resetToTheme(*newActiveTheme, i, true);
         markSeriesVisualsDirty();
-        emit themeChanged(theme);
+        emit activeThemeChanged(newActiveTheme);
     }
 }
 
-Q3DTheme *Abstract3DController::theme() const
+Q3DTheme *Abstract3DController::activeTheme() const
 {
-    return m_themeManager->theme();
+    return m_themeManager->activeTheme();
 }
 
 void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)

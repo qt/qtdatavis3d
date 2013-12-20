@@ -33,6 +33,21 @@ Item {
         id: seriesData
     }
     //! [4]
+
+    //! [13]
+    Theme3D {
+        id: themeIsabelle
+        type: Theme3D.ThemeIsabelle
+        font.family: "Lucida Handwriting"
+        font.pointSize: 40
+    }
+    //! [13]
+
+    Theme3D {
+        id : themeArmyBlue
+        type: Theme3D.ThemeArmyBlue
+    }
+
     //! [8]
     //! [9]
     Item {
@@ -50,11 +65,7 @@ Item {
             height: dataView.height
             //! [2]
             //! [3]
-            theme: Theme3D {
-                type: Theme3D.ThemeIsabelle
-                font.family: "Lucida Handwriting"
-                font.pointSize: 40
-            }
+            theme: themeIsabelle
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [6]
@@ -179,14 +190,9 @@ Item {
             text: "Change Theme"
             onClicked: {
                 if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
-                    // Ownership of the theme is transferred and old theme is destroyed when setting
-                    // a new one, so we need to create them dynamically
-                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
-                        Theme3D {type: Theme3D.ThemeIsabelle; font.family: "Lucida Handwriting";
-                        font.pointSize: 40}', parent);
+                    scatterGraph.theme = themeIsabelle
                 } else {
-                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
-                        Theme3D {type: Theme3D.ThemeArmyBlue}', parent);
+                    scatterGraph.theme = themeArmyBlue
                 }
             }
         }

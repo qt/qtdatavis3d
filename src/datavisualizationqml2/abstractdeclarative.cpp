@@ -43,12 +43,12 @@ Q3DScene* AbstractDeclarative::scene() const
 
 void AbstractDeclarative::setTheme(Q3DTheme *theme)
 {
-    m_controller->setTheme(theme);
+    m_controller->setActiveTheme(theme);
 }
 
 Q3DTheme *AbstractDeclarative::theme() const
 {
-    return m_controller->theme();
+    return m_controller->activeTheme();
 }
 
 void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)
@@ -79,7 +79,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::shadowQualityChanged);
     QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
                      &AbstractDeclarative::inputHandlerChanged);
-    QObject::connect(m_controller, &Abstract3DController::themeChanged, this,
+    QObject::connect(m_controller, &Abstract3DController::activeThemeChanged, this,
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::selectionModeChanged);

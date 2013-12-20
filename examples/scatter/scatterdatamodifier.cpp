@@ -39,10 +39,10 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_smooth(true)
 {
     //! [0]
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeEbony));
-    QFont font = m_graph->theme()->font();
+    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeEbony));
+    QFont font = m_graph->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->theme()->setFont(font);
+    m_graph->activeTheme()->setFont(font);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [0]
@@ -131,10 +131,14 @@ void ScatterDataModifier::setSmoothDots(int smooth)
 
 void ScatterDataModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
-    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
-    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
-    emit fontChanged(m_graph->theme()->font());
+    Q3DTheme *currentTheme = m_graph->activeTheme();
+    m_graph->releaseTheme(currentTheme);
+    delete currentTheme;
+    currentTheme = new Q3DTheme(Q3DTheme::Theme(theme));
+    m_graph->setActiveTheme(currentTheme);
+    emit backgroundEnabledChanged(currentTheme->isBackgroundEnabled());
+    emit gridEnabledChanged(currentTheme->isGridEnabled());
+    emit fontChanged(currentTheme->font());
 }
 
 void ScatterDataModifier::changePresetCamera()
@@ -149,14 +153,14 @@ void ScatterDataModifier::changePresetCamera()
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->theme()->setFont(newFont);
+    m_graph->activeTheme()->setFont(newFont);
 }
 
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
@@ -173,12 +177,12 @@ void ScatterDataModifier::changeShadowQuality(int quality)
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->theme()->setBackgroundEnabled((bool)enabled);
+    m_graph->activeTheme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_graph->theme()->setGridEnabled((bool)enabled);
+    m_graph->activeTheme()->setGridEnabled((bool)enabled);
 }
 //! [8]
 

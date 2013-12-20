@@ -191,8 +191,11 @@ public:
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);
 
-    virtual void setTheme(Q3DTheme *theme);
-    virtual Q3DTheme *theme() const;
+    virtual void addTheme(Q3DTheme *theme);
+    virtual void releaseTheme(Q3DTheme *theme);
+    virtual void setActiveTheme(Q3DTheme *theme);
+    virtual Q3DTheme *activeTheme() const;
+    virtual QList<Q3DTheme *> themes() const;
 
     virtual void setSelectionMode(QDataVis::SelectionFlags mode);
     virtual QDataVis::SelectionFlags selectionMode() const;
@@ -253,7 +256,7 @@ public slots:
 signals:
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
-    void themeChanged(Q3DTheme *theme);
+    void activeThemeChanged(Q3DTheme *activeTheme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void needRender();
 

@@ -72,7 +72,7 @@ void Bars3DController::initializeOpenGL()
 void Bars3DController::synchDataToRenderer()
 {
     // Background change requires reloading the meshes in bar graphs, so dirty the series visuals
-    if (m_themeManager->theme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
+    if (m_themeManager->activeTheme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
         m_isSeriesVisualsDirty = true;
         foreach (QAbstract3DSeries *series, m_seriesList)
             series->d_ptr->m_changeTracker.meshChanged = true;

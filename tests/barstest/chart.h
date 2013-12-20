@@ -129,6 +129,7 @@ private:
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;
     QAbstract3DInputHandler *m_defaultInputHandler;
+    Q3DTheme *m_ownTheme;
 };
 
 #endif

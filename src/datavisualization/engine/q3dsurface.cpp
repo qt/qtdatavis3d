@@ -103,8 +103,6 @@ Q3DSurface::Q3DSurface(QWindow *parent)
     dptr()->m_shared->initializeOpenGL();
     QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
                      &Q3DSurface::selectionModeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
-                     &Q3DSurface::themeChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DSurface::shadowQualityChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
@@ -202,23 +200,6 @@ Q3DSurfacePrivate *Q3DSurface::dptr()
 const Q3DSurfacePrivate *Q3DSurface::dptrc() const
 {
     return static_cast<const Q3DSurfacePrivate *>(d_ptr.data());
-}
-
-/*!
- * \property Q3DSurface::theme
- *
- * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
- * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
- * it, and the modifications take effect immediately.
- */
-void Q3DSurface::setTheme(Q3DTheme *theme)
-{
-    dptr()->m_shared->setTheme(theme);
-}
-
-Q3DTheme *Q3DSurface::theme() const
-{
-    return dptrc()->m_shared->theme();
 }
 
 /*!

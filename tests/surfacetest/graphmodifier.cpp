@@ -338,12 +338,12 @@ void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->theme()->setFont(newFont);
+    m_graph->activeTheme()->setFont(newFont);
 }
 
 void GraphModifier::changeStyle()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::selectButtonClicked()
@@ -363,7 +363,10 @@ void GraphModifier::selectedPointChanged(const QPoint &point)
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    Q3DTheme *currentTheme = m_graph->activeTheme();
+    m_graph->releaseTheme(currentTheme);
+    delete currentTheme;
+    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
 }
 
 

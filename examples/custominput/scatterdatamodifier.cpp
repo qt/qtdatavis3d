@@ -32,7 +32,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_inputHandler(new CustomInputHandler())
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
+    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
     m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 

@@ -108,8 +108,6 @@ Q3DBars::Q3DBars(QWindow *parent)
                      &Q3DBars::selectionModeChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DBars::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
-                     &Q3DBars::themeChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
                      &Q3DWindowPrivate::renderLater);
     QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
@@ -269,23 +267,6 @@ void Q3DBars::setBarSpacingRelative(bool relative)
 bool Q3DBars::isBarSpacingRelative()
 {
     return dptr()->m_shared->isBarSpecRelative();
-}
-
-/*!
- * \property Q3DBars::theme
- *
- * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
- * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
- * it, and the modifications take effect immediately.
- */
-void Q3DBars::setTheme(Q3DTheme *theme)
-{
-    dptr()->m_shared->setTheme(theme);
-}
-
-Q3DTheme *Q3DBars::theme() const
-{
-    return dptrc()->m_shared->theme();
 }
 
 /*!

@@ -21,7 +21,6 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
-#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QLinearGradient>
 
@@ -42,7 +41,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
@@ -52,9 +50,6 @@ public:
     void addSeries(QBar3DSeries *series);
     void removeSeries(QBar3DSeries *series);
     QList<QBar3DSeries *> seriesList();
-
-    void setTheme(Q3DTheme *theme);
-    Q3DTheme *theme() const;
 
     void setBarThickness(float thicknessRatio);
     float barThickness();
@@ -89,7 +84,6 @@ signals:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
-    void themeChanged(Q3DTheme *theme);
 
 protected:
 

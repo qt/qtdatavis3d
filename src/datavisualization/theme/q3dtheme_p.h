@@ -97,6 +97,9 @@ public:
 
     bool sync(Q3DThemePrivate &other);
 
+    inline bool isDefaultTheme() { return m_isDefaultTheme; }
+    inline void setDefaultTheme(bool isDefault) { m_isDefaultTheme = isDefault; }
+
 signals:
     void needRender();
 
@@ -126,6 +129,7 @@ public:
     bool m_backgoundEnabled;
     bool m_gridEnabled;
     bool m_labelBackground;
+    bool m_isDefaultTheme;
 
 protected:
     Q3DTheme *q_ptr;

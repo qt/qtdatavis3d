@@ -32,10 +32,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class Q3DWindowPrivate;
 class Abstract3DController;
 class QAbstract3DInputHandler;
+class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DWindow : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
+    Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
 
 protected:
     explicit Q3DWindow(Q3DWindowPrivate *d, QWindow *parent = 0);
@@ -47,10 +49,19 @@ public:
     void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     QAbstract3DInputHandler *activeInputHandler();
 
+    void addTheme(Q3DTheme *theme);
+    void releaseTheme(Q3DTheme *theme);
+    void setActiveTheme(Q3DTheme *theme);
+    Q3DTheme *activeTheme() const;
+    QList<Q3DTheme *> themes() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
     void exposeEvent(QExposeEvent *event);
+
+signals:
+    void activeThemeChanged(Q3DTheme *theme);
 
 private:
     QScopedPointer<Q3DWindowPrivate> d_ptr;

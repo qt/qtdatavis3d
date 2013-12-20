@@ -48,5 +48,5 @@
 
 /*!
   \qmlproperty Theme3D AbstractGraph3D::theme
-  Theme of the graph.
+  The active theme of the graph.
  */

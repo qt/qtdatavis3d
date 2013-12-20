@@ -22,7 +22,6 @@
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dwindow.h>
 #include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QLinearGradient>
 
@@ -33,14 +32,12 @@ class LabelItem;
 class Q3DValueAxis;
 class Q3DCategoryAxis;
 class QScatter3DSeries;
-class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
@@ -50,9 +47,6 @@ public:
     void addSeries(QScatter3DSeries *series);
     void removeSeries(QScatter3DSeries *series);
     QList<QScatter3DSeries *> seriesList();
-
-    void setTheme(Q3DTheme *theme);
-    Q3DTheme *theme() const;
 
     void setSelectionMode(QDataVis::SelectionFlags mode);
     QDataVis::SelectionFlags selectionMode() const;
@@ -75,7 +69,6 @@ public:
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
-    void themeChanged(Q3DTheme* theme);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);

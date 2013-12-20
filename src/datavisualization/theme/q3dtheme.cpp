@@ -377,6 +377,10 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty Theme3D.Theme Theme3D::type
  *
  * The type of the theme. If no type is set, the type is \c Theme3D.ThemeUserDefined.
+ * \note Changing the type to one of the predefined types doesn't reset the properties
+ * that have been explicitly set since the last render cycle. This is done to allow
+ * customization of predefined types also from QML. It is not recommended
+ * changing the type of an existing Theme3D item via this property.
  */
 
 /*!
@@ -862,8 +866,11 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
 /*!
  * \property Q3DTheme::type
  *
- * The type of the theme. Type is automatically set when constructing a theme. User should not
- * need to use this when using C++ API.
+ * The type of the theme. Type is automatically set when constructing a theme.
+ * \note Changing the type to one of the predefined types doesn't reset the properties
+ * that have been explicitly set since the last render cycle. This is done to allow
+ * customization of predefined types also from QML. It is not recommended
+ * changing the type of an existing Q3DTheme object via this property.
  */
 void Q3DTheme::setType(Theme themeType)
 {
@@ -907,6 +914,7 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
       m_backgoundEnabled(true),
       m_gridEnabled(true),
       m_labelBackground(true),
+      m_isDefaultTheme(false),
       q_ptr(q)
 {
     m_baseColors.append(QColor(Qt::black));

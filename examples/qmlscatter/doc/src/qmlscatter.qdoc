@@ -112,8 +112,12 @@
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 3
 
-    We added a built-in Theme3D and changed the font in it. We also changed the shadow quality.
+    We added a customized theme and changed the shadow quality.
     We're happy with the other visual properties, so we won't change them.
+
+    The custom theme is based on a predefined theme, but we change the font in it:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 13
 
     Then it's time to start feeding the graph some data.
 

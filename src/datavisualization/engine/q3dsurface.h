@@ -29,13 +29,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class Q3DSurfacePrivate;
 class Q3DValueAxis;
 class QSurface3DSeries;
-class Q3DTheme;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
 {
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
@@ -46,9 +44,6 @@ public:
     void addSeries(QSurface3DSeries *series);
     void removeSeries(QSurface3DSeries *series);
     QList<QSurface3DSeries *> seriesList();
-
-    void setTheme(Q3DTheme *theme);
-    Q3DTheme *theme() const;
 
     void setShadowQuality(QDataVis::ShadowQuality quality);
     QDataVis::ShadowQuality shadowQuality() const;
@@ -71,7 +66,6 @@ public:
 
 signals:
     void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void themeChanged(Q3DTheme *theme);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
 
 protected:

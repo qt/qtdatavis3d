@@ -92,8 +92,6 @@ Q3DScatter::Q3DScatter(QWindow *parent)
                      &Q3DScatter::selectionModeChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
                      &Q3DScatter::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
-                     &Q3DScatter::themeChanged);
     QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
                      &Q3DWindowPrivate::renderLater);
     QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
@@ -189,23 +187,6 @@ Q3DScatterPrivate *Q3DScatter::dptr()
 const Q3DScatterPrivate *Q3DScatter::dptrc() const
 {
     return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
-}
-
-/*!
- * \property Q3DScatter::theme
- *
- * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
- * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
- * it, and the modifications take effect immediately.
- */
-void Q3DScatter::setTheme(Q3DTheme *theme)
-{
-    dptr()->m_shared->setTheme(theme);
-}
-
-Q3DTheme *Q3DScatter::theme() const
-{
-    return dptrc()->m_shared->theme();
 }
 
 /*!
