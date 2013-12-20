@@ -56,7 +56,8 @@ Drawer::Drawer(Q3DTheme *theme)
 Drawer::~Drawer()
 {
     delete m_textureHelper;
-    glDeleteBuffers(1, &m_pointbuffer);
+    if (QOpenGLContext::currentContext())
+        glDeleteBuffers(1, &m_pointbuffer);
 }
 
 void Drawer::initializeOpenGL()

@@ -26,7 +26,6 @@ import "."
 //! [1]
 Item {
     id: mainView
-    visible: true
     //! [1]
 
     //! [4]

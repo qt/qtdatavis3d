@@ -21,86 +21,124 @@ import QtDataVisualization 1.0
 //! [0]
 
 //! [1]
-Bars3D {
-    rows: 4
-    columns: 4
-    barSpacing: Qt.size(0.5, 0.5)
-    barSpacingRelative: false
+import QtQuick 2.0
+import QtDataVisualization 1.0
 
-    Bar3DSeries {
-        itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
+Item {
+    width: 640
+    height: 480
 
-        ItemModelBarDataProxy {
-            itemModel: model // E.g. a list model defined elsewhere containing monthly expenses data.
-            // Mapping model roles to bar series rows, columns, and values.
-            rowRole: "year"
-            columnRole: "city"
-            valueRole: "expenses"
-            rowCategories: ["2010", "2011", "2012", "2013"]
-            columnCategories: ["Oulu", "Rauma", "Helsinki", "Tampere"]
+    Bars3D {
+        width: parent.width
+        height: parent.height
+
+        Bar3DSeries {
+            itemLabelFormat: "@colLabel, @rowLabel: @valueLabel"
+
+            ItemModelBarDataProxy {
+                itemModel: dataModel
+                // Mapping model roles to bar series rows, columns, and values.
+                rowRole: "year"
+                columnRole: "city"
+                valueRole: "expenses"
+            }
         }
+    }
+
+    ListModel {
+        id: dataModel
+        ListElement{ year: "2012"; city: "Oulu";     expenses: "4200"; }
+        ListElement{ year: "2012"; city: "Rauma";    expenses: "2100"; }
+        ListElement{ year: "2012"; city: "Helsinki"; expenses: "7040"; }
+        ListElement{ year: "2012"; city: "Tampere";  expenses: "4330"; }
+        ListElement{ year: "2013"; city: "Oulu";     expenses: "3960"; }
+        ListElement{ year: "2013"; city: "Rauma";    expenses: "1990"; }
+        ListElement{ year: "2013"; city: "Helsinki"; expenses: "7230"; }
+        ListElement{ year: "2013"; city: "Tampere";  expenses: "4650"; }
     }
 }
 //! [1]
 
 //! [2]
-Scatter3D {
-    axisX.segmentCount: 2
-    axisX.subSegmentCount: 2
-    axisX.labelFormat: "%.2f"
-    axisZ.segmentCount: 2
-    axisZ.subSegmentCount: 2
-    axisZ.labelFormat: "%.2f"
-    axisY.segmentCount: 3
-    axisY.subSegmentCount: 2
-    axisY.labelFormat: "%.2f"
+import QtQuick 2.0
+import QtDataVisualization 1.0
 
-    Scatter3DSeries {
-        itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+Item {
+    width: 640
+    height: 480
 
-        ItemModelScatterDataProxy {
-            itemModel: model // E.g. a list model defined elsewhere containing point coordinates.
-            // Mapping model roles to scatter series item coordinates.
-            xPosRole: "xPos"
-            yPosRole: "yPos"
-            zPosRole: "zPos"
+    Scatter3D {
+        width: parent.width
+        height: parent.height
+        Scatter3DSeries {
+            ItemModelScatterDataProxy {
+                itemModel: dataModel
+                // Mapping model roles to scatter series item coordinates.
+                xPosRole: "xPos"
+                yPosRole: "yPos"
+                zPosRole: "zPos"
+            }
         }
+    }
+
+    ListModel {
+        id: dataModel
+        ListElement{ xPos: "2.754"; yPos: "1.455"; zPos: "3.362"; }
+        ListElement{ xPos: "3.164"; yPos: "2.022"; zPos: "4.348"; }
+        ListElement{ xPos: "4.564"; yPos: "1.865"; zPos: "1.346"; }
+        ListElement{ xPos: "1.068"; yPos: "1.224"; zPos: "2.983"; }
+        ListElement{ xPos: "2.323"; yPos: "2.502"; zPos: "3.133"; }
     }
 }
 //! [2]
 
 //! [3]
-Surface3D {
-    axisX.min: 0.0
-    axisX.max: 10.0
-    axisZ.min: 0.0
-    axisZ.max: 10.0
-    axisY.min: 0.0
-    axisY.max: 5.0
-    axisX.segmentCount: 5
-    axisX.subSegmentCount: 2
-    axisX.labelFormat: "%i"
-    axisZ.segmentCount: 5
-    axisZ.subSegmentCount: 2
-    axisZ.labelFormat: "%i"
-    axisY.segmentCount: 5
-    axisY.labelFormat: "%.1f"
+import QtQuick 2.0
+import QtDataVisualization 1.0
 
-    Surface3DSeries {
-        ItemModelSurfaceDataProxy {
-            itemModel: model // E.g. a list model defined elsewhere containing population data.
-            // Mapping model roles to surface series rows, columns, and values.
-            rowRole: "longitude"
-            columnRole: "latitude"
-            valueRole: "pop_density"
+Item {
+    width: 640
+    height: 480
+
+    Surface3D {
+        width: parent.width
+        height: parent.height
+        Surface3DSeries {
+            itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
+            ItemModelSurfaceDataProxy {
+                itemModel: dataModel
+                // Mapping model roles to surface series rows, columns, and values.
+                rowRole: "longitude"
+                columnRole: "latitude"
+                valueRole: "pop_density"
+            }
         }
+    }
+    ListModel {
+        id: dataModel
+        ListElement{ longitude: "20"; latitude: "10"; pop_density: "4.75"; }
+        ListElement{ longitude: "21"; latitude: "10"; pop_density: "3.00"; }
+        ListElement{ longitude: "22"; latitude: "10"; pop_density: "1.24"; }
+        ListElement{ longitude: "23"; latitude: "10"; pop_density: "2.53"; }
+        ListElement{ longitude: "20"; latitude: "11"; pop_density: "2.55"; }
+        ListElement{ longitude: "21"; latitude: "11"; pop_density: "2.03"; }
+        ListElement{ longitude: "22"; latitude: "11"; pop_density: "3.46"; }
+        ListElement{ longitude: "23"; latitude: "11"; pop_density: "5.12"; }
+        ListElement{ longitude: "20"; latitude: "12"; pop_density: "1.37"; }
+        ListElement{ longitude: "21"; latitude: "12"; pop_density: "2.98"; }
+        ListElement{ longitude: "22"; latitude: "12"; pop_density: "3.33"; }
+        ListElement{ longitude: "23"; latitude: "12"; pop_density: "3.23"; }
+        ListElement{ longitude: "20"; latitude: "13"; pop_density: "4.34"; }
+        ListElement{ longitude: "21"; latitude: "13"; pop_density: "3.54"; }
+        ListElement{ longitude: "22"; latitude: "13"; pop_density: "1.65"; }
+        ListElement{ longitude: "23"; latitude: "13"; pop_density: "2.67"; }
     }
 }
 //! [3]
 
 //! [7]
 ItemModelBarDataProxy {
-    itemModel: model // E.g. a list model defined elsewhere containing monthly expenses data.
+    itemModel: model // E.g. a list model defined elsewhere containing yearly expenses data.
     // Mapping model roles to bar series rows, columns, and values.
     rowRole: "year"
     columnRole: "city"

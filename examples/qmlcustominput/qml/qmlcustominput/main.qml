@@ -25,7 +25,6 @@ Item {
     id: mainView
     width: 1280
     height: 720
-    visible: true
 
     Data {
         id: graphData
@@ -182,7 +181,7 @@ Item {
             id: cameraToggle
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3
-            text: "Animate Camera"
+            text: "Pause Camera"
 
             onClicked: {
                 cameraAnimationX.paused = !cameraAnimationX.paused;

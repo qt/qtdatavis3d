@@ -27,7 +27,6 @@ Item {
     id: mainview
     width: 1280
     height: 1024
-    visible: true
 
     property int buttonLayoutHeight: 180;
     state: Screen.width < Screen.height ? "portrait" : "landscape"

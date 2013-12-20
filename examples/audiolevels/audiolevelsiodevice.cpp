@@ -66,7 +66,7 @@ qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
         for (int i = 0; i <= middleRow; i++) {
             QBarDataItem *srcPos = m_array->at(i)->data();
             QBarDataItem *dstPos = srcPos + newDataSize;
-            memmove(dstPos, srcPos, (rowSize - newDataSize) * sizeof(QBarDataItem));
+            memmove((void *)dstPos, (void *)srcPos, (rowSize - newDataSize) * sizeof(QBarDataItem));
         }
     }
 
@@ -90,7 +90,7 @@ qint64 AudioLevelsIODevice::writeData(const char *data, qint64 maxSize)
     for (int i = rowCount - 1; i > middleRow; i--) {
         QBarDataItem *srcPos = m_array->at(index++)->data();
         QBarDataItem *dstPos = m_array->at(i)->data();
-        memcpy(dstPos, srcPos, rowSize * sizeof(QBarDataItem));
+        memcpy((void *)dstPos, (void *)srcPos, rowSize * sizeof(QBarDataItem));
     }
 
     // Reset the proxy array now that data has been updated to trigger a redraw.

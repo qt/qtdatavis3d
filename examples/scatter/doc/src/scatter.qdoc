@@ -80,7 +80,7 @@
     \snippet ../examples/scatter/scatterdatamodifier.cpp 1
 
     And finally we create a QScatterDataProxy and the associated QScatter3DSeries. We set custom label format
-    for the series and add it to the graph:
+    and mesh smoothing for the series and add it to the graph:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 2
 

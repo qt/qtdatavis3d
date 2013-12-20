@@ -134,16 +134,17 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
 
 Surface3DRenderer::~Surface3DRenderer()
 {
-    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
-    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+    if (QOpenGLContext::currentContext()) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
 
-    m_textureHelper->deleteTexture(&m_depthTexture);
-    m_textureHelper->deleteTexture(&m_depthModelTexture);
-    m_textureHelper->deleteTexture(&m_selectionTexture);
-    m_textureHelper->deleteTexture(&m_selectionResultTexture);
-    m_textureHelper->deleteTexture(&m_uniformGradientTexture);
-
+        m_textureHelper->deleteTexture(&m_depthTexture);
+        m_textureHelper->deleteTexture(&m_depthModelTexture);
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_textureHelper->deleteTexture(&m_selectionResultTexture);
+        m_textureHelper->deleteTexture(&m_uniformGradientTexture);
+    }
     delete m_shader;
     delete m_depthShader;
     delete m_backgroundShader;
@@ -264,6 +265,10 @@ void Surface3DRenderer::updateData()
 
         delete m_surfaceObj;
         m_surfaceObj = 0;
+#if !defined(QT_OPENGL_ES_2)
+        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                          m_shadowQualityMultiplier, 1.0f);
+#endif
     }
 
     for (int i = 0; i < m_sliceDataArray.size(); i++)
@@ -285,6 +290,12 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 
         QSurface3DSeries::DrawFlags drawMode = series->drawMode();
         m_cachedSurfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
+#if !defined(QT_OPENGL_ES_2)
+        if (!m_cachedSurfaceVisible) {
+            m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                              m_shadowQualityMultiplier, 1.0f);
+        }
+#endif
         m_cachedSurfaceGridOn = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
 
         QVector3D seriesColor = Utils::vectorFromColor(series->baseColor());
@@ -304,11 +315,9 @@ void Surface3DRenderer::updateRows(const QVector<int> &rows)
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
-            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
-            if (dataProxy)
-                array = dataProxy->array();
-        }
+        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+        if (dataProxy)
+            array = dataProxy->array();
     }
 
     if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
@@ -346,11 +355,9 @@ void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        if (m_cachedSurfaceGridOn || m_cachedSurfaceVisible) {
-            QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
-            if (dataProxy)
-                array = dataProxy->array();
-        }
+        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+        if (dataProxy)
+            array = dataProxy->array();
     }
 
     if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&

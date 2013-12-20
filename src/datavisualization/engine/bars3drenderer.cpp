@@ -99,11 +99,13 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
 
 Bars3DRenderer::~Bars3DRenderer()
 {
-    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
-    m_textureHelper->deleteTexture(&m_selectionTexture);
-    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-    m_textureHelper->deleteTexture(&m_bgrTexture);
+    if (QOpenGLContext::currentContext()) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        m_textureHelper->deleteTexture(&m_bgrTexture);
+    }
 
     delete m_barShader;
     delete m_barGradientShader;

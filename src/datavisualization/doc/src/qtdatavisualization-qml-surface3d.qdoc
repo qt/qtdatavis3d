@@ -36,6 +36,11 @@
 
   See \l{Qt Quick 2 Surface Example} for more thorough usage example.
 
+  \note Qt Data Visualization graphs are rendered behind any other QML elements on screen, including
+  the parent elements of the graph. To make the whole graph show, ensure that no other element
+  draws anything over the area the graph occupies. For example, having a non-transparent \c Rectangle
+  item as the parent of a graph causes the graph to be hidden.
+
   \sa Surface3DSeries, ItemModelSurfaceDataProxy, Bars3D, Scatter3D, {Qt Data Visualization C++ Classes}
  */
 
@@ -74,6 +79,7 @@
 
 /*!
  * \qmlproperty list<QSurface3DSeries> Surface3D::seriesList
+ * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.

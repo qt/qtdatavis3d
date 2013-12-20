@@ -98,11 +98,13 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 
 Scatter3DRenderer::~Scatter3DRenderer()
 {
-    m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
-    m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
-    m_textureHelper->deleteTexture(&m_selectionTexture);
-    m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
-    m_textureHelper->deleteTexture(&m_bgrTexture);
+    if (QOpenGLContext::currentContext()) {
+        m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
+        m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
+        m_textureHelper->deleteTexture(&m_selectionTexture);
+        m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
+        m_textureHelper->deleteTexture(&m_bgrTexture);
+    }
     delete m_dotShader;
     delete m_dotGradientShader;
     delete m_depthShader;

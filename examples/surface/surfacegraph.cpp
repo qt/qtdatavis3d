@@ -49,6 +49,7 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     QImage heightMapImage(":/maps/mountain");
     m_heightMapProxy = new QHeightMapSurfaceDataProxy(heightMapImage);
     m_heightMapSeries = new QSurface3DSeries(m_heightMapProxy);
+    m_heightMapSeries->setItemLabelFormat(QStringLiteral("(@xLabel, @zLabel): @yLabel"));
     m_heightMapProxy->setValueRanges(34.0f, 40.0f, 18.0f, 24.0f);
     //! [2]
     m_heightMapWidth = heightMapImage.width();

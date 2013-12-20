@@ -73,6 +73,12 @@ Please refer to the generated documentation for more information:
 Known Issues
 ============
 
+- All other QML elements are drawn on top of the Qt DataVisualization graphs,
+  including the parent elements of the graphs. To ensure the graphs are not
+  hidden, make sure you don't draw anything opaque on top of the graphs.
+  For example, Qt Creator application wizard for Qt Quick 2 applications
+  creates by default an opaque white Rectangle element as the main element,
+  which covers any graph added to it.
 - Using multiple graphs in one application crashes on application shutdown
   unless the last graph to have active context is deleted last.
 - Android doesn't support both widgets and OpenGL simultaneously, so only
