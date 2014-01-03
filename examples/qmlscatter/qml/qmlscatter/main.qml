@@ -30,18 +30,9 @@ Item {
 
     //! [4]
     Data {
-        id: seriesOneData
+        id: seriesData
     }
     //! [4]
-
-    Data {
-        id: seriesTwoData
-    }
-
-    Data {
-        id: seriesThreeData
-    }
-
     //! [8]
     //! [9]
     Item {
@@ -87,7 +78,7 @@ Item {
 
                 //! [11]
                 ItemModelScatterDataProxy {
-                    itemModel: seriesOneData.model
+                    itemModel: seriesData.model
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -104,7 +95,7 @@ Item {
                 //! [12]
 
                 ItemModelScatterDataProxy {
-                    itemModel: seriesTwoData.modelTwo
+                    itemModel: seriesData.modelTwo
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -117,7 +108,7 @@ Item {
                 mesh: Abstract3DSeries.MeshMinimal
 
                 ItemModelScatterDataProxy {
-                    itemModel: seriesThreeData.modelThree
+                    itemModel: seriesData.modelThree
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"

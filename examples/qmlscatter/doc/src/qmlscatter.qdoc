@@ -119,12 +119,11 @@
 
     \section1 Adding data to the graph
 
-    Let's create a \c Data item inside the \c mainView and name it \c {seriesOneData}:
+    Let's create a \c Data item inside the \c mainView and name it \c seriesData:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 4
 
-    We'll add two more of these: \c seriesTwoData and \c seriesThreeData to add to the three series
-    we're going to have. They are added similarly as \c {seriesOneData}.
+    The \c seriesData item contains the data models for all three series we use in this example.
 
     This is the component that holds our data in \c {data.qml}. It has an \c Item as the main
     component.
