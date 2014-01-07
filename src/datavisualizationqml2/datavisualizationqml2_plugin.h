@@ -27,8 +27,8 @@
 #include "qitemmodelscatterdataproxy.h"
 #include "qitemmodelsurfacedataproxy.h"
 #include "qheightmapsurfacedataproxy.h"
-#include "q3dvalueaxis.h"
-#include "q3dcategoryaxis.h"
+#include "qvalue3daxis.h"
+#include "qcategory3daxis.h"
 #include "q3dobject.h"
 #include "q3dcamera.h"
 #include "q3dscene.h"
@@ -55,9 +55,9 @@ QML_DECLARE_TYPE(DeclarativeSurface)
 QML_DECLARE_TYPE(const QAbstractItemModel)
 QML_DECLARE_TYPE(QDataVis)
 
-QML_DECLARE_TYPE(Q3DAbstractAxis)
-QML_DECLARE_TYPE(Q3DCategoryAxis)
-QML_DECLARE_TYPE(Q3DValueAxis)
+QML_DECLARE_TYPE(QAbstract3DAxis)
+QML_DECLARE_TYPE(QCategory3DAxis)
+QML_DECLARE_TYPE(QValue3DAxis)
 
 QML_DECLARE_TYPE(Q3DScene)
 QML_DECLARE_TYPE(Q3DObject)

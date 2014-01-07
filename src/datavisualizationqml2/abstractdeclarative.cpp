@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include <QThread>
 #include <QGuiApplication>
 #include <QSGSimpleRectNode>

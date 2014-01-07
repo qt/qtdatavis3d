@@ -19,7 +19,7 @@
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "q3dcamera.h"
 #include "qscatter3dseries_p.h"
 
@@ -141,7 +141,7 @@ const Q3DScatterPrivate *Q3DScatter::dptrc() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisX(Q3DValueAxis *axis)
+void Q3DScatter::setAxisX(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisX(axis);
 }
@@ -149,9 +149,9 @@ void Q3DScatter::setAxisX(Q3DValueAxis *axis)
 /*!
  * \return used X-axis.
  */
-Q3DValueAxis *Q3DScatter::axisX() const
+QValue3DAxis *Q3DScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -164,7 +164,7 @@ Q3DValueAxis *Q3DScatter::axisX() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisY(Q3DValueAxis *axis)
+void Q3DScatter::setAxisY(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisY(axis);
 }
@@ -172,9 +172,9 @@ void Q3DScatter::setAxisY(Q3DValueAxis *axis)
 /*!
  * \return used Y-axis.
  */
-Q3DValueAxis *Q3DScatter::axisY() const
+QValue3DAxis *Q3DScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -187,7 +187,7 @@ Q3DValueAxis *Q3DScatter::axisY() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
+void Q3DScatter::setAxisZ(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisZ(axis);
 }
@@ -195,9 +195,9 @@ void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
 /*!
  * \return used Z-axis.
  */
-Q3DValueAxis *Q3DScatter::axisZ() const
+QValue3DAxis *Q3DScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -207,7 +207,7 @@ Q3DValueAxis *Q3DScatter::axisZ() const
  *
  * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::addAxis(Q3DValueAxis *axis)
+void Q3DScatter::addAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->addAxis(axis);
 }
@@ -220,7 +220,7 @@ void Q3DScatter::addAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
+void Q3DScatter::releaseAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->releaseAxis(axis);
 }
@@ -230,12 +230,12 @@ void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis()
  */
-QList<Q3DValueAxis *> Q3DScatter::axes() const
+QList<QValue3DAxis *> Q3DScatter::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
-    QList<Q3DValueAxis *> retList;
-    foreach (Q3DAbstractAxis *axis, abstractAxes)
-        retList.append(static_cast<Q3DValueAxis *>(axis));
+    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_shared->axes();
+    QList<QValue3DAxis *> retList;
+    foreach (QAbstract3DAxis *axis, abstractAxes)
+        retList.append(static_cast<QValue3DAxis *>(axis));
 
     return retList;
 }

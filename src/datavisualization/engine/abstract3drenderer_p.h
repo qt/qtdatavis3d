@@ -84,13 +84,13 @@ public:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
-    virtual void updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type);
-    virtual void updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title);
-    virtual void updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
-    virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type);
+    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title);
+    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
@@ -108,7 +108,7 @@ protected:
     virtual void handleShadowQualityChange();
     virtual void handleResize();
 
-    AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
+    AxisRenderCache &axisCacheForOrientation(QAbstract3DAxis::AxisOrientation orientation);
 
     virtual void lowerShadowQuality();
 

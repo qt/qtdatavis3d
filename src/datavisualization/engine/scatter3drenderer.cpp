@@ -1621,7 +1621,7 @@ void Scatter3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Me
     }
 }
 
-void Scatter3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation,
+void Scatter3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation,
                                         float min, float max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);

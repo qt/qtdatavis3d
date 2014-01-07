@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "declarativesurface_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qitemmodelsurfacedataproxy.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -50,32 +50,32 @@ DeclarativeSurface::~DeclarativeSurface()
     delete m_surfaceController;
 }
 
-Q3DValueAxis *DeclarativeSurface::axisX() const
+QValue3DAxis *DeclarativeSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisX());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisX());
 }
 
-void DeclarativeSurface::setAxisX(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisX(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisX(axis);
 }
 
-Q3DValueAxis *DeclarativeSurface::axisY() const
+QValue3DAxis *DeclarativeSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisY());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisY());
 }
 
-void DeclarativeSurface::setAxisY(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisY(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisY(axis);
 }
 
-Q3DValueAxis *DeclarativeSurface::axisZ() const
+QValue3DAxis *DeclarativeSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisZ());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisZ());
 }
 
-void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisZ(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisZ(axis);
 }

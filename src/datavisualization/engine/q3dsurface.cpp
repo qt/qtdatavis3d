@@ -18,7 +18,7 @@
 
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qsurfacedataproxy.h"
 #include "q3dcamera.h"
 #include "qsurface3dseries_p.h"
@@ -40,7 +40,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * The selection pointer is accompanied with a label which in default case shows the value of the
  * data point and the coordinates of the point.
  *
- * The value range and the label format shown on the axis can be controlled through Q3DValueAxis.
+ * The value range and the label format shown on the axis can be controlled through QValue3DAxis.
  *
  * To rotate the graph, hold down the right mouse button and move the mouse. Zooming is done using mouse
  * wheel. Both assume the default input handler is in use.
@@ -156,7 +156,7 @@ const Q3DSurfacePrivate *Q3DSurface::dptrc() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DSurface::setAxisX(Q3DValueAxis *axis)
+void Q3DSurface::setAxisX(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisX(axis);
 }
@@ -164,9 +164,9 @@ void Q3DSurface::setAxisX(Q3DValueAxis *axis)
 /*!
  * \return used X-axis.
  */
-Q3DValueAxis *Q3DSurface::axisX() const
+QValue3DAxis *Q3DSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
@@ -179,7 +179,7 @@ Q3DValueAxis *Q3DSurface::axisX() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DSurface::setAxisY(Q3DValueAxis *axis)
+void Q3DSurface::setAxisY(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisY(axis);
 }
@@ -187,9 +187,9 @@ void Q3DSurface::setAxisY(Q3DValueAxis *axis)
 /*!
  * \return used Y-axis.
  */
-Q3DValueAxis *Q3DSurface::axisY() const
+QValue3DAxis *Q3DSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
@@ -202,7 +202,7 @@ Q3DValueAxis *Q3DSurface::axisY() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
+void Q3DSurface::setAxisZ(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisZ(axis);
 }
@@ -210,9 +210,9 @@ void Q3DSurface::setAxisZ(Q3DValueAxis *axis)
 /*!
  * \return used Z-axis.
  */
-Q3DValueAxis *Q3DSurface::axisZ() const
+QValue3DAxis *Q3DSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -222,7 +222,7 @@ Q3DValueAxis *Q3DSurface::axisZ() const
  *
  * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DSurface::addAxis(Q3DValueAxis *axis)
+void Q3DSurface::addAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->addAxis(axis);
 }
@@ -235,7 +235,7 @@ void Q3DSurface::addAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
+void Q3DSurface::releaseAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->releaseAxis(axis);
 }
@@ -245,12 +245,12 @@ void Q3DSurface::releaseAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis()
  */
-QList<Q3DValueAxis *> Q3DSurface::axes() const
+QList<QValue3DAxis *> Q3DSurface::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
-    QList<Q3DValueAxis *> retList;
-    foreach (Q3DAbstractAxis *axis, abstractAxes)
-        retList.append(static_cast<Q3DValueAxis *>(axis));
+    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_shared->axes();
+    QList<QValue3DAxis *> retList;
+    foreach (QAbstract3DAxis *axis, abstractAxes)
+        retList.append(static_cast<QValue3DAxis *>(axis));
 
     return retList;
 }

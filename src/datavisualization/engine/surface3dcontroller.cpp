@@ -19,9 +19,9 @@
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "q3dabstractaxis_p.h"
-#include "q3dvalueaxis_p.h"
-#include "q3dcategoryaxis.h"
+#include "qabstract3daxis_p.h"
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 #include "shaderhelper_p.h"
@@ -91,7 +91,7 @@ void Surface3DController::synchDataToRenderer()
     }
 }
 
-void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -383,9 +383,9 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
 
 void Surface3DController::adjustValueAxisRange()
 {
-    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
-    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
-    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+    QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+    QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
     bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
     bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
     bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());

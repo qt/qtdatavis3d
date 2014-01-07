@@ -19,8 +19,8 @@
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "q3dabstractaxis_p.h"
-#include "q3dvalueaxis_p.h"
+#include "qabstract3daxis_p.h"
+#include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
@@ -179,7 +179,7 @@ void Scatter3DController::handleItemClicked(int index, QScatter3DSeries *series)
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
-        Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+        QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -239,9 +239,9 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
 
 void Scatter3DController::adjustValueAxisRange()
 {
-    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
-    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
-    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+    QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+    QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
     bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
     bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
     bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());

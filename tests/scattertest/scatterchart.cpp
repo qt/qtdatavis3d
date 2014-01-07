@@ -19,7 +19,7 @@
 #include "scatterchart.h"
 #include <QtDataVisualization/qscatterdataproxy.h>
 #include <QtDataVisualization/qscatter3dseries.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
@@ -43,9 +43,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->activeTheme()->setFont(font);
     m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
-    m_chart->setAxisX(new Q3DValueAxis);
-    m_chart->setAxisY(new Q3DValueAxis);
-    m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->setAxisX(new QValue3DAxis);
+    m_chart->setAxisY(new QValue3DAxis);
+    m_chart->setAxisZ(new QValue3DAxis);
 
     createAndAddSeries();
     createAndAddSeries();
@@ -217,9 +217,9 @@ void ScatterDataModifier::resetAxes()
     m_chart->releaseAxis(m_chart->axisY());
     m_chart->releaseAxis(m_chart->axisZ());
 
-    m_chart->setAxisX(new Q3DValueAxis);
-    m_chart->setAxisY(new Q3DValueAxis);
-    m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->setAxisX(new QValue3DAxis);
+    m_chart->setAxisY(new QValue3DAxis);
+    m_chart->setAxisZ(new QValue3DAxis);
     m_chart->axisX()->setSegmentCount(5);
     m_chart->axisY()->setSegmentCount(5);
     m_chart->axisZ()->setSegmentCount(5);

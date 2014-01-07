@@ -38,7 +38,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * If you use QBarDataRow pointers to directly modify data after adding the array to the proxy,
  * you must also emit proper signal to make the graph update.
  *
- * QBarDataProxy optionally keeps track of row and column labels, which Q3DCategoryAxis can utilize
+ * QBarDataProxy optionally keeps track of row and column labels, which QCategory3DAxis can utilize
  * to show axis labels. The row and column labels are stored in separate array from the data and
  * row manipulation methods provide an alternate versions that don't affect the row labels.
  * This enables the option of having row labels that relate to the position of the data in the

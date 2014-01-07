@@ -18,7 +18,7 @@
 
 #include "scatterdatamodifier.h"
 #include <QtDataVisualization/qscatterdataproxy.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qscatter3dseries.h>
@@ -48,9 +48,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     //! [0]
 
     //! [1]
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
     //! [1]
 
     //! [2]

@@ -19,7 +19,7 @@
 #include "scatterdatamodifier.h"
 
 #include <QtDataVisualization/QScatterDataProxy>
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DScene>
 #include <QtDataVisualization/Q3DCamera>
 #include <QtDataVisualization/QScatter3DSeries>
@@ -36,9 +36,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
 
     m_graph->axisX()->setRange(-10.0f, 10.0f);
     m_graph->axisY()->setRange(-5.0f, 5.0f);

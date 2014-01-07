@@ -28,8 +28,8 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DScatterPrivate;
-class Q3DValueAxis;
-class Q3DCategoryAxis;
+class QValue3DAxis;
+class QCategory3DAxis;
 class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
@@ -43,15 +43,15 @@ public:
     void removeSeries(QScatter3DSeries *series);
     QList<QScatter3DSeries *> seriesList();
 
-    void setAxisX(Q3DValueAxis *axis);
-    Q3DValueAxis *axisX() const;
-    void setAxisY(Q3DValueAxis *axis);
-    Q3DValueAxis *axisY() const;
-    void setAxisZ(Q3DValueAxis *axis);
-    Q3DValueAxis *axisZ() const;
-    void addAxis(Q3DValueAxis *axis);
-    void releaseAxis(Q3DValueAxis *axis);
-    QList<Q3DValueAxis *> axes() const;
+    void setAxisX(QValue3DAxis *axis);
+    QValue3DAxis *axisX() const;
+    void setAxisY(QValue3DAxis *axis);
+    QValue3DAxis *axisY() const;
+    void setAxisZ(QValue3DAxis *axis);
+    QValue3DAxis *axisZ() const;
+    void addAxis(QValue3DAxis *axis);
+    void releaseAxis(QValue3DAxis *axis);
+    QList<QValue3DAxis *> axes() const;
 
 private:
     Q3DScatterPrivate *dptr();

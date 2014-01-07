@@ -27,9 +27,9 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
-class Q3DAbstractAxis;
-class Q3DCategoryAxis;
-class Q3DValueAxis;
+class QAbstract3DAxis;
+class QCategory3DAxis;
+class QValue3DAxis;
 class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
@@ -56,15 +56,15 @@ public:
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative();
 
-    void setRowAxis(Q3DCategoryAxis *axis);
-    Q3DCategoryAxis *rowAxis() const;
-    void setColumnAxis(Q3DCategoryAxis *axis);
-    Q3DCategoryAxis *columnAxis() const;
-    void setValueAxis(Q3DValueAxis *axis);
-    Q3DValueAxis *valueAxis() const;
-    void addAxis(Q3DAbstractAxis *axis);
-    void releaseAxis(Q3DAbstractAxis *axis);
-    QList<Q3DAbstractAxis *> axes() const;
+    void setRowAxis(QCategory3DAxis *axis);
+    QCategory3DAxis *rowAxis() const;
+    void setColumnAxis(QCategory3DAxis *axis);
+    QCategory3DAxis *columnAxis() const;
+    void setValueAxis(QValue3DAxis *axis);
+    QValue3DAxis *valueAxis() const;
+    void addAxis(QAbstract3DAxis *axis);
+    void releaseAxis(QAbstract3DAxis *axis);
+    QList<QAbstract3DAxis *> axes() const;
 
 signals:
     void barThicknessChanged(float thicknessRatio);

@@ -29,7 +29,7 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                          QLatin1String("Trying to create uncreatable: AbstractItemModel."));
     qmlRegisterUncreatableType<QDataVis>(uri, 1, 0, "DataVis",
                                          QLatin1String("Trying to create uncreatable: DataVis."));
-    qmlRegisterUncreatableType<Q3DAbstractAxis>(uri, 1, 0, "AbstractAxis3D",
+    qmlRegisterUncreatableType<QAbstract3DAxis>(uri, 1, 0, "AbstractAxis3D",
                                                 QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstractDataProxy>(uri, 1, 0, "AbstractDataProxy",
                                                    QLatin1String("Trying to create uncreatable: AbstractDataProxy."));
@@ -60,8 +60,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
     qmlRegisterType<DeclarativeSurface>(uri, 1, 0, "Surface3D");
 
-    qmlRegisterType<Q3DValueAxis>(uri, 1, 0, "ValueAxis3D");
-    qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
+    qmlRegisterType<QValue3DAxis>(uri, 1, 0, "ValueAxis3D");
+    qmlRegisterType<QCategory3DAxis>(uri, 1, 0, "CategoryAxis3D");
 
     qmlRegisterType<Q3DCamera>(uri, 1, 0, "Camera3D");
     qmlRegisterType<Q3DLight>(uri, 1, 0, "Light3D");

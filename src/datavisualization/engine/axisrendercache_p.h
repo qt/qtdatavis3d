@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "labelitem_p.h"
-#include "q3dabstractaxis_p.h"
+#include "qabstract3daxis_p.h"
 #include "drawer_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -45,8 +45,8 @@ public:
 
     void setDrawer(Drawer *drawer);
 
-    void setType(Q3DAbstractAxis::AxisType type);
-    inline Q3DAbstractAxis::AxisType type() const { return m_type; }
+    void setType(QAbstract3DAxis::AxisType type);
+    inline QAbstract3DAxis::AxisType type() const { return m_type; }
     void setTitle(const QString &title);
     inline const QString &title() { return m_title; }
     void setLabels(const QStringList &labels);
@@ -76,7 +76,7 @@ private:
     int maxLabelWidth(const QStringList &labels) const;
 
     // Cached axis values
-    Q3DAbstractAxis::AxisType m_type;
+    QAbstract3DAxis::AxisType m_type;
     QString m_title;
     QStringList m_labels;
     float m_min;

@@ -19,7 +19,7 @@
 #define NOMINMAX
 
 #include "data.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DCamera>
 #include <QtDataVisualization/QBar3DSeries>
 #include <QtDataVisualization/QScatter3DSeries>

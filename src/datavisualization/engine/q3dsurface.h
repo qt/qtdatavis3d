@@ -27,7 +27,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
-class Q3DValueAxis;
+class QValue3DAxis;
 class QSurface3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
@@ -42,15 +42,15 @@ public:
     QList<QSurface3DSeries *> seriesList();
 
     // Axes
-    void setAxisX(Q3DValueAxis *axis);
-    Q3DValueAxis *axisX() const;
-    void setAxisY(Q3DValueAxis *axis);
-    Q3DValueAxis *axisY() const;
-    void setAxisZ(Q3DValueAxis *axis);
-    Q3DValueAxis *axisZ() const;
-    void addAxis(Q3DValueAxis *axis);
-    void releaseAxis(Q3DValueAxis *axis);
-    QList<Q3DValueAxis *> axes() const;
+    void setAxisX(QValue3DAxis *axis);
+    QValue3DAxis *axisX() const;
+    void setAxisY(QValue3DAxis *axis);
+    QValue3DAxis *axisY() const;
+    void setAxisZ(QValue3DAxis *axis);
+    QValue3DAxis *axisZ() const;
+    void addAxis(QValue3DAxis *axis);
+    void releaseAxis(QValue3DAxis *axis);
+    QList<QValue3DAxis *> axes() const;
 
 private:
     Q3DSurfacePrivate *dptr();

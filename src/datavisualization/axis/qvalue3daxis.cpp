@@ -16,19 +16,19 @@
 **
 ****************************************************************************/
 
-#include "q3dvalueaxis.h"
-#include "q3dvalueaxis_p.h"
+#include "qvalue3daxis.h"
+#include "qvalue3daxis_p.h"
 #include "utils_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
- * \class Q3DValueAxis
+ * \class QValue3DAxis
  * \inmodule QtDataVisualization
- * \brief The Q3DValueAxis class is used for manipulating an axis of a graph.
+ * \brief The QValue3DAxis class is used for manipulating an axis of a graph.
  * \since Qt Data Visualization 1.0
  *
- * Q3DValueAxis provides an axis that can be given a range of values and segment and subsegment
+ * QValue3DAxis provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
  *
  * Labels are drawn between each segment. Grid lines are drawn between each segment and each
@@ -41,7 +41,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates Q3DValueAxis
+ * \instantiates QValue3DAxis
  * \inherits AbstractAxis3D
  * \brief The ValueAxis3D type is used for manipulating an axis of a graph.
  *
@@ -74,23 +74,23 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs Q3DValueAxis with the given \a parent.
+ * Constructs QValue3DAxis with the given \a parent.
  */
-Q3DValueAxis::Q3DValueAxis(QObject *parent) :
-    Q3DAbstractAxis(new Q3DValueAxisPrivate(this), parent)
+QValue3DAxis::QValue3DAxis(QObject *parent) :
+    QAbstract3DAxis(new QValue3DAxisPrivate(this), parent)
 {
 }
 
 /*!
- * Destroys Q3DValueAxis.
+ * Destroys QValue3DAxis.
  */
-Q3DValueAxis::~Q3DValueAxis()
+QValue3DAxis::~QValue3DAxis()
 {
 }
 
 
 /*!
- * \property Q3DValueAxis::segmentCount
+ * \property QValue3DAxis::segmentCount
  *
  * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
  * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
@@ -98,7 +98,7 @@ Q3DValueAxis::~Q3DValueAxis()
  *
  * \sa setSubSegmentCount()
  */
-void Q3DValueAxis::setSegmentCount(int count)
+void QValue3DAxis::setSegmentCount(int count)
 {
     if (count <= 0) {
         qWarning() << "Warning: Illegal segment count automatically adjusted to a legal one:"
@@ -112,13 +112,13 @@ void Q3DValueAxis::setSegmentCount(int count)
     }
 }
 
-int Q3DValueAxis::segmentCount() const
+int QValue3DAxis::segmentCount() const
 {
     return dptrc()->m_segmentCount;
 }
 
 /*!
- * \property Q3DValueAxis::subSegmentCount
+ * \property QValue3DAxis::subSegmentCount
  *
  * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
  * each subsegment, in addition to each segment.
@@ -126,7 +126,7 @@ int Q3DValueAxis::segmentCount() const
  *
  * \sa setSegmentCount()
  */
-void Q3DValueAxis::setSubSegmentCount(int count)
+void QValue3DAxis::setSubSegmentCount(int count)
 {
     if (count <= 0) {
         qWarning() << "Warning: Illegal subsegment count automatically adjusted to a legal one:"
@@ -139,13 +139,13 @@ void Q3DValueAxis::setSubSegmentCount(int count)
     }
 }
 
-int Q3DValueAxis::subSegmentCount() const
+int QValue3DAxis::subSegmentCount() const
 {
     return dptrc()->m_subSegmentCount;
 }
 
 /*!
- * \property Q3DValueAxis::labelFormat
+ * \property QValue3DAxis::labelFormat
  *
  * Defines the label format to be used for the labels on this axis. Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
@@ -154,7 +154,7 @@ int Q3DValueAxis::subSegmentCount() const
  *
  * \c {axis->setLabelFormat("%.2f mm");}
  */
-void Q3DValueAxis::setLabelFormat(const QString &format)
+void QValue3DAxis::setLabelFormat(const QString &format)
 {
     if (dptr()->m_labelFormat != format) {
         dptr()->m_labelFormat = format;
@@ -163,7 +163,7 @@ void Q3DValueAxis::setLabelFormat(const QString &format)
     }
 }
 
-QString Q3DValueAxis::labelFormat() const
+QString QValue3DAxis::labelFormat() const
 {
     return dptrc()->m_labelFormat;
 }
@@ -171,21 +171,21 @@ QString Q3DValueAxis::labelFormat() const
 /*!
  * \internal
  */
-Q3DValueAxisPrivate *Q3DValueAxis::dptr()
+QValue3DAxisPrivate *QValue3DAxis::dptr()
 {
-    return static_cast<Q3DValueAxisPrivate *>(d_ptr.data());
+    return static_cast<QValue3DAxisPrivate *>(d_ptr.data());
 }
 
 /*!
  * \internal
  */
-const Q3DValueAxisPrivate *Q3DValueAxis::dptrc() const
+const QValue3DAxisPrivate *QValue3DAxis::dptrc() const
 {
-    return static_cast<const Q3DValueAxisPrivate *>(d_ptr.data());
+    return static_cast<const QValue3DAxisPrivate *>(d_ptr.data());
 }
 
-Q3DValueAxisPrivate::Q3DValueAxisPrivate(Q3DValueAxis *q)
-    : Q3DAbstractAxisPrivate(q, Q3DAbstractAxis::AxisTypeValue),
+QValue3DAxisPrivate::QValue3DAxisPrivate(QValue3DAxis *q)
+    : QAbstract3DAxisPrivate(q, QAbstract3DAxis::AxisTypeValue),
       m_segmentCount(5),
       m_subSegmentCount(1),
       m_labelFormat(Utils::defaultLabelFormat()),
@@ -193,47 +193,47 @@ Q3DValueAxisPrivate::Q3DValueAxisPrivate(Q3DValueAxis *q)
 {
 }
 
-Q3DValueAxisPrivate::~Q3DValueAxisPrivate()
+QValue3DAxisPrivate::~QValue3DAxisPrivate()
 {
 }
 
-void Q3DValueAxisPrivate::setRange(float min, float max)
+void QValue3DAxisPrivate::setRange(float min, float max)
 {
     bool dirty = (min != m_min || max != m_max);
 
-    Q3DAbstractAxisPrivate::setRange(min, max);
+    QAbstract3DAxisPrivate::setRange(min, max);
 
     if (dirty)
         emitLabelsChanged();
 }
 
-void Q3DValueAxisPrivate::setMin(float min)
+void QValue3DAxisPrivate::setMin(float min)
 {
     bool dirty = (min != m_min);
 
-    Q3DAbstractAxisPrivate::setMin(min);
+    QAbstract3DAxisPrivate::setMin(min);
 
     if (dirty)
         emitLabelsChanged();
 }
 
-void Q3DValueAxisPrivate::setMax(float max)
+void QValue3DAxisPrivate::setMax(float max)
 {
     bool dirty = (max != m_max);
 
-    Q3DAbstractAxisPrivate::setMax(max);
+    QAbstract3DAxisPrivate::setMax(max);
 
     if (dirty)
         emitLabelsChanged();
 }
 
-void Q3DValueAxisPrivate::emitLabelsChanged()
+void QValue3DAxisPrivate::emitLabelsChanged()
 {
     m_labelsDirty = true;
     emit q_ptr->labelsChanged();
 }
 
-void Q3DValueAxisPrivate::updateLabels()
+void QValue3DAxisPrivate::updateLabels()
 {
     if (!m_labelsDirty)
         return;
@@ -262,9 +262,9 @@ void Q3DValueAxisPrivate::updateLabels()
         m_labels = newLabels;
 }
 
-Q3DValueAxis *Q3DValueAxisPrivate::qptr()
+QValue3DAxis *QValue3DAxisPrivate::qptr()
 {
-    return static_cast<Q3DValueAxis *>(q_ptr);
+    return static_cast<QValue3DAxis *>(q_ptr);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

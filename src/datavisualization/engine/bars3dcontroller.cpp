@@ -19,9 +19,9 @@
 #include "bars3dcontroller_p.h"
 #include "bars3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "q3dabstractaxis_p.h"
-#include "q3dvalueaxis_p.h"
-#include "q3dcategoryaxis_p.h"
+#include "qabstract3daxis_p.h"
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis_p.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 #include "thememanager_p.h"
@@ -164,7 +164,7 @@ void Bars3DController::handleDataRowLabelsChanged()
         int min = int(m_axisZ->min());
         int count = int(m_axisZ->max()) - min + 1;
         QStringList subList = firstSeries->dataProxy()->rowLabels().mid(min, count);
-        static_cast<Q3DCategoryAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
+        static_cast<QCategory3DAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
     }
 }
 
@@ -179,7 +179,7 @@ void Bars3DController::handleDataColumnLabelsChanged()
         int count = int(m_axisX->max()) - min + 1;
         QStringList subList = static_cast<QBarDataProxy *>(firstSeries->dataProxy())
                 ->columnLabels().mid(min, count);
-        static_cast<Q3DCategoryAxis *>(m_axisX)->dptr()->setDataLabels(subList);
+        static_cast<QCategory3DAxis *>(m_axisX)->dptr()->setDataLabels(subList);
     }
 }
 
@@ -192,7 +192,7 @@ void Bars3DController::handleBarClicked(const QPoint &position, QBar3DSeries *se
 }
 
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
-        Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+        QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -214,13 +214,13 @@ QPoint Bars3DController::invalidSelectionPosition()
     return invalidSelectionPos;
 }
 
-void Bars3DController::setAxisX(Q3DAbstractAxis *axis)
+void Bars3DController::setAxisX(QAbstract3DAxis *axis)
 {
     Abstract3DController::setAxisX(axis);
     handleDataColumnLabelsChanged();
 }
 
-void Bars3DController::setAxisZ(Q3DAbstractAxis *axis)
+void Bars3DController::setAxisZ(QAbstract3DAxis *axis)
 {
     Abstract3DController::setAxisZ(axis);
     handleDataRowLabelsChanged();
@@ -385,9 +385,9 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
 void Bars3DController::adjustAxisRanges()
 {
-    Q3DCategoryAxis *categoryAxisZ = static_cast<Q3DCategoryAxis *>(m_axisZ);
-    Q3DCategoryAxis *categoryAxisX = static_cast<Q3DCategoryAxis *>(m_axisX);
-    Q3DValueAxis *valueAxis = static_cast<Q3DValueAxis *>(m_axisY);
+    QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_axisZ);
+    QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_axisX);
+    QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_axisY);
 
     bool adjustZ = (categoryAxisZ && categoryAxisZ->isAutoAdjustRange());
     bool adjustX = (categoryAxisX && categoryAxisX->isAutoAdjustRange());
@@ -493,11 +493,11 @@ void Bars3DController::adjustSelectionPosition(QPoint &pos, const QBar3DSeries *
     }
 }
 
-Q3DAbstractAxis *Bars3DController::createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation)
+QAbstract3DAxis *Bars3DController::createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation)
 {
-    Q3DAbstractAxis *defaultAxis = 0;
+    QAbstract3DAxis *defaultAxis = 0;
 
-    if (orientation == Q3DAbstractAxis::AxisOrientationY)
+    if (orientation == QAbstract3DAxis::AxisOrientationY)
         defaultAxis = createDefaultValueAxis();
     else
         defaultAxis = createDefaultCategoryAxis();

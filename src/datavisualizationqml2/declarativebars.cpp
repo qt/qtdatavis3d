@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "declarativebars_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qitemmodelbardataproxy.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
@@ -50,32 +50,32 @@ DeclarativeBars::~DeclarativeBars()
     delete m_barsController;
 }
 
-Q3DCategoryAxis *DeclarativeBars::rowAxis() const
+QCategory3DAxis *DeclarativeBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisZ());
+    return static_cast<QCategory3DAxis *>(m_barsController->axisZ());
 }
 
-void DeclarativeBars::setRowAxis(Q3DCategoryAxis *axis)
+void DeclarativeBars::setRowAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisZ(axis);
 }
 
-Q3DValueAxis *DeclarativeBars::valueAxis() const
+QValue3DAxis *DeclarativeBars::valueAxis() const
 {
-    return static_cast<Q3DValueAxis *>(m_barsController->axisY());
+    return static_cast<QValue3DAxis *>(m_barsController->axisY());
 }
 
-void DeclarativeBars::setValueAxis(Q3DValueAxis *axis)
+void DeclarativeBars::setValueAxis(QValue3DAxis *axis)
 {
     m_barsController->setAxisY(axis);
 }
 
-Q3DCategoryAxis *DeclarativeBars::columnAxis() const
+QCategory3DAxis *DeclarativeBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisX());
+    return static_cast<QCategory3DAxis *>(m_barsController->axisX());
 }
 
-void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
+void DeclarativeBars::setColumnAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisX(axis);
 }

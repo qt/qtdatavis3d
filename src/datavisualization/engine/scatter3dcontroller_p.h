@@ -80,7 +80,7 @@ public:
     virtual void removeSeries(QAbstract3DSeries *series);
     virtual QList<QScatter3DSeries *> scatterSeriesList();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
 
 public slots:

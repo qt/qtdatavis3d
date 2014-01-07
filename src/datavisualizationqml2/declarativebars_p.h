@@ -33,8 +33,8 @@
 #include "abstractdeclarative_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
-#include "q3dvalueaxis.h"
-#include "q3dcategoryaxis.h"
+#include "qvalue3daxis.h"
+#include "qcategory3daxis.h"
 #include "qbardataproxy.h"
 #include "qbar3dseries.h"
 
@@ -48,9 +48,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 class DeclarativeBars : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
-    Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
-    Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
+    Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
@@ -61,12 +61,12 @@ public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
-    Q3DCategoryAxis *rowAxis() const;
-    void setRowAxis(Q3DCategoryAxis *axis);
-    Q3DValueAxis *valueAxis() const;
-    void setValueAxis(Q3DValueAxis *axis);
-    Q3DCategoryAxis *columnAxis() const;
-    void setColumnAxis(Q3DCategoryAxis *axis);
+    QCategory3DAxis *rowAxis() const;
+    void setRowAxis(QCategory3DAxis *axis);
+    QValue3DAxis *valueAxis() const;
+    void setValueAxis(QValue3DAxis *axis);
+    QCategory3DAxis *columnAxis() const;
+    void setColumnAxis(QCategory3DAxis *axis);
 
     void setBarThickness(float thicknessRatio);
     float barThickness() const;
@@ -86,9 +86,9 @@ public:
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
 signals:
-    void rowAxisChanged(Q3DCategoryAxis *axis);
-    void valueAxisChanged(Q3DValueAxis *axis);
-    void columnAxisChanged(Q3DCategoryAxis *axis);
+    void rowAxisChanged(QCategory3DAxis *axis);
+    void valueAxisChanged(QValue3DAxis *axis);
+    void columnAxisChanged(QCategory3DAxis *axis);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);

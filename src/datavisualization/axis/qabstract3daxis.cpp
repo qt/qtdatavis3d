@@ -16,20 +16,20 @@
 **
 ****************************************************************************/
 
-#include "q3dabstractaxis.h"
-#include "q3dabstractaxis_p.h"
+#include "qabstract3daxis.h"
+#include "qabstract3daxis_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
- * \class Q3DAbstractAxis
+ * \class QAbstract3DAxis
  * \inmodule QtDataVisualization
- * \brief Q3DAbstractAxis is base class for axes of a graph.
+ * \brief QAbstract3DAxis is base class for axes of a graph.
  * \since Qt Data Visualization 1.0
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
- * \sa Q3DCategoryAxis, Q3DValueAxis
+ * \sa QCategory3DAxis, QValue3DAxis
  */
 
 /*!
@@ -37,7 +37,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates Q3DAbstractAxis
+ * \instantiates QAbstract3DAxis
  * \brief AbstractAxis3D is base type for axes of a graph.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
@@ -88,7 +88,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 
 /*!
- * \enum Q3DAbstractAxis::AxisOrientation
+ * \enum QAbstract3DAxis::AxisOrientation
  *
  * The orientation of the axis object.
  *
@@ -99,7 +99,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \enum Q3DAbstractAxis::AxisType
+ * \enum QAbstract3DAxis::AxisType
  *
  * The type of the axis object.
  *
@@ -111,45 +111,45 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \internal
  */
-Q3DAbstractAxis::Q3DAbstractAxis(Q3DAbstractAxisPrivate *d, QObject *parent) :
+QAbstract3DAxis::QAbstract3DAxis(QAbstract3DAxisPrivate *d, QObject *parent) :
     QObject(parent),
     d_ptr(d)
 {
 }
 
 /*!
- * Destroys Q3DAbstractAxis.
+ * Destroys QAbstract3DAxis.
  */
-Q3DAbstractAxis::~Q3DAbstractAxis()
+QAbstract3DAxis::~QAbstract3DAxis()
 {
 }
 
 /*!
- * \property Q3DAbstractAxis::orientation
+ * \property QAbstract3DAxis::orientation
  *
- * Defines the orientation of the axis, one of \c Q3DAbstractAxis::AxisOrientation.
+ * Defines the orientation of the axis, one of \c QAbstract3DAxis::AxisOrientation.
  */
-Q3DAbstractAxis::AxisOrientation Q3DAbstractAxis::orientation() const
+QAbstract3DAxis::AxisOrientation QAbstract3DAxis::orientation() const
 {
     return d_ptr->m_orientation;
 }
 
 /*!
- * \property Q3DAbstractAxis::type
+ * \property QAbstract3DAxis::type
  *
- * Defines the type of the axis, one of \c Q3DAbstractAxis::AxisType.
+ * Defines the type of the axis, one of \c QAbstract3DAxis::AxisType.
  */
-Q3DAbstractAxis::AxisType Q3DAbstractAxis::type() const
+QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
 {
     return d_ptr->m_type;
 }
 
 /*!
- * \property Q3DAbstractAxis::title
+ * \property QAbstract3DAxis::title
  *
  * Defines the title for the axis.
  */
-void Q3DAbstractAxis::setTitle(QString title)
+void QAbstract3DAxis::setTitle(QString title)
 {
     if (d_ptr->m_title != title) {
         d_ptr->m_title = title;
@@ -157,23 +157,23 @@ void Q3DAbstractAxis::setTitle(QString title)
     }
 }
 
-QString Q3DAbstractAxis::title() const
+QString QAbstract3DAxis::title() const
 {
     return d_ptr->m_title;
 }
 
 /*!
- * \property Q3DAbstractAxis::labels
+ * \property QAbstract3DAxis::labels
  *
  * Defines the labels for the axis.
- * \note Setting this property for Q3DValueAxis does nothing, as it generates labels automatically.
+ * \note Setting this property for QValue3DAxis does nothing, as it generates labels automatically.
  */
-void Q3DAbstractAxis::setLabels(const QStringList &labels)
+void QAbstract3DAxis::setLabels(const QStringList &labels)
 {
     Q_UNUSED(labels)
 }
 
-QStringList Q3DAbstractAxis::labels() const
+QStringList QAbstract3DAxis::labels() const
 {
     d_ptr->updateLabels();
     return d_ptr->m_labels;
@@ -182,60 +182,60 @@ QStringList Q3DAbstractAxis::labels() const
 /*!
  * Sets value range of the axis from \a min to \a max.
  * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
- * \note For Q3DCategoryAxis this specifies the index range of rows or columns to show.
+ * \note For QCategory3DAxis this specifies the index range of rows or columns to show.
  */
-void Q3DAbstractAxis::setRange(float min, float max)
+void QAbstract3DAxis::setRange(float min, float max)
 {
     d_ptr->setRange(min, max);
     setAutoAdjustRange(false);
 }
 
 /*!
- * \property Q3DAbstractAxis::min
+ * \property QAbstract3DAxis::min
  *
  * Defines the minimum value on the axis.
  * When setting this property the max is adjusted if necessary, to ensure that the range remains
  * valid.
- * \note For Q3DCategoryAxis this specifies the index of the first row or column to show.
+ * \note For QCategory3DAxis this specifies the index of the first row or column to show.
  */
-void Q3DAbstractAxis::setMin(float min)
+void QAbstract3DAxis::setMin(float min)
 {
     d_ptr->setMin(min);
     setAutoAdjustRange(false);
 }
 
 /*!
- * \property Q3DAbstractAxis::max
+ * \property QAbstract3DAxis::max
  *
  * Defines the maximum value on the axis.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
- * \note For Q3DCategoryAxis this specifies the index of the last row or column to show.
+ * \note For QCategory3DAxis this specifies the index of the last row or column to show.
  */
-void Q3DAbstractAxis::setMax(float max)
+void QAbstract3DAxis::setMax(float max)
 {
     d_ptr->setMax(max);
     setAutoAdjustRange(false);
 }
 
-float Q3DAbstractAxis::min() const
+float QAbstract3DAxis::min() const
 {
     return d_ptr->m_min;
 }
 
-float Q3DAbstractAxis::max() const
+float QAbstract3DAxis::max() const
 {
     return d_ptr->m_max;
 }
 
 /*!
- * \property Q3DAbstractAxis::autoAdjustRange
+ * \property QAbstract3DAxis::autoAdjustRange
  *
  * If set, the axis will automatically adjust the range so that all data fits in it.
  *
  * \sa setRange(), setMin(), setMax()
  */
-void Q3DAbstractAxis::setAutoAdjustRange(bool autoAdjust)
+void QAbstract3DAxis::setAutoAdjustRange(bool autoAdjust)
 {
     if (d_ptr->m_autoAdjust != autoAdjust) {
         d_ptr->m_autoAdjust = autoAdjust;
@@ -243,23 +243,23 @@ void Q3DAbstractAxis::setAutoAdjustRange(bool autoAdjust)
     }
 }
 
-bool Q3DAbstractAxis::isAutoAdjustRange() const
+bool QAbstract3DAxis::isAutoAdjustRange() const
 {
     return d_ptr->m_autoAdjust;
 }
 
 /*!
- * \fn Q3DAbstractAxis::rangeChanged(float min, float max)
+ * \fn QAbstract3DAxis::rangeChanged(float min, float max)
  *
  * Emits range \a min and \a max values when range changes.
  */
 
-// Q3DAbstractAxisPrivate
+// QAbstract3DAxisPrivate
 
-Q3DAbstractAxisPrivate::Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAxis::AxisType type)
+QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAxis::AxisType type)
     : QObject(0),
       q_ptr(q),
-      m_orientation(Q3DAbstractAxis::AxisOrientationNone),
+      m_orientation(QAbstract3DAxis::AxisOrientationNone),
       m_type(type),
       m_isDefaultAxis(false),
       m_min(0.0f),
@@ -270,13 +270,13 @@ Q3DAbstractAxisPrivate::Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAx
 {
 }
 
-Q3DAbstractAxisPrivate::~Q3DAbstractAxisPrivate()
+QAbstract3DAxisPrivate::~QAbstract3DAxisPrivate()
 {
 }
 
-void Q3DAbstractAxisPrivate::setOrientation(Q3DAbstractAxis::AxisOrientation orientation)
+void QAbstract3DAxisPrivate::setOrientation(QAbstract3DAxis::AxisOrientation orientation)
 {
-    if (m_orientation == Q3DAbstractAxis::AxisOrientationNone) {
+    if (m_orientation == QAbstract3DAxis::AxisOrientationNone) {
         m_orientation = orientation;
         emit q_ptr->orientationChanged(orientation);
     } else {
@@ -284,12 +284,12 @@ void Q3DAbstractAxisPrivate::setOrientation(Q3DAbstractAxis::AxisOrientation ori
     }
 }
 
-void Q3DAbstractAxisPrivate::updateLabels()
+void QAbstract3DAxisPrivate::updateLabels()
 {
     // Default implementation does nothing
 }
 
-void Q3DAbstractAxisPrivate::setRange(float min, float max)
+void QAbstract3DAxisPrivate::setRange(float min, float max)
 {
     bool adjusted = false;
     if (m_onlyPositiveValues) {
@@ -336,7 +336,7 @@ void Q3DAbstractAxisPrivate::setRange(float min, float max)
         emit q_ptr->maxChanged(m_max);
 }
 
-void Q3DAbstractAxisPrivate::setMin(float min)
+void QAbstract3DAxisPrivate::setMin(float min)
 {
     if (m_onlyPositiveValues) {
         if (min < 0.0f) {
@@ -365,7 +365,7 @@ void Q3DAbstractAxisPrivate::setMin(float min)
     }
 }
 
-void Q3DAbstractAxisPrivate::setMax(float max)
+void QAbstract3DAxisPrivate::setMax(float max)
 {
     if (m_onlyPositiveValues) {
         if (max < 0.0f) {

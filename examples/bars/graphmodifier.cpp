@@ -17,8 +17,8 @@
 ****************************************************************************/
 
 #include "graphmodifier.h"
-#include <QtDataVisualization/q3dcategoryaxis.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
@@ -42,9 +42,9 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_minval(-20.0f),
       m_maxval(20.0f),
       //! [1]
-      m_temperatureAxis(new Q3DValueAxis),
-      m_yearAxis(new Q3DCategoryAxis),
-      m_monthAxis(new Q3DCategoryAxis),
+      m_temperatureAxis(new QValue3DAxis),
+      m_yearAxis(new QCategory3DAxis),
+      m_monthAxis(new QCategory3DAxis),
       m_primaryData(new QBarDataProxy),
       m_secondaryData(new QBarDataProxy),
       //! [1]

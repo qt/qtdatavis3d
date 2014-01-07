@@ -16,8 +16,8 @@
 **
 ****************************************************************************/
 
-#ifndef Q3DABSTRACTAXIS_H
-#define Q3DABSTRACTAXIS_H
+#ifndef QABSTRACT3DAXIS_H
+#define QABSTRACT3DAXIS_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QObject>
@@ -27,9 +27,9 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DAbstractAxisPrivate;
+class QAbstract3DAxisPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DAbstractAxis : public QObject
+class QT_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
 {
     Q_OBJECT
     Q_ENUMS(AxisOrientation)
@@ -58,10 +58,10 @@ public:
     };
 
 protected:
-    explicit Q3DAbstractAxis(Q3DAbstractAxisPrivate *d, QObject *parent = 0);
+    explicit QAbstract3DAxis(QAbstract3DAxisPrivate *d, QObject *parent = 0);
 
 public:
-    virtual ~Q3DAbstractAxis();
+    virtual ~QAbstract3DAxis();
 
     void setTitle(QString title);
     QString title() const;
@@ -93,10 +93,10 @@ signals:
     void autoAdjustRangeChanged(bool autoAdjust);
 
 protected:
-    QScopedPointer<Q3DAbstractAxisPrivate> d_ptr;
+    QScopedPointer<QAbstract3DAxisPrivate> d_ptr;
 
 private:
-    Q_DISABLE_COPY(Q3DAbstractAxis)
+    Q_DISABLE_COPY(QAbstract3DAxis)
 
     friend class Abstract3DController;
     friend class Bars3DController;
@@ -104,4 +104,4 @@ private:
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QABSTRACTAXIS_H
+#endif

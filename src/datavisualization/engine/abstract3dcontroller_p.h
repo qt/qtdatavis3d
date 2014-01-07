@@ -30,7 +30,7 @@
 #define ABSTRACT3DCONTROLLER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "q3dabstractaxis.h"
+#include "qabstract3daxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
@@ -145,11 +145,11 @@ protected:
     QAbstract3DInputHandler *m_activeInputHandler;
     CameraHelper *m_cameraHelper;
     // Active axes
-    Q3DAbstractAxis *m_axisX;
-    Q3DAbstractAxis *m_axisY;
-    Q3DAbstractAxis *m_axisZ;
+    QAbstract3DAxis *m_axisX;
+    QAbstract3DAxis *m_axisY;
+    QAbstract3DAxis *m_axisZ;
 
-    QList<Q3DAbstractAxis *> m_axes; // List of all added axes
+    QList<QAbstract3DAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
     bool m_isSeriesVisibilityDirty;
@@ -173,15 +173,15 @@ public:
     virtual void removeSeries(QAbstract3DSeries *series);
     QList<QAbstract3DSeries *> seriesList();
 
-    virtual void setAxisX(Q3DAbstractAxis *axis);
-    virtual Q3DAbstractAxis *axisX();
-    virtual void setAxisY(Q3DAbstractAxis *axis);
-    virtual Q3DAbstractAxis *axisY();
-    virtual void setAxisZ(Q3DAbstractAxis *axis);
-    virtual Q3DAbstractAxis *axisZ();
-    virtual void addAxis(Q3DAbstractAxis *axis);
-    virtual void releaseAxis(Q3DAbstractAxis *axis);
-    virtual QList<Q3DAbstractAxis *> axes() const; // Omits default axes
+    virtual void setAxisX(QAbstract3DAxis *axis);
+    virtual QAbstract3DAxis *axisX();
+    virtual void setAxisY(QAbstract3DAxis *axis);
+    virtual QAbstract3DAxis *axisY();
+    virtual void setAxisZ(QAbstract3DAxis *axis);
+    virtual QAbstract3DAxis *axisZ();
+    virtual void addAxis(QAbstract3DAxis *axis);
+    virtual void releaseAxis(QAbstract3DAxis *axis);
+    virtual QList<QAbstract3DAxis *> axes() const; // Omits default axes
 
     virtual void addInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
@@ -226,7 +226,7 @@ public:
     virtual void handleAxisSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisSubSegmentCountChangedBySender(QObject *sender);
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
-            Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust) = 0;
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
@@ -262,13 +262,13 @@ signals:
     void needRender();
 
 protected:
-    virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
-    Q3DValueAxis *createDefaultValueAxis();
-    Q3DCategoryAxis *createDefaultCategoryAxis();
+    virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
+    QValue3DAxis *createDefaultValueAxis();
+    QCategory3DAxis *createDefaultCategoryAxis();
 
 private:
-    void setAxisHelper(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis *axis,
-                       Q3DAbstractAxis **axisPtr);
+    void setAxisHelper(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis *axis,
+                       QAbstract3DAxis **axisPtr);
 
     friend class Bars3DController;
 };

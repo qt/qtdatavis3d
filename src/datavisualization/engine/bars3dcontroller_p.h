@@ -92,13 +92,13 @@ public:
     void setSelectionMode(QDataVis::SelectionFlags mode);
     void setSelectedBar(const QPoint &position, QBar3DSeries *series);
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 
     static QPoint invalidSelectionPosition();
 
-    virtual void setAxisX(Q3DAbstractAxis *axis);
-    virtual void setAxisZ(Q3DAbstractAxis *axis);
+    virtual void setAxisX(QAbstract3DAxis *axis);
+    virtual void setAxisZ(QAbstract3DAxis *axis);
 
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
@@ -120,7 +120,7 @@ public slots:
     void handleBarClicked(const QPoint &position, QBar3DSeries *series);
 
 protected:
-    virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
+    virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
 
 private:
     void adjustAxisRanges();

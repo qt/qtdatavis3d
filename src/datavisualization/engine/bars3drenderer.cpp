@@ -1848,12 +1848,12 @@ void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, const QSizeF &spacin
     calculateSceneScalingFactors();
 }
 
-void Bars3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min,
+void Bars3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
                                      float max)
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 
-    if (orientation == Q3DAbstractAxis::AxisOrientationY) {
+    if (orientation == QAbstract3DAxis::AxisOrientationY) {
         calculateHeightAdjustment();
         // Check if we have negative values
         if (min < 0 && !m_hasNegativeValues) {

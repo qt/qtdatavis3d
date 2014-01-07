@@ -16,16 +16,16 @@
 **
 ****************************************************************************/
 
-#ifndef QVALUEAXIS_H
-#define QVALUEAXIS_H
+#ifndef QVALUE3DAXIS_H
+#define QVALUE3DAXIS_H
 
-#include <QtDataVisualization/q3dabstractaxis.h>
+#include <QtDataVisualization/qabstract3daxis.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DValueAxisPrivate;
+class QValue3DAxisPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DValueAxis : public Q3DAbstractAxis
+class QT_DATAVISUALIZATION_EXPORT QValue3DAxis : public QAbstract3DAxis
 {
     Q_OBJECT
     Q_PROPERTY(int segmentCount READ segmentCount WRITE setSegmentCount NOTIFY segmentCountChanged)
@@ -33,8 +33,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DValueAxis : public Q3DAbstractAxis
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
 
 public:
-    explicit Q3DValueAxis(QObject *parent = 0);
-    virtual ~Q3DValueAxis();
+    explicit QValue3DAxis(QObject *parent = 0);
+    virtual ~QValue3DAxis();
 
     int segmentCount() const;
     int subSegmentCount() const;
@@ -50,11 +50,11 @@ signals:
     void labelFormatChanged(QString format);
 
 protected:
-    Q3DValueAxisPrivate *dptr();
-    const Q3DValueAxisPrivate *dptrc() const;
+    QValue3DAxisPrivate *dptr();
+    const QValue3DAxisPrivate *dptrc() const;
 
 private:
-    Q_DISABLE_COPY(Q3DValueAxis)
+    Q_DISABLE_COPY(QValue3DAxis)
     friend class Bars3DController;
     friend class Scatter3DController;
     friend class Surface3DController;
@@ -62,4 +62,4 @@ private:
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QVALUEAXIS_H
+#endif

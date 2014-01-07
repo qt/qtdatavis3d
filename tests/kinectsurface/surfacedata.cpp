@@ -20,7 +20,7 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QScrollBar>
 #include <QSize>
 #include <QImage>

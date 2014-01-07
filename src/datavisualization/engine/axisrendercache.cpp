@@ -23,7 +23,7 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 AxisRenderCache::AxisRenderCache()
-    : m_type(Q3DAbstractAxis::AxisTypeNone),
+    : m_type(QAbstract3DAxis::AxisTypeNone),
       m_min(0.0f),
       m_max(10.0f),
       m_segmentCount(5),
@@ -51,7 +51,7 @@ void AxisRenderCache::setDrawer(Drawer *drawer)
     }
 }
 
-void AxisRenderCache::setType(Q3DAbstractAxis::AxisType type)
+void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
 {
     m_type = type;
 

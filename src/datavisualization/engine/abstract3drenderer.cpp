@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "abstract3drenderer_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
 #include "q3dscene_p.h"
@@ -85,9 +85,9 @@ void Abstract3DRenderer::initializeOpenGL()
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationX).setDrawer(m_drawer);
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationY).setDrawer(m_drawer);
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationX).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationY).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationZ).setDrawer(m_drawer);
 }
 
 void Abstract3DRenderer::render(const GLuint defaultFboHandle)
@@ -280,39 +280,39 @@ void Abstract3DRenderer::handleResize()
 #endif
 }
 
-void Abstract3DRenderer::updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type)
+void Abstract3DRenderer::updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type)
 {
     axisCacheForOrientation(orientation).setType(type);
 }
 
-void Abstract3DRenderer::updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title)
+void Abstract3DRenderer::updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title)
 {
     axisCacheForOrientation(orientation).setTitle(title);
 }
 
-void Abstract3DRenderer::updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels)
+void Abstract3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels)
 {
     axisCacheForOrientation(orientation).setLabels(labels);
 }
 
-void Abstract3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max)
+void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max)
 {
     AxisRenderCache &cache = axisCacheForOrientation(orientation);
     cache.setMin(min);
     cache.setMax(max);
 }
 
-void Abstract3DRenderer::updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count)
 {
     axisCacheForOrientation(orientation).setSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count)
 {
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format)
+void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format)
 {
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
@@ -353,14 +353,14 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
 }
 
-AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation)
+AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstract3DAxis::AxisOrientation orientation)
 {
     switch (orientation) {
-    case Q3DAbstractAxis::AxisOrientationX:
+    case QAbstract3DAxis::AxisOrientationX:
         return m_axisCacheX;
-    case Q3DAbstractAxis::AxisOrientationY:
+    case QAbstract3DAxis::AxisOrientationY:
         return m_axisCacheY;
-    case Q3DAbstractAxis::AxisOrientationZ:
+    case QAbstract3DAxis::AxisOrientationZ:
         return m_axisCacheZ;
     default:
         qFatal("Abstract3DRenderer::axisCacheForOrientation");

@@ -74,9 +74,9 @@ private:
     float m_maxval;
     QStringList m_months;
     QStringList m_years;
-    Q3DValueAxis *m_temperatureAxis;
-    Q3DCategoryAxis *m_yearAxis;
-    Q3DCategoryAxis *m_monthAxis;
+    QValue3DAxis *m_temperatureAxis;
+    QCategory3DAxis *m_yearAxis;
+    QCategory3DAxis *m_monthAxis;
     QBarDataProxy *m_primaryData;
     QBarDataProxy *m_secondaryData;
     QAbstract3DSeries::Mesh m_primaryStyle;

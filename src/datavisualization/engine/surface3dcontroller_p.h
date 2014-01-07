@@ -79,7 +79,7 @@ public:
     void setSelectionMode(QDataVis::SelectionFlags mode);
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
 

@@ -17,9 +17,9 @@
 ****************************************************************************/
 
 #include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/q3dcategoryaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qitemmodelbardataproxy.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>

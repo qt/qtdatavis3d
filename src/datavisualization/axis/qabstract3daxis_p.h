@@ -27,22 +27,22 @@
 // We mean it.
 
 #include "datavisualizationglobal_p.h"
-#include "q3dabstractaxis.h"
+#include "qabstract3daxis.h"
 #include "abstract3dcontroller_p.h"
 
-#ifndef Q3DABSTRACTAXIS_P_H
-#define Q3DABSTRACTAXIS_P_H
+#ifndef QABSTRACT3DAXIS_P_H
+#define QABSTRACT3DAXIS_P_H
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DAbstractAxisPrivate : public QObject
+class QAbstract3DAxisPrivate : public QObject
 {
     Q_OBJECT
 public:
-    Q3DAbstractAxisPrivate(Q3DAbstractAxis *q, Q3DAbstractAxis::AxisType type);
-    virtual ~Q3DAbstractAxisPrivate();
+    QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAxis::AxisType type);
+    virtual ~QAbstract3DAxisPrivate();
 
-    void setOrientation(Q3DAbstractAxis::AxisOrientation orientation);
+    void setOrientation(QAbstract3DAxis::AxisOrientation orientation);
 
     inline bool isDefaultAxis() { return m_isDefaultAxis; }
     inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
@@ -54,12 +54,12 @@ public:
 protected:
     virtual void updateLabels();
 
-    Q3DAbstractAxis *q_ptr;
+    QAbstract3DAxis *q_ptr;
 
     QString m_title;
     QStringList m_labels;
-    Q3DAbstractAxis::AxisOrientation m_orientation;
-    Q3DAbstractAxis::AxisType m_type;
+    QAbstract3DAxis::AxisOrientation m_orientation;
+    QAbstract3DAxis::AxisType m_type;
     bool m_isDefaultAxis;
     float m_min;
     float m_max;
@@ -67,11 +67,11 @@ protected:
     bool m_onlyPositiveValues;
     bool m_allowMinMaxSame;
 
-    friend class Q3DAbstractAxis;
-    friend class Q3DValueAxis;
-    friend class Q3DCategoryAxis;
+    friend class QAbstract3DAxis;
+    friend class QValue3DAxis;
+    friend class QCategory3DAxis;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QABSTRACTAXIS_P_H
+#endif

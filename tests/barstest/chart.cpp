@@ -17,8 +17,8 @@
 ****************************************************************************/
 
 #include "chart.h"
-#include <QtDataVisualization/q3dcategoryaxis.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
@@ -45,13 +45,13 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_minval(-16.0f),
       m_maxval(20.0f),
       m_selectedBar(-1, -1),
-      m_autoAdjustingAxis(new Q3DValueAxis),
-      m_fixedRangeAxis(new Q3DValueAxis),
-      m_temperatureAxis(new Q3DValueAxis),
-      m_yearAxis(new Q3DCategoryAxis),
-      m_monthAxis(new Q3DCategoryAxis),
-      m_genericRowAxis(new Q3DCategoryAxis),
-      m_genericColumnAxis(new Q3DCategoryAxis),
+      m_autoAdjustingAxis(new QValue3DAxis),
+      m_fixedRangeAxis(new QValue3DAxis),
+      m_temperatureAxis(new QValue3DAxis),
+      m_yearAxis(new QCategory3DAxis),
+      m_monthAxis(new QCategory3DAxis),
+      m_genericRowAxis(new QCategory3DAxis),
+      m_genericColumnAxis(new QCategory3DAxis),
       m_temperatureData(new QBar3DSeries),
       m_temperatureData2(new QBar3DSeries),
       m_genericData(new QBar3DSeries),

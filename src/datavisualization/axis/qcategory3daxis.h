@@ -16,42 +16,38 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVisualization API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#ifndef QCATEGORY3DAXIS_H
+#define QCATEGORY3DAXIS_H
 
-#include "q3dcategoryaxis.h"
-#include "q3dabstractaxis_p.h"
-#include "qbardataitem.h"
-
-#ifndef QCATEGORYAXIS_P_H
-#define QCATEGORYAXIS_P_H
+#include <QtDataVisualization/qabstract3daxis.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DCategoryAxisPrivate : public Q3DAbstractAxisPrivate
+class QCategory3DAxisPrivate;
+
+class QT_DATAVISUALIZATION_EXPORT QCategory3DAxis : public QAbstract3DAxis
 {
     Q_OBJECT
+    Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)
 
 public:
-    Q3DCategoryAxisPrivate(Q3DCategoryAxis *q);
-    virtual ~Q3DCategoryAxisPrivate();
+    explicit QCategory3DAxis(QObject *parent = 0);
+    virtual ~QCategory3DAxis();
 
-    void setDataLabels(const QStringList &labels);
+    void setLabels(const QStringList &labels);
+    QStringList labels() const;
+
+signals:
+    void labelsChanged();
+
+protected:
+    QCategory3DAxisPrivate *dptr();
 
 private:
-    Q3DCategoryAxis *qptr();
-
-    bool m_labelsExplicitlySet;
-    friend class Q3DCategoryAxis;
+    Q_DISABLE_COPY(QCategory3DAxis)
+    friend class Bars3DController;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QCATEGORYAXIS_P_H
+#endif

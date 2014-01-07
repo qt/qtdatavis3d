@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "graphmodifier.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtDataVisualization/Q3DTheme>
@@ -55,9 +55,9 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_theSeries(new QSurface3DSeries),
       m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
     m_graph->addSeries(m_theSeries);

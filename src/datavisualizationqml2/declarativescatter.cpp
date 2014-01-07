@@ -49,32 +49,32 @@ DeclarativeScatter::~DeclarativeScatter()
     delete m_scatterController;
 }
 
-Q3DValueAxis *DeclarativeScatter::axisX() const
+QValue3DAxis *DeclarativeScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisX());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisX());
 }
 
-void DeclarativeScatter::setAxisX(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisX(QValue3DAxis *axis)
 {
     m_scatterController->setAxisX(axis);
 }
 
-Q3DValueAxis *DeclarativeScatter::axisY() const
+QValue3DAxis *DeclarativeScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisY());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisY());
 }
 
-void DeclarativeScatter::setAxisY(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisY(QValue3DAxis *axis)
 {
     m_scatterController->setAxisY(axis);
 }
 
-Q3DValueAxis *DeclarativeScatter::axisZ() const
+QValue3DAxis *DeclarativeScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisZ());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisZ());
 }
 
-void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisZ(QValue3DAxis *axis)
 {
     m_scatterController->setAxisZ(axis);
 }

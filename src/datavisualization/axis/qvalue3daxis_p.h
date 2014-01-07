@@ -26,21 +26,21 @@
 //
 // We mean it.
 
-#include "q3dvalueaxis.h"
-#include "q3dabstractaxis_p.h"
+#include "qvalue3daxis.h"
+#include "qabstract3daxis_p.h"
 
-#ifndef QVALUEAXIS_P_H
-#define QVALUEAXIS_P_H
+#ifndef QVALUE3DAXIS_P_H
+#define QVALUE3DAXIS_P_H
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DValueAxisPrivate : public Q3DAbstractAxisPrivate
+class QValue3DAxisPrivate : public QAbstract3DAxisPrivate
 {
     Q_OBJECT
 
 public:
-    Q3DValueAxisPrivate(Q3DValueAxis *q);
-    virtual ~Q3DValueAxisPrivate();
+    QValue3DAxisPrivate(QValue3DAxis *q);
+    virtual ~QValue3DAxisPrivate();
 
     virtual void setRange(float min, float max);
     virtual void setMin(float min);
@@ -56,11 +56,11 @@ protected:
     bool m_labelsDirty;
 
 private:
-    Q3DValueAxis *qptr();
+    QValue3DAxis *qptr();
 
-    friend class Q3DValueAxis;
+    friend class QValue3DAxis;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // QVALUEAXIS_P_H
+#endif

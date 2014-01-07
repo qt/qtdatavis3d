@@ -18,7 +18,7 @@
 
 #include "surfacegraph.h"
 
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DTheme>
 #include <QtGui/QImage>
 #include <QtCore/qmath.h>
@@ -35,9 +35,9 @@ const float sampleMax = 8.0f;
 SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     : m_graph(surface)
 {
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
 
     //! [0]
     m_sqrtSinProxy = new QSurfaceDataProxy();
