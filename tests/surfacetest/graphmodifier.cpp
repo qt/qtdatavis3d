@@ -363,10 +363,7 @@ void GraphModifier::selectedPointChanged(const QPoint &point)
 
 void GraphModifier::changeTheme(int theme)
 {
-    Q3DTheme *currentTheme = m_graph->activeTheme();
-    m_graph->releaseTheme(currentTheme);
-    delete currentTheme;
-    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    m_graph->activeTheme()->setType(Q3DTheme::Theme(theme));
 }
 
 

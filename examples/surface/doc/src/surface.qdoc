@@ -124,7 +124,8 @@
 
     Q3DSurface supports all the themes Qt Data Visualization has. The example has a pull
     down menu for selecting the theme. The following method is connected to the
-    menu to activate the selected theme. The old theme is released and deleted:
+    menu to activate the selected theme. The theme type is changed to another predefined theme,
+    which overwrites all theme properties to predefined values:
 
     \snippet ../examples/surface/surfacegraph.cpp 6
 

@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "q3dtheme_p.h"
+#include "thememanager_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -377,10 +378,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty Theme3D.Theme Theme3D::type
  *
  * The type of the theme. If no type is set, the type is \c Theme3D.ThemeUserDefined.
- * \note Changing the type to one of the predefined types doesn't reset the properties
- * that have been explicitly set since the last render cycle. This is done to allow
- * customization of predefined types also from QML. It is not recommended
- * changing the type of an existing Theme3D item via this property.
+ * Changing the theme type after the item has been constructed will change all other properties
+ * of the theme to what the predefined theme specifies. Changing the theme type of the active theme
+ * of the graph will also reset all attached series to use the new theme.
  */
 
 /*!
@@ -389,7 +389,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 Q3DTheme::Q3DTheme(QObject *parent)
     : QObject(parent),
-      d_ptr(new Q3DThemePrivate(this, ThemeUserDefined))
+      d_ptr(new Q3DThemePrivate(this))
 {
 }
 
@@ -400,8 +400,9 @@ Q3DTheme::Q3DTheme(QObject *parent)
  */
 Q3DTheme::Q3DTheme(Theme themeType, QObject *parent)
     : QObject(parent),
-      d_ptr(new Q3DThemePrivate(this, themeType))
+      d_ptr(new Q3DThemePrivate(this))
 {
+    setType(themeType);
 }
 
 /*!
@@ -412,7 +413,7 @@ Q3DTheme::Q3DTheme(Q3DThemePrivate *d, Theme themeType,
     QObject(parent),
     d_ptr(d)
 {
-    d_ptr->m_themeId = themeType;
+    setType(themeType);
 }
 
 /*!
@@ -866,17 +867,18 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
 /*!
  * \property Q3DTheme::type
  *
- * The type of the theme. Type is automatically set when constructing a theme.
- * \note Changing the type to one of the predefined types doesn't reset the properties
- * that have been explicitly set since the last render cycle. This is done to allow
- * customization of predefined types also from QML. It is not recommended
- * changing the type of an existing Q3DTheme object via this property.
+ * The type of the theme. The type is automatically set when constructing a theme,
+ * but can also be changed later. Changing the theme type will change all other
+ * properties of the theme to what the predefined theme specifies.
+ * Changing the theme type of the active theme of the graph will also reset all
+ * attached series to use the new theme.
  */
 void Q3DTheme::setType(Theme themeType)
 {
     d_ptr->m_dirtyBits.themeIdDirty = true;
     if (d_ptr->m_themeId != themeType) {
         d_ptr->m_themeId = themeType;
+        ThemeManager::setPredefinedPropertiesToTheme(this, themeType);
         emit typeChanged(themeType);
     }
 }
@@ -888,9 +890,9 @@ Q3DTheme::Theme Q3DTheme::type() const
 
 // Q3DThemePrivate
 
-Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
+Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q)
     : QObject(0),
-      m_themeId(theme_id),
+      m_themeId(Q3DTheme::ThemeUserDefined),
       m_backgroundColor(Qt::black),
       m_windowColor(Qt::black),
       m_textColor(Qt::white),
@@ -915,6 +917,7 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
       m_gridEnabled(true),
       m_labelBackground(true),
       m_isDefaultTheme(false),
+      m_forcePredefinedType(true),
       q_ptr(q)
 {
     m_baseColors.append(QColor(Qt::black));

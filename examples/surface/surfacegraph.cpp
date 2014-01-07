@@ -229,10 +229,7 @@ void SurfaceGraph::setAxisZRange(float min, float max)
 //! [6]
 void SurfaceGraph::changeTheme(int theme)
 {
-    Q3DTheme *currentTheme = m_graph->activeTheme();
-    m_graph->releaseTheme(currentTheme);
-    delete currentTheme;
-    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    m_graph->activeTheme()->setType(Q3DTheme::Theme(theme));
 }
 //! [6]
 

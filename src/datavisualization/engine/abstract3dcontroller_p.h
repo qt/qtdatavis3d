@@ -249,6 +249,7 @@ public slots:
     void handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient);
     void handleThemeMultiHighlightColorChanged(const QColor &color);
     void handleThemeMultiHighlightGradientChanged(const QLinearGradient &gradient);
+    void handleThemeTypeChanged(Q3DTheme::Theme theme);
 
     // Renderer callback handlers
     void handleRequestShadowQuality(QDataVis::ShadowQuality quality);

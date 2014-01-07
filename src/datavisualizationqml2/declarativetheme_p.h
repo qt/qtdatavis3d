@@ -32,13 +32,16 @@
 #include "datavisualizationglobal_p.h"
 #include "declarativecolor_p.h"
 #include "colorgradient_p.h"
-#include "q3dtheme.h"
+#include "q3dtheme_p.h"
+
+#include <QtQml/qqmlparserstatus.h>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class DeclarativeTheme3D : public Q3DTheme
+class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
     Q_PROPERTY(QQmlListProperty<DeclarativeColor> baseColors READ baseColors)
     Q_PROPERTY(QQmlListProperty<ColorGradient> baseGradients READ baseGradients)
@@ -72,6 +75,10 @@ public:
 
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
+
+    // From QQmlParserStatus
+    virtual void classBegin();
+    virtual void componentComplete();
 
 signals:
     void singleHighlightGradientChanged(ColorGradient *gradient);

@@ -446,6 +446,19 @@ void Abstract3DController::handleThemeMultiHighlightGradientChanged(const QLinea
     markSeriesVisualsDirty();
 }
 
+void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
+{
+    Q_UNUSED(theme)
+
+    // Changing theme type is logically equivalent of changing the entire theme
+    // object, so reset all attached series to the new theme.
+
+    Q3DTheme *activeTheme = m_themeManager->activeTheme();
+    for (int i = 0; i < m_seriesList.size(); i++)
+        m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, true);
+    markSeriesVisualsDirty();
+}
+
 void Abstract3DController::setAxisX(Q3DAbstractAxis *axis)
 {
     setAxisHelper(Q3DAbstractAxis::AxisOrientationX, axis, &m_axisX);

@@ -130,6 +130,7 @@ private:
     bool m_useNullInputHandler;
     QAbstract3DInputHandler *m_defaultInputHandler;
     Q3DTheme *m_ownTheme;
+    Q3DTheme *m_builtinTheme;
 };
 
 #endif

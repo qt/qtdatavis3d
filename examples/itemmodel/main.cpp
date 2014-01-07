@@ -107,7 +107,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [7]
 
     // Set theme
-    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
 
     // Set font
     m_graph->activeTheme()->setFont(QFont("Impact", 20));

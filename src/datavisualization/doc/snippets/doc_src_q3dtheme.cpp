@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     //! [3]
     Q3DBars *graph = new Q3DBars();
-    graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemePrimaryColors));
+    graph->activeTheme()->setType(Q3DTheme::ThemePrimaryColors);
     graph->activeTheme()->setBaseColor(Qt::red);
     graph->activeTheme()->setSingleHighlightColor(Qt::yellow);
     //! [3]

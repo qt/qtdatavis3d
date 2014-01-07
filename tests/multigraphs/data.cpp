@@ -45,7 +45,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_started(false)
 {
     // Initialize surface
-    m_surface->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -63,7 +63,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_surface->addSeries(series1);
 
     // Initialize scatter
-    m_scatter->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
+    m_scatter->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
     m_scatter->setSelectionMode(QDataVis::SelectionNone);
     m_scatter->activeTheme()->setGridEnabled(false);
     m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
@@ -73,7 +73,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_scatter->addSeries(series2);
 
     // Initialize bars
-    m_bars->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+    m_bars->activeTheme()->setType(Q3DTheme::ThemeQt);
     m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
     m_bars->activeTheme()->setGridEnabled(false);
     m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
@@ -185,10 +185,7 @@ void Data::scrollDown()
 
 void Data::useGradientOne()
 {
-    Q3DTheme *currentTheme = m_surface->activeTheme();
-    m_surface->releaseTheme(currentTheme);
-    delete currentTheme;
-    m_surface->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -201,10 +198,7 @@ void Data::useGradientOne()
 
 void Data::useGradientTwo()
 {
-    Q3DTheme *currentTheme = m_surface->activeTheme();
-    m_surface->releaseTheme(currentTheme);
-    delete currentTheme;
-    m_surface->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeQt);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(0.8, Qt::red);

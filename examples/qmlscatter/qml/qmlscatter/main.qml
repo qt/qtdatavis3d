@@ -44,7 +44,7 @@ Item {
     //! [13]
 
     Theme3D {
-        id : themeArmyBlue
+        id: themeArmyBlue
         type: Theme3D.ThemeArmyBlue
     }
 
@@ -193,6 +193,11 @@ Item {
                     scatterGraph.theme = themeIsabelle
                 } else {
                     scatterGraph.theme = themeArmyBlue
+                }
+                if (scatterGraph.theme.backgroundEnabled === true) {
+                    backgroundToggle.text = "Hide Background";
+                } else {
+                    backgroundToggle.text = "Show Background";
                 }
             }
         }

@@ -186,10 +186,7 @@ void GraphModifier::changePresetCamera()
 void GraphModifier::changeTheme(int theme)
 {
     Q3DTheme *currentTheme = m_graph->activeTheme();
-    m_graph->releaseTheme(currentTheme);
-    delete currentTheme;
-    currentTheme = new Q3DTheme(Q3DTheme::Theme(theme));
-    m_graph->setActiveTheme(currentTheme);
+    currentTheme->setType(Q3DTheme::Theme(theme));
     emit backgroundEnabledChanged(currentTheme->isBackgroundEnabled());
     emit gridEnabledChanged(currentTheme->isGridEnabled());
     emit fontChanged(currentTheme->font());

@@ -64,7 +64,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_negativeValuesOn(false),
       m_useNullInputHandler(false),
       m_defaultInputHandler(0),
-      m_ownTheme(0)
+      m_ownTheme(0),
+      m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss))
 {
     // Generate generic labels
     QStringList genericColumnLabels;
@@ -117,7 +118,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->addAxis(m_genericRowAxis);
     m_graph->addAxis(m_genericColumnAxis);
 
-    m_graph->setActiveTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
+    m_graph->setActiveTheme(m_builtinTheme);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
@@ -578,11 +579,9 @@ void GraphModifier::changeTheme()
     static int theme = Q3DTheme::ThemeQt;
 
     Q3DTheme *currentTheme = m_graph->activeTheme();
-    if (currentTheme != m_ownTheme) {
-        m_graph->releaseTheme(currentTheme);
-        delete currentTheme;
-    }
-    m_graph->setActiveTheme(new Q3DTheme((Q3DTheme::Theme)theme));
+    m_builtinTheme->setType(Q3DTheme::Theme(theme));
+    if (currentTheme == m_ownTheme)
+        m_graph->setActiveTheme(m_builtinTheme);
 
     switch (theme) {
         case Q3DTheme::ThemeQt:
@@ -851,11 +850,6 @@ void GraphModifier::useOwnTheme()
         m_ownTheme->setWindowColor(QColor(QRgb(0xffffff)));
     }
 
-    Q3DTheme *currentTheme = m_graph->activeTheme();
-    if (currentTheme != m_ownTheme) {
-        m_graph->releaseTheme(currentTheme);
-        delete currentTheme;
-    }
     m_graph->setActiveTheme(m_ownTheme);
 
     m_colorDialog->open();

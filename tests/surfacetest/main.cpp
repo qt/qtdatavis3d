@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     QSize screenSize = surfaceGraph->screen()->size();
 
     // Set to default, should be same as the initial on themeList
-    surfaceGraph->setActiveTheme(new Q3DTheme(Q3DTheme::Theme(initialTheme)));
+    surfaceGraph->activeTheme()->setType(Q3DTheme::Theme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceGraph);
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));

@@ -150,6 +150,19 @@ ColorGradient *DeclarativeTheme3D::multiHighlightGradient() const
     return m_multiHLGradient;
 }
 
+void DeclarativeTheme3D::classBegin()
+{
+    // Turn off predefined type forcing for the duration of initial class construction
+    // so that predefined type customization can be done.
+    d_ptr->setForcePredefinedType(false);
+}
+
+void DeclarativeTheme3D::componentComplete()
+{
+    d_ptr->setForcePredefinedType(true);
+}
+
+
 void DeclarativeTheme3D::setThemeGradient(ColorGradient *gradient, GradientType type)
 {
     QLinearGradient newGradient = convertGradient(gradient);
@@ -217,7 +230,7 @@ void DeclarativeTheme3D::addColor(DeclarativeColor *color)
 QList<DeclarativeColor *> DeclarativeTheme3D::colorList()
 {
     if (m_colors.isEmpty()) {
-        // Create dummy ThemeColors from theme's gradients
+        // Create dummy ThemeColors from theme's colors
         m_dummyColors = true;
         QList<QColor> list = Q3DTheme::baseColors();
         foreach (QColor item, list) {
