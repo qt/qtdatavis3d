@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef Q3DWINDOW_P_H
-#define Q3DWINDOW_P_H
+#ifndef QABSTRACT3DGRAPH_P_H
+#define QABSTRACT3DGRAPH_P_H
 
 #include "datavisualizationglobal_p.h"
 
@@ -38,15 +38,15 @@ class QOpenGLPaintDevice;
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Q3DWindow;
+class QAbstract3DGraph;
 class Abstract3DController;
 
-class Q3DWindowPrivate : public QObject
+class QAbstract3DGraphPrivate : public QObject
 {
     Q_OBJECT
 public:
-    Q3DWindowPrivate(Q3DWindow *q);
-    ~Q3DWindowPrivate();
+    QAbstract3DGraphPrivate(QAbstract3DGraph *q);
+    ~QAbstract3DGraphPrivate();
 
     void render();
 
@@ -58,7 +58,7 @@ public slots:
     void renderNow();
 
 public:
-    Q3DWindow *q_ptr;
+    QAbstract3DGraph *q_ptr;
 
     bool m_updatePending;
     QOpenGLContext *m_context;

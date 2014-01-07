@@ -23,8 +23,6 @@
 #include "q3dcamera.h"
 #include "qscatter3dseries_p.h"
 
-#include <QMouseEvent>
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
@@ -83,19 +81,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Constructs a new 3D scatter graph with optional \a parent window.
  */
 Q3DScatter::Q3DScatter(QWindow *parent)
-    : Q3DWindow(new Q3DScatterPrivate(this), parent)
+    : QAbstract3DGraph(new Q3DScatterPrivate(this), parent)
 {
     dptr()->m_shared = new Scatter3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
-                     &Q3DScatter::selectionModeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DScatter::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
-                     &Q3DWindowPrivate::renderLater);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
-                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 /*!
@@ -131,54 +121,6 @@ QList<QScatter3DSeries *> Q3DScatter::seriesList()
     return dptr()->m_shared->scatterSeriesList();
 }
 
-/*!
- * \internal
- */
-void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseDoubleClickEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::touchEvent(QTouchEvent *event)
-{
-    dptr()->m_shared->touchEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mousePressEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mousePressEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseMoveEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::wheelEvent(QWheelEvent *event)
-{
-    dptr()->m_shared->wheelEvent(event);
-}
-
 Q3DScatterPrivate *Q3DScatter::dptr()
 {
     return static_cast<Q3DScatterPrivate *>(d_ptr.data());
@@ -187,54 +129,6 @@ Q3DScatterPrivate *Q3DScatter::dptr()
 const Q3DScatterPrivate *Q3DScatter::dptrc() const
 {
     return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
-}
-
-/*!
- * \property Q3DScatter::selectionMode
- *
- * Sets item selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
- * \c QDataVis::SelectionItem by default.
- *
- * \note Only \c QDataVis::SelectionItem and \c QDataVis::SelectionNone are supported.
- */
-void Q3DScatter::setSelectionMode(QDataVis::SelectionFlags mode)
-{
-    dptr()->m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionFlags Q3DScatter::selectionMode() const
-{
-    return dptrc()->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DScatter::scene
- *
- * This property contains the read only Q3DScene that can be used to access e.g. camera object.
- */
-Q3DScene *Q3DScatter::scene() const
-{
-    return dptrc()->m_shared->scene();
-}
-
-/*!
- * \property Q3DScatter::shadowQuality
- *
- * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowQualityMedium by default.
- *
- * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is
- * done.
- */
-void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    return dptr()->m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
-{
-    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -346,25 +240,13 @@ QList<Q3DValueAxis *> Q3DScatter::axes() const
     return retList;
 }
 
-/*!
- * \fn void Q3DScatter::shadowQualityChanged(QDataVis::ShadowQuality quality)
- *
- * This signal is emitted when shadow \a quality changes.
- */
-
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
-    : Q3DWindowPrivate(q)
+    : QAbstract3DGraphPrivate(q)
 {
 }
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
-    delete m_shared;
-}
-
-void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit qptr()->shadowQualityChanged(quality);
 }
 
 Q3DScatter *Q3DScatterPrivate::qptr()

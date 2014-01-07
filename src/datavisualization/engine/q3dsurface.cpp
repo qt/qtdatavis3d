@@ -23,8 +23,6 @@
 #include "q3dcamera.h"
 #include "qsurface3dseries_p.h"
 
-#include <QMouseEvent>
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
@@ -96,17 +94,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Constructs a new 3D surface graph with optional \a parent window.
  */
 Q3DSurface::Q3DSurface(QWindow *parent)
-    : Q3DWindow(new Q3DSurfacePrivate(this), parent)
+    : QAbstract3DGraph(new Q3DSurfacePrivate(this), parent)
 {
     dptr()->m_shared = new Surface3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
-                     &Q3DSurface::selectionModeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DSurface::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
-                     &Q3DWindowPrivate::renderLater);
 }
 
 /*!
@@ -144,54 +136,6 @@ QList<QSurface3DSeries *> Q3DSurface::seriesList()
     return dptr()->m_shared->surfaceSeriesList();
 }
 
-/*!
- * \internal
- */
-void Q3DSurface::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseDoubleClickEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::touchEvent(QTouchEvent *event)
-{
-    dptr()->m_shared->touchEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::mousePressEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mousePressEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::mouseReleaseEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::mouseMoveEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseMoveEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DSurface::wheelEvent(QWheelEvent *event)
-{
-    dptr()->m_shared->wheelEvent(event);
-}
-
 Q3DSurfacePrivate *Q3DSurface::dptr()
 {
     return static_cast<Q3DSurfacePrivate *>(d_ptr.data());
@@ -200,53 +144,6 @@ Q3DSurfacePrivate *Q3DSurface::dptr()
 const Q3DSurfacePrivate *Q3DSurface::dptrc() const
 {
     return static_cast<const Q3DSurfacePrivate *>(d_ptr.data());
-}
-
-/*!
- * \property Q3DSurface::shadowQuality
- *
- * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowQualityMedium by default.
- *
- * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is
- * done.
- */
-void Q3DSurface::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    return dptr()->m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality Q3DSurface::shadowQuality() const
-{
-    return dptrc()->m_shared->shadowQuality();
-}
-
-/*!
- * \property Q3DSurface::selectionMode
- *
- * Sets point selection \a mode to a combination of \c QDataVis::SelectionFlags. Surface supports
- * \c SelectionItem and \c SelectionSlice with either \c SelectionRow or \c SelectionColumn.
- * It is preset to \c SelectionItem by default.
- */
-void Q3DSurface::setSelectionMode(QDataVis::SelectionFlags mode)
-{
-    dptr()->m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionFlags Q3DSurface::selectionMode() const
-{
-    return dptrc()->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DSurface::scene
- *
- * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
- */
-Q3DScene *Q3DSurface::scene() const
-{
-    return dptrc()->m_shared->scene();
 }
 
 /*!
@@ -361,13 +258,12 @@ QList<Q3DValueAxis *> Q3DSurface::axes() const
 /////////////////// PRIVATE ///////////////////////////////////
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
-    : Q3DWindowPrivate(q)
+    : QAbstract3DGraphPrivate(q)
 {
 }
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
-    delete m_shared;
 }
 
 Q3DSurface *Q3DSurfacePrivate::qptr()

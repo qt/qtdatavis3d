@@ -31,7 +31,7 @@
 
 #include "surface3dcontroller_p.h"
 #include "qdatavisualizationenums.h"
-#include "q3dwindow_p.h"
+#include "qabstract3dgraph_p.h"
 
 #include <QList>
 
@@ -39,7 +39,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DSurface;
 
-class Q3DSurfacePrivate : public Q3DWindowPrivate
+class Q3DSurfacePrivate : public QAbstract3DGraphPrivate
 {
     Q_OBJECT
 public:

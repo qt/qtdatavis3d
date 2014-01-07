@@ -31,21 +31,18 @@
 
 #include "bars3dcontroller_p.h"
 #include "qdatavisualizationenums.h"
-#include "q3dwindow_p.h"
+#include "qabstract3dgraph_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class Q3DBars;
 
-class Q3DBarsPrivate : public Q3DWindowPrivate
+class Q3DBarsPrivate : public QAbstract3DGraphPrivate
 {
     Q_OBJECT
 public:
     Q3DBarsPrivate(Q3DBars *q);
     ~Q3DBarsPrivate();
-
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
 
     Q3DBars *qptr();
 

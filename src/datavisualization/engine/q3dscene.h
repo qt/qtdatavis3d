@@ -96,7 +96,7 @@ private:
     Q_DISABLE_COPY(Q3DScene)
 
     friend class AbstractDeclarative;
-    friend class Q3DWindow;
+    friend class QAbstract3DGraph;
     friend class Abstract3DController;
     friend class Q3DScenePrivate;
     friend class Abstract3DRenderer;

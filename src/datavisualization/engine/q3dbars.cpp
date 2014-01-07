@@ -24,9 +24,6 @@
 #include "q3dcamera.h"
 #include "qbar3dseries_p.h"
 
-#include <QMouseEvent>
-
-
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
@@ -99,19 +96,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Constructs a new 3D bar graph with optional \a parent window.
  */
 Q3DBars::Q3DBars(QWindow *parent)
-    : Q3DWindow(new Q3DBarsPrivate(this), parent)
+    : QAbstract3DGraph(new Q3DBarsPrivate(this), parent)
 {
     dptr()->m_shared = new Bars3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
-                     &Q3DBars::selectionModeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DBars::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
-                     &Q3DWindowPrivate::renderLater);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
-                     &Q3DBarsPrivate::handleShadowQualityUpdate);
 }
 
 /*!
@@ -148,65 +137,6 @@ void Q3DBars::removeSeries(QBar3DSeries *series)
 QList<QBar3DSeries *> Q3DBars::seriesList()
 {
     return dptr()->m_shared->barSeriesList();
-}
-
-/*!
- * \internal
- */
-void Q3DBars::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseDoubleClickEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DBars::touchEvent(QTouchEvent *event)
-{
-    dptr()->m_shared->touchEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DBars::mousePressEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mousePressEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DBars::mouseReleaseEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DBars::mouseMoveEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseMoveEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DBars::wheelEvent(QWheelEvent *event)
-{
-    dptr()->m_shared->wheelEvent(event);
-}
-
-
-Q3DBarsPrivate *Q3DBars::dptr()
-{
-    return static_cast<Q3DBarsPrivate *>(d_ptr.data());
-}
-
-const Q3DBarsPrivate *Q3DBars::dptrc() const
-{
-    return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
 }
 
 /*!
@@ -267,52 +197,6 @@ void Q3DBars::setBarSpacingRelative(bool relative)
 bool Q3DBars::isBarSpacingRelative()
 {
     return dptr()->m_shared->isBarSpecRelative();
-}
-
-/*!
- * \property Q3DBars::selectionMode
- *
- * Sets bar selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
- * \c QDataVis::SelectionItem by default.
- */
-void Q3DBars::setSelectionMode(QDataVis::SelectionFlags mode)
-{
-    dptr()->m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionFlags Q3DBars::selectionMode() const
-{
-    return dptrc()->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DBars::scene
- *
- * This property contains the read only Q3DScene that can be used to access e.g. camera object.
- */
-Q3DScene *Q3DBars::scene() const
-{
-    return dptrc()->m_shared->scene();
-}
-
-/*!
- * \property Q3DBars::shadowQuality
- *
- * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowQualityMedium by default.
- *
- * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is
- * done.
- */
-void Q3DBars::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    dptr()->m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality Q3DBars::shadowQuality() const
-{
-    return dptrc()->m_shared->shadowQuality();
 }
 
 /*!
@@ -417,19 +301,23 @@ QList<Q3DAbstractAxis *> Q3DBars::axes() const
     return dptrc()->m_shared->axes();
 }
 
+Q3DBarsPrivate *Q3DBars::dptr()
+{
+    return static_cast<Q3DBarsPrivate *>(d_ptr.data());
+}
+
+const Q3DBarsPrivate *Q3DBars::dptrc() const
+{
+    return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
+}
+
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
-    : Q3DWindowPrivate(q)
+    : QAbstract3DGraphPrivate(q)
 {
 }
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
-    delete m_shared;
-}
-
-void Q3DBarsPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
-{
-    emit qptr()->shadowQualityChanged(quality);
 }
 
 Q3DBars *Q3DBarsPrivate::qptr()

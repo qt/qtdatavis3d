@@ -20,7 +20,7 @@
 #define Q3DSURFACE_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
-#include <QtDataVisualization/q3dwindow.h>
+#include <QtDataVisualization/qabstract3dgraph.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
 
@@ -30,13 +30,9 @@ class Q3DSurfacePrivate;
 class Q3DValueAxis;
 class QSurface3DSeries;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public Q3DWindow
+class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene)
-
 public:
     explicit Q3DSurface(QWindow *parent = 0);
     virtual ~Q3DSurface();
@@ -44,12 +40,6 @@ public:
     void addSeries(QSurface3DSeries *series);
     void removeSeries(QSurface3DSeries *series);
     QList<QSurface3DSeries *> seriesList();
-
-    void setShadowQuality(QDataVis::ShadowQuality quality);
-    QDataVis::ShadowQuality shadowQuality() const;
-
-    void setSelectionMode(QDataVis::SelectionFlags mode);
-    QDataVis::SelectionFlags selectionMode() const;
 
     // Axes
     void setAxisX(Q3DValueAxis *axis);
@@ -61,20 +51,6 @@ public:
     void addAxis(Q3DValueAxis *axis);
     void releaseAxis(Q3DValueAxis *axis);
     QList<Q3DValueAxis *> axes() const;
-
-    Q3DScene *scene() const;
-
-signals:
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
-
-protected:
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
 
 private:
     Q3DSurfacePrivate *dptr();

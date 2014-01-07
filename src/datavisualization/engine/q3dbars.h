@@ -20,7 +20,7 @@
 #define Q3DBARS_H
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
-#include <QtDataVisualization/q3dwindow.h>
+#include <QtDataVisualization/qabstract3dgraph.h>
 #include <QFont>
 #include <QLinearGradient>
 
@@ -30,18 +30,14 @@ class Q3DBarsPrivate;
 class Q3DAbstractAxis;
 class Q3DCategoryAxis;
 class Q3DValueAxis;
-class Q3DScene;
 class QBar3DSeries;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
+class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene)
 
 public:
     explicit Q3DBars(QWindow *parent = 0);
@@ -60,14 +56,6 @@ public:
     void setBarSpacingRelative(bool relative);
     bool isBarSpacingRelative();
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
-    QDataVis::SelectionFlags selectionMode() const;
-
-    Q3DScene *scene() const;
-
-    void setShadowQuality(QDataVis::ShadowQuality quality);
-    QDataVis::ShadowQuality shadowQuality() const;
-
     void setRowAxis(Q3DCategoryAxis *axis);
     Q3DCategoryAxis *rowAxis() const;
     void setColumnAxis(Q3DCategoryAxis *axis);
@@ -79,20 +67,9 @@ public:
     QList<Q3DAbstractAxis *> axes() const;
 
 signals:
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
-
-protected:
-
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
 
 private:
     Q3DBarsPrivate *dptr();

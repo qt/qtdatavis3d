@@ -159,9 +159,9 @@ protected:
     QList<QAbstract3DSeries *> m_seriesList;
 
     explicit Abstract3DController(QRect initialViewport, QObject *parent = 0);
-    virtual ~Abstract3DController();
 
 public:
+    virtual ~Abstract3DController();
 
     inline bool isInitialized() { return (m_renderer != 0); }
     virtual void synchDataToRenderer();

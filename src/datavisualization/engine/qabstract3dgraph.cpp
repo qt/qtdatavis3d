@@ -16,8 +16,8 @@
 **
 ****************************************************************************/
 
-#include "q3dwindow.h"
-#include "q3dwindow_p.h"
+#include "qabstract3dgraph.h"
+#include "qabstract3dgraph_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "q3dscene_p.h"
@@ -31,16 +31,16 @@
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 /*!
- * \class Q3DWindow
+ * \class QAbstract3DGraph
  * \inmodule QtDataVisualization
- * \brief The Q3DWindow class provides a window and render loop.
+ * \brief The QAbstract3DGraph class provides a window and render loop for graphs.
  * \since Qt Data Visualization 1.0
  *
- * This class creates a QWindow and provides render loop for visualization types inheriting it.
+ * This class subclasses a QWindow and provides render loop for graphs inheriting it.
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
- * \note Q3DWindow sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
+ * \note QAbstract3DGraph sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
  * graph windows as standalone windows with regular window frame, clear this flag after constructing
  * the graph. For example:
  *
@@ -55,7 +55,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \internal
  */
-Q3DWindow::Q3DWindow(Q3DWindowPrivate *d, QWindow *parent)
+QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, QWindow *parent)
     : QWindow(parent),
       d_ptr(d)
 {
@@ -93,16 +93,13 @@ Q3DWindow::Q3DWindow(Q3DWindowPrivate *d, QWindow *parent)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif
 
-    QObject::connect(d_ptr->m_visualController, &Abstract3DController::activeThemeChanged, this,
-                     &Q3DWindow::activeThemeChanged);
-
     d_ptr->renderLater();
 }
 
 /*!
- * Destroys Q3DWindow.
+ * Destroys QAbstract3DGraph.
  */
-Q3DWindow::~Q3DWindow()
+QAbstract3DGraph::~QAbstract3DGraph()
 {
 }
 
@@ -113,7 +110,7 @@ Q3DWindow::~Q3DWindow()
  *
  * \sa releaseInputHandler(), setActiveInputHandler()
  */
-void Q3DWindow::addInputHandler(QAbstract3DInputHandler *inputHandler)
+void QAbstract3DGraph::addInputHandler(QAbstract3DInputHandler *inputHandler)
 {
     d_ptr->m_visualController->addInputHandler(inputHandler);
 }
@@ -126,28 +123,27 @@ void Q3DWindow::addInputHandler(QAbstract3DInputHandler *inputHandler)
  *
  * \sa addInputHandler(), setActiveInputHandler()
  */
-void Q3DWindow::releaseInputHandler(QAbstract3DInputHandler *inputHandler)
+void QAbstract3DGraph::releaseInputHandler(QAbstract3DInputHandler *inputHandler)
 {
     d_ptr->m_visualController->releaseInputHandler(inputHandler);
 }
 
 /*!
- * Sets the active \a inputHandler. Implicitly calls addInputHandler() to transfer ownership of
- * the \a inputHandler to this graph.
+ * \property QAbstract3DGraph::activeInputHandler
+ *
+ * The active \a inputHandler used in the graph. Implicitly calls addInputHandler() to transfer
+ * ownership of the \a inputHandler to this graph.
  *
  * If the \a inputHandler is null, no input handler will be active after this call.
  *
  * \sa addInputHandler(), releaseInputHandler()
  */
-void Q3DWindow::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
+void QAbstract3DGraph::setActiveInputHandler(QAbstract3DInputHandler *inputHandler)
 {
     d_ptr->m_visualController->setActiveInputHandler(inputHandler);
 }
 
-/*!
- * \return currently active input handler.
- */
-QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
+QAbstract3DInputHandler *QAbstract3DGraph::activeInputHandler()
 {
     return d_ptr->m_visualController->activeInputHandler();
 }
@@ -159,7 +155,7 @@ QAbstract3DInputHandler *Q3DWindow::activeInputHandler()
  *
  * \sa releaseTheme(), setActiveTheme()
  */
-void Q3DWindow::addTheme(Q3DTheme *theme)
+void QAbstract3DGraph::addTheme(Q3DTheme *theme)
 {
     d_ptr->m_visualController->addTheme(theme);
 }
@@ -172,13 +168,13 @@ void Q3DWindow::addTheme(Q3DTheme *theme)
  *
  * \sa addTheme(), setActiveTheme()
  */
-void Q3DWindow::releaseTheme(Q3DTheme *theme)
+void QAbstract3DGraph::releaseTheme(Q3DTheme *theme)
 {
     d_ptr->m_visualController->releaseTheme(theme);
 }
 
 /*!
- * \property Q3DWindow::activeTheme
+ * \property QAbstract3DGraph::activeTheme
  *
  * The active \a theme to be used for the graph. Implicitly calls addTheme() to transfer ownership
  * of the \a theme to this graph.
@@ -187,13 +183,13 @@ void Q3DWindow::releaseTheme(Q3DTheme *theme)
  * Properties of the \a theme can be modified even after setting it, and the modifications take
  * effect immediately.
  */
-void Q3DWindow::setActiveTheme(Q3DTheme *theme)
+void QAbstract3DGraph::setActiveTheme(Q3DTheme *theme)
 {
     d_ptr->m_visualController->setActiveTheme(theme);
 }
 
 
-Q3DTheme *Q3DWindow::activeTheme() const
+Q3DTheme *QAbstract3DGraph::activeTheme() const
 {
     return d_ptr->m_visualController->activeTheme();
 }
@@ -203,15 +199,63 @@ Q3DTheme *Q3DWindow::activeTheme() const
  *
  * \sa addTheme()
  */
-QList<Q3DTheme *> Q3DWindow::themes() const
+QList<Q3DTheme *> QAbstract3DGraph::themes() const
 {
     return d_ptr->m_visualController->themes();
 }
 
 /*!
+ * \property QAbstract3DGraph::selectionMode
+ *
+ * Sets selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
+ * \c QDataVis::SelectionItem by default.
+ * Different graph types support different selection modes. See \c QDataVis::SelectionFlags
+ * documentation for details.
+ */
+void QAbstract3DGraph::setSelectionMode(QDataVis::SelectionFlags mode)
+{
+    d_ptr->m_visualController->setSelectionMode(mode);
+}
+
+QDataVis::SelectionFlags QAbstract3DGraph::selectionMode() const
+{
+    return d_ptr->m_visualController->selectionMode();
+}
+
+/*!
+ * \property QAbstract3DGraph::shadowQuality
+ *
+ * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
+ * \c QDataVis::ShadowQualityMedium by default.
+ *
+ * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
+ * until it is successful and shadowQualityChanged signal is emitted for each time the change is
+ * done.
+ */
+void QAbstract3DGraph::setShadowQuality(QDataVis::ShadowQuality quality)
+{
+    d_ptr->m_visualController->setShadowQuality(quality);
+}
+
+QDataVis::ShadowQuality QAbstract3DGraph::shadowQuality() const
+{
+    return d_ptr->m_visualController->shadowQuality();
+}
+
+/*!
+ * \property QAbstract3DGraph::scene
+ *
+ * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ */
+Q3DScene *QAbstract3DGraph::scene() const
+{
+    return d_ptr->m_visualController->scene();
+}
+
+/*!
  * \internal
  */
-bool Q3DWindow::event(QEvent *event)
+bool QAbstract3DGraph::event(QEvent *event)
 {
     switch (event->type()) {
     case QEvent::UpdateRequest:
@@ -231,7 +275,7 @@ bool Q3DWindow::event(QEvent *event)
 /*!
  * \internal
  */
-void Q3DWindow::resizeEvent(QResizeEvent *event)
+void QAbstract3DGraph::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
 
@@ -243,7 +287,7 @@ void Q3DWindow::resizeEvent(QResizeEvent *event)
 /*!
  * \internal
  */
-void Q3DWindow::exposeEvent(QExposeEvent *event)
+void QAbstract3DGraph::exposeEvent(QExposeEvent *event)
 {
     Q_UNUSED(event);
 
@@ -251,7 +295,55 @@ void Q3DWindow::exposeEvent(QExposeEvent *event)
         d_ptr->renderNow();
 }
 
-Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    d_ptr->m_visualController->mouseDoubleClickEvent(event);
+}
+
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::touchEvent(QTouchEvent *event)
+{
+    d_ptr->m_visualController->touchEvent(event);
+}
+
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::mousePressEvent(QMouseEvent *event)
+{
+    d_ptr->m_visualController->mousePressEvent(event, event->pos());
+}
+
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::mouseReleaseEvent(QMouseEvent *event)
+{
+    d_ptr->m_visualController->mouseReleaseEvent(event, event->pos());
+}
+
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::mouseMoveEvent(QMouseEvent *event)
+{
+    d_ptr->m_visualController->mouseMoveEvent(event, event->pos());
+}
+
+/*!
+ * \internal
+ */
+void QAbstract3DGraph::wheelEvent(QWheelEvent *event)
+{
+    d_ptr->m_visualController->wheelEvent(event);
+}
+
+QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
     : QObject(0),
       q_ptr(q),
       m_updatePending(false),
@@ -260,18 +352,19 @@ Q3DWindowPrivate::Q3DWindowPrivate(Q3DWindow *q)
 {
 }
 
-Q3DWindowPrivate::~Q3DWindowPrivate()
+QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
 {
+    delete m_visualController;
 }
 
-void Q3DWindowPrivate::render()
+void QAbstract3DGraphPrivate::render()
 {
     handleDevicePixelRatioChange();
     m_visualController->synchDataToRenderer();
     m_visualController->render();
 }
 
-void Q3DWindowPrivate::renderLater()
+void QAbstract3DGraphPrivate::renderLater()
 {
     if (!m_updatePending) {
         m_updatePending = true;
@@ -279,7 +372,7 @@ void Q3DWindowPrivate::renderLater()
     }
 }
 
-void Q3DWindowPrivate::renderNow()
+void QAbstract3DGraphPrivate::renderNow()
 {
     if (!q_ptr->isExposed())
         return;
@@ -293,12 +386,23 @@ void Q3DWindowPrivate::renderNow()
     m_context->swapBuffers(q_ptr);
 }
 
-void Q3DWindowPrivate::setVisualController(Abstract3DController *controller)
+void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controller)
 {
     m_visualController = controller;
+
+    QObject::connect(m_visualController, &Abstract3DController::activeInputHandlerChanged, q_ptr,
+                     &QAbstract3DGraph::activeInputHandlerChanged);
+    QObject::connect(m_visualController, &Abstract3DController::activeThemeChanged, q_ptr,
+                     &QAbstract3DGraph::activeThemeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::selectionModeChanged, q_ptr,
+                     &QAbstract3DGraph::selectionModeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
+                     &QAbstract3DGraph::shadowQualityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::needRender, this,
+                     &QAbstract3DGraphPrivate::renderLater);
 }
 
-void Q3DWindowPrivate::handleDevicePixelRatioChange()
+void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()
 {
     if (q_ptr->devicePixelRatio() == m_devicePixelRatio || !m_visualController)
         return;
