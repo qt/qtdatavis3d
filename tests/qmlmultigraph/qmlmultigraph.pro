@@ -5,7 +5,7 @@
 QT += widgets
 
 # Add more folders to ship with the application, here
-folder_01.source = qml/qmldynamicdata
+folder_01.source = qml/qmlmultigraph
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
@@ -19,8 +19,7 @@ SOURCES += main.cpp
 include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
-RESOURCES += \
-    qmldynamicdata.qrc
+RESOURCES += qmlmultigraph.qrc
 
 OTHER_FILES += doc/src/* \
                doc/images/*

@@ -122,9 +122,15 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
                m_viewport.y(),
                m_viewport.width(),
                m_viewport.height());
+    glScissor(m_viewport.x(),
+              m_viewport.y(),
+              m_viewport.width(),
+              m_viewport.height());
+    glEnable(GL_SCISSOR_TEST);
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme->windowColor());
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
 }
 
 QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)

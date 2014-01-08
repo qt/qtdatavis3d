@@ -24,9 +24,12 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
+static QList<const QQuickWindow *> clearList;
+
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
-    m_controller(0)
+    m_controller(0),
+    m_clearWindowBeforeRendering(true)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(true);
@@ -49,6 +52,19 @@ void AbstractDeclarative::setTheme(Q3DTheme *theme)
 Q3DTheme *AbstractDeclarative::theme() const
 {
     return m_controller->activeTheme();
+}
+
+void AbstractDeclarative::setClearWindowBeforeRendering(bool enable)
+{
+    if (m_clearWindowBeforeRendering != enable) {
+        m_clearWindowBeforeRendering = enable;
+        emit clearWindowBeforeRenderingChanged(enable);
+    }
+}
+
+bool AbstractDeclarative::clearWindowBeforeRendering() const
+{
+    return m_clearWindowBeforeRendering;
 }
 
 void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)
@@ -87,6 +103,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::synchDataToRenderer()
 {
+    if (m_clearWindowBeforeRendering && clearList.size())
+        clearList.clear();
     m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
 }
@@ -140,10 +158,9 @@ void AbstractDeclarative::updateWindowParameters()
             win->update();
         }
 
-        QPointF point = QQuickItem::mapToScene(QPointF(m_cachedGeometry.x(), m_cachedGeometry.y()));
-        if (m_controller) {
+        QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
+        if (m_controller)
             scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
-        }
     }
 }
 
@@ -151,11 +168,14 @@ void AbstractDeclarative::render()
 {
     updateWindowParameters();
 
-    // Clear the background as that is not done by default
-    glViewport(0, 0, window()->width(), window()->height());
-    QColor clearColor = window()->color();
-    glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // Clear the background once per window as that is not done by default
+    const QQuickWindow *win = window();
+    if (m_clearWindowBeforeRendering && !clearList.contains(win)) {
+        clearList.append(win);
+        QColor clearColor = win->color();
+        glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     // TODO: Store the state of these and restore before returning
     glDepthMask(GL_TRUE);

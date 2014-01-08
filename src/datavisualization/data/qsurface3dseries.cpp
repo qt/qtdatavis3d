@@ -306,7 +306,7 @@ QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
       m_flatShadingEnabled(true),
       m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
-    m_itemLabelFormat = QStringLiteral("(@xLabel, @yLabel, @zLabel)");
+    m_itemLabelFormat = QStringLiteral("@xLabel, @yLabel, @zLabel");
     m_mesh = QAbstract3DSeries::MeshSphere;
 }
 

@@ -454,6 +454,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             && SelectOnScene == m_selectionState && seriesCount > 0) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
+        glViewport(0, 0,
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
+
         glEnable(GL_DEPTH_TEST); // Needed, otherwise the depth render buffer is not used
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white (= skipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
@@ -552,7 +556,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         selectionColorToSeriesAndIndex(clickedColor, clickedIndex, clickedSeries);
         emit itemClicked(clickedIndex, clickedSeries);
 
+        // Revert to original fbo and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
+        glViewport(m_primarySubViewport.x(),
+                   m_primarySubViewport.y(),
+                   m_primarySubViewport.width(),
+                   m_primarySubViewport.height());
 
 #if 0 // Use this if you want to see what is being drawn to the framebuffer
         m_labelShader->bind();

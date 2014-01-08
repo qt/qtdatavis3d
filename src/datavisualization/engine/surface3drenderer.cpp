@@ -881,6 +881,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
+
         // Attach texture to depth attachment
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -2146,6 +2147,10 @@ void Surface3DRenderer::updateDepthBuffer()
     if (m_depthTexture) {
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_depthTexture = 0;
+    }
+    if (m_depthModelTexture) {
+        m_textureHelper->deleteTexture(&m_depthModelTexture);
+        m_depthModelTexture = 0;
     }
 
     if (m_primarySubViewport.size().isEmpty())

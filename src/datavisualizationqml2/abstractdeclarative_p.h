@@ -48,10 +48,17 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(bool clearWindowBeforeRendering READ clearWindowBeforeRendering WRITE setClearWindowBeforeRendering NOTIFY clearWindowBeforeRenderingChanged)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
     virtual ~AbstractDeclarative();
+
+    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
+    virtual QDataVis::SelectionFlags selectionMode() const;
+
+    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
+    virtual QDataVis::ShadowQuality shadowQuality() const;
 
     virtual Q3DScene *scene() const;
 
@@ -61,13 +68,10 @@ public:
     virtual void setTheme(Q3DTheme *theme);
     virtual Q3DTheme *theme() const;
 
-    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
-    virtual QDataVis::SelectionFlags selectionMode() const;
+    virtual void setClearWindowBeforeRendering(bool enable);
+    virtual bool clearWindowBeforeRendering() const;
 
     virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
-
-    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
-    virtual QDataVis::ShadowQuality shadowQuality() const;
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
@@ -87,16 +91,17 @@ protected:
 
 signals:
     // Signals shadow quality changes.
+    void selectionModeChanged(QDataVis::SelectionFlags mode);
     void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void itemLabelFormatChanged(QString format);
-    void sceneChanged(Q3DScene *scene);
+    void clearWindowBeforeRenderingChanged(bool enable);
 
 private:
     Abstract3DController *m_controller;
     QRectF m_cachedGeometry;
+    bool m_clearWindowBeforeRendering;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

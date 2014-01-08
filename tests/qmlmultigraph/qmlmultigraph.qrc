@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="main.qml">qml/qmlmultigraph/main.qml</file>
+        <file alias="NewButton.qml">qml/qmlmultigraph/newbutton.qml</file>
+    </qresource>
+</RCC>

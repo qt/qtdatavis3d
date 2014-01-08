@@ -12,7 +12,8 @@ SUBDIRS += barstest \
            surfacetest \
            qmlcamera \
            qmldynamicdata \
-           multigraphs
+           multigraphs \
+           qmlmultigraph
 
 #SUBDIRS += kinectsurface
 
