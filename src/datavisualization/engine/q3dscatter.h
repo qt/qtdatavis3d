@@ -35,6 +35,10 @@ class QScatter3DSeries;
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
 {
     Q_OBJECT
+    Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+
 public:
     explicit Q3DScatter(QWindow *parent = 0);
     virtual ~Q3DScatter();
@@ -52,6 +56,11 @@ public:
     void addAxis(QValue3DAxis *axis);
     void releaseAxis(QValue3DAxis *axis);
     QList<QValue3DAxis *> axes() const;
+
+signals:
+    void axisXChanged(QValue3DAxis *axis);
+    void axisYChanged(QValue3DAxis *axis);
+    void axisZChanged(QValue3DAxis *axis);
 
 private:
     Q3DScatterPrivate *dptr();

@@ -68,6 +68,10 @@ public slots:
     void addSeries();
     void removeSeries();
 
+    void handleAxisXChanged(QValue3DAxis *axis);
+    void handleAxisYChanged(QValue3DAxis *axis);
+    void handleAxisZChanged(QValue3DAxis *axis);
+
 signals:
     void shadowQualityChanged(int quality);
 

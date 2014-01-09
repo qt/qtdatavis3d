@@ -71,6 +71,11 @@ public:
     Q_INVOKABLE void addSeries(QScatter3DSeries *series);
     Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
+public slots:
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
 signals:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);

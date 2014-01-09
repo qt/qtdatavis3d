@@ -79,6 +79,11 @@ public:
     void synchDataToRenderer();
     void render();
 
+public slots:
+    virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
+    virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
+    virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
+
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void touchEvent(QTouchEvent *event);

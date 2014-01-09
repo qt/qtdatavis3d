@@ -28,21 +28,9 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
     m_scatterController = new Scatter3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_scatterController);
-
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_scatterController, &Scatter3DController::axisXChanged,
-//            this, &DeclarativeBars::axisXChanged);
-//    connect(m_scatterController, &Scatter3DController::axisYChanged,
-//            this, &DeclarativeBars::axisYChanged);
-//    connect(m_scatterController, &Scatter3DController::axisZChanged,
-//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -122,6 +110,21 @@ void DeclarativeScatter::removeSeries(QScatter3DSeries *series)
 {
     m_scatterController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
+}
+
+void DeclarativeScatter::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeScatter::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeScatter::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

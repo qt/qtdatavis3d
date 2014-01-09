@@ -464,7 +464,11 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 
 void Abstract3DController::setAxisX(QAbstract3DAxis *axis)
 {
-    setAxisHelper(QAbstract3DAxis::AxisOrientationX, axis, &m_axisX);
+    // Setting null axis will always create new default axis
+    if (!axis || axis != m_axisX) {
+        setAxisHelper(QAbstract3DAxis::AxisOrientationX, axis, &m_axisX);
+        emit axisXChanged(m_axisX);
+    }
 }
 
 QAbstract3DAxis *Abstract3DController::axisX()
@@ -474,7 +478,11 @@ QAbstract3DAxis *Abstract3DController::axisX()
 
 void Abstract3DController::setAxisY(QAbstract3DAxis *axis)
 {
-    setAxisHelper(QAbstract3DAxis::AxisOrientationY, axis, &m_axisY);
+    // Setting null axis will always create new default axis
+    if (!axis || axis != m_axisY) {
+        setAxisHelper(QAbstract3DAxis::AxisOrientationY, axis, &m_axisY);
+        emit axisYChanged(m_axisY);
+    }
 }
 
 QAbstract3DAxis *Abstract3DController::axisY()
@@ -484,7 +492,11 @@ QAbstract3DAxis *Abstract3DController::axisY()
 
 void Abstract3DController::setAxisZ(QAbstract3DAxis *axis)
 {
-    setAxisHelper(QAbstract3DAxis::AxisOrientationZ, axis, &m_axisZ);
+    // Setting null axis will always create new default axis
+    if (!axis || axis != m_axisZ) {
+        setAxisHelper(QAbstract3DAxis::AxisOrientationZ, axis, &m_axisZ);
+        emit axisZChanged(m_axisZ);
+    }
 }
 
 QAbstract3DAxis *Abstract3DController::axisZ()

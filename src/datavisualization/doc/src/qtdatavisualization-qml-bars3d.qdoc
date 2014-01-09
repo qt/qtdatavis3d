@@ -46,7 +46,7 @@
 
 /*!
  * \qmlproperty CategoryAxis3D Bars3D::rowAxis
- * A user-defined row axis.
+ * The active row axis.
  *
  * If an axis is not given, a temporary default axis with no labels is created.
  * This temporary axis is destroyed if another axis is explicitly set to same orientation.
@@ -54,7 +54,7 @@
 
 /*!
  * \qmlproperty ValueAxis3D Bars3D::valueAxis
- * A user-defined value axis.
+ * The active value axis.
  *
  * If an axis is not given, a temporary default axis with no labels and automatically adjusting
  * range is created.
@@ -63,7 +63,7 @@
 
 /*!
  * \qmlproperty CategoryAxis3D Bars3D::columnAxis
- * A user-defined column axis.
+ * The active column axis.
  *
  * If an axis is not given, a temporary default axis with no labels is created.
  * This temporary axis is destroyed if another axis is explicitly set to same orientation.

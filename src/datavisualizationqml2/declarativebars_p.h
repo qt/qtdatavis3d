@@ -85,6 +85,11 @@ public:
     Q_INVOKABLE void addSeries(QBar3DSeries *series);
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
 
+public slots:
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
 signals:
     void rowAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);

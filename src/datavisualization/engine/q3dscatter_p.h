@@ -44,6 +44,10 @@ public:
     Q3DScatterPrivate(Q3DScatter *q);
     ~Q3DScatterPrivate();
 
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
     Q3DScatter *qptr();
 
     Scatter3DController *m_shared;

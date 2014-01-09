@@ -40,6 +40,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
 class QAbstract3DGraph;
 class Abstract3DController;
+class QAbstract3DAxis;
 
 class QAbstract3DGraphPrivate : public QObject
 {
@@ -48,14 +49,18 @@ public:
     QAbstract3DGraphPrivate(QAbstract3DGraph *q);
     ~QAbstract3DGraphPrivate();
 
-    void render();
-
     void setVisualController(Abstract3DController *controller);
     void handleDevicePixelRatioChange();
+
+    void render();
 
 public slots:
     void renderLater();
     void renderNow();
+
+    virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
+    virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
+    virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
 
 public:
     QAbstract3DGraph *q_ptr;

@@ -29,21 +29,9 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
     m_barsController = new Bars3DController(boundingRect().toRect(), new Declarative3DScene);
     AbstractDeclarative::setSharedController(m_barsController);
-
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_barsController, &Bars3DController::rowAxisChanged,
-//            this, &DeclarativeBars::rowAxisChanged);
-//    connect(m_barsController, &Bars3DController::valueAxisChanged,
-//            this, &DeclarativeBars::valueAxisChanged);
-//    connect(m_barsController, &Bars3DController::columnAxisChanged,
-//            this, &DeclarativeBars::columnAxisChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -162,6 +150,21 @@ void DeclarativeBars::removeSeries(QBar3DSeries *series)
 {
     m_barsController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
+}
+
+void DeclarativeBars::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
+}
+
+void DeclarativeBars::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit valueAxisChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeBars::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

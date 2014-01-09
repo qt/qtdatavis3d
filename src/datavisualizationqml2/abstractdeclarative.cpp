@@ -100,6 +100,13 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::selectionModeChanged);
+
+    QObject::connect(m_controller, &Abstract3DController::axisXChanged, this,
+                     &AbstractDeclarative::handleAxisXChanged);
+    QObject::connect(m_controller, &Abstract3DController::axisYChanged, this,
+                     &AbstractDeclarative::handleAxisYChanged);
+    QObject::connect(m_controller, &Abstract3DController::axisZChanged, this,
+                     &AbstractDeclarative::handleAxisZChanged);
 }
 
 void AbstractDeclarative::synchDataToRenderer()

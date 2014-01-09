@@ -184,6 +184,13 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     QObject::connect(m_genericData, &QBar3DSeries::selectedBarChanged, this,
                      &GraphModifier::handleSelectionChange);
 
+    QObject::connect(m_graph, &Q3DBars::rowAxisChanged, this,
+                     &GraphModifier::handleRowAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::columnAxisChanged, this,
+                     &GraphModifier::handleColumnAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::valueAxisChanged, this,
+                     &GraphModifier::handleValueAxisChanged);
+
     m_graph->addSeries(m_temperatureData);
     m_graph->addSeries(m_temperatureData2);
 
@@ -681,6 +688,20 @@ void GraphModifier::setUseNullInputHandler(bool useNull)
         m_graph->setActiveInputHandler(m_defaultInputHandler);
 }
 
+void GraphModifier::handleRowAxisChanged(QCategory3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->rowAxis());
+}
+
+void GraphModifier::handleColumnAxisChanged(QCategory3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->columnAxis());
+}
+
+void GraphModifier::handleValueAxisChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->valueAxis());
+}
 
 void GraphModifier::changeShadowQuality(int quality)
 {

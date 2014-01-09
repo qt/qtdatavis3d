@@ -55,6 +55,13 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QObject::connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
     QObject::connect(m_chart, &Q3DScatter::shadowQualityChanged, this,
                      &ScatterDataModifier::shadowQualityUpdatedByVisual);
+
+    QObject::connect(m_chart, &Q3DScatter::axisXChanged, this,
+                     &ScatterDataModifier::handleAxisXChanged);
+    QObject::connect(m_chart, &Q3DScatter::axisYChanged, this,
+                     &ScatterDataModifier::handleAxisYChanged);
+    QObject::connect(m_chart, &Q3DScatter::axisZChanged, this,
+                     &ScatterDataModifier::handleAxisZChanged);
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -459,6 +466,21 @@ void ScatterDataModifier::removeSeries()
         else
             m_targetSeries = 0;
     }
+}
+
+void ScatterDataModifier::handleAxisXChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisX());
+}
+
+void ScatterDataModifier::handleAxisYChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisY());
+}
+
+void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisZ());
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)

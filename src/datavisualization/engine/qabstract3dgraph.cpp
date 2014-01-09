@@ -367,6 +367,38 @@ QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
     delete m_visualController;
 }
 
+void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controller)
+{
+    m_visualController = controller;
+
+    QObject::connect(m_visualController, &Abstract3DController::activeInputHandlerChanged, q_ptr,
+                     &QAbstract3DGraph::activeInputHandlerChanged);
+    QObject::connect(m_visualController, &Abstract3DController::activeThemeChanged, q_ptr,
+                     &QAbstract3DGraph::activeThemeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::selectionModeChanged, q_ptr,
+                     &QAbstract3DGraph::selectionModeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
+                     &QAbstract3DGraph::shadowQualityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::needRender, this,
+                     &QAbstract3DGraphPrivate::renderLater);
+
+    QObject::connect(m_visualController, &Abstract3DController::axisXChanged, this,
+                     &QAbstract3DGraphPrivate::handleAxisXChanged);
+    QObject::connect(m_visualController, &Abstract3DController::axisYChanged, this,
+                     &QAbstract3DGraphPrivate::handleAxisYChanged);
+    QObject::connect(m_visualController, &Abstract3DController::axisZChanged, this,
+                     &QAbstract3DGraphPrivate::handleAxisZChanged);
+}
+
+void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()
+{
+    if (q_ptr->devicePixelRatio() == m_devicePixelRatio || !m_visualController)
+        return;
+
+    m_devicePixelRatio = q_ptr->devicePixelRatio();
+    m_visualController->scene()->setDevicePixelRatio(m_devicePixelRatio);
+}
+
 void QAbstract3DGraphPrivate::render()
 {
     handleDevicePixelRatioChange();
@@ -394,31 +426,6 @@ void QAbstract3DGraphPrivate::renderNow()
     render();
 
     m_context->swapBuffers(q_ptr);
-}
-
-void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controller)
-{
-    m_visualController = controller;
-
-    QObject::connect(m_visualController, &Abstract3DController::activeInputHandlerChanged, q_ptr,
-                     &QAbstract3DGraph::activeInputHandlerChanged);
-    QObject::connect(m_visualController, &Abstract3DController::activeThemeChanged, q_ptr,
-                     &QAbstract3DGraph::activeThemeChanged);
-    QObject::connect(m_visualController, &Abstract3DController::selectionModeChanged, q_ptr,
-                     &QAbstract3DGraph::selectionModeChanged);
-    QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
-                     &QAbstract3DGraph::shadowQualityChanged);
-    QObject::connect(m_visualController, &Abstract3DController::needRender, this,
-                     &QAbstract3DGraphPrivate::renderLater);
-}
-
-void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()
-{
-    if (q_ptr->devicePixelRatio() == m_devicePixelRatio || !m_visualController)
-        return;
-
-    m_devicePixelRatio = q_ptr->devicePixelRatio();
-    m_visualController->scene()->setDevicePixelRatio(m_devicePixelRatio);
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

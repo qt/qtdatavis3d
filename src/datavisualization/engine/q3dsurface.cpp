@@ -147,7 +147,9 @@ const Q3DSurfacePrivate *Q3DSurface::dptrc() const
 }
 
 /*!
- * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DSurface::axisX
+ *
+ * The active X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -170,7 +172,9 @@ QValue3DAxis *Q3DSurface::axisX() const
 }
 
 /*!
- * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DSurface::axisY
+ *
+ * The active Y-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -193,7 +197,9 @@ QValue3DAxis *Q3DSurface::axisY() const
 }
 
 /*!
- * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DSurface::axisZ
+ *
+ * The active Z-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -264,6 +270,21 @@ Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
 
 Q3DSurfacePrivate::~Q3DSurfacePrivate()
 {
+}
+
+void Q3DSurfacePrivate::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DSurfacePrivate::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DSurfacePrivate::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
 Q3DSurface *Q3DSurfacePrivate::qptr()

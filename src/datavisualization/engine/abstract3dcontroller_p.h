@@ -261,6 +261,9 @@ signals:
     void activeThemeChanged(Q3DTheme *activeTheme);
     void selectionModeChanged(QDataVis::SelectionFlags mode);
     void needRender();
+    void axisXChanged(QAbstract3DAxis *axis);
+    void axisYChanged(QAbstract3DAxis *axis);
+    void axisZChanged(QAbstract3DAxis *axis);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

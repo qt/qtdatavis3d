@@ -65,6 +65,13 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
     connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
+
+    QObject::connect(m_graph, &Q3DSurface::axisXChanged, this,
+                     &GraphModifier::handleAxisXChanged);
+    QObject::connect(m_graph, &Q3DSurface::axisYChanged, this,
+                     &GraphModifier::handleAxisYChanged);
+    QObject::connect(m_graph, &Q3DSurface::axisZChanged, this,
+                     &GraphModifier::handleAxisZChanged);
 }
 
 GraphModifier::~GraphModifier()
@@ -391,6 +398,21 @@ void GraphModifier::timeout()
 
     // Reset same array to make it redraw
     m_theSeries->dataProxy()->resetArray(m_planeArray);
+}
+
+void GraphModifier::handleAxisXChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisX());
+}
+
+void GraphModifier::handleAxisYChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisY());
+}
+
+void GraphModifier::handleAxisZChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisZ());
 }
 
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)

@@ -200,7 +200,9 @@ bool Q3DBars::isBarSpacingRelative()
 }
 
 /*!
- * Sets a user-defined row \a axis. Implicitly calls addAxis() to transfer ownership of
+ * \property Q3DBars::rowAxis
+ *
+ * The active row \a axis. Implicitly calls addAxis() to transfer ownership of
  * the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels is created.
@@ -213,16 +215,15 @@ void Q3DBars::setRowAxis(QCategory3DAxis *axis)
     dptr()->m_shared->setAxisZ(axis);
 }
 
-/*!
- * \return category axis for rows.
- */
 QCategory3DAxis *Q3DBars::rowAxis() const
 {
     return static_cast<QCategory3DAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
- * Sets a user-defined column \a axis. Implicitly calls addAxis() to transfer ownership of
+ * \property Q3DBars::columnAxis
+ *
+ * The active column \a axis. Implicitly calls addAxis() to transfer ownership of
  * the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels is created.
@@ -235,16 +236,15 @@ void Q3DBars::setColumnAxis(QCategory3DAxis *axis)
     dptr()->m_shared->setAxisX(axis);
 }
 
-/*!
- * \return category axis for columns.
- */
 QCategory3DAxis *Q3DBars::columnAxis() const
 {
     return static_cast<QCategory3DAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
- * Sets a user-defined value \a axis (the Y-axis). Implicitly calls addAxis() to transfer ownership
+ * \property Q3DBars::valueAxis
+ *
+ * The active value \a axis (the Y-axis). Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -258,9 +258,6 @@ void Q3DBars::setValueAxis(QValue3DAxis *axis)
     dptr()->m_shared->setAxisY(axis);
 }
 
-/*!
- * \return used value axis (Y-axis).
- */
 QValue3DAxis *Q3DBars::valueAxis() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
@@ -318,6 +315,21 @@ Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
 
 Q3DBarsPrivate::~Q3DBarsPrivate()
 {
+}
+
+void Q3DBarsPrivate::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
+}
+
+void Q3DBarsPrivate::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->valueAxisChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DBarsPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
 Q3DBars *Q3DBarsPrivate::qptr()

@@ -43,6 +43,16 @@ Item {
                 valueRole: "expenses"
             }
         }
+
+        onRowAxisChanged: {
+            console.log("Bars: Row axis changed.")
+        }
+        onColumnAxisChanged: {
+            console.log("Bars: column axis changed.")
+        }
+        onValueAxisChanged: {
+            console.log("Bars: Value axis changed.")
+        }
     }
 
     ListModel {
@@ -75,6 +85,16 @@ Item {
                 zPosRole: "zPos"
             }
         }
+
+        onAxisXChanged: {
+            console.log("Scatter: axis X changed.")
+        }
+        onAxisYChanged: {
+            console.log("Scatter: axis Y changed.")
+        }
+        onAxisZChanged: {
+            console.log("Scatter: axis Z changed.")
+        }
     }
 
     ListModel {
@@ -104,6 +124,16 @@ Item {
                 columnRole: "latitude"
                 valueRole: "pop_density"
             }
+        }
+
+        onAxisXChanged: {
+            console.log("Surface: axis X changed.")
+        }
+        onAxisYChanged: {
+            console.log("Surface: axis Y changed.")
+        }
+        onAxisZChanged: {
+            console.log("Surface: axis Z changed.")
         }
     }
     ListModel {
@@ -140,6 +170,24 @@ Item {
             Layout.fillWidth: true
             text: "Quit"
             onClicked: Qt.quit(0);
+        }
+
+        NewButton {
+            id: resetAxesButton
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Reset axes"
+            onClicked: {
+                barGraph.rowAxis = null
+                barGraph.columnAxis = null
+                barGraph.valueAxis = null
+                scatterGraph.axisX = null
+                scatterGraph.axisY = null
+                scatterGraph.axisZ = null
+                surfaceGraph.axisX = null
+                surfaceGraph.axisY = null
+                surfaceGraph.axisZ = null
+            }
         }
     }
 

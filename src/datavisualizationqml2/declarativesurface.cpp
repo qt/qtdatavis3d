@@ -29,21 +29,9 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
     m_surfaceController = new Surface3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_surfaceController);
-
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_surfaceController, &Surface3DController::axisXChanged,
-//            this, &DeclarativeBars::axisXChanged);
-//    connect(m_surfaceController, &Surface3DController::axisYChanged,
-//            this, &DeclarativeBars::axisYChanged);
-//    connect(m_surfaceController, &Surface3DController::axisZChanged,
-//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -123,6 +111,21 @@ void DeclarativeSurface::removeSeries(QSurface3DSeries *series)
 {
     m_surfaceController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
+}
+
+void DeclarativeSurface::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeSurface::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeSurface::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
 QT_DATAVISUALIZATION_END_NAMESPACE

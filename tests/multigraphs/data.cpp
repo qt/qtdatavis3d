@@ -42,6 +42,8 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_resolution(QSize(300, 300)),
     m_resolutionLevel(0),
     m_mode(Surface),
+    m_scatterDataArray(0),
+    m_barDataArray(0),
     m_started(false)
 {
     // Initialize surface

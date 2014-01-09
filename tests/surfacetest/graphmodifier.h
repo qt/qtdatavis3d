@@ -87,6 +87,10 @@ public slots:
     void changeSelectionMode(int mode);
     void timeout();
 
+    void handleAxisXChanged(QValue3DAxis *axis);
+    void handleAxisYChanged(QValue3DAxis *axis);
+    void handleAxisZChanged(QValue3DAxis *axis);
+
 private:
     void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
                               float maxX);

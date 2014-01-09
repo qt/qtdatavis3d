@@ -89,6 +89,10 @@ public slots:
     void handleSelectionChange(const QPoint &position);
     void setUseNullInputHandler(bool useNull);
 
+    void handleRowAxisChanged(QCategory3DAxis *axis);
+    void handleColumnAxisChanged(QCategory3DAxis *axis);
+    void handleValueAxisChanged(QValue3DAxis *axis);
+
 signals:
     void shadowQualityChanged(int quality);
 

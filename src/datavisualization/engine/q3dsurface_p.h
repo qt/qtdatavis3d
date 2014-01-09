@@ -46,6 +46,10 @@ public:
     Q3DSurfacePrivate(Q3DSurface *q);
     ~Q3DSurfacePrivate();
 
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
     Q3DSurface *qptr();
 
     Surface3DController *m_shared;

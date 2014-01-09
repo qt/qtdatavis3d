@@ -38,6 +38,9 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
+    Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
 
 public:
     explicit Q3DBars(QWindow *parent = 0);
@@ -70,6 +73,9 @@ signals:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
+    void rowAxisChanged(QCategory3DAxis *axis);
+    void columnAxisChanged(QCategory3DAxis *axis);
+    void valueAxisChanged(QValue3DAxis *axis);
 
 private:
     Q3DBarsPrivate *dptr();

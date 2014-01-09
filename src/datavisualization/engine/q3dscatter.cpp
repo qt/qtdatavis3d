@@ -132,7 +132,9 @@ const Q3DScatterPrivate *Q3DScatter::dptrc() const
 }
 
 /*!
- * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DScatter::axisX
+ *
+ * The active X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -146,16 +148,15 @@ void Q3DScatter::setAxisX(QValue3DAxis *axis)
     dptr()->m_shared->setAxisX(axis);
 }
 
-/*!
- * \return used X-axis.
- */
 QValue3DAxis *Q3DScatter::axisX() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
- * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DScatter::axisY
+ *
+ * The active Y-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -169,16 +170,15 @@ void Q3DScatter::setAxisY(QValue3DAxis *axis)
     dptr()->m_shared->setAxisY(axis);
 }
 
-/*!
- * \return used Y-axis.
- */
 QValue3DAxis *Q3DScatter::axisY() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
- * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DScatter::axisZ
+ *
+ * The active Z-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -247,6 +247,21 @@ Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
+}
+
+void Q3DScatterPrivate::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DScatterPrivate::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DScatterPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
 Q3DScatter *Q3DScatterPrivate::qptr()
