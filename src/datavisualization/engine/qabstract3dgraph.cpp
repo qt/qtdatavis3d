@@ -21,6 +21,7 @@
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "q3dscene_p.h"
+#include "qutils.h"
 
 #include <QGuiApplication>
 #include <QOpenGLContext>
@@ -65,19 +66,15 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     QSurfaceFormat surfaceFormat;
     if (format) {
         surfaceFormat = *format;
-    } else {
-        surfaceFormat.setDepthBufferSize(24);
+        // Make sure renderable type is correct
 #if !defined(QT_OPENGL_ES_2)
-        surfaceFormat.setSamples(8);
-#endif
-        surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    }
-
-#if !defined(QT_OPENGL_ES_2)
-    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
+        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
 #else
-    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
+        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
 #endif
+    } else {
+        surfaceFormat = qDefaultSurfaceFormat();
+    }
 
     d_ptr->m_context = new QOpenGLContext(this);
     setSurfaceType(QWindow::OpenGLSurface);

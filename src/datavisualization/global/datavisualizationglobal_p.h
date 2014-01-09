@@ -59,4 +59,4 @@ static const GLfloat gradientTextureWidth = 2.0f;
 
 QT_DATAVISUALIZATION_END_NAMESPACE
 
-#endif // DATAVISUALIZATIONGLOBAL_P_H
+#endif

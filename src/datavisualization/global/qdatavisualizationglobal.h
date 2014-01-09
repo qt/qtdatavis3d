@@ -64,4 +64,4 @@
 #  define QT_DATAVISUALIZATION_USE_NAMESPACE
 #endif
 
-#endif // QVIS3DGLOBAL_H
+#endif
