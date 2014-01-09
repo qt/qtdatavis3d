@@ -53,7 +53,7 @@ public:
 
     void setSelectedPoint(const QPoint &position);
     QPoint selectedPoint() const;
-    QPoint invalidSelectionPosition() const;
+    static QPoint invalidSelectionPosition();
 
     void setFlatShadingEnabled(bool enabled);
     bool isFlatShadingEnabled() const;

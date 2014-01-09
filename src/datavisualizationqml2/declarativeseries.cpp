@@ -235,6 +235,11 @@ ColorGradient *DeclarativeScatter3DSeries::multiHighlightGradient() const
     return m_multiHighlightGradient;
 }
 
+int DeclarativeScatter3DSeries::invalidSelectionIndex() const
+{
+    return QScatter3DSeries::invalidSelectionIndex();
+}
+
 void DeclarativeScatter3DSeries::handleBaseGradientUpdate()
 {
     if (m_baseGradient)

@@ -63,7 +63,7 @@ private:
                                             // in single series selection cases.
 
 public:
-    explicit Scatter3DController(QRect rect);
+    explicit Scatter3DController(QRect rect, Q3DScene *scene = 0);
     ~Scatter3DController();
 
     virtual void initializeOpenGL();

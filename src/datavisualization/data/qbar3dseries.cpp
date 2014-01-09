@@ -93,16 +93,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Selects a bar at the \a position. The \a position is the (row, column) position in
  * the data array of the series.
  * Only one bar can be selected at a time.
- * To clear selection, set invalidSelectionPosition() as the \a position.
+ * To clear selection, set invalidSelectionPosition as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting a bar on another added series will also
  * clear the selection.
  */
 
 /*!
- * \qmlmethod point Bar3DSeries::invalidSelectionPosition()
- * \return an invalid position for selection. Set this position to selectedBar property if you
- * want to clear the selection.
+ * \qmlproperty point Bar3DSeries::invalidSelectionPosition
+ * A constant property providing an invalid position for selection. Set this position to
+ * selectedBar property if you want to clear the selection.
  */
 
 /*!
@@ -185,7 +185,7 @@ QPoint QBar3DSeries::selectedBar() const
  * \return an invalid position for selection. Set this position to selectedBar property if you
  * want to clear the selection.
  */
-QPoint QBar3DSeries::invalidSelectionPosition() const
+QPoint QBar3DSeries::invalidSelectionPosition()
 {
     return Bars3DController::invalidSelectionPosition();
 }

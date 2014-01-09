@@ -43,7 +43,7 @@ Item {
     selectedSeries: barSeries
 
     function handleSelectionChange(series, position) {
-        if (position != series.invalidSelectionPosition()) {
+        if (position != series.invalidSelectionPosition) {
             selectedSeries = series
         }
 

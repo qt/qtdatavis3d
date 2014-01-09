@@ -32,6 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler.h"
+#include "declarativescene_p.h"
 
 #include <QAbstractItemModel>
 #include <QQuickItem>
@@ -45,7 +46,7 @@ class AbstractDeclarative : public QQuickItem
     Q_OBJECT
     Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene NOTIFY sceneChanged)
+    Q_PROPERTY(Declarative3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(bool clearWindowBeforeRendering READ clearWindowBeforeRendering WRITE setClearWindowBeforeRendering NOTIFY clearWindowBeforeRenderingChanged)
@@ -60,7 +61,7 @@ public:
     virtual void setShadowQuality(QDataVis::ShadowQuality quality);
     virtual QDataVis::ShadowQuality shadowQuality() const;
 
-    virtual Q3DScene *scene() const;
+    virtual Declarative3DScene *scene() const;
 
     virtual QAbstract3DInputHandler *inputHandler() const;
     virtual void setInputHandler(QAbstract3DInputHandler *inputHandler);

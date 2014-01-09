@@ -29,8 +29,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Scatter3DController::Scatter3DController(QRect boundRect)
-    : Abstract3DController(boundRect),
+Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
+    : Abstract3DController(boundRect, scene),
       m_renderer(0),
       m_selectedItem(invalidSelectionIndex()),
       m_selectedItemSeries(0)

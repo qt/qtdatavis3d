@@ -43,11 +43,10 @@ public:
 
     void setSelectedItem(int index);
     int selectedItem() const;
+    static int invalidSelectionIndex();
 
     void setItemSize(float size);
     float itemSize() const;
-
-    Q_INVOKABLE int invalidSelectionIndex() const;
 
 signals:
     void dataProxyChanged(QScatterDataProxy *proxy);

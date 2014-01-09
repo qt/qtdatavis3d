@@ -92,15 +92,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Selects a surface grid point in a \a position. The position is the (row, column) position in
  * the data array of the series.
  * Only one point can be selected at a time.
- * To clear selection, set invalidSelectionPosition() as the \a position.
+ * To clear selection, set invalidSelectionPosition as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
  */
 
 /*!
- * \qmlmethod point Surface3DSeries::invalidSelectionPosition()
- * \return a point signifying an invalid selection position. Set this to selectedPoint property
- * to clear the selection.
+ * \qmlproperty point Surface3DSeries::invalidSelectionPosition
+ * A constant property providing an invalid selection position.
+ * Set this to selectedPoint property to clear the selection.
  */
 
 /*!
@@ -221,7 +221,7 @@ QPoint QSurface3DSeries::selectedPoint() const
  * \return a QPoint signifying an invalid selection position. Set this to selectedPoint property
  * to clear the selection.
  */
-QPoint QSurface3DSeries::invalidSelectionPosition() const
+QPoint QSurface3DSeries::invalidSelectionPosition()
 {
     return Surface3DController::invalidSelectionPosition();
 }

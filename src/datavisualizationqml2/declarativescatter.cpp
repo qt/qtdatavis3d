@@ -18,6 +18,7 @@
 
 #include "declarativescatter_p.h"
 #include "qitemmodelscatterdataproxy.h"
+#include "declarativescene_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -32,7 +33,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_scatterController = new Scatter3DController(boundingRect().toRect());
+    m_scatterController = new Scatter3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_scatterController);
 
     // TODO: Uncomment when doing QTRD-2669

@@ -18,6 +18,7 @@
 
 #include "abstractdeclarative_p.h"
 #include "qvalue3daxis.h"
+
 #include <QThread>
 #include <QGuiApplication>
 #include <QSGSimpleRectNode>
@@ -39,9 +40,9 @@ AbstractDeclarative::~AbstractDeclarative()
 {
 }
 
-Q3DScene* AbstractDeclarative::scene() const
+Declarative3DScene* AbstractDeclarative::scene() const
 {
-    return m_controller->scene();
+    return static_cast<Declarative3DScene *>(m_controller->scene());
 }
 
 void AbstractDeclarative::setTheme(Q3DTheme *theme)

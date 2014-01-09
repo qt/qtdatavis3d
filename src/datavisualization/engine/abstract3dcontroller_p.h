@@ -158,7 +158,7 @@ protected:
 
     QList<QAbstract3DSeries *> m_seriesList;
 
-    explicit Abstract3DController(QRect initialViewport, QObject *parent = 0);
+    explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
 public:
     virtual ~Abstract3DController();

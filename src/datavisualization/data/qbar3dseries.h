@@ -43,7 +43,7 @@ public:
 
     void setSelectedBar(const QPoint &position);
     QPoint selectedBar() const;
-    QPoint invalidSelectionPosition() const;
+    static QPoint invalidSelectionPosition();
 
 signals:
     void dataProxyChanged(QBarDataProxy *proxy);

@@ -27,7 +27,8 @@ SOURCES += \
     colorgradient.cpp \
     declarativeseries.cpp \
     declarativetheme.cpp \
-    declarativecolor.cpp
+    declarativecolor.cpp \
+    declarativescene.cpp
 
 HEADERS += \
     datavisualizationqml2_plugin.h \
@@ -38,7 +39,8 @@ HEADERS += \
     colorgradient_p.h \
     declarativeseries_p.h \
     declarativetheme_p.h \
-    declarativecolor_p.h
+    declarativecolor_p.h \
+    declarativescene_p.h
 
 OTHER_FILES = qmldir
 

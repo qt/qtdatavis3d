@@ -19,6 +19,7 @@
 #include "declarativesurface_p.h"
 #include "qvalue3daxis.h"
 #include "qitemmodelsurfacedataproxy.h"
+#include "declarativescene_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -33,7 +34,7 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     setSmooth(true);
 
     // Create the shared component on the main GUI thread.
-    m_surfaceController = new Surface3DController(boundingRect().toRect());
+    m_surfaceController = new Surface3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_surfaceController);
 
     // TODO: Uncomment when doing QTRD-2669

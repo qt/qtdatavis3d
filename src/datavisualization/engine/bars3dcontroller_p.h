@@ -73,7 +73,7 @@ private:
     Bars3DRenderer *m_renderer;
 
 public:
-    explicit Bars3DController(QRect rect);
+    explicit Bars3DController(QRect rect, Q3DScene *scene = 0);
     ~Bars3DController();
 
     virtual void initializeOpenGL();

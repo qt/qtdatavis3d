@@ -32,8 +32,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Surface3DController::Surface3DController(QRect rect)
-    : Abstract3DController(rect),
+Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
+    : Abstract3DController(rect, scene),
       m_renderer(0),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),

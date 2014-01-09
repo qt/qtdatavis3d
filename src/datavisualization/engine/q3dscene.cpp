@@ -90,9 +90,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty point Scene3D::selectionQueryPosition
  *
  * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than \c{(-1, -1)} the
+ * by the scene as selection. If this is set to value other than invalidSelectionPoint the
  * graph tries to select a data item at the given point within the primary viewport.
- * After the rendering pass the property is returned to its default state of \c{(-1, -1)}.
+ * After the rendering pass the property is returned to its default state of invalidSelectionPoint.
  */
 
 /*!
@@ -129,6 +129,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * This property contains the current device pixel ratio that is used when mapping input
  * coordinates to pixel coordinates.
  */
+
+/*!
+ * \qmlproperty point Scene3D::invalidSelectionPoint
+ * A constant property providing an invalid point for selection.
+ */
+
 
 /*!
  * Constructs a basic scene with one light and one camera in it. An
@@ -272,7 +278,7 @@ QPoint Q3DScene::selectionQueryPosition() const
 /*!
  * \return a QPoint signifying an invalid selection position.
  */
-const QPoint Q3DScene::invalidSelectionPoint()
+QPoint Q3DScene::invalidSelectionPoint()
 {
     static const QPoint invalidSelectionPos(-1, -1);
     return invalidSelectionPos;

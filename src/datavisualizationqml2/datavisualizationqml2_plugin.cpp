@@ -41,8 +41,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
-    qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
-                                         QLatin1String("Trying to create uncreatable: Scene3D."));
+    qmlRegisterUncreatableType<Declarative3DScene>(uri, 1, 0, "Scene3D",
+                                                 QLatin1String("Trying to create uncreatable: Scene3D."));
     qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
                                                   QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",

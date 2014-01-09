@@ -35,12 +35,12 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Abstract3DController::Abstract3DController(QRect initialViewport, QObject *parent) :
+Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),
     m_selectionMode(QDataVis::SelectionItem),
     m_shadowQuality(QDataVis::ShadowQualityMedium),
-    m_scene(new Q3DScene()),
+    m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
     m_axisY(0),
@@ -51,6 +51,9 @@ Abstract3DController::Abstract3DController(QRect initialViewport, QObject *paren
     m_isSeriesVisualsDirty(true),
     m_renderPending(false)
 {
+    if (!m_scene)
+        m_scene = new Q3DScene;
+
     // Set initial theme
     setActiveTheme(new Q3DTheme(Q3DTheme::ThemeQt));
 

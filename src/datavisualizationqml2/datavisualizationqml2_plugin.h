@@ -42,6 +42,7 @@
 #include "declarativetheme_p.h"
 #include "qabstract3dinputhandler.h"
 #include "declarativecolor_p.h"
+#include "declarativescene_p.h"
 
 #include <QQmlExtensionPlugin>
 
@@ -60,6 +61,7 @@ QML_DECLARE_TYPE(QCategory3DAxis)
 QML_DECLARE_TYPE(QValue3DAxis)
 
 QML_DECLARE_TYPE(Q3DScene)
+QML_DECLARE_TYPE(Declarative3DScene)
 QML_DECLARE_TYPE(Q3DObject)
 QML_DECLARE_TYPE(Q3DCamera)
 QML_DECLARE_TYPE(Q3DLight)

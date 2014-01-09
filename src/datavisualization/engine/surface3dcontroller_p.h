@@ -70,7 +70,7 @@ private:
     QVector<int> m_changedRows;
 
 public:
-    explicit Surface3DController(QRect rect);
+    explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
     virtual void initializeOpenGL();

@@ -32,8 +32,8 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-Bars3DController::Bars3DController(QRect boundRect)
-    : Abstract3DController(boundRect),
+Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
+    : Abstract3DController(boundRect, scene),
       m_selectedBar(invalidSelectionPosition()),
       m_selectedBarSeries(0),
       m_isBarSpecRelative(true),
