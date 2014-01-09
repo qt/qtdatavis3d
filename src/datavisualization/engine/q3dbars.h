@@ -43,7 +43,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
 
 public:
-    explicit Q3DBars(QWindow *parent = 0);
+    explicit Q3DBars(const QSurfaceFormat *format = 0, QWindow *parent = 0);
     virtual ~Q3DBars();
 
     void addSeries(QBar3DSeries *series);

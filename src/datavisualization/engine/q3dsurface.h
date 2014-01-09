@@ -38,7 +38,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
 
 public:
-    explicit Q3DSurface(QWindow *parent = 0);
+    explicit Q3DSurface(const QSurfaceFormat *format = 0, QWindow *parent = 0);
     virtual ~Q3DSurface();
 
     void addSeries(QSurface3DSeries *series);

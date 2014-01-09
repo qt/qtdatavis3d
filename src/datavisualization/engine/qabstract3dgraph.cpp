@@ -55,23 +55,32 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 /*!
  * \internal
  */
-QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, QWindow *parent)
+QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format, QWindow *parent)
     : QWindow(parent),
       d_ptr(d)
 {
-    d_ptr->m_context = new QOpenGLContext(this);
-
+    // Default to frameless window, as typically graphs are not toplevel
     setFlags(flags() | Qt::FramelessWindowHint);
-    setSurfaceType(QWindow::OpenGLSurface);
+
     QSurfaceFormat surfaceFormat;
-    surfaceFormat.setDepthBufferSize(24);
+    if (format) {
+        surfaceFormat = *format;
+    } else {
+        surfaceFormat.setDepthBufferSize(24);
 #if !defined(QT_OPENGL_ES_2)
-    surfaceFormat.setSamples(8);
+        surfaceFormat.setSamples(8);
+#endif
+        surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    }
+
+#if !defined(QT_OPENGL_ES_2)
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
 #else
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
 #endif
-    surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+
+    d_ptr->m_context = new QOpenGLContext(this);
+    setSurfaceType(QWindow::OpenGLSurface);
     setFormat(surfaceFormat);
 
     create();
@@ -82,13 +91,16 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, QWindow *parent)
 
     initializeOpenGLFunctions();
 
-    const GLubyte *version = glGetString(GL_VERSION);
-    qDebug() << "OpenGL version:" << (const char *)version;
-    version = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    qDebug() << "GLSL version:" << (const char *)version;
+    const GLubyte *shaderVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+#ifndef QT_NO_DEBUG
+    const GLubyte *openGLVersion = glGetString(GL_VERSION);
+    qDebug() << "OpenGL version:" << (const char *)openGLVersion;
+    qDebug() << "GLSL version:" << (const char *)shaderVersion;
+#endif
+
 #if !defined(QT_OPENGL_ES_2)
     // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr = QString::fromLatin1((const char *)version).split(QChar::fromLatin1(' '));
+    QStringList splitversionstr = QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #endif

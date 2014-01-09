@@ -91,10 +91,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D surface graph with optional \a parent window.
+ * Constructs a new 3D surface graph with optional \a parent window
+ * and surface \a format.
  */
-Q3DSurface::Q3DSurface(QWindow *parent)
-    : QAbstract3DGraph(new Q3DSurfacePrivate(this), parent)
+Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
+    : QAbstract3DGraph(new Q3DSurfacePrivate(this), format, parent)
 {
     dptr()->m_shared = new Surface3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);

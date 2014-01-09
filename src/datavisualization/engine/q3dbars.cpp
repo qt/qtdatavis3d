@@ -93,10 +93,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D bar graph with optional \a parent window.
+ * Constructs a new 3D bar graph with optional \a parent window
+ * and surface \a format.
  */
-Q3DBars::Q3DBars(QWindow *parent)
-    : QAbstract3DGraph(new Q3DBarsPrivate(this), parent)
+Q3DBars::Q3DBars(const QSurfaceFormat *format, QWindow *parent)
+    : QAbstract3DGraph(new Q3DBarsPrivate(this), format, parent)
 {
     dptr()->m_shared = new Bars3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);

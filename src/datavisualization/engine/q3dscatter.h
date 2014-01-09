@@ -40,7 +40,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
 
 public:
-    explicit Q3DScatter(QWindow *parent = 0);
+    explicit Q3DScatter(const QSurfaceFormat *format = 0, QWindow *parent = 0);
     virtual ~Q3DScatter();
 
     void addSeries(QScatter3DSeries *series);

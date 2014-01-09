@@ -78,10 +78,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D scatter graph with optional \a parent window.
+ * Constructs a new 3D scatter graph with optional \a parent window
+ * and surface \a format.
  */
-Q3DScatter::Q3DScatter(QWindow *parent)
-    : QAbstract3DGraph(new Q3DScatterPrivate(this), parent)
+Q3DScatter::Q3DScatter(const QSurfaceFormat *format, QWindow *parent)
+    : QAbstract3DGraph(new Q3DScatterPrivate(this), format, parent)
 {
     dptr()->m_shared = new Scatter3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);

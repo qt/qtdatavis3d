@@ -42,7 +42,14 @@ int main(int argc, char **argv)
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
 
-    Q3DBars *widgetchart = new Q3DBars();
+    // For testing custom surface format
+    QSurfaceFormat surfaceFormat;
+    surfaceFormat.setDepthBufferSize(24);
+#if !defined(QT_OPENGL_ES_2)
+    surfaceFormat.setSamples(8);
+#endif
+
+    Q3DBars *widgetchart = new Q3DBars(&surfaceFormat);
     QSize screenSize = widgetchart->screen()->size();
 
     QWidget *container = QWidget::createWindowContainer(widgetchart);
