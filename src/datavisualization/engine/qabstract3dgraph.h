@@ -53,6 +53,7 @@ public:
     void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
     void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     QAbstract3DInputHandler *activeInputHandler();
+    QList<QAbstract3DInputHandler *> inputHandlers() const;
 
     void addTheme(Q3DTheme *theme);
     void releaseTheme(Q3DTheme *theme);

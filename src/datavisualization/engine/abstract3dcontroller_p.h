@@ -187,6 +187,7 @@ public:
     virtual void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual QAbstract3DInputHandler *activeInputHandler();
+    virtual QList<QAbstract3DInputHandler *> inputHandlers() const;
 
     virtual int zoomLevel();
     virtual void setZoomLevel(int zoomLevel);

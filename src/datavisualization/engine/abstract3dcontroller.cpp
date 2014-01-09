@@ -598,6 +598,11 @@ QAbstract3DInputHandler* Abstract3DController::activeInputHandler()
     return m_activeInputHandler;
 }
 
+QList<QAbstract3DInputHandler *> Abstract3DController::inputHandlers() const
+{
+    return m_inputHandlers;
+}
+
 int Abstract3DController::zoomLevel()
 {
     return m_scene->activeCamera()->zoomLevel();

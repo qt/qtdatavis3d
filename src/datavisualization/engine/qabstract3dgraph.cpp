@@ -149,6 +149,16 @@ QAbstract3DInputHandler *QAbstract3DGraph::activeInputHandler()
 }
 
 /*!
+ * \return list of all added input handlers.
+ *
+ * \sa addInputHandler()
+ */
+QList<QAbstract3DInputHandler *> QAbstract3DGraph::inputHandlers() const
+{
+    return d_ptr->m_visualController->inputHandlers();
+}
+
+/*!
  * Adds the given \a theme to the graph. The themes added via addTheme are not taken in to use
  * directly. Only the ownership of the a\ theme is given to the graph.
  * The \a theme must not be null or already added to another graph.
