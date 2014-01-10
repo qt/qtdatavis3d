@@ -95,7 +95,7 @@ QML_DECLARE_TYPE(QAbstract3DInputHandler)
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-class Datavis3Dqml2Plugin : public QQmlExtensionPlugin
+class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")

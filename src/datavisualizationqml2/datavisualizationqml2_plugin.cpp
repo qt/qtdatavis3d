@@ -22,7 +22,7 @@
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
-void Datavis3Dqml2Plugin::registerTypes(const char *uri)
+void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
     // @uri QtDataVisualization
     qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
