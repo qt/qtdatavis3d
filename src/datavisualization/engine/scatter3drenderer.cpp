@@ -160,10 +160,15 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     float maxItemSize = 0.0f;
     float itemSize = 0.0f;
 
+    if (m_cachedItemSize.size() != seriesCount)
+        m_cachedItemSize.resize(seriesCount);
+
     for (int series = 0; series < seriesCount; series++) {
         itemSize = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize();
         if (maxItemSize < itemSize)
             maxItemSize = itemSize;
+        if (m_cachedItemSize.at(series) != itemSize)
+            m_cachedItemSize[series] = itemSize;
     }
     m_backgroundMargin = defaultMargin;
     m_maxItemSize = maxItemSize;
@@ -364,10 +369,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
-            // TODO: Accessing series directly during rendering
-            float itemSize =
-                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
-                    / itemScaler;
+            float itemSize = m_cachedItemSize.at(series) / itemScaler;
             if (itemSize == 0.0f)
                 itemSize = m_dotSizeScale;
             if (drawingPoints) {

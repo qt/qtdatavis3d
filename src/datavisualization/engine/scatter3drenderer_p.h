@@ -92,6 +92,7 @@ private:
     QVector<ScatterRenderItemArray> m_renderingArrays;
     GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
+    QVector<float> m_cachedItemSize;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);

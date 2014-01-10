@@ -112,6 +112,8 @@ void ScatterDataModifier::addData()
 
     m_chart->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     m_chart->seriesList().at(1)->dataProxy()->resetArray(dataArray2);
+    m_chart->seriesList().at(0)->setItemSize(0.0f);
+    m_chart->seriesList().at(1)->setItemSize(0.0f);
 }
 
 void ScatterDataModifier::changeStyle()
@@ -522,6 +524,7 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
     series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));
+    series->setItemSize(float(rand() % 90 + 10) / 100.0f);
 
     QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
                      &ScatterDataModifier::handleSelectionChange);
