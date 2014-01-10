@@ -90,21 +90,10 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
 }
 
 Data::~Data()
-{   // HACK: The current context needs to be destroyed last
-    // TODO: Fix properly in datavis code somehow
-    if (m_mode == Surface) {
-        delete m_scatter;
-        delete m_bars;
-        delete m_surface;
-    } else if (m_mode == Bars) {
-        delete m_scatter;
-        delete m_surface;
-        delete m_bars;
-    } else {
-        delete m_bars;
-        delete m_surface;
-        delete m_scatter;
-    }
+{
+    delete m_bars;
+    delete m_surface;
+    delete m_scatter;
     delete m_widget;
     delete m_scatterDataArray; // only portion of this array is set to graph
 }
