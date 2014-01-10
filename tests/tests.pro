@@ -17,10 +17,9 @@ SUBDIRS += barstest \
 
 #SUBDIRS += kinectsurface
 
-qtHaveModule(multimedia):!android: SUBDIRS += spectrum
+qtHaveModule(multimedia):!android:!static: SUBDIRS += spectrum
 
 # For testing code snippets of minimal applications
 SUBDIRS += minimalbars \
            minimalscatter \
            minimalsurface
-
