@@ -98,8 +98,11 @@ void Bars3DController::synchDataToRenderer()
 
 void Bars3DController::handleArrayReset()
 {
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
     emitNeedRender();
@@ -109,8 +112,11 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -118,8 +124,11 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -127,8 +136,11 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
 
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
@@ -140,8 +152,11 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -149,8 +164,11 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     Q_UNUSED(rowIndex)
     Q_UNUSED(columnIndex)
-    adjustAxisRanges();
-    m_isDataDirty = true;
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -203,6 +221,8 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
+    adjustAxisRanges();
+
     // Visibility changes may require disabling/enabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
@@ -234,9 +254,10 @@ void Bars3DController::addSeries(QAbstract3DSeries *series)
 
     Abstract3DController::addSeries(series);
 
-    if (firstAdded) {
+    if (series->isVisible())
         adjustAxisRanges();
 
+    if (firstAdded) {
         handleDataRowLabelsChanged();
         handleDataColumnLabelsChanged();
     }
@@ -250,14 +271,17 @@ void Bars3DController::removeSeries(QAbstract3DSeries *series)
 {
     bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
 
+    bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
+
     Abstract3DController::removeSeries(series);
 
     if (m_selectedBarSeries == series)
         setSelectedBar(invalidSelectionPosition(), 0);
 
-    if (firstRemoved) {
+    if (wasVisible)
         adjustAxisRanges();
 
+    if (firstRemoved) {
         handleDataRowLabelsChanged();
         handleDataColumnLabelsChanged();
     }

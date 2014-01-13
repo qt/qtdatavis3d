@@ -80,11 +80,9 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 {
     Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeScatter);
 
-    bool firstAdded = !m_seriesList.size();
-
     Abstract3DController::addSeries(series);
 
-    if (firstAdded)
+    if (series->isVisible())
         adjustValueAxisRange();
 
     QScatter3DSeries *scatterSeries =  static_cast<QScatter3DSeries *>(series);
@@ -94,14 +92,14 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 
 void Scatter3DController::removeSeries(QAbstract3DSeries *series)
 {
-    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
+    bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
 
     Abstract3DController::removeSeries(series);
 
     if (m_selectedItemSeries == series)
         setSelectedItem(invalidSelectionIndex(), 0);
 
-    if (firstRemoved)
+    if (wasVisible)
         adjustValueAxisRange();
 }
 
@@ -120,8 +118,11 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
 
 void Scatter3DController::handleArrayReset()
 {
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
     emitNeedRender();
 }
@@ -131,8 +132,11 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -141,8 +145,11 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -151,8 +158,11 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
 
     // Clear selection unless it is still valid
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
@@ -165,8 +175,11 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -192,6 +205,13 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
 
     // Update selected index - may be moved offscreen
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
+}
+
+void Scatter3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
+{
+    Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
+
+    adjustValueAxisRange();
 }
 
 void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)

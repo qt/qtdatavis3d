@@ -470,6 +470,12 @@ void ScatterDataModifier::removeSeries()
     }
 }
 
+void ScatterDataModifier::toggleSeriesVisibility()
+{
+    if (m_targetSeries)
+        m_targetSeries->setVisible(!m_targetSeries->isVisible());
+}
+
 void ScatterDataModifier::handleAxisXChanged(QValue3DAxis *axis)
 {
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisX());

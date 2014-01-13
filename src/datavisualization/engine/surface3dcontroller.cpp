@@ -111,6 +111,8 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
+    adjustValueAxisRange();
+
     // Visibility changes may require disabling/enabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
@@ -134,7 +136,8 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
     if (!m_seriesList.size()) {
         Abstract3DController::addSeries(series);
 
-        adjustValueAxisRange();
+        if (series->isVisible())
+            adjustValueAxisRange();
     } else {
         qWarning("Surface graph only supports a single series.");
     }
@@ -146,14 +149,15 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
 
 void Surface3DController::removeSeries(QAbstract3DSeries *series)
 {
-    if (series && series->d_ptr->m_controller == this) {
-        Abstract3DController::removeSeries(series);
+    bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
 
-        if (m_selectedSeries == series)
-            setSelectedPoint(invalidSelectionPosition(), 0);
+    Abstract3DController::removeSeries(series);
 
+    if (m_selectedSeries == series)
+        setSelectedPoint(invalidSelectionPosition(), 0);
+
+    if (wasVisible)
         adjustValueAxisRange();
-    }
 }
 
 QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
@@ -266,8 +270,11 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
 
 void Surface3DController::handleArrayReset()
 {
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     // Clear selection unless still valid
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
     emitNeedRender();
@@ -299,7 +306,8 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
     if (m_changedRows.size() == 0)
         m_changedRows.reserve(sender->rowCount());
 
-    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+    QSurface3DSeries *series = sender->series();
+    if (series->isVisible()) {
         // Change is for the visible series, put the change to queue
         int oldChangeCount = m_changedRows.size();
         for (int i = 0; i < count; i++) {
@@ -328,7 +336,8 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
 void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
-    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+    QSurface3DSeries *series = sender->series();
+    if (series->isVisible()) {
         // Change is for the visible series, put the change to queue
         bool newItem = true;
         QPoint candidate(columnIndex, rowIndex);
@@ -354,8 +363,11 @@ void Surface3DController::handleRowsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -363,8 +375,11 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -372,8 +387,11 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
 
     // Clear selection unless still valid
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
