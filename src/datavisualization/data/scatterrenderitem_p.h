@@ -45,6 +45,9 @@ public:
     inline const QVector3D &position() const { return m_position; }
     inline void setPosition(const QVector3D &pos);
 
+    inline QQuaternion rotation() const { return m_rotation; }
+    inline void setRotation(const QQuaternion &rotation);
+
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
 
@@ -54,6 +57,7 @@ public:
 
 protected:
     QVector3D m_position;
+    QQuaternion m_rotation;
     bool m_visible;
     //float m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
@@ -68,6 +72,12 @@ void ScatterRenderItem::setPosition(const QVector3D &pos)
         if (!m_selectionLabel.isNull())
             setSelectionLabel(QString());
     }
+}
+
+void ScatterRenderItem::setRotation(const QQuaternion &rotation)
+{
+    if (m_rotation != rotation)
+        m_rotation = rotation;
 }
 
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;

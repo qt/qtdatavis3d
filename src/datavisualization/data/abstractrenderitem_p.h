@@ -35,6 +35,7 @@
 #include <QOpenGLFunctions>
 #include <QString>
 #include <QVector3D>
+#include <QQuaternion>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 

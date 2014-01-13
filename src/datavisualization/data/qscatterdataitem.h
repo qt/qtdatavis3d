@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QVector3D>
+#include <QQuaternion>
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -38,6 +39,8 @@ public:
 
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
+    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline QQuaternion rotation() const { return m_rotation; }
     inline void setX(float value) { m_position.setX(value); }
     inline void setY(float value) { m_position.setY(value); }
     inline void setZ(float value) { m_position.setZ(value); }
@@ -52,6 +55,7 @@ protected:
 
 private:
     QVector3D m_position;
+    QQuaternion m_rotation;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

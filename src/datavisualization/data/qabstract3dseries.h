@@ -67,6 +67,7 @@ public:
         MeshBevelCube,
         MeshSphere,
         MeshMinimal,
+        MeshArrow,
         MeshPoint
     };
 

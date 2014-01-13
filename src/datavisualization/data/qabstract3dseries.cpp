@@ -198,6 +198,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *         Sphere.
  *  \value MeshMinimal
  *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
+ *  \value MeshArrow
+ *         Arrow pointing upwards.
  *  \value MeshPoint
  *         2D point. Usable only with Q3DScatter.
  *         \b Note: Shadows and color gradients do not affect this style.

@@ -96,6 +96,9 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
             case QAbstract3DSeries::MeshMinimal:
                 meshFileName = QStringLiteral(":/defaultMeshes/minimal");
                 break;
+            case QAbstract3DSeries::MeshArrow:
+                meshFileName = QStringLiteral(":/defaultMeshes/arrow");
+                break;
             case QAbstract3DSeries::MeshPoint:
 #if defined(QT_OPENGL_ES_2)
                 qWarning("QAbstract3DSeries::MeshPoint is not fully supported on OpenGL ES2");

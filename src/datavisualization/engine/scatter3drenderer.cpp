@@ -208,6 +208,7 @@ void Scatter3DRenderer::updateData()
                     && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
                 m_renderingArrays[series][i].setPosition(dotPos);
                 m_renderingArrays[series][i].setVisible(true);
+                m_renderingArrays[series][i].setRotation(dataArray.at(i).rotation());
                 calculateTranslation(m_renderingArrays[series][i]);
             } else {
                 m_renderingArrays[series][i].setVisible(false);
@@ -387,8 +388,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
 
                 modelMatrix.translate(item.translation());
-                if (!drawingPoints)
+                if (!drawingPoints) {
+                    modelMatrix.rotate(item.rotation());
                     modelMatrix.scale(modelScaler);
+                }
 
                 MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
@@ -512,8 +515,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
 
                 modelMatrix.translate(item.translation());
-                if (!drawingPoints)
+                if (!drawingPoints) {
+                    modelMatrix.rotate(item.rotation());
                     modelMatrix.scale(modelScaler);
+                }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -682,8 +687,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             modelMatrix.translate(item.translation());
             if (!drawingPoints) {
+                modelMatrix.rotate(item.rotation());
                 modelMatrix.scale(modelScaler);
                 itModelMatrix.scale(modelScaler);
+                itModelMatrix.rotate(item.rotation());
             }
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -714,6 +721,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 dotShader->setUniformValue(dotShader->nModel(),
                                            itModelMatrix.inverted().transposed());
             }
+
             dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
             if (useColor) {
                 dotShader->setUniformValue(dotShader->color(), dotColor);
