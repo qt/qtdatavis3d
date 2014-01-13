@@ -85,6 +85,7 @@ signals:
     void multiHighlightGradientChanged(ColorGradient *gradient);
 
 protected:
+    void handleTypeChange(Theme themeType);
     void handleBaseColorUpdate();
     void handleBaseGradientUpdate();
     void handleSingleHLGradientUpdate();

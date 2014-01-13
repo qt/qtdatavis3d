@@ -29,6 +29,7 @@ DeclarativeTheme3D::DeclarativeTheme3D(QObject *parent)
       m_dummyGradients(false),
       m_dummyColors(false)
 {
+    connect(this, &Q3DTheme::typeChanged, this, &DeclarativeTheme3D::handleTypeChange);
 }
 
 DeclarativeTheme3D::~DeclarativeTheme3D()
@@ -46,6 +47,23 @@ void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, Q
     Q_UNUSED(list)
     Q_UNUSED(element)
     // Nothing to do, seriesChildren is there only to enable scoping gradient items in Theme3D item.
+}
+
+void DeclarativeTheme3D::handleTypeChange(Theme themeType)
+{
+    Q_UNUSED(themeType)
+
+    // Theme changed, disconnect base color/gradient connections
+    if (!m_colors.isEmpty()) {
+        foreach (DeclarativeColor *item, m_colors)
+            disconnect(item, 0, this, 0);
+        m_colors.clear();
+    }
+    if (!m_gradients.isEmpty()) {
+        foreach (ColorGradient *item, m_gradients)
+            disconnect(item, 0, this, 0);
+        m_gradients.clear();
+    }
 }
 
 void DeclarativeTheme3D::handleBaseColorUpdate()
