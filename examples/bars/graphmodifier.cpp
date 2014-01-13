@@ -45,11 +45,10 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_temperatureAxis(new QValue3DAxis),
       m_yearAxis(new QCategory3DAxis),
       m_monthAxis(new QCategory3DAxis),
-      m_primaryData(new QBarDataProxy),
-      m_secondaryData(new QBarDataProxy),
+      m_primarySeries(new QBar3DSeries),
+      m_secondarySeries(new QBar3DSeries),
       //! [1]
-      m_primaryStyle(QAbstract3DSeries::MeshBevelBar),
-      m_secondaryStyle(QAbstract3DSeries::MeshSphere),
+      m_barMesh(QAbstract3DSeries::MeshBevelBar),
       m_smooth(false)
 {
     //! [2]
@@ -78,21 +77,19 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     //! [3]
 
     //! [8]
-    QBar3DSeries *series = new QBar3DSeries(m_primaryData);
-    series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
-    series->setMesh(QAbstract3DSeries::MeshBevelBar);
-    series->setMeshSmooth(false);
+    m_primarySeries->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
+    m_primarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
+    m_primarySeries->setMeshSmooth(false);
 
-    QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
-    series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
-    series2->setMesh(QAbstract3DSeries::MeshSphere);
-    series2->setMeshSmooth(false);
-    series2->setVisible(false);
+    m_secondarySeries->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
+    m_secondarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
+    m_secondarySeries->setMeshSmooth(false);
+    m_secondarySeries->setVisible(false);
     //! [8]
 
     //! [4]
-    m_graph->addSeries(series);
-    m_graph->addSeries(series2);
+    m_graph->addSeries(m_primarySeries);
+    m_graph->addSeries(m_secondarySeries);
     //! [4]
 
     //! [6]
@@ -155,9 +152,9 @@ void GraphModifier::resetTemperatureData()
         dataSet2->append(dataRow2);
     }
 
-    // Add data to the graph (the graph assumes ownership of it)
-    m_primaryData->resetArray(dataSet, m_years, m_months);
-    m_secondaryData->resetArray(dataSet2, m_years, m_months);
+    // Add data to the data proxy (the data proxy assumes ownership of it)
+    m_primarySeries->dataProxy()->resetArray(dataSet, m_years, m_months);
+    m_secondarySeries->dataProxy()->resetArray(dataSet2, m_years, m_months);
     //! [5]
 }
 
@@ -165,9 +162,9 @@ void GraphModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
-        m_primaryStyle = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
-        if (m_graph->seriesList().size())
-            m_graph->seriesList().at(0)->setMesh(m_primaryStyle);
+        m_barMesh = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        m_primarySeries->setMesh(m_barMesh);
+        m_secondarySeries->setMesh(m_barMesh);
     }
 }
 
@@ -262,15 +259,13 @@ void GraphModifier::setGridEnabled(int enabled)
 void GraphModifier::setSmoothBars(int smooth)
 {
     m_smooth = bool(smooth);
-    if (m_graph->seriesList().size()) {
-        m_graph->seriesList().at(0)->setMeshSmooth(m_smooth);
-        m_graph->seriesList().at(1)->setMeshSmooth(m_smooth);
-    }
+    m_primarySeries->setMeshSmooth(m_smooth);
+    m_secondarySeries->setMeshSmooth(m_smooth);
 }
 
 void GraphModifier::setSeriesVisibility(int enabled)
 {
-    m_graph->seriesList().at(1)->setVisible(bool(enabled));
+    m_secondarySeries->setVisible(bool(enabled));
     if (enabled) {
         m_graph->setBarThickness(2.0f);
         m_graph->setBarSpacing(QSizeF(1.0, 3.0));

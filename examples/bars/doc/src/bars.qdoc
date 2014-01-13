@@ -75,7 +75,7 @@
 
     Let's take a closer look at parts of the code.
 
-    First we're creating the axes and the proxy into member variables to support changing them
+    First we're creating the axes and the series into member variables to support changing them
     easily later on, if we want to:
 
     \snippet ../examples/bars/graphmodifier.cpp 1
@@ -88,8 +88,8 @@
 
     \snippet ../examples/bars/graphmodifier.cpp 3
 
-    Next we create two series for the graph, giving each one a data proxy. Here we also initialize
-    some of the visual properties of the series. Note that the second series is initially not visible:
+    Next we initialize the visual properties of the series.
+    Note that the second series is initially not visible:
 
     \snippet ../examples/bars/graphmodifier.cpp 8
 

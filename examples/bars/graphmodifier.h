@@ -77,10 +77,9 @@ private:
     QValue3DAxis *m_temperatureAxis;
     QCategory3DAxis *m_yearAxis;
     QCategory3DAxis *m_monthAxis;
-    QBarDataProxy *m_primaryData;
-    QBarDataProxy *m_secondaryData;
-    QAbstract3DSeries::Mesh m_primaryStyle;
-    QAbstract3DSeries::Mesh m_secondaryStyle;
+    QBar3DSeries *m_primarySeries;
+    QBar3DSeries *m_secondarySeries;
+    QAbstract3DSeries::Mesh m_barMesh;
     bool m_smooth;
 };
 
