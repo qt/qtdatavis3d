@@ -61,7 +61,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_font(QFont(QStringLiteral("Arial"))),
       m_isGridEnabled(true),
       m_cachedIsSlicingActivated(false),
-      m_shader(0),
       m_depthShader(0),
       m_backgroundShader(0),
       m_surfaceShader(0),
@@ -145,7 +144,6 @@ Surface3DRenderer::~Surface3DRenderer()
         m_textureHelper->deleteTexture(&m_selectionResultTexture);
         m_textureHelper->deleteTexture(&m_uniformGradientTexture);
     }
-    delete m_shader;
     delete m_depthShader;
     delete m_backgroundShader;
     delete m_selectionShader;
@@ -540,8 +538,10 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
     Abstract3DRenderer::updateScene(scene);
 
-    if (m_selectionPointer)
+    if (m_selectionPointer) {
         m_selectionPointer->updateScene(m_cachedScene);
+        m_selectionDirty = true; // Ball may need repositioning if scene changes
+    }
 
     updateSlicingActive(scene->isSlicingActive());
 }
@@ -608,6 +608,9 @@ void Surface3DRenderer::drawSlicedScene()
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
 
+        // TODO: Do properly when multiseries support implemented QTRD-2657
+        const SeriesRenderCache &series = m_visibleSeriesList.at(0);
+
         modelMatrix.translate(offset, 0.0f, 0.0f);
         QVector3D scaling(scaleX, 1.0f, sliceZScale);
         modelMatrix.scale(scaling);
@@ -621,11 +624,12 @@ void Surface3DRenderer::drawSlicedScene()
                 glPolygonOffset(0.5f, 1.0f);
             }
 
-            ShaderHelper *surfaceShader = m_shader;
+            ShaderHelper *surfaceShader = m_surfaceShader;
             surfaceShader->bind();
 
-            QVector3D color;
-            color = Utils::vectorFromColor(m_cachedTheme->multiHighlightColor());
+            GLuint baseGradientTexture = m_uniformGradientTexture;
+            if (series.colorStyle() != Q3DTheme::ColorStyleUniform)
+                baseGradientTexture = series.baseGradientTexture();
 
             // Set shader bindings
             surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
@@ -634,12 +638,11 @@ void Surface3DRenderer::drawSlicedScene()
             surfaceShader->setUniformValue(surfaceShader->nModel(),
                                            itModelMatrix.inverted().transposed());
             surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
-            surfaceShader->setUniformValue(surfaceShader->color(), color);
-            surfaceShader->setUniformValue(surfaceShader->lightS(), 0.25f);
+            surfaceShader->setUniformValue(surfaceShader->lightS(), 0.15f);
             surfaceShader->setUniformValue(surfaceShader->ambientS(),
-                                           m_cachedTheme->ambientLightStrength() * 2.0f);
+                                           m_cachedTheme->ambientLightStrength() * 2.3f);
 
-            m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj);
+            m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj, baseGradientTexture);
         }
 
         // Draw surface grid
@@ -668,8 +671,8 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.0f);
-        lineShader->setUniformValue(lineShader->lightS(), 0.25f);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.3f);
+        lineShader->setUniformValue(lineShader->lightS(), 0.0f);
 
         // Horizontal lines
         if (m_axisCacheY.segmentCount() > 0) {
@@ -2059,11 +2062,8 @@ void Surface3DRenderer::loadLabelMesh()
 
 void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
-    // m_shader is used slice view surface only.
-    if (m_shader)
-        delete m_shader;
-    m_shader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_shader->initialize();
+    Q_UNUSED(vertexShader);
+    Q_UNUSED(fragmentShader);
 
     // draw the shader for the surface according to smooth status, shadow and uniform color
     if (m_surfaceShader)

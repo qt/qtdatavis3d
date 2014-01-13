@@ -323,8 +323,8 @@ void Bars3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.0f);
-        lineShader->setUniformValue(lineShader->lightS(), 0.25f);
+        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.3f);
+        lineShader->setUniformValue(lineShader->lightS(), 0.0f);
 
         GLfloat scaleFactor = 0.0f;
         if (rowMode)
@@ -438,15 +438,15 @@ void Bars3DRenderer::drawSlicedScene()
     m_barShader->bind();
     m_barShader->setUniformValue(m_barShader->lightP(), lightPos);
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
-    m_barShader->setUniformValue(m_barShader->lightS(), 0.5f);
+    m_barShader->setUniformValue(m_barShader->lightS(), 0.15f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme->ambientLightStrength() * 2.0f);
+                                 m_cachedTheme->ambientLightStrength() * 2.3f);
     m_barGradientShader->bind();
     m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
     m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
-    m_barGradientShader->setUniformValue(m_barGradientShader->lightS(), 0.5f);
+    m_barGradientShader->setUniformValue(m_barGradientShader->lightS(), 0.15f);
     m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
-                                         m_cachedTheme->ambientLightStrength() * 2.0f);
+                                         m_cachedTheme->ambientLightStrength() * 2.3f);
     m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
 
     // Default to uniform shader
@@ -457,10 +457,10 @@ void Bars3DRenderer::drawSlicedScene()
     Q3DTheme::ColorStyle previousColorStyle = Q3DTheme::ColorStyleUniform;
     Q3DTheme::ColorStyle colorStyle = Q3DTheme::ColorStyleUniform;
     ObjectHelper *barObj = 0;
-    QVector3D barHighlightColor;
-    QVector3D rowHighlightColor;
-    GLuint barGradientTexture = 0;
-    GLuint rowGradientTexture = 0;
+    QVector3D highlightColor;
+    QVector3D baseColor;
+    GLuint highlightGradientTexture = 0;
+    GLuint baseGradientTexture = 0;
     const SeriesRenderCache *currentSeries = 0;
     bool colorStyleIsUniform = true;
 
@@ -477,11 +477,11 @@ void Bars3DRenderer::drawSlicedScene()
             colorStyle = currentSeries->colorStyle();
             colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
             if (colorStyleIsUniform) {
-                barHighlightColor = currentSeries->singleHighlightColor();
-                rowHighlightColor = currentSeries->multiHighlightColor();
+                highlightColor = currentSeries->singleHighlightColor();
+                baseColor = currentSeries->baseColor();
             } else {
-                barGradientTexture = currentSeries->singleHighlightGradientTexture();
-                rowGradientTexture = currentSeries->multiHighlightGradientTexture();
+                highlightGradientTexture = currentSeries->singleHighlightGradientTexture();
+                baseGradientTexture = currentSeries->baseGradientTexture();
             }
 
             // Rebind shader if it has changed
@@ -535,14 +535,14 @@ void Bars3DRenderer::drawSlicedScene()
         if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                 && m_visualSelectedBarPos.y() == item->position().y()) {
             if (colorStyleIsUniform)
-                barColor = barHighlightColor;
+                barColor = highlightColor;
             else
-                gradientTexture = barGradientTexture;
+                gradientTexture = highlightGradientTexture;
         } else {
             if (colorStyleIsUniform)
-                barColor = rowHighlightColor;
+                barColor = baseColor;
             else
-                gradientTexture = rowGradientTexture;
+                gradientTexture = baseGradientTexture;
         }
 
         if (item->height() != 0) {

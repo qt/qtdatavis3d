@@ -69,7 +69,6 @@ private:
     bool m_cachedIsSlicingActivated;
 
     // Internal attributes purely related to how the scene is drawn with GL.
-    ShaderHelper *m_shader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceShader;
