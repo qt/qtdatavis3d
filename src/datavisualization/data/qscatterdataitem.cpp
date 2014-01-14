@@ -92,6 +92,16 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  */
 
 /*!
+ * \fn void QScatterDataItem::setRotation(const QQuaternion &rotation)
+ * Sets \a rotation to this data item.
+ */
+
+/*!
+ * \fn QQuaternion QScatterDataItem::rotation() const
+ * \return rotation of this data item.
+ */
+
+/*!
  * \fn void QScatterDataItem::setX(float value)
  * Sets the X component of the item position to the \a value.
  */

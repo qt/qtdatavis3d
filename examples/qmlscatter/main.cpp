@@ -32,7 +32,9 @@ int main(int argc, char *argv[])
     QtQuick2ApplicationViewer viewer;
 
     // Enable antialiasing
+    //! [2]
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
+    //! [2]
 
 #ifdef Q_OS_ANDROID
     viewer.addImportPath(QString::fromLatin1("assets:/qml"));

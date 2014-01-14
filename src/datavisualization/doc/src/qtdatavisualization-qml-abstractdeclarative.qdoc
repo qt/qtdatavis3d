@@ -28,6 +28,12 @@
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
 
+  \note QML doesn't support the type of anti-aliasing used by Qt Data Visualization graphs
+  by default. Setting the \c antialiasing property doesn't affect graphs. To enable
+  anti-aliasing for graphs, a custom surface format must be set up for the QQuickView
+  before showing it. You can use the convenience function
+  \c{QtDataVisualization::qDefaultSurfaceFormat()} to create the custom surface format object.
+
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 

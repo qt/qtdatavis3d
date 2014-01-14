@@ -41,6 +41,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
+ * Anti-aliasing is turned on by default on C++, except in OpenGL ES2
+ * environments, where anti-aliasing is not supported by Qt Data Visualization.
+ * To specify non-default anti-aliasing for a graph, give a custom surface format as
+ * a constructor parameter. You can use the convenience function \c{QtDataVisualization::qDefaultSurfaceFormat()}
+ * to create the surface format object.
+ *
  * \note QAbstract3DGraph sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
  * graph windows as standalone windows with regular window frame, clear this flag after constructing
  * the graph. For example:

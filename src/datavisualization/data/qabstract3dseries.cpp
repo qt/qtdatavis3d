@@ -159,6 +159,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty string Abstract3DSeries::name
+ *
+ * Sets the series name.
+ * Series name can be used in item label format with tag \c{@seriesName}.
+ *
+ * \sa itemLabelFormat
+ */
+
+/*!
  * \enum QAbstract3DSeries::SeriesType
  *
  * Type of the series.
@@ -488,6 +497,14 @@ QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
     return d_ptr->m_multiHighlightGradient;
 }
 
+/*!
+ * \property QAbstract3DSeries::name
+ *
+ * Sets the series name.
+ * Series name can be used in item label format with tag \c{@seriesName}.
+ *
+ * \sa itemLabelFormat
+ */
 void QAbstract3DSeries::setName(const QString &name)
 {
     if (d_ptr->m_name != name) {

@@ -50,6 +50,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *   \row
  *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
  *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li @seriesName \li Name of the series
  * \endtable
  *
  * For example:

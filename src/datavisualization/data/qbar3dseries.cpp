@@ -53,6 +53,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
  *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
  *   \row
+ *     \li @seriesName    \li Name of the series
+ *   \row
  *     \li %<format spec> \li Item value in specified format.
  * \endtable
  *

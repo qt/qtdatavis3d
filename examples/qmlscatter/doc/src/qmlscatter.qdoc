@@ -46,8 +46,13 @@
 
     \snippet ../examples/qmlscatter/main.cpp 0
 
-    This will help us when deploying the application to Android. We'll also change the application
-    to be shown maximized by replacing
+    This will help us when deploying the application to Android.
+
+    We'll enable anti-aliasing for our application in environments that support it:
+
+    \snippet ../examples/qmlscatter/main.cpp 2
+
+    We'll also change the application to be shown maximized by replacing
 
     \code viewer.showExpanded(); \endcode
 
