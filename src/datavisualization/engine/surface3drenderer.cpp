@@ -795,7 +795,7 @@ void Surface3DRenderer::drawSlicedScene()
     }
 
     labelNbr = 0;
-    positionComp.setY(backgroundMargin);
+    positionComp.setY(-0.1f);
     rotation.setZ(-45.0f);
     labelTrans.setY(-backgroundMargin);
     for (int segment = 0; segment <= lastSegment; segment++) {
@@ -814,7 +814,7 @@ void Surface3DRenderer::drawSlicedScene()
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, rotation, 0, QDataVis::SelectionRow,
                                 m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
-                                false, false, Drawer::LabelBelow, Qt::AlignTop, true);
+                                false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
         }
         labelNbr++;
         labelPos += posStep;

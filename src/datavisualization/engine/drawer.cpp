@@ -223,7 +223,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     switch (position) {
     case LabelBelow: {
-        yPosition = -2.6f + positionComp.y(); // minus maximum negative height (+ some extra for axis title label)
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight - 0.1f;
         break;
     }
     case LabelLow: {
@@ -241,30 +241,27 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         break;
     }
     case LabelOver: {
-        float mod = 0.3f;
-        if (itemHeight < 0)
-            mod = 0.15f;
-        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight + mod;
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight + 0.1f;
         break;
     }
     case LabelBottom: {
-        yPosition = -2.95f + positionComp.y();
+        yPosition = -2.75f + positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelTop: {
-        yPosition = 2.95f - positionComp.y();
+        yPosition = 2.75f - positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelLeft: {
         yPosition = 0.0f;
-        xPosition = -2.95f;
+        xPosition = -2.75f;
         break;
     }
     case LabelRight: {
         yPosition = 0.0f;
-        xPosition = 2.95f;
+        xPosition = 2.75f;
         break;
     }
     }
@@ -277,33 +274,55 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     GLfloat xAlignment = 0.0f;
     GLfloat yAlignment = 0.0f;
     GLfloat zAlignment = 0.0f;
+    GLfloat sinRotY = qFabs(qSin(qDegreesToRadians(rotation.y())));
+    GLfloat cosRotY = qFabs(qCos(qDegreesToRadians(rotation.y())));
+    GLfloat sinRotZ = 0.0f;
+    GLfloat cosRotZ = 0.0f;
+    if (rotation.z()) {
+        sinRotZ = qFabs(qSin(qDegreesToRadians(rotation.z())));
+        cosRotZ = qFabs(qCos(qDegreesToRadians(rotation.z())));
+    }
     switch (alignment) {
     case Qt::AlignLeft: {
-        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qSin(qDegreesToRadians(rotation.y())));
+        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
+            xAlignment = ((-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                          - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
+            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
+        } else {
+            xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+            zAlignment = ((GLfloat)textureSize.width() * scaleFactor) * sinRotY;
+        }
         break;
     }
     case Qt::AlignRight: {
-        xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qSin(qDegreesToRadians(rotation.y())));
+        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
+            xAlignment = (((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
+            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
+        } else {
+            xAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+            zAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * sinRotY;
+        }
         break;
     }
     case Qt::AlignTop: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        if (itemHeight < 0)
-            yAlignment = -yAlignment;
+        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
         break;
     }
     case Qt::AlignBottom: {
-        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        if (itemHeight < 0)
-            yAlignment = -yAlignment;
+        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+        break;
+    }
+    case Qt::AlignHCenter: {
+        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                      - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
+        break;
+    }
+    case Qt::AlignVCenter: {
+        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                      + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
         break;
     }
     default: {
