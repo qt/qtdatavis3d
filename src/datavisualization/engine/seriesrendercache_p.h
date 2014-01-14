@@ -61,6 +61,7 @@ public:
     inline const GLuint &singleHighlightGradientTexture() const { return m_singleHighlightGradientTexture; }
     inline const QVector3D &multiHighlightColor() const { return m_multiHighlightColor; }
     inline const GLuint &multiHighlightGradientTexture() const { return m_multiHighlightGradientTexture; }
+    inline const QString &name() const { return m_name; }
 
 protected:
     QAbstract3DSeries *m_series;
@@ -75,6 +76,8 @@ protected:
     GLuint m_singleHighlightGradientTexture;
     QVector3D m_multiHighlightColor;
     GLuint m_multiHighlightGradientTexture;
+
+    QString m_name;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

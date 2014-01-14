@@ -1756,9 +1756,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glDisable(GL_DEPTH_TEST);
         // Draw the selection label
         LabelItem &labelItem = selectedBar->selectionLabelItem();
-        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()) {
+        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()
+                || m_selectionLabelDirty) {
             QString labelText = selectedBar->selectionLabel();
-            if (labelText.isNull()) {
+            if (labelText.isNull() || m_selectionLabelDirty) {
                 static const QString rowIndexTag(QStringLiteral("@rowIdx"));
                 static const QString rowLabelTag(QStringLiteral("@rowLabel"));
                 static const QString rowTitleTag(QStringLiteral("@rowTitle"));
@@ -1767,6 +1768,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 static const QString colTitleTag(QStringLiteral("@colTitle"));
                 static const QString valueTitleTag(QStringLiteral("@valueTitle"));
                 static const QString valueLabelTag(QStringLiteral("@valueLabel"));
+                static const QString seriesNameTag(QStringLiteral("@seriesName"));
 
                 // Custom format expects printf format specifier. There is no tag for it.
                 labelText = generateValueLabel(
@@ -1797,7 +1799,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     labelText.replace(valueLabelTag, valueLabelText);
                 }
 
+                labelText.replace(seriesNameTag, m_visibleSeriesList[m_visualSelectedBarSeriesIndex].name());
+
                 selectedBar->setSelectionLabel(labelText);
+                m_selectionLabelDirty = false;
             }
             m_drawer->generateLabelItem(labelItem, labelText);
             m_selectedBar = selectedBar;

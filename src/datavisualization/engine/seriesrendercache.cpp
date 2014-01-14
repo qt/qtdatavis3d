@@ -164,6 +164,11 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         renderer->fixGradientAndGenerateTexture(&gradient, &m_multiHighlightGradientTexture);
         changeTracker.multiHighlightGradientChanged = false;
     }
+
+    if (seriesChanged || changeTracker.nameChanged) {
+        m_name = series->name();
+        changeTracker.nameChanged = false;
+    }
 }
 
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)

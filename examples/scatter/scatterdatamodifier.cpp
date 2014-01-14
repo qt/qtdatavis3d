@@ -56,7 +56,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     //! [2]
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);
-    series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
+    series->setItemLabelFormat(QStringLiteral("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel"));
     series->setMeshSmooth(m_smooth);
     m_graph->addSeries(series);
     //! [2]

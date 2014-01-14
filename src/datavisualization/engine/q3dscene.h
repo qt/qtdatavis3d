@@ -104,6 +104,7 @@ private:
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
     friend class Q3DCameraPrivate;
+    friend class Q3DObject;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

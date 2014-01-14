@@ -61,7 +61,10 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
     m_graph->addSeries(m_theSeries);
+
     changeStyle();
+
+    m_theSeries->setItemLabelFormat(QStringLiteral("@seriesName: (@xLabel, @zLabel): @yLabel"));
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
     connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
@@ -144,6 +147,8 @@ void GraphModifier::toggleSqrtSin(bool enable)
         m_graph->axisX()->setLabelFormat("%.2f");
         m_graph->axisZ()->setLabelFormat("%.2f");
 
+        m_theSeries->setName("Sqrt & Sin");
+
         resetArrayAndSliders(dataArray, minZ, maxZ, minX, maxX);
 
         m_activeSample = GraphModifier::SqrtSin;
@@ -196,6 +201,8 @@ void GraphModifier::togglePlane(bool enable)
             *m_planeArray << newRow;
         }
 
+        m_theSeries->setName("Wonky Plane");
+
         resetArrayAndSliders(m_planeArray, minZ, maxZ + add, minX, m_xCount * maxStepX + minX);
 #else
         for (float i = 0; i < m_zCount; i++) {
@@ -215,6 +222,8 @@ void GraphModifier::togglePlane(bool enable)
 
             *m_planeArray << newRow;
         }
+
+        m_theSeries->setName("Plane");
 
         resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, maxX);
 #endif
@@ -259,6 +268,8 @@ void GraphModifier::setHeightMapData(bool enable)
         m_graph->axisY()->setAutoAdjustRange(true);
         m_graph->axisX()->setLabelFormat("%.1f N");
         m_graph->axisZ()->setLabelFormat("%.1f E");
+
+        m_theSeries->setName("Height Map");
 
         resetArrayAndSliders(dataArray, minZ, maxZ, minX, maxX);
 

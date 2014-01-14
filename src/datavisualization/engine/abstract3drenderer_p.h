@@ -137,6 +137,7 @@ protected:
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
+    bool m_selectionLabelDirty;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

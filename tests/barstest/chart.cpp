@@ -121,9 +121,13 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->setActiveTheme(m_builtinTheme);
     m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
-    m_temperatureData2->setItemLabelFormat(QStringLiteral("2: @valueTitle for @colLabel @rowLabel: @valueLabel"));
-    m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+    m_temperatureData->setName("Oulu");
+    m_temperatureData2->setName("Helsinki");
+    m_genericData->setName("Generic series");
+
+    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_temperatureData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_genericData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
     m_temperatureData->setBaseColor(Qt::red);

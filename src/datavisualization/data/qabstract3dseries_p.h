@@ -50,6 +50,7 @@ struct QAbstract3DSeriesChangeBitField {
     bool singleHighlightGradientChanged : 1;
     bool multiHighlightColorChanged     : 1;
     bool multiHighlightGradientChanged  : 1;
+    bool nameChanged                    : 1;
 
     QAbstract3DSeriesChangeBitField()
         : itemLabelFormatChanged(true),
@@ -62,7 +63,8 @@ struct QAbstract3DSeriesChangeBitField {
           singleHighlightColorChanged(true),
           singleHighlightGradientChanged(true),
           multiHighlightColorChanged(true),
-          multiHighlightGradientChanged(true)
+          multiHighlightGradientChanged(true),
+          nameChanged(true)
     {
     }
 };
@@ -113,6 +115,7 @@ public:
     void setSingleHighlightGradient(const QLinearGradient &gradient);
     void setMultiHighlightColor(const QColor &color);
     void setMultiHighlightGradient(const QLinearGradient &gradient);
+    void setName(const QString &name);
 
     void resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force);
 
@@ -136,6 +139,7 @@ public:
     QColor m_multiHighlightColor;
     QLinearGradient m_multiHighlightGradient;
 
+    QString m_name;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

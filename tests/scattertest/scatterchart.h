@@ -68,6 +68,7 @@ public slots:
     void addSeries();
     void removeSeries();
     void toggleSeriesVisibility();
+    void changeSeriesName();
 
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);

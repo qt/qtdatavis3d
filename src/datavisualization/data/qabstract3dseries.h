@@ -47,6 +47,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
 public:
     enum SeriesType {
@@ -109,6 +110,9 @@ public:
     void setMultiHighlightGradient(const QLinearGradient &gradient);
     QLinearGradient multiHighlightGradient() const;
 
+    void setName(const QString &name);
+    QString name() const;
+
 signals:
     void itemLabelFormatChanged(QString format);
     void visibilityChanged(bool visible);
@@ -122,6 +126,7 @@ signals:
     void singleHighlightGradientChanged(QLinearGradient gradient);
     void multiHighlightColorChanged(QColor color);
     void multiHighlightGradientChanged(QLinearGradient gradient);
+    void nameChanged(QString name);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;
@@ -135,6 +140,7 @@ private:
     friend class Scatter3DController;
     friend class QBar3DSeries;
     friend class SeriesRenderCache;
+    friend class Abstract3DRenderer;
 };
 
 QT_DATAVISUALIZATION_END_NAMESPACE

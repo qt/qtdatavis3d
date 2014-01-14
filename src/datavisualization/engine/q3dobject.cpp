@@ -18,7 +18,7 @@
 
 #include "q3dobject.h"
 #include "q3dobject_p.h"
-#include "q3dscene.h"
+#include "q3dscene_p.h"
 
 QT_DATAVISUALIZATION_BEGIN_NAMESPACE
 
@@ -97,6 +97,8 @@ void Q3DObject::setPosition(const QVector3D &position)
 void Q3DObject::setDirty(bool dirty)
 {
     d_ptr->m_isDirty = dirty;
+    if (parentScene())
+        parentScene()->d_ptr->m_sceneDirty = true;
 }
 
 /*!

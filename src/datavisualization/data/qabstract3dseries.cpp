@@ -488,6 +488,19 @@ QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
     return d_ptr->m_multiHighlightGradient;
 }
 
+void QAbstract3DSeries::setName(const QString &name)
+{
+    if (d_ptr->m_name != name) {
+        d_ptr->setName(name);
+        emit nameChanged(name);
+    }
+}
+
+QString QAbstract3DSeries::name() const
+{
+    return d_ptr->m_name;
+}
+
 // QAbstract3DSeriesPrivate
 
 QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
@@ -625,6 +638,14 @@ void QAbstract3DSeriesPrivate::setMultiHighlightGradient(const QLinearGradient &
 {
     m_multiHighlightGradient = gradient;
     m_changeTracker.multiHighlightGradientChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setName(const QString &name)
+{
+    m_name = name;
+    m_changeTracker.nameChanged = true;
     if (m_controller)
         m_controller->markSeriesVisualsDirty();
 }

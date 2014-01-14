@@ -476,6 +476,12 @@ void ScatterDataModifier::toggleSeriesVisibility()
         m_targetSeries->setVisible(!m_targetSeries->isVisible());
 }
 
+void ScatterDataModifier::changeSeriesName()
+{
+    if (m_targetSeries)
+        m_targetSeries->setName(m_targetSeries->name().append("-").append(QString::number(qrand() % 10)));
+}
+
 void ScatterDataModifier::handleAxisXChanged(QValue3DAxis *axis)
 {
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisX());
@@ -526,7 +532,8 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
         m_targetSeries = series;
 
     m_chart->addSeries(series);
-    series->setItemLabelFormat(QString("%1: @xLabel - @yLabel - @zLabel").arg(counter++));
+    series->setName(QString("Series %1").arg(counter++));
+    series->setItemLabelFormat(QStringLiteral("@seriesName: @xLabel - @yLabel - @zLabel"));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
     series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));

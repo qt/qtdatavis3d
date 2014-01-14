@@ -136,7 +136,8 @@ void Abstract3DController::synchDataToRenderer()
     if (!m_renderer)
         return;
 
-    m_renderer->updateScene(m_scene);
+    if (m_scene->d_ptr->m_sceneDirty)
+        m_renderer->updateScene(m_scene);
 
     m_renderer->updateTheme(m_themeManager->activeTheme());
 

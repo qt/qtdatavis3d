@@ -538,8 +538,8 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
     Abstract3DRenderer::updateScene(scene);
 
-    if (m_selectionPointer) {
-        m_selectionPointer->updateScene(m_cachedScene);
+    if (m_selectionPointer && m_selectionActive
+            && m_cachedSelectionMode.testFlag(QDataVis::SelectionItem)) {
         m_selectionDirty = true; // Ball may need repositioning if scene changes
     }
 
@@ -1692,7 +1692,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glUseProgram(0);
 
     // Selection handling
-    if (m_selectionDirty) {
+    if (m_selectionDirty || m_selectionLabelDirty) {
         QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
         if (m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
             int x = m_selectedPoint.x() - m_sampleSpace.y();
@@ -1956,6 +1956,7 @@ QString Surface3DRenderer::createSelectionLabel(float value, int column, int row
     static const QString xLabelTag(QStringLiteral("@xLabel"));
     static const QString yLabelTag(QStringLiteral("@yLabel"));
     static const QString zLabelTag(QStringLiteral("@zLabel"));
+    static const QString seriesNameTag(QStringLiteral("@seriesName"));
 
     labelText.replace(xTitleTag, m_axisCacheX.title());
     labelText.replace(yTitleTag, m_axisCacheY.title());
@@ -1984,6 +1985,11 @@ QString Surface3DRenderer::createSelectionLabel(float value, int column, int row
                                                     m_dataArray.at(row)->at(column).z());
         labelText.replace(zLabelTag, valueLabelText);
     }
+
+    // TODO: Get from correct series once multiple series supported
+    labelText.replace(seriesNameTag, m_visibleSeriesList[0].name());
+
+    m_selectionLabelDirty = false;
 
     return labelText;
 }
