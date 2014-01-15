@@ -67,6 +67,15 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_ownTheme(0),
       m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss))
 {
+    m_temperatureData->setObjectName("m_temperatureData");
+    m_temperatureData2->setObjectName("m_temperatureData2");
+    m_genericData->setObjectName("m_genericData");
+    m_dummyData->setObjectName("m_dummyData");
+    m_dummyData2->setObjectName("m_dummyData2");
+    m_dummyData3->setObjectName("m_dummyData3");
+    m_dummyData4->setObjectName("m_dummyData4");
+    m_dummyData5->setObjectName("m_dummyData5");
+
     // Generate generic labels
     QStringList genericColumnLabels;
     for (int i = 0; i < 400; i++) {
@@ -124,10 +133,22 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_temperatureData->setName("Oulu");
     m_temperatureData2->setName("Helsinki");
     m_genericData->setName("Generic series");
+    m_dummyData->setName("Dummy 1");
+    m_dummyData2->setName("Dummy 2");
+    m_dummyData3->setName("Dummy 3");
+    m_dummyData4->setName("Dummy 4");
+    m_dummyData5->setName("Dummy 5");
 
     m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_temperatureData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+
+    m_dummyData->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData3->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData4->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData5->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
     m_temperatureData->setBaseColor(Qt::red);
@@ -194,6 +215,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
                      &GraphModifier::handleColumnAxisChanged);
     QObject::connect(m_graph, &Q3DBars::valueAxisChanged, this,
                      &GraphModifier::handleValueAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::primarySeriesChanged, this,
+                     &GraphModifier::handlePrimarySeriesChanged);
 
     m_graph->addSeries(m_temperatureData);
     m_graph->addSeries(m_temperatureData2);
@@ -707,6 +730,11 @@ void GraphModifier::handleValueAxisChanged(QValue3DAxis *axis)
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->valueAxis());
 }
 
+void GraphModifier::handlePrimarySeriesChanged(QBar3DSeries *series)
+{
+    qDebug() << __FUNCTION__ << series;
+}
+
 void GraphModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
@@ -763,6 +791,207 @@ QBarDataArray *GraphModifier::makeDummyData()
         dataSet->append(dataRow);
     }
     return dataSet;
+}
+
+// Executes one step of the primary series test
+void GraphModifier::primarySeriesTest()
+{
+    static int nextStep = 0;
+
+    QStringList testLabels;
+    QStringList testLabels2;
+    QStringList testLabels3;
+    QStringList testLabels5;
+    testLabels << "1" << "2" << "3" << "4";
+    testLabels2 << "11" << "22" << "33" << "44";
+    testLabels3 << "111" << "222" << "333" << "444";
+    testLabels5 << "11111" << "22222" << "33333" << "44444";
+
+    switch (nextStep++) {
+    case 0: {
+        qDebug() << "Step 0 - Init:";
+        m_graph->addSeries(m_dummyData); // Add one series to enforce release in releaseProxies()
+        releaseProxies();
+        releaseAxes();
+        m_dummyData->dataProxy()->resetArray(makeDummyData(),
+                                             testLabels,
+                                             QStringList() << "A" << "B" << "C" << "D");
+        m_dummyData2->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels2,
+                                              QStringList() << "AA" << "BB" << "CC" << "DD");
+        m_dummyData3->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels3,
+                                              QStringList() << "AAA" << "BBB" << "CCC" << "DDD");
+        m_dummyData4->dataProxy()->resetArray(makeDummyData(),
+                                              QStringList() << "1111" << "2222" << "3333" << "4444",
+                                              QStringList() << "AAAA" << "BBBB" << "CCCC" << "DDDD");
+        m_dummyData5->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels5,
+                                              QStringList() << "AAAAA" << "BBBBB" << "CCCCC" << "DDDDD");
+
+        m_graph->addSeries(m_dummyData);
+        m_graph->addSeries(m_dummyData2);
+        m_graph->addSeries(m_dummyData3);
+
+        m_dummyData->setBaseColor(Qt::black);
+        m_dummyData2->setBaseColor(Qt::white);
+        m_dummyData3->setBaseColor(Qt::red);
+        m_dummyData4->setBaseColor(Qt::blue);
+        m_dummyData5->setBaseColor(Qt::green);
+
+        if (m_graph->primarySeries() == m_dummyData)
+            if (m_graph->rowAxis()->labels() == testLabels)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 1: {
+        qDebug() << "Step 1 - Set another series as primary:";
+        m_graph->setPrimarySeries(m_dummyData3);
+        if (m_graph->primarySeries() == m_dummyData3) {
+            if (m_graph->rowAxis()->labels() == testLabels3)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        } else {
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        }
+        break;
+    }
+    case 2: {
+        qDebug() << "Step 2 - Add new series:";
+        m_graph->addSeries(m_dummyData4);
+        if (m_graph->primarySeries() == m_dummyData3)
+            if (m_graph->rowAxis()->labels() == testLabels3)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 3: {
+        qDebug() << "Step 3 - Reset primary series:";
+        m_graph->setPrimarySeries(0);
+        if (m_graph->primarySeries() == m_dummyData)
+            if (m_graph->rowAxis()->labels() == testLabels)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 4: {
+        qDebug() << "Step 4 - Set new series at primary:";
+        m_graph->setPrimarySeries(m_dummyData5);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 5: {
+        qDebug() << "Step 5 - Remove nonexistent series:";
+        m_graph->removeSeries(0);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 6: {
+        qDebug() << "Step 6 - Remove non-primary series:";
+        m_graph->removeSeries(m_dummyData);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 7: {
+        qDebug() << "Step 7 - Remove primary series:";
+        m_graph->removeSeries(m_dummyData5);
+        if (m_graph->primarySeries() == m_dummyData2) // first series removed, second should be first now
+            if (m_graph->rowAxis()->labels() == testLabels2)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 8: {
+        qDebug() << "Step 8 - move a series (m_dummyData2) forward to a different position";
+        m_graph->insertSeries(3, m_dummyData2);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(2) == m_dummyData2) // moving series forward, index decrements
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 2 has:" << m_graph->seriesList().at(2);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 9: {
+        qDebug() << "Step 9 - move a series (m_dummyData4) backward to a different position";
+        m_graph->insertSeries(0, m_dummyData4);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(0) == m_dummyData4)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 0 has:" << m_graph->seriesList().at(0);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 10: {
+        qDebug() << "Step 10 - Insert a series (m_dummyData) series to position 2";
+        m_graph->insertSeries(2, m_dummyData);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(2) == m_dummyData)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 2 has:" << m_graph->seriesList().at(2);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 11: {
+        qDebug() << "Step 11 - Remove everything";
+        m_graph->removeSeries(m_dummyData);
+        m_graph->removeSeries(m_dummyData2);
+        m_graph->removeSeries(m_dummyData3);
+        m_graph->removeSeries(m_dummyData4);
+        m_graph->removeSeries(m_dummyData5);
+        if (m_graph->primarySeries() == 0)
+            if (m_graph->rowAxis()->labels() == QStringList())
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be null, actual: " << m_graph->primarySeries();
+        break;
+    }
+    default:
+        qDebug() << "-- Restarting test sequence --";
+        nextStep = 0;
+        break;
+    }
+
+
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)

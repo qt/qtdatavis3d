@@ -36,6 +36,7 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
       m_selectedBar(invalidSelectionPosition()),
       m_selectedBarSeries(0),
+      m_primarySeries(0),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
@@ -174,29 +175,28 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 
 void Bars3DController::handleDataRowLabelsChanged()
 {
-    QBar3DSeries *firstSeries = 0;
-    if (m_seriesList.size())
-        firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
-    if (m_axisZ && firstSeries && firstSeries->dataProxy()) {
+    if (m_axisZ) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
         int min = int(m_axisZ->min());
         int count = int(m_axisZ->max()) - min + 1;
-        QStringList subList = firstSeries->dataProxy()->rowLabels().mid(min, count);
+        QStringList subList;
+        if (m_primarySeries && m_primarySeries->dataProxy())
+            subList = m_primarySeries->dataProxy()->rowLabels().mid(min, count);
         static_cast<QCategory3DAxis *>(m_axisZ)->dptr()->setDataLabels(subList);
     }
 }
 
 void Bars3DController::handleDataColumnLabelsChanged()
 {
-    QBar3DSeries *firstSeries = 0;
-    if (m_seriesList.size())
-        firstSeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
-    if (m_axisX && firstSeries && firstSeries->dataProxy()) {
+    if (m_axisX) {
         // Grab a sublist equal to data window (no need to have more labels in axis)
         int min = int(m_axisX->min());
         int count = int(m_axisX->max()) - min + 1;
-        QStringList subList = static_cast<QBarDataProxy *>(firstSeries->dataProxy())
-                ->columnLabels().mid(min, count);
+        QStringList subList;
+        if (m_primarySeries && m_primarySeries->dataProxy()) {
+            subList = static_cast<QBarDataProxy *>(m_primarySeries->dataProxy())
+                    ->columnLabels().mid(min, count);
+        }
         static_cast<QCategory3DAxis *>(m_axisX)->dptr()->setDataLabels(subList);
     }
 }
@@ -246,31 +246,36 @@ void Bars3DController::setAxisZ(QAbstract3DAxis *axis)
     handleDataRowLabelsChanged();
 }
 
-void Bars3DController::addSeries(QAbstract3DSeries *series)
+void Bars3DController::setPrimarySeries(QBar3DSeries *series)
 {
-    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeBar);
-
-    bool firstAdded = !m_seriesList.size();
-
-    Abstract3DController::addSeries(series);
-
-    if (series->isVisible())
-        adjustAxisRanges();
-
-    if (firstAdded) {
-        handleDataRowLabelsChanged();
-        handleDataColumnLabelsChanged();
+    if (!series) {
+        if (m_seriesList.size())
+            series = static_cast<QBar3DSeries *>(m_seriesList.at(0));
+    } else if (!m_seriesList.contains(series)) {
+        // Add nonexistent series.
+        addSeries(series);
     }
 
-    QBar3DSeries *barSeries =  static_cast<QBar3DSeries *>(series);
-    if (barSeries->selectedBar() != invalidSelectionPosition())
-        setSelectedBar(barSeries->selectedBar(), barSeries);
+    if (m_primarySeries != series) {
+        m_primarySeries = series;
+        handleDataRowLabelsChanged();
+        handleDataColumnLabelsChanged();
+        emit primarySeriesChanged(m_primarySeries);
+    }
+}
+
+QBar3DSeries *Bars3DController::primarySeries() const
+{
+    return m_primarySeries;
+}
+
+void Bars3DController::addSeries(QAbstract3DSeries *series)
+{
+    insertSeries(m_seriesList.size(), series);
 }
 
 void Bars3DController::removeSeries(QAbstract3DSeries *series)
 {
-    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
-
     bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
 
     Abstract3DController::removeSeries(series);
@@ -281,9 +286,44 @@ void Bars3DController::removeSeries(QAbstract3DSeries *series)
     if (wasVisible)
         adjustAxisRanges();
 
-    if (firstRemoved) {
+    // If primary series is removed, reset it to default
+    if (series == m_primarySeries) {
+        if (m_seriesList.size())
+            m_primarySeries = static_cast<QBar3DSeries *>(m_seriesList.at(0));
+        else
+            m_primarySeries = 0;
+
         handleDataRowLabelsChanged();
         handleDataColumnLabelsChanged();
+
+        emit primarySeriesChanged(m_primarySeries);
+    }
+}
+
+void Bars3DController::insertSeries(int index, QAbstract3DSeries *series)
+{
+    Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeBar);
+
+    int oldSize = m_seriesList.size();
+
+    Abstract3DController::insertSeries(index, series);
+
+    if (oldSize != m_seriesList.size())  {
+        if (series->isVisible())
+            adjustAxisRanges();
+
+        QBar3DSeries *barSeries =  static_cast<QBar3DSeries *>(series);
+        if (!oldSize) {
+            m_primarySeries = barSeries;
+            handleDataRowLabelsChanged();
+            handleDataColumnLabelsChanged();
+        }
+
+        if (barSeries->selectedBar() != invalidSelectionPosition())
+            setSelectedBar(barSeries->selectedBar(), barSeries);
+
+        if (!oldSize)
+            emit primarySeriesChanged(m_primarySeries);
     }
 }
 

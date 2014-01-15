@@ -55,6 +55,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
+    Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
@@ -84,6 +85,9 @@ public:
     static void clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
     Q_INVOKABLE void addSeries(QBar3DSeries *series);
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
+    Q_INVOKABLE void insertSeries(int index, QBar3DSeries *series);
+    void setPrimarySeries(QBar3DSeries *series);
+    QBar3DSeries *primarySeries() const;
 
 public slots:
     void handleAxisXChanged(QAbstract3DAxis *axis);
@@ -98,6 +102,7 @@ signals:
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);
+    void primarySeriesChanged(QBar3DSeries *series);
 
 private:
     Bars3DController *m_barsController;

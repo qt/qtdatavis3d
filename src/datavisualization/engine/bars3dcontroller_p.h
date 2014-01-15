@@ -63,6 +63,7 @@ private:
     QPoint m_selectedBar;     // Points to row & column in data window.
     QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
                                        // single series selection cases.
+    QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
 
     // Look'n'feel
     bool m_isBarSpecRelative;
@@ -100,8 +101,11 @@ public:
     virtual void setAxisX(QAbstract3DAxis *axis);
     virtual void setAxisZ(QAbstract3DAxis *axis);
 
+    virtual void setPrimarySeries(QBar3DSeries *series);
+    virtual QBar3DSeries *primarySeries() const;
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
+    virtual void insertSeries(int index, QAbstract3DSeries *series);
     virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
@@ -118,6 +122,9 @@ public slots:
 
     // Renderer callback handlers
     void handleBarClicked(const QPoint &position, QBar3DSeries *series);
+
+signals:
+    void primarySeriesChanged(QBar3DSeries *series);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

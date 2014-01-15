@@ -80,6 +80,7 @@ public:
     void changeColorStyle();
     void showFiveSeries();
     QBarDataArray *makeDummyData();
+    void primarySeriesTest();
 
 public slots:
     void flipViews();
@@ -92,6 +93,7 @@ public slots:
     void handleRowAxisChanged(QCategory3DAxis *axis);
     void handleColumnAxisChanged(QCategory3DAxis *axis);
     void handleValueAxisChanged(QValue3DAxis *axis);
+    void handlePrimarySeriesChanged(QBar3DSeries *series);
 
 signals:
     void shadowQualityChanged(int quality);

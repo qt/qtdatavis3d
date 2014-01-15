@@ -150,6 +150,10 @@ int main(int argc, char **argv)
     ownThemeButton->setText(QStringLiteral("Use own theme"));
     ownThemeButton->setEnabled(true);
 
+    QPushButton *primarySeriesTestsButton = new QPushButton(widget);
+    primarySeriesTestsButton->setText(QStringLiteral("Test primary series"));
+    primarySeriesTestsButton->setEnabled(true);
+
     QColorDialog *colorDialog = new QColorDialog(widget);
 
     QLinearGradient grBtoY(0, 0, 100, 0);
@@ -294,6 +298,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
@@ -391,6 +396,8 @@ int main(int argc, char **argv)
                      &GraphModifier::changeColorStyle);
     QObject::connect(ownThemeButton, &QPushButton::clicked, modifier,
                      &GraphModifier::useOwnTheme);
+    QObject::connect(primarySeriesTestsButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::primarySeriesTest);
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
                      &GraphModifier::changeBaseColor);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,

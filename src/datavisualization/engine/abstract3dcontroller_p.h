@@ -170,6 +170,7 @@ public:
     void setRenderer(Abstract3DRenderer *renderer);
 
     virtual void addSeries(QAbstract3DSeries *series);
+    virtual void insertSeries(int index, QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
     QList<QAbstract3DSeries *> seriesList();
 

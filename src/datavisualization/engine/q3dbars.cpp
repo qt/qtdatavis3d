@@ -102,6 +102,8 @@ Q3DBars::Q3DBars(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared = new Bars3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Bars3DController::primarySeriesChanged,
+                     this, &Q3DBars::primarySeriesChanged);
 }
 
 /*!
@@ -112,12 +114,37 @@ Q3DBars::~Q3DBars()
 }
 
 /*!
+ * \property Q3DBars::primarySeries
+ *
+ * Specifies the \a series that is the primary series of the graph. The primary series
+ * is used to determine the row and column axis labels when the labels are not explicitly
+ * set to the axes.
+ * If the specified \a series is not already added to the graph, setting it as the
+ * primary series will also implicitly add it to the graph.
+ * If the primary series itself is removed from the graph, this property
+ * resets to default.
+ * If \a series is null, this property resets to default.
+ * Defaults to the first added series or zero if no series are added to the graph.
+ */
+void Q3DBars::setPrimarySeries(QBar3DSeries *series)
+{
+    dptr()->m_shared->setPrimarySeries(series);
+}
+
+QBar3DSeries *Q3DBars::primarySeries() const
+{
+    return dptrc()->m_shared->primarySeries();
+}
+
+/*!
  * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
  * so the rows and columns of all series must match for the visualized data to be meaningful.
  * If the graph has multiple visible series, only the first one added will
  * generate the row or column labels on the axes in cases where the labels are not explicitly set
  * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
+ *
+ * /sa seriesList()
  */
 void Q3DBars::addSeries(QBar3DSeries *series)
 {
@@ -130,6 +157,21 @@ void Q3DBars::addSeries(QBar3DSeries *series)
 void Q3DBars::removeSeries(QBar3DSeries *series)
 {
     dptr()->m_shared->removeSeries(series);
+}
+
+/*!
+ * Inserts the \a series into the position \a index in the series list.
+ * If the \a series has already been added to the list, it is moved to the
+ * new \a index.
+ * \note When moving a series to a new \a index that is after its old index,
+ * the new position in list is calculated as if the series was still in its old
+ * index, so the final index is actually the \a index decremented by one.
+ *
+ * \sa addSeries(), seriesList(), seriesIndex()
+ */
+void Q3DBars::insertSeries(int index, QBar3DSeries *series)
+{
+    dptr()->m_shared->insertSeries(index, series);
 }
 
 /*!

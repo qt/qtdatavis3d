@@ -32,6 +32,9 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_barsController = new Bars3DController(boundingRect().toRect(), new Declarative3DScene);
     AbstractDeclarative::setSharedController(m_barsController);
+
+    QObject::connect(m_barsController, &Bars3DController::primarySeriesChanged,
+                     this, &DeclarativeBars::primarySeriesChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -150,6 +153,21 @@ void DeclarativeBars::removeSeries(QBar3DSeries *series)
 {
     m_barsController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
+}
+
+void DeclarativeBars::insertSeries(int index, QBar3DSeries *series)
+{
+    m_barsController->insertSeries(index, series);
+}
+
+void DeclarativeBars::setPrimarySeries(QBar3DSeries *series)
+{
+    m_barsController->setPrimarySeries(series);
+}
+
+QBar3DSeries *DeclarativeBars::primarySeries() const
+{
+    return m_barsController->primarySeries();
 }
 
 void DeclarativeBars::handleAxisXChanged(QAbstract3DAxis *axis)

@@ -97,15 +97,30 @@ void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 
 void Abstract3DController::addSeries(QAbstract3DSeries *series)
 {
-    if (series && !m_seriesList.contains(series)) {
-        int oldSize = m_seriesList.size();
-        m_seriesList.append(series);
-        series->d_ptr->setController(this);
-        QObject::connect(series, &QAbstract3DSeries::visibilityChanged,
-                         this, &Abstract3DController::handleSeriesVisibilityChanged);
+    insertSeries(m_seriesList.size(), series);
+}
+
+void Abstract3DController::insertSeries(int index, QAbstract3DSeries *series)
+{
+    if (series) {
+        if (m_seriesList.contains(series)) {
+            int oldIndex = m_seriesList.indexOf(series);
+            if (index != oldIndex) {
+                m_seriesList.removeOne(series);
+                if (oldIndex < index)
+                    index--;
+                m_seriesList.insert(index, series);
+            }
+        } else {
+            int oldSize = m_seriesList.size();
+            m_seriesList.insert(index, series);
+            series->d_ptr->setController(this);
+            QObject::connect(series, &QAbstract3DSeries::visibilityChanged,
+                             this, &Abstract3DController::handleSeriesVisibilityChanged);
+            series->d_ptr->resetToTheme(*m_themeManager->activeTheme(), oldSize, false);
+        }
         if (series->isVisible())
             handleSeriesVisibilityChangedBySender(series);
-        series->d_ptr->resetToTheme(*m_themeManager->activeTheme(), oldSize, false);
     }
 }
 
