@@ -18,7 +18,7 @@
 
 #include "qscatterdataitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QScatterDataItem
@@ -148,4 +148,4 @@ QScatterDataItemPrivate::~QScatterDataItemPrivate()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

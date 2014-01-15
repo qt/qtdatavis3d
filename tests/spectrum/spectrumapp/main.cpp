@@ -78,14 +78,14 @@ MainApp::MainApp(Q3DBars *window)
     // Disable auto-scaling of height by defining explicit range
     m_chart->valueAxis()->setRange(0.0f, 1.0f);
     // Disable shadows
-    m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
+    m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
 #if USE_CONES
     // Set bar specifications; make them a bit wider than deep and make them be drawn 75%
     // inside each other
     m_chart->setBarThickness(1.25);
     m_chart->setBarSpacing(QSizeF(0.2, -0.75));
     // Set bar type, smooth cones
-    m_chart->setBarType(QDataVis::MeshCones, true);
+    m_chart->setBarType(QAbstract3DGraph::MeshCones, true);
     // Adjust zoom manually; automatic zoom level calculation does not work well with negative
     // spacings (in setBarSpacing)
     m_chart->setCameraPosition(10.0f, 5.0f, 70.0f);
@@ -98,7 +98,7 @@ MainApp::MainApp(Q3DBars *window)
     m_chart->scene()->activeCamera()->setCameraPosition(10.0f, 7.5f, 75.0f);
 #endif
     // Disable selection
-    m_chart->setSelectionMode(QDataVis::SelectionNone);
+    m_chart->setSelectionMode(QAbstract3DGraph::SelectionNone);
     QObject::connect(m_engine, &Engine::changedSpectrum, this, &MainApp::spectrumChanged);
     QObject::connect(m_engine, &Engine::stateChanged, this, &MainApp::stateChanged);
     m_restartTimer->setSingleShot(true);

@@ -19,7 +19,7 @@
 #include "audiolevelsiodevice.h"
 #include <QDebug>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 //! [1]
 static const int resolution = 8;

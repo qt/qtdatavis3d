@@ -22,7 +22,7 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QIODevice>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 class AudioLevelsIODevice : public QIODevice
 {

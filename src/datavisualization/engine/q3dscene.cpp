@@ -25,7 +25,7 @@
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DScene
@@ -644,4 +644,4 @@ QRect Q3DScenePrivate::glSecondarySubViewport()
     return m_glSecondarySubViewport;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

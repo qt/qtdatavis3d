@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qdatavisualizationenums.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
@@ -39,7 +38,7 @@ public:
 };
 StaticLibInitializer staticLibInitializer;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
@@ -205,7 +204,7 @@ void Drawer::drawPoint(ShaderHelper *shader)
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat itemHeight, QDataVis::SelectionFlags mode,
+                       GLfloat itemHeight, QAbstract3DGraph::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        const Q3DCamera *camera, bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
@@ -334,7 +333,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (mode.testFlag(QDataVis::SelectionColumn) && isSlicing)
+        else if (mode.testFlag(QAbstract3DGraph::SelectionColumn) && isSlicing)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 
@@ -401,4 +400,4 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

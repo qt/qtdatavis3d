@@ -32,7 +32,7 @@
 #include "qbar3dseries.h"
 #include "qabstract3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QBar3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
@@ -55,6 +55,6 @@ private:
     friend class QBar3DSeries;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

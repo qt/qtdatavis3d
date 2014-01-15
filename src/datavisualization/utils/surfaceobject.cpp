@@ -24,7 +24,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 SurfaceObject::SurfaceObject()
 {
@@ -681,4 +681,4 @@ QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QV
     return QVector3D::crossProduct(v1, v2);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

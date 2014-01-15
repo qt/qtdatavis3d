@@ -19,11 +19,10 @@
 #ifndef QSCATTERDATAITEM_H
 #define QSCATTERDATAITEM_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QVector3D>
 #include <QQuaternion>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QScatterDataItemPrivate;
 
@@ -58,6 +57,6 @@ private:
     QQuaternion m_rotation;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

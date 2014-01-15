@@ -43,7 +43,7 @@
 #include <QObject>
 #include <QQuickWindow>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class DeclarativeBars : public AbstractDeclarative
 {
@@ -103,6 +103,6 @@ private:
     Bars3DController *m_barsController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

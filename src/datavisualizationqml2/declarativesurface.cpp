@@ -21,7 +21,7 @@
 #include "qitemmodelsurfacedataproxy.h"
 #include "declarativescene_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -128,4 +128,4 @@ void DeclarativeSurface::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

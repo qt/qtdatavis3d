@@ -19,15 +19,13 @@
 #ifndef QABSTRACT3DGRAPH_H
 #define QABSTRACT3DGRAPH_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
 
 #include <QWindow>
 #include <QOpenGLFunctions>
 #include <QScreen>
 
-class QPainter;
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstract3DGraphPrivate;
 class Abstract3DController;
@@ -38,14 +36,42 @@ class Q3DScene;
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
+    Q_ENUMS(ShadowQuality)
+    Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(QAbstract3DInputHandler* activeInputHandler READ activeInputHandler WRITE setActiveInputHandler NOTIFY activeInputHandlerChanged)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format, QWindow *parent = 0);
+
+public:
+    enum SelectionFlag {
+        SelectionNone              = 0,
+        SelectionItem              = 1,
+        SelectionRow               = 2,
+        SelectionItemAndRow        = SelectionItem | SelectionRow,
+        SelectionColumn            = 4,
+        SelectionItemAndColumn     = SelectionItem | SelectionColumn,
+        SelectionRowAndColumn      = SelectionRow | SelectionColumn,
+        SelectionItemRowAndColumn  = SelectionItem | SelectionRow | SelectionColumn,
+        SelectionSlice             = 8,
+        SelectionMultiSeries       = 16
+    };
+    Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
+
+    enum ShadowQuality {
+        ShadowQualityNone = 0,
+        ShadowQualityLow,
+        ShadowQualityMedium,
+        ShadowQualityHigh,
+        ShadowQualitySoftLow,
+        ShadowQualitySoftMedium,
+        ShadowQualitySoftHigh
+    };
+
 public:
     virtual ~QAbstract3DGraph();
 
@@ -61,11 +87,11 @@ public:
     Q3DTheme *activeTheme() const;
     QList<Q3DTheme *> themes() const;
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
-    QDataVis::SelectionFlags selectionMode() const;
+    void setSelectionMode(SelectionFlags mode);
+    SelectionFlags selectionMode() const;
 
-    void setShadowQuality(QDataVis::ShadowQuality quality);
-    QDataVis::ShadowQuality shadowQuality() const;
+    void setShadowQuality(ShadowQuality quality);
+    ShadowQuality shadowQuality() const;
 
     Q3DScene *scene() const;
 
@@ -85,8 +111,8 @@ protected:
 signals:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *theme);
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void selectionModeChanged(SelectionFlags mode);
+    void shadowQualityChanged(ShadowQuality quality);
 
 private:
     QScopedPointer<QAbstract3DGraphPrivate> d_ptr;
@@ -95,7 +121,8 @@ private:
     friend class Q3DScatter;
     friend class Q3DSurface;
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

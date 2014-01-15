@@ -22,7 +22,7 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 CameraHelper::CameraHelper(QObject *parent) :
     QObject(parent),
@@ -283,4 +283,4 @@ void CameraHelper::setCameraPreset(Q3DCamera::CameraPreset preset)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -20,7 +20,7 @@
 #include "scatter3drenderer_p.h"
 #include "qscatterdataproxy.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 ScatterRenderItem::ScatterRenderItem()
     : AbstractRenderItem(),
@@ -39,4 +39,4 @@ ScatterRenderItem::~ScatterRenderItem()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

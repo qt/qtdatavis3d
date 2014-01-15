@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DInputHandler; // Workaround for qdoc bug, removing this will cause qdoc compiler to not find the class.
 
@@ -43,6 +43,6 @@ private:
     Q_DISABLE_COPY(Q3DInputHandler)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // QDEFAULT3DINPUTHANDLER_H

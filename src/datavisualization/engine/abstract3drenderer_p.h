@@ -41,7 +41,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class TextureHelper;
 class Theme;
@@ -70,7 +70,7 @@ public:
     virtual void render(GLuint defaultFboHandle);
 
     virtual void updateTheme(Q3DTheme *theme);
-    virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
+    virtual void updateSelectionMode(QAbstract3DGraph::SelectionFlags newMode);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
@@ -80,7 +80,7 @@ public:
 #if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
 #endif
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
+    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
@@ -97,7 +97,7 @@ public:
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
-    void requestShadowQuality(QDataVis::ShadowQuality quality); // For automatic quality adjustments
+    void requestShadowQuality(QAbstract3DGraph::ShadowQuality quality); // For automatic quality adjustments
 
 protected:
     Abstract3DRenderer(Abstract3DController *controller);
@@ -118,10 +118,10 @@ protected:
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
     QRect m_viewport;
-    QDataVis::ShadowQuality m_cachedShadowQuality;
+    QAbstract3DGraph::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
 
-    QDataVis::SelectionFlags m_cachedSelectionMode;
+    QAbstract3DGraph::SelectionFlags m_cachedSelectionMode;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -146,6 +146,6 @@ protected:
 #endif
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // ABSTRACT3DRENDERER_P_H

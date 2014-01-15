@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
@@ -95,4 +95,4 @@ void ObjectHelper::load()
     m_meshDataLoaded = true;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

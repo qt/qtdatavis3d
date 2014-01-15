@@ -88,7 +88,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
     m_graph->rowAxis()->setCategoryLabels(QStringList(QString()));
@@ -99,7 +99,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [6]
 
     // Set selection mode to slice row
-    m_graph->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
 
     //! [6]
 #endif

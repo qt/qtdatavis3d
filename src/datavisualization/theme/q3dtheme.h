@@ -19,12 +19,13 @@
 #ifndef Q3DTHEME_H
 #define Q3DTHEME_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QLinearGradient>
 #include <QFont>
 #include <QColor>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DThemePrivate;
 
@@ -183,6 +184,6 @@ private:
     Q_DISABLE_COPY(Q3DTheme)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

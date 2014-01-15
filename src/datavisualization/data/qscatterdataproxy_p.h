@@ -33,7 +33,7 @@
 #include "qabstractdataproxy_p.h"
 #include "qscatterdataitem.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QScatterDataProxyPrivate : public QAbstractDataProxyPrivate
 {
@@ -61,6 +61,6 @@ private:
     friend class QScatterDataProxy;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // QBARDATAPROXY_P_H

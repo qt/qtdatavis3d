@@ -33,7 +33,7 @@
 #include "qabstract3dinputhandler.h"
 #include <QRect>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstract3DInputHandler;
 class Q3DScene;
@@ -65,6 +65,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // QABSTRACT3DINPUTHANDLER_P_H

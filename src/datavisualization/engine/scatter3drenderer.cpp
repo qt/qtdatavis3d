@@ -41,7 +41,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
@@ -324,7 +324,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_PROGRAM_POINT_SIZE);
     }
 
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Bind depth shader
         m_depthShader->bind();
@@ -455,7 +455,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     ShaderHelper *selectionShader = m_selectionShader;
 
     // Skip selection mode drawing if we have no selection mode
-    if (m_cachedSelectionMode > QDataVis::SelectionNone
+    if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && SelectOnScene == m_selectionState && seriesCount > 0) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -704,7 +704,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 gradientTexture = currentSeries.baseGradientTexture();
 
             GLfloat lightStrength = m_cachedTheme->lightStrength();
-            if (m_cachedSelectionMode > QDataVis::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
+            if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
                 if (useColor)
                     dotColor = currentSeries.singleHighlightColor();
                 else
@@ -730,7 +730,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                            (item.position().y() + 1.0f) / 2.0f);
             }
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 if (!drawingPoints) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -821,7 +821,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -869,7 +869,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
@@ -943,7 +943,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     // Set shadow shader bindings
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -995,7 +995,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1052,7 +1052,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1107,7 +1107,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1171,7 +1171,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1229,7 +1229,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1561,31 +1561,31 @@ void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *se
     }
 }
 
-void Scatter3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
+void Scatter3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
     switch (quality) {
-    case QDataVis::ShadowQualityLow:
+    case QAbstract3DGraph::ShadowQualityLow:
         m_shadowQualityToShader = 33.3f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualityMedium:
+    case QAbstract3DGraph::ShadowQualityMedium:
         m_shadowQualityToShader = 100.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualityHigh:
+    case QAbstract3DGraph::ShadowQualityHigh:
         m_shadowQualityToShader = 200.0f;
         m_shadowQualityMultiplier = 5;
         break;
-    case QDataVis::ShadowQualitySoftLow:
+    case QAbstract3DGraph::ShadowQualitySoftLow:
         m_shadowQualityToShader = 5.0f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualitySoftMedium:
+    case QAbstract3DGraph::ShadowQualitySoftMedium:
         m_shadowQualityToShader = 10.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualitySoftHigh:
+    case QAbstract3DGraph::ShadowQualitySoftHigh:
         m_shadowQualityToShader = 15.0f;
         m_shadowQualityMultiplier = 4;
         break;
@@ -1733,7 +1733,7 @@ void Scatter3DRenderer::updateDepthBuffer()
     if (m_primarySubViewport.size().isEmpty())
         return;
 
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
@@ -1800,4 +1800,4 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, i
     series = 0;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

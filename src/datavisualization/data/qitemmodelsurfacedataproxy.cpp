@@ -20,7 +20,7 @@
 #include "surfaceitemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 // TODO: CHECK DOCUMENTATION!
 
@@ -499,4 +499,4 @@ QItemModelSurfaceDataProxy *QItemModelSurfaceDataProxyPrivate::qptr()
     return static_cast<QItemModelSurfaceDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

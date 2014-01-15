@@ -18,7 +18,7 @@
 
 #include "declarativecolor_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 DeclarativeColor::DeclarativeColor(QObject *parent)
     : QObject(parent)
@@ -38,4 +38,4 @@ QColor DeclarativeColor::color() const
     return m_color;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

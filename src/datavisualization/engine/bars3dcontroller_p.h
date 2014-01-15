@@ -34,7 +34,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Bars3DRenderer;
 class QBar3DSeries;
@@ -89,7 +89,7 @@ public:
     QSizeF barSpacing();
     bool isBarSpecRelative();
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void setSelectedBar(const QPoint &position, QBar3DSeries *series);
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
@@ -131,6 +131,6 @@ private:
 };
 
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

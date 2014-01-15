@@ -34,7 +34,7 @@
 #include <QPointer>
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class AbstractItemModelHandler : public QObject
 {
@@ -79,6 +79,6 @@ private:
     Q_DISABLE_COPY(AbstractItemModelHandler)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

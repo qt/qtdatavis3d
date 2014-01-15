@@ -39,7 +39,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ShaderHelper;
 class ObjectHelper;
@@ -110,7 +110,7 @@ protected:
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
+    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
@@ -150,6 +150,6 @@ private:
     void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

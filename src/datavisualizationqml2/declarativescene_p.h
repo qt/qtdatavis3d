@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dscene.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Declarative3DScene : public Q3DScene
 {
@@ -55,6 +55,6 @@ signals:
     void selectionQueryPositionChanged(const QPointF position);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

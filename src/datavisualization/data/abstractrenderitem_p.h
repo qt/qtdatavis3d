@@ -37,7 +37,7 @@
 #include <QVector3D>
 #include <QQuaternion>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class AbstractRenderItem
 {
@@ -65,6 +65,6 @@ protected:
     friend class QAbstractDataItem;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

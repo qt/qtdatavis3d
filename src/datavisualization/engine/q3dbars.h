@@ -19,12 +19,11 @@
 #ifndef Q3DBARS_H
 #define Q3DBARS_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/qabstract3dgraph.h>
 #include <QFont>
 #include <QLinearGradient>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DBarsPrivate;
 class QAbstract3DAxis;
@@ -83,6 +82,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

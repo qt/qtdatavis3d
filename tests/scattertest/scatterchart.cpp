@@ -41,7 +41,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     QFont font = m_chart->activeTheme()->font();
     font.setPointSize(m_fontSize);
     m_chart->activeTheme()->setFont(font);
-    m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
+    m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
@@ -50,7 +50,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     createAndAddSeries();
     createAndAddSeries();
 
-    m_chart->setSelectionMode(QDataVis::SelectionItem);
+    m_chart->setSelectionMode(QAbstract3DGraph::SelectionItem);
 
     QObject::connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
     QObject::connect(m_chart, &Q3DScatter::shadowQualityChanged, this,
@@ -201,7 +201,7 @@ void ScatterDataModifier::changePointSize(int pointSize)
     m_targetSeries->setItemSize(0.01f *  float(pointSize));
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
      // Updates the UI component to show correct shadow quality
@@ -499,7 +499,7 @@ void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_chart->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }

@@ -66,10 +66,10 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     series->setMesh(QAbstract3DSeries::MeshCylinder);
 
     // Set shadows to medium
-    m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
 
     // Set selection mode to bar and column
-    m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice);
 
     // Set theme
     m_graph->activeTheme()->setType(Q3DTheme::ThemeArmyBlue);

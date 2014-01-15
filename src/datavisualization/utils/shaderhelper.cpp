@@ -20,7 +20,7 @@
 
 #include <QOpenGLShader>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -268,4 +268,4 @@ GLuint ShaderHelper::normalAtt()
     return m_normalAttr;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

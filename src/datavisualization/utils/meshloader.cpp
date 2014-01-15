@@ -26,7 +26,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 QString slashTag = QStringLiteral("/");
 
@@ -122,4 +122,4 @@ bool MeshLoader::loadOBJ(const QString &path,
     return true;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

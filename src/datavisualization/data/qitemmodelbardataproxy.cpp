@@ -20,7 +20,7 @@
 #include "baritemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QItemModelBarDataProxy
@@ -489,4 +489,4 @@ QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()
     return static_cast<QItemModelBarDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

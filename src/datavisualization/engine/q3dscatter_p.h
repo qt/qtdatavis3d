@@ -30,10 +30,9 @@
 #define Q3DSCATTER_P_H
 
 #include "scatter3dcontroller_p.h"
-#include "qdatavisualizationenums.h"
 #include "qabstract3dgraph_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DScatter;
 
@@ -53,6 +52,6 @@ public:
     Scatter3DController *m_shared;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -21,7 +21,7 @@
 #include "qabstractdataproxy_p.h"
 #include "abstract3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QAbstract3DSeries
@@ -704,4 +704,4 @@ void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesInd
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

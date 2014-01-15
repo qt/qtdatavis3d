@@ -27,7 +27,7 @@
 #include <QTime>
 #include <QComboBox>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -52,7 +52,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_smooth(false)
 {
     //! [2]
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
     m_graph->activeTheme()->setBackgroundEnabled(false);
     m_graph->activeTheme()->setFont(QFont("Times New Roman", m_fontSize));
     m_graph->activeTheme()->setLabelBackgroundEnabled(true);
@@ -200,7 +200,7 @@ void GraphModifier::changeSelectionMode(int selectionMode)
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(selectionMode).toInt();
-        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+        m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
     }
 }
 
@@ -218,7 +218,7 @@ void GraphModifier::changeFontSize(int fontsize)
     m_graph->activeTheme()->setFont(font);
 }
 
-void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
@@ -227,7 +227,7 @@ void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }

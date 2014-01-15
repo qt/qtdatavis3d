@@ -26,7 +26,7 @@
 #include <QRegExp>
 #include <qmath.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 2
@@ -239,4 +239,4 @@ float Utils::wrapValue(float value, float min, float max)
     return value;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -33,7 +33,7 @@
 #include "abstractobjecthelper_p.h"
 #include <QOpenGLFunctions>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ObjectHelper : public AbstractObjectHelper
 {
@@ -49,6 +49,6 @@ private:
     QString m_objectFile;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

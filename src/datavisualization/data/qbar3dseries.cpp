@@ -19,7 +19,7 @@
 #include "qbar3dseries_p.h"
 #include "bars3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QBar3DSeries
@@ -275,4 +275,4 @@ void QBar3DSeriesPrivate::setSelectedBar(const QPoint &position)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

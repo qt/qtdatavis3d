@@ -20,7 +20,7 @@
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QSurfaceDataProxy
@@ -520,4 +520,4 @@ void QSurfaceDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(surfaceSeries);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

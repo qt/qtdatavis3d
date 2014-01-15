@@ -30,10 +30,9 @@
 #define Q3DBARS_P_H
 
 #include "bars3dcontroller_p.h"
-#include "qdatavisualizationenums.h"
 #include "qabstract3dgraph_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DBars;
 
@@ -53,6 +52,6 @@ public:
     Bars3DController *m_shared;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -38,7 +38,7 @@
 
 static const int ID_TO_RGBA_MASK = 0xff;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
@@ -399,7 +399,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 
     float adjust = (0.025f * m_heightNormalizer) / 2.0f;
     float stepDown = 2.0f * adjust;
-    if (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow)) {
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
         QSurfaceDataRow *src = m_dataArray.at(row);
         sliceRow = new QSurfaceDataRow(src->size());
         for (int i = 0; i < sliceRow->size(); i++)
@@ -539,7 +539,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     Abstract3DRenderer::updateScene(scene);
 
     if (m_selectionPointer && m_selectionActive
-            && m_cachedSelectionMode.testFlag(QDataVis::SelectionItem)) {
+            && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
         m_selectionDirty = true; // Ball may need repositioning if scene changes
     }
 
@@ -557,7 +557,7 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
 
     // Render selection ball
     if (m_selectionPointer && m_selectionActive
-            && m_cachedSelectionMode.testFlag(QDataVis::SelectionItem)) {
+            && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
         m_selectionPointer->render(defaultFboHandle);
     }
 }
@@ -588,7 +588,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    bool rowMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionRow);
+    bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
 
     GLfloat scaleX = 0.0f;
     GLfloat scaleXBackground = 0.0f;
@@ -812,7 +812,7 @@ void Surface3DRenderer::drawSlicedScene()
                 axisLabelItem = m_axisCacheZ.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, rotation, 0, QDataVis::SelectionRow,
+                                positionComp, rotation, 0, QAbstract3DGraph::SelectionRow,
                                 m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
                                 false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
         }
@@ -880,7 +880,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
     GLfloat adjustedLightStrength =  m_cachedTheme->lightStrength() / 10.0f;
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceVisible) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceVisible) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -994,7 +994,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && m_surfaceObj && m_selectionState == SelectOnScene
-            && m_cachedSelectionMode > QDataVis::SelectionNone
+            && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && (m_cachedSurfaceVisible || m_cachedSurfaceGridOn)
             && m_visibleSeriesList.size() > 0) {
         m_selectionShader->bind();
@@ -1091,7 +1091,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 gradientTexture = m_visibleSeriesList.at(0).baseGradientTexture();
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                 m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
@@ -1168,7 +1168,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -1209,7 +1209,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
@@ -1267,7 +1267,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1311,7 +1311,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1356,7 +1356,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1402,7 +1402,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1454,7 +1454,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1499,7 +1499,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1703,14 +1703,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        if (m_cachedSelectionMode == QDataVis::SelectionNone
+        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone
                 || visiblePoint == Surface3DController::invalidSelectionPosition()) {
             m_selectionActive = false;
         } else {
             // TODO: Need separate selection ball for slice and main surface view QTRD-2515
             if (m_cachedIsSlicingActivated)
                 updateSliceDataModel(visiblePoint);
-            if (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))
+            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
                 surfacePointSelected(visiblePoint);
             m_selectionActive = true;
         }
@@ -1909,13 +1909,13 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 
     QVector3D pos;
     if (m_cachedIsSlicingActivated) {
-        if (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow)) {
+        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
             pos = m_sliceSurfaceObj->vertexAt(column, 0);
             pos *= QVector3D(m_surfaceScaleX, 1.0f, 0.0f);
             pos += QVector3D(m_surfaceOffsetX, 0.0f, 0.0f);
             m_selectionPointer->updateBoundingRect(m_secondarySubViewport);
             m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
-        } else if (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn)) {
+        } else if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
             pos = m_sliceSurfaceObj->vertexAt(row, 0);
             pos *= QVector3D(m_surfaceScaleZ, 1.0f, 0.0f);
             pos += QVector3D(-m_surfaceOffsetZ, 0.0f, 0.0f);
@@ -1994,32 +1994,32 @@ QString Surface3DRenderer::createSelectionLabel(float value, int column, int row
     return labelText;
 }
 
-void Surface3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
+void Surface3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
 
     switch (quality) {
-    case QDataVis::ShadowQualityLow:
+    case QAbstract3DGraph::ShadowQualityLow:
         m_shadowQualityToShader = 33.3f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualityMedium:
+    case QAbstract3DGraph::ShadowQualityMedium:
         m_shadowQualityToShader = 100.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualityHigh:
+    case QAbstract3DGraph::ShadowQualityHigh:
         m_shadowQualityToShader = 200.0f;
         m_shadowQualityMultiplier = 5;
         break;
-    case QDataVis::ShadowQualitySoftLow:
+    case QAbstract3DGraph::ShadowQualitySoftLow:
         m_shadowQualityToShader = 5.0f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualitySoftMedium:
+    case QAbstract3DGraph::ShadowQualitySoftMedium:
         m_shadowQualityToShader = 10.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualitySoftHigh:
+    case QAbstract3DGraph::ShadowQualitySoftHigh:
         m_shadowQualityToShader = 15.0f;
         m_shadowQualityMultiplier = 4;
         break;
@@ -2076,7 +2076,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         delete m_surfaceShader;
 #if !defined(QT_OPENGL_ES_2)
     if (!m_cachedFlatShading) {
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
                                                QStringLiteral(":/shaders/fragmentSurfaceShadowNoTex"));
         } else {
@@ -2084,7 +2084,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
                                                QStringLiteral(":/shaders/fragmentSurface"));
         }
     } else {
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             m_surfaceShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
                                                QStringLiteral(":/shaders/fragmentSurfaceShadowFlat"));
         } else {
@@ -2162,7 +2162,7 @@ void Surface3DRenderer::updateDepthBuffer()
     if (m_primarySubViewport.size().isEmpty())
         return;
 
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
@@ -2188,4 +2188,4 @@ void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

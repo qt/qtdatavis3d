@@ -30,7 +30,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
     : Abstract3DController(rect, scene),
@@ -173,18 +173,20 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
     return surfaceSeriesList;
 }
 
-void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // Currently surface only supports row and column modes when also slicing
-    if ((mode.testFlag(QDataVis::SelectionRow) || mode.testFlag(QDataVis::SelectionColumn))
-            && !mode.testFlag(QDataVis::SelectionSlice)) {
+    if ((mode.testFlag(QAbstract3DGraph::SelectionRow)
+         || mode.testFlag(QAbstract3DGraph::SelectionColumn))
+            && !mode.testFlag(QAbstract3DGraph::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
-    } else if (mode.testFlag(QDataVis::SelectionSlice)
-               && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+    } else if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
+               && (mode.testFlag(QAbstract3DGraph::SelectionRow)
+                   == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QDataVis::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -195,8 +197,8 @@ void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QDataVis::SelectionSlice)
-                    && oldMode.testFlag(QDataVis::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -227,7 +229,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             pos = invalidSelectionPosition();
     }
 
-    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
         if (pos == invalidSelectionPosition() || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {
@@ -509,4 +511,4 @@ void Surface3DController::adjustValueAxisRange()
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

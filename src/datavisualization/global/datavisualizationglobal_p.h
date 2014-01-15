@@ -30,12 +30,11 @@
 #define DATAVISUALIZATIONGLOBAL_P_H
 
 #include "qdatavisualizationglobal.h"
-#include "qdatavisualizationenums.h"
 #include <QOpenGLFunctions>
 #include <QVector3D>
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 // Constants used in several files
 // Distance from camera to origin
@@ -57,6 +56,6 @@ static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -19,11 +19,10 @@
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QMouseEvent>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstract3DInputHandlerPrivate;
 
@@ -88,6 +87,6 @@ private:
     friend class QTouch3DInputHandlerPrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // QABSTRACT3DINPUTHANDLER_H

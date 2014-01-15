@@ -54,7 +54,7 @@ public slots:
     void changeSelectionMode(int selectionMode);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
 
 signals:
     void shadowQualityChanged(int quality);

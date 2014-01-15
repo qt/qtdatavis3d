@@ -18,7 +18,7 @@
 
 #include "qbardataitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QBarDataItem
@@ -107,4 +107,4 @@ QBarDataItemPrivate::~QBarDataItemPrivate()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

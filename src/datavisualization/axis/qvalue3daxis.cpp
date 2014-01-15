@@ -20,7 +20,7 @@
 #include "qvalue3daxis_p.h"
 #include "utils_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QValue3DAxis
@@ -267,4 +267,4 @@ QValue3DAxis *QValue3DAxisPrivate::qptr()
     return static_cast<QValue3DAxis *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

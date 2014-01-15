@@ -19,13 +19,14 @@
 #ifndef QABSTRACT3DAXIS_H
 #define QABSTRACT3DAXIS_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QObject>
 #include <QScopedPointer>
 #include <QVector>
 #include <QStringList>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstract3DAxisPrivate;
 
@@ -102,6 +103,6 @@ private:
     friend class Bars3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

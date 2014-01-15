@@ -38,12 +38,12 @@ public:
     void enableSqrtSinModel(bool enable);
 
     //! [0]
-    void toggleModeNone() { m_graph->setSelectionMode(QDataVis::SelectionNone); }
-    void toggleModeItem() { m_graph->setSelectionMode(QDataVis::SelectionItem); }
-    void toggleModeSliceRow() { m_graph->setSelectionMode(QDataVis::SelectionItemAndRow
-                                                          | QDataVis::SelectionSlice); }
-    void toggleModeSliceColumn() { m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn
-                                                             | QDataVis::SelectionSlice); }
+    void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone); }
+    void toggleModeItem() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItem); }
+    void toggleModeSliceRow() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow
+                                                          | QAbstract3DGraph::SelectionSlice); }
+    void toggleModeSliceColumn() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn
+                                                             | QAbstract3DGraph::SelectionSlice); }
     //! [0]
 
     void setBlackToYellowGradient();

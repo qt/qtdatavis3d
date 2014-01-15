@@ -33,7 +33,7 @@
 #include "abstract3dcontroller_p.h"
 #include "q3dtheme.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ThemeManager : public QObject
 {
@@ -81,6 +81,6 @@ private:
     Abstract3DController *m_controller;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

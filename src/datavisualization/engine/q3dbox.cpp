@@ -20,7 +20,7 @@
 #include "q3dbox.h"
 #include <QtCore/QList>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
     \class Q3DBox
@@ -478,4 +478,4 @@ QDataStream &operator>>(QDataStream &stream, Q3DBox &box)
 
 #endif // QT_NO_DATASTREAM
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

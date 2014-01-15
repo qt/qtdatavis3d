@@ -27,7 +27,7 @@
 #include <QMatrix4x4>
 #include <qmath.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
@@ -214,10 +214,10 @@ void Scatter3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     adjustValueAxisRange();
 }
 
-void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Scatter3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // We only support single item selection mode and no selection mode
-    if (mode != QDataVis::SelectionItem && mode != QDataVis::SelectionNone) {
+    if (mode != QAbstract3DGraph::SelectionItem && mode != QAbstract3DGraph::SelectionNone) {
         qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }
@@ -367,4 +367,4 @@ void Scatter3DController::adjustValueAxisRange()
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

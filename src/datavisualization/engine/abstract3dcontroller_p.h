@@ -42,7 +42,7 @@
 
 class QFont;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class CameraHelper;
 class Abstract3DRenderer;
@@ -136,8 +136,8 @@ private:
     GLfloat m_horizontalRotation;
     GLfloat m_verticalRotation;
     ThemeManager *m_themeManager;
-    QDataVis::SelectionFlags m_selectionMode;
-    QDataVis::ShadowQuality m_shadowQuality;
+    QAbstract3DGraph::SelectionFlags m_selectionMode;
+    QAbstract3DGraph::ShadowQuality m_shadowQuality;
     Q3DScene *m_scene;
 
 protected:
@@ -198,11 +198,11 @@ public:
     virtual Q3DTheme *activeTheme() const;
     virtual QList<Q3DTheme *> themes() const;
 
-    virtual void setSelectionMode(QDataVis::SelectionFlags mode);
-    virtual QDataVis::SelectionFlags selectionMode() const;
+    virtual void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
+    virtual QAbstract3DGraph::SelectionFlags selectionMode() const;
 
-    virtual void setShadowQuality(QDataVis::ShadowQuality quality);
-    virtual QDataVis::ShadowQuality shadowQuality() const;
+    virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
@@ -253,13 +253,13 @@ public slots:
     void handleThemeTypeChanged(Q3DTheme::Theme theme);
 
     // Renderer callback handlers
-    void handleRequestShadowQuality(QDataVis::ShadowQuality quality);
+    void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
 signals:
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *activeTheme);
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
+    void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void needRender();
     void axisXChanged(QAbstract3DAxis *axis);
     void axisYChanged(QAbstract3DAxis *axis);
@@ -277,6 +277,6 @@ private:
     friend class Bars3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -36,7 +36,7 @@
 #include "abstractrenderitem_p.h"
 #include <QFont>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ShaderHelper;
 class ObjectHelper;
@@ -81,7 +81,7 @@ public:
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   QDataVis::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
+                   QAbstract3DGraph::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
                    const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
                    Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
@@ -100,6 +100,6 @@ private:
     GLuint m_pointbuffer;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qsurfacedataitem.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QSurfaceDataItemPrivate
 {
@@ -46,6 +46,6 @@ protected:
     friend class QSurfaceDataItem;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

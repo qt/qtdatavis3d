@@ -20,7 +20,7 @@
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QScatterDataProxy
@@ -408,4 +408,4 @@ QScatterDataProxy *QScatterDataProxyPrivate::qptr()
     return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

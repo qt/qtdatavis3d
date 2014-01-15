@@ -25,7 +25,7 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QTime>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -119,7 +119,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->addAxis(m_genericColumnAxis);
 
     m_graph->setActiveTheme(m_builtinTheme);
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
 
     m_temperatureData->setName("Oulu");
     m_temperatureData2->setName("Helsinki");
@@ -637,10 +637,10 @@ void GraphModifier::changeSelectionMode()
 {
     static int selectionMode = m_graph->selectionMode();
 
-    if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice | QDataVis::SelectionMultiSeries))
-        selectionMode = QDataVis::SelectionNone;
+    if (++selectionMode > (QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionMultiSeries))
+        selectionMode = QAbstract3DGraph::SelectionNone;
 
-    m_graph->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
+    m_graph->setSelectionMode((QAbstract3DGraph::SelectionFlag)selectionMode);
 }
 
 void GraphModifier::changeFont(const QFont &font)
@@ -658,7 +658,7 @@ void GraphModifier::changeFontSize(int fontsize)
     m_graph->activeTheme()->setFont(font);
 }
 
-void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
@@ -709,7 +709,7 @@ void GraphModifier::handleValueAxisChanged(QValue3DAxis *axis)
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
@@ -718,7 +718,7 @@ void GraphModifier::showFiveSeries()
 {
     releaseProxies();
     releaseAxes();
-    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn | QDataVis::SelectionMultiSeries);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn | QAbstract3DGraph::SelectionMultiSeries);
 
     m_dummyData->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
     m_dummyData2->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());

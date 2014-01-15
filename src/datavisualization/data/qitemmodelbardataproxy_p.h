@@ -32,7 +32,7 @@
 #include "qitemmodelbardataproxy.h"
 #include "qbardataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class BarItemModelHandler;
 
@@ -66,6 +66,6 @@ private:
     friend class QItemModelBarDataProxy;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

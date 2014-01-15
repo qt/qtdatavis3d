@@ -19,13 +19,12 @@
 #ifndef Q3DOBJECT_H
 #define Q3DOBJECT_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dscene.h>
 
 #include <QObject>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DObjectPrivate;
 
@@ -61,6 +60,6 @@ private:
     friend class Q3DScenePrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DOBJECT_H

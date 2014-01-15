@@ -20,7 +20,7 @@
 #include "q3dscene.h"
 #include "q3dlight_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DLight
@@ -79,4 +79,4 @@ void Q3DLightPrivate::sync(Q3DLight &other)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

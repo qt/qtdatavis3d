@@ -21,7 +21,7 @@
 #include "bars3dcontroller_p.h"
 #include "qbardataproxy.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QCategory3DAxis
@@ -153,4 +153,4 @@ QCategory3DAxis *QCategory3DAxisPrivate::qptr()
     return static_cast<QCategory3DAxis *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

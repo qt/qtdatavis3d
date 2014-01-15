@@ -29,7 +29,7 @@
 #include <QPainter>
 
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QAbstract3DGraph
@@ -58,6 +58,59 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
+
+/*!
+    \enum QAbstract3DGraph::SelectionFlag
+
+    Item selection modes. Values of this enumeration can be combined with OR operator.
+
+    \value SelectionNone
+           Selection mode disabled.
+    \value SelectionItem
+           Selection highlights a single item.
+    \value SelectionRow
+           Selection highlights a single row.
+    \value SelectionItemAndRow
+           Combination flag for highlighting both item and row with different colors.
+    \value SelectionColumn
+           Selection highlights a single column.
+    \value SelectionItemAndColumn
+           Combination flag for highlighting both item and column with different colors.
+    \value SelectionRowAndColumn
+           Combination flag for highlighting both row and column.
+    \value SelectionItemRowAndColumn
+           Combination flag for highlighting item, row, and column.
+    \value SelectionSlice
+           Setting this mode flag indicates that the graph should take care of the slice view handling
+           automatically. If you wish to control the slice view yourself via Q3DScene, do not set this
+           flag. When setting this mode flag, either \c SelectionRow or \c SelectionColumn must also
+           be set, but not both. Slicing is supported by Q3DBars and Q3DSurface only.
+    \value SelectionMultiSeries
+           Setting this mode means that items for all series at same position are highlighted, instead
+           of just the selected item. The actual selection in the other series doesn't change.
+           Multi-series selection is only supported for Q3DBars.
+*/
+
+/*!
+    \enum QAbstract3DGraph::ShadowQuality
+
+    Quality of shadows.
+
+    \value ShadowQualityNone
+           Shadows are disabled.
+    \value ShadowQualityLow
+           Shadows are rendered in low quality.
+    \value ShadowQualityMedium
+           Shadows are rendered in medium quality.
+    \value ShadowQualityHigh
+           Shadows are rendered in high quality.
+    \value ShadowQualitySoftLow
+           Shadows are rendered in low quality with softened edges.
+    \value ShadowQualitySoftMedium
+           Shadows are rendered in medium quality with softened edges.
+    \value ShadowQualitySoftHigh
+           Shadows are rendered in high quality with softened edges.
+*/
 
 /*!
  * \internal
@@ -232,17 +285,17 @@ QList<Q3DTheme *> QAbstract3DGraph::themes() const
 /*!
  * \property QAbstract3DGraph::selectionMode
  *
- * Sets selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
- * \c QDataVis::SelectionItem by default.
- * Different graph types support different selection modes. See \c QDataVis::SelectionFlags
+ * Sets selection \a mode to a combination of SelectionFlags. It is preset to
+ * \c SelectionItem by default.
+ * Different graph types support different selection modes. See \c SelectionFlags
  * documentation for details.
  */
-void QAbstract3DGraph::setSelectionMode(QDataVis::SelectionFlags mode)
+void QAbstract3DGraph::setSelectionMode(SelectionFlags mode)
 {
     d_ptr->m_visualController->setSelectionMode(mode);
 }
 
-QDataVis::SelectionFlags QAbstract3DGraph::selectionMode() const
+QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
 {
     return d_ptr->m_visualController->selectionMode();
 }
@@ -250,19 +303,19 @@ QDataVis::SelectionFlags QAbstract3DGraph::selectionMode() const
 /*!
  * \property QAbstract3DGraph::shadowQuality
  *
- * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowQualityMedium by default.
+ * Sets shadow \a quality to one of ShadowQuality. It is preset to
+ * \c ShadowQualityMedium by default.
  *
- * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
+ * \note If setting ShadowQuality of a certain level fails, a level is lowered
  * until it is successful and shadowQualityChanged signal is emitted for each time the change is
  * done.
  */
-void QAbstract3DGraph::setShadowQuality(QDataVis::ShadowQuality quality)
+void QAbstract3DGraph::setShadowQuality(ShadowQuality quality)
 {
     d_ptr->m_visualController->setShadowQuality(quality);
 }
 
-QDataVis::ShadowQuality QAbstract3DGraph::shadowQuality() const
+QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 {
     return d_ptr->m_visualController->shadowQuality();
 }
@@ -443,4 +496,4 @@ void QAbstract3DGraphPrivate::renderNow()
     m_context->swapBuffers(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

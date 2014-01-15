@@ -29,7 +29,7 @@
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     : QObject(parent),
@@ -43,8 +43,8 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->valueAxis()->setRange(-100.0f, 100.0f);
     m_graph->valueAxis()->setSegmentCount(20);
     m_graph->valueAxis()->setLabelFormat(QStringLiteral("%d%%"));
-    m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->setSelectionMode(QDataVis::SelectionNone);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
     m_graph->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     m_graph->activeTheme()->setGridEnabled(true);

@@ -22,7 +22,7 @@
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qsurfacedataproxy.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QSurface3DSeriesPrivate;
 
@@ -34,7 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
     Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_PROPERTY(bool flatShadingEnabled READ isFlatShadingEnabled WRITE setFlatShadingEnabled NOTIFY flatShadingEnabledChanged)
     Q_PROPERTY(bool flatShadingSupported READ isFlatShadingSupported NOTIFY flatShadingSupportedChanged)
-    Q_PROPERTY(QtDataVisualization::QSurface3DSeries::DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
+    Q_PROPERTY(DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
 
 public:
     enum DrawFlag {
@@ -81,6 +81,6 @@ private:
     friend class Surface3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

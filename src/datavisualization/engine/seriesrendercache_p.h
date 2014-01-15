@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Abstract3DRenderer;
 class ObjectHelper;
@@ -80,7 +80,7 @@ protected:
     QString m_name;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif
 

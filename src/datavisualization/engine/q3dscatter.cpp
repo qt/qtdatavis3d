@@ -23,7 +23,7 @@
 #include "q3dcamera.h"
 #include "qscatter3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DScatter
@@ -270,5 +270,5 @@ Q3DScatter *Q3DScatterPrivate::qptr()
     return static_cast<Q3DScatter *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 

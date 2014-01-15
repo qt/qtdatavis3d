@@ -184,29 +184,29 @@ int main(int argc, char *argv[])
 
     QComboBox *selectionMode = new QComboBox(widget);
     selectionMode->addItem(QStringLiteral("None"),
-                               int(QDataVis::SelectionNone));
+                               int(QAbstract3DGraph::SelectionNone));
     selectionMode->addItem(QStringLiteral("Item"),
-                               int(QDataVis::SelectionItem));
+                               int(QAbstract3DGraph::SelectionItem));
     selectionMode->addItem(QStringLiteral("Row"),
-                               int(QDataVis::SelectionRow));
+                               int(QAbstract3DGraph::SelectionRow));
     selectionMode->addItem(QStringLiteral("Item and Row"),
-                               int(QDataVis::SelectionItemAndRow));
+                               int(QAbstract3DGraph::SelectionItemAndRow));
     selectionMode->addItem(QStringLiteral("Column"),
-                               int(QDataVis::SelectionColumn));
+                               int(QAbstract3DGraph::SelectionColumn));
     selectionMode->addItem(QStringLiteral("Item and Column"),
-                               int(QDataVis::SelectionItemAndColumn));
+                               int(QAbstract3DGraph::SelectionItemAndColumn));
     selectionMode->addItem(QStringLiteral("Row and Column"),
-                               int(QDataVis::SelectionRowAndColumn));
+                               int(QAbstract3DGraph::SelectionRowAndColumn));
     selectionMode->addItem(QStringLiteral("Item, Row and Column"),
-                               int(QDataVis::SelectionItemRowAndColumn));
+                               int(QAbstract3DGraph::SelectionItemRowAndColumn));
     selectionMode->addItem(QStringLiteral("Slice into Row"),
-                               int(QDataVis::SelectionSlice | QDataVis::SelectionRow));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionRow));
     selectionMode->addItem(QStringLiteral("Slice into Row and Item"),
-                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndRow));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow));
     selectionMode->addItem(QStringLiteral("Slice into Column"),
-                               int(QDataVis::SelectionSlice | QDataVis::SelectionColumn));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionColumn));
     selectionMode->addItem(QStringLiteral("Slice into Column and Item"),
-                               int(QDataVis::SelectionSlice | QDataVis::SelectionItemAndColumn));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn));
     selectionMode->setCurrentIndex(1);
 
     QPushButton *selectButton = new QPushButton(widget);

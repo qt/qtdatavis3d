@@ -17,7 +17,7 @@
 ****************************************************************************/
 #include "qabstract3dinputhandler_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QAbstract3DInputHandler
@@ -243,4 +243,4 @@ QAbstract3DInputHandlerPrivate::~QAbstract3DInputHandlerPrivate()
 
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -29,7 +29,7 @@
 #include <QSize>
 #include <QImage>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
            QTextEdit *statusArea, QWidget *widget) :
@@ -53,7 +53,7 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setSelectionMode(QDataVis::SelectionNone);
+    m_surface->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_surface->activeTheme()->setGridEnabled(false);
     m_surface->activeTheme()->setBackgroundEnabled(false);
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
@@ -66,9 +66,9 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
 
     // Initialize scatter
     m_scatter->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
-    m_scatter->setSelectionMode(QDataVis::SelectionNone);
+    m_scatter->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_scatter->activeTheme()->setGridEnabled(false);
-    m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
+    m_scatter->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
     m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
     QScatter3DSeries *series2 = new QScatter3DSeries;
     series2->setMesh(QAbstract3DSeries::MeshPoint);
@@ -76,9 +76,9 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
 
     // Initialize bars
     m_bars->activeTheme()->setType(Q3DTheme::ThemeQt);
-    m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
+    m_bars->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
     m_bars->activeTheme()->setGridEnabled(false);
-    m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
+    m_bars->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
     m_bars->scene()->activeCamera()->setCameraPosition(0.0, 75.0, 150);
     QBar3DSeries *series3 = new QBar3DSeries;

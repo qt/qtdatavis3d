@@ -21,7 +21,7 @@
 #include <QTimer>
 #include <qmath.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 const float maxTapAndHoldJitter = 20.0f;
 const int maxPinchJitter = 10;
@@ -209,4 +209,4 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

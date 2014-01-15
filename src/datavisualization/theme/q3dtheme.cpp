@@ -19,7 +19,7 @@
 #include "q3dtheme_p.h"
 #include "thememanager_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DTheme
@@ -122,22 +122,22 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *   \row
  *     \li multiHighlightColor
  *     \li The color to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  *     \li Qt::blue
  *   \row
  *     \li multiHighlightGradient
  *     \li The gradient to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li singleHighlightColor
  *     \li The color to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionItem flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
  *     \li Qt::red
  *   \row
  *     \li singleHighlightGradient
  *     \li The gradient to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionItem flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li windowColor
@@ -554,7 +554,7 @@ QColor Q3DTheme::gridLineColor() const
  * \property Q3DTheme::singleHighlightColor
  *
  * Highlight color for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode} has
- * \c QDataVis::SelectionItem flag set.
+ * \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
 {
@@ -574,7 +574,7 @@ QColor Q3DTheme::singleHighlightColor() const
  * \property Q3DTheme::multiHighlightColor
  *
  * Highlight color for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode} has
- * \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ * \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
 {
@@ -643,7 +643,7 @@ QList<QLinearGradient> Q3DTheme::baseGradients() const
  * \property Q3DTheme::singleHighlightGradient
  *
  * Highlight gradient for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QDataVis::SelectionItem flag set.
+ * has \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
@@ -663,7 +663,7 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
  * \property Q3DTheme::multiHighlightGradient
  *
  * Highlight gradient for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ * has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
@@ -1072,4 +1072,4 @@ bool Q3DThemePrivate::sync(Q3DThemePrivate &other)
     return changed;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

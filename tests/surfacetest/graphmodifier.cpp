@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <QComboBox>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 //#define JITTER_PLANE
 //#define WONKY_PLANE
@@ -438,7 +438,7 @@ void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, f
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
 }
 
@@ -447,7 +447,7 @@ void GraphModifier::changeSelectionMode(int mode)
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(mode).toInt();
-        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+        m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
     }
 }
 

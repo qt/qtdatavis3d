@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dtheme.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 struct Q3DThemeDirtyBitField {
     bool baseColorDirty                : 1;
@@ -144,6 +144,6 @@ protected:
     Q3DTheme *q_ptr;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

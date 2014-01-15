@@ -38,7 +38,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
@@ -301,8 +301,8 @@ void Bars3DRenderer::drawSlicedScene()
 
     // Draw the selected row / column
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
-    bool rowMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionRow);
-    bool itemMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionItem);
+    bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
+    bool itemMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem);
 
     GLfloat barPosYAdjustment = -0.8f; // Translate to -1.0 + 0.2 for row/column labels
     GLfloat scaleFactor = 0.0f;
@@ -778,10 +778,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    bool rowMode = m_cachedSelectionMode.testFlag(QDataVis::SelectionRow);
+    bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
 
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -904,7 +904,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // TODO: Selection must be enabled currently to support clicked signal. (QTRD-2517)
     // Skip selection mode drawing if we're slicing or have no selection mode
-    if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QDataVis::SelectionNone
+    if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && m_selectionState == SelectOnScene && seriesCount > 0) {
         // Bind selection shader
         m_selectionShader->bind();
@@ -1044,7 +1044,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             reserveAmount = m_cachedColumnCount;
         else
             reserveAmount = m_cachedRowCount;
-        if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries))
             reserveAmount *= m_visibleSeriesList.size();
         m_sliceSelection.resize(reserveAmount);
 
@@ -1092,7 +1092,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         // Always use base color when no selection mode
-        if (m_cachedSelectionMode == QDataVis::SelectionNone) {
+        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone) {
             if (colorStyleIsUniform)
                 barColor = baseColor;
             else
@@ -1103,7 +1103,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         int sliceSeriesAdjust = 0;
         if (m_selectionDirty && m_cachedIsSlicingActivated) {
             int seriesMultiplier = 0;
-            if (m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries))
+            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries))
                 seriesMultiplier = series;
             if (rowMode)
                 sliceSeriesAdjust = seriesMultiplier * m_cachedColumnCount;
@@ -1141,7 +1141,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 GLfloat lightStrength = m_cachedTheme->lightStrength();
                 GLfloat shadowLightStrength = adjustedLightStrength;
 
-                if (m_cachedSelectionMode > QDataVis::SelectionNone) {
+                if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone) {
                     Bars3DController::SelectionType selectionType = Bars3DController::SelectionNone;
                     if (somethingSelected)
                         selectionType = isSelected(row, bar, series);
@@ -1164,7 +1164,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         }
                         if (m_selectionDirty && m_cachedIsSlicingActivated) {
                             QVector3D translation = modelMatrix.column(3).toVector3D();
-                            if (m_cachedSelectionMode & QDataVis::SelectionColumn
+                            if (m_cachedSelectionMode & QAbstract3DGraph::SelectionColumn
                                     && seriesCount > 1) {
                                 translation.setZ((m_columnDepth - ((row + 0.5f + seriesPos)
                                                                    * (m_cachedBarSpacing.height())))
@@ -1254,7 +1254,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     }
 
 #if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                         // Set shadow shader bindings
                         QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                         barShader->setUniformValue(barShader->shadowQ(), m_shadowQualityToShader);
@@ -1324,7 +1324,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
 
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -1372,7 +1372,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                 m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
@@ -1405,7 +1405,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->color(), barColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
 #if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
@@ -1453,7 +1453,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1491,7 +1491,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1548,7 +1548,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1597,7 +1597,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                     // Set shadow shader bindings
                     QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
@@ -1926,31 +1926,31 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
     }
 }
 
-void Bars3DRenderer::updateShadowQuality(QDataVis::ShadowQuality quality)
+void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     m_cachedShadowQuality = quality;
     switch (quality) {
-    case QDataVis::ShadowQualityLow:
+    case QAbstract3DGraph::ShadowQualityLow:
         m_shadowQualityToShader = 33.3f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualityMedium:
+    case QAbstract3DGraph::ShadowQualityMedium:
         m_shadowQualityToShader = 100.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualityHigh:
+    case QAbstract3DGraph::ShadowQualityHigh:
         m_shadowQualityToShader = 200.0f;
         m_shadowQualityMultiplier = 5;
         break;
-    case QDataVis::ShadowQualitySoftLow:
+    case QAbstract3DGraph::ShadowQualitySoftLow:
         m_shadowQualityToShader = 7.5f;
         m_shadowQualityMultiplier = 1;
         break;
-    case QDataVis::ShadowQualitySoftMedium:
+    case QAbstract3DGraph::ShadowQualitySoftMedium:
         m_shadowQualityToShader = 10.0f;
         m_shadowQualityMultiplier = 3;
         break;
-    case QDataVis::ShadowQualitySoftHigh:
+    case QAbstract3DGraph::ShadowQualitySoftHigh:
         m_shadowQualityToShader = 15.0f;
         m_shadowQualityMultiplier = 4;
         break;
@@ -2058,17 +2058,17 @@ Bars3DController::SelectionType Bars3DRenderer::isSelected(int row, int bar, int
 {
     Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
 
-    if ((m_cachedSelectionMode.testFlag(QDataVis::SelectionMultiSeries)
+    if ((m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)
          && m_visualSelectedBarSeriesIndex >= 0)
             || seriesIndex == m_visualSelectedBarSeriesIndex) {
         if (row == m_visualSelectedBarPos.x() && bar == m_visualSelectedBarPos.y()
-                && (m_cachedSelectionMode.testFlag(QDataVis::SelectionItem))) {
+                && (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))) {
             isSelectedType = Bars3DController::SelectionItem;
         } else if (row == m_visualSelectedBarPos.x()
-                   && (m_cachedSelectionMode.testFlag(QDataVis::SelectionRow))) {
+                   && (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow))) {
             isSelectedType = Bars3DController::SelectionRow;
         } else if (bar == m_visualSelectedBarPos.y()
-                   && (m_cachedSelectionMode.testFlag(QDataVis::SelectionColumn))) {
+                   && (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn))) {
             isSelectedType = Bars3DController::SelectionColumn;
         }
     }
@@ -2173,7 +2173,7 @@ void Bars3DRenderer::updateDepthBuffer()
     if (m_primarySubViewport.size().isEmpty())
         return;
 
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
@@ -2200,4 +2200,4 @@ void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString
     m_labelShader->initialize();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

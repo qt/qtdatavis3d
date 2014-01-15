@@ -19,13 +19,12 @@
 #ifndef QABSTRACT3DSERIES_H
 #define QABSTRACT3DSERIES_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QLinearGradient>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstract3DSeriesPrivate;
 
@@ -143,6 +142,6 @@ private:
     friend class Abstract3DRenderer;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

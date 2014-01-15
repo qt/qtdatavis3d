@@ -46,7 +46,7 @@
 
 #include <QQmlExtensionPlugin>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 QML_DECLARE_TYPE(AbstractDeclarative)
 QML_DECLARE_TYPE(DeclarativeBars)
@@ -54,7 +54,6 @@ QML_DECLARE_TYPE(DeclarativeScatter)
 QML_DECLARE_TYPE(DeclarativeSurface)
 
 QML_DECLARE_TYPE(const QAbstractItemModel)
-QML_DECLARE_TYPE(QDataVis)
 
 QML_DECLARE_TYPE(QAbstract3DAxis)
 QML_DECLARE_TYPE(QCategory3DAxis)
@@ -93,7 +92,7 @@ QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 {
@@ -104,7 +103,7 @@ public:
     void registerTypes(const char *uri);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // DATAVISUALIZATIONQML2_PLUGIN_H
 

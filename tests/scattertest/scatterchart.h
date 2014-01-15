@@ -49,7 +49,7 @@ public:
 
 public slots:
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void clear();
     void resetAxes();
     void addOne();

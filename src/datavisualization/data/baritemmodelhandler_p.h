@@ -32,7 +32,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelbardataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class BarItemModelHandler : public AbstractItemModelHandler
 {
@@ -49,6 +49,6 @@ protected:
     int m_columnCount;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

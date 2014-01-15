@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/qabstract3daxis.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QCategory3DAxisPrivate;
 
@@ -48,6 +48,6 @@ private:
     friend class Bars3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

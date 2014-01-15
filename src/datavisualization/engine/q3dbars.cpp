@@ -24,7 +24,7 @@
 #include "q3dcamera.h"
 #include "qbar3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DBars
@@ -338,4 +338,4 @@ Q3DBars *Q3DBarsPrivate::qptr()
     return static_cast<Q3DBars *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

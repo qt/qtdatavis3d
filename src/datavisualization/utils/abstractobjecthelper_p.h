@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QOpenGLFunctions>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class AbstractObjectHelper: protected QOpenGLFunctions
 {
@@ -60,6 +60,6 @@ public:
     GLuint m_indicesType;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // ABSTRACTOBJECTHELPER_H

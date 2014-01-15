@@ -18,7 +18,7 @@
 
 #include "colorgradient_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 ColorGradientStop::ColorGradientStop(QObject *parent)
     : QObject(parent)
@@ -74,4 +74,4 @@ void ColorGradient::doUpdate()
     emit updated();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

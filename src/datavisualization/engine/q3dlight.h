@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/q3dobject.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DLightPrivate;
 class Q3DScene;
@@ -43,6 +43,6 @@ private:
     friend class Q3DScenePrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DLIGHT_H

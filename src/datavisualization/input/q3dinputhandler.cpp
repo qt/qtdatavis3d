@@ -21,7 +21,7 @@
 #include "q3dcamera_p.h"
 #include "q3dlight.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 const int minZoomLevel         = 10;
 const int halfSizeZoomLevel    = 50;
@@ -190,4 +190,4 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
     scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

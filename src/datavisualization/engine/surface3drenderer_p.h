@@ -43,7 +43,7 @@
 
 class QOpenGLShaderProgram;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ShaderHelper;
 class ObjectHelper;
@@ -152,7 +152,7 @@ signals:
 
 private:
     void updateSliceDataModel(const QPoint &point);
-    void updateShadowQuality(QDataVis::ShadowQuality quality);
+    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     QRect calculateSampleRect(const QSurfaceDataArray &array);
@@ -184,6 +184,6 @@ private:
     Q_DISABLE_COPY(Surface3DRenderer)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // SURFACE3DRENDERER_P_H

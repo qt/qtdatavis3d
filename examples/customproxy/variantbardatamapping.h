@@ -19,10 +19,7 @@
 #ifndef VARIANTBARDATAMAPPING_H
 #define VARIANTBARDATAMAPPING_H
 
-#include "qdatavisualizationenums.h"
 #include <QStringList>
-
-using namespace QtDataVisualization;
 
 class VariantBarDataMapping : public QObject
 {

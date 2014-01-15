@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Scatter3DRenderer;
 
@@ -82,6 +82,6 @@ void ScatterRenderItem::setRotation(const QQuaternion &rotation)
 
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

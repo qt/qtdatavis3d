@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QStringList>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QItemModelBarDataProxyPrivate;
 
@@ -104,6 +104,6 @@ private:
     friend class BarItemModelHandler;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -23,7 +23,7 @@
 #include <QGuiApplication>
 #include <QSGSimpleRectNode>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 static QList<const QQuickWindow *> clearList;
 
@@ -68,24 +68,26 @@ bool AbstractDeclarative::clearWindowBeforeRendering() const
     return m_clearWindowBeforeRendering;
 }
 
-void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)
+void AbstractDeclarative::setSelectionMode(SelectionFlags mode)
 {
-    m_controller->setSelectionMode(mode);
+    int intmode = int(mode);
+    m_controller->setSelectionMode(QAbstract3DGraph::SelectionFlags(intmode));
 }
 
-QDataVis::SelectionFlags AbstractDeclarative::selectionMode() const
+AbstractDeclarative::SelectionFlags AbstractDeclarative::selectionMode() const
 {
-    return m_controller->selectionMode();
+    int intmode = int(m_controller->selectionMode());
+    return SelectionFlags(intmode);
 }
 
-void AbstractDeclarative::setShadowQuality(QDataVis::ShadowQuality quality)
+void AbstractDeclarative::setShadowQuality(ShadowQuality quality)
 {
-    m_controller->setShadowQuality(quality);
+    m_controller->setShadowQuality(QAbstract3DGraph::ShadowQuality(quality));
 }
 
-QDataVis::ShadowQuality AbstractDeclarative::shadowQuality() const
+AbstractDeclarative::ShadowQuality AbstractDeclarative::shadowQuality() const
 {
-    return m_controller->shadowQuality();
+    return ShadowQuality(m_controller->shadowQuality());
 }
 
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)
@@ -93,13 +95,13 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     Q_ASSERT(controller);
     m_controller = controller;
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
-                     &AbstractDeclarative::shadowQualityChanged);
+                     &AbstractDeclarative::handleShadowQualityChange);
     QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
                      &AbstractDeclarative::inputHandlerChanged);
     QObject::connect(m_controller, &Abstract3DController::activeThemeChanged, this,
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
-                     &AbstractDeclarative::selectionModeChanged);
+                     &AbstractDeclarative::handleSelectionModeChange);
 
     QObject::connect(m_controller, &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);
@@ -167,9 +169,22 @@ void AbstractDeclarative::updateWindowParameters()
         }
 
         QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
-        if (m_controller)
-            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
+        if (m_controller) {
+            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
+                                            m_cachedGeometry.height()));
+        }
     }
+}
+
+void AbstractDeclarative::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
+{
+    int intmode = int(mode);
+    emit selectionModeChanged(SelectionFlags(intmode));
+}
+
+void AbstractDeclarative::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
+{
+    emit shadowQualityChanged(ShadowQuality(quality));
 }
 
 void AbstractDeclarative::render()
@@ -242,4 +257,4 @@ void AbstractDeclarative::wheelEvent(QWheelEvent *event)
     m_controller->wheelEvent(event);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

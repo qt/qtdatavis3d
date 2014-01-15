@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Bars3DRenderer;
 
@@ -90,6 +90,6 @@ void BarRenderItem::setValue(float value)
 typedef QVector<BarRenderItem> BarRenderItemRow;
 typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

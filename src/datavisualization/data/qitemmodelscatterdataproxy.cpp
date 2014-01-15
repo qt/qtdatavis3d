@@ -20,7 +20,7 @@
 #include "scatteritemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QItemModelScatterDataProxy
@@ -265,4 +265,4 @@ QItemModelScatterDataProxy *QItemModelScatterDataProxyPrivate::qptr()
     return static_cast<QItemModelScatterDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

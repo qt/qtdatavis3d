@@ -26,7 +26,7 @@
 #include <qmath.h>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class Q3DCamera
@@ -868,4 +868,4 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
 }
 
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -23,7 +23,7 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QPoint>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QBar3DSeriesPrivate;
 
@@ -60,6 +60,6 @@ private:
     friend class Bars3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -19,11 +19,12 @@
 #ifndef Q3DSCENE_H
 #define Q3DSCENE_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QObject>
 #include <QRect>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DCamera;
 class Q3DBox;
@@ -107,6 +108,6 @@ private:
     friend class Q3DObject;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DSCENE_H

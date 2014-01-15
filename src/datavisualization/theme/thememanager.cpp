@@ -19,7 +19,7 @@
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 const float defaultBuiltInColorLevel = 0.7f; // for built-in gradient themes
 const float defaultColorLevel = 0.5f; // for built-in uniform themes
@@ -590,4 +590,4 @@ void ThemeManager::setColorStyle(Q3DTheme *theme, Q3DTheme::ColorStyle style)
         theme->setColorStyle(style);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

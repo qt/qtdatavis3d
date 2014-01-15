@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DCamera;
 
@@ -82,6 +82,6 @@ public:
     friend class QMac3DInputHandler;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DCAMERA_P_H

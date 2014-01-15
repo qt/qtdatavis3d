@@ -30,7 +30,7 @@
 #include <QMatrix4x4>
 #include <qmath.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
@@ -341,13 +341,13 @@ bool Bars3DController::isBarSpecRelative()
     return m_isBarSpecRelative;
 }
 
-void Bars3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
-    if (mode.testFlag(QDataVis::SelectionSlice)
-            && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+    if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
+            && (mode.testFlag(QAbstract3DGraph::SelectionRow) == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QDataVis::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -358,8 +358,8 @@ void Bars3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QDataVis::SelectionSlice)
-                    && oldMode.testFlag(QDataVis::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -377,7 +377,7 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
     adjustSelectionPosition(pos, series);
 
-    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
         // If the selected bar is outside data window, or there is no visible selected bar, disable slicing
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()
                 || pos.y() < m_axisX->min() || pos.y() > m_axisX->max()
@@ -529,4 +529,4 @@ QAbstract3DAxis *Bars3DController::createDefaultAxis(QAbstract3DAxis::AxisOrient
     return defaultAxis;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

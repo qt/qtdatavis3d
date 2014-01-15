@@ -34,7 +34,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Scatter3DRenderer;
 class QScatterDataProxy;
@@ -69,7 +69,7 @@ public:
     virtual void initializeOpenGL();
 
     // Change selection mode
-    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
 
     void setSelectedItem(int index, QScatter3DSeries *series);
     static inline int invalidSelectionIndex() { return -1; }
@@ -101,6 +101,6 @@ private:
 };
 
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

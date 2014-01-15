@@ -20,15 +20,13 @@
 
 #include <qqml.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
     // @uri QtDataVisualization
     qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
                                                          QLatin1String("Trying to create uncreatable: AbstractItemModel."));
-    qmlRegisterUncreatableType<QDataVis>(uri, 1, 0, "DataVis",
-                                         QLatin1String("Trying to create uncreatable: DataVis."));
     qmlRegisterUncreatableType<QAbstract3DAxis>(uri, 1, 0, "AbstractAxis3D",
                                                 QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstractDataProxy>(uri, 1, 0, "AbstractDataProxy",
@@ -82,5 +80,5 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 

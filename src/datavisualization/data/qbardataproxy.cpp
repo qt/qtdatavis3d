@@ -20,7 +20,7 @@
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QBarDataProxy
@@ -713,4 +713,4 @@ void QBarDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(barSeries);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

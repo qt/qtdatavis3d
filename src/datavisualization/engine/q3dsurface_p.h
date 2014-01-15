@@ -30,12 +30,11 @@
 #define Q3DSURFACE_P_H
 
 #include "surface3dcontroller_p.h"
-#include "qdatavisualizationenums.h"
 #include "qabstract3dgraph_p.h"
 
 #include <QList>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DSurface;
 
@@ -55,6 +54,6 @@ public:
     Surface3DController *m_shared;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DSURFACE_P_H

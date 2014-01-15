@@ -19,13 +19,12 @@
 #ifndef Q3DSCATTER_H
 #define Q3DSCATTER_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/qabstract3dgraph.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
 #include <QLinearGradient>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DScatterPrivate;
 class QValue3DAxis;
@@ -68,6 +67,6 @@ private:
     Q_DISABLE_COPY(Q3DScatter)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

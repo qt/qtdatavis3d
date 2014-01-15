@@ -32,7 +32,7 @@
 #include "qsurface3dseries.h"
 #include "qabstract3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QSurface3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
@@ -59,6 +59,6 @@ private:
     friend class QSurface3DSeries;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

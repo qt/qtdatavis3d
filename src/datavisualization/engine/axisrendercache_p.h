@@ -34,7 +34,7 @@
 #include "qabstract3daxis_p.h"
 #include "drawer_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class AxisRenderCache : public QObject
 {
@@ -96,6 +96,6 @@ private:
     Q_DISABLE_COPY(AxisRenderCache)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

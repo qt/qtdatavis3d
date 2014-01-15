@@ -35,7 +35,7 @@
 #include <QVector2D>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class VertexIndexer
 {
@@ -83,6 +83,6 @@ class VertexIndexer
                                            unsigned short &result);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

@@ -34,7 +34,7 @@
 
 class QOpenGLShaderProgram;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ShaderHelper
 {
@@ -110,6 +110,6 @@ class ShaderHelper
     GLboolean m_initialized;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

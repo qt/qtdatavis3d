@@ -19,11 +19,8 @@
 #ifndef VARIANTDATASET_H
 #define VARIANTDATASET_H
 
-#include "qdatavisualizationenums.h"
 #include <QScopedPointer>
 #include <QVariantList>
-
-using namespace QtDataVisualization;
 
 //! [1]
 typedef QVariantList VariantDataItem;

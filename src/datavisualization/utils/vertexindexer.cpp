@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 int unique_vertices = 0;
 
@@ -150,4 +150,4 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
     //qDebug() << "unique vertices" << unique_vertices;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

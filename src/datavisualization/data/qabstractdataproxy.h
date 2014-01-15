@@ -19,11 +19,12 @@
 #ifndef QABSTRACTDATAPROXY_H
 #define QABSTRACTDATAPROXY_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QObject>
 #include <QScopedPointer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class QAbstractDataProxyPrivate;
 
@@ -58,6 +59,6 @@ private:
     friend class QAbstract3DSeriesPrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // QABSTRACTDATAPROXY_H

@@ -18,7 +18,7 @@
 
 #include "labelitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 LabelItem::LabelItem()
     : m_size(QSize(0, 0)),
@@ -61,4 +61,4 @@ void LabelItem::clear()
     m_size = QSize(0, 0);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -27,18 +27,16 @@
 #include "q3dtheme_p.h"
 #include "objecthelper_p.h"
 
-Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
       m_hasNegativeValues(false),
       m_cachedTheme(new Q3DTheme()),
       m_drawer(new Drawer(m_cachedTheme)),
-      m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
+      m_cachedShadowQuality(QAbstract3DGraph::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedSelectionMode(QDataVis::SelectionNone),
+      m_cachedSelectionMode(QAbstract3DGraph::SelectionNone),
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
@@ -220,7 +218,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
 void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
                             QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -250,15 +248,15 @@ void Abstract3DRenderer::handleShadowQualityChange()
     reInitShaders();
 
 #if defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality != QDataVis::ShadowQualityNone) {
-        emit requestShadowQuality(QDataVis::ShadowQualityNone);
+    if (m_cachedShadowQuality != QAbstract3DGraph::ShadowQualityNone) {
+        emit requestShadowQuality(QAbstract3DGraph::ShadowQualityNone);
         qWarning("Shadows are not yet supported for OpenGL ES2");
-        m_cachedShadowQuality = QDataVis::ShadowQualityNone;
+        m_cachedShadowQuality = QAbstract3DGraph::ShadowQualityNone;
     }
 #endif
 }
 
-void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
+void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     m_cachedSelectionMode = mode;
     m_selectionDirty = true;
@@ -382,32 +380,32 @@ AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstract3DAxis::Ax
 
 void Abstract3DRenderer::lowerShadowQuality()
 {
-    QDataVis::ShadowQuality newQuality = QDataVis::ShadowQualityNone;
+    QAbstract3DGraph::ShadowQuality newQuality = QAbstract3DGraph::ShadowQualityNone;
 
     switch (m_cachedShadowQuality) {
-    case QDataVis::ShadowQualityHigh:
+    case QAbstract3DGraph::ShadowQualityHigh:
         qWarning("Creating high quality shadows failed. Changing to medium quality.");
-        newQuality = QDataVis::ShadowQualityMedium;
+        newQuality = QAbstract3DGraph::ShadowQualityMedium;
         break;
-    case QDataVis::ShadowQualityMedium:
+    case QAbstract3DGraph::ShadowQualityMedium:
         qWarning("Creating medium quality shadows failed. Changing to low quality.");
-        newQuality = QDataVis::ShadowQualityLow;
+        newQuality = QAbstract3DGraph::ShadowQualityLow;
         break;
-    case QDataVis::ShadowQualityLow:
+    case QAbstract3DGraph::ShadowQualityLow:
         qWarning("Creating low quality shadows failed. Switching shadows off.");
-        newQuality = QDataVis::ShadowQualityNone;
+        newQuality = QAbstract3DGraph::ShadowQualityNone;
         break;
-    case QDataVis::ShadowQualitySoftHigh:
+    case QAbstract3DGraph::ShadowQualitySoftHigh:
         qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-        newQuality = QDataVis::ShadowQualitySoftMedium;
+        newQuality = QAbstract3DGraph::ShadowQualitySoftMedium;
         break;
-    case QDataVis::ShadowQualitySoftMedium:
+    case QAbstract3DGraph::ShadowQualitySoftMedium:
         qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-        newQuality = QDataVis::ShadowQualitySoftLow;
+        newQuality = QAbstract3DGraph::ShadowQualitySoftLow;
         break;
-    case QDataVis::ShadowQualitySoftLow:
+    case QAbstract3DGraph::ShadowQualitySoftLow:
         qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-        newQuality = QDataVis::ShadowQualityNone;
+        newQuality = QAbstract3DGraph::ShadowQualityNone;
         break;
     default:
         // You'll never get here
@@ -432,4 +430,4 @@ void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient
     *gradientTexture = m_textureHelper->createGradientTexture(*gradient);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

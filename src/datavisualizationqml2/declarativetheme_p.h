@@ -36,7 +36,7 @@
 
 #include <QtQml/qqmlparserstatus.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
 {
@@ -121,6 +121,6 @@ private:
     bool m_dummyColors;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

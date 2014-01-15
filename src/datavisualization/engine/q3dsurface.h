@@ -19,12 +19,11 @@
 #ifndef Q3DSURFACE_H
 #define Q3DSURFACE_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/qabstract3dgraph.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class Q3DSurfacePrivate;
 class QValue3DAxis;
@@ -67,6 +66,6 @@ private:
     Q_DISABLE_COPY(Q3DSurface)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif // Q3DSURFACE_H

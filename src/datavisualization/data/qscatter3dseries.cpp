@@ -19,7 +19,7 @@
 #include "qscatter3dseries_p.h"
 #include "scatter3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QScatter3DSeries
@@ -301,4 +301,4 @@ void QScatter3DSeriesPrivate::setItemSize(float size)
         m_controller->markSeriesVisualsDirty();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

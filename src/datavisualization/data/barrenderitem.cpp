@@ -19,7 +19,7 @@
 #include "barrenderitem_p.h"
 #include "bars3drenderer_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
@@ -66,4 +66,4 @@ QString &BarRenderItem::sliceLabel()
 }
 
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -18,7 +18,7 @@
 
 #include "qheightmapsurfacedataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 // Default ranges correspond value axis defaults
 const float defaultMinValue = 0.0f;
@@ -548,4 +548,4 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
     emit qptr()->heightMapChanged(m_heightMap);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

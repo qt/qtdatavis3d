@@ -32,7 +32,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelscatterdataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 class ScatterItemModelHandler : public AbstractItemModelHandler
 {
@@ -48,6 +48,6 @@ protected:
     QScatterDataArray *m_proxyArray; // Not owned
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
 
 #endif

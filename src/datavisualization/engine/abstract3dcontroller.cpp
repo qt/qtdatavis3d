@@ -33,13 +33,13 @@
 
 #include <QThread>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),
-    m_selectionMode(QDataVis::SelectionItem),
-    m_shadowQuality(QDataVis::ShadowQualityMedium),
+    m_selectionMode(QAbstract3DGraph::SelectionItem),
+    m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -668,7 +668,7 @@ Q3DTheme *Abstract3DController::activeTheme() const
     return m_themeManager->activeTheme();
 }
 
-void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Abstract3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     if (mode != m_selectionMode) {
         m_selectionMode = mode;
@@ -678,12 +678,12 @@ void Abstract3DController::setSelectionMode(QDataVis::SelectionFlags mode)
     }
 }
 
-QDataVis::SelectionFlags Abstract3DController::selectionMode() const
+QAbstract3DGraph::SelectionFlags Abstract3DController::selectionMode() const
 {
     return m_selectionMode;
 }
 
-void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
+void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     if (quality != m_shadowQuality) {
         m_shadowQuality = quality;
@@ -693,7 +693,7 @@ void Abstract3DController::setShadowQuality(QDataVis::ShadowQuality quality)
     }
 }
 
-QDataVis::ShadowQuality Abstract3DController::shadowQuality() const
+QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
 }
@@ -844,7 +844,7 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
 void Abstract3DController::handleInputStateChanged(QAbstract3DInputHandler::InputState state)
 {
     // When in automatic slicing mode, input state change to overview disables slice mode
-    if (m_selectionMode.testFlag(QDataVis::SelectionSlice)
+    if (m_selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
             && state == QAbstract3DInputHandler::InputStateOnPrimaryView) {
         setSlicingActive(false);
     }
@@ -868,7 +868,7 @@ void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
     handleSeriesVisibilityChangedBySender(sender());
 }
 
-void Abstract3DController::handleRequestShadowQuality(QDataVis::ShadowQuality quality)
+void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     setShadowQuality(quality);
 }
@@ -1001,4 +1001,4 @@ void Abstract3DController::emitNeedRender()
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

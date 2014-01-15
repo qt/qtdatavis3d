@@ -19,7 +19,7 @@
 #include "qsurface3dseries_p.h"
 #include "surface3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
  * \class QSurface3DSeries
@@ -380,4 +380,4 @@ void QSurface3DSeriesPrivate::setDrawMode(QSurface3DSeries::DrawFlags mode)
         m_controller->markSeriesVisualsDirty();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}

@@ -20,7 +20,7 @@
 #include "q3dobject_p.h"
 #include "q3dscene_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+namespace QtDataVisualization {
 
 /*!
    \class Q3DObject
@@ -120,4 +120,4 @@ Q3DObjectPrivate::~Q3DObjectPrivate()
 
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+}
