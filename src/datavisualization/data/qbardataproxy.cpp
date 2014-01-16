@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QBarDataProxy
+ * \class QtDataVisualization::QBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DBars.
  * \since Qt Data Visualization 1.0
@@ -48,11 +48,23 @@ namespace QtDataVisualization {
  */
 
 /*!
+ * \typedef QtDataVisualization::QBarDataRow
+ *
+ * A vector of QBarDataItems.
+ */
+
+/*!
+ * \typedef QtDataVisualization::QBarDataArray
+ *
+ * A list of pointers to QBarDataRows.
+ */
+
+/*!
  * \qmltype BarDataProxy
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QBarDataProxy
+ * \instantiates QtDataVisualization::QBarDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy type for Bars3D.
  *
@@ -481,6 +493,10 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
 
 // QBarDataProxyPrivate
 
+/*!
+ * \class QtDataVisualization::QBarDataProxyPrivate
+ * \internal
+ */
 QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
       m_dataArray(new QBarDataArray)

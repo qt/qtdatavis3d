@@ -21,7 +21,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QSurfaceDataItem
+ * \class QtDataVisualization::QSurfaceDataItem
  * \inmodule QtDataVisualization
  * \brief The QSurfaceDataItem class provides a container for resolved data to be added to surface
  * graphs.
@@ -132,6 +132,10 @@ void QSurfaceDataItem::createExtraData()
         d_ptr = new QSurfaceDataItemPrivate;
 }
 
+/*!
+ * \class QtDataVisualization::QSurfaceDataItemPrivate
+ * \internal
+ */
 QSurfaceDataItemPrivate::QSurfaceDataItemPrivate()
 {
 }

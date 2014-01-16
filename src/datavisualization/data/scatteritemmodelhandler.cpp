@@ -21,6 +21,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::ScatterItemModelHandler
+ * \internal
+ */
+
 ScatterItemModelHandler::ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),

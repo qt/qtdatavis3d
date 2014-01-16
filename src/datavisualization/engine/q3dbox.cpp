@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
-    \class Q3DBox
+    \class QtDataVisualization::Q3DBox
     \inmodule QtDataVisualization
     \brief The Q3DBox class represents an axis-aligned box in 3D space.
     \since Qt Data Visualization 1.0
@@ -404,13 +404,17 @@ Q3DBox Q3DBox::transformed(const QMatrix4x4& matrix) const
 
 /*!
     \fn bool qFuzzyCompare(const Q3DBox& box1, const Q3DBox& box2)
-    \relates Q3DBox
+    \relates QtDataVisualization::Q3DBox
 
     Returns true if \a box1 and \a box2 are almost equal; false otherwise.
 */
 
 #ifndef QT_NO_DEBUG_STREAM
 
+/*!
+    \fn operator<<(QDebug dbg, const Q3DBox &box)
+    \internal
+ */
 QDebug operator<<(QDebug dbg, const Q3DBox &box)
 {
     if (box.isFinite()) {

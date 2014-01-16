@@ -20,6 +20,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::AbstractRenderItem
+ * \internal
+ */
+
 AbstractRenderItem::AbstractRenderItem()
     : m_selectionLabelItem(0)
 {

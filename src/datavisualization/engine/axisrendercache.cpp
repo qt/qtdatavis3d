@@ -22,6 +22,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::AxisRenderCache
+ * \internal
+ */
+
 AxisRenderCache::AxisRenderCache()
     : m_type(QAbstract3DAxis::AxisTypeNone),
       m_min(0.0f),

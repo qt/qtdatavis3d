@@ -47,7 +47,15 @@ public:
     inline const QPoint &position() const { return m_position; }
 
     // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(float value);
+    inline void setValue(float value)
+    {
+        m_value = value;
+         // Force reformatting on next access by setting label string to null string
+        if (!m_sliceLabel.isNull())
+            setSliceLabel(QString());
+        if (!m_selectionLabel.isNull())
+            setSelectionLabel(QString());
+    }
     inline float value() const { return m_value; }
 
     // Normalized bar height
@@ -76,16 +84,6 @@ protected:
 
     friend class QBarDataItem;
 };
-
-void BarRenderItem::setValue(float value)
-{
-    m_value = value;
-     // Force reformatting on next access by setting label string to null string
-    if (!m_sliceLabel.isNull())
-        setSliceLabel(QString());
-    if (!m_selectionLabel.isNull())
-        setSelectionLabel(QString());
-}
 
 typedef QVector<BarRenderItem> BarRenderItemRow;
 typedef QVector<BarRenderItemRow> BarRenderItemArray;

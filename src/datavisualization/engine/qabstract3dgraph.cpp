@@ -32,7 +32,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QAbstract3DGraph
+ * \class QtDataVisualization::QAbstract3DGraph
  * \inmodule QtDataVisualization
  * \brief The QAbstract3DGraph class provides a window and render loop for graphs.
  * \since Qt Data Visualization 1.0
@@ -421,6 +421,10 @@ void QAbstract3DGraph::wheelEvent(QWheelEvent *event)
     d_ptr->m_visualController->wheelEvent(event);
 }
 
+/*!
+ * \class QtDataVisualization::QAbstract3DGraphPrivate
+ * \internal
+ */
 QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
     : QObject(0),
       q_ptr(q),

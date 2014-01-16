@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QItemModelBarDataProxy
+ * \class QtDataVisualization::QItemModelBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DBars.
  * \since Qt Data Visualization 1.0
@@ -66,7 +66,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QItemModelBarDataProxy
+ * \instantiates QtDataVisualization::QItemModelBarDataProxy
  * \inherits BarDataProxy
  * \brief Proxy class for presenting data in item models with Bars3D.
  *
@@ -446,6 +446,31 @@ const QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptrc() const
     return static_cast<const QItemModelBarDataProxyPrivate *>(d_ptr.data());
 }
 
+// QItemModelBarDataProxyPrivate
+
+/*!
+ * \class QtDataVisualization::QItemModelBarDataProxyPrivate
+ * \internal
+ */
+QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q)
+    : QBarDataProxyPrivate(q),
+      m_itemModelHandler(new BarItemModelHandler(q)),
+      m_useModelCategories(false),
+      m_autoRowCategories(true),
+      m_autoColumnCategories(true)
+{
+}
+
+QItemModelBarDataProxyPrivate::~QItemModelBarDataProxyPrivate()
+{
+    delete m_itemModelHandler;
+}
+
+QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()
+{
+    return static_cast<QItemModelBarDataProxy *>(q_ptr);
+}
+
 void QItemModelBarDataProxyPrivate::connectItemModelHandler()
 {
     QObject::connect(m_itemModelHandler, &BarItemModelHandler::itemModelChanged,
@@ -466,27 +491,6 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::autoColumnCategoriesChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-}
-
-// QItemModelBarDataProxyPrivate
-
-QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q)
-    : QBarDataProxyPrivate(q),
-      m_itemModelHandler(new BarItemModelHandler(q)),
-      m_useModelCategories(false),
-      m_autoRowCategories(true),
-      m_autoColumnCategories(true)
-{
-}
-
-QItemModelBarDataProxyPrivate::~QItemModelBarDataProxyPrivate()
-{
-    delete m_itemModelHandler;
-}
-
-QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()
-{
-    return static_cast<QItemModelBarDataProxy *>(q_ptr);
 }
 
 }

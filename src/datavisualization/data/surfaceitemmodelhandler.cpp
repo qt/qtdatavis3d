@@ -20,6 +20,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::SurfaceItemModelHandler
+ * \internal
+ */
+
 SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),

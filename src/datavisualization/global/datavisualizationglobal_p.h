@@ -45,10 +45,10 @@ static const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 static const float gridLineOffset = 0.0001f; // Offset for lifting grid lines off background
 // Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
 // y position is added to the minimum height (or can be thought to be that much above or below the camera)
-static const QVector3D defaultLightPos(0.0f, 0.5f, 0.0f);
-static const QVector3D zeroVector(0.0f, 0.0f, 0.0f);
-static const QVector3D upVector(0.0f, 1.0f, 0.0f);
-static const QVector3D cameraDistanceVector(0.0f, 0.0f, cameraDistance);
+static const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, 0.0f);
+static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
+static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
+static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
 
 // Skip color == selection texture's background color
 static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);

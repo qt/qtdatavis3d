@@ -32,6 +32,16 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Surface3DController
+ * \internal
+ */
+
+/*!
+ * \class QtDataVisualization::Surface3DChangeBitField
+ * \internal
+ */
+
 Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
     : Abstract3DController(rect, scene),
       m_renderer(0),

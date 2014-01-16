@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QScatterDataProxy
+ * \class QtDataVisualization::QScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -36,11 +36,17 @@ namespace QtDataVisualization {
  */
 
 /*!
+ * \typedef QtDataVisualization::QScatterDataArray
+ *
+ * A vector of QScatterDataItems.
+ */
+
+/*!
  * \qmltype ScatterDataProxy
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QScatterDataProxy
+ * \instantiates QtDataVisualization::QScatterDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy class for Scatter3D.
  *
@@ -277,6 +283,10 @@ const QScatterDataProxyPrivate *QScatterDataProxy::dptrc() const
 
 // QScatterDataProxyPrivate
 
+/*!
+ * \class QtDataVisualization::QScatterDataProxyPrivate
+ * \internal
+ */
 QScatterDataProxyPrivate::QScatterDataProxyPrivate(QScatterDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeScatter),
       m_dataArray(new QScatterDataArray)

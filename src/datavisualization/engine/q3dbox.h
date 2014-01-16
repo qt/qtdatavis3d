@@ -29,25 +29,71 @@ class Q3DBox; // Needed to circumvent an issue with qdoc. If this line is remove
 class QT_DATAVISUALIZATION_EXPORT Q3DBox
 {
 public:
-    Q3DBox();
-    Q3DBox(const QVector3D& corner1, const QVector3D& corner2);
+    inline Q3DBox() : boxtype(Null), mincorner(0, 0, 0), maxcorner(0, 0, 0) {}
+    inline Q3DBox(const QVector3D& corner1, const QVector3D& corner2): boxtype(Finite),
+        mincorner(qMin(corner1.x(), corner2.x()),
+                  qMin(corner1.y(), corner2.y()),
+                  qMin(corner1.z(), corner2.z())),
+        maxcorner(qMax(corner1.x(), corner2.x()),
+                  qMax(corner1.y(), corner2.y()),
+                  qMax(corner1.z(), corner2.z())) {}
 
-    bool isNull() const;
-    bool isFinite() const;
-    bool isInfinite() const;
+    inline bool isNull() const { return (boxtype == Null); }
+    inline bool isFinite() const { return (boxtype == Finite); }
+    inline bool isInfinite() const { return (boxtype == Infinite); }
 
-    QVector3D minimum() const;
-    QVector3D maximum() const;
-    void setExtents(const QVector3D& corner1, const QVector3D& corner2);
+    inline QVector3D minimum() const { return mincorner; }
+    inline QVector3D maximum() const { return maxcorner; }
+    inline void setExtents(const QVector3D& corner1, const QVector3D& corner2)
+    {
+        boxtype = Finite;
+        mincorner = QVector3D(qMin(corner1.x(), corner2.x()),
+                              qMin(corner1.y(), corner2.y()),
+                              qMin(corner1.z(), corner2.z()));
+        maxcorner = QVector3D(qMax(corner1.x(), corner2.x()),
+                              qMax(corner1.y(), corner2.y()),
+                              qMax(corner1.z(), corner2.z()));
+    }
 
-    void setToNull();
-    void setToInfinite();
+    inline void setToNull()
+    {
+        boxtype = Null;
+        mincorner = QVector3D(0, 0, 0);
+        maxcorner = QVector3D(0, 0, 0);
+    }
 
-    QVector3D size() const;
-    QVector3D center() const;
+    inline void setToInfinite()
+    {
+        boxtype = Infinite;
+        mincorner = QVector3D(0, 0, 0);
+        maxcorner = QVector3D(0, 0, 0);
+    }
 
-    bool contains(const QVector3D& point) const;
-    bool contains(const Q3DBox& box) const;
+    inline QVector3D size() const { return maxcorner - mincorner; }
+    inline QVector3D center() const { return (mincorner + maxcorner) * 0.5f; }
+
+    inline bool contains(const QVector3D& point) const
+    {
+        if (boxtype == Finite) {
+            return (point.x() >= mincorner.x() && point.x() <= maxcorner.x() &&
+                    point.y() >= mincorner.y() && point.y() <= maxcorner.y() &&
+                    point.z() >= mincorner.z() && point.z() <= maxcorner.z());
+        } else if (boxtype == Infinite) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    inline bool contains(const Q3DBox& box) const
+    {
+        if (box.boxtype == Finite)
+            return contains(box.mincorner) && contains(box.maxcorner);
+        else if (box.boxtype == Infinite)
+            return (boxtype == Infinite);
+        else
+            return false;
+    }
 
     bool intersects(const Q3DBox& box) const;
     void intersect(const Q3DBox& box);
@@ -62,8 +108,19 @@ public:
     void transform(const QMatrix4x4& matrix);
     Q3DBox transformed(const QMatrix4x4& matrix) const;
 
-    bool operator==(const Q3DBox& box) const;
-    bool operator!=(const Q3DBox& box) const;
+    inline bool operator==(const Q3DBox& box) const
+    {
+        return (boxtype == box.boxtype &&
+                mincorner == box.mincorner &&
+                maxcorner == box.maxcorner);
+    }
+
+    inline bool operator!=(const Q3DBox& box) const
+    {
+        return (boxtype != box.boxtype ||
+                mincorner != box.mincorner ||
+                maxcorner != box.maxcorner);
+    }
 
     friend bool qFuzzyCompare(const Q3DBox& box1, const Q3DBox& box2);
 
@@ -78,89 +135,6 @@ private:
     Q3DBox::Type boxtype;
     QVector3D mincorner, maxcorner;
 };
-
-inline Q3DBox::Q3DBox() : boxtype(Null), mincorner(0, 0, 0), maxcorner(0, 0, 0) {}
-
-inline Q3DBox::Q3DBox(const QVector3D& corner1, const QVector3D& corner2)
-    : boxtype(Finite),
-      mincorner(qMin(corner1.x(), corner2.x()),
-                qMin(corner1.y(), corner2.y()),
-                qMin(corner1.z(), corner2.z())),
-      maxcorner(qMax(corner1.x(), corner2.x()),
-                qMax(corner1.y(), corner2.y()),
-                qMax(corner1.z(), corner2.z())) {}
-
-inline bool Q3DBox::isNull() const { return (boxtype == Null); }
-inline bool Q3DBox::isFinite() const { return (boxtype == Finite); }
-inline bool Q3DBox::isInfinite() const { return (boxtype == Infinite); }
-
-inline QVector3D Q3DBox::minimum() const { return mincorner; }
-inline QVector3D Q3DBox::maximum() const { return maxcorner; }
-
-inline void Q3DBox::setExtents(const QVector3D& corner1, const QVector3D& corner2)
-{
-    boxtype = Finite;
-    mincorner = QVector3D(qMin(corner1.x(), corner2.x()),
-                          qMin(corner1.y(), corner2.y()),
-                          qMin(corner1.z(), corner2.z()));
-    maxcorner = QVector3D(qMax(corner1.x(), corner2.x()),
-                          qMax(corner1.y(), corner2.y()),
-                          qMax(corner1.z(), corner2.z()));
-}
-
-inline void Q3DBox::setToNull()
-{
-    boxtype = Null;
-    mincorner = QVector3D(0, 0, 0);
-    maxcorner = QVector3D(0, 0, 0);
-}
-
-inline void Q3DBox::setToInfinite()
-{
-    boxtype = Infinite;
-    mincorner = QVector3D(0, 0, 0);
-    maxcorner = QVector3D(0, 0, 0);
-}
-
-inline QVector3D Q3DBox::size() const { return maxcorner - mincorner; }
-inline QVector3D Q3DBox::center() const { return (mincorner + maxcorner) * 0.5f; }
-
-inline bool Q3DBox::contains(const QVector3D& point) const
-{
-    if (boxtype == Finite) {
-        return (point.x() >= mincorner.x() && point.x() <= maxcorner.x() &&
-                point.y() >= mincorner.y() && point.y() <= maxcorner.y() &&
-                point.z() >= mincorner.z() && point.z() <= maxcorner.z());
-    } else if (boxtype == Infinite) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-inline bool Q3DBox::contains(const Q3DBox& box) const
-{
-    if (box.boxtype == Finite)
-        return contains(box.mincorner) && contains(box.maxcorner);
-    else if (box.boxtype == Infinite)
-        return (boxtype == Infinite);
-    else
-        return false;
-}
-
-inline bool Q3DBox::operator==(const Q3DBox& box) const
-{
-    return (boxtype == box.boxtype &&
-            mincorner == box.mincorner &&
-            maxcorner == box.maxcorner);
-}
-
-inline bool Q3DBox::operator!=(const Q3DBox& box) const
-{
-    return (boxtype != box.boxtype ||
-            mincorner != box.mincorner ||
-            maxcorner != box.maxcorner);
-}
 
 inline bool qFuzzyCompare(const Q3DBox& box1, const Q3DBox& box2)
 {

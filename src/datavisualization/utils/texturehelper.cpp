@@ -26,6 +26,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::TextureHelper
+ * \internal
+ */
+
 TextureHelper::TextureHelper()
 {
     initializeOpenGLFunctions();

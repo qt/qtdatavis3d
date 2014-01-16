@@ -43,6 +43,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Scatter3DRenderer
+ * \internal
+ */
+
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.

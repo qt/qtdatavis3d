@@ -34,6 +34,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::SelectionPointer
+ * \internal
+ */
+
 const GLfloat sliceUnits = 2.5;
 
 SelectionPointer::SelectionPointer(Drawer *drawer)

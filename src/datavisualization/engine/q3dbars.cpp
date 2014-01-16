@@ -27,7 +27,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class Q3DBars
+ * \class QtDataVisualization::Q3DBars
  * \inmodule QtDataVisualization
  * \brief The Q3DBars class provides methods for rendering 3D bar graphs.
  * \since Qt Data Visualization 1.0
@@ -351,6 +351,10 @@ const Q3DBarsPrivate *Q3DBars::dptrc() const
     return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
 }
 
+/*!
+ * \class QtDataVisualization::Q3DBarsPrivate
+ * \internal
+ */
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : QAbstract3DGraphPrivate(q)
 {

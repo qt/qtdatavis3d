@@ -26,7 +26,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class Q3DSurface
+ * \class QtDataVisualization::Q3DSurface
  * \inmodule QtDataVisualization
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
  * \since Qt Data Visualization 1.0
@@ -264,6 +264,10 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
 
 /////////////////// PRIVATE ///////////////////////////////////
 
+/*!
+ * \class QtDataVisualization::Q3DSurfacePrivate
+ * \internal
+ */
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
     : QAbstract3DGraphPrivate(q)
 {

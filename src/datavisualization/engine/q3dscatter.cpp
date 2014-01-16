@@ -26,7 +26,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class Q3DScatter
+ * \class QtDataVisualization::Q3DScatter
  * \inmodule QtDataVisualization
  * \brief The Q3DScatter class provides methods for rendering 3D scatter graphs.
  * \since Qt Data Visualization 1.0
@@ -241,6 +241,10 @@ QList<QValue3DAxis *> Q3DScatter::axes() const
     return retList;
 }
 
+/*!
+ * \class QtDataVisualization::Q3DScatterPrivate
+ * \internal
+ */
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
     : QAbstract3DGraphPrivate(q)
 {

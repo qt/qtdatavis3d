@@ -24,6 +24,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::SeriesRenderCache
+ * \internal
+ */
+
 const QString smoothString(QStringLiteral("Smooth"));
 
 SeriesRenderCache::SeriesRenderCache()

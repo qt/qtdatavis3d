@@ -20,6 +20,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::BarItemModelHandler
+ * \internal
+ */
+
 BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),

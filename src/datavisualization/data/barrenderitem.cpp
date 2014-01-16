@@ -21,6 +21,21 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::BarRenderItem
+ * \internal
+ */
+
+/*!
+ * \typedef QtDataVisualization::BarRenderItemRow
+ * \internal
+ */
+
+/*!
+ * \typedef QtDataVisualization::BarRenderItemArray
+ * \internal
+ */
+
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_value(0),

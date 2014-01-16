@@ -25,7 +25,7 @@ const float defaultMinValue = 0.0f;
 const float defaultMaxValue = 10.0f;
 
 /*!
- * \class QHeightMapSurfaceDataProxy
+ * \class QtDataVisualization::QHeightMapSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -46,7 +46,7 @@ const float defaultMaxValue = 10.0f;
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QHeightMapSurfaceDataProxy
+ * \instantiates QtDataVisualization::QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Base proxy type for Surface3D.
  *
@@ -300,6 +300,10 @@ const QHeightMapSurfaceDataProxyPrivate *QHeightMapSurfaceDataProxy::dptrc() con
 //  QHeightMapSurfaceDataProxyPrivate
 //
 
+/*!
+ * \class QtDataVisualization::QHeightMapSurfaceDataProxyPrivate
+ * \internal
+ */
 QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q),
       m_minXValue(defaultMinValue),

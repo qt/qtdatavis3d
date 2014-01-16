@@ -25,6 +25,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::ObjectHelper
+ * \internal
+ */
+
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
 {

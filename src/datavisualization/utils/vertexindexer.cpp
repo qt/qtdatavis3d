@@ -25,6 +25,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::VertexIndexer
+ * \internal
+ */
+
 int unique_vertices = 0;
 
 // Returns true if v1 can be considered equal to v2

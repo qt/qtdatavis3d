@@ -28,6 +28,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Utils
+ * \internal
+ */
+
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 2
 

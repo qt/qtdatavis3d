@@ -22,7 +22,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QBar3DSeries
+ * \class QtDataVisualization::QBar3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DBars.
  * \since Qt Data Visualization 1.0
@@ -69,7 +69,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QBar3DSeries
+ * \instantiates QtDataVisualization::QBar3DSeries
  * \inherits Abstract3DSeries
  * \brief Base series type for Bars3D.
  *
@@ -209,6 +209,10 @@ const QBar3DSeriesPrivate *QBar3DSeries::dptrc() const
 }
 
 // QBar3DSeriesPrivate
+/*!
+ * \class QtDataVisualization::QBar3DSeriesPrivate
+ * \internal
+ */
 
 QBar3DSeriesPrivate::QBar3DSeriesPrivate(QBar3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeBar),

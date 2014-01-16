@@ -21,7 +21,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QScatterDataItem
+ * \class QtDataVisualization::QScatterDataItem
  * \inmodule QtDataVisualization
  * \brief The QScatterDataItem class provides a container for resolved data to be added to scatter
  * graphs.
@@ -140,6 +140,10 @@ void QScatterDataItem::createExtraData()
         d_ptr = new QScatterDataItemPrivate;
 }
 
+/*!
+ * \class QtDataVisualization::QScatterDataItemPrivate
+ * \internal
+ */
 QScatterDataItemPrivate::QScatterDataItemPrivate()
 {
 }

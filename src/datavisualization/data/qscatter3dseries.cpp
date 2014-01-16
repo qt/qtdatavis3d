@@ -22,7 +22,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QScatter3DSeries
+ * \class QtDataVisualization::QScatter3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -65,7 +65,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QScatter3DSeries
+ * \instantiates QtDataVisualization::QScatter3DSeries
  * \inherits Abstract3DSeries
  * \brief Base series type for Scatter3D.
  *
@@ -234,6 +234,10 @@ const QScatter3DSeriesPrivate *QScatter3DSeries::dptrc() const
 
 // QScatter3DSeriesPrivate
 
+/*!
+ * \class QtDataVisualization::QScatter3DSeriesPrivate
+ * \internal
+ */
 QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeScatter),
       m_selectedItem(Scatter3DController::invalidSelectionIndex()),

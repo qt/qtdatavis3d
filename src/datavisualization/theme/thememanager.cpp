@@ -21,6 +21,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::ThemeManager
+ * \internal
+ */
+
 const float defaultBuiltInColorLevel = 0.7f; // for built-in gradient themes
 const float defaultColorLevel = 0.5f; // for built-in uniform themes
 

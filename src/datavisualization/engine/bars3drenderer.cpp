@@ -40,6 +40,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Bars3DRenderer
+ * \internal
+ */
+
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 

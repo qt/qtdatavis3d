@@ -21,6 +21,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::AbstractItemModelHandler
+ * \internal
+ */
+
 AbstractItemModelHandler::AbstractItemModelHandler(QObject *parent)
     : QObject(parent),
       resolvePending(0)

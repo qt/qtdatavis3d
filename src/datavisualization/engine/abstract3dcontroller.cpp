@@ -35,6 +35,16 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Abstract3DController
+ * \internal
+ */
+
+/*!
+ * \class QtDataVisualization::Abstract3DChangeBitField
+ * \internal
+ */
+
 Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),

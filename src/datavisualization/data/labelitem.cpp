@@ -20,6 +20,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::LabelItem
+ * \internal
+ */
+
 LabelItem::LabelItem()
     : m_size(QSize(0, 0)),
       m_textureId(0)

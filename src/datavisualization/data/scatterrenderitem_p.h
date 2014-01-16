@@ -43,10 +43,23 @@ public:
     virtual ~ScatterRenderItem();
 
     inline const QVector3D &position() const { return m_position; }
-    inline void setPosition(const QVector3D &pos);
+    inline void setPosition(const QVector3D &pos)
+    {
+        if (m_position != pos) {
+            m_position = pos;
+            // Force reformatting on next access by setting label string to null string
+            if (!m_selectionLabel.isNull())
+                setSelectionLabel(QString());
+        }
+    }
 
     inline QQuaternion rotation() const { return m_rotation; }
-    inline void setRotation(const QQuaternion &rotation);
+    inline void setRotation(const QQuaternion &rotation)
+    {
+        if (m_rotation != rotation)
+            m_rotation = rotation;
+    }
+
 
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
@@ -63,23 +76,6 @@ protected:
 
     friend class QScatterDataItem;
 };
-
-void ScatterRenderItem::setPosition(const QVector3D &pos)
-{
-    if (m_position != pos) {
-        m_position = pos;
-        // Force reformatting on next access by setting label string to null string
-        if (!m_selectionLabel.isNull())
-            setSelectionLabel(QString());
-    }
-}
-
-void ScatterRenderItem::setRotation(const QQuaternion &rotation)
-{
-    if (m_rotation != rotation)
-        m_rotation = rotation;
-}
-
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 
 }

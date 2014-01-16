@@ -40,6 +40,11 @@ static const int ID_TO_RGBA_MASK = 0xff;
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Surface3DRenderer
+ * \internal
+ */
+
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
 // TODO Uniform scaling is broken on surface

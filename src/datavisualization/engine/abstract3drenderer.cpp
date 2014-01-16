@@ -29,6 +29,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Abstract3DRenderer
+ * \internal
+ */
+
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
       m_hasNegativeValues(false),

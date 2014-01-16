@@ -35,7 +35,7 @@ const int farZoomRangeDivider  = 120;
 const float rotationSpeed      = 100.0f;
 
 /*!
- * \class Q3DInputHandler
+ * \class QtDataVisualization::Q3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic wheel mouse based input handler.
  * \since Qt Data Visualization 1.0
@@ -189,5 +189,10 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
 
     scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
+
+/*!
+ * \class QtDataVisualization::Q3DInputHandlerPrivate
+ * \internal
+ */
 
 }

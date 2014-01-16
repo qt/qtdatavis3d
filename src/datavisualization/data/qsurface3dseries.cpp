@@ -22,7 +22,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QSurface3DSeries
+ * \class QtDataVisualization::QSurface3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -68,7 +68,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QSurface3DSeries
+ * \instantiates QtDataVisualization::QSurface3DSeries
  * \inherits Abstract3DSeries
  * \brief Base series type for Surfaces3D.
  *
@@ -302,6 +302,10 @@ const QSurface3DSeriesPrivate *QSurface3DSeries::dptrc() const
 
 // QSurface3DSeriesPrivate
 
+/*!
+ * \class QtDataVisualization::QSurface3DSeriesPrivate
+ * \internal
+ */
 QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),

@@ -19,7 +19,6 @@
 /*!
     \namespace QtDataVisualization
     \inmodule QtDataVisualization
-    \target QtDataVisualization namespace
 
     QtDataVisualization namespace holds all the classes and enumerations in the QtDataVisualization
     module.
@@ -300,7 +299,7 @@
 
 /*!
  * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias = true)
- * \relates QAbstract3DGraph
+ * \relates QtDataVisualization::QAbstract3DGraph
  *
  * Anti-aliasing is turned on by default on C++ and turned off on QML, except in OpenGL ES2
  * environments, where anti-aliasing is not supported by Qt Data Visualization.

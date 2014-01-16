@@ -40,6 +40,11 @@ StaticLibInitializer staticLibInitializer;
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Drawer
+ * \internal
+ */
+
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 

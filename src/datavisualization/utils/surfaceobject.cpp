@@ -26,6 +26,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::SurfaceObject
+ * \internal
+ */
+
 SurfaceObject::SurfaceObject()
 {
     m_indicesType = GL_UNSIGNED_INT;

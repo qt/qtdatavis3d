@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QAbstractDataProxy
+ * \class QtDataVisualization::QAbstractDataProxy
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization data proxies.
  * \since Qt Data Visualization 1.0
@@ -37,7 +37,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QAbstractDataProxy
+ * \instantiates QtDataVisualization::QAbstractDataProxy
  * \brief Base type for all QtDataVisualization data proxies.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
@@ -91,6 +91,10 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 }
 
 // QAbstractDataProxyPrivate
+/*!
+ * \class QtDataVisualization::QAbstractDataProxyPrivate
+ * \internal
+ */
 
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
     : QObject(0),

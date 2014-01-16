@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QSurfaceDataProxy
+ * \class QtDataVisualization::QSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -57,11 +57,23 @@ namespace QtDataVisualization {
  */
 
 /*!
+ * \typedef QtDataVisualization::QSurfaceDataRow
+ *
+ * A vector of QSurfaceDataItems.
+ */
+
+/*!
+ * \typedef QtDataVisualization::QSurfaceDataArray
+ *
+ * A list of pointers to QSurfaceDataRows.
+ */
+
+/*!
  * \qmltype SurfaceDataProxy
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QSurfaceDataProxy
+ * \instantiates QtDataVisualization::QSurfaceDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy class for Surface3D.
  *
@@ -347,6 +359,10 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
 //  QSurfaceDataProxyPrivate
 //
 
+/*!
+ * \class QtDataVisualization::QSurfaceDataProxyPrivate
+ * \internal
+ */
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
       m_dataArray(new QSurfaceDataArray)

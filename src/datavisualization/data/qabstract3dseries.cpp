@@ -24,7 +24,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QAbstract3DSeries
+ * \class QtDataVisualization::QAbstract3DSeries
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization series.
  * \since Qt Data Visualization 1.0
@@ -34,15 +34,72 @@ namespace QtDataVisualization {
  */
 
 /*!
+ * \class QtDataVisualization::QAbstract3DSeriesChangeBitField
+ * \internal
+ */
+
+/*!
+ * \class QtDataVisualization::QAbstract3DSeriesThemeOverrideBitField
+ * \internal
+ */
+
+/*!
  * \qmltype Abstract3DSeries
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QAbstract3DSeries
+ * \instantiates QtDataVisualization::QAbstract3DSeries
  * \brief Base type for all QtDataVisualization series.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
+ */
+
+/*!
+ * \enum QAbstract3DSeries::SeriesType
+ *
+ * Type of the series.
+ *
+ * \value SeriesTypeNone
+ *        No series type.
+ * \value SeriesTypeBar
+ *        Series type for Q3DBars.
+ * \value SeriesTypeScatter
+ *        Series type for Q3DScatter.
+ * \value SeriesTypeSurface
+ *        Series type for Q3DSurface.
+ */
+
+/*!
+ *  \enum QAbstract3DSeries::Mesh
+ *
+ *  Predefined mesh types. All styles are not usable with all visualization types.
+ *
+ *  \value MeshUserDefined
+ *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
+ *  \value MeshBar
+ *         Basic rectangular bar.
+ *  \value MeshCube
+ *         Basic cube.
+ *  \value MeshPyramid
+ *         Four-sided pyramid.
+ *  \value MeshCone
+ *         Basic cone.
+ *  \value MeshCylinder
+ *         Basic cylinder.
+ *  \value MeshBevelBar
+ *         Slightly beveled (rounded) rectangular bar.
+ *  \value MeshBevelCube
+ *         Slightly beveled (rounded) cube.
+ *  \value MeshSphere
+ *         Sphere.
+ *  \value MeshMinimal
+ *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
+ *  \value MeshArrow
+ *         Arrow pointing upwards.
+ *  \value MeshPoint
+ *         2D point. Usable only with Q3DScatter.
+ *         \b Note: Shadows and color gradients do not affect this style.
  */
 
 /*!
@@ -165,53 +222,6 @@ namespace QtDataVisualization {
  * Series name can be used in item label format with tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
- */
-
-/*!
- * \enum QAbstract3DSeries::SeriesType
- *
- * Type of the series.
- *
- * \value SeriesTypeNone
- *        No series type.
- * \value SeriesTypeBar
- *        Series type for Q3DBars.
- * \value SeriesTypeScatter
- *        Series type for Q3DScatter.
- * \value SeriesTypeSurface
- *        Series type for Q3DSurface.
- */
-
-/*!
- *  \enum QAbstract3DSeries::Mesh
- *
- *  Predefined mesh types. All styles are not usable with all visualization types.
- *
- *  \value MeshUserDefined
- *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
- *  \value MeshBar
- *         Basic rectangular bar.
- *  \value MeshCube
- *         Basic cube.
- *  \value MeshPyramid
- *         Four-sided pyramid.
- *  \value MeshCone
- *         Basic cone.
- *  \value MeshCylinder
- *         Basic cylinder.
- *  \value MeshBevelBar
- *         Slightly beveled (rounded) rectangular bar.
- *  \value MeshBevelCube
- *         Slightly beveled (rounded) cube.
- *  \value MeshSphere
- *         Sphere.
- *  \value MeshMinimal
- *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
- *  \value MeshArrow
- *         Arrow pointing upwards.
- *  \value MeshPoint
- *         2D point. Usable only with Q3DScatter.
- *         \b Note: Shadows and color gradients do not affect this style.
  */
 
 /*!
@@ -519,6 +529,10 @@ QString QAbstract3DSeries::name() const
 }
 
 // QAbstract3DSeriesPrivate
+/*!
+ * \class QtDataVisualization::QAbstract3DSeriesPrivate
+ * \internal
+ */
 
 QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
     : QObject(0),

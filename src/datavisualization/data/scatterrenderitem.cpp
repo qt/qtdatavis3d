@@ -22,6 +22,16 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::ScatterRenderItem
+ * \internal
+ */
+
+/*!
+ * \typedef ScatterRenderItemArray
+ * \internal
+ */
+
 ScatterRenderItem::ScatterRenderItem()
     : AbstractRenderItem(),
       m_visible(false)

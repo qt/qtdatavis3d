@@ -32,6 +32,16 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Bars3DController
+ * \internal
+ */
+
+/*!
+ * \class QtDataVisualization::Bars3DChangeBitField
+ * \internal
+ */
+
 Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
       m_selectedBar(invalidSelectionPosition()),

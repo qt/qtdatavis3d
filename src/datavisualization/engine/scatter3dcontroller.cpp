@@ -29,6 +29,16 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::Scatter3DController
+ * \internal
+ */
+
+/*!
+ * \class QtDataVisualization::Scatter3DChangeBitField
+ * \internal
+ */
+
 Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
       m_renderer(0),

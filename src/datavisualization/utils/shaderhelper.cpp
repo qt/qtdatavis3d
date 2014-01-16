@@ -22,6 +22,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::ShaderHelper
+ * \internal
+ */
+
 void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     Q_UNUSED(type)

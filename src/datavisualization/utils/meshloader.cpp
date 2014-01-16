@@ -28,6 +28,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::MeshLoader
+ * \internal
+ */
+
 QString slashTag = QStringLiteral("/");
 
 bool MeshLoader::loadOBJ(const QString &path,

@@ -36,7 +36,7 @@ const int minZoomLevel = 10;
 const int maxZoomLevel = 500;
 
 /*!
- * \class QTouch3DInputHandler
+ * \class QtDataVisualization::QTouch3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic touch display based input handler.
  * \since Qt Data Visualization 1.0
@@ -129,6 +129,10 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     }
 }
 
+/*!
+ * \class QtDataVisualization::QTouch3DInputHandlerPrivate
+ * \internal
+ */
 QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q)
     : q_ptr(q),
       m_holdTimer(0)

@@ -25,7 +25,7 @@ namespace QtDataVisualization {
 // TODO: CHECK DOCUMENTATION!
 
 /*!
- * \class QItemModelSurfaceDataProxy
+ * \class QtDataVisualization::QItemModelSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -69,7 +69,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QItemModelSurfaceDataProxy
+ * \instantiates QtDataVisualization::QItemModelSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Proxy class for presenting data in item models with Surface3D.
  *
@@ -456,6 +456,31 @@ const QItemModelSurfaceDataProxyPrivate *QItemModelSurfaceDataProxy::dptrc() con
     return static_cast<const QItemModelSurfaceDataProxyPrivate *>(d_ptr.data());
 }
 
+// QItemModelSurfaceDataProxyPrivate
+
+/*!
+ * \class QtDataVisualization::QItemModelSurfaceDataProxyPrivate
+ * \internal
+ */
+QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q)
+    : QSurfaceDataProxyPrivate(q),
+      m_itemModelHandler(new SurfaceItemModelHandler(q)),
+      m_useModelCategories(false),
+      m_autoRowCategories(true),
+      m_autoColumnCategories(true)
+{
+}
+
+QItemModelSurfaceDataProxyPrivate::~QItemModelSurfaceDataProxyPrivate()
+{
+    delete m_itemModelHandler;
+}
+
+QItemModelSurfaceDataProxy *QItemModelSurfaceDataProxyPrivate::qptr()
+{
+    return static_cast<QItemModelSurfaceDataProxy *>(q_ptr);
+}
+
 void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
 {
     QObject::connect(m_itemModelHandler, &SurfaceItemModelHandler::itemModelChanged,
@@ -476,27 +501,6 @@ void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelSurfaceDataProxy::autoColumnCategoriesChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-}
-
-// QItemModelSurfaceDataProxyPrivate
-
-QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q)
-    : QSurfaceDataProxyPrivate(q),
-      m_itemModelHandler(new SurfaceItemModelHandler(q)),
-      m_useModelCategories(false),
-      m_autoRowCategories(true),
-      m_autoColumnCategories(true)
-{
-}
-
-QItemModelSurfaceDataProxyPrivate::~QItemModelSurfaceDataProxyPrivate()
-{
-    delete m_itemModelHandler;
-}
-
-QItemModelSurfaceDataProxy *QItemModelSurfaceDataProxyPrivate::qptr()
-{
-    return static_cast<QItemModelSurfaceDataProxy *>(q_ptr);
 }
 
 }

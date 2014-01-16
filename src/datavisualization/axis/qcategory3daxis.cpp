@@ -24,7 +24,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QCategory3DAxis
+ * \class QtDataVisualization::QCategory3DAxis
  * \inmodule QtDataVisualization
  * \brief The QCategory3DAxis class is used for manipulating an axis of a graph.
  * \since Qt Data Visualization 1.0
@@ -41,7 +41,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QCategory3DAxis
+ * \instantiates QtDataVisualization::QCategory3DAxis
  * \inherits AbstractAxis3D
  * \brief The CategoryAxis3D type is used for manipulating an axis of a graph.
  *
@@ -116,6 +116,11 @@ QCategory3DAxisPrivate *QCategory3DAxis::dptr()
 {
     return static_cast<QCategory3DAxisPrivate *>(d_ptr.data());
 }
+
+/*!
+ * \class QtDataVisualization::QCategory3DAxisPrivate
+ * \internal
+ */
 
 QCategory3DAxisPrivate::QCategory3DAxisPrivate(QCategory3DAxis *q)
     : QAbstract3DAxisPrivate(q, QAbstract3DAxis::AxisTypeCategory),

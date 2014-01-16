@@ -23,7 +23,7 @@
 namespace QtDataVisualization {
 
 /*!
- * \class QItemModelScatterDataProxy
+ * \class QtDataVisualization::QItemModelScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -52,7 +52,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QItemModelScatterDataProxy
+ * \instantiates QtDataVisualization::QItemModelScatterDataProxy
  * \inherits ScatterDataProxy
  * \brief Proxy class for presenting data in item models with Scatter3D.
  *
@@ -235,20 +235,12 @@ const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() con
     return static_cast<const QItemModelScatterDataProxyPrivate *>(d_ptr.data());
 }
 
-void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
-{
-    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
-                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-}
-
 // QItemModelScatterDataProxyPrivate
 
+/*!
+ * \class QtDataVisualization::QItemModelScatterDataProxyPrivate
+ * \internal
+ */
 QItemModelScatterDataProxyPrivate::QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q)
     : QScatterDataProxyPrivate(q),
       m_itemModelHandler(new ScatterItemModelHandler(q))
@@ -263,6 +255,18 @@ QItemModelScatterDataProxyPrivate::~QItemModelScatterDataProxyPrivate()
 QItemModelScatterDataProxy *QItemModelScatterDataProxyPrivate::qptr()
 {
     return static_cast<QItemModelScatterDataProxy *>(q_ptr);
+}
+
+void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
+{
+    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
+                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
 }

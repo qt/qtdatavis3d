@@ -24,6 +24,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::CameraHelper
+ * \internal
+ */
+
 CameraHelper::CameraHelper(QObject *parent) :
     QObject(parent),
     m_position(0, 0.25, 3),

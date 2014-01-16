@@ -22,6 +22,11 @@
 
 namespace QtDataVisualization {
 
+/*!
+ * \class QtDataVisualization::AbstractObjectHelper
+ * \internal
+ */
+
 AbstractObjectHelper::AbstractObjectHelper()
     : m_vertexbuffer(0),
       m_normalbuffer(0),
