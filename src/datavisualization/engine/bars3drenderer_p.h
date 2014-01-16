@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef Q3DBARSRENDERER_p_H
-#define Q3DBARSRENDERER_p_H
+#ifndef Q3DBARSRENDERER_P_H
+#define Q3DBARSRENDERER_P_H
 
 #include "datavisualizationglobal_p.h"
 #include "bars3dcontroller_p.h"
@@ -39,7 +39,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -162,7 +162,6 @@ private:
     friend class BarRenderItem;
 };
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qscatterdataitem.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QScatterDataItemPrivate
 {
@@ -46,6 +46,6 @@ protected:
     friend class QScatterDataItem;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

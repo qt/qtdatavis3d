@@ -23,7 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QFont>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DSurfacePrivate;
 class QValue3DAxis;
@@ -66,6 +66,6 @@ private:
     Q_DISABLE_COPY(Q3DSurface)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DSURFACE_H

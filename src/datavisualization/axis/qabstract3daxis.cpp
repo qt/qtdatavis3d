@@ -19,10 +19,10 @@
 #include "qabstract3daxis.h"
 #include "qabstract3daxis_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QAbstract3DAxis
+ * \class QAbstract3DAxis
  * \inmodule QtDataVisualization
  * \brief QAbstract3DAxis is base class for axes of a graph.
  * \since Qt Data Visualization 1.0
@@ -37,7 +37,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QAbstract3DAxis
+ * \instantiates QAbstract3DAxis
  * \brief AbstractAxis3D is base type for axes of a graph.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
@@ -255,11 +255,6 @@ bool QAbstract3DAxis::isAutoAdjustRange() const
  */
 
 // QAbstract3DAxisPrivate
-/*!
- * \class QtDataVisualization::QAbstract3DAxisPrivate
- * \internal
- */
-
 QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAxis::AxisType type)
     : QObject(0),
       q_ptr(q),
@@ -405,4 +400,4 @@ void QAbstract3DAxisPrivate::setMax(float max)
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

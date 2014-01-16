@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QVector3D>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DObjectPrivate;
 
@@ -60,6 +60,6 @@ private:
     friend class Q3DScenePrivate;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DOBJECT_H

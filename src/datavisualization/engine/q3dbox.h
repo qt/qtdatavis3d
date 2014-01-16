@@ -22,7 +22,7 @@
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QVector3D>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBox; // Needed to circumvent an issue with qdoc. If this line is removed, make docs will not work for this.
 
@@ -152,6 +152,6 @@ QT_DATAVISUALIZATION_EXPORT QDataStream &operator<<(QDataStream &stream, const Q
 QT_DATAVISUALIZATION_EXPORT QDataStream &operator>>(QDataStream &stream, Q3DBox &box);
 #endif
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

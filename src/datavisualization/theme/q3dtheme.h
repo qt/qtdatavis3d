@@ -25,7 +25,7 @@
 #include <QFont>
 #include <QColor>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DThemePrivate;
 
@@ -184,6 +184,6 @@ private:
     Q_DISABLE_COPY(Q3DTheme)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

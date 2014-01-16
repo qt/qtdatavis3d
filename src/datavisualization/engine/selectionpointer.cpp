@@ -32,12 +32,7 @@
 
 #include <QDebug>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::SelectionPointer
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const GLfloat sliceUnits = 2.5;
 
@@ -264,4 +259,4 @@ void SelectionPointer::loadLabelMesh()
     m_labelObj->load();
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

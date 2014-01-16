@@ -33,17 +33,7 @@
 
 #include <QThread>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Abstract3DController
- * \internal
- */
-
-/*!
- * \class QtDataVisualization::Abstract3DChangeBitField
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent) :
     QObject(parent),
@@ -1026,4 +1016,4 @@ void Abstract3DController::emitNeedRender()
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

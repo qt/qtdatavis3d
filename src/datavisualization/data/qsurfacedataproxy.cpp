@@ -20,10 +20,10 @@
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QSurfaceDataProxy
+ * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -57,13 +57,13 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \typedef QtDataVisualization::QSurfaceDataRow
+ * \typedef QSurfaceDataRow
  *
  * A vector of QSurfaceDataItems.
  */
 
 /*!
- * \typedef QtDataVisualization::QSurfaceDataArray
+ * \typedef QSurfaceDataArray
  *
  * A list of pointers to QSurfaceDataRows.
  */
@@ -73,7 +73,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QSurfaceDataProxy
+ * \instantiates QSurfaceDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy class for Surface3D.
  *
@@ -359,10 +359,6 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
 //  QSurfaceDataProxyPrivate
 //
 
-/*!
- * \class QtDataVisualization::QSurfaceDataProxyPrivate
- * \internal
- */
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
       m_dataArray(new QSurfaceDataArray)
@@ -536,4 +532,4 @@ void QSurfaceDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(surfaceSeries);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

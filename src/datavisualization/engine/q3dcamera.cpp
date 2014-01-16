@@ -26,10 +26,10 @@
 #include <qmath.h>
 #include <QVector3D>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DCamera
+ * \class Q3DCamera
  * \inmodule QtDataVisualization
  * \brief Representation of a camera in 3D space.
  * \since Qt Data Visualization 1.0
@@ -81,7 +81,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::Q3DCamera
+ * \instantiates Q3DCamera
  * \brief Representation of a camera in 3D space.
  *
  * Camera3D represents a basic orbit around centerpoint 3D camera that is used when rendering the
@@ -760,10 +760,6 @@ void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
     setYRotation(vertical);
 }
 
-/*!
- * \class QtDataVisualization::Q3DCameraPrivate
- * \internal
- */
 Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     q_ptr(q),
     m_isViewMatrixUpdateActive(true),
@@ -871,5 +867,4 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     q_ptr->setViewMatrix(viewMatrix);
 }
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

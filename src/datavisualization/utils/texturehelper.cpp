@@ -24,12 +24,7 @@
 
 #include <QDebug>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::TextureHelper
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 TextureHelper::TextureHelper()
 {
@@ -372,4 +367,4 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

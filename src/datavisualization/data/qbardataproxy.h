@@ -24,13 +24,13 @@
 #include <QVector>
 #include <QStringList>
 
-namespace QtDataVisualization {
-
-typedef QVector<QBarDataItem> QBarDataRow;
-typedef QList<QBarDataRow *> QBarDataArray;
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataProxyPrivate;
 class QBar3DSeries;
+
+typedef QVector<QBarDataItem> QBarDataRow;
+typedef QList<QBarDataRow *> QBarDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
@@ -104,6 +104,6 @@ private:
     friend class Bars3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QBARDATAPROXY_H

@@ -17,10 +17,10 @@
 ****************************************************************************/
 #include "qabstract3dinputhandler_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QAbstract3DInputHandler
+ * \class QAbstract3DInputHandler
  * \inmodule QtDataVisualization
  * \brief The base class for implementations of input handlers.
  * \since Qt Data Visualization 1.0
@@ -55,7 +55,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QAbstract3DInputHandler
+ * \instantiates QAbstract3DInputHandler
  * \brief Base type for all QtDataVisualization input handlers.
  *
  * This type is uncreatable.
@@ -227,11 +227,6 @@ QPoint QAbstract3DInputHandler::previousInputPos() const
     return d_ptr->m_previousInputPos;
 }
 
-
-/*!
- * \class QtDataVisualization::QAbstract3DInputHandlerPrivate
- * \internal
- */
 QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputHandler *q) :
     q_ptr(q),
     m_prevDistance(0),
@@ -247,4 +242,4 @@ QAbstract3DInputHandlerPrivate::~QAbstract3DInputHandlerPrivate()
 
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

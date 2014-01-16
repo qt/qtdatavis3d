@@ -19,22 +19,7 @@
 #include "barrenderitem_p.h"
 #include "bars3drenderer_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::BarRenderItem
- * \internal
- */
-
-/*!
- * \typedef QtDataVisualization::BarRenderItemRow
- * \internal
- */
-
-/*!
- * \typedef QtDataVisualization::BarRenderItemArray
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
@@ -80,5 +65,4 @@ QString &BarRenderItem::sliceLabel()
     return m_sliceLabel;
 }
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

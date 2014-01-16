@@ -33,7 +33,7 @@
 #include <QOpenGLFunctions>
 #include <QSize>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class LabelItem
 {
@@ -54,6 +54,6 @@ private:
     GLuint m_textureId;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

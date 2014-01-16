@@ -92,7 +92,7 @@ QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 {
@@ -103,7 +103,7 @@ public:
     void registerTypes(const char *uri);
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // DATAVISUALIZATIONQML2_PLUGIN_H
 

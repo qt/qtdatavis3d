@@ -33,7 +33,7 @@
 #include <QColor>
 #include <QQmlListProperty>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ColorGradientStop : public QObject
 {
@@ -83,6 +83,6 @@ Q_SIGNALS:
     void updated();
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

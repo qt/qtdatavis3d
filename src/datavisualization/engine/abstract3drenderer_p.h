@@ -41,7 +41,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class TextureHelper;
 class Theme;
@@ -146,6 +146,6 @@ protected:
 #endif
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // ABSTRACT3DRENDERER_P_H

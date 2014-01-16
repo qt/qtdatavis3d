@@ -34,7 +34,7 @@
 #include <QVector3D>
 #include <QDebug>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // Constants used in several files
 // Distance from camera to origin
@@ -56,6 +56,6 @@ static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

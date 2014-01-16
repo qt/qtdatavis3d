@@ -36,7 +36,7 @@
 class QOpenGLContext;
 class QOpenGLPaintDevice;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraph;
 class Abstract3DController;
@@ -71,6 +71,6 @@ public:
     float m_devicePixelRatio;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

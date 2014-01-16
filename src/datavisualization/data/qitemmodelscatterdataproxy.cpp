@@ -20,10 +20,10 @@
 #include "scatteritemmodelhandler_p.h"
 #include <QTimer>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QItemModelScatterDataProxy
+ * \class QItemModelScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -52,7 +52,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QItemModelScatterDataProxy
+ * \instantiates QItemModelScatterDataProxy
  * \inherits ScatterDataProxy
  * \brief Proxy class for presenting data in item models with Scatter3D.
  *
@@ -237,10 +237,6 @@ const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() con
 
 // QItemModelScatterDataProxyPrivate
 
-/*!
- * \class QtDataVisualization::QItemModelScatterDataProxyPrivate
- * \internal
- */
 QItemModelScatterDataProxyPrivate::QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q)
     : QScatterDataProxyPrivate(q),
       m_itemModelHandler(new ScatterItemModelHandler(q))
@@ -269,4 +265,4 @@ void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -21,7 +21,7 @@
 #include <QTimer>
 #include <qmath.h>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const float maxTapAndHoldJitter = 20.0f;
 const int maxPinchJitter = 10;
@@ -36,7 +36,7 @@ const int minZoomLevel = 10;
 const int maxZoomLevel = 500;
 
 /*!
- * \class QtDataVisualization::QTouch3DInputHandler
+ * \class QTouch3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic touch display based input handler.
  * \since Qt Data Visualization 1.0
@@ -129,10 +129,6 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     }
 }
 
-/*!
- * \class QtDataVisualization::QTouch3DInputHandlerPrivate
- * \internal
- */
 QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q)
     : q_ptr(q),
       m_holdTimer(0)
@@ -213,4 +209,4 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

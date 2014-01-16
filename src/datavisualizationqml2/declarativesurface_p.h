@@ -42,7 +42,7 @@
 #include <QObject>
 #include <QQuickWindow>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeSurface : public AbstractDeclarative
 {
@@ -86,6 +86,6 @@ private:
     Surface3DController *m_surfaceController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

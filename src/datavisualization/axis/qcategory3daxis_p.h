@@ -33,7 +33,7 @@
 #ifndef QCATEGORY3DAXIS_P_H
 #define QCATEGORY3DAXIS_P_H
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QCategory3DAxisPrivate : public QAbstract3DAxisPrivate
 {
@@ -52,6 +52,6 @@ private:
     friend class QCategory3DAxis;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

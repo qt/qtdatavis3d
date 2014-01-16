@@ -32,7 +32,7 @@
 #include "qitemmodelsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class SurfaceItemModelHandler;
 
@@ -66,6 +66,6 @@ private:
     friend class QItemModelSurfaceDataProxy;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QStringList>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QItemModelSurfaceDataProxyPrivate;
 
@@ -104,6 +104,6 @@ private:
     friend class SurfaceItemModelHandler;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

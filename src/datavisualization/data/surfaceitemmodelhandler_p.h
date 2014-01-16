@@ -32,7 +32,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelsurfacedataproxy_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class SurfaceItemModelHandler : public AbstractItemModelHandler
 {
@@ -48,6 +48,6 @@ protected:
     QSurfaceDataArray *m_proxyArray; // Not owned
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

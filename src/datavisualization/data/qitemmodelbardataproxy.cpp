@@ -20,10 +20,10 @@
 #include "baritemmodelhandler_p.h"
 #include <QTimer>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QItemModelBarDataProxy
+ * \class QItemModelBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DBars.
  * \since Qt Data Visualization 1.0
@@ -66,7 +66,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QItemModelBarDataProxy
+ * \instantiates QItemModelBarDataProxy
  * \inherits BarDataProxy
  * \brief Proxy class for presenting data in item models with Bars3D.
  *
@@ -448,10 +448,6 @@ const QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptrc() const
 
 // QItemModelBarDataProxyPrivate
 
-/*!
- * \class QtDataVisualization::QItemModelBarDataProxyPrivate
- * \internal
- */
 QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q)
     : QBarDataProxyPrivate(q),
       m_itemModelHandler(new BarItemModelHandler(q)),
@@ -493,4 +489,4 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

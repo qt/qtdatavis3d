@@ -20,10 +20,10 @@
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QBarDataProxy
+ * \class QBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DBars.
  * \since Qt Data Visualization 1.0
@@ -48,13 +48,13 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \typedef QtDataVisualization::QBarDataRow
+ * \typedef QBarDataRow
  *
  * A vector of QBarDataItems.
  */
 
 /*!
- * \typedef QtDataVisualization::QBarDataArray
+ * \typedef QBarDataArray
  *
  * A list of pointers to QBarDataRows.
  */
@@ -64,7 +64,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QBarDataProxy
+ * \instantiates QBarDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy type for Bars3D.
  *
@@ -493,10 +493,6 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
 
 // QBarDataProxyPrivate
 
-/*!
- * \class QtDataVisualization::QBarDataProxyPrivate
- * \internal
- */
 QBarDataProxyPrivate::QBarDataProxyPrivate(QBarDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeBar),
       m_dataArray(new QBarDataArray)
@@ -729,4 +725,4 @@ void QBarDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(barSeries);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

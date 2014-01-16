@@ -33,7 +33,7 @@
 #ifndef QABSTRACTDATAPROXY_P_H
 #define QABSTRACTDATAPROXY_P_H
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DSeries;
 
@@ -56,6 +56,6 @@ private:
     friend class QAbstractDataProxy;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QABSTRACTDATAPROXY_P_H

@@ -24,7 +24,7 @@
 #include <QScopedPointer>
 #include <QLinearGradient>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DSeriesPrivate;
 
@@ -142,6 +142,6 @@ private:
     friend class Abstract3DRenderer;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

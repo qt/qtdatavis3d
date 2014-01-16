@@ -21,7 +21,7 @@
 #include "qitemmodelbardataproxy.h"
 #include "declarativescene_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -185,4 +185,4 @@ void DeclarativeBars::handleAxisZChanged(QAbstract3DAxis *axis)
     emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -23,10 +23,10 @@
 #include "q3dcamera.h"
 #include "qscatter3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DScatter
+ * \class Q3DScatter
  * \inmodule QtDataVisualization
  * \brief The Q3DScatter class provides methods for rendering 3D scatter graphs.
  * \since Qt Data Visualization 1.0
@@ -241,10 +241,6 @@ QList<QValue3DAxis *> Q3DScatter::axes() const
     return retList;
 }
 
-/*!
- * \class QtDataVisualization::Q3DScatterPrivate
- * \internal
- */
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
     : QAbstract3DGraphPrivate(q)
 {
@@ -274,5 +270,5 @@ Q3DScatter *Q3DScatterPrivate::qptr()
     return static_cast<Q3DScatter *>(q_ptr);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 

@@ -18,10 +18,10 @@
 
 #include "qbardataitem_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QBarDataItem
+ * \class QBarDataItem
  * \inmodule QtDataVisualization
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
  * \since Qt Data Visualization 1.0
@@ -99,10 +99,6 @@ void QBarDataItem::createExtraData()
         d_ptr = new QBarDataItemPrivate;
 }
 
-/*!
- * \class QtDataVisualization::QBarDataItemPrivate
- * \internal
- */
 QBarDataItemPrivate::QBarDataItemPrivate()
 {
 }
@@ -111,4 +107,4 @@ QBarDataItemPrivate::~QBarDataItemPrivate()
 {
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -20,12 +20,7 @@
 
 #include <QDebug>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::AbstractObjectHelper
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractObjectHelper::AbstractObjectHelper()
     : m_vertexbuffer(0),
@@ -85,4 +80,4 @@ GLuint AbstractObjectHelper::indicesType()
     return m_indicesType;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

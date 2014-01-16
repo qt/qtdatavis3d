@@ -25,7 +25,7 @@
 class QVector3D;
 class QPoint;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCameraPrivate;
 
@@ -157,6 +157,6 @@ private:
     friend class QMac3DInputHandler;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DCAMERA_H

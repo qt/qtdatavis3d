@@ -12,8 +12,7 @@ imagedirs  += ../images \
               images
 sourcedirs += ..
 
-depends += qtcore \
-           qtgui
+depends += qtcore qtgui qtdeclarative
 
 indexes += $QTDIR/doc/html/qt.index
 

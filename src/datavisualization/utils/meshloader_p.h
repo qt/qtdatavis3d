@@ -34,7 +34,7 @@
 class QVector2D;
 class QVector3D;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class MeshLoader
 {
@@ -46,6 +46,6 @@ class MeshLoader
     // TODO: add loaders for other formats?
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

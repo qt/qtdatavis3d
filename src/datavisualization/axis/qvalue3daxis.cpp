@@ -20,10 +20,10 @@
 #include "qvalue3daxis_p.h"
 #include "utils_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QValue3DAxis
+ * \class QValue3DAxis
  * \inmodule QtDataVisualization
  * \brief The QValue3DAxis class is used for manipulating an axis of a graph.
  * \since Qt Data Visualization 1.0
@@ -41,7 +41,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QValue3DAxis
+ * \instantiates QValue3DAxis
  * \inherits AbstractAxis3D
  * \brief The ValueAxis3D type is used for manipulating an axis of a graph.
  *
@@ -184,11 +184,6 @@ const QValue3DAxisPrivate *QValue3DAxis::dptrc() const
     return static_cast<const QValue3DAxisPrivate *>(d_ptr.data());
 }
 
-/*!
- * \class QtDataVisualization::QValue3DAxisPrivate
- * \internal
- */
-
 QValue3DAxisPrivate::QValue3DAxisPrivate(QValue3DAxis *q)
     : QAbstract3DAxisPrivate(q, QAbstract3DAxis::AxisTypeValue),
       m_segmentCount(5),
@@ -272,4 +267,4 @@ QValue3DAxis *QValue3DAxisPrivate::qptr()
     return static_cast<QValue3DAxis *>(q_ptr);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

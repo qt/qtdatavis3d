@@ -41,7 +41,7 @@
 #include <QQuickItem>
 #include <QObject>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeScatter : public AbstractDeclarative
 {
@@ -85,6 +85,6 @@ protected:
     Scatter3DController *m_scatterController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

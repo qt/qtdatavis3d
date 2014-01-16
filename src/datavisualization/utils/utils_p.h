@@ -39,7 +39,7 @@ class QString;
 class QPoint;
 class QImage;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Utils
 {
@@ -75,6 +75,6 @@ private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

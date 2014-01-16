@@ -26,7 +26,7 @@
 #include <QVector>
 #include <QStringList>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DAxisPrivate;
 
@@ -103,6 +103,6 @@ private:
     friend class Bars3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

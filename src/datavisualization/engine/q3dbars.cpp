@@ -24,10 +24,10 @@
 #include "q3dcamera.h"
 #include "qbar3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DBars
+ * \class Q3DBars
  * \inmodule QtDataVisualization
  * \brief The Q3DBars class provides methods for rendering 3D bar graphs.
  * \since Qt Data Visualization 1.0
@@ -167,7 +167,7 @@ void Q3DBars::removeSeries(QBar3DSeries *series)
  * the new position in list is calculated as if the series was still in its old
  * index, so the final index is actually the \a index decremented by one.
  *
- * \sa addSeries(), seriesList(), seriesIndex()
+ * \sa addSeries(), seriesList()
  */
 void Q3DBars::insertSeries(int index, QBar3DSeries *series)
 {
@@ -351,10 +351,6 @@ const Q3DBarsPrivate *Q3DBars::dptrc() const
     return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
 }
 
-/*!
- * \class QtDataVisualization::Q3DBarsPrivate
- * \internal
- */
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
     : QAbstract3DGraphPrivate(q)
 {
@@ -384,4 +380,4 @@ Q3DBars *Q3DBarsPrivate::qptr()
     return static_cast<Q3DBars *>(q_ptr);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

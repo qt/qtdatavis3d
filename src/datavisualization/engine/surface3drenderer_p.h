@@ -43,7 +43,7 @@
 
 class QOpenGLShaderProgram;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -184,6 +184,6 @@ private:
     Q_DISABLE_COPY(Surface3DRenderer)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // SURFACE3DRENDERER_P_H

@@ -18,12 +18,7 @@
 
 #include "baritemmodelhandler_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::BarItemModelHandler
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
@@ -148,4 +143,4 @@ void BarItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray, rowLabels, columnLabels);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

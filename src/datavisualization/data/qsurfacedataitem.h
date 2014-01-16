@@ -19,9 +19,11 @@
 #ifndef QSURFACEDATAITEM_H
 #define QSURFACEDATAITEM_H
 
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QVector3D>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataItemPrivate;
 
@@ -53,6 +55,6 @@ private:
     QVector3D m_position;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

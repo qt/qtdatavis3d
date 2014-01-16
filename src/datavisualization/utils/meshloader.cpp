@@ -26,12 +26,7 @@
 
 #include <QDebug>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::MeshLoader
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 QString slashTag = QStringLiteral("/");
 
@@ -127,4 +122,4 @@ bool MeshLoader::loadOBJ(const QString &path,
     return true;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

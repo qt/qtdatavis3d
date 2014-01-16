@@ -18,14 +18,14 @@
 
 #include "qheightmapsurfacedataproxy_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // Default ranges correspond value axis defaults
 const float defaultMinValue = 0.0f;
 const float defaultMaxValue = 10.0f;
 
 /*!
- * \class QtDataVisualization::QHeightMapSurfaceDataProxy
+ * \class QHeightMapSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -46,7 +46,7 @@ const float defaultMaxValue = 10.0f;
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QHeightMapSurfaceDataProxy
+ * \instantiates QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Base proxy type for Surface3D.
  *
@@ -300,10 +300,6 @@ const QHeightMapSurfaceDataProxyPrivate *QHeightMapSurfaceDataProxy::dptrc() con
 //  QHeightMapSurfaceDataProxyPrivate
 //
 
-/*!
- * \class QtDataVisualization::QHeightMapSurfaceDataProxyPrivate
- * \internal
- */
 QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q),
       m_minXValue(defaultMinValue),
@@ -552,4 +548,4 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
     emit qptr()->heightMapChanged(m_heightMap);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

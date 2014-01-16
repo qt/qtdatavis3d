@@ -39,7 +39,7 @@ class QVector3D;
 class QPoint;
 class QPointF;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class CameraHelper : public QObject
 {
@@ -86,6 +86,6 @@ public:
     void setCameraPreset(Q3DCamera::CameraPreset preset);
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

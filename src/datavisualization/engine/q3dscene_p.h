@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QRect>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCamera;
 class Q3DLight;
@@ -110,6 +110,6 @@ public:
     bool m_sceneDirty;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DSCENE_P_H

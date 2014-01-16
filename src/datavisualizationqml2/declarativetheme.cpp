@@ -18,7 +18,7 @@
 
 #include "declarativetheme_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeTheme3D::DeclarativeTheme3D(QObject *parent)
     : Q3DTheme(parent),
@@ -390,4 +390,4 @@ void DeclarativeTheme3D::clearBaseGradientsFunc(QQmlListProperty<ColorGradient> 
     reinterpret_cast<DeclarativeTheme3D *>(list->data)->clearGradients();
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

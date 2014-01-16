@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QRect>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCamera;
 class Q3DBox;
@@ -108,6 +108,6 @@ private:
     friend class Q3DObject;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DSCENE_H

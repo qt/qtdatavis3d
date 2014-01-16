@@ -32,7 +32,7 @@
 #include "qitemmodelscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ScatterItemModelHandler;
 
@@ -57,6 +57,6 @@ private:
     friend class QItemModelScatterDataProxy;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

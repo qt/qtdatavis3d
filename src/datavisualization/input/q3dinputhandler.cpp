@@ -21,7 +21,7 @@
 #include "q3dcamera_p.h"
 #include "q3dlight.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const int minZoomLevel         = 10;
 const int halfSizeZoomLevel    = 50;
@@ -35,7 +35,7 @@ const int farZoomRangeDivider  = 120;
 const float rotationSpeed      = 100.0f;
 
 /*!
- * \class QtDataVisualization::Q3DInputHandler
+ * \class Q3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic wheel mouse based input handler.
  * \since Qt Data Visualization 1.0
@@ -190,9 +190,4 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
     scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
 
-/*!
- * \class QtDataVisualization::Q3DInputHandlerPrivate
- * \internal
- */
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -38,12 +38,7 @@
 
 static const int ID_TO_RGBA_MASK = 0xff;
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Surface3DRenderer
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
@@ -2193,4 +2188,4 @@ void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

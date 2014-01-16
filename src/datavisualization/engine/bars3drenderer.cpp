@@ -38,12 +38,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Bars3DRenderer
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
@@ -2205,4 +2200,4 @@ void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString
     m_labelShader->initialize();
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

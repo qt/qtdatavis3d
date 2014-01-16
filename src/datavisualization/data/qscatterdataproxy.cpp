@@ -20,10 +20,10 @@
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QScatterDataProxy
+ * \class QScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -36,7 +36,7 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \typedef QtDataVisualization::QScatterDataArray
+ * \typedef QScatterDataArray
  *
  * A vector of QScatterDataItems.
  */
@@ -46,7 +46,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QScatterDataProxy
+ * \instantiates QScatterDataProxy
  * \inherits AbstractDataProxy
  * \brief Base proxy class for Scatter3D.
  *
@@ -283,10 +283,6 @@ const QScatterDataProxyPrivate *QScatterDataProxy::dptrc() const
 
 // QScatterDataProxyPrivate
 
-/*!
- * \class QtDataVisualization::QScatterDataProxyPrivate
- * \internal
- */
 QScatterDataProxyPrivate::QScatterDataProxyPrivate(QScatterDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeScatter),
       m_dataArray(new QScatterDataArray)
@@ -418,4 +414,4 @@ QScatterDataProxy *QScatterDataProxyPrivate::qptr()
     return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

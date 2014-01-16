@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dlight.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DScene;
 class Q3DLight;
@@ -49,7 +49,7 @@ public:
     Q3DLight *q_ptr;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DLIGHT_P_H
 

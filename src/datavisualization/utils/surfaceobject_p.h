@@ -36,7 +36,7 @@
 #include <QOpenGLFunctions>
 #include <QRect>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class SurfaceObject : public AbstractObjectHelper
 {
@@ -85,5 +85,6 @@ private:
     QVector<QVector3D> m_normals;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
+
 #endif // SURFACEOBJECT_P_H

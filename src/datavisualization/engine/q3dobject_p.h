@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DObject;
 class Q3DScene;
@@ -48,6 +48,6 @@ public:
     bool m_isDirty;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DOBJECT_P_H

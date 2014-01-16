@@ -41,7 +41,7 @@
 
 class QOpenGLShaderProgram;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -93,6 +93,6 @@ private:
     QVector3D m_highlightColor;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // NOTIFICATIONLABEL_P_H

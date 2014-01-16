@@ -22,12 +22,7 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::SeriesRenderCache
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const QString smoothString(QStringLiteral("Smooth"));
 
@@ -184,4 +179,4 @@ void SeriesRenderCache::cleanup(TextureHelper *texHelper)
     texHelper->deleteTexture(&m_multiHighlightGradientTexture);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

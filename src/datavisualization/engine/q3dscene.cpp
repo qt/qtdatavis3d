@@ -25,10 +25,10 @@
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DScene
+ * \class Q3DScene
  * \inmodule QtDataVisualization
  * \brief Q3DScene class provides description of the 3D scene being visualized.
  * \since Qt Data Visualization 1.0
@@ -47,7 +47,7 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \class QtDataVisualization::Q3DSceneChangeBitField
+ * \class Q3DSceneChangeBitField
  * \internal
  */
 
@@ -56,7 +56,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::Q3DScene
+ * \instantiates Q3DScene
  * \brief Scene3D type provides description of the 3D scene being visualized.
  *
  * The 3D scene contains a single active camera and a single active light source.
@@ -461,10 +461,6 @@ void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePositio
                                                                    distanceModifier));
 }
 
-/*!
- * \class QtDataVisualization::Q3DScenePrivate
- * \internal
- */
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     QObject(0),
     q_ptr(q),
@@ -653,4 +649,4 @@ QRect Q3DScenePrivate::glSecondarySubViewport()
     return m_glSecondarySubViewport;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

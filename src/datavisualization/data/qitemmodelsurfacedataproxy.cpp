@@ -20,12 +20,12 @@
 #include "surfaceitemmodelhandler_p.h"
 #include <QTimer>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // TODO: CHECK DOCUMENTATION!
 
 /*!
- * \class QtDataVisualization::QItemModelSurfaceDataProxy
+ * \class QItemModelSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DSurface.
  * \since Qt Data Visualization 1.0
@@ -69,7 +69,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QItemModelSurfaceDataProxy
+ * \instantiates QItemModelSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Proxy class for presenting data in item models with Surface3D.
  *
@@ -458,10 +458,6 @@ const QItemModelSurfaceDataProxyPrivate *QItemModelSurfaceDataProxy::dptrc() con
 
 // QItemModelSurfaceDataProxyPrivate
 
-/*!
- * \class QtDataVisualization::QItemModelSurfaceDataProxyPrivate
- * \internal
- */
 QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q),
       m_itemModelHandler(new SurfaceItemModelHandler(q)),
@@ -503,4 +499,4 @@ void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

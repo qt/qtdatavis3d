@@ -34,7 +34,7 @@
 #include <QRgb>
 #include <QLinearGradient>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class TextureHelper : protected QOpenGLFunctions
 {
@@ -67,6 +67,6 @@ class TextureHelper : protected QOpenGLFunctions
     friend class Scatter3DRenderer;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

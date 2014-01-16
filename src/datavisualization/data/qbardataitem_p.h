@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qbardataitem.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataItemPrivate
 {
@@ -46,6 +46,6 @@ protected:
     friend class QBarDataItem;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

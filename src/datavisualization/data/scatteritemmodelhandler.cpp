@@ -19,12 +19,7 @@
 #include "scatteritemmodelhandler_p.h"
 #include <QTimer>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::ScatterItemModelHandler
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 ScatterItemModelHandler::ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
@@ -82,4 +77,4 @@ void ScatterItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

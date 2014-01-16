@@ -22,7 +22,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QMouseEvent>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DInputHandlerPrivate;
 
@@ -87,6 +87,6 @@ private:
     friend class QTouch3DInputHandlerPrivate;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QABSTRACT3DINPUTHANDLER_H

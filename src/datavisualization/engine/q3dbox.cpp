@@ -20,10 +20,10 @@
 #include "q3dbox.h"
 #include <QtCore/QList>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
-    \class QtDataVisualization::Q3DBox
+    \class Q3DBox
     \inmodule QtDataVisualization
     \brief The Q3DBox class represents an axis-aligned box in 3D space.
     \since Qt Data Visualization 1.0
@@ -404,7 +404,7 @@ Q3DBox Q3DBox::transformed(const QMatrix4x4& matrix) const
 
 /*!
     \fn bool qFuzzyCompare(const Q3DBox& box1, const Q3DBox& box2)
-    \relates QtDataVisualization::Q3DBox
+    \relates Q3DBox
 
     Returns true if \a box1 and \a box2 are almost equal; false otherwise.
 */
@@ -482,4 +482,4 @@ QDataStream &operator>>(QDataStream &stream, Q3DBox &box)
 
 #endif // QT_NO_DATASTREAM
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

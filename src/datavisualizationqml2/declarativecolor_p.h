@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QColor>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeColor : public QObject
 {
@@ -52,6 +52,6 @@ private:
     QColor m_color;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

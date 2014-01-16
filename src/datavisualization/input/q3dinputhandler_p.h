@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DInputHandler;
 
@@ -46,6 +46,6 @@ public:
 
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DINPUTHANDLER_P_H

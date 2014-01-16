@@ -21,10 +21,10 @@
 #include "qabstractdataproxy_p.h"
 #include "abstract3dcontroller_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QAbstract3DSeries
+ * \class QAbstract3DSeries
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization series.
  * \since Qt Data Visualization 1.0
@@ -34,12 +34,12 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \class QtDataVisualization::QAbstract3DSeriesChangeBitField
+ * \class QAbstract3DSeriesChangeBitField
  * \internal
  */
 
 /*!
- * \class QtDataVisualization::QAbstract3DSeriesThemeOverrideBitField
+ * \class QAbstract3DSeriesThemeOverrideBitField
  * \internal
  */
 
@@ -48,7 +48,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QAbstract3DSeries
+ * \instantiates QAbstract3DSeries
  * \brief Base type for all QtDataVisualization series.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
@@ -529,10 +529,6 @@ QString QAbstract3DSeries::name() const
 }
 
 // QAbstract3DSeriesPrivate
-/*!
- * \class QtDataVisualization::QAbstract3DSeriesPrivate
- * \internal
- */
 
 QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
     : QObject(0),
@@ -718,4 +714,4 @@ void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesInd
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

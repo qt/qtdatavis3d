@@ -20,10 +20,10 @@
 #include "q3dscene.h"
 #include "q3dlight_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DLight
+ * \class Q3DLight
  * \inmodule QtDataVisualization
  * \brief Representation of a light source in 3D space.
  * \since Qt Data Visualization 1.0
@@ -36,7 +36,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::Q3DLight
+ * \instantiates Q3DLight
  * \brief Representation of a light source in 3D space.
  *
  * Light3D represents a monochrome non variable light source in 3D space.
@@ -59,10 +59,6 @@ Q3DLight::~Q3DLight()
 {
 }
 
-/*!
- * \class QtDataVisualization::Q3DLightPrivate
- * \internal
- */
 Q3DLightPrivate::Q3DLightPrivate(Q3DLight *q) :
     q_ptr(q)
 {
@@ -83,4 +79,4 @@ void Q3DLightPrivate::sync(Q3DLight &other)
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

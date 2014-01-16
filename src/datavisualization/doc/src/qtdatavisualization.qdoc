@@ -299,7 +299,7 @@
 
 /*!
  * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias = true)
- * \relates QtDataVisualization::QAbstract3DGraph
+ * \relates QAbstract3DGraph
  *
  * Anti-aliasing is turned on by default on C++ and turned off on QML, except in OpenGL ES2
  * environments, where anti-aliasing is not supported by Qt Data Visualization.

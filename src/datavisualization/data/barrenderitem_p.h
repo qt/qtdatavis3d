@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Bars3DRenderer;
 
@@ -88,6 +88,6 @@ protected:
 typedef QVector<BarRenderItem> BarRenderItemRow;
 typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

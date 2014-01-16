@@ -18,12 +18,7 @@
 
 #include "surfaceitemmodelhandler_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::SurfaceItemModelHandler
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
@@ -144,4 +139,4 @@ void SurfaceItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

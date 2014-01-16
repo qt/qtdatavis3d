@@ -19,12 +19,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include <QTimer>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::AbstractItemModelHandler
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractItemModelHandler::AbstractItemModelHandler(QObject *parent)
     : QObject(parent),
@@ -201,4 +196,4 @@ void AbstractItemModelHandler::handlePendingResolve()
     resolveModel();
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

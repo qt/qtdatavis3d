@@ -18,12 +18,7 @@
 
 #include "abstractrenderitem_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::AbstractRenderItem
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractRenderItem::AbstractRenderItem()
     : m_selectionLabelItem(0)
@@ -61,5 +56,4 @@ QString &AbstractRenderItem::selectionLabel()
     return m_selectionLabel;
 }
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

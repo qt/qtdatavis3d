@@ -24,7 +24,7 @@
 #include <QFont>
 #include <QLinearGradient>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DScatterPrivate;
 class QValue3DAxis;
@@ -67,6 +67,6 @@ private:
     Q_DISABLE_COPY(Q3DScatter)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

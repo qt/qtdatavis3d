@@ -21,7 +21,7 @@
 
 #include "qtouch3dinputhandler.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DInputHandler;
 
@@ -45,6 +45,6 @@ public:
     QPointF m_touchHoldPos;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QTOUCH3DINPUTHANDLER_H

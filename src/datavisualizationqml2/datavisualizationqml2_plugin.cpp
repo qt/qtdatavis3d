@@ -20,7 +20,7 @@
 
 #include <qqml.h>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
@@ -80,5 +80,5 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 

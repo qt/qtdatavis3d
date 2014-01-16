@@ -36,7 +36,7 @@
 #include "abstractrenderitem_p.h"
 #include <QFont>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -100,6 +100,6 @@ private:
     GLuint m_pointbuffer;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

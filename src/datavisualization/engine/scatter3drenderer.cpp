@@ -41,12 +41,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Scatter3DRenderer
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
@@ -1805,4 +1800,4 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, i
     series = 0;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

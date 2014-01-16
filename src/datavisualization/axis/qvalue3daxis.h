@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/qabstract3daxis.h>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QValue3DAxisPrivate;
 
@@ -60,6 +60,6 @@ private:
     friend class Surface3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

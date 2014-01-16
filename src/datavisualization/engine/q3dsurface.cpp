@@ -23,10 +23,10 @@
 #include "q3dcamera.h"
 #include "qsurface3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DSurface
+ * \class Q3DSurface
  * \inmodule QtDataVisualization
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
  * \since Qt Data Visualization 1.0
@@ -264,10 +264,6 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
 
 /////////////////// PRIVATE ///////////////////////////////////
 
-/*!
- * \class QtDataVisualization::Q3DSurfacePrivate
- * \internal
- */
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
     : QAbstract3DGraphPrivate(q)
 {
@@ -297,4 +293,4 @@ Q3DSurface *Q3DSurfacePrivate::qptr()
     return static_cast<Q3DSurface *>(q_ptr);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

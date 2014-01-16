@@ -23,7 +23,7 @@
 #include <QFont>
 #include <QLinearGradient>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBarsPrivate;
 class QAbstract3DAxis;
@@ -87,6 +87,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

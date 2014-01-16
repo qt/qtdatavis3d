@@ -34,7 +34,7 @@
 
 #include <QList>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DSurface;
 
@@ -54,6 +54,6 @@ public:
     Surface3DController *m_shared;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // Q3DSURFACE_P_H

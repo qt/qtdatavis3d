@@ -39,7 +39,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -150,6 +150,6 @@ private:
     void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

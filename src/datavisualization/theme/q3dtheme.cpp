@@ -19,10 +19,10 @@
 #include "q3dtheme_p.h"
 #include "thememanager_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::Q3DTheme
+ * \class Q3DTheme
  * \inmodule QtDataVisualization
  * \brief Q3DTheme class provides a visual style for graphs.
  * \since Qt Data Visualization 1.0
@@ -209,16 +209,11 @@ namespace QtDataVisualization {
  */
 
 /*!
- * \class QtDataVisualization::Q3DThemeDirtyBitField
- * \internal
- */
-
-/*!
  * \qmltype Theme3D
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::Q3DTheme
+ * \instantiates Q3DTheme
  * \brief A visual style for graphs.
  *
  * This type is used to specify visual properties that affect the whole graph. There are several
@@ -895,10 +890,6 @@ Q3DTheme::Theme Q3DTheme::type() const
 
 // Q3DThemePrivate
 
-/*!
- * \class QtDataVisualization::Q3DThemePrivate
- * \internal
- */
 Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q)
     : QObject(0),
       m_themeId(Q3DTheme::ThemeUserDefined),
@@ -1081,4 +1072,4 @@ bool Q3DThemePrivate::sync(Q3DThemePrivate &other)
     return changed;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

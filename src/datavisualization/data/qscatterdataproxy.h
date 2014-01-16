@@ -22,12 +22,12 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qscatterdataitem.h>
 
-namespace QtDataVisualization {
-
-typedef QVector<QScatterDataItem> QScatterDataArray;
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QScatterDataProxyPrivate;
 class QScatter3DSeries;
+
+typedef QVector<QScatterDataItem> QScatterDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
@@ -79,6 +79,6 @@ private:
     friend class Scatter3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

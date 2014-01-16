@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QScopedPointer>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstractDataProxyPrivate;
 
@@ -59,6 +59,6 @@ private:
     friend class QAbstract3DSeriesPrivate;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QABSTRACTDATAPROXY_H

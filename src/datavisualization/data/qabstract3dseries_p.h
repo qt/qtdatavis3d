@@ -33,7 +33,7 @@
 #ifndef QABSTRACT3DSERIES_P_H
 #define QABSTRACT3DSERIES_P_H
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstractDataProxy;
 class Abstract3DController;
@@ -142,6 +142,6 @@ public:
     QString m_name;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QAbstract3DSeries_P_H

@@ -19,7 +19,9 @@
 #ifndef QBARDATAITEM_H
 #define QBARDATAITEM_H
 
-namespace QtDataVisualization {
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataItemPrivate;
 
@@ -45,6 +47,6 @@ private:
     float m_value;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

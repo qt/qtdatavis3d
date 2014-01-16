@@ -36,7 +36,7 @@
 #include "colorgradient_p.h"
 #include <QQmlListProperty>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 enum GradientType {
     GradientTypeBase,
@@ -185,6 +185,6 @@ private:
     ColorGradient *m_multiHighlightGradient; // Not owned
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

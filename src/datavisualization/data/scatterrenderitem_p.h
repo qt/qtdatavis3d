@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Scatter3DRenderer;
 
@@ -78,6 +78,6 @@ protected:
 };
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

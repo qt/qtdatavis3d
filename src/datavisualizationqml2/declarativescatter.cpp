@@ -20,7 +20,7 @@
 #include "qitemmodelscatterdataproxy.h"
 #include "declarativescene_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -127,4 +127,4 @@ void DeclarativeScatter::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

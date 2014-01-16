@@ -22,13 +22,13 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qsurfacedataitem.h>
 
-namespace QtDataVisualization {
-
-typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
-typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate;
 class QSurface3DSeries;
+
+typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
+typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
@@ -86,6 +86,6 @@ private:
     friend class Surface3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QSURFACEDATAPROXY_H

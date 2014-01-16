@@ -20,12 +20,7 @@
 #include "qmath.h"
 #include <QFontMetrics>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::AxisRenderCache
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AxisRenderCache::AxisRenderCache()
     : m_type(QAbstract3DAxis::AxisTypeNone),
@@ -188,4 +183,4 @@ int AxisRenderCache::maxLabelWidth(const QStringList &labels) const
     return labelWidth;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

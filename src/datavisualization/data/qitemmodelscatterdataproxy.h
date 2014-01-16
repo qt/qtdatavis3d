@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QStringList>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QItemModelScatterDataProxyPrivate;
 
@@ -71,6 +71,6 @@ private:
     friend class ScatterItemModelHandler;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

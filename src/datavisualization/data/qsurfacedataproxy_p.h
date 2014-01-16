@@ -34,7 +34,7 @@
 
 #include <QSize>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate : public QAbstractDataProxyPrivate
 {
@@ -67,6 +67,6 @@ private:
     friend class QSurfaceDataProxy;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QSURFACEDATAPROXY_P_H

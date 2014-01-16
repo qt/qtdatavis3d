@@ -20,10 +20,10 @@
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dseries_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QAbstractDataProxy
+ * \class QAbstractDataProxy
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization data proxies.
  * \since Qt Data Visualization 1.0
@@ -37,7 +37,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QAbstractDataProxy
+ * \instantiates QAbstractDataProxy
  * \brief Base type for all QtDataVisualization data proxies.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
@@ -91,10 +91,6 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 }
 
 // QAbstractDataProxyPrivate
-/*!
- * \class QtDataVisualization::QAbstractDataProxyPrivate
- * \internal
- */
 
 QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
     : QObject(0),
@@ -114,4 +110,4 @@ void QAbstractDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     m_series = series;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

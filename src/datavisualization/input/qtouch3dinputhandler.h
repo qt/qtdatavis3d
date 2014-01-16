@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/q3dinputhandler.h>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QTouch3DInputHandlerPrivate;
 
@@ -42,6 +42,6 @@ private:
     QScopedPointer<QTouch3DInputHandlerPrivate> d_ptr;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // QTOUCH3DINPUTHANDLER_H

@@ -22,7 +22,7 @@
 #include "qsurfacedataproxy.h"
 #include <QMetaMethod>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static void setSeriesGradient(QAbstract3DSeries *series, const ColorGradient &gradient, GradientType type)
 {
@@ -348,4 +348,4 @@ void DeclarativeSurface3DSeries::handleMultiHighlightGradientUpdate()
         setSeriesGradient(this, *m_multiHighlightGradient, GradientTypeMulti);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
