@@ -44,6 +44,18 @@ Item {
             }
         }
 
+        Bar3DSeries {
+            itemLabelFormat: "@colLabel, @rowLabel: @valueLabel"
+
+            ItemModelBarDataProxy {
+                itemModel: barDataModel
+                // Mapping model roles to bar series rows, columns, and values.
+                rowRole: "year"
+                columnRole: "city"
+                valueRole: "income"
+            }
+        }
+
         onRowAxisChanged: {
             console.log("Bars: Row axis changed.")
         }
@@ -57,14 +69,14 @@ Item {
 
     ListModel {
         id: barDataModel
-        ListElement{ year: "2012"; city: "Oulu";     expenses: "4200"; }
-        ListElement{ year: "2012"; city: "Rauma";    expenses: "2100"; }
-        ListElement{ year: "2012"; city: "Helsinki"; expenses: "7040"; }
-        ListElement{ year: "2012"; city: "Tampere";  expenses: "4330"; }
-        ListElement{ year: "2013"; city: "Oulu";     expenses: "3960"; }
-        ListElement{ year: "2013"; city: "Rauma";    expenses: "1990"; }
-        ListElement{ year: "2013"; city: "Helsinki"; expenses: "7230"; }
-        ListElement{ year: "2013"; city: "Tampere";  expenses: "4650"; }
+        ListElement{ year: "2012"; city: "Oulu";     expenses: "4200"; income: "8300"; }
+        ListElement{ year: "2012"; city: "Rauma";    expenses: "2100"; income: "6500"; }
+        ListElement{ year: "2012"; city: "Helsinki"; expenses: "7040"; income: "7500"; }
+        ListElement{ year: "2012"; city: "Tampere";  expenses: "4330"; income: "5800"; }
+        ListElement{ year: "2013"; city: "Oulu";     expenses: "3960"; income: "9000"; }
+        ListElement{ year: "2013"; city: "Rauma";    expenses: "1990"; income: "3000"; }
+        ListElement{ year: "2013"; city: "Helsinki"; expenses: "7230"; income: "9900"; }
+        ListElement{ year: "2013"; city: "Tampere";  expenses: "4650"; income: "7600"; }
     }
 
     Scatter3D {
@@ -187,6 +199,18 @@ Item {
                 surfaceGraph.axisX = null
                 surfaceGraph.axisY = null
                 surfaceGraph.axisZ = null
+            }
+        }
+
+        NewButton {
+            id: clearSelectionsButton
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            text: "Clear Selections"
+            onClicked: {
+                barGraph.clearSelection()
+                scatterGraph.clearSelection()
+                surfaceGraph.clearSelection()
             }
         }
     }

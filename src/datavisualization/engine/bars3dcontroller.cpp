@@ -457,6 +457,11 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
     }
 }
 
+void Bars3DController::clearSelection()
+{
+    setSelectedBar(invalidSelectionPosition(), 0);
+}
+
 void Bars3DController::adjustAxisRanges()
 {
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_axisZ);

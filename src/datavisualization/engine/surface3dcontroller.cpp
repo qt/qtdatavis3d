@@ -280,6 +280,11 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
     }
 }
 
+void Surface3DController::clearSelection()
+{
+    setSelectedPoint(invalidSelectionPosition(), 0);
+}
+
 void Surface3DController::handleArrayReset()
 {
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();

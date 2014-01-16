@@ -95,6 +95,8 @@ public:
 
     Q3DScene *scene() const;
 
+    void clearSelection();
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);

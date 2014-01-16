@@ -96,6 +96,8 @@ public:
     virtual void setTheme(Q3DTheme *theme);
     virtual Q3DTheme *theme() const;
 
+    Q_INVOKABLE virtual void clearSelection();
+
     virtual void setClearWindowBeforeRendering(bool enable);
     virtual bool clearWindowBeforeRendering() const;
 

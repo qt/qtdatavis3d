@@ -73,6 +73,7 @@ public:
 
     void setSelectedItem(int index, QScatter3DSeries *series);
     static inline int invalidSelectionIndex() { return -1; }
+    virtual void clearSelection();
 
     void synchDataToRenderer();
 

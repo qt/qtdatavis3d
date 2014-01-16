@@ -215,6 +215,8 @@ public:
 
     void emitNeedRender();
 
+    virtual void clearSelection() = 0;
+
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void touchEvent(QTouchEvent *event);
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);

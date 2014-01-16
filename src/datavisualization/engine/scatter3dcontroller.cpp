@@ -267,6 +267,11 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
     }
 }
 
+void Scatter3DController::clearSelection()
+{
+    setSelectedItem(invalidSelectionIndex(), 0);
+}
+
 void Scatter3DController::adjustValueAxisRange()
 {
     QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);

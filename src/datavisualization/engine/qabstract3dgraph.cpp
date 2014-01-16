@@ -331,6 +331,14 @@ Q3DScene *QAbstract3DGraph::scene() const
 }
 
 /*!
+ * Clears selection from all attached series.
+ */
+void QAbstract3DGraph::clearSelection()
+{
+    d_ptr->m_visualController->clearSelection();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)

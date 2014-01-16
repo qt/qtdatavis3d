@@ -92,6 +92,7 @@ public:
 
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void setSelectedBar(const QPoint &position, QBar3DSeries *series);
+    virtual void clearSelection();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);

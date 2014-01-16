@@ -78,6 +78,7 @@ public:
 
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
+    virtual void clearSelection();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);

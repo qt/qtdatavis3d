@@ -82,3 +82,9 @@
   \note If window clearing before rendering is suppressed, any areas of the window not fully
   covered with opaque items may not draw properly.
  */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::clearSelection()
+ * Clears selection from all attached series.
+ */
+

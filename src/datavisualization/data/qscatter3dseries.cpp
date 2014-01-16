@@ -90,10 +90,12 @@ namespace QtDataVisualization {
  *
  * Selects an item at the \a index. The \a index is the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection, set invalidSelectionIndex as the \a index.
+ * To clear selection from this series, set invalidSelectionIndex as the \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -107,7 +109,9 @@ namespace QtDataVisualization {
 /*!
  * \qmlproperty int Scatter3DSeries::invalidSelectionIndex
  * A constant property providing an invalid index for selection. Set this index to
- * selectedItem property if you want to clear the selection.
+ * selectedItem property if you want to clear the selection from this series.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -166,10 +170,12 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
  *
  * Selects an item at the \a index. The \a index is the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection, set invalidSelectionIndex() as the \a index.
+ * To clear selection from this series, set invalidSelectionIndex() as the \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 void QScatter3DSeries::setSelectedItem(int index)
 {
@@ -209,7 +215,9 @@ float QScatter3DSeries::itemSize() const
 
 /*!
  * \return an invalid index for selection. Set this index to selectedItem property if you
- * want to clear the selection.
+ * want to clear the selection from this series.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 int QScatter3DSeries::invalidSelectionIndex()
 {

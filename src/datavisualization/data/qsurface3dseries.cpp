@@ -94,15 +94,19 @@ namespace QtDataVisualization {
  * Selects a surface grid point in a \a position. The position is the (row, column) position in
  * the data array of the series.
  * Only one point can be selected at a time.
- * To clear selection, set invalidSelectionPosition as the \a position.
+ * To clear selection from this series, set invalidSelectionPosition as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
  * \qmlproperty point Surface3DSeries::invalidSelectionPosition
  * A constant property providing an invalid selection position.
- * Set this to selectedPoint property to clear the selection.
+ * Set this to selectedPoint property to clear the selection from this series.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -201,9 +205,11 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
  * Selects a surface grid point in a \a position. The position is the (row, column) position in
  * the data array of the series.
  * Only one point can be selected at a time.
- * To clear selection, set invalidSelectionPosition() as the \a position.
+ * To clear selection from this series, set invalidSelectionPosition() as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 void QSurface3DSeries::setSelectedPoint(const QPoint &position)
 {
@@ -221,7 +227,9 @@ QPoint QSurface3DSeries::selectedPoint() const
 
 /*!
  * \return a QPoint signifying an invalid selection position. Set this to selectedPoint property
- * to clear the selection.
+ * to clear the selection from this series.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 QPoint QSurface3DSeries::invalidSelectionPosition()
 {

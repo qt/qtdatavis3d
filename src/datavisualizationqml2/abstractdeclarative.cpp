@@ -55,6 +55,11 @@ Q3DTheme *AbstractDeclarative::theme() const
     return m_controller->activeTheme();
 }
 
+void AbstractDeclarative::clearSelection()
+{
+    m_controller->clearSelection();
+}
+
 void AbstractDeclarative::setClearWindowBeforeRendering(bool enable)
 {
     if (m_clearWindowBeforeRendering != enable) {

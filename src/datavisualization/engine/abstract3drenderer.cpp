@@ -198,6 +198,10 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
                                logicalPixelPosition.y() * m_devicePixelRatio));
 
+
+    // Synchronize the renderer scene to controller scene
+    scene->d_ptr->sync(*m_cachedScene->d_ptr);
+
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
     } else {
@@ -215,9 +219,6 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
             updateSelectionState(SelectOnScene);
         }
     }
-
-    // Synchronize the controller scene with renderer
-    scene->d_ptr->sync(*m_cachedScene->d_ptr);
 }
 
 void Abstract3DRenderer::reInitShaders()
