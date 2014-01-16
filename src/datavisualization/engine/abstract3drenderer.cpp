@@ -46,11 +46,14 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
       m_selectionState(SelectNone),
-      m_devicePixelRatio(1.0f)
-    #ifdef DISPLAY_RENDER_SPEED
+      m_devicePixelRatio(1.0f),
+      m_selectionLabelDirty(true),
+      m_clickPending(false),
+      m_clickedSeries(0)
+#ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
-    #endif
+#endif
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -207,6 +210,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     } else {
         // Selections are one-shot, reset selection active to false before processing
         scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
+        m_clickPending = true;
 
         if (scene->isSlicingActive()) {
             if (scene->isPointInPrimarySubView(logicalPixelPosition))

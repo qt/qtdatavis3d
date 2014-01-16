@@ -84,6 +84,7 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
 public slots:
     void handleArrayReset();
@@ -91,9 +92,6 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
-
-    // Renderer callback handlers
-    void handleItemClicked(int index, QScatter3DSeries *series);
 
 private:
     void adjustValueAxisRange();

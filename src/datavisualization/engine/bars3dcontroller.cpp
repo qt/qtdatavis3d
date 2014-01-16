@@ -75,8 +75,6 @@ void Bars3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Bars3DRenderer::barClicked, this,
-                     &Bars3DController::handleBarClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -211,14 +209,6 @@ void Bars3DController::handleDataColumnLabelsChanged()
     }
 }
 
-void Bars3DController::handleBarClicked(const QPoint &position, QBar3DSeries *series)
-{
-    setSelectedBar(position, series);
-
-    // TODO: pass clicked to parent. (QTRD-2517)
-    // TODO: Also hover needed? (QTRD-2131)
-}
-
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
@@ -236,6 +226,19 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     // Visibility changes may require disabling/enabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
+}
+
+void Bars3DController::handlePendingClick()
+{
+    // This function is called while doing the sync, so it is okay to query from renderer
+    QPoint position = m_renderer->clickedPosition();
+    QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
+
+    // TODO: Adjust position according to inserts/removes in the series
+
+    setSelectedBar(position, series);
+
+    m_renderer->resetClickedStatus();
 }
 
 QPoint Bars3DController::invalidSelectionPosition()

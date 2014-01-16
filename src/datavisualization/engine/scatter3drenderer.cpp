@@ -90,7 +90,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
       m_backgroundMargin(defaultMargin),
-      m_maxItemSize(0.0f)
+      m_maxItemSize(0.0f),
+      m_clickedIndex(Scatter3DController::invalidSelectionIndex())
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -233,6 +234,12 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
     }
 
     Abstract3DRenderer::updateScene(scene);
+}
+
+void Scatter3DRenderer::resetClickedStatus()
+{
+    m_clickedIndex = Scatter3DController::invalidSelectionIndex();
+    m_clickedSeries = 0;
 }
 
 void Scatter3DRenderer::render(GLuint defaultFboHandle)
@@ -558,10 +565,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_viewport.height());
-        int clickedIndex = 0;
-        QScatter3DSeries *clickedSeries = 0;
-        selectionColorToSeriesAndIndex(clickedColor, clickedIndex, clickedSeries);
-        emit itemClicked(clickedIndex, clickedSeries);
+        selectionColorToSeriesAndIndex(clickedColor, m_clickedIndex, m_clickedSeries);
 
         // Revert to original fbo and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1778,7 +1782,7 @@ QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
     return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
 }
 
-void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series)
+void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QAbstract3DSeries *&series)
 {
     if (color != selectionSkipColor) {
         index = int(color.x())
@@ -1787,7 +1791,7 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, i
         // Find the series and adjust the index accordingly
         for (int i = 0; i < m_renderingArrays.size(); i++) {
             if (index < m_renderingArrays.at(i).size()) {
-                series = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(i).series());
+                series = m_visibleSeriesList.at(i).series();
                 return; // Valid found and already set to return parameters, so we can return
             } else {
                 index -= m_renderingArrays.at(i).size();

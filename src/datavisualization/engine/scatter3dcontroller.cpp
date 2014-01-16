@@ -67,8 +67,6 @@ void Scatter3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Scatter3DRenderer::itemClicked, this,
-                     &Scatter3DController::handleItemClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
@@ -193,14 +191,6 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     emitNeedRender();
 }
 
-void Scatter3DController::handleItemClicked(int index, QScatter3DSeries *series)
-{
-    setSelectedItem(index, series);
-
-    // TODO: pass clicked to parent. (QTRD-2517)
-    // TODO: Also hover needed? (QTRD-2131)
-}
-
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
@@ -222,6 +212,18 @@ void Scatter3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
     adjustValueAxisRange();
+}
+
+void Scatter3DController::handlePendingClick()
+{
+    int index = m_renderer->clickedIndex();
+    QScatter3DSeries *series = static_cast<QScatter3DSeries *>(m_renderer->clickedSeries());
+
+    // TODO: Adjust position according to inserts/removes in the series
+
+    setSelectedItem(index, series);
+
+    m_renderer->resetClickedStatus();
 }
 
 void Scatter3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)

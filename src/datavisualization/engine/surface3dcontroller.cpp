@@ -70,8 +70,7 @@ void Surface3DController::initializeOpenGL()
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
     synchDataToRenderer();
-    QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
-                     &Surface3DController::handlePointClicked, Qt::QueuedConnection);
+
     emitNeedRender();
 }
 
@@ -126,6 +125,19 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     // Visibility changes may require disabling/enabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
+void Surface3DController::handlePendingClick()
+{
+    // This function is called while doing the sync, so it is okay to query from renderer
+    QPoint position = m_renderer->clickedPosition();
+    QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_renderer->clickedSeries());
+
+    // TODO: Adjust position according to inserts/removes in the series
+
+    setSelectedPoint(position, series);
+
+    m_renderer->resetClickedStatus();
 }
 
 QPoint Surface3DController::invalidSelectionPosition()
@@ -295,13 +307,6 @@ void Surface3DController::handleArrayReset()
     // Clear selection unless still valid
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
     emitNeedRender();
-}
-
-void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DSeries *series)
-{
-    setSelectedPoint(position, series);
-    // TODO: pass clicked to parent. (QTRD-2517)
-    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Surface3DController::handleFlatShadingSupportedChange(bool supported)

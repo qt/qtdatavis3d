@@ -233,6 +233,7 @@ public:
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick() = 0;
 
 public slots:
     void handleAxisTitleChanged(const QString &title);

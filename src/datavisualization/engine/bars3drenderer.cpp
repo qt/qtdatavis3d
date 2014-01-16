@@ -91,7 +91,8 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_noZeroInRange(false),
       m_seriesScale(0.0f),
       m_seriesStep(0.0f),
-      m_seriesStart(0.0f)
+      m_seriesStart(0.0f),
+      m_clickedPosition(Bars3DController::invalidSelectionPosition())
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -988,7 +989,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Read color under cursor
         QVector3D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_viewport.height());
-        emit barClicked(selectionColorToArrayPosition(clickedColor), selectionColorToSeries(clickedColor));
+        m_clickedPosition = selectionColorToArrayPosition(clickedColor);
+        m_clickedSeries = selectionColorToSeries(clickedColor);
 
         // Revert to original render target and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1924,6 +1926,12 @@ void Bars3DRenderer::updateSelectedBar(const QPoint &position, const QBar3DSerie
     } else {
         m_visualSelectedBarPos = QPoint(adjustedZ, adjustedX);
     }
+}
+
+void Bars3DRenderer::resetClickedStatus()
+{
+    m_clickedPosition = Bars3DController::invalidSelectionPosition();
+    m_clickedSeries = 0;
 }
 
 void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality)

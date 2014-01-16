@@ -105,6 +105,7 @@ private:
     float m_seriesScale;
     float m_seriesStep;
     float m_seriesStart;
+    QPoint m_clickedPosition;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -123,12 +124,11 @@ public slots:
                         bool relative = true);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
+    inline QPoint clickedPosition() const { return m_clickedPosition; }
+    void resetClickedStatus();
 
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
-
-signals:
-    void barClicked(QPoint position, QBar3DSeries *series);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

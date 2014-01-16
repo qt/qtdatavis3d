@@ -125,6 +125,7 @@ private:
     const QSurface3DSeries *m_selectedSeries;
     GLuint m_uniformGradientTexture;
     QVector3D m_uniformGradientTextureColor;
+    QPoint m_clickedPosition;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -139,6 +140,8 @@ public:
     void updateSurfaceGridStatus(bool enable);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
+    inline QPoint clickedPosition() const { return m_clickedPosition; }
+    void resetClickedStatus();
 
     void drawSlicedScene();
     void render(GLuint defaultFboHandle = 0);
@@ -147,7 +150,6 @@ protected:
     void initializeOpenGL();
 
 signals:
-    void pointClicked(QPoint position, QSurface3DSeries *series);
     void flatShadingSupportedChanged(bool supported);
 
 private:

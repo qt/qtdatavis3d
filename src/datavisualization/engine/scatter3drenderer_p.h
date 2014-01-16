@@ -93,6 +93,7 @@ private:
     GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
     QVector<float> m_cachedItemSize;
+    int m_clickedIndex;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
@@ -101,6 +102,9 @@ public:
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateData();
     void updateScene(Q3DScene *scene);
+
+    inline int clickedIndex() const { return m_clickedIndex; }
+    void resetClickedStatus();
 
     void render(GLuint defaultFboHandle);
 
@@ -142,12 +146,9 @@ public slots:
 
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 
-signals:
-    void itemClicked(int index, QScatter3DSeries *series);
-
 private:
     QVector3D indexToSelectionColor(GLint index);
-    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
+    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QAbstract3DSeries *&series);
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

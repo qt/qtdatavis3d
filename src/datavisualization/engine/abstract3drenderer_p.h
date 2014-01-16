@@ -95,6 +95,10 @@ public:
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
+    inline bool isClickPending() { return m_clickPending; }
+    inline void clearClickPending() { m_clickPending = false; }
+    inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
+
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
     void requestShadowQuality(QAbstract3DGraph::ShadowQuality quality); // For automatic quality adjustments
@@ -138,6 +142,8 @@ protected:
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
     bool m_selectionLabelDirty;
+    bool m_clickPending;
+    QAbstract3DSeries *m_clickedSeries;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

@@ -110,7 +110,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_hasHeightAdjustmentChanged(true),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_selectedSeries(0),
-      m_uniformGradientTexture(0)
+      m_uniformGradientTexture(0),
+      m_clickedPosition(Surface3DController::invalidSelectionPosition())
 {
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -1038,8 +1039,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
 
-        emit pointClicked(QPoint(selectionIdToSurfacePoint(selectionId)),
-                          static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series()));
+        m_clickedPosition = selectionIdToSurfacePoint(selectionId);
+        m_clickedSeries = m_visibleSeriesList.at(0).series();
 
         // Revert to original viewport
         glViewport(m_primarySubViewport.x(),
@@ -1860,6 +1861,12 @@ void Surface3DRenderer::updateSelectedPoint(const QPoint &position, const QSurfa
     m_selectedPoint = position;
     m_selectedSeries = series;
     m_selectionDirty = true;
+}
+
+void Surface3DRenderer::resetClickedStatus()
+{
+    m_clickedPosition = Surface3DController::invalidSelectionPosition();
+    m_clickedSeries = 0;
 }
 
 void Surface3DRenderer::updateSurfaceGridStatus(bool enable)

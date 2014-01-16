@@ -96,6 +96,7 @@ public:
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
     static QPoint invalidSelectionPosition();
 
@@ -120,9 +121,6 @@ public slots:
     void handleItemChanged(int rowIndex, int columnIndex);
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
-
-    // Renderer callback handlers
-    void handleBarClicked(const QPoint &position, QBar3DSeries *series);
 
 signals:
     void primarySeriesChanged(QBar3DSeries *series);

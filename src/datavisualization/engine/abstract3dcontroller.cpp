@@ -151,6 +151,14 @@ void Abstract3DController::synchDataToRenderer()
     if (!m_renderer)
         return;
 
+    // If there is a pending click from renderer, handle that first.
+    if (m_renderer->isClickPending()) {
+        handlePendingClick();
+        m_renderer->clearClickPending();
+    }
+
+    // TODO: start recording inserts/removals
+
     if (m_scene->d_ptr->m_sceneDirty)
         m_renderer->updateScene(m_scene);
 

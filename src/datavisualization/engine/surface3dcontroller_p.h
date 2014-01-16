@@ -84,6 +84,7 @@ public:
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
     static QPoint invalidSelectionPosition();
     bool isFlatShadingSupported();
@@ -99,9 +100,6 @@ public slots:
     void handleRowsRemoved(int startIndex, int count);
     void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
-
-    // Renderer callback handlers
-    void handlePointClicked(const QPoint &position, QSurface3DSeries *series);
 
     void handleFlatShadingSupportedChange(bool supported);
 
