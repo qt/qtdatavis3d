@@ -606,10 +606,11 @@ void Bars3DRenderer::drawSlicedScene()
             // Draw values
             if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0f)) {
                 // Create label texture if we need it
-                if (item->sliceLabel().isNull()) {
+                if (item->sliceLabel().isNull() || m_updateLabels) {
                     item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(),
                                                            item->value()));
                     m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
+                    m_updateLabels = false;
                 }
                 Qt::AlignmentFlag alignment = (item->height() < 0) ? Qt::AlignBottom : Qt::AlignTop;
                 Drawer::LabelPosition labelPos = (item->height() < 0) ? Drawer::LabelBelow : Drawer::LabelOver;
@@ -632,10 +633,11 @@ void Bars3DRenderer::drawSlicedScene()
                     && m_visualSelectedBarPos.y() == item->position().y()
                     && item->seriesIndex() == m_visualSelectedBarSeriesIndex) {
                 // Create label texture if we need it
-                if (item->sliceLabel().isNull()) {
+                if (item->sliceLabel().isNull() || m_updateLabels) {
                     item->setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(),
                                                            item->value()));
                     m_drawer->generateLabelItem(item->sliceLabelItem(), item->sliceLabel());
+                    m_updateLabels = false;
                 }
                 Qt::AlignmentFlag alignment = (item->height() < 0) ? Qt::AlignBottom : Qt::AlignTop;
                 Drawer::LabelPosition labelPos = (item->height() < 0) ? Drawer::LabelBelow : Drawer::LabelOver;
