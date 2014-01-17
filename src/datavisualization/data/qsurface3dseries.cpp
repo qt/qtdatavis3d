@@ -75,6 +75,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * This type  manages the series specific visual elements, as well as series data
  * (via data proxy).
  *
+ * For Surface3DSeries enums, see \l QSurface3DSeries::DrawFlag
+ *
  * For more complete description, see QSurface3DSeries.
  *
  * \sa {Qt Data Visualization Data Handling}

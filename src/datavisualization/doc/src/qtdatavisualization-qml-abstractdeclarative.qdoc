@@ -34,6 +34,9 @@
   before showing it. You can use the convenience function
   \c{QtDataVisualization::qDefaultSurfaceFormat()} to create the custom surface format object.
 
+  For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag and
+  \l QAbstract3DGraph::ShadowQuality
+
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 

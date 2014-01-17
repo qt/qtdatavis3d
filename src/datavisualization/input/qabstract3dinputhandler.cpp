@@ -59,6 +59,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief Base type for all QtDataVisualization input handlers.
  *
  * This type is uncreatable.
+ *
+ * For AbstractInputHandler3D enums, see \l QAbstract3DInputHandler::InputState
  */
 
 /*!

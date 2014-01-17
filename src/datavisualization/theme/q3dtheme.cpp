@@ -235,6 +235,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Using a user-defined theme:
  *
  * \snippet doc_src_q3dtheme.cpp 6
+ *
+ * For Theme3D enums, see \l Q3DTheme::ColorStyle and \l Q3DTheme::Theme
  */
 
 /*!

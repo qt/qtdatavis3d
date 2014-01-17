@@ -41,6 +41,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief AbstractAxis3D is base type for axes of a graph.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
+ *
+ * For AbstractAxis3D enums, see \l QAbstract3DAxis::AxisOrientation and \l QAbstract3DAxis::AxisType
  */
 
 /*!

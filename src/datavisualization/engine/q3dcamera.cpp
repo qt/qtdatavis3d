@@ -88,6 +88,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * data visualization. The class offers simple methods for setting the orbit point in rotations,
  * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
  * needed.
+ *
+ * For Camera3D enums, see \l Q3DCamera::CameraPreset
  */
 
 /*!

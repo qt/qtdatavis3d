@@ -52,6 +52,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief Base type for all QtDataVisualization series.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
+ *
+ * For Abstract3DSeries enums, see \l QAbstract3DSeries::SeriesType and \l QAbstract3DSeries::Mesh
+ *
  * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
  */
 
