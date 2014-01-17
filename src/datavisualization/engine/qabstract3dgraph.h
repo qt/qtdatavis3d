@@ -25,7 +25,7 @@
 #include <QOpenGLFunctions>
 #include <QScreen>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraphPrivate;
 class Abstract3DController;
@@ -125,6 +125,6 @@ private:
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

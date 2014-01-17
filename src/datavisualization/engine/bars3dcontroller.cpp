@@ -30,17 +30,7 @@
 #include <QMatrix4x4>
 #include <qmath.h>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Bars3DController
- * \internal
- */
-
-/*!
- * \class QtDataVisualization::Bars3DChangeBitField
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
@@ -587,4 +577,4 @@ QAbstract3DAxis *Bars3DController::createDefaultAxis(QAbstract3DAxis::AxisOrient
     return defaultAxis;
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

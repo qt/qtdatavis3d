@@ -39,7 +39,7 @@
 #include <QObject>
 #include <QQuickWindow>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class AbstractDeclarative : public QQuickItem
 {
@@ -142,6 +142,6 @@ private:
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // ABSTRACTDECLARATIVE_P_H

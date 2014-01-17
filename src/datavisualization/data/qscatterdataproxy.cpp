@@ -36,9 +36,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \typedef QScatterDataArray
+ * \typedef QtDataVisualization::QScatterDataArray
  *
- * A vector of QScatterDataItems.
+ * A vector of \l {QScatterDataItem}s.
  */
 
 /*!

@@ -19,10 +19,10 @@
 #include "qscatter3dseries_p.h"
 #include "scatter3dcontroller_p.h"
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
- * \class QtDataVisualization::QScatter3DSeries
+ * \class QScatter3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DScatter.
  * \since Qt Data Visualization 1.0
@@ -65,7 +65,7 @@ namespace QtDataVisualization {
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QtDataVisualization::QScatter3DSeries
+ * \instantiates QScatter3DSeries
  * \inherits Abstract3DSeries
  * \brief Base series type for Scatter3D.
  *
@@ -242,10 +242,6 @@ const QScatter3DSeriesPrivate *QScatter3DSeries::dptrc() const
 
 // QScatter3DSeriesPrivate
 
-/*!
- * \class QtDataVisualization::QScatter3DSeriesPrivate
- * \internal
- */
 QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeScatter),
       m_selectedItem(Scatter3DController::invalidSelectionIndex()),
@@ -313,4 +309,4 @@ void QScatter3DSeriesPrivate::setItemSize(float size)
         m_controller->markSeriesVisualsDirty();
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

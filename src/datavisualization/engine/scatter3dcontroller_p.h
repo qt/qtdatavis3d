@@ -34,7 +34,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Scatter3DRenderer;
 class QScatterDataProxy;
@@ -99,7 +99,6 @@ private:
     Q_DISABLE_COPY(Scatter3DController)
 };
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

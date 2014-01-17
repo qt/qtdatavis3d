@@ -33,7 +33,7 @@
 #include "datavisualizationglobal_p.h"
 
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Surface3DRenderer;
 class QSurface3DSeries;
@@ -109,6 +109,6 @@ private:
     Q_DISABLE_COPY(Surface3DController)
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // SURFACE3DCONTROLLER_P_H
+#endif

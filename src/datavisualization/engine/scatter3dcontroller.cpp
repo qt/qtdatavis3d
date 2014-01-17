@@ -27,17 +27,7 @@
 #include <QMatrix4x4>
 #include <qmath.h>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Scatter3DController
- * \internal
- */
-
-/*!
- * \class QtDataVisualization::Scatter3DChangeBitField
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
@@ -384,4 +374,4 @@ void Scatter3DController::adjustValueAxisRange()
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

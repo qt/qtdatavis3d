@@ -23,7 +23,7 @@
 #include <QGuiApplication>
 #include <QSGSimpleRectNode>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static QList<const QQuickWindow *> clearList;
 
@@ -262,4 +262,4 @@ void AbstractDeclarative::wheelEvent(QWheelEvent *event)
     m_controller->wheelEvent(event);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

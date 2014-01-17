@@ -30,17 +30,7 @@
 
 #include <QDebug>
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Surface3DController
- * \internal
- */
-
-/*!
- * \class QtDataVisualization::Surface3DChangeBitField
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
     : Abstract3DController(rect, scene),
@@ -531,4 +521,4 @@ void Surface3DController::adjustValueAxisRange()
     }
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

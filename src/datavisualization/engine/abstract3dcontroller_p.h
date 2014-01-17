@@ -42,7 +42,7 @@
 
 class QFont;
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class CameraHelper;
 class Abstract3DRenderer;
@@ -281,6 +281,6 @@ private:
     friend class Bars3DController;
 };
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

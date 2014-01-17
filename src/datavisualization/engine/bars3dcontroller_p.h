@@ -34,7 +34,7 @@
 
 //#define DISPLAY_RENDER_SPEED
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Bars3DRenderer;
 class QBar3DSeries;
@@ -136,7 +136,6 @@ private:
 
 };
 
-
-}
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

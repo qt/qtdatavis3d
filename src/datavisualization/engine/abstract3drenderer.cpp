@@ -27,12 +27,7 @@
 #include "q3dtheme_p.h"
 #include "objecthelper_p.h"
 
-namespace QtDataVisualization {
-
-/*!
- * \class QtDataVisualization::Abstract3DRenderer
- * \internal
- */
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
@@ -440,4 +435,4 @@ void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient
     *gradientTexture = m_textureHelper->createGradientTexture(*gradient);
 }
 
-}
+QT_END_NAMESPACE_DATAVISUALIZATION

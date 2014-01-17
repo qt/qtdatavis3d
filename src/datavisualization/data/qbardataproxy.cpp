@@ -48,15 +48,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \typedef QBarDataRow
+ * \typedef QtDataVisualization::QBarDataRow
  *
- * A vector of QBarDataItems.
+ * A vector of \l {QBarDataItem}s.
  */
 
 /*!
- * \typedef QBarDataArray
+ * \typedef QtDataVisualization::QBarDataArray
  *
- * A list of pointers to QBarDataRows.
+ * A list of pointers to \l {QBarDataRow}s.
  */
 
 /*!
