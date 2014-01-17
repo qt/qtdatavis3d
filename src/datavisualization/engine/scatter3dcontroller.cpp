@@ -162,8 +162,18 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
         m_isDataDirty = true;
     }
 
-    // Clear selection unless it is still valid
-    setSelectedItem(m_selectedItem, m_selectedItemSeries);
+    if (series == m_selectedItemSeries) {
+        // If items removed from selected series before the selection, adjust the selection
+        int selectedItem = m_selectedItem;
+        if (startIndex <= selectedItem) {
+            if ((startIndex + count) > selectedItem)
+                selectedItem = -1; // Selected item removed
+            else
+                selectedItem -= count; // Move selected item down by amount of item removed
+
+            setSelectedItem(selectedItem, m_selectedItemSeries);
+        }
+    }
 
     emitNeedRender();
 }
@@ -178,6 +188,16 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
         adjustValueAxisRange();
         m_isDataDirty = true;
     }
+
+    if (series == m_selectedItemSeries) {
+        // If items inserted to selected series before the selection, adjust the selection
+        int selectedItem = m_selectedItem;
+        if (startIndex <= selectedItem) {
+            selectedItem += count;
+            setSelectedItem(selectedItem, m_selectedItemSeries);
+        }
+    }
+
     emitNeedRender();
 }
 

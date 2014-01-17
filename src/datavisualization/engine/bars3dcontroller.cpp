@@ -141,8 +141,18 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
         m_isDataDirty = true;
     }
 
-    // Clear selection unless still valid
-    setSelectedBar(m_selectedBar, m_selectedBarSeries);
+    if (series == m_selectedBarSeries) {
+        // If rows removed from selected series before the selection, adjust the selection
+        int selectedRow = m_selectedBar.x();
+        if (startIndex <= selectedRow) {
+            if ((startIndex + count) > selectedRow)
+                selectedRow = -1; // Selected row removed
+            else
+                selectedRow -= count; // Move selected row down by amount of rows removed
+
+            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
+        }
+    }
 
     emitNeedRender();
 }
@@ -168,6 +178,16 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+
+    if (series == m_selectedBarSeries) {
+        // If rows inserted to selected series before the selection, adjust the selection
+        int selectedRow = m_selectedBar.x();
+        if (startIndex <= selectedRow) {
+            selectedRow += count;
+            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
+        }
+    }
+
     emitNeedRender();
 }
 

@@ -99,6 +99,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * To clear selection from this series, set invalidSelectionPosition as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ * Removing rows from or inserting rows to the series before the row of the selected point
+ * will adjust the selection so that the same point will stay selected.
  *
  * \sa AbstractGraph3D::clearSelection()
  */
@@ -210,6 +212,8 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
  * To clear selection from this series, set invalidSelectionPosition() as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ * Removing rows from or inserting rows to the series before the row of the selected point
+ * will adjust the selection so that the same point will stay selected.
  *
  * \sa QAbstract3DGraph::clearSelection()
  */

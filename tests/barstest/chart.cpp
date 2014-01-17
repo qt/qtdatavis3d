@@ -543,7 +543,7 @@ void GraphModifier::removeRows()
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBar.x();
     if (row >= 0) {
-        int startRow = qMax(row - 2, 0);
+        int startRow = qMax(row - 3, 0);
         m_genericData->dataProxy()->removeRows(startRow, 3);
     }
 }

@@ -392,6 +392,16 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
         adjustValueAxisRange();
         m_isDataDirty = true;
     }
+
+    if (series == m_selectedSeries) {
+        // If rows inserted to selected series before the selection, adjust the selection
+        int selectedRow = m_selectedPoint.x();
+        if (startIndex <= selectedRow) {
+            selectedRow += count;
+            setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
+        }
+    }
+
     emitNeedRender();
 }
 
@@ -405,8 +415,18 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
         m_isDataDirty = true;
     }
 
-    // Clear selection unless still valid
-    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+    if (series == m_selectedSeries) {
+        // If rows removed from selected series before the selection, adjust the selection
+        int selectedRow = m_selectedPoint.x();
+        if (startIndex <= selectedRow) {
+            if ((startIndex + count) > selectedRow)
+                selectedRow = -1; // Selected row removed
+            else
+                selectedRow -= count; // Move selected row down by amount of rows removed
+
+            setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
+        }
+    }
 
     emitNeedRender();
 }

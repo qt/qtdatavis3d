@@ -94,6 +94,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ * Removing items from or inserting items to the series before the selected item
+ * will adjust the selection so that the same item will stay selected.
  *
  * \sa AbstractGraph3D::clearSelection()
  */
@@ -174,6 +176,8 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ * Removing items from or inserting items to the series before the selected item
+ * will adjust the selection so that the same item will stay selected.
  *
  * \sa QAbstract3DGraph::clearSelection()
  */

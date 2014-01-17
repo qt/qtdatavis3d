@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     removeRowButton->setEnabled(false);
 
     QPushButton *removeRowsButton = new QPushButton(widget);
-    removeRowsButton->setText(QStringLiteral("Remove three rows from selected"));
+    removeRowsButton->setText(QStringLiteral("Remove three rows before selected"));
     removeRowsButton->setEnabled(false);
 
     QPushButton *massiveArrayButton = new QPushButton(widget);
