@@ -254,6 +254,7 @@ void Scatter3DRenderer::render(GLuint defaultFboHandle)
 void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
+    GLfloat selectedItemSize = 0.0f;
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
@@ -605,13 +606,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             m_dotGradientShader->bind();
             m_dotGradientShader->setUniformValue(m_dotGradientShader->lightP(), lightPos);
             m_dotGradientShader->setUniformValue(m_dotGradientShader->view(), viewMatrix);
-            m_dotGradientShader->setUniformValue(m_dotGradientShader->ambientS(), m_cachedTheme->ambientLightStrength());
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->ambientS(),
+                                                 m_cachedTheme->ambientLightStrength());
         }
         if (haveUniformColorMeshSeries) {
             m_dotShader->bind();
             m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
             m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
-            m_dotShader->setUniformValue(m_dotShader->ambientS(), m_cachedTheme->ambientLightStrength());
+            m_dotShader->setUniformValue(m_dotShader->ambientS(),
+                                         m_cachedTheme->ambientLightStrength());
             dotShader = m_dotShader;
         } else {
             dotShader = m_dotGradientShader;
@@ -708,7 +711,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 gradientTexture = currentSeries.baseGradientTexture();
 
             GLfloat lightStrength = m_cachedTheme->lightStrength();
-            if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone && (m_selectedItemTotalIndex == dotNo)) {
+            if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
+                    && (m_selectedItemTotalIndex == dotNo)) {
                 if (useColor)
                     dotColor = currentSeries.singleHighlightColor();
                 else
@@ -717,6 +721,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
                 selectedItem = &item;
                 dotSelectionFound = true;
+                // Save selected item size (adjusted with font size) for selection label positioning
+                selectedItemSize = itemSize + (m_cachedTheme->font().pointSizeF() / 500.0f);
             }
 
             if (!drawingPoints) {
@@ -1526,8 +1532,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
 
         m_drawer->drawLabel(*selectedItem, labelItem, viewMatrix, projectionMatrix,
-                            zeroVector, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, true, false, Drawer::LabelOver);
+                            zeroVector, zeroVector, selectedItemSize, m_cachedSelectionMode,
+                            m_labelShader, m_labelObj, activeCamera, true, false,
+                            Drawer::LabelOver);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;
