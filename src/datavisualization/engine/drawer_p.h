@@ -70,9 +70,7 @@ public:
 
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
-    void setFont(const QFont &font);
     QFont font() const;
-    void setLabelBackground(bool enabled);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
@@ -94,8 +92,6 @@ Q_SIGNALS:
 
 private:
     Q3DTheme *m_theme;
-    QFont m_font;
-    bool m_labelBackground;
     TextureHelper *m_textureHelper;
     GLuint m_pointbuffer;
 };

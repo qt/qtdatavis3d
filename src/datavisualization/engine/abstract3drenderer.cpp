@@ -162,14 +162,10 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const 
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
-    bool changed = theme->d_ptr->sync(*m_cachedTheme->d_ptr);
+    bool updateDrawer = theme->d_ptr->sync(*m_cachedTheme->d_ptr);
 
-    if (changed) {
-        // Update drawer if sync changed something
+    if (updateDrawer)
         m_drawer->setTheme(m_cachedTheme);
-        // Re-initialize shaders
-        reInitShaders();
-    }
 }
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)

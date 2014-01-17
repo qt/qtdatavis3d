@@ -45,8 +45,6 @@ const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
 Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
-      m_font(theme->font()),
-      m_labelBackground(theme->isLabelBackgroundEnabled()),
       m_textureHelper(0),
       m_pointbuffer(0)
 {
@@ -70,8 +68,6 @@ void Drawer::initializeOpenGL()
 void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
-    m_font = m_theme->font();
-    m_labelBackground = m_theme->isLabelBackgroundEnabled();
     emit drawerChanged();
 }
 
@@ -80,25 +76,9 @@ Q3DTheme *Drawer::theme() const
     return m_theme;
 }
 
-void Drawer::setFont(const QFont &font)
-{
-    // We need to be able to override theme's font for drawer
-    // TODO: (or do we?)
-    m_font = font;
-    emit drawerChanged();
-}
-
 QFont Drawer::font() const
 {
-    return m_font;
-}
-
-void Drawer::setLabelBackground(bool enabled)
-{
-    // We need to be able to override theme's label background for drawer
-    // TODO: (or do we?)
-    m_labelBackground = enabled;
-    emit drawerChanged();
+    return m_theme->font();
 }
 
 void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
@@ -266,7 +246,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_font.pointSizeF() / 500.0f;
+    GLfloat scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Apply alignment
@@ -385,11 +365,11 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
     if (!text.isEmpty()) {
         // Create labels
         // Print label into a QImage using QPainter
-        QImage label = Utils::printTextToImage(m_font,
+        QImage label = Utils::printTextToImage(m_theme->font(),
                                                text,
                                                m_theme->labelBackgroundColor(),
                                                m_theme->labelTextColor(),
-                                               m_labelBackground,
+                                               m_theme->isLabelBackgroundEnabled(),
                                                m_theme->isLabelBorderEnabled(),
                                                widestLabel);
 

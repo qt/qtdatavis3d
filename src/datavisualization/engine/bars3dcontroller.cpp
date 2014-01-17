@@ -166,6 +166,16 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+
+    if (series == m_selectedBarSeries) {
+        // If rows inserted to selected series before the selection, adjust the selection
+        int selectedRow = m_selectedBar.x();
+        if (startIndex <= selectedRow) {
+            selectedRow += count;
+            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
+        }
+    }
+
     emitNeedRender();
 }
 
@@ -178,16 +188,6 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
-
-    if (series == m_selectedBarSeries) {
-        // If rows inserted to selected series before the selection, adjust the selection
-        int selectedRow = m_selectedBar.x();
-        if (startIndex <= selectedRow) {
-            selectedRow += count;
-            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
-        }
-    }
-
     emitNeedRender();
 }
 
