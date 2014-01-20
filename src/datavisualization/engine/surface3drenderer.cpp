@@ -567,6 +567,8 @@ void Surface3DRenderer::drawSlicedScene()
 {
     QVector3D lightPos;
 
+    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
                m_secondarySubViewport.y(),
@@ -642,6 +644,7 @@ void Surface3DRenderer::drawSlicedScene()
             surfaceShader->setUniformValue(surfaceShader->lightS(), 0.15f);
             surfaceShader->setUniformValue(surfaceShader->ambientS(),
                                            m_cachedTheme->ambientLightStrength() * 2.3f);
+            surfaceShader->setUniformValue(surfaceShader->lightColor(), lightColor);
 
             m_drawer->drawObject(surfaceShader, m_sliceSurfaceObj, baseGradientTexture);
         }
@@ -674,6 +677,7 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.3f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
+        lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
         // Horizontal lines
         if (m_axisCacheY.segmentCount() > 0) {
@@ -832,6 +836,8 @@ void Surface3DRenderer::drawSlicedScene()
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
     GLfloat backgroundRotation = 0;
+    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+
     glViewport(m_primarySubViewport.x(),
                m_primarySubViewport.y(),
                m_primarySubViewport.width(),
@@ -881,13 +887,15 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
     GLfloat adjustedLightStrength =  m_cachedTheme->lightStrength() / 10.0f;
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && m_surfaceObj && m_cachedSurfaceVisible) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && m_surfaceObj
+            && m_cachedSurfaceVisible) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
 
         // Attach texture to depth attachment
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                               m_depthTexture, 0);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Bind depth shader
@@ -948,7 +956,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthModelTexture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+                               m_depthModelTexture, 0);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Draw the triangles
@@ -1083,6 +1092,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_surfaceShader->setUniformValue(m_surfaceShader->MVP(), MVPMatrix);
             m_surfaceShader->setUniformValue(m_surfaceShader->ambientS(),
                                              m_cachedTheme->ambientLightStrength());
+            m_surfaceShader->setUniformValue(m_surfaceShader->lightColor(), lightColor);
 
             // TODO: Do properly when multiseries support implemented QTRD-2657
             GLuint gradientTexture;
@@ -1095,12 +1105,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(), m_shadowQualityToShader);
+                m_surfaceShader->setUniformValue(m_surfaceShader->shadowQ(),
+                                                 m_shadowQualityToShader);
                 m_surfaceShader->setUniformValue(m_surfaceShader->depth(), depthMVPMatrix);
                 m_surfaceShader->setUniformValue(m_surfaceShader->lightS(), adjustedLightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, gradientTexture, m_depthModelTexture);
+                m_drawer->drawObject(m_surfaceShader, m_surfaceObj, gradientTexture,
+                                     m_depthModelTexture);
             } else
 #endif
             {
@@ -1167,6 +1179,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
+        m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -1209,6 +1222,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
+        lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
@@ -1219,7 +1233,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme->lightStrength() / 2.5f);
         }
 
         QQuaternion lineYRotation = QQuaternion();
@@ -2173,7 +2188,8 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
-        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(), m_shadowQualityMultiplier, 1.0f);
+        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                          m_shadowQualityMultiplier, 1.0f);
         m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
                                                                   m_shadowQualityMultiplier);
         if (!m_depthTexture || !m_depthModelTexture)

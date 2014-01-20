@@ -258,6 +258,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
+    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+
     // Specify viewport
     glViewport(m_primarySubViewport.x(),
                m_primarySubViewport.y(),
@@ -266,7 +268,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width() / (GLfloat)m_primarySubViewport.height();
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width()
+            / (GLfloat)m_primarySubViewport.height();
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Calculate view matrix
@@ -608,6 +611,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             m_dotGradientShader->setUniformValue(m_dotGradientShader->view(), viewMatrix);
             m_dotGradientShader->setUniformValue(m_dotGradientShader->ambientS(),
                                                  m_cachedTheme->ambientLightStrength());
+            m_dotGradientShader->setUniformValue(m_dotGradientShader->lightColor(), lightColor);
         }
         if (haveUniformColorMeshSeries) {
             m_dotShader->bind();
@@ -615,6 +619,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
             m_dotShader->setUniformValue(m_dotShader->ambientS(),
                                          m_cachedTheme->ambientLightStrength());
+            m_dotShader->setUniformValue(m_dotShader->lightColor(), lightColor);
             dotShader = m_dotShader;
         } else {
             dotShader = m_dotGradientShader;
@@ -829,6 +834,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
+        m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -878,6 +884,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
+        lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
@@ -888,7 +895,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme->lightStrength() / 2.5f);
         }
 
         QQuaternion lineYRotation = QQuaternion();
@@ -1692,7 +1700,8 @@ void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &
     m_dotShader->initialize();
 }
 
-void Scatter3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+void Scatter3DRenderer::initGradientShaders(const QString &vertexShader,
+                                            const QString &fragmentShader)
 {
     if (m_dotGradientShader)
         delete m_dotGradientShader;
@@ -1789,7 +1798,9 @@ QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
     return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
 }
 
-void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QAbstract3DSeries *&series)
+void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color,
+                                                       int &index,
+                                                       QAbstract3DSeries *&series)
 {
     if (color != selectionSkipColor) {
         index = int(color.x())

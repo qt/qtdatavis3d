@@ -111,8 +111,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *     \li Qt::white
  *   \row
  *     \li lightColor
- *     \li The color of the specular light. Doesn't affect ambient light. \note Not yet supported
- *         in alpha release.
+ *     \li The color of the light. Affects both ambient and specular light.
  *     \li Qt::white
  *   \row
  *     \li lightStrength
@@ -295,8 +294,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty Color Theme3D::lightColor
  *
  * Color for the specular light defined in Scene3D.
- *
- * \warning Not supported in alpha release.
  */
 
 /*!
@@ -596,8 +593,6 @@ QColor Q3DTheme::multiHighlightColor() const
  * \property Q3DTheme::lightColor
  *
  * Color for the specular light defined in Q3DScene.
- *
- * \warning Not supported in alpha release.
  */
 void Q3DTheme::setLightColor(const QColor &color)
 {

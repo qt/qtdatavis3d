@@ -33,8 +33,7 @@
         \li QML2 support
         \li Customizable axes for data - control viewable data window with axis ranges
         \li Customizable input handling
-        \li Customizable scene handling - full control of viewports
-            (upcoming feature - not fully supported in alpha)
+        \li Customizable scene handling
         \li Customizable themes
     \endlist
 

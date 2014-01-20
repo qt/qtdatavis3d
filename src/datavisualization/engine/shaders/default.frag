@@ -11,11 +11,12 @@ uniform highp vec3 lightPosition_wrld;
 uniform highp vec3 color_mdl;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
+uniform highp vec3 lightColor;
 
 void main() {
     highp vec3 materialDiffuseColor = color_mdl.rgb;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor;
 
     highp float distance = length(lightPosition_wrld - position_wrld);
 

@@ -7,6 +7,7 @@ uniform highp sampler2DShadow shadowMap;
 uniform sampler2D textureSampler;
 uniform highp float gradMin;
 uniform highp float gradHeight;
+uniform highp vec3 lightColor;
 
 varying highp vec4 shadowCoord;
 varying highp vec3 position_wrld;
@@ -41,8 +42,8 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
 void main() {
     highp vec2 gradientUV = vec2(0.0, gradMin + ((coords_mdl.y + 1.0) * gradHeight));
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor;
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);

@@ -73,6 +73,7 @@ class ShaderHelper
     GLuint shadow();
     GLuint gradientMin();
     GLuint gradientHeight();
+    GLuint lightColor();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -106,6 +107,7 @@ class ShaderHelper
     GLuint m_shadowUniform;
     GLuint m_gradientMinUniform;
     GLuint m_gradientHeightUniform;
+    GLuint m_lightColorUniform;
 
     GLboolean m_initialized;
 };

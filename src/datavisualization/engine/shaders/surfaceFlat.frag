@@ -12,12 +12,13 @@ uniform sampler2D textureSampler;
 uniform highp vec3 lightPosition_wrld;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
+uniform highp vec3 lightColor;
 
 void main() {
     highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.0) / 2.0);
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor;
 
     highp float distance = length(lightPosition_wrld - position_wrld);
 

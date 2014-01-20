@@ -275,6 +275,7 @@ void Bars3DRenderer::drawSlicedScene()
 {
     GLfloat barPosX = 0;
     QVector3D lightPos;
+    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
@@ -330,6 +331,7 @@ void Bars3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->ambientS(),
                                     m_cachedTheme->ambientLightStrength() * 2.3f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
+        lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
         if (rowMode)
             scaleFactor = (1.1f * m_rowWidth) / m_scaleFactor;
@@ -441,6 +443,7 @@ void Bars3DRenderer::drawSlicedScene()
     m_barShader->setUniformValue(m_barShader->lightS(), 0.15f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
                                  m_cachedTheme->ambientLightStrength() * 2.3f);
+    m_barShader->setUniformValue(m_barShader->lightColor(), lightColor);
     m_barGradientShader->bind();
     m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
     m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
@@ -448,6 +451,7 @@ void Bars3DRenderer::drawSlicedScene()
     m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
                                          m_cachedTheme->ambientLightStrength() * 2.3f);
     m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
+    m_barGradientShader->setUniformValue(m_barGradientShader->lightColor(), lightColor);
 
     // Default to uniform shader
     ShaderHelper *barShader = m_barShader;
@@ -711,6 +715,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
 
+    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+
     int seriesCount = m_visibleSeriesList.size();
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
@@ -722,7 +728,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width() / (GLfloat)m_primarySubViewport.height();
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width()
+            / (GLfloat)m_primarySubViewport.height();
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Get the view matrix
@@ -1026,6 +1033,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
                                              m_cachedTheme->ambientLightStrength());
         m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
+        m_barGradientShader->setUniformValue(m_barGradientShader->lightColor(), lightColor);
     }
 
     if (haveUniformColorSeries) {
@@ -1034,6 +1042,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
         m_barShader->setUniformValue(m_barShader->ambientS(),
                                      m_cachedTheme->ambientLightStrength());
+        m_barShader->setUniformValue(m_barShader->lightColor(), lightColor);
         barShader = m_barShader;
     } else {
         barShader = m_barGradientShader;
@@ -1264,6 +1273,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         barShader->setUniformValue(barShader->shadowQ(), m_shadowQualityToShader);
                         barShader->setUniformValue(barShader->depth(), depthMVPMatrix);
                         barShader->setUniformValue(barShader->lightS(), shadowLightStrength);
+                        barShader->setUniformValue(barShader->lightColor(), lightColor);
 
                         // Draw the object
                         m_drawer->drawObject(barShader, barObj, gradientTexture, m_depthTexture);
@@ -1326,6 +1336,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
         m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
+        m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -1408,6 +1419,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), barColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
+        lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadowed shader bindings
@@ -1821,7 +1833,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     labelText.replace(valueLabelTag, valueLabelText);
                 }
 
-                labelText.replace(seriesNameTag, m_visibleSeriesList[m_visualSelectedBarSeriesIndex].name());
+                labelText.replace(seriesNameTag,
+                                  m_visibleSeriesList[m_visualSelectedBarSeriesIndex].name());
 
                 selectedBar->setSelectionLabel(labelText);
                 m_selectionLabelDirty = false;

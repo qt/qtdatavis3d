@@ -92,6 +92,7 @@ void ShaderHelper::initialize()
     m_shadowUniform = m_program->uniformLocation("shadowMap");
     m_gradientMinUniform = m_program->uniformLocation("gradMin");
     m_gradientHeightUniform = m_program->uniformLocation("gradHeight");
+    m_lightColorUniform = m_program->uniformLocation("lightColor");
     m_initialized = true;
 }
 
@@ -245,6 +246,13 @@ GLuint ShaderHelper::gradientHeight()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_gradientHeightUniform;
+}
+
+GLuint ShaderHelper::lightColor()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_lightColorUniform;
 }
 
 GLuint ShaderHelper::posAtt()
