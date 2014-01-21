@@ -42,9 +42,9 @@ public:
 private:
     Q_DISABLE_COPY(Q3DInputHandler)
 
-    QScopedPointer<Q3DInputHandlerPrivate> *d_ptr;
+    QScopedPointer<Q3DInputHandlerPrivate> d_ptr;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QDEFAULT3DINPUTHANDLER_H
+#endif

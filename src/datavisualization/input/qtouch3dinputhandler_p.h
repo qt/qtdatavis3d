@@ -19,6 +19,7 @@
 #ifndef QTOUCH3DINPUTHANDLER_P_H
 #define QTOUCH3DINPUTHANDLER_P_H
 
+#include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -41,6 +42,7 @@ public:
 public:
     QTouch3DInputHandler *q_ptr;
     QTimer *m_holdTimer;
+    QAbstract3DInputHandlerPrivate::InputState m_inputState;
     QPointF m_startHoldPos;
     QPointF m_touchHoldPos;
 };

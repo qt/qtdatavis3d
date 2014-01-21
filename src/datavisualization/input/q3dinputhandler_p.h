@@ -29,11 +29,10 @@
 #ifndef Q3DINPUTHANDLER_P_H
 #define Q3DINPUTHANDLER_P_H
 
-#include "datavisualizationglobal_p.h"
+#include "qabstract3dinputhandler_p.h"
+#include "q3dinputhandler.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
-
-class Q3DInputHandler;
 
 class Q3DInputHandlerPrivate
 {
@@ -43,7 +42,7 @@ public:
 
 public:
     Q3DInputHandler *q_ptr;
-
+    QAbstract3DInputHandlerPrivate::InputState m_inputState;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

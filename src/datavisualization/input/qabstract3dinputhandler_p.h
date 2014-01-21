@@ -45,6 +45,13 @@ public:
     ~QAbstract3DInputHandlerPrivate();
 
 public:
+    enum InputState {
+        InputStateNone = 0,
+        InputStateSelecting,
+        InputStateRotating,
+        InputStatePinching
+    };
+
     QAbstract3DInputHandler *q_ptr;
     int m_prevDistance;
     QPoint m_previousInputPos;
@@ -53,7 +60,6 @@ public:
     GLfloat m_defaultYRotation;
 
 private:
-    QAbstract3DInputHandler::InputState m_inputState;
     QAbstract3DInputHandler::InputView m_inputView;
     QPoint m_inputPosition;
     QRect m_mainViewPort;

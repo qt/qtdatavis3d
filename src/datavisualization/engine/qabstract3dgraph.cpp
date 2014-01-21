@@ -44,10 +44,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Anti-aliasing is turned on by default on C++, except in OpenGL ES2
  * environments, where anti-aliasing is not supported by Qt Data Visualization.
  * To specify non-default anti-aliasing for a graph, give a custom surface format as
- * a constructor parameter. You can use the convenience function \c{QtDataVisualization::qDefaultSurfaceFormat()}
+ * a constructor parameter. You can use the convenience function \c QtDataVisualization::qDefaultSurfaceFormat()
  * to create the surface format object.
  *
- * \note QAbstract3DGraph sets window flag \c{Qt::FramelessWindowHint} on by default. If you want to display
+ * \note QAbstract3DGraph sets window flag \c Qt::FramelessWindowHint on by default. If you want to display
  * graph windows as standalone windows with regular window frame, clear this flag after constructing
  * the graph. For example:
  *
@@ -115,7 +115,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \internal
  */
-QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format, QWindow *parent)
+QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
+                                   QWindow *parent)
     : QWindow(parent),
       d_ptr(d)
 {
@@ -175,7 +176,7 @@ QAbstract3DGraph::~QAbstract3DGraph()
 
 /*!
  * Adds the given \a inputHandler to the graph. The input handlers added via addInputHandler
- * are not taken in to use directly. Only the ownership of the a\ inputHandler is given to the graph.
+ * are not taken in to use directly. Only the ownership of the \a inputHandler is given to the graph.
  * The \a inputHandler must not be null or already added to another graph.
  *
  * \sa releaseInputHandler(), setActiveInputHandler()
@@ -289,7 +290,7 @@ QList<Q3DTheme *> QAbstract3DGraph::themes() const
  *
  * Sets selection \a mode to a combination of SelectionFlags. It is preset to
  * \c SelectionItem by default.
- * Different graph types support different selection modes. See \c SelectionFlags
+ * Different graph types support different selection modes. See SelectionFlags
  * documentation for details.
  */
 void QAbstract3DGraph::setSelectionMode(SelectionFlags mode)
@@ -325,7 +326,7 @@ QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 /*!
  * \property QAbstract3DGraph::scene
  *
- * This property contains the read only Q3DScene that can be used to access e.g. camera object.
+ * This property contains the read only Q3DScene that can be used to access for example a camera object.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {

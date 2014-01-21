@@ -29,21 +29,12 @@ class QAbstract3DInputHandlerPrivate;
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(InputState)
     Q_ENUMS(InputView)
-    Q_PROPERTY(InputState inputState READ inputState WRITE setInputState NOTIFY inputStateChanged)
     Q_PROPERTY(InputView inputView READ inputView WRITE setInputView NOTIFY inputViewChanged)
     Q_PROPERTY(QPoint inputPosition READ inputPosition WRITE setInputPosition NOTIFY positionChanged)
     Q_PROPERTY(Q3DScene *scene READ scene WRITE setScene NOTIFY sceneChanged)
 
 public:
-    enum InputState {
-        InputStateNone = 0,
-        InputStateSelecting,
-        InputStateRotating,
-        InputStatePinching
-    };
-
     enum InputView {
         InputViewNone = 0,
         InputViewOnPrimary,
@@ -63,11 +54,6 @@ public:
     virtual void wheelEvent(QWheelEvent *event);
 
 public:
-    // TODO: Check if the inputState needs to be visible outside of subclasses in the final architecture
-    InputState inputState();
-    void setInputState(InputState inputState);
-
-    // TODO: Check if the inputView needs to be visible outside of subclasses in the final architecture
     InputView inputView();
     void setInputView(InputView inputView);
 
@@ -79,7 +65,6 @@ public:
 
 signals:
     void positionChanged(QPoint position);
-    void inputStateChanged(InputState state);
     void inputViewChanged(InputView view);
     void sceneChanged(const Q3DScene *scene);
 
