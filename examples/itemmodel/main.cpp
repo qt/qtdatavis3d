@@ -84,17 +84,18 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
-    m_graph->setDataWindow(m_rowCount, m_columnCount);
+    m_graph->rowAxis()->setRange(0, m_rowCount);
+    m_graph->columnAxis()->setRange(0, m_columnCount);
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
     m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
-    m_graph->rowAxis()->setCategoryLabels(QStringList(QString()));
-    m_graph->columnAxis()->setCategoryLabels(QStringList(QString()));
+    m_graph->rowAxis()->setLabels(QStringList(QString()));
+    m_graph->columnAxis()->setLabels(QStringList(QString()));
 
-    m_graph->activeDataProxy()->setItemLabelFormat(QStringLiteral("@valueLabel"));
+    m_graph->seriesList().at(0)->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
     //! [6]
 

@@ -41,11 +41,23 @@ public:
     ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent = 0);
     virtual ~ScatterItemModelHandler();
 
+public slots:
+    virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                                   const QVector<int> &roles = QVector<int> ());
+    virtual void handleRowsInserted(const QModelIndex &parent, int start, int end);
+    virtual void handleRowsRemoved(const QModelIndex &parent, int start, int end);
+
 protected:
     void virtual resolveModel();
 
+private:
+    void modelPosToScatterItem(int modelRow, int modelColumn, QScatterDataItem &item);
+
     QItemModelScatterDataProxy *m_proxy; // Not owned
     QScatterDataArray *m_proxyArray; // Not owned
+    int m_xPosRole;
+    int m_yPosRole;
+    int m_zPosRole;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

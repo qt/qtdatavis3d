@@ -138,9 +138,9 @@ private:
     ThemeManager *m_themeManager;
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
-    Q3DScene *m_scene;
 
 protected:
+    Q3DScene *m_scene;
     QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
     QAbstract3DInputHandler *m_activeInputHandler;
     CameraHelper *m_cameraHelper;
@@ -273,6 +273,7 @@ protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
     QValue3DAxis *createDefaultValueAxis();
     QCategory3DAxis *createDefaultCategoryAxis();
+    virtual void startRecordingRemovesAndInserts();
 
 private:
     void setAxisHelper(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis *axis,

@@ -59,7 +59,6 @@ void Surface3DController::initializeOpenGL()
 
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
-    synchDataToRenderer();
 
     emitNeedRender();
 }
@@ -388,11 +387,6 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustValueAxisRange();
-        m_isDataDirty = true;
-    }
-
     if (series == m_selectedSeries) {
         // If rows inserted to selected series before the selection, adjust the selection
         int selectedRow = m_selectedPoint.x();
@@ -400,6 +394,11 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
             selectedRow += count;
             setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
         }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
     }
 
     emitNeedRender();
@@ -410,11 +409,6 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustValueAxisRange();
-        m_isDataDirty = true;
-    }
-
     if (series == m_selectedSeries) {
         // If rows removed from selected series before the selection, adjust the selection
         int selectedRow = m_selectedPoint.x();
@@ -426,6 +420,11 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
 
             setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
         }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
     }
 
     emitNeedRender();

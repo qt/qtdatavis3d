@@ -22,11 +22,13 @@
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
 #include <QPointer>
 #include <QColorDialog>
+#include <QTimer>
 
 using namespace QtDataVisualization;
 
@@ -81,6 +83,7 @@ public:
     void showFiveSeries();
     QBarDataArray *makeDummyData();
     void primarySeriesTest();
+    void insertRemoveTestToggle();
 
 public slots:
     void flipViews();
@@ -94,6 +97,9 @@ public slots:
     void handleColumnAxisChanged(QCategory3DAxis *axis);
     void handleValueAxisChanged(QValue3DAxis *axis);
     void handlePrimarySeriesChanged(QBar3DSeries *series);
+
+    void insertRemoveTimerTimeout();
+    void triggerSelection();
 
 signals:
     void shadowQualityChanged(int quality);
@@ -137,6 +143,10 @@ private:
     QAbstract3DInputHandler *m_defaultInputHandler;
     Q3DTheme *m_ownTheme;
     Q3DTheme *m_builtinTheme;
+    QTimer m_insertRemoveTimer;
+    int m_insertRemoveStep;
+    QAbstract3DInputHandler *m_customInputHandler;
+    QTimer m_selectionTimer;
 };
 
 #endif

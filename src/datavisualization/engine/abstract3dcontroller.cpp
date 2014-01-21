@@ -30,6 +30,7 @@
 #include "qabstract3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dscene_p.h"
+#include "q3dscene.h"
 
 #include <QThread>
 
@@ -147,9 +148,7 @@ QList<QAbstract3DSeries *> Abstract3DController::seriesList()
  */
 void Abstract3DController::synchDataToRenderer()
 {
-    // If we don't have a renderer, don't do anything
-    if (!m_renderer)
-        return;
+    // Subclass implementations check for renderer validity already, so no need to check here.
 
     // If there is a pending click from renderer, handle that first.
     if (m_renderer->isClickPending()) {
@@ -157,7 +156,7 @@ void Abstract3DController::synchDataToRenderer()
         m_renderer->clearClickPending();
     }
 
-    // TODO: start recording inserts/removals
+    startRecordingRemovesAndInserts();
 
     if (m_scene->d_ptr->m_sceneDirty)
         m_renderer->updateScene(m_scene);
@@ -1014,6 +1013,11 @@ QCategory3DAxis *Abstract3DController::createDefaultCategoryAxis()
     QCategory3DAxis *defaultAxis = new QCategory3DAxis;
     defaultAxis->d_ptr->setDefaultAxis(true);
     return defaultAxis;
+}
+
+void Abstract3DController::startRecordingRemovesAndInserts()
+{
+    // Default implementation does nothing
 }
 
 void Abstract3DController::emitNeedRender()

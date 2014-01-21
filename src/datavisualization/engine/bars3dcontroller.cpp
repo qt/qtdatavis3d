@@ -70,6 +70,9 @@ void Bars3DController::initializeOpenGL()
 
 void Bars3DController::synchDataToRenderer()
 {
+    if (!isInitialized())
+        return;
+
     // Background change requires reloading the meshes in bar graphs, so dirty the series visuals
     if (m_themeManager->activeTheme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
         m_isSeriesVisualsDirty = true;
@@ -78,9 +81,6 @@ void Bars3DController::synchDataToRenderer()
     }
 
     Abstract3DController::synchDataToRenderer();
-
-    if (!isInitialized())
-        return;
 
     // Notify changes to renderer
     if (m_changeTracker.barSpecsChanged) {
@@ -135,12 +135,8 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
-    }
 
+    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
     if (series == m_selectedBarSeries) {
         // If rows removed from selected series before the selection, adjust the selection
         int selectedRow = m_selectedBar.x();
@@ -154,6 +150,11 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
         }
     }
 
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
+    }
+
     emitNeedRender();
 }
 
@@ -162,11 +163,6 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
-    }
-
     if (series == m_selectedBarSeries) {
         // If rows inserted to selected series before the selection, adjust the selection
         int selectedRow = m_selectedBar.x();
@@ -174,6 +170,11 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
             selectedRow += count;
             setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
         }
+    }
+
+    if (series->isVisible()) {
+        adjustAxisRanges();
+        m_isDataDirty = true;
     }
 
     emitNeedRender();
@@ -243,8 +244,6 @@ void Bars3DController::handlePendingClick()
     // This function is called while doing the sync, so it is okay to query from renderer
     QPoint position = m_renderer->clickedPosition();
     QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
-
-    // TODO: Adjust position according to inserts/removes in the series
 
     setSelectedBar(position, series);
 

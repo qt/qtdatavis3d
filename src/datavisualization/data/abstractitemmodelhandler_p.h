@@ -74,6 +74,7 @@ protected:
     QPointer<const QAbstractItemModel> m_itemModel;  // Not owned
     bool resolvePending;
     QTimer m_resolveTimer;
+    bool m_fullReset;
 
 private:
     Q_DISABLE_COPY(AbstractItemModelHandler)

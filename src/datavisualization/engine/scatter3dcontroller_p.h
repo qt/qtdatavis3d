@@ -62,6 +62,30 @@ private:
     QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
                                             // in single series selection cases.
 
+    struct InsertRemoveRecord {
+        bool m_isInsert;
+        int m_startIndex;
+        int m_count;
+        QAbstract3DSeries *m_series;
+
+        InsertRemoveRecord() :
+            m_isInsert(false),
+            m_startIndex(0),
+            m_count(0),
+            m_series(0)
+        {}
+
+        InsertRemoveRecord(bool isInsert, int startIndex, int count, QAbstract3DSeries *series) :
+            m_isInsert(isInsert),
+            m_startIndex(startIndex),
+            m_count(count),
+            m_series(series)
+        {}
+    };
+
+    QVector<InsertRemoveRecord> m_insertRemoveRecords;
+    bool m_recordInsertsAndRemoves;
+
 public:
     explicit Scatter3DController(QRect rect, Q3DScene *scene = 0);
     ~Scatter3DController();
@@ -92,6 +116,9 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
+
+protected:
+    virtual void startRecordingRemovesAndInserts();
 
 private:
     void adjustValueAxisRange();

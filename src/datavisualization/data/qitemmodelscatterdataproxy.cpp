@@ -32,7 +32,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * for Q3DScatter. It maps roles of QAbstractItemModel to the XYZ-values of Q3DScatter points.
  *
  * The data is resolved asynchronously whenever the mapping or the model changes.
- * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
+ * QScatterDataProxy::arrayReset() is emitted when the data has been resolved. However, inserts,
+ * removes, and single data item changes after the model initialization are resolved synchronously,
+ * unless the same frame also contains a change that causes the whole model to be resolved.
  *
  * Mapping ignores rows and columns of the QAbstractItemModel and treats
  * all items equally. It requires the model to provide at least three roles for the data items

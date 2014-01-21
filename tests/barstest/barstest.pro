@@ -2,8 +2,8 @@
     error( "Couldn't find the tests.pri file!" )
 }
 
-SOURCES += main.cpp chart.cpp
-HEADERS += chart.h
+SOURCES += main.cpp chart.cpp custominputhandler.cpp
+HEADERS += chart.h custominputhandler.h
 
 QT += widgets
 

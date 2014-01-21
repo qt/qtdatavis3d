@@ -126,6 +126,10 @@ int main(int argc, char **argv)
     swapAxisButton->setText(QStringLiteral("Swap value axis"));
     swapAxisButton->setEnabled(false);
 
+    QPushButton *insertRemoveTestButton = new QPushButton(widget);
+    insertRemoveTestButton->setText(QStringLiteral("Toggle insert/remove cycle"));
+    insertRemoveTestButton->setEnabled(true);
+
     QPushButton *releaseAxesButton = new QPushButton(widget);
     releaseAxesButton->setText(QStringLiteral("Release all axes"));
     releaseAxesButton->setEnabled(true);
@@ -293,6 +297,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertRemoveTestButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
@@ -385,6 +390,8 @@ int main(int argc, char **argv)
                      &GraphModifier::selectBar);
     QObject::connect(swapAxisButton, &QPushButton::clicked, modifier,
                      &GraphModifier::swapAxis);
+    QObject::connect(insertRemoveTestButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::insertRemoveTestToggle);
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,

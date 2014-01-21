@@ -17,12 +17,14 @@
 ****************************************************************************/
 
 #include "chart.h"
+#include "custominputhandler.h"
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/q3dinputhandler.h>
 #include <QTime>
 
 using namespace QtDataVisualization;
@@ -65,7 +67,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_useNullInputHandler(false),
       m_defaultInputHandler(0),
       m_ownTheme(0),
-      m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss))
+      m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss)),
+      m_customInputHandler(new CustomInputHandler)
 {
     m_temperatureData->setObjectName("m_temperatureData");
     m_temperatureData2->setObjectName("m_temperatureData2");
@@ -218,8 +221,14 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     QObject::connect(m_graph, &Q3DBars::primarySeriesChanged, this,
                      &GraphModifier::handlePrimarySeriesChanged);
 
+    QObject::connect(&m_insertRemoveTimer, &QTimer::timeout, this,
+                     &GraphModifier::insertRemoveTimerTimeout);
+
     m_graph->addSeries(m_temperatureData);
     m_graph->addSeries(m_temperatureData2);
+
+    QObject::connect(&m_selectionTimer, &QTimer::timeout, this,
+                     &GraphModifier::triggerSelection);
 
     resetTemperatureData();
 }
@@ -992,6 +1001,69 @@ void GraphModifier::primarySeriesTest()
     }
 
 
+}
+
+void GraphModifier::insertRemoveTestToggle()
+{
+    if (m_insertRemoveTimer.isActive()) {
+        m_insertRemoveTimer.stop();
+        m_selectionTimer.stop();
+        m_graph->removeSeries(m_dummyData);
+        m_graph->removeSeries(m_dummyData2);
+        releaseProxies();
+        releaseAxes();
+        m_graph->setActiveInputHandler(m_defaultInputHandler);
+    } else {
+        releaseProxies();
+        releaseAxes();
+        m_graph->rowAxis()->setRange(0, 32);
+        m_graph->columnAxis()->setRange(0, 10);
+        m_graph->setActiveInputHandler(m_customInputHandler);
+        m_graph->addSeries(m_dummyData);
+        m_graph->addSeries(m_dummyData2);
+        m_insertRemoveStep = 0;
+        m_insertRemoveTimer.start(100);
+        m_selectionTimer.start(10);
+    }
+}
+
+void GraphModifier::insertRemoveTimerTimeout()
+{
+    if (m_insertRemoveStep < 32) {
+        for (int k = 0; k < 1; k++) {
+            QBarDataRow *dataRow = new QBarDataRow(10);
+            for (float i = 0; i < 10; i++)
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+
+            QString label = QStringLiteral("Insert %1").arg(insertCounter++);
+            m_dummyData->dataProxy()->insertRow(0, dataRow, label);
+        }
+    } else {
+        for (int k = 0; k < 1; k++)
+            m_dummyData->dataProxy()->removeRows(0, 1);
+    }
+
+    if (m_insertRemoveStep < 16 || (m_insertRemoveStep > 31 && m_insertRemoveStep < 48)) {
+        for (int k = 0; k < 2; k++) {
+            QBarDataRow *dataRow = new QBarDataRow(10);
+            for (float i = 0; i < 10; i++)
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+
+            QString label = QStringLiteral("Insert %1").arg(insertCounter++);
+            m_dummyData2->dataProxy()->insertRow(0, dataRow, label);
+        }
+    } else {
+        for (int k = 0; k < 2; k++)
+            m_dummyData2->dataProxy()->removeRows(0, 1);
+    }
+
+    if (m_insertRemoveStep++ > 63)
+        m_insertRemoveStep = 0;
+}
+
+void GraphModifier::triggerSelection()
+{
+    m_graph->scene()->setSelectionQueryPosition(m_customInputHandler->inputPosition());
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)
