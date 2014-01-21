@@ -54,6 +54,7 @@ public:
 
 private:
     QAbstract3DInputHandler::InputState m_inputState;
+    QAbstract3DInputHandler::InputView m_inputView;
     QPoint m_inputPosition;
     QRect m_mainViewPort;
 

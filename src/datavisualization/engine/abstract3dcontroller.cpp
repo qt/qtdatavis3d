@@ -68,8 +68,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     inputHandler = new QTouch3DInputHandler();
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
-    connect(inputHandler, &QAbstract3DInputHandler::inputStateChanged, this,
-            &Abstract3DController::handleInputStateChanged);
+    connect(inputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
+            &Abstract3DController::handleInputViewChanged);
     connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
             &Abstract3DController::handleInputPositionChanged);
     connect(m_scene->d_ptr.data(), &Q3DScenePrivate::needRender, this,
@@ -863,15 +863,15 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
-void Abstract3DController::handleInputStateChanged(QAbstract3DInputHandler::InputState state)
+void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
-    // When in automatic slicing mode, input state change to overview disables slice mode
+    // When in automatic slicing mode, input view change to primary disables slice mode
     if (m_selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
-            && state == QAbstract3DInputHandler::InputStateOnPrimaryView) {
+            && view == QAbstract3DInputHandler::InputViewOnPrimary) {
         setSlicingActive(false);
     }
 
-    m_changeTracker.inputStateChanged = true;
+    m_changeTracker.inputViewChanged = true;
     emitNeedRender();
 }
 

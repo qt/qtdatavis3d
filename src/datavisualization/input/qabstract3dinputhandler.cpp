@@ -38,16 +38,23 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * \value InputStateNone
  *        Default "no input received" state.
- * \value InputStateOnScene
- *        Mouse or touch input received on the 3D scene.
- * \value InputStateOnPrimaryView
- *        Mouse or touch input received on the primary view area.
- * \value InputStateOnSecondaryView
- *        Mouse or touch input received on the secondary view area.
  * \value InputStateRotating
  *        Rotation of the 3D geometry ongoing.
  * \value InputStatePinching
  *        Pinch/punch multitouch input ongoing.
+ */
+
+/*!
+ * \enum QAbstract3DInputHandler::InputView
+ *
+ * Predefined input views for mouse and touch based input handlers.
+ *
+ * \value InputViewNone
+ *        Mouse or touch not on a view.
+ * \value InputViewOnPrimary
+ *        Mouse or touch input received on the primary view area.
+ * \value InputViewOnSecondary
+ *        Mouse or touch input received on the secondary view area.
  */
 
 /*!
@@ -159,6 +166,25 @@ void QAbstract3DInputHandler::setInputState(InputState inputState)
 }
 
 /*!
+ * \property QAbstract3DInputHandler::inputView
+ *
+ * Current enumerated input view based on the view of the processed input events.
+ * When the view changes inputViewChanged() is emitted.
+ */
+QAbstract3DInputHandler::InputView QAbstract3DInputHandler::inputView()
+{
+    return d_ptr->m_inputView;
+}
+
+void QAbstract3DInputHandler::setInputView(InputView inputView)
+{
+    if (inputView != d_ptr->m_inputView) {
+        d_ptr->m_inputView = inputView;
+        emit inputViewChanged(inputView);
+    }
+}
+
+/*!
  * \property QAbstract3DInputHandler::inputPosition
  *
  * Last input position based on the processed input events.
@@ -234,6 +260,7 @@ QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputH
     m_prevDistance(0),
     m_previousInputPos(QPoint(0,0)),
     m_inputState(QAbstract3DInputHandler::InputStateNone),
+    m_inputView(QAbstract3DInputHandler::InputViewNone),
     m_inputPosition(QPoint(0,0)),
     m_scene(0)
 {

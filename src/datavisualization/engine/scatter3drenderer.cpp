@@ -571,6 +571,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                      m_viewport.height());
         selectionColorToSeriesAndIndex(clickedColor, m_clickedIndex, m_clickedSeries);
 
+        emit needRender();
+
         // Revert to original fbo and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
         glViewport(m_primarySubViewport.x(),

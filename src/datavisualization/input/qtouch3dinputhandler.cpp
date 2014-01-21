@@ -99,24 +99,27 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
         if (event->type() == QEvent::TouchBegin) {
             if (scene()->isSlicingActive()) {
                 if (scene()->isPointInPrimarySubView(pointerPos.toPoint()))
-                    setInputState(InputStateOnPrimaryView);
+                    setInputView(InputViewOnPrimary);
                 else if (scene()->isPointInSecondarySubView(pointerPos.toPoint()))
-                    setInputState(InputStateOnSecondaryView);
+                    setInputView(InputViewOnSecondary);
                 else
-                    setInputState(InputStateNone);
+                    setInputView(InputViewNone);
             } else {
                 // Handle possible tap-and-hold selection
                 d_ptr->m_startHoldPos = pointerPos;
                 d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
                 d_ptr->m_holdTimer->start();
+                setInputView(InputViewOnPrimary);
                 // Start rotating
                 setInputState(InputStateRotating);
                 setInputPosition(pointerPos.toPoint());
             }
         } else if (event->type() == QEvent::TouchEnd) {
+            setInputView(InputViewNone);
             d_ptr->m_holdTimer->stop();
             // Handle possible selection
-            d_ptr->handleSelection(pointerPos);
+            if (QAbstract3DInputHandler::InputStatePinching != inputState())
+                d_ptr->handleSelection(pointerPos);
         } else if (event->type() == QEvent::TouchUpdate) {
             if (!scene()->isSlicingActive()) {
                 d_ptr->m_touchHoldPos = pointerPos;
@@ -172,19 +175,22 @@ void QTouch3DInputHandlerPrivate::handleTapAndHold()
     QPointF distance = m_startHoldPos - m_touchHoldPos;
     if (distance.manhattanLength() < maxTapAndHoldJitter) {
         q_ptr->setInputPosition(m_touchHoldPos.toPoint());
-        q_ptr->setInputState(QAbstract3DInputHandler::InputStateOnScene);
+        q_ptr->scene()->setSelectionQueryPosition(m_touchHoldPos.toPoint());
+        q_ptr->setInputState(QAbstract3DInputHandler::InputStateSelecting);
     }
 }
 
 void QTouch3DInputHandlerPrivate::handleSelection(const QPointF &position)
 {
     QPointF distance = m_startHoldPos - position;
-    if (distance.manhattanLength() < maxSelectionJitter)
-        q_ptr->setInputState(QAbstract3DInputHandler::InputStateOnScene);
-    else
+    if (distance.manhattanLength() < maxSelectionJitter) {
+        q_ptr->setInputState(QAbstract3DInputHandler::InputStateSelecting);
+        q_ptr->scene()->setSelectionQueryPosition(position.toPoint());
+    } else {
         q_ptr->setInputState(QAbstract3DInputHandler::InputStateNone);
+        q_ptr->setInputView(QAbstract3DInputHandler::InputViewNone);
+    }
     q_ptr->setPreviousInputPos(position.toPoint());
-    q_ptr->scene()->setSelectionQueryPosition(position.toPoint());
 }
 
 void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)

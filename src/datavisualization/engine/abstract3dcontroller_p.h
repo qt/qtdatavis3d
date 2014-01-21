@@ -76,7 +76,7 @@ struct Abstract3DChangeBitField {
     bool axisXLabelFormatChanged       : 1;
     bool axisYLabelFormatChanged       : 1;
     bool axisZLabelFormatChanged       : 1;
-    bool inputStateChanged             : 1;
+    bool inputViewChanged              : 1;
     bool inputPositionChanged          : 1;
 
     Abstract3DChangeBitField() :
@@ -243,7 +243,7 @@ public slots:
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
-    void handleInputStateChanged(QAbstract3DInputHandler::InputState state);
+    void handleInputViewChanged(QAbstract3DInputHandler::InputView view);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);
 

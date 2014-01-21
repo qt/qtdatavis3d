@@ -1051,6 +1051,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_clickedPosition = selectionIdToSurfacePoint(selectionId);
         m_clickedSeries = m_visibleSeriesList.at(0).series();
 
+        emit needRender();
+
         // Revert to original viewport
         glViewport(m_primarySubViewport.x(),
                    m_primarySubViewport.y(),

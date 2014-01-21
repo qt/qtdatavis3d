@@ -24,8 +24,7 @@ QT += datavisualization
     vis_lib_name = DataVisualization
     vis_src_lib = lib$${vis_lib_name}.so
     vis_lib_dir = $$OUT_PWD/../../lib/$$vis_src_lib
-    vis_lib_formatted = $$replace(vis_lib_dir, /, $$QMAKE_DIR_SEP)
-    ANDROID_EXTRA_LIBS = $$vis_lib_formatted
+    ANDROID_EXTRA_LIBS = $$vis_lib_dir
 }
 
 contains(TARGET, qml.*) {

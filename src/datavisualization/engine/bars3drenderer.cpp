@@ -1001,6 +1001,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_clickedPosition = selectionColorToArrayPosition(clickedColor);
         m_clickedSeries = selectionColorToSeries(clickedColor);
 
+        emit needRender();
+
         // Revert to original render target and viewport
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
         glViewport(m_primarySubViewport.x(),
