@@ -42,9 +42,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-// TODO Uniform scaling is broken on surface
-//#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
-
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat labelMargin = 0.05f;
@@ -227,7 +224,6 @@ void Surface3DRenderer::updateData()
             m_dataArray.clear();
         }
 
-        // TODO: Handle partial surface grids on the graph edges
         if (sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
             if (dimensionChanged) {
                 m_dataArray.reserve(sampleSpace.height());
@@ -281,8 +277,6 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 {
     Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
 
-    // TODO: move to render cache when multiseries support implemented QTRD-2657
-    // TODO: until then just update them always.
     if (m_visibleSeriesList.size()) {
         QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
         updateFlatStatus(series->isFlatShadingEnabled());
@@ -348,8 +342,6 @@ void Surface3DRenderer::updateRows(const QVector<int> &rows)
 
 void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
 {
-    // TODO: Properly support non-straight rows and columns (QTRD-2643)
-
     // Surface only supports single series for now, so we are only interested in the first series
     const QSurfaceDataArray *array = 0;
     if (m_visibleSeriesList.size()) {
@@ -611,7 +603,6 @@ void Surface3DRenderer::drawSlicedScene()
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
 
-        // TODO: Do properly when multiseries support implemented QTRD-2657
         const SeriesRenderCache &series = m_visibleSeriesList.at(0);
 
         modelMatrix.translate(offset, 0.0f, 0.0f);
@@ -912,9 +903,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
-        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
-        // That causes the scene to be not drawn from above -> must be fixed
-        // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
@@ -1096,7 +1084,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                              m_cachedTheme->ambientLightStrength());
             m_surfaceShader->setUniformValue(m_surfaceShader->lightColor(), lightColor);
 
-            // TODO: Do properly when multiseries support implemented QTRD-2657
             GLuint gradientTexture;
             if (m_visibleSeriesList.at(0).colorStyle() == Q3DTheme::ColorStyleUniform)
                 gradientTexture = m_uniformGradientTexture;
@@ -1725,7 +1712,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 || visiblePoint == Surface3DController::invalidSelectionPosition()) {
             m_selectionActive = false;
         } else {
-            // TODO: Need separate selection ball for slice and main surface view QTRD-2515
             if (m_cachedIsSlicingActivated)
                 updateSliceDataModel(visiblePoint);
             if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
@@ -1831,17 +1817,10 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
     m_areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
     m_scaleX = aspectRatio * m_areaSize.width() / m_scaleFactor;
     m_scaleZ = aspectRatio * m_areaSize.height() / m_scaleFactor;
     m_scaleXWithBackground = m_scaleX * backgroundMargin;
     m_scaleZWithBackground = m_scaleZ * backgroundMargin;
-#else // ..and this if we want uniform scaling based on largest dimension
-    m_scaleX = aspectRatio / m_scaleFactor;
-    m_scaleZ = aspectRatio / m_scaleFactor;
-    m_scaleXWithBackground = aspectRatio * backgroundMargin;
-    m_scaleZWithBackground = aspectRatio * backgroundMargin;
-#endif
 }
 
 bool Surface3DRenderer::updateFlatStatus(bool enable)
@@ -1956,7 +1935,6 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 
     m_selectionPointer->setPosition(pos);
     m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
-    // TODO: Get pointer object from correct series once multiseries support implemented
     m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
     m_selectionPointer->setHighlightColor(m_visibleSeriesList.at(0).singleHighlightColor());
     m_selectionPointer->updateScene(m_cachedScene);
@@ -1972,7 +1950,6 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 
 QString Surface3DRenderer::createSelectionLabel(float value, int column, int row)
 {
-    // TODO: Get from correct series once multiple series supported
     QString labelText = m_visibleSeriesList[0].itemLabelFormat();
     static const QString xTitleTag(QStringLiteral("@xTitle"));
     static const QString yTitleTag(QStringLiteral("@yTitle"));
@@ -2010,7 +1987,6 @@ QString Surface3DRenderer::createSelectionLabel(float value, int column, int row
         labelText.replace(zLabelTag, valueLabelText);
     }
 
-    // TODO: Get from correct series once multiple series supported
     labelText.replace(seriesNameTag, m_visibleSeriesList[0].name());
 
     m_selectionLabelDirty = false;
@@ -2203,7 +2179,6 @@ void Surface3DRenderer::updateDepthBuffer()
 void Surface3DRenderer::generateUniformGradient(const QVector3D newColor)
 {
     if (m_visibleSeriesList.size()) {
-        // TODO: move uniform gradient to render cache when multiseries support implemented QTRD-2657
         QColor newQColor = Utils::colorFromVector(newColor);
         m_uniformGradientTextureColor = newColor;
         QLinearGradient newGradient;

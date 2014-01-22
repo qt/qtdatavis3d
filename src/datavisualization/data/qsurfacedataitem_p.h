@@ -40,8 +40,6 @@ public:
     QSurfaceDataItemPrivate();
     virtual ~QSurfaceDataItemPrivate();
 
-    // TODO stores other data for surface items besides position
-
 protected:
     friend class QSurfaceDataItem;
 };

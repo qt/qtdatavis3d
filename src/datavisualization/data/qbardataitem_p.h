@@ -40,8 +40,6 @@ public:
     QBarDataItemPrivate();
     virtual ~QBarDataItemPrivate();
 
-    // TODO stores other data for bars besides value
-
 protected:
     friend class QBarDataItem;
 };

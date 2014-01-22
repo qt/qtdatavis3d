@@ -76,7 +76,6 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
         createExtraData();
     else
         d_ptr = 0;
-    // TODO set extra data
     return *this;
 }
 

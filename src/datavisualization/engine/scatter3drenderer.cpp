@@ -224,7 +224,6 @@ void Scatter3DRenderer::updateData()
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: See QTRD-2374
     scene->activeCamera()->setMinYRotation(-90.0f);
 
     if (m_hasHeightAdjustmentChanged) {
@@ -357,18 +356,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QVector3D depthLightPos = activeCamera->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
-        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
-        // That causes the scene to be not drawn from above -> must be fixed
-        // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
         // Set the depth projection matrix
 #ifndef USE_WIDER_SHADOWS
         // Use this for perspective shadows
         depthProjectionMatrix.perspective(15.0f, viewPortRatio, 3.0f, 100.0f);
 #else
         // Use these for orthographic shadows
-        //depthProjectionMatrix.ortho(-aspectRatio * 2.0f, aspectRatio * 2.0f,
-        //                            -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
-        //                            0.0f, 100.0f);
         GLfloat testAspectRatio = viewPortRatio;
         depthProjectionMatrix.ortho(-testAspectRatio * 2.0f, testAspectRatio * 2.0f,
                                     -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
@@ -489,7 +482,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
-            // TODO: Accessing series directly during rendering
             float itemSize =
                     static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
                     / itemScaler;
@@ -643,7 +635,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
         bool useColor = colorStyleIsUniform || drawingPoints;
 
-        // TODO: Accessing series directly during rendering
         float itemSize =
                 static_cast<QScatter3DSeries *>(currentSeries.series())->itemSize()
                 / itemScaler;
@@ -1267,8 +1258,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
 
     // Draw axis labels
-    // TODO: Calculations done temporarily here. Should be done when calculating lines to avoid
-    // extra for -loops?
     // Bind label shader
     m_labelShader->bind();
 

@@ -22,8 +22,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-// TODO: CHECK DOCUMENTATION!
-
 /*!
  * \class QItemModelSurfaceDataProxy
  * \inmodule QtDataVisualization

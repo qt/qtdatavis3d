@@ -117,7 +117,6 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
             renderer->fixMeshFileName(meshFileName, m_mesh);
         }
 
-        // TODO: Optimize by having some kind of object cache in renderer instead of having separate ObjectHelper for each series?
         delete m_object;
         if (meshFileName.isEmpty()) {
             m_object = 0;

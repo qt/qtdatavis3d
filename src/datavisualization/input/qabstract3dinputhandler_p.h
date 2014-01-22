@@ -64,7 +64,6 @@ private:
     QPoint m_inputPosition;
     QRect m_mainViewPort;
 
-    // TODO: Check if this could be avoided with signals/slots or some other way.
     Q3DScene *m_scene;
     bool m_isDefaultHandler;
 

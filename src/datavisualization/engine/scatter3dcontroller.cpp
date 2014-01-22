@@ -132,7 +132,6 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series->isVisible()) {
         adjustValueAxisRange();
@@ -145,7 +144,6 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series->isVisible()) {
         adjustValueAxisRange();
@@ -158,7 +156,6 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series == m_selectedItemSeries) {
         // If items removed from selected series before the selection, adjust the selection
@@ -190,7 +187,6 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series == m_selectedItemSeries) {
         // If items inserted to selected series before the selection, adjust the selection

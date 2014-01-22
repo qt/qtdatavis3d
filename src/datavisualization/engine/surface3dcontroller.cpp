@@ -122,8 +122,6 @@ void Surface3DController::handlePendingClick()
     QPoint position = m_renderer->clickedPosition();
     QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_renderer->clickedSeries());
 
-    // TODO: Adjust position according to inserts/removes in the series
-
     setSelectedPoint(position, series);
 
     m_renderer->resetClickedStatus();
@@ -245,8 +243,6 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             scene()->setSlicingActive(false);
         } else {
             // If the selected point is outside data window, or there is no selected point, disable slicing
-            // TODO: (QTRD-2351) This logic doesn't match the renderer logic for non straight surfaces,
-            // but that logic needs to change anyway, so this is good for now.
             float axisMinX = m_axisX->min();
             float axisMaxX = m_axisX->max();
             float axisMinZ = m_axisZ->min();

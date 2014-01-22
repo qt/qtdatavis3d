@@ -60,19 +60,13 @@ public:
             m_rotation = rotation;
     }
 
-
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
-
-    // TODO: Will we ever support item specific size? If not, remove.
-    //inline void setSize(float size);
-    //inline float size() const { return m_size; }
 
 protected:
     QVector3D m_position;
     QQuaternion m_rotation;
     bool m_visible;
-    //float m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
     friend class QScatterDataItem;
 };

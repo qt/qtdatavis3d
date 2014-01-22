@@ -72,13 +72,11 @@ QSurfaceDataItem::~QSurfaceDataItem()
 QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
 {
     m_position = other.m_position;
-    //m_size = other.m_size;
 
     if (other.d_ptr)
         createExtraData();
     else
         d_ptr = 0;
-    // TODO set extra data
 
     return *this;
 }

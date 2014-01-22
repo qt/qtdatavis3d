@@ -205,7 +205,6 @@ void AbstractDeclarative::render()
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    // TODO: Store the state of these and restore before returning
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

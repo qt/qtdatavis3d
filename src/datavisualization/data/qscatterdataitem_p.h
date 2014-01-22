@@ -40,8 +40,6 @@ public:
     QScatterDataItemPrivate();
     virtual ~QScatterDataItemPrivate();
 
-    // TODO stores other data for scatter items besides position
-
 protected:
     friend class QScatterDataItem;
 };

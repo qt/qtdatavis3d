@@ -422,7 +422,6 @@ Q3DTheme::~Q3DTheme()
 {
 }
 
-// TODO: Add needRenders if necessary after color api has been added to series (QTRD-2200/2557)
 /*!
  * \property Q3DTheme::baseColors
  *

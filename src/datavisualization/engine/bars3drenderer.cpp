@@ -43,7 +43,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 
-const bool sliceGridLabels = true; // TODO: Make this user controllable (QTRD-2546)
+const bool sliceGridLabels = true;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
@@ -242,7 +242,6 @@ void Bars3DRenderer::updateData()
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
-    // TODO: See QTRD-2374
     if (m_hasNegativeValues)
         scene->activeCamera()->setMinYRotation(-90.0);
     else
@@ -308,7 +307,6 @@ void Bars3DRenderer::drawSlicedScene()
 
     GLfloat barPosYAdjustment = -0.8f; // Translate to -1.0 + 0.2 for row/column labels
     GLfloat scaleFactor = 0.0f;
-    // TODO: When doing this correctly (QTRD-2125), use label dimensions instead of magic number
     GLfloat barLabelYPos = barPosYAdjustment - 0.4f - labelMargin; // 0.4 for labels
     GLfloat zeroPosAdjustment = 0.0f;
     if (!m_noZeroInRange)
@@ -393,7 +391,6 @@ void Bars3DRenderer::drawSlicedScene()
             }
         }
 
-        // TODO: Make user controllable (QTRD-2546)
         if (sliceGridLabels) {
             // Bind label shader
             m_labelShader->bind();
@@ -593,7 +590,6 @@ void Bars3DRenderer::drawSlicedScene()
         m_dummyBarRenderItem.setTranslation(QVector3D(item->translation().x(),
                                                       barLabelYPos,
                                                       item->translation().z()));
-        // TODO: Make user controllable (QTRD-2546)
         // Draw labels
         m_drawer->drawLabel(m_dummyBarRenderItem, *m_sliceCache->labelItems().at(labelNo),
                             viewMatrix, projectionMatrix, positionComp, sliceLabelRotation,
@@ -605,7 +601,6 @@ void Bars3DRenderer::drawSlicedScene()
     for (int col = 0; col < sliceItemCount; col++) {
         BarRenderItem *item = m_sliceSelection.at(col);
 
-        // TODO: Make user controllable (QTRD-2546)
         if (!sliceGridLabels) {
             // Draw values
             if (item->height() != 0.0f || (!m_noZeroInRange && item->value() == 0.0f)) {
@@ -631,8 +626,6 @@ void Bars3DRenderer::drawSlicedScene()
             }
         } else {
             // Only draw value for selected item when grid labels are on
-            // TODO: Maybe use selection label instead of value? Should it be user controllable
-            // as well? (QTRD-2546)
             if (itemMode && m_visualSelectedBarPos.x() == item->position().x()
                     && m_visualSelectedBarPos.y() == item->position().y()
                     && item->seriesIndex() == m_visualSelectedBarSeriesIndex) {
@@ -659,7 +652,6 @@ void Bars3DRenderer::drawSlicedScene()
         }
     }
 
-    // TODO: Make user controllable (QTRD-2546)
     // Draw labels for axes
     if (rowMode) {
         if (m_sliceTitleItem) {
@@ -812,10 +804,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
-        // TODO: Why does depthViewMatrix.column(3).y() goes to zero when we're directly above?
-        // That causes the scene to be not drawn from above -> must be fixed
-        // qDebug() << lightPos << depthViewMatrix << depthViewMatrix.column(3);
-
         // Set the depth projection matrix
         depthProjectionMatrix.perspective(10.0f, viewPortRatio, 3.0f, 100.0f);
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
@@ -912,7 +900,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 #endif
 
-    // TODO: Selection must be enabled currently to support clicked signal. (QTRD-2517)
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && m_selectionState == SelectOnScene && seriesCount > 0) {

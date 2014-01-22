@@ -55,7 +55,6 @@ public:
         AxisTypeNone = 0,
         AxisTypeCategory = 1,
         AxisTypeValue = 2
-        //AxisTypeLogValue = 6 // inherits valueaxis (4 + 2) // TODO
     };
 
 protected:

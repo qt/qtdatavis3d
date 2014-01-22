@@ -43,7 +43,6 @@ class MeshLoader
                         QVector<QVector3D> &out_vertices,
                         QVector<QVector2D> &out_uvs,
                         QVector<QVector3D> &out_normals);
-    // TODO: add loaders for other formats?
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

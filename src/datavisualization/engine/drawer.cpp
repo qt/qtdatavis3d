@@ -210,12 +210,10 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         break;
     }
     case LabelMid: {
-        // Use this for positioning with absolute item y position value
         yPosition = item.translation().y();
         break;
     }
     case LabelHigh: {
-        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
         yPosition = item.translation().y() + itemHeight / 2.0f;
         break;
     }

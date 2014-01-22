@@ -205,7 +205,6 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
  */
 bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
 {
-    // TODO: Needs fixing. Doesn't respect whether slice or main view is on top or if slicing is even activated currently.
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_primarySubViewport.x();
@@ -224,7 +223,6 @@ bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
  */
 bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 {
-    // TODO: Needs fixing. Doesn't respect whether slice or main view is on top or if slicing is even activated currently.
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_secondarySubViewport.x();
