@@ -469,9 +469,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
-            float itemSize =
-                    static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize()
-                    / itemScaler;
+            float itemSize = m_cachedItemSize.at(series) / itemScaler;
             if (itemSize == 0.0f)
                 itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
@@ -609,9 +607,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
         bool useColor = colorStyleIsUniform || drawingPoints;
 
-        float itemSize =
-                static_cast<QScatter3DSeries *>(currentSeries.series())->itemSize()
-                / itemScaler;
+        float itemSize = m_cachedItemSize.at(series) / itemScaler;
         if (itemSize == 0.0f)
             itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
