@@ -24,8 +24,6 @@
 #include <QVector2D>
 #include <QVector3D>
 
-#include <QDebug>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 QString slashTag = QStringLiteral("/");
@@ -35,8 +33,6 @@ bool MeshLoader::loadOBJ(const QString &path,
                          QVector<QVector2D> &out_uvs,
                          QVector<QVector3D> &out_normals)
 {
-    //qDebug() << "Loading OBJ file" << path;
-
     QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
     QVector<QVector3D> temp_vertices;
     QVector<QVector2D> temp_uvs;
@@ -95,9 +91,6 @@ bool MeshLoader::loadOBJ(const QString &path,
             normalIndices.append(normalIndex[0]);
             normalIndices.append(normalIndex[1]);
             normalIndices.append(normalIndex[2]);
-        }
-        else {
-            //qWarning("Line did not contain usable data");
         }
     }
 

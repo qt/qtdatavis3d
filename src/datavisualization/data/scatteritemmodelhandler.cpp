@@ -92,7 +92,8 @@ void ScatterItemModelHandler::handleRowsRemoved(const QModelIndex &parent, int s
     }
 }
 
-void ScatterItemModelHandler::modelPosToScatterItem(int modelRow, int modelColumn, QScatterDataItem &item)
+void ScatterItemModelHandler::modelPosToScatterItem(int modelRow, int modelColumn,
+                                                    QScatterDataItem &item)
 {
     QModelIndex index = m_itemModel->index(modelRow, modelColumn);
     float xPos(0.0f);

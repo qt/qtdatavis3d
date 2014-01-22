@@ -131,7 +131,7 @@ void SurfaceItemModelHandler::resolveModel()
             for (int j = 0; j < columnList.size(); j++) {
                 newProxyRow[j].setPosition(QVector3D(columnList.at(j).toFloat(),
                                                      itemValueMap[rowKey][columnList.at(j)],
-                                                     rowList.at(i).toFloat()));
+                                           rowList.at(i).toFloat()));
             }
         }
     }

@@ -29,17 +29,18 @@
 #ifndef ABSTRACT3DRENDERER_P_H
 #define ABSTRACT3DRENDERER_P_H
 
+//#define DISPLAY_RENDER_SPEED
+
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
+#ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
+#endif
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
 #include "qabstractdataproxy.h"
 #include "seriesrendercache_p.h"
-
-//#define DISPLAY_RENDER_SPEED
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -154,4 +155,4 @@ protected:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // ABSTRACT3DRENDERER_P_H
+#endif

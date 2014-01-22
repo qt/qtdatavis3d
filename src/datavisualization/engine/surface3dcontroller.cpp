@@ -89,7 +89,8 @@ void Surface3DController::synchDataToRenderer()
     }
 }
 
-void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
+void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(
+        QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)

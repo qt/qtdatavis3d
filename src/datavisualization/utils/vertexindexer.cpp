@@ -18,10 +18,7 @@
 
 #include "vertexindexer_p.h"
 
-#include <string.h> // for memcmp
 #include <qmath.h>
-
-#include <QDebug>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -33,8 +30,7 @@ bool VertexIndexer::is_near(float v1, float v2)
     return qAbs(v1 - v2) < 0.01f;
 }
 
-// Searches through all already exported vertices
-// for a similar one.
+// Searches through all already exported vertices for a similar one.
 // Similar = same position + same UVs + same normal
 bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex,
                                           const QVector2D &in_uv,
@@ -44,7 +40,7 @@ bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex,
                                           QVector<QVector3D> &out_normals,
                                           unsigned short &result)
 {
-    // Lame linear search
+    // Linear search
     for (int i = 0; i < out_vertices.size(); i++) {
         if (is_near(in_vertex.x() , out_vertices[i].x())
                 && is_near(in_vertex.y() , out_vertices[i].y())
@@ -58,8 +54,7 @@ bool VertexIndexer::getSimilarVertexIndex(const QVector3D &in_vertex,
             return true;
         }
     }
-    // No other vertex could be used instead.
-    // Looks like we'll have to add it to the VBO.
+    // No other vertex could be used instead
     return false;
 }
 
@@ -107,7 +102,6 @@ void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices,
             VertexToOutIndex[packed] = newindex;
         }
     }
-    //qDebug() << "unique vertices" << unique_vertices;
 }
 
 void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
@@ -125,7 +119,6 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
     unique_vertices = 0;
     // For each input vertex
     for (int i = 0; i < in_vertices.size(); i++) {
-
         // Try to find a similar vertex in out_XXXX
         unsigned short index;
         bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i],
@@ -133,7 +126,6 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
 
         if (found) {
             out_indices.append(index);
-
             // Average the tangents and the bitangents
             out_tangents[index] += in_tangents[i];
             out_bitangents[index] += in_bitangents[i];
@@ -147,7 +139,6 @@ void VertexIndexer::indexVBO_TBN(const QVector<QVector3D> &in_vertices,
             out_indices.append((unsigned short)out_vertices.size() - 1);
         }
     }
-    //qDebug() << "unique vertices" << unique_vertices;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

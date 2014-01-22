@@ -19,6 +19,7 @@
 #ifndef Q3DBOX_H
 #define Q3DBOX_H
 
+#include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QVector3D>
 

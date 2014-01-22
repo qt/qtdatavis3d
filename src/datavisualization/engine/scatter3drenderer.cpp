@@ -227,7 +227,7 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
     scene->activeCamera()->setMinYRotation(-90.0f);
 
     if (m_hasHeightAdjustmentChanged) {
-        // Set initial m_cachedScene->activeCamera() position. Also update if height adjustment has changed.
+        // Set initial camera position. Also update if height adjustment has changed.
         scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         m_hasHeightAdjustmentChanged = false;
     }
@@ -437,19 +437,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                    m_primarySubViewport.y(),
                    m_primarySubViewport.width(),
                    m_primarySubViewport.height());
-
-#if 0 // Use this if you want to see what is being drawn to the framebuffer
-        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
-        m_labelShader->bind();
-        glEnable(GL_TEXTURE_2D);
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f), zeroVector, upVector);
-        QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
-        m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-        m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
-        glDisable(GL_TEXTURE_2D);
-#endif
     }
 
     ShaderHelper *pointSelectionShader = m_selectionShader;
@@ -571,19 +558,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                    m_primarySubViewport.y(),
                    m_primarySubViewport.width(),
                    m_primarySubViewport.height());
-
-#if 0 // Use this if you want to see what is being drawn to the framebuffer
-        m_labelShader->bind();
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_TEXTURE_2D);
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.0f), zeroVector, upVector);
-        QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
-        m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-        m_drawer->drawObject(m_labelShader, m_labelObj, m_selectionTexture);
-        glDisable(GL_TEXTURE_2D);
-#endif
     }
 
     // Draw dots

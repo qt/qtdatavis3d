@@ -45,4 +45,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DLIGHT_H
+#endif

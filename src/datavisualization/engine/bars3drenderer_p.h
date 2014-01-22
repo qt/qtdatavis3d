@@ -128,7 +128,8 @@ public slots:
     void resetClickedStatus();
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

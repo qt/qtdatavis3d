@@ -144,4 +144,4 @@ public:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QAbstract3DSeries_P_H
+#endif

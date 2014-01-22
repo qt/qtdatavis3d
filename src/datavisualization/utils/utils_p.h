@@ -30,7 +30,6 @@
 #define UTILS_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "q3dbars.h"
 
 class QVector3D;
 class QColor;

@@ -33,7 +33,6 @@
 #include "abstractobjecthelper_p.h"
 #include "qsurfacedataproxy.h"
 
-#include <QOpenGLFunctions>
 #include <QRect>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -87,4 +86,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // SURFACEOBJECT_P_H
+#endif

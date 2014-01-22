@@ -21,8 +21,6 @@
 #include "objecthelper_p.h"
 #include "abstractobjecthelper_p.h"
 
-#include <QDebug>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 ObjectHelper::ObjectHelper(const QString &objectFile)

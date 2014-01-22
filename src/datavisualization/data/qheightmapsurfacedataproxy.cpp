@@ -296,9 +296,7 @@ const QHeightMapSurfaceDataProxyPrivate *QHeightMapSurfaceDataProxy::dptrc() con
     return static_cast<const QHeightMapSurfaceDataProxyPrivate *>(d_ptr.data());
 }
 
-//
 //  QHeightMapSurfaceDataProxyPrivate
-//
 
 QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q),
@@ -321,7 +319,8 @@ QHeightMapSurfaceDataProxy *QHeightMapSurfaceDataProxyPrivate::qptr()
     return static_cast<QHeightMapSurfaceDataProxy *>(q_ptr);
 }
 
-void QHeightMapSurfaceDataProxyPrivate::setValueRanges(float minX, float maxX, float minZ, float maxZ)
+void QHeightMapSurfaceDataProxyPrivate::setValueRanges(float minX, float maxX,
+                                                       float minZ, float maxZ)
 {
     bool minXChanged = false;
     bool maxXChanged = false;
@@ -509,10 +508,10 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
             for (; j < lastCol; j++)
                 newRow[j].setPosition(QVector3D((float(j) * xMul) + m_minXValue,
                                                 float(bits[bitCount + (j * 4)]),
-                                                zVal));
+                                      zVal));
             newRow[j].setPosition(QVector3D(m_maxXValue,
                                             float(bits[bitCount + (j * 4)]),
-                                            zVal));
+                                  zVal));
         }
     } else {
         // Not grayscale, we'll need to calculate height from RGB

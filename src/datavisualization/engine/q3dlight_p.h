@@ -51,7 +51,7 @@ public:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DLIGHT_P_H
+#endif
 
 
 

@@ -134,7 +134,6 @@ signals:
     void wrapYRotationChanged(bool isEnabled);
 
 private:
-    // To be exposed in the future
     void setMinXRotation(float rotation);
     void setMinYRotation(float rotation);
     void setMaxXRotation(float rotation);
@@ -159,4 +158,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DCAMERA_H
+#endif

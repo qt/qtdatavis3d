@@ -112,4 +112,4 @@ public:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DSCENE_P_H
+#endif

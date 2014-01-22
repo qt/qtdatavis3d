@@ -84,4 +84,4 @@ public:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DCAMERA_P_H
+#endif

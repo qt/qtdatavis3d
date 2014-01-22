@@ -48,7 +48,7 @@ public:
     void clear();
 
 private:
-    Q_DISABLE_COPY(LabelItem);
+    Q_DISABLE_COPY(LabelItem)
 
     QSize m_size;
     GLuint m_textureId;

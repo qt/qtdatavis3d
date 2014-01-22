@@ -480,6 +480,6 @@ QDataStream &operator>>(QDataStream &stream, Q3DBox &box)
     return stream;
 }
 
-#endif // QT_NO_DATASTREAM
+#endif
 
 QT_END_NAMESPACE_DATAVISUALIZATION

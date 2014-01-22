@@ -32,8 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 
-//#define DISPLAY_RENDER_SPEED
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Scatter3DRenderer;
@@ -105,7 +103,8 @@ public:
     virtual void removeSeries(QAbstract3DSeries *series);
     virtual QList<QScatter3DSeries *> scatterSeriesList();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();

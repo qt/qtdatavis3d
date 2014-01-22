@@ -167,9 +167,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleUniform);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0x14aaff)),
-                                                                   defaultColorLevel));
+                                                         defaultColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0x6400aa)),
-                                                                  defaultColorLevel));
+                                                        defaultColorLevel));
         break;
     }
 
@@ -206,9 +206,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleUniform);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0x27beee)),
-                                                                   defaultColorLevel));
+                                                         defaultColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0xee1414)),
-                                                                  defaultColorLevel));
+                                                        defaultColorLevel));
         break;
     }
 
@@ -245,9 +245,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleObjectGradient);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0xfa0000)),
-                                                                   defaultBuiltInColorLevel));
+                                                         defaultBuiltInColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0x333333)),
-                                                                  defaultBuiltInColorLevel));
+                                                        defaultBuiltInColorLevel));
         break;
     }
 
@@ -284,9 +284,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleUniform);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0xfbf6d6)),
-                                                                   defaultColorLevel));
+                                                         defaultColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0x442f20)),
-                                                                  defaultColorLevel));
+                                                        defaultColorLevel));
         break;
     }
 
@@ -323,9 +323,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleObjectGradient);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0x2aa2f9)),
-                                                                   defaultBuiltInColorLevel));
+                                                         defaultBuiltInColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0x103753)),
-                                                                  defaultBuiltInColorLevel));
+                                                        defaultBuiltInColorLevel));
         break;
     }
 
@@ -362,9 +362,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleObjectGradient);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0x8ea317)),
-                                                                   defaultBuiltInColorLevel));
+                                                         defaultBuiltInColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0xc25708)),
-                                                                  defaultBuiltInColorLevel));
+                                                        defaultBuiltInColorLevel));
         break;
     }
 
@@ -401,9 +401,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleUniform);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0xf5dc0d)),
-                                                                   defaultColorLevel));
+                                                         defaultColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0xd72222)),
-                                                                  defaultColorLevel));
+                                                        defaultColorLevel));
         break;
     }
 
@@ -440,9 +440,9 @@ void ThemeManager::setPredefinedPropertiesToTheme(Q3DTheme *theme, Q3DTheme::The
         setColorStyle(theme, Q3DTheme::ColorStyleUniform);
         setBaseGradients(theme, baseGradients);
         setSingleHighlightGradient(theme, createGradient(QColor(QRgb(0xfff7cc)),
-                                                                   defaultColorLevel));
+                                                         defaultColorLevel));
         setMultiHighlightGradient(theme, createGradient(QColor(QRgb(0xde0a0a)),
-                                                                  defaultColorLevel));
+                                                        defaultColorLevel));
         break;
     }
     default:

@@ -95,7 +95,8 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 
 // QAbstractDataProxyPrivate
 
-QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
+QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q,
+                                                     QAbstractDataProxy::DataType type)
     : QObject(0),
       q_ptr(q),
       m_type(type),

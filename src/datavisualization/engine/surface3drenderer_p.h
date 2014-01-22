@@ -29,28 +29,17 @@
 #ifndef SURFACE3DRENDERER_P_H
 #define SURFACE3DRENDERER_P_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
-#include <QWindow>
-
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "scatterrenderitem_p.h"
 #include "qsurfacedataproxy.h"
 
-class QOpenGLShaderProgram;
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
 class SurfaceObject;
-class TextureHelper;
-class Theme;
-class Drawer;
 class Q3DScene;
 class SelectionPointer;
 
@@ -188,4 +177,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // SURFACE3DRENDERER_P_H
+#endif

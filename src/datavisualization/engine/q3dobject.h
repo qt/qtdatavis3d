@@ -62,4 +62,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DOBJECT_H
+#endif

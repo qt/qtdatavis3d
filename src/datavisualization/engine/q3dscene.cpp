@@ -208,8 +208,10 @@ bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_primarySubViewport.x();
-    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_primarySubViewport.x() + d_ptr->m_primarySubViewport.width();
-    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_primarySubViewport.y() + d_ptr->m_primarySubViewport.height();
+    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_primarySubViewport.x()
+            + d_ptr->m_primarySubViewport.width();
+    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_primarySubViewport.y()
+            + d_ptr->m_primarySubViewport.height();
     int areaMinY = d_ptr->m_viewport.y() + d_ptr->m_primarySubViewport.y();
 
     return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
@@ -226,8 +228,10 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_secondarySubViewport.x();
-    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_secondarySubViewport.x() + d_ptr->m_secondarySubViewport.width();
-    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_secondarySubViewport.y() + d_ptr->m_secondarySubViewport.height();
+    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_secondarySubViewport.x()
+            + d_ptr->m_secondarySubViewport.width();
+    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_secondarySubViewport.y()
+            + d_ptr->m_secondarySubViewport.height();
     int areaMinY = d_ptr->m_viewport.y() + d_ptr->m_secondarySubViewport.y();
 
     return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
@@ -607,7 +611,8 @@ void Q3DScenePrivate::updateGLViewport()
 {
     // Update GL viewport
     m_glViewport.setX(m_viewport.x() * m_devicePixelRatio);
-    m_glViewport.setY((m_windowSize.height() - (m_viewport.y() + m_viewport.height())) * m_devicePixelRatio);
+    m_glViewport.setY((m_windowSize.height() - (m_viewport.y() + m_viewport.height()))
+                      * m_devicePixelRatio);
     m_glViewport.setWidth(m_viewport.width() * m_devicePixelRatio);
     m_glViewport.setHeight(m_viewport.height() * m_devicePixelRatio);
 
@@ -622,12 +627,17 @@ void Q3DScenePrivate::updateGLViewport()
 void Q3DScenePrivate::updateGLSubViewports()
 {
     m_glPrimarySubViewport.setX((m_primarySubViewport.x() + m_viewport.x()) * m_devicePixelRatio);
-    m_glPrimarySubViewport.setY((m_windowSize.height() - (m_primarySubViewport.y() + m_viewport.y() + m_primarySubViewport.height())) * m_devicePixelRatio);
+    m_glPrimarySubViewport.setY((m_windowSize.height() - (m_primarySubViewport.y() + m_viewport.y()
+                                                          + m_primarySubViewport.height()))
+                                * m_devicePixelRatio);
     m_glPrimarySubViewport.setWidth(m_primarySubViewport.width() * m_devicePixelRatio);
     m_glPrimarySubViewport.setHeight(m_primarySubViewport.height() * m_devicePixelRatio);
 
     m_glSecondarySubViewport.setX(m_secondarySubViewport.x() * m_devicePixelRatio);
-    m_glSecondarySubViewport.setY((m_windowSize.height() - (m_secondarySubViewport.y() + m_viewport.y() + m_secondarySubViewport.height())) * m_devicePixelRatio);
+    m_glSecondarySubViewport.setY((m_windowSize.height() - (m_secondarySubViewport.y()
+                                                            + m_viewport.y()
+                                                            + m_secondarySubViewport.height()))
+                                  * m_devicePixelRatio);
     m_glSecondarySubViewport.setWidth(m_secondarySubViewport.width() * m_devicePixelRatio);
     m_glSecondarySubViewport.setHeight(m_secondarySubViewport.height() * m_devicePixelRatio);
 }

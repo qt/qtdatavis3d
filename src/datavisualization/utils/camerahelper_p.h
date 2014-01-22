@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef CAMERAPOSITIONER_P_H
-#define CAMERAPOSITIONER_P_H
+#ifndef CAMERAHELPER_P_H
+#define CAMERAHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"

@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class VertexIndexer
 {
-    public:
+public:
     struct PackedVertex {
         QVector3D position;
         QVector2D uv;
@@ -69,7 +69,7 @@ class VertexIndexer
                              QVector<QVector3D> &out_tangents,
                              QVector<QVector3D> &out_bitangents);
 
-    private:
+private:
     static bool is_near(float v1, float v2);
     static bool getSimilarVertexIndex(const QVector3D &in_vertex,
                                       const QVector2D &in_uv,

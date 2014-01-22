@@ -191,7 +191,8 @@ QList<QBar3DSeries *> Q3DBars::seriesList()
 void Q3DBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
-        dptr()->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        dptr()->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(),
+                                      isBarSpacingRelative());
         emit barThicknessChanged(thicknessRatio);
     }
 }

@@ -142,13 +142,15 @@ private:
 
 public slots:
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
 
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 
 private:
     QVector3D indexToSelectionColor(GLint index);
-    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QAbstract3DSeries *&series);
+    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index,
+                                        QAbstract3DSeries *&series);
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

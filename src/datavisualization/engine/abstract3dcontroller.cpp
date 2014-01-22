@@ -36,7 +36,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent) :
+Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene,
+                                           QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),
     m_selectionMode(QAbstract3DGraph::SelectionItem),
@@ -576,7 +577,8 @@ void Abstract3DController::addInputHandler(QAbstract3DInputHandler *inputHandler
     Q_ASSERT(inputHandler);
     Abstract3DController *owner = qobject_cast<Abstract3DController *>(inputHandler->parent());
     if (owner != this) {
-        Q_ASSERT_X(!owner, "addInputHandler", "Input handler already attached to another component.");
+        Q_ASSERT_X(!owner, "addInputHandler",
+                   "Input handler already attached to another component.");
         inputHandler->setParent(this);
     }
 

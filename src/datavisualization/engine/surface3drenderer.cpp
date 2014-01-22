@@ -232,7 +232,8 @@ void Surface3DRenderer::updateData()
             }
             for (int i = 0; i < sampleSpace.height(); i++) {
                 for (int j = 0; j < sampleSpace.width(); j++)
-                    (*(m_dataArray.at(i)))[j] = array->at(i + sampleSpace.y())->at(j + sampleSpace.x());
+                    (*(m_dataArray.at(i)))[j] = array->at(i + sampleSpace.y())->at(
+                            j + sampleSpace.x());
             }
 
             if (m_dataArray.size() > 0) {
@@ -273,7 +274,8 @@ void Surface3DRenderer::updateData()
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility)
+void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
+                                     bool updateVisibility)
 {
     Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
 
@@ -295,7 +297,8 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         if (m_uniformGradientTextureColor != seriesColor)
             generateUniformGradient(seriesColor);
         if (m_selectionPointer) {
-            m_selectionPointer->setHighlightColor(Utils::vectorFromColor(series->singleHighlightColor()));
+            m_selectionPointer->setHighlightColor(
+                        Utils::vectorFromColor(series->singleHighlightColor()));
             // Make sure selection pointer object reference is still good
             m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
         }
@@ -313,8 +316,8 @@ void Surface3DRenderer::updateRows(const QVector<int> &rows)
             array = dataProxy->array();
     }
 
-    if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
-        m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
+    if (array && array->size() >= 2 && array->at(0)->size() >= 2
+            && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         bool updateBuffers = false;
         int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
         foreach (int row, rows) {
@@ -325,10 +328,12 @@ void Surface3DRenderer::updateRows(const QVector<int> &rows)
                         array->at(row)->at(j + m_sampleSpace.x());
 
                 if (m_cachedFlatShading) {
-                    m_surfaceObj->updateCoarseRow(m_dataArray, row - m_sampleSpace.y(), m_heightNormalizer,
+                    m_surfaceObj->updateCoarseRow(m_dataArray, row - m_sampleSpace.y(),
+                                                  m_heightNormalizer,
                                                   m_axisCacheY.min());
                 } else {
-                    m_surfaceObj->updateSmoothRow(m_dataArray, row - m_sampleSpace.y(), m_heightNormalizer,
+                    m_surfaceObj->updateSmoothRow(m_dataArray, row - m_sampleSpace.y(),
+                                                  m_heightNormalizer,
                                                   m_axisCacheY.min());
                 }
             }
@@ -351,23 +356,25 @@ void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
             array = dataProxy->array();
     }
 
-    if (array && array->size() >= 2 && array->at(0)->size() >= 2 &&
-        m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
+    if (array && array->size() >= 2 && array->at(0)->size() >= 2
+            && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
         int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
         int sampleSpaceRight = m_sampleSpace.x() + m_sampleSpace.width();
         bool updateBuffers = false;
         foreach (QPoint item, points) {
             if (item.y() <= sampleSpaceTop && item.y() >= m_sampleSpace.y() &&
-                item.x() <= sampleSpaceRight && item.x() >= m_sampleSpace.x()) {
+                    item.x() <= sampleSpaceRight && item.x() >= m_sampleSpace.x()) {
                 updateBuffers = true;
                 int x = item.x() - m_sampleSpace.x();
                 int y = item.y() - m_sampleSpace.y();
                 (*(m_dataArray.at(y)))[x] = array->at(item.y())->at(item.x());
 
                 if (m_cachedFlatShading) {
-                    m_surfaceObj->updateCoarseItem(m_dataArray, y, x, m_heightNormalizer, m_axisCacheY.min());
+                    m_surfaceObj->updateCoarseItem(m_dataArray, y, x, m_heightNormalizer,
+                                                   m_axisCacheY.min());
                 } else {
-                    m_surfaceObj->updateSmoothItem(m_dataArray, y, x, m_heightNormalizer, m_axisCacheY.min());
+                    m_surfaceObj->updateSmoothItem(m_dataArray, y, x, m_heightNormalizer,
+                                                   m_axisCacheY.min());
                 }
             }
         }
@@ -410,8 +417,10 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 
     // Make a duplicate, so that we get a little bit depth
     QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
-    for (int i = 0; i < sliceRow->size(); i++)
-        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown, 1.0f));
+    for (int i = 0; i < sliceRow->size(); i++) {
+        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown,
+                                             1.0f));
+    }
 
     m_sliceDataArray << duplicateRow;
 
@@ -570,7 +579,8 @@ void Surface3DRenderer::drawSlicedScene()
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
 
-    GLfloat aspect = (GLfloat)m_secondarySubViewport.width() / (GLfloat)m_secondarySubViewport.height();
+    GLfloat aspect = (GLfloat)m_secondarySubViewport.width()
+            / (GLfloat)m_secondarySubViewport.height();
     projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
                            -sliceUnits, sliceUnits, -1.0f, 4.0f);
 
@@ -666,7 +676,8 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
-        lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength() * 2.3f);
+        lineShader->setUniformValue(lineShader->ambientS(),
+                                    m_cachedTheme->ambientLightStrength() * 2.3f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
@@ -970,21 +981,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Reset culling to normal
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-
-#if 0 // Use this if you want to see what is being drawn to the framebuffer
-        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
-        {
-            m_labelShader->bind();
-            glEnable(GL_TEXTURE_2D);
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 viewmatrix;
-            viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f), zeroVector, upVector);
-            QMatrix4x4 MVPMatrix = projectionMatrix * viewmatrix * modelMatrix;
-            m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-            m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
-            glDisable(GL_TEXTURE_2D);
-        }
-#endif
     }
 #endif
     // Enable texturing

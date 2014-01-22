@@ -74,4 +74,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QBARDATAPROXY_P_H
+#endif

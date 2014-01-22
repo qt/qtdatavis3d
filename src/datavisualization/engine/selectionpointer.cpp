@@ -22,15 +22,11 @@
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "q3dcamera.h"
-#include "q3dcamera_p.h"
 #include "drawer_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
 
-#include <QImage>
 #include <QMatrix4x4>
-
-#include <QDebug>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

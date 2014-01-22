@@ -74,10 +74,8 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     if (maxLabelWidth)
         valueStrWidth = maxLabelWidth + paddingWidth / 2;
     labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
-    //qDebug() << "label size before padding" << text << labelSize;
     labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
     labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
-    //qDebug() << "label size after padding" << labelSize << paddingWidth << paddingHeight;
 #else
     if (!labelBackground)
         labelSize = QSize(valueStrWidth, valueStrHeight);
@@ -131,30 +129,12 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 
 QVector3D Utils::getSelection(QPoint mousepos, int height)
 {
-    //#if defined(QT_OPENGL_ES_2)
-    // This is the only one that works with ANGLE (ES 2.0)
+    // This is the only one that works with OpenGL ES 2.0, so we're forced to use it
     // Item count will be limited to 256*256*256
     GLubyte pixel[4] = {255, 255, 255, 0};
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                  (void *)pixel);
-
-    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2] << pixel[3] << "mousepos:" << mousepos << "height:" << height;
-
-    //#else
-    // These work with desktop OpenGL
-    // They offer a lot higher possible object count and a possibility to use object ids
-    //GLuint pixel[3];
-    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
-    //             GL_RGB, GL_UNSIGNED_INT, (void *)pixel);
-    //qDebug() << "rgba" << pixel[0] << pixel[1] << pixel[2];// << pixel[3];
-
-    //GLfloat pixel3[3];
-    //glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1,
-    //             GL_RGB, GL_FLOAT, (void *)pixel3);
-    //qDebug() << "rgba" << pixel3[0] << pixel3[1] << pixel3[2];// << pixel[3];
-    //#endif
     QVector3D selectedColor(pixel[0], pixel[1], pixel[2]);
-    //qDebug() << selectedColor;
 
     return selectedColor;
 }

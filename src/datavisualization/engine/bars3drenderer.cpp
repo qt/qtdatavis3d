@@ -876,19 +876,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
-#if 0 // Use this if you want to see what is being drawn to the framebuffer
-        // You'll also have to comment out GL_COMPARE_R_TO_TEXTURE -line in texturehelper (if using it)
-        m_labelShader->bind();
-        glCullFace(GL_BACK);
-        glEnable(GL_TEXTURE_2D);
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 viewmatrix;
-        viewmatrix.lookAt(QVector3D(0.0f, 0.0f, 2.5f), zeroVector, upVector);
-        QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
-        m_labelShader->setUniformValue(m_labelShader->MVP(), MVPMatrix);
-        m_drawer->drawObject(m_labelShader, m_labelObj, m_depthTexture);
-        glDisable(GL_TEXTURE_2D);
-#endif
         // Reset culling to normal
         glCullFace(GL_BACK);
 
@@ -945,15 +932,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                     MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                    //#if !defined(QT_OPENGL_ES_2)
-                    //                QVector3D barColor = QVector3D(GLfloat(row) / 32767.0f,
-                    //                                               GLfloat(bar) / 32767.0f,
-                    //                                               0.0f);
-                    //#else
                     QVector3D barColor = QVector3D(GLfloat(row) / 255.0f,
                                                    GLfloat(bar) / 255.0f,
                                                    GLfloat(series) / 255.0f);
-                    //#endif
 
                     m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
                     m_selectionShader->setUniformValue(m_selectionShader->color(), barColor);
@@ -1158,7 +1139,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         lightStrength = m_cachedTheme->highlightLightStrength();
                         shadowLightStrength = adjustedHighlightStrength;
                         // Insert position data into render item. We have no ownership, don't delete the previous one
-                        if (!m_cachedIsSlicingActivated && m_visualSelectedBarSeriesIndex == series) {
+                        if (!m_cachedIsSlicingActivated
+                                && m_visualSelectedBarSeriesIndex == series) {
                             selectedBar = &item;
                             selectedBar->setPosition(QPoint(row, bar));
                             item.setTranslation(modelMatrix.column(3).toVector3D());
@@ -1419,7 +1401,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #endif
         {
             // Set shadowless shader bindings
-            lineShader->setUniformValue(lineShader->lightS(), m_cachedTheme->lightStrength() / 2.5f);
+            lineShader->setUniformValue(lineShader->lightS(),
+                                        m_cachedTheme->lightStrength() / 2.5f);
         }
 
         GLfloat yFloorLinePosition = 0.0f;
@@ -1648,7 +1631,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     for (int row = 0; row != m_cachedRowCount; row++) {
         if (m_axisCacheZ.labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
-            // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
+            // We need only positions for them, labels have already been generated
             rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
             if (m_xFlipped)
                 colPos = -colPosValue;
@@ -1685,7 +1668,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     for (int column = 0; column != m_cachedColumnCount; column++) {
         if (m_axisCacheX.labelItems().size() > column) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
-            // We need only positions for them, labels have already been generated at QDataSetPrivate. Just add LabelItems
+            // We need only positions for them, labels have already been generated
             colPos = (column + 0.5f) * m_cachedBarSpacing.width();
             if (m_zFlipped)
                 rowPos = -rowPosValue;

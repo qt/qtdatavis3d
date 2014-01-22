@@ -22,8 +22,6 @@
 #include <QVector3D>
 #include <QVector2D>
 
-#include <QDebug>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 SurfaceObject::SurfaceObject()
@@ -74,7 +72,8 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
             float normalizedX = ((data.x() - xMin) / xNormalizer);
             float normalizedY = ((data.y() - yMin) / yNormalizer);
             float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
+                                               normalizedZ + 1.0f);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
             totalIndex++;
@@ -195,7 +194,8 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
     float normalizedX = ((data.x() - xMin) / xNormalizer);
     float normalizedY = ((data.y() - yMin) / yNormalizer);
     float normalizedZ = ((data.z() - zMin) / zNormalizer);
-    m_vertices[row * m_columns + column] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+    m_vertices[row * m_columns + column] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
+                                                     normalizedZ + 1.0f);
 
     // Create normals
     int startRow = row;
@@ -354,7 +354,8 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
             float normalizedX = ((data.x() - xMin) / xNormalizer);
             float normalizedY = ((data.y() - yMin) / yNormalizer);
             float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
+                                               normalizedZ + 1.0f);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
 

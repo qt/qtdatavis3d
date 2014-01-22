@@ -32,7 +32,6 @@
 #include "abstract3dcontroller_p.h"
 #include "datavisualizationglobal_p.h"
 
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Surface3DRenderer;

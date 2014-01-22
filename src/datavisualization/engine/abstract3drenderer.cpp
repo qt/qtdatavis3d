@@ -103,7 +103,8 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     // Measure speed (as milliseconds per frame)
     m_numFrames++;
     if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (=" << float(m_numFrames) << "fps)";
+        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (="
+                 << float(m_numFrames) << "fps)";
         m_numFrames = 0;
         m_lastFrameTime.restart();
     }
@@ -152,7 +153,8 @@ void Abstract3DRenderer::updateInputPosition(const QPoint &position)
     m_inputPosition = position;
 }
 
-void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
+                                             const QString &fragmentShader)
 {
     // Do nothing by default
     Q_UNUSED(vertexShader)
@@ -191,7 +193,6 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
                                logicalPixelPosition.y() * m_devicePixelRatio));
-
 
     // Synchronize the renderer scene to controller scene
     scene->d_ptr->sync(*m_cachedScene->d_ptr);
@@ -285,39 +286,46 @@ void Abstract3DRenderer::handleResize()
 #endif
 }
 
-void Abstract3DRenderer::updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type)
+void Abstract3DRenderer::updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
+                                        QAbstract3DAxis::AxisType type)
 {
     axisCacheForOrientation(orientation).setType(type);
 }
 
-void Abstract3DRenderer::updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title)
+void Abstract3DRenderer::updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
+                                         const QString &title)
 {
     axisCacheForOrientation(orientation).setTitle(title);
 }
 
-void Abstract3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels)
+void Abstract3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                          const QStringList &labels)
 {
     axisCacheForOrientation(orientation).setLabels(labels);
 }
 
-void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max)
+void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation,
+                                         float min, float max)
 {
     AxisRenderCache &cache = axisCacheForOrientation(orientation);
     cache.setMin(min);
     cache.setMax(max);
 }
 
-void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                                int count)
 {
     axisCacheForOrientation(orientation).setSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                                   int count)
 {
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format)
+void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
+                                               const QString &format)
 {
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
@@ -354,7 +362,7 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
     foreach (QAbstract3DSeries *current, seriesList) {
         if (current->isVisible()) {
-             // Item selection label may need update
+            // Item selection label may need update
             if (current->d_ptr->m_changeTracker.nameChanged
                     || current->d_ptr->m_changeTracker.itemLabelFormatChanged) {
                 m_selectionLabelDirty = true;
@@ -364,7 +372,8 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
 }
 
-AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(QAbstract3DAxis::AxisOrientation orientation)
+AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(
+        QAbstract3DAxis::AxisOrientation orientation)
 {
     switch (orientation) {
     case QAbstract3DAxis::AxisOrientationX:
@@ -417,7 +426,8 @@ void Abstract3DRenderer::lowerShadowQuality()
     updateShadowQuality(newQuality);
 }
 
-void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture)
+void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient,
+                                                       GLuint *gradientTexture)
 {
     // Readjust start/stop to match gradient texture size
     gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));

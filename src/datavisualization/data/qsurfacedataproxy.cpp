@@ -355,9 +355,7 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  * need to emit this signal yourself or the graph won't get updated.
  */
 
-//
 //  QSurfaceDataProxyPrivate
-//
 
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),

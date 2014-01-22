@@ -262,7 +262,7 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
     return retList;
 }
 
-/////////////////// PRIVATE ///////////////////////////////////
+// Q3DSurfacePrivate
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
     : QAbstract3DGraphPrivate(q)

@@ -26,20 +26,14 @@
 //
 // We mean it.
 
-#ifndef NOTIFICATIONLABEL_P_H
-#define NOTIFICATIONLABEL_P_H
+#ifndef SELECTIONPOINTER_P_H
+#define SELECTIONPOINTER_P_H
 
-#include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
-#include <QWindow>
 #include <QVector3D>
 
 #include "q3dscene.h"
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
-
-class QOpenGLShaderProgram;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -47,9 +41,7 @@ class ShaderHelper;
 class ObjectHelper;
 class SurfaceObject;
 class TextureHelper;
-class Theme;
 class Drawer;
-class Q3DCamera;
 
 class SelectionPointer : public QObject, protected QOpenGLFunctions
 {
@@ -95,4 +87,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // NOTIFICATIONLABEL_P_H
+#endif

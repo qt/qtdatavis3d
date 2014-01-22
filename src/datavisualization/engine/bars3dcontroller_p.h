@@ -32,8 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 
-//#define DISPLAY_RENDER_SPEED
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Bars3DRenderer;

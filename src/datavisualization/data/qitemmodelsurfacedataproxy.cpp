@@ -158,7 +158,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QObject *parent)
  * Constructs QItemModelSurfaceDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, QObject *parent)
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
@@ -173,7 +174,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * in rows and columns already, so it also sets useModelCategories property to true.
  */
 QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
-                                                       const QString &valueRole, QObject *parent)
+                                                       const QString &valueRole,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
@@ -190,7 +192,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
 QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
-                                                       const QString &valueRole, QObject *parent)
+                                                       const QString &valueRole,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);

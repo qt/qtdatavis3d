@@ -406,7 +406,8 @@ bool Bars3DController::isBarSpecRelative()
 void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
-            && (mode.testFlag(QAbstract3DGraph::SelectionRow) == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
+            && (mode.testFlag(QAbstract3DGraph::SelectionRow)
+                == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
         QAbstract3DGraph::SelectionFlags oldMode = selectionMode();

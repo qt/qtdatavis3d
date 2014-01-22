@@ -294,12 +294,12 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
     case Qt::AlignHCenter: {
         xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                      - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
+                - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
         break;
     }
     case Qt::AlignVCenter: {
         yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                      + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
+                + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
         break;
     }
     default: {
