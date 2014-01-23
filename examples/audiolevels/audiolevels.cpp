@@ -57,16 +57,17 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->addSeries(series);
 
     //! [0]
+    QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
+
     QAudioFormat formatAudio;
-    formatAudio.setSampleRate(8000);
-    formatAudio.setChannelCount(1);
-    formatAudio.setSampleSize(8);
-    formatAudio.setCodec("audio/pcm");
+    formatAudio.setSampleRate(inputDevice.supportedSampleRates().at(0));
+    formatAudio.setChannelCount(inputDevice.supportedChannelCounts().at(0));
+    formatAudio.setSampleSize(inputDevice.supportedSampleSizes().at(0));
+    formatAudio.setCodec(inputDevice.supportedCodecs().at(0));
     formatAudio.setByteOrder(QAudioFormat::LittleEndian);
     formatAudio.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo inputDevices = QAudioDeviceInfo::defaultInputDevice();
-    m_audioInput = new QAudioInput(inputDevices, formatAudio, this);
+    m_audioInput = new QAudioInput(inputDevice, formatAudio, this);
 #ifdef Q_OS_MAC
     // Mac seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
     m_audioInput->setBufferSize(256);
