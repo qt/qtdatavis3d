@@ -3,7 +3,8 @@ SUBDIRS += qmlbars \
            qmlscatter \
            qmlsurface \
            qmlcustominput \
-           qmllegend
+           qmllegend \
+           qmlmultigraph
 
 !android: {
     SUBDIRS += bars \

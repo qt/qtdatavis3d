@@ -27,7 +27,7 @@
     \image qmllegend-example.png
 
     The interesting thing about this example is displaying the legend. We'll concentrate on
-    thate and skip explaining the basic functionality - for
+    that and skip explaining the basic functionality - for
     more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
     \section1 Legend

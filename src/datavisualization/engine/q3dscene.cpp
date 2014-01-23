@@ -199,8 +199,6 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
 
 /*!
  * Returns whether the given \a point resides inside the primary subview or not.
- * The method takes care of correctly mapping between OpenGL coordinates used in the
- * viewport definitions and the Qt event coordinate system used in the input system.
  * \return \c true if the point is inside the primary subview.
  */
 bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
@@ -208,19 +206,15 @@ bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_primarySubViewport.x();
-    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_primarySubViewport.x()
-            + d_ptr->m_primarySubViewport.width();
-    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_primarySubViewport.y()
-            + d_ptr->m_primarySubViewport.height();
-    int areaMinY = d_ptr->m_viewport.y() + d_ptr->m_primarySubViewport.y();
+    int areaMaxX = d_ptr->m_primarySubViewport.x() + d_ptr->m_primarySubViewport.width();
+    int areaMinY = d_ptr->m_primarySubViewport.y();
+    int areaMaxY = d_ptr->m_primarySubViewport.y() + d_ptr->m_primarySubViewport.height();
 
     return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
 }
 
 /*!
  * Returns whether the given \a point resides inside the secondary subview or not.
- * The method takes care of correctly mapping between OpenGL coordinates used in the
- * viewport definitions and the Qt event coordinate system used in the input system.
  * \return \c true if the point is inside the secondary subview.
  */
 bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
@@ -228,11 +222,9 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
     int x = point.x();
     int y = point.y();
     int areaMinX = d_ptr->m_secondarySubViewport.x();
-    int areaMaxX = d_ptr->m_viewport.x() + d_ptr->m_secondarySubViewport.x()
-            + d_ptr->m_secondarySubViewport.width();
-    int areaMaxY = d_ptr->m_viewport.y() + d_ptr->m_secondarySubViewport.y()
-            + d_ptr->m_secondarySubViewport.height();
-    int areaMinY = d_ptr->m_viewport.y() + d_ptr->m_secondarySubViewport.y();
+    int areaMaxX = d_ptr->m_secondarySubViewport.x() + d_ptr->m_secondarySubViewport.width();
+    int areaMinY = d_ptr->m_secondarySubViewport.y();
+    int areaMaxY = d_ptr->m_secondarySubViewport.y() + d_ptr->m_secondarySubViewport.height();
 
     return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
 }

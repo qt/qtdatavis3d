@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
     viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),
                                                                        QString::fromLatin1("lib")));
 #endif
-    viewer.setTitle(QStringLiteral("QML multigraph test"));
+    viewer.setTitle(QStringLiteral("QML multigraph example"));
     viewer.setSource(QUrl("qrc:/qml/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
-    viewer.showMaximized();
+    viewer.showExpanded();
 
     return app.exec();
 }
