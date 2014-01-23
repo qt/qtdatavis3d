@@ -633,7 +633,8 @@ void Q3DScenePrivate::updateGLSubViewports()
     m_glPrimarySubViewport.setWidth(m_primarySubViewport.width() * m_devicePixelRatio);
     m_glPrimarySubViewport.setHeight(m_primarySubViewport.height() * m_devicePixelRatio);
 
-    m_glSecondarySubViewport.setX(m_secondarySubViewport.x() * m_devicePixelRatio);
+    m_glSecondarySubViewport.setX((m_secondarySubViewport.x() + m_viewport.x())
+                                  * m_devicePixelRatio);
     m_glSecondarySubViewport.setY((m_windowSize.height() - (m_secondarySubViewport.y()
                                                             + m_viewport.y()
                                                             + m_secondarySubViewport.height()))
