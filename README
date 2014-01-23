@@ -68,7 +68,7 @@ The documentation can also be generated with:
     make docs
 
 Please refer to the generated documentation for more information:
-    doc/qtdatavisualization/qtdatavisualization-index.html
+    doc/qtdatavisualization/index.html
 
 Known Issues
 ============
