@@ -29,6 +29,7 @@
 #include "qtouch3dinputhandler.h"
 #include "qabstract3dseries_p.h"
 #include "thememanager_p.h"
+#include "q3dtheme_p.h"
 #include "q3dscene_p.h"
 #include "q3dscene.h"
 
@@ -57,7 +58,9 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
         m_scene = new Q3DScene;
 
     // Set initial theme
-    setActiveTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+    Q3DTheme *defaultTheme = new Q3DTheme(Q3DTheme::ThemeQt);
+    defaultTheme->d_ptr->setDefaultTheme(true);
+    setActiveTheme(defaultTheme);
 
     m_scene->d_ptr->setViewport(initialViewport);
 

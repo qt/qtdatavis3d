@@ -18,6 +18,7 @@
 
 #include "abstractdeclarative_p.h"
 #include "qvalue3daxis.h"
+#include "declarativetheme_p.h"
 
 #include <QThread>
 #include <QGuiApplication>
@@ -99,6 +100,13 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
+
+    // Reset default theme, as the default C++ theme is Q3DTheme, not DeclarativeTheme3D.
+    DeclarativeTheme3D *defaultTheme = new DeclarativeTheme3D;
+    defaultTheme->d_ptr->setDefaultTheme(true);
+    defaultTheme->setType(Q3DTheme::ThemeQt);
+    m_controller->setActiveTheme(defaultTheme);
+
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
                      &AbstractDeclarative::handleShadowQualityChange);
     QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
