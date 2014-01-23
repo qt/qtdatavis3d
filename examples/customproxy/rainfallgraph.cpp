@@ -74,12 +74,14 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     // Set theme
     m_graph->activeTheme()->setType(Q3DTheme::ThemeArmyBlue);
 
-    // Set font to theme
+    // Override font in theme
     m_graph->activeTheme()->setFont(QFont("Century Gothic", 30));
+
+    // Override label background for theme
+    m_graph->activeTheme()->setLabelBackgroundEnabled(false);
 
     // Set camera position and zoom
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRightHigh);
-    m_graph->scene()->activeCamera()->setZoomLevel(75);
 
     // Set window title
     m_graph->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));
