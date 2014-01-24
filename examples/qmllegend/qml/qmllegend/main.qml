@@ -56,6 +56,7 @@ Item {
             selectionMode: AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             theme: firstTheme
+            valueAxis.labelFormat: "%d\u00B0C"
 
             Bar3DSeries {
                 id: station1
