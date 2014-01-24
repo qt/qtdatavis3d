@@ -38,12 +38,14 @@ class Bars3DRenderer;
 class QBar3DSeries;
 
 struct Bars3DChangeBitField {
-    bool slicingActiveChanged     : 1;
-    bool barSpecsChanged          : 1;
-    bool selectedBarChanged       : 1;
+    bool slicingActiveChanged       : 1;
+    bool multiSeriesScalingChanged  : 1;
+    bool barSpecsChanged            : 1;
+    bool selectedBarChanged         : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
+        multiSeriesScalingChanged(true),
         barSpecsChanged(true),
         selectedBarChanged(true)
     {
@@ -64,6 +66,7 @@ private:
     QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
 
     // Look'n'feel
+    bool m_isMultiSeriesUniform;
     bool m_isBarSpecRelative;
     GLfloat m_barThicknessRatio;
     QSizeF m_barSpacing;
@@ -77,6 +80,9 @@ public:
 
     virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
+
+    void setMultiSeriesScaling(bool uniform);
+    bool multiSeriesScaling() const;
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction

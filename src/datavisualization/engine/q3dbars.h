@@ -34,6 +34,7 @@ class QBar3DSeries;
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
+    Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
@@ -52,6 +53,9 @@ public:
     void removeSeries(QBar3DSeries *series);
     void insertSeries(int index, QBar3DSeries *series);
     QList<QBar3DSeries *> seriesList();
+
+    void setMultiSeriesUniform(bool uniform);
+    bool isMultiSeriesUniform() const;
 
     void setBarThickness(float thicknessRatio);
     float barThickness();
@@ -73,6 +77,7 @@ public:
     QList<QAbstract3DAxis *> axes() const;
 
 signals:
+    void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);

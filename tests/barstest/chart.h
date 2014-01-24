@@ -88,6 +88,7 @@ public:
 public slots:
     void flipViews();
     void setGradient();
+    void toggleMultiseriesScaling();
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);

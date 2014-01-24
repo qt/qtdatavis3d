@@ -69,6 +69,12 @@
  * This temporary axis is destroyed if another axis is explicitly set to same orientation.
  */
 
+/*!
+ * \qmlproperty bool Bars3D::multiSeriesUniform
+ * This property controls if bars are to be scaled with proportions set to a single series bar even
+ * if there are multiple series displayed. If set to \c {true}, \l{barSpacing}{bar spacing} will
+ * affect only X-axis correctly. It is preset to \c false by default.
+ */
 
 /*!
  * \qmlproperty real Bars3D::barThickness

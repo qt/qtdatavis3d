@@ -51,6 +51,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
     Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
     Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
@@ -68,6 +69,9 @@ public:
     void setValueAxis(QValue3DAxis *axis);
     QCategory3DAxis *columnAxis() const;
     void setColumnAxis(QCategory3DAxis *axis);
+
+    void setMultiSeriesUniform(bool uniform);
+    bool isMultiSeriesUniform() const;
 
     void setBarThickness(float thicknessRatio);
     float barThickness() const;
@@ -98,6 +102,7 @@ signals:
     void rowAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);
+    void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);

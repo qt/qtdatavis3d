@@ -102,10 +102,12 @@ private:
     BarRenderItem m_dummyBarRenderItem;
     QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
-    float m_seriesScale;
+    float m_seriesScaleX;
+    float m_seriesScaleZ;
     float m_seriesStep;
     float m_seriesStart;
     QPoint m_clickedPosition;
+    bool m_keepSeriesUniform;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -119,6 +121,7 @@ protected:
     virtual void initializeOpenGL();
 
 public slots:
+    void updateMultiSeriesScaling(bool uniform);
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);

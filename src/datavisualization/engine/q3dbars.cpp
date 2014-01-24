@@ -183,6 +183,26 @@ QList<QBar3DSeries *> Q3DBars::seriesList()
 }
 
 /*!
+ * \property Q3DBars::multiSeriesUniform
+ *
+ * This property controls if bars are to be scaled with proportions set to a single series bar even
+ * if there are multiple series displayed. If set to \c {true}, \l{barSpacing}{bar spacing} will
+ * affect only X-axis correctly. It is preset to \c false by default.
+ */
+void Q3DBars::setMultiSeriesUniform(bool uniform)
+{
+    if (uniform != isMultiSeriesUniform()) {
+        dptr()->m_shared->setMultiSeriesScaling(uniform);
+        emit multiSeriesUniformChanged(uniform);
+    }
+}
+
+bool Q3DBars::isMultiSeriesUniform() const
+{
+    return dptrc()->m_shared->multiSeriesScaling();
+}
+
+/*!
  * \property Q3DBars::barThickness
  *
  * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
@@ -208,7 +228,7 @@ float Q3DBars::barThickness()
  * Bar spacing, which is the empty space between bars, in X and Z dimensions. It is preset to
  * \c {(1.0, 1.0)} by default. Spacing is affected by barSpacingRelative -property.
  *
- * \sa barSpacingRelative
+ * \sa barSpacingRelative, multiSeriesUniform
  */
 void Q3DBars::setBarSpacing(QSizeF spacing)
 {

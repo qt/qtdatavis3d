@@ -110,6 +110,9 @@ int main(int argc, char **argv)
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
 
+    QPushButton *multiScaleButton = new QPushButton(widget);
+    multiScaleButton->setText(QStringLiteral("Change multiseries scaling"));
+
     QPushButton *styleButton = new QPushButton(widget);
     styleButton->setText(QStringLiteral("Change bar style"));
 
@@ -292,6 +295,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(showFiveSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
+    vLayout->addWidget(multiScaleButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
@@ -367,6 +371,8 @@ int main(int argc, char **argv)
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
 
+    QObject::connect(multiScaleButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::toggleMultiseriesScaling);
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &GraphModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);

@@ -83,6 +83,11 @@ void Bars3DController::synchDataToRenderer()
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
+    if (m_changeTracker.multiSeriesScalingChanged) {
+        m_renderer->updateMultiSeriesScaling(m_isMultiSeriesUniform);
+        m_changeTracker.multiSeriesScalingChanged = false;
+    }
+
     if (m_changeTracker.barSpecsChanged) {
         m_renderer->updateBarSpecs(m_barThicknessRatio, m_barSpacing, m_isBarSpecRelative);
         m_changeTracker.barSpecsChanged = false;
@@ -376,6 +381,19 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
 
     // Update selected bar - may be moved offscreen
     setSelectedBar(m_selectedBar, m_selectedBarSeries);
+}
+
+void Bars3DController::setMultiSeriesScaling(bool uniform)
+{
+    m_isMultiSeriesUniform = uniform;
+
+    m_changeTracker.multiSeriesScalingChanged = true;
+    emitNeedRender();
+}
+
+bool Bars3DController::multiSeriesScaling() const
+{
+    return m_isMultiSeriesUniform;
 }
 
 void Bars3DController::setBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)

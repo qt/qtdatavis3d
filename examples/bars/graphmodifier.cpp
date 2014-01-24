@@ -56,6 +56,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_graph->activeTheme()->setBackgroundEnabled(false);
     m_graph->activeTheme()->setFont(QFont("Times New Roman", m_fontSize));
     m_graph->activeTheme()->setLabelBackgroundEnabled(true);
+    m_graph->setMultiSeriesUniform(true);
     //! [2]
 
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
@@ -266,11 +267,4 @@ void GraphModifier::setSmoothBars(int smooth)
 void GraphModifier::setSeriesVisibility(int enabled)
 {
     m_secondarySeries->setVisible(bool(enabled));
-    if (enabled) {
-        m_graph->setBarThickness(2.0f);
-        m_graph->setBarSpacing(QSizeF(1.0, 3.0));
-    } else {
-        m_graph->setBarThickness(1.0f);
-        m_graph->setBarSpacing(QSizeF(1.0, 1.0));
-    }
 }

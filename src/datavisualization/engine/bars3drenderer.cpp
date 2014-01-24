@@ -89,10 +89,12 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_selectedBarPos(Bars3DController::invalidSelectionPosition()),
       m_selectedBarSeries(0),
       m_noZeroInRange(false),
-      m_seriesScale(0.0f),
+      m_seriesScaleX(0.0f),
+      m_seriesScaleZ(0.0f),
       m_seriesStep(0.0f),
       m_seriesStart(0.0f),
-      m_clickedPosition(Bars3DController::invalidSelectionPosition())
+      m_clickedPosition(Bars3DController::invalidSelectionPosition()),
+      m_keepSeriesUniform(false)
 {
     initializeOpenGLFunctions();
     initializeOpenGL();
@@ -160,10 +162,16 @@ void Bars3DRenderer::updateData()
 
     if (m_renderingArrays.size() != seriesCount) {
         m_renderingArrays.resize(seriesCount);
-        m_seriesScale = 1.0f / float(seriesCount);
+        m_seriesScaleX = 1.0f / float(seriesCount);
         m_seriesStep = 1.0f / float(seriesCount);
         m_seriesStart = -((float(seriesCount) - 1.0f) / 2.0f) * m_seriesStep;
     }
+
+
+    if (m_keepSeriesUniform)
+        m_seriesScaleZ = m_seriesScaleX;
+    else
+        m_seriesScaleZ = 1.0f;
 
     if (m_cachedRowCount != newRows || m_cachedColumnCount != newColumns) {
         // Force update for selection related items
@@ -427,11 +435,11 @@ void Bars3DRenderer::drawSlicedScene()
     }
 
     // Draw bars
-    QVector3D modelMatrixScaler(m_scaleX, 0.0f, m_scaleZ);
-    if (rowMode)
-        modelMatrixScaler.setX(m_scaleX * m_seriesScale);
-    else
-        modelMatrixScaler.setZ(m_scaleZ * m_seriesScale);
+    QVector3D modelMatrixScaler(m_scaleX * m_seriesScaleX, 0.0f, m_scaleZ * m_seriesScaleZ);
+    if (!rowMode) {
+        modelMatrixScaler.setX(m_scaleZ * m_seriesScaleZ);
+        modelMatrixScaler.setZ(m_scaleX * m_seriesScaleX);
+    }
 
     // Set common bar shader bindings
     m_barShader->bind();
@@ -809,7 +817,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw bars to depth buffer
-        QVector3D shadowScaler(m_scaleX * m_seriesScale * 0.9f, 0.0f, m_scaleZ * 0.9f);
+        QVector3D shadowScaler(m_scaleX * m_seriesScaleX * 0.9f, 0.0f,
+                               m_scaleZ * m_seriesScaleZ * 0.9f);
         float seriesPos = m_seriesStart;
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
@@ -926,9 +935,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                           item.height(),
                                           (m_columnDepth - rowPos) / m_scaleFactor);
-                    modelMatrix.scale(QVector3D(m_scaleX * m_seriesScale,
+                    modelMatrix.scale(QVector3D(m_scaleX * m_seriesScaleX,
                                                 item.height(),
-                                                m_scaleZ));
+                                                m_scaleZ * m_seriesScaleZ));
 
                     MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1049,7 +1058,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     QVector3D baseColor;
     QVector3D barColor;
-    QVector3D modelScaler(m_scaleX * m_seriesScale, 0.0f, m_scaleZ);
+    QVector3D modelScaler(m_scaleX * m_seriesScaleX, 0.0f, m_scaleZ * m_seriesScaleZ);
     bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::invalidSelectionPosition());
     float seriesPos = m_seriesStart;
     for (int series = 0; series < seriesCount; series++) {
@@ -1835,6 +1844,18 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glUseProgram(0);
 
     m_selectionDirty = false;
+}
+
+void Bars3DRenderer::updateMultiSeriesScaling(bool uniform)
+{
+    m_keepSeriesUniform = uniform;
+
+    // Recalculate scale factors
+    m_seriesScaleX = 1.0f / float(m_visibleSeriesList.size());
+    if (m_keepSeriesUniform)
+        m_seriesScaleZ = m_seriesScaleX;
+    else
+        m_seriesScaleZ = 1.0f;
 }
 
 void Bars3DRenderer::updateBarSpecs(GLfloat thicknessRatio, const QSizeF &spacing, bool relative)

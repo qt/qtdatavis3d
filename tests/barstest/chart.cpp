@@ -1223,3 +1223,8 @@ void GraphModifier::setGradient()
 
     m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
 }
+
+void GraphModifier::toggleMultiseriesScaling()
+{
+    m_graph->setMultiSeriesUniform(!m_graph->isMultiSeriesUniform());
+}

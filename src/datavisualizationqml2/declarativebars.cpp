@@ -72,6 +72,19 @@ void DeclarativeBars::setColumnAxis(QCategory3DAxis *axis)
     m_barsController->setAxisX(axis);
 }
 
+void DeclarativeBars::setMultiSeriesUniform(bool uniform)
+{
+    if (uniform != isMultiSeriesUniform()) {
+        m_barsController->setMultiSeriesScaling(uniform);
+        emit multiSeriesUniformChanged(uniform);
+    }
+}
+
+bool DeclarativeBars::isMultiSeriesUniform() const
+{
+    return m_barsController->multiSeriesScaling();
+}
+
 void DeclarativeBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {

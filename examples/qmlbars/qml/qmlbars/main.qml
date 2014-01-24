@@ -76,7 +76,7 @@ Item {
         anchors.bottom: mainview.bottom
 
         Bars3D {
-            id: testGraph
+            id: barGraph
             width: dataView.width
             height: dataView.height
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
@@ -189,7 +189,7 @@ Item {
             clip: true
             //! [1]
             onClicked: {
-                if (testGraph.rowAxis.max !== 6) {
+                if (barGraph.rowAxis.max !== 6) {
                     text = "Show 2010 - 2012"
                     modelProxy.autoRowCategories = true
                     secondaryProxy.autoRowCategories = true
@@ -213,11 +213,11 @@ Item {
             text: "Hide Shadows"
             clip: true
             onClicked: {
-                if (testGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
-                    testGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
+                if (barGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
+                    barGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
                     text = "Hide Shadows"
                 } else {
-                    testGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    barGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                     text = "Show Shadows"
                 }
             }
@@ -233,17 +233,17 @@ Item {
             onClicked: {
                 if (!secondarySeries.visible) {
                     text = "Show Both"
-                    testGraph.valueAxis = graphAxes.expenses
+                    barGraph.valueAxis = graphAxes.expenses
                     barSeries.visible = false
                     secondarySeries.visible = true
                 } else if (!barSeries.visible){
                     barSeries.visible = true
                     text = "Show Income"
-                    testGraph.valueAxis = graphAxes.income
+                    barGraph.valueAxis = graphAxes.income
                 } else {
                     secondarySeries.visible = false
                     text = "Show Expenses"
-                    testGraph.valueAxis = graphAxes.income
+                    barGraph.valueAxis = graphAxes.income
                 }
             }
             //! [0]
