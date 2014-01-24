@@ -47,7 +47,11 @@ contains(TARGET, qml.*) {
 
     static:contains(QT_CONFIG, static) {
         # Make import scan find our copied qmldir & statically built qml lib
-        LIB_EXTENSION = lib
+        !win32 {
+            LIB_EXTENSION = a
+        } else {
+            LIB_EXTENSION = lib
+        }
         QMLPATHS += $$DESTDIR
         # We need to copy the qmldir & lib already at qmake run stage as import scan is done then
         exists($$copy_qmldir.depends): system($$QMAKE_COPY $$copy_qmldir_formatted)
@@ -55,7 +59,7 @@ contains(TARGET, qml.*) {
         win32 {
             LIB_EXTENSION = dll
         } else {
-            mac {
+            mac|ios {
                 LIB_EXTENSION = dylib
             } else {
                 LIB_EXTENSION = so
@@ -65,16 +69,16 @@ contains(TARGET, qml.*) {
 
     win32 {
         CONFIG(debug, release|debug) {
-            src_dir = debug
+            src_dir = /debug
             src_lib = $${lib_name}d.$$LIB_EXTENSION
         }
         CONFIG(release, release|debug){
-            src_dir = release
+            src_dir = /release
             src_lib = $${lib_name}.$$LIB_EXTENSION
         }
     } else {
-        src_dir = .
-        mac {
+        src_dir =
+            mac|ios {
             CONFIG(debug, release|debug) {
                 src_lib = lib$${lib_name}_debug.$$LIB_EXTENSION
             }
@@ -87,7 +91,7 @@ contains(TARGET, qml.*) {
         }
     }
     copy_lib.target = $$make_qmldir_path/$$src_lib
-    copy_lib.depends = $$OUT_PWD/../../src/$$lib_name/$$src_dir/$$src_lib
+    copy_lib.depends = $$OUT_PWD/../../src/$$lib_name$$src_dir/$$src_lib
     copy_lib_formatted = \"$$replace(copy_lib.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_lib.target, /, $$QMAKE_DIR_SEP)\"
     copy_lib.commands = $(COPY_FILE) $$copy_lib_formatted
     QMAKE_EXTRA_TARGETS += copy_lib
@@ -98,12 +102,17 @@ contains(TARGET, qml.*) {
         android_qmldir.files = $$copy_qmldir.target
         android_qmldir.path = /assets/qml/$$uri_replaced
         INSTALLS += android_qmldir
-        # No need to do custom install for qml plugin lib when it is statically built into app
-        !static|!contains(QT_CONFIG, static) {
-            system($$QMAKE_COPY $$copy_lib_formatted)
-            android_qmlplugin.files = $$copy_lib.target
-            android_qmlplugin.path = $$target.path
-            INSTALLS += android_qmlplugin
-        }
+    }
+    ios {
+        system($$QMAKE_COPY $$copy_qmldir_formatted)
+        ios_qmldir.files = $$copy_qmldir.target
+        ios_qmldir.path = /TODO/$$uri_replaced
+        INSTALLS += ios_qmldir
+    }
+    android|ios {
+        system($$QMAKE_COPY $$copy_lib_formatted)
+        android_qmlplugin.files = $$copy_lib.target
+        android_qmlplugin.path = $$target.path
+        INSTALLS += android_qmlplugin
     }
 }
