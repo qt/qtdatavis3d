@@ -142,6 +142,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty quaternion Abstract3DSeries::meshRotation
+ *
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized quaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * Bar3DSeries ignores any rotation that is not around Y-axis.
+ * Surface3DSeries applies the rotation only to the selection pointer.
+ * Defaults to no rotation.
+ */
+
+/*!
  * \qmlproperty string Abstract3DSeries::userDefinedMesh
  *
  * Sets the \a fileName for user defined custom mesh for objects that is used when mesh
@@ -303,7 +315,8 @@ bool QAbstract3DSeries::isVisible() const
  */
 void QAbstract3DSeries::setMesh(QAbstract3DSeries::Mesh mesh)
 {
-    if ((mesh == QAbstract3DSeries::MeshPoint || mesh == QAbstract3DSeries::MeshMinimal)
+    if ((mesh == QAbstract3DSeries::MeshPoint || mesh == QAbstract3DSeries::MeshMinimal
+         || mesh == QAbstract3DSeries::MeshArrow)
             && type() != QAbstract3DSeries::SeriesTypeScatter) {
         qWarning() << "Specified style is only supported for QScatter3DSeries.";
     } else if (d_ptr->m_mesh != mesh) {
@@ -335,6 +348,30 @@ void QAbstract3DSeries::setMeshSmooth(bool enable)
 bool QAbstract3DSeries::isMeshSmooth() const
 {
     return d_ptr->m_meshSmooth;
+}
+
+/*!
+ * \property QAbstract3DSeries::meshRotation
+ *
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized QQuaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * QBar3DSeries ignores any rotation that is not around Y-axis.
+ * QSurface3DSeries applies the rotation only to the selection pointer.
+ * Defaults to no rotation.
+ */
+void QAbstract3DSeries::setMeshRotation(const QQuaternion &rotation)
+{
+    if (d_ptr->m_meshRotation != rotation) {
+        d_ptr->setMeshRotation(rotation);
+        emit meshRotationChanged(rotation);
+    }
+}
+
+QQuaternion QAbstract3DSeries::meshRotation() const
+{
+    return d_ptr->m_meshRotation;
 }
 
 /*!
@@ -604,6 +641,14 @@ void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
 {
     m_meshSmooth = enable;
     m_changeTracker.meshSmoothChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
+{
+    m_meshRotation = rotation;
+    m_changeTracker.meshRotationChanged = true;
     if (m_controller)
         m_controller->markSeriesVisualsDirty();
 }

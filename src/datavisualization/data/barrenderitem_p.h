@@ -67,12 +67,15 @@ public:
 
     // Formatted label for item.
     void setSliceLabel(const QString &label);
-    QString &sliceLabel(); // Formats label if not previously formatted
+    const QString &sliceLabel() const; // Formats label if not previously formatted
 
     // Series index in visual series that this item belongs to.
     // This is only utilized by slicing, so it may not be up to date on all items.
     inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
-    inline int seriesIndex() { return m_seriesIndex; }
+    inline int seriesIndex() const { return m_seriesIndex; }
+
+    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline const QQuaternion &rotation() const { return m_rotation; }
 
 protected:
     float m_value;
@@ -81,6 +84,7 @@ protected:
     QString m_sliceLabel;
     LabelItem *m_sliceLabelItem;
     int m_seriesIndex;
+    QQuaternion m_rotation;
 
     friend class QBarDataItem;
 };

@@ -110,8 +110,15 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Position the pointer ball
     modelMatrix.translate(m_position);
 
+    if (!m_rotation.isIdentity()) {
+        modelMatrix.rotate(m_rotation);
+        itModelMatrix.rotate(m_rotation);
+    }
+
     // Scale the point with fixed values (at this point)
-    modelMatrix.scale(QVector3D(0.05f, 0.05f, 0.05f));
+    QVector3D scaleVector(0.05f, 0.05f, 0.05f);
+    modelMatrix.scale(scaleVector);
+    itModelMatrix.scale(scaleVector);
 
     MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -189,7 +196,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     glEnable(GL_DEPTH_TEST);
 }
 
-void SelectionPointer::setPosition(QVector3D position)
+void SelectionPointer::setPosition(const QVector3D &position)
 {
     m_position = position;
 }
@@ -200,9 +207,14 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setHighlightColor(QVector3D colorVector)
+void SelectionPointer::setHighlightColor(const QVector3D &colorVector)
 {
     m_highlightColor = colorVector;
+}
+
+void SelectionPointer::setRotation(const QQuaternion &rotation)
+{
+    m_rotation = rotation;
 }
 
 void SelectionPointer::setLabel(const QString &label)
@@ -222,7 +234,7 @@ void SelectionPointer::handleDrawerChange()
     setLabel(m_label);
 }
 
-void SelectionPointer::updateBoundingRect(QRect rect)
+void SelectionPointer::updateBoundingRect(const QRect &rect)
 {
     m_mainViewPort = rect;
 }

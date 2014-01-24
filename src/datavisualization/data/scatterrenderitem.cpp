@@ -33,6 +33,7 @@ ScatterRenderItem::ScatterRenderItem(const ScatterRenderItem &other)
       m_visible(false)
 {
     m_position = other.m_position;
+    m_rotation = other.m_rotation;
 }
 
 ScatterRenderItem::~ScatterRenderItem()

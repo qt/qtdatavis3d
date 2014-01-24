@@ -114,6 +114,7 @@ public:
     ~Bars3DRenderer();
 
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 

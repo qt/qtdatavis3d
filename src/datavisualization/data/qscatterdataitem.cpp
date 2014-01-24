@@ -72,6 +72,7 @@ QScatterDataItem::~QScatterDataItem()
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
+    m_rotation = other.m_rotation;
 
     if (other.d_ptr)
         createExtraData();
@@ -94,11 +95,15 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 /*!
  * \fn void QScatterDataItem::setRotation(const QQuaternion &rotation)
  * Sets \a rotation to this data item.
+ * The \a rotation should be a normalized QQuaternion.
+ * If the series also has rotation, item and series rotations are multiplied together.
+ * Defaults to no rotation.
  */
 
 /*!
  * \fn QQuaternion QScatterDataItem::rotation() const
  * \return rotation of this data item.
+ * \sa setRotation()
  */
 
 /*!

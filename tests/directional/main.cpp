@@ -78,6 +78,9 @@ int main(int argc, char **argv)
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
+    QPushButton *toggleRotationButton = new QPushButton(widget);
+    toggleRotationButton->setText(QStringLiteral("Toggle rotation"));
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -103,6 +106,7 @@ int main(int argc, char **argv)
     //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change dot style")));
@@ -122,6 +126,8 @@ int main(int argc, char **argv)
     //! [6]
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
+    QObject::connect(toggleRotationButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::toggleRotation);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeLabelStyle);
 

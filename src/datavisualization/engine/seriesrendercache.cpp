@@ -126,6 +126,11 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         }
     }
 
+    if (seriesChanged || changeTracker.meshRotationChanged) {
+        m_meshRotation = series->meshRotation();
+        changeTracker.meshRotationChanged = false;
+    }
+
     if (seriesChanged || changeTracker.colorStyleChanged) {
         m_colorStyle = series->colorStyle();
         changeTracker.colorStyleChanged = false;

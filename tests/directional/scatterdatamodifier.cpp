@@ -56,6 +56,9 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     series->setItemLabelFormat("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel");
     m_graph->addSeries(series);
 
+    QObject::connect(&m_rotationTimer, &QTimer::timeout, this,
+                     &ScatterDataModifier::triggerRotation);
+
     addData();
 }
 
@@ -164,6 +167,24 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQ
     emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
 }
 
+void ScatterDataModifier::triggerRotation()
+{
+    if (m_graph->seriesList().size()) {
+        int selectedIndex = m_graph->seriesList().at(0)->selectedItem();
+        if (selectedIndex != QScatter3DSeries::invalidSelectionIndex()) {
+            static float itemAngle = 0.0f;
+            QScatterDataItem item(*(m_graph->seriesList().at(0)->dataProxy()->itemAt(selectedIndex)));
+            QQuaternion itemRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, itemAngle++);
+            item.setRotation(itemRotation);
+            m_graph->seriesList().at(0)->dataProxy()->setItem(selectedIndex, item);
+        } else {
+            static float seriesAngle = 0.0f;
+            QQuaternion rotation = QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 1.0f, seriesAngle++);
+            m_graph->seriesList().at(0)->setMeshRotation(rotation);
+        }
+    }
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
@@ -178,4 +199,12 @@ void ScatterDataModifier::setBackgroundEnabled(int enabled)
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
     m_graph->activeTheme()->setGridEnabled((bool)enabled);
+}
+
+void ScatterDataModifier::toggleRotation()
+{
+    if (m_rotationTimer.isActive())
+        m_rotationTimer.stop();
+    else
+        m_rotationTimer.start(20);
 }

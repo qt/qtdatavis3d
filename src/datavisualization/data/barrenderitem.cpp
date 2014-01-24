@@ -39,6 +39,7 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_sliceLabel = other.m_sliceLabel;
     m_sliceLabelItem = 0;
     m_seriesIndex = other.m_seriesIndex;
+    m_rotation = other.m_rotation;
 }
 
 BarRenderItem::~BarRenderItem()
@@ -60,7 +61,7 @@ void BarRenderItem::setSliceLabel(const QString &label)
     m_sliceLabel = label;
 }
 
-QString &BarRenderItem::sliceLabel()
+const QString &BarRenderItem::sliceLabel() const
 {
     return m_sliceLabel;
 }

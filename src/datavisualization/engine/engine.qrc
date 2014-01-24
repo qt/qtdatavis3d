@@ -27,8 +27,8 @@
         <file alias="negativeBackground">meshes/backgroundNegatives.obj</file>
         <file alias="minimal">meshes/minimalFlat.obj</file>
         <file alias="minimalSmooth">meshes/minimalSmooth.obj</file>
-        <file alias="arrowFull">meshes/arrowFlat.obj</file>
-        <file alias="arrowSmoothFull">meshes/arrowSmooth.obj</file>
+        <file alias="arrow">meshes/arrowFlat.obj</file>
+        <file alias="arrowSmooth">meshes/arrowSmooth.obj</file>
     </qresource>
     <qresource prefix="/shaders">
         <file alias="fragment">shaders/default.frag</file>

@@ -47,6 +47,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_minval(-16.0f),
       m_maxval(20.0f),
       m_selectedBar(-1, -1),
+      m_selectedSeries(0),
       m_autoAdjustingAxis(new QValue3DAxis),
       m_fixedRangeAxis(new QValue3DAxis),
       m_temperatureAxis(new QValue3DAxis),
@@ -229,6 +230,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
 
     QObject::connect(&m_selectionTimer, &QTimer::timeout, this,
                      &GraphModifier::triggerSelection);
+    QObject::connect(&m_rotationTimer, &QTimer::timeout, this,
+                     &GraphModifier::triggerRotation);
 
     resetTemperatureData();
 }
@@ -702,10 +705,16 @@ void GraphModifier::handleSelectionChange(const QPoint &position)
     m_selectedBar = position;
     int index = 0;
     foreach (QBar3DSeries *series, m_graph->seriesList()) {
-        if (series == sender())
+        if (series == sender()) {
+            if (series->selectedBar() != QBar3DSeries::invalidSelectionPosition())
+                m_selectedSeries = series;
             break;
+        }
         index++;
     }
+
+    if (m_selectedSeries->selectedBar() == QBar3DSeries::invalidSelectionPosition())
+        m_selectedSeries = 0;
 
     qDebug() << "Selected bar position:" << position << "series:" << index;
 }
@@ -1027,6 +1036,14 @@ void GraphModifier::insertRemoveTestToggle()
     }
 }
 
+void GraphModifier::toggleRotation()
+{
+    if (m_rotationTimer.isActive())
+        m_rotationTimer.stop();
+    else
+        m_rotationTimer.start(20);
+}
+
 void GraphModifier::insertRemoveTimerTimeout()
 {
     if (m_insertRemoveStep < 32) {
@@ -1064,6 +1081,25 @@ void GraphModifier::insertRemoveTimerTimeout()
 void GraphModifier::triggerSelection()
 {
     m_graph->scene()->setSelectionQueryPosition(m_customInputHandler->inputPosition());
+}
+
+void GraphModifier::triggerRotation()
+{
+    if (m_selectedSeries) {
+        QPoint selectedBar = m_selectedSeries->selectedBar();
+        if (selectedBar != QBar3DSeries::invalidSelectionPosition()) {
+            QBarDataItem item(*(m_selectedSeries->dataProxy()->itemAt(selectedBar.x(), selectedBar.y())));
+            item.setRotation(item.rotation() + 1.0f);
+            m_selectedSeries->dataProxy()->setItem(selectedBar.x(), selectedBar.y(), item);
+        }
+    } else {
+        // Rotate the first series instead
+        static float seriesAngle = 0.0f;
+        if (m_graph->seriesList().size()) {
+            QQuaternion rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, seriesAngle++);
+            m_graph->seriesList().at(0)->setMeshRotation(rotation);
+        }
+    }
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)

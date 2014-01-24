@@ -52,14 +52,15 @@ public:
     ~SelectionPointer();
 
     void render(GLuint defaultFboHandle = 0);
-    void setPosition(QVector3D position);
+    void setPosition(const QVector3D &position);
     void setLabel(const QString &label);
     void setPointerObject(ObjectHelper *object);
     void handleDrawerChange();
-    void updateBoundingRect(QRect rect);
+    void updateBoundingRect(const QRect &rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
-    void setHighlightColor(QVector3D colorVector);
+    void setHighlightColor(const QVector3D &colorVector);
+    void setRotation(const QQuaternion &rotation);
 
 private:
     void initializeOpenGL();
@@ -83,6 +84,7 @@ private:
     bool m_cachedIsSlicingActivated;
     GLfloat m_autoScaleAdjustment;
     QVector3D m_highlightColor;
+    QQuaternion m_rotation;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

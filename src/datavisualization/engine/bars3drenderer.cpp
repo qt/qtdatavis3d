@@ -44,6 +44,7 @@ const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 
 const bool sliceGridLabels = true;
+const QQuaternion identityQuaternion;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
@@ -190,12 +191,13 @@ void Bars3DRenderer::updateData()
     }
 
     for (int series = 0; series < seriesCount; series++) {
-        if (newRows != m_renderingArrays.at(series).size()
-                || newColumns != m_renderingArrays.at(series).at(0).size()) {
+        BarRenderItemArray &renderArray = m_renderingArrays[series];
+        if (newRows != renderArray.size()
+                || newColumns != renderArray.at(0).size()) {
             // Destroy old render items and reallocate new array
-            m_renderingArrays[series].resize(newRows);
+            renderArray.resize(newRows);
             for (int i = 0; i < newRows; i++)
-                m_renderingArrays[series][i].resize(newColumns);
+                renderArray[i].resize(newColumns);
         }
 
         // Update cached data window
@@ -208,10 +210,10 @@ void Bars3DRenderer::updateData()
         GLfloat heightValue = 0.0f;
         for (int i = 0; i < newRows; i++) {
             int j = 0;
+            BarRenderItemRow &renderRow = renderArray[i];
             if (dataRowIndex < dataRowCount) {
                 const QBarDataRow *dataRow = dataProxy->rowAt(dataRowIndex);
-                updateSize = qMin((dataRow->size() - minCol),
-                                  m_renderingArrays.at(series).at(i).size());
+                updateSize = qMin((dataRow->size() - minCol), renderRow.size());
                 if (dataRow) {
                     int dataColIndex = minCol;
                     for (; j < updateSize ; j++) {
@@ -230,15 +232,24 @@ void Bars3DRenderer::updateData()
                                     heightValue = 0.0f;
                             }
                         }
-                        m_renderingArrays[series][i][j].setValue(value);
-                        m_renderingArrays[series][i][j].setHeight(heightValue / m_heightNormalizer);
+                        renderRow[j].setValue(value);
+                        renderRow[j].setHeight(heightValue / m_heightNormalizer);
+                        float angle = dataRow->at(dataColIndex).rotation();
+                        if (angle) {
+                            renderRow[j].setRotation(
+                                        QQuaternion::fromAxisAndAngle(
+                                            upVector, angle));
+                        } else {
+                            renderRow[j].setRotation(identityQuaternion);
+                        }
                         dataColIndex++;
                     }
                 }
             }
             for (; j < m_renderingArrays.at(series).at(i).size(); j++) {
-                m_renderingArrays[series][i][j].setValue(0.0f);
-                m_renderingArrays[series][i][j].setHeight(0.0f);
+                renderRow[j].setValue(0.0f);
+                renderRow[j].setHeight(0.0f);
+                renderRow[j].setRotation(identityQuaternion);
             }
             dataRowIndex++;
         }
@@ -246,6 +257,18 @@ void Bars3DRenderer::updateData()
 
     // Reset selected bar to update selection
     updateSelectedBar(m_selectedBarPos, m_selectedBarSeries);
+}
+
+void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility)
+{
+    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+
+    // Fix the series rotations - ignore any rotations that are not along Y-axis
+    for (int series = 0; series < m_visibleSeriesList.size(); series++) {
+        QVector3D vector = m_visibleSeriesList.at(series).meshRotation().vector();
+        if (vector.x() || vector.z())
+            m_visibleSeriesList[series].setMeshRotation(identityQuaternion);
+    }
 }
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
@@ -283,6 +306,7 @@ void Bars3DRenderer::drawSlicedScene()
     GLfloat barPosX = 0;
     QVector3D lightPos;
     QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    static QQuaternion ninetyDegreeRotation = QQuaternion::fromAxisAndAngle(upVector, 90.0f);
 
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
@@ -479,6 +503,8 @@ void Bars3DRenderer::drawSlicedScene()
         if (!item)
             continue;
 
+        QQuaternion seriesRotation;
+
         if (item->seriesIndex() != currentSeriesIndex) {
             currentSeriesIndex = item->seriesIndex();
             currentSeries = &(m_visibleSeriesList.at(currentSeriesIndex));
@@ -509,6 +535,7 @@ void Bars3DRenderer::drawSlicedScene()
             }
 
             previousColorStyle = colorStyle;
+            seriesRotation = currentSeries->meshRotation();
         }
 
         if (item->height() < 0)
@@ -519,20 +546,27 @@ void Bars3DRenderer::drawSlicedScene()
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
-        GLfloat barRotation = 0.0f;
+        QQuaternion barRotation = item->rotation();
         GLfloat barPosY = item->translation().y() + barPosYAdjustment - zeroPosAdjustment;
 
         if (rowMode) {
             barPosX = item->translation().x();
         } else {
             barPosX = -(item->translation().z()); // flip z; frontmost bar to the left
-            barRotation = 90.0f;
+            barRotation *= ninetyDegreeRotation;
         }
 
         modelMatrix.translate(barPosX, barPosY, 0.0f);
         modelMatrixScaler.setY(item->height());
-        modelMatrix.rotate(barRotation, 0.0f, 1.0f, 0.0f);
-        itModelMatrix.rotate(barRotation, 0.0f, 1.0f, 0.0f);
+
+        if (!seriesRotation.isIdentity())
+            barRotation *= seriesRotation;
+
+        if (!barRotation.isIdentity()) {
+            modelMatrix.rotate(barRotation);
+            itModelMatrix.rotate(barRotation);
+        }
+
         modelMatrix.scale(modelMatrixScaler);
         itModelMatrix.scale(modelMatrixScaler);
 
@@ -822,6 +856,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         float seriesPos = m_seriesStart;
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
+            QQuaternion seriesRotation(m_visibleSeriesList.at(series).meshRotation());
             for (int row = startRow; row != stopRow; row += stepRow) {
                 for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     GLfloat shadowOffset = 0.0f;
@@ -853,6 +888,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                           (m_columnDepth - rowPos) / m_scaleFactor);
                     // Scale the bars down in X and Z to reduce self-shadowing issues
                     shadowScaler.setY(item.height());
+                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                        modelMatrix.rotate(seriesRotation * item.rotation());
                     modelMatrix.scale(shadowScaler);
 
                     MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -915,6 +952,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         float seriesPos = m_seriesStart;
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *barObj = m_visibleSeriesList.at(series).object();
+            QQuaternion seriesRotation(m_visibleSeriesList.at(series).meshRotation());
             for (int row = startRow; row != stopRow; row += stepRow) {
                 for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     const BarRenderItem &item = m_renderingArrays.at(series).at(row).at(bar);
@@ -935,6 +973,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
                                           item.height(),
                                           (m_columnDepth - rowPos) / m_scaleFactor);
+                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                        modelMatrix.rotate(seriesRotation * item.rotation());
                     modelMatrix.scale(QVector3D(m_scaleX * m_seriesScaleX,
                                                 item.height(),
                                                 m_scaleZ * m_seriesScaleZ));
@@ -1063,6 +1103,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     float seriesPos = m_seriesStart;
     for (int series = 0; series < seriesCount; series++) {
         const SeriesRenderCache &currentSeries = m_visibleSeriesList.at(series);
+        QQuaternion seriesRotation(currentSeries.meshRotation());
         ObjectHelper *barObj = currentSeries.object();
         Q3DTheme::ColorStyle colorStyle = currentSeries.colorStyle();
         bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
@@ -1123,6 +1164,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                       item.height(),
                                       (m_columnDepth - rowPos) / m_scaleFactor);
                 modelScaler.setY(item.height());
+                if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
+                    QQuaternion totalRotation = seriesRotation * item.rotation();
+                    modelMatrix.rotate(totalRotation);
+                    itModelMatrix.rotate(totalRotation);
+                }
                 modelMatrix.scale(modelScaler);
                 itModelMatrix.scale(modelScaler);
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
@@ -1388,7 +1434,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw grid lines
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
         ShaderHelper *lineShader = m_backgroundShader;
-        QQuaternion lineRotation = QQuaternion();
+        QQuaternion lineRotation;
 
         // Bind bar shader
         lineShader->bind();
@@ -2021,7 +2067,7 @@ void Bars3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh 
 {
     if (!m_cachedTheme->isBackgroundEnabled()) {
         // Load full version of meshes that have it available
-        // Note: Minimal and Point not supported in bar charts
+        // Note: Minimal, Point, and Arrow not supported in bar charts
         if (mesh != QAbstract3DSeries::MeshSphere)
             fileName.append(QStringLiteral("Full"));
     }

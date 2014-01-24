@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtGui/QFont>
+#include <QtCore/QTimer>
 
 using namespace QtDataVisualization;
 
@@ -40,6 +41,7 @@ public:
     void changeFontSize(int fontsize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void toggleRotation();
     void start();
 
 public slots:
@@ -47,6 +49,7 @@ public slots:
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
+    void triggerRotation();
 
 signals:
     void backgroundEnabledChanged(bool enabled);
@@ -59,6 +62,7 @@ private:
     int m_fontSize;
     QAbstract3DSeries::Mesh m_style;
     bool m_smooth;
+    QTimer m_rotationTimer;
 };
 
 #endif

@@ -204,15 +204,16 @@ void Scatter3DRenderer::updateData()
 
         for (int i = 0; i < dataSize; i++) {
             QVector3D dotPos = dataArray.at(i).position();
+            ScatterRenderItem &renderItem = m_renderingArrays[series][i];
             if ((dotPos.x() >= minX && dotPos.x() <= maxX )
                     && (dotPos.y() >= minY && dotPos.y() <= maxY)
                     && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
-                m_renderingArrays[series][i].setPosition(dotPos);
-                m_renderingArrays[series][i].setVisible(true);
-                m_renderingArrays[series][i].setRotation(dataArray.at(i).rotation());
-                calculateTranslation(m_renderingArrays[series][i]);
+                renderItem.setPosition(dotPos);
+                renderItem.setVisible(true);
+                renderItem.setRotation(dataArray.at(i).rotation());
+                calculateTranslation(renderItem);
             } else {
-                m_renderingArrays[series][i].setVisible(false);
+                renderItem.setVisible(false);
             }
         }
     }
@@ -372,6 +373,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Draw dots to depth buffer
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
+            QQuaternion seriesRotation = m_visibleSeriesList.at(series).meshRotation();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
             float itemSize = m_cachedItemSize.at(series) / itemScaler;
@@ -393,7 +395,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.translate(item.translation());
                 if (!drawingPoints) {
-                    modelMatrix.rotate(item.rotation());
+                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                        modelMatrix.rotate(seriesRotation * item.rotation());
                     modelMatrix.scale(modelScaler);
                 }
 
@@ -467,6 +470,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         bool previousDrawingPoints = (m_visibleSeriesList.at(0).mesh() != QAbstract3DSeries::MeshPoint);
         for (int series = 0; series < seriesCount; series++) {
             ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
+            QQuaternion seriesRotation = m_visibleSeriesList.at(series).meshRotation();
             bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
 
             float itemSize = m_cachedItemSize.at(series) / itemScaler;
@@ -504,7 +508,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.translate(item.translation());
                 if (!drawingPoints) {
-                    modelMatrix.rotate(item.rotation());
+                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                        modelMatrix.rotate(seriesRotation * item.rotation());
                     modelMatrix.scale(modelScaler);
                 }
 
@@ -601,6 +606,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     for (int series = 0; series < seriesCount; series++) {
         const SeriesRenderCache &currentSeries = m_visibleSeriesList.at(series);
+        QQuaternion seriesRotation = currentSeries.meshRotation();
         ObjectHelper *dotObj = currentSeries.object();
         bool drawingPoints = (currentSeries.mesh() == QAbstract3DSeries::MeshPoint);
         Q3DTheme::ColorStyle colorStyle = currentSeries.colorStyle();
@@ -662,10 +668,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             modelMatrix.translate(item.translation());
             if (!drawingPoints) {
-                modelMatrix.rotate(item.rotation());
+                if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
+                    QQuaternion totalRotation = seriesRotation * item.rotation();
+                    modelMatrix.rotate(totalRotation);
+                    itModelMatrix.rotate(totalRotation);
+                }
                 modelMatrix.scale(modelScaler);
                 itModelMatrix.scale(modelScaler);
-                itModelMatrix.rotate(item.rotation());
             }
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -862,8 +871,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                         m_cachedTheme->lightStrength() / 2.5f);
         }
 
-        QQuaternion lineYRotation = QQuaternion();
-        QQuaternion lineXRotation = QQuaternion();
+        QQuaternion lineYRotation;
+        QQuaternion lineXRotation;
 
         if (m_xFlipped)
             lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
@@ -1618,7 +1627,8 @@ void Scatter3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Me
     // Load full version of meshes that have it available
     if (mesh != QAbstract3DSeries::MeshSphere
             && mesh != QAbstract3DSeries::MeshMinimal
-            && mesh != QAbstract3DSeries::MeshPoint) {
+            && mesh != QAbstract3DSeries::MeshPoint
+            && mesh != QAbstract3DSeries::MeshArrow) {
         fileName.append(QStringLiteral("Full"));
     }
 }

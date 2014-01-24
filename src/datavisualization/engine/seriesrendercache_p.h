@@ -53,6 +53,8 @@ public:
 
     inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
     inline const QAbstract3DSeries::Mesh &mesh() const { return m_mesh; }
+    inline const QQuaternion &meshRotation() const { return m_meshRotation; }
+    inline void setMeshRotation(const QQuaternion &rotation) { m_meshRotation = rotation; }
     inline ObjectHelper *object() const { return m_object; }
     inline const Q3DTheme::ColorStyle &colorStyle() const { return m_colorStyle; }
     inline const QVector3D &baseColor() const { return m_baseColor; }
@@ -68,6 +70,7 @@ protected:
     QString m_itemLabelFormat;
     ObjectHelper *m_object;
     QAbstract3DSeries::Mesh m_mesh;
+    QQuaternion m_meshRotation;
 
     Q3DTheme::ColorStyle m_colorStyle;
     QVector3D m_baseColor;

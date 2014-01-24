@@ -37,7 +37,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 QBarDataItem::QBarDataItem()
     : d_ptr(0), // private data doesn't exist by default (optimization)
-      m_value(0.0f)
+      m_value(0.0f),
+      m_angle(0.0f)
 {
 }
 
@@ -46,7 +47,18 @@ QBarDataItem::QBarDataItem()
  */
 QBarDataItem::QBarDataItem(float value)
     : d_ptr(0),
-      m_value(value)
+      m_value(value),
+      m_angle(0.0f)
+{
+}
+
+/*!
+ * Constructs QBarDataItem with \a value and \a angle
+ */
+QBarDataItem::QBarDataItem(float value, float angle)
+    : d_ptr(0),
+      m_value(value),
+      m_angle(angle)
 {
 }
 
@@ -72,6 +84,7 @@ QBarDataItem::~QBarDataItem()
 QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 {
     m_value = other.m_value;
+    m_angle = other.m_angle;
     if (other.d_ptr)
         createExtraData();
     else
@@ -87,6 +100,16 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 /*!
  * \fn float QBarDataItem::value() const
  * \return value of this data item.
+ */
+
+/*!
+ * \fn void QBarDataItem::setRotation(float angle)
+ * Sets rotation \a angle in degrees for this data item.
+ */
+
+/*!
+ * \fn float QBarDataItem::rotation() const
+ * \return rotation angle in degrees for this data item.
  */
 
 /*!

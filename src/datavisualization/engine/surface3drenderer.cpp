@@ -301,6 +301,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                         Utils::vectorFromColor(series->singleHighlightColor()));
             // Make sure selection pointer object reference is still good
             m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
+            m_selectionPointer->setRotation(m_visibleSeriesList.at(0).meshRotation());
         }
     }
 }
@@ -1222,8 +1223,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                         m_cachedTheme->lightStrength() / 2.5f);
         }
 
-        QQuaternion lineYRotation = QQuaternion();
-        QQuaternion lineXRotation = QQuaternion();
+        QQuaternion lineYRotation;
+        QQuaternion lineXRotation;
 
         if (m_xFlipped)
             lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
@@ -1934,6 +1935,7 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
     m_selectionPointer->setPointerObject(m_visibleSeriesList.at(0).object());
     m_selectionPointer->setHighlightColor(m_visibleSeriesList.at(0).singleHighlightColor());
     m_selectionPointer->updateScene(m_cachedScene);
+    m_selectionPointer->setRotation(m_visibleSeriesList.at(0).meshRotation());
 }
 
 // Maps selection Id to surface point in data array

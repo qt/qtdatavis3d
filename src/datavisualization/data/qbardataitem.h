@@ -30,13 +30,16 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataItem
 public:
     QBarDataItem();
     QBarDataItem(float value);
+    QBarDataItem(float value, float angle);
     QBarDataItem(const QBarDataItem &other);
     ~QBarDataItem();
 
     QBarDataItem &operator=(const QBarDataItem &other);
 
-    void setValue(float value) { m_value = value; }
-    float value() const { return m_value; }
+    inline void setValue(float value) { m_value = value; }
+    inline float value() const { return m_value; }
+    inline void setRotation(float angle) { m_angle = angle; }
+    inline float rotation() const { return m_angle; }
 
 protected:
     virtual void createExtraData();
@@ -45,6 +48,7 @@ protected:
 
 private:
     float m_value;
+    float m_angle;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

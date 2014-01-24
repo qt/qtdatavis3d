@@ -84,6 +84,7 @@ public:
     QBarDataArray *makeDummyData();
     void primarySeriesTest();
     void insertRemoveTestToggle();
+    void toggleRotation();
 
 public slots:
     void flipViews();
@@ -101,6 +102,7 @@ public slots:
 
     void insertRemoveTimerTimeout();
     void triggerSelection();
+    void triggerRotation();
 
 signals:
     void shadowQualityChanged(int quality);
@@ -123,6 +125,7 @@ private:
     QStringList m_months;
     QStringList m_years;
     QPoint m_selectedBar;
+    QBar3DSeries *m_selectedSeries;
     QValue3DAxis *m_autoAdjustingAxis;
     QValue3DAxis *m_fixedRangeAxis;
     QValue3DAxis *m_temperatureAxis;
@@ -148,6 +151,7 @@ private:
     int m_insertRemoveStep;
     QAbstract3DInputHandler *m_customInputHandler;
     QTimer m_selectionTimer;
+    QTimer m_rotationTimer;
 };
 
 #endif

@@ -42,6 +42,7 @@ struct QAbstract3DSeriesChangeBitField {
     bool itemLabelFormatChanged         : 1;
     bool meshChanged                    : 1;
     bool meshSmoothChanged              : 1;
+    bool meshRotationChanged            : 1;
     bool userDefinedMeshChanged         : 1;
     bool colorStyleChanged              : 1;
     bool baseColorChanged               : 1;
@@ -56,6 +57,7 @@ struct QAbstract3DSeriesChangeBitField {
         : itemLabelFormatChanged(true),
           meshChanged(true),
           meshSmoothChanged(true),
+          meshRotationChanged(true),
           userDefinedMeshChanged(true),
           colorStyleChanged(true),
           baseColorChanged(true),
@@ -106,6 +108,7 @@ public:
     void setVisible(bool visible);
     void setMesh(QAbstract3DSeries::Mesh mesh);
     void setMeshSmooth(bool enable);
+    void setMeshRotation(const QQuaternion &rotation);
     void setUserDefinedMesh(const QString &meshFile);
 
     void setColorStyle(Q3DTheme::ColorStyle style);
@@ -129,6 +132,7 @@ public:
     Abstract3DController *m_controller;
     QAbstract3DSeries::Mesh m_mesh;
     bool m_meshSmooth;
+    QQuaternion m_meshRotation;
     QString m_userDefinedMesh;
 
     Q3DTheme::ColorStyle m_colorStyle;

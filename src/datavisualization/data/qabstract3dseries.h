@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QScopedPointer>
 #include <QLinearGradient>
+#include <QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -38,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
     Q_PROPERTY(Mesh mesh READ mesh WRITE setMesh NOTIFY meshChanged)
     Q_PROPERTY(bool meshSmooth READ isMeshSmooth WRITE setMeshSmooth NOTIFY meshSmoothChanged)
+    Q_PROPERTY(QQuaternion meshRotation READ meshRotation WRITE setMeshRotation NOTIFY meshRotationChanged)
     Q_PROPERTY(QString userDefinedMesh READ userDefinedMesh WRITE setUserDefinedMesh NOTIFY userDefinedMeshChanged)
     Q_PROPERTY(QtDataVisualization::Q3DTheme::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor baseColor READ baseColor WRITE setBaseColor NOTIFY baseColorChanged)
@@ -91,6 +93,9 @@ public:
     void setMeshSmooth(bool enable);
     bool isMeshSmooth() const;
 
+    void setMeshRotation(const QQuaternion &rotation);
+    QQuaternion meshRotation() const;
+
     void setUserDefinedMesh(const QString &fileName);
     QString userDefinedMesh() const;
 
@@ -117,6 +122,7 @@ signals:
     void visibilityChanged(bool visible);
     void meshChanged(Mesh mesh);
     void meshSmoothChanged(bool enabled);
+    void meshRotationChanged(QQuaternion rotation);
     void userDefinedMeshChanged(QString fileName);
     void colorStyleChanged(Q3DTheme::ColorStyle style);
     void baseColorChanged(QColor color);
