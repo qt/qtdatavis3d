@@ -52,19 +52,19 @@ public:
     void addSeries(QBar3DSeries *series);
     void removeSeries(QBar3DSeries *series);
     void insertSeries(int index, QBar3DSeries *series);
-    QList<QBar3DSeries *> seriesList();
+    QList<QBar3DSeries *> seriesList() const;
 
     void setMultiSeriesUniform(bool uniform);
     bool isMultiSeriesUniform() const;
 
     void setBarThickness(float thicknessRatio);
-    float barThickness();
+    float barThickness() const;
 
-    void setBarSpacing(QSizeF spacing);
-    QSizeF barSpacing();
+    void setBarSpacing(const QSizeF &spacing);
+    QSizeF barSpacing() const;
 
     void setBarSpacingRelative(bool relative);
-    bool isBarSpacingRelative();
+    bool isBarSpacingRelative() const;
 
     void setRowAxis(QCategory3DAxis *axis);
     QCategory3DAxis *rowAxis() const;

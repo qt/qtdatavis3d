@@ -36,13 +36,14 @@ public:
     explicit QValue3DAxis(QObject *parent = 0);
     virtual ~QValue3DAxis();
 
-    int segmentCount() const;
-    int subSegmentCount() const;
-    QString labelFormat() const;
-
     void setSegmentCount(int count);
+    int segmentCount() const;
+
     void setSubSegmentCount(int count);
+    int subSegmentCount() const;
+
     void setLabelFormat(const QString &format);
+    QString labelFormat() const;
 
 signals:
     void segmentCountChanged(int count);

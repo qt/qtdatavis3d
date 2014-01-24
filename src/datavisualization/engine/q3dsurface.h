@@ -42,7 +42,7 @@ public:
 
     void addSeries(QSurface3DSeries *series);
     void removeSeries(QSurface3DSeries *series);
-    QList<QSurface3DSeries *> seriesList();
+    QList<QSurface3DSeries *> seriesList() const;
 
     // Axes
     void setAxisX(QValue3DAxis *axis);

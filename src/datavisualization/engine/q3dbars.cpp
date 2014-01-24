@@ -177,9 +177,9 @@ void Q3DBars::insertSeries(int index, QBar3DSeries *series)
 /*!
  * \return list of series added to this graph.
  */
-QList<QBar3DSeries *> Q3DBars::seriesList()
+QList<QBar3DSeries *> Q3DBars::seriesList() const
 {
-    return dptr()->m_shared->barSeriesList();
+    return dptrc()->m_shared->barSeriesList();
 }
 
 /*!
@@ -217,9 +217,9 @@ void Q3DBars::setBarThickness(float thicknessRatio)
     }
 }
 
-float Q3DBars::barThickness()
+float Q3DBars::barThickness() const
 {
-    return dptr()->m_shared->barThickness();
+    return dptrc()->m_shared->barThickness();
 }
 
 /*!
@@ -230,7 +230,7 @@ float Q3DBars::barThickness()
  *
  * \sa barSpacingRelative, multiSeriesUniform
  */
-void Q3DBars::setBarSpacing(QSizeF spacing)
+void Q3DBars::setBarSpacing(const QSizeF &spacing)
 {
     if (spacing != barSpacing()) {
         dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
@@ -238,9 +238,9 @@ void Q3DBars::setBarSpacing(QSizeF spacing)
     }
 }
 
-QSizeF Q3DBars::barSpacing()
+QSizeF Q3DBars::barSpacing() const
 {
-    return dptr()->m_shared->barSpacing();
+    return dptrc()->m_shared->barSpacing();
 }
 
 /*!
@@ -258,9 +258,9 @@ void Q3DBars::setBarSpacingRelative(bool relative)
     }
 }
 
-bool Q3DBars::isBarSpacingRelative()
+bool Q3DBars::isBarSpacingRelative() const
 {
-    return dptr()->m_shared->isBarSpecRelative();
+    return dptrc()->m_shared->isBarSpecRelative();
 }
 
 /*!

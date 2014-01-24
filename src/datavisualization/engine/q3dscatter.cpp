@@ -117,9 +117,9 @@ void Q3DScatter::removeSeries(QScatter3DSeries *series)
 /*!
  * \return list of series added to this graph.
  */
-QList<QScatter3DSeries *> Q3DScatter::seriesList()
+QList<QScatter3DSeries *> Q3DScatter::seriesList() const
 {
-    return dptr()->m_shared->scatterSeriesList();
+    return dptrc()->m_shared->scatterSeriesList();
 }
 
 Q3DScatterPrivate *Q3DScatter::dptr()

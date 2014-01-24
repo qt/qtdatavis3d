@@ -54,7 +54,7 @@ public:
     virtual void wheelEvent(QWheelEvent *event);
 
 public:
-    InputView inputView();
+    InputView inputView() const;
     void setInputView(InputView inputView);
 
     QPoint inputPosition() const;

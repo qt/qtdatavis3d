@@ -44,7 +44,7 @@ public:
 
     void addSeries(QScatter3DSeries *series);
     void removeSeries(QScatter3DSeries *series);
-    QList<QScatter3DSeries *> seriesList();
+    QList<QScatter3DSeries *> seriesList() const;
 
     void setAxisX(QValue3DAxis *axis);
     QValue3DAxis *axisX() const;

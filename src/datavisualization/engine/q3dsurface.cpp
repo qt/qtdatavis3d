@@ -132,9 +132,9 @@ void Q3DSurface::removeSeries(QSurface3DSeries *series)
  *
  * \note The surface graph currently supports only a single series at a time.
  */
-QList<QSurface3DSeries *> Q3DSurface::seriesList()
+QList<QSurface3DSeries *> Q3DSurface::seriesList() const
 {
-    return dptr()->m_shared->surfaceSeriesList();
+    return dptrc()->m_shared->surfaceSeriesList();
 }
 
 Q3DSurfacePrivate *Q3DSurface::dptr()
