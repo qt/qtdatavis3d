@@ -48,7 +48,7 @@ qhp.qtdatavisualization.subprojects.types.sortPages             = true
 HTML.footer = \
     "<div class=\"footer\">\n" \
     "    <p>\n" \
-    "      <acronym title=\"Copyright\">&copy;</acronym> 2013 Digia. Qt and Qt logos are\n" \
+    "      <acronym title=\"Copyright\">&copy;</acronym> 2014 Digia. Qt and Qt logos are\n" \
     "      trademarks of of Digia Corporation in Finland and/or other countries worldwide.\n" \
     "    </p>\n" \
     "      All other trademarks are property of their respective owners.\n" \
