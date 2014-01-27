@@ -120,6 +120,8 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     : QWindow(parent),
       d_ptr(d)
 {
+    qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
+
     // Default to frameless window, as typically graphs are not toplevel
     setFlags(flags() | Qt::FramelessWindowHint);
 

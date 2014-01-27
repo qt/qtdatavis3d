@@ -78,6 +78,8 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
     qmlRegisterType<DeclarativeScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
     qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
+
+    qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
