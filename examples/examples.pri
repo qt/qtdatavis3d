@@ -102,12 +102,6 @@ contains(TARGET, qml.*) {
         android_qmldir.path = /assets/qml/$$uri_replaced
         INSTALLS += android_qmldir
     }
-    ios {
-        system($$QMAKE_COPY $$copy_qmldir_formatted)
-        ios_qmldir.files = $$copy_qmldir.target
-        ios_qmldir.path = /TODO/$$uri_replaced
-        INSTALLS += ios_qmldir
-    }
     android|ios {
         system($$QMAKE_COPY $$copy_lib_formatted)
         android_qmlplugin.files = $$copy_lib.target
