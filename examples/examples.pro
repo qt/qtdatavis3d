@@ -6,7 +6,7 @@ SUBDIRS += qmlbars \
            qmllegend \
            qmlmultigraph
 
-!android: {
+!android:!ios {
     SUBDIRS += bars \
                custominput \
                customproxy \
