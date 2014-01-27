@@ -86,6 +86,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_surfaceObj(0),
       m_sliceSurfaceObj(0),
       m_depthTexture(0),
+      m_depthModelTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),

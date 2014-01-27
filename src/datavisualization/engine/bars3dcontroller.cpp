@@ -37,6 +37,7 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
       m_selectedBar(invalidSelectionPosition()),
       m_selectedBarSeries(0),
       m_primarySeries(0),
+      m_isMultiSeriesUniform(false),
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),

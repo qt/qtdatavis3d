@@ -110,7 +110,7 @@ QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
 
 void QAbstractDataProxyPrivate::setSeries(QAbstract3DSeries *series)
 {
-    setParent(series);
+    q_ptr->setParent(series);
     m_series = series;
 }
 
