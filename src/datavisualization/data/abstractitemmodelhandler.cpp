@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,11 +19,12 @@
 #include "abstractitemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractItemModelHandler::AbstractItemModelHandler(QObject *parent)
     : QObject(parent),
-      resolvePending(0)
+      resolvePending(0),
+      m_fullReset(true)
 {
     m_resolveTimer.setSingleShot(true);
     QObject::connect(&m_resolveTimer, &QTimer::timeout,
@@ -81,9 +82,12 @@ void AbstractItemModelHandler::handleColumnsInserted(const QModelIndex &parent,
     Q_UNUSED(start)
     Q_UNUSED(end)
 
-    // Resolve new items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Manipulating columns changes all rows in proxies that map rows/columns directly,
+    // and its effects are not clearly defined in others -> always do full reset.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleColumnsMoved(const QModelIndex &sourceParent,
@@ -98,9 +102,12 @@ void AbstractItemModelHandler::handleColumnsMoved(const QModelIndex &sourceParen
     Q_UNUSED(destinationParent)
     Q_UNUSED(destinationColumn)
 
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Manipulating columns changes all rows in proxies that map rows/columns directly,
+    // and its effects are not clearly defined in others -> always do full reset.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleColumnsRemoved(const QModelIndex &parent,
@@ -110,9 +117,12 @@ void AbstractItemModelHandler::handleColumnsRemoved(const QModelIndex &parent,
     Q_UNUSED(start)
     Q_UNUSED(end)
 
-    // Remove old items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Manipulating columns changes all rows in proxies that map rows/columns directly,
+    // and its effects are not clearly defined in others -> always do full reset.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
@@ -123,9 +133,13 @@ void AbstractItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
     Q_UNUSED(bottomRight)
     Q_UNUSED(roles)
 
-    // Resolve changed items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Default handling for dataChanged is to do full reset, as it cannot be optimized
+    // in a general case, where we do not know which row/column/index the item model item
+    // actually ended up to in the proxy.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleLayoutChanged(const QList<QPersistentModelIndex> &parents,
@@ -134,16 +148,20 @@ void AbstractItemModelHandler::handleLayoutChanged(const QList<QPersistentModelI
     Q_UNUSED(parents)
     Q_UNUSED(hint)
 
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Resolve entire model if layout changes
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleModelReset()
 {
     // Data cleared, reset array
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleRowsInserted(const QModelIndex &parent, int start, int end)
@@ -152,9 +170,13 @@ void AbstractItemModelHandler::handleRowsInserted(const QModelIndex &parent, int
     Q_UNUSED(start)
     Q_UNUSED(end)
 
-    // Resolve new items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Default handling for rowsInserted is to do full reset, as it cannot be optimized
+    // in a general case, where we do not know which row/column/index the item model item
+    // actually ended up to in the proxy.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleRowsMoved(const QModelIndex &sourceParent,
@@ -169,9 +191,13 @@ void AbstractItemModelHandler::handleRowsMoved(const QModelIndex &sourceParent,
     Q_UNUSED(destinationParent)
     Q_UNUSED(destinationRow)
 
-    // Resolve moved items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Default handling for rowsMoved is to do full reset, as it cannot be optimized
+    // in a general case, where we do not know which row/column/index the item model item
+    // actually ended up to in the proxy.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleRowsRemoved(const QModelIndex &parent, int start, int end)
@@ -180,9 +206,13 @@ void AbstractItemModelHandler::handleRowsRemoved(const QModelIndex &parent, int 
     Q_UNUSED(start)
     Q_UNUSED(end)
 
-    // Resolve removed items
-    if (!m_resolveTimer.isActive())
-        m_resolveTimer.start(0); // TODO Resolving entire model is inefficient
+    // Default handling for rowsRemoved is to do full reset, as it cannot be optimized
+    // in a general case, where we do not know which row/column/index the item model item
+    // actually ended up to in the proxy.
+    if (!m_resolveTimer.isActive()) {
+        m_fullReset = true;
+        m_resolveTimer.start(0);
+    }
 }
 
 void AbstractItemModelHandler::handleMappingChanged()
@@ -194,6 +224,7 @@ void AbstractItemModelHandler::handleMappingChanged()
 void AbstractItemModelHandler::handlePendingResolve()
 {
     resolveModel();
+    m_fullReset = false;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

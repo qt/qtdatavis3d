@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,9 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 
-//#define DISPLAY_RENDER_SPEED
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Scatter3DRenderer;
 class QScatterDataProxy;
@@ -62,17 +60,42 @@ private:
     QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
                                             // in single series selection cases.
 
+    struct InsertRemoveRecord {
+        bool m_isInsert;
+        int m_startIndex;
+        int m_count;
+        QAbstract3DSeries *m_series;
+
+        InsertRemoveRecord() :
+            m_isInsert(false),
+            m_startIndex(0),
+            m_count(0),
+            m_series(0)
+        {}
+
+        InsertRemoveRecord(bool isInsert, int startIndex, int count, QAbstract3DSeries *series) :
+            m_isInsert(isInsert),
+            m_startIndex(startIndex),
+            m_count(count),
+            m_series(series)
+        {}
+    };
+
+    QVector<InsertRemoveRecord> m_insertRemoveRecords;
+    bool m_recordInsertsAndRemoves;
+
 public:
-    explicit Scatter3DController(QRect rect);
+    explicit Scatter3DController(QRect rect, Q3DScene *scene = 0);
     ~Scatter3DController();
 
     virtual void initializeOpenGL();
 
     // Change selection mode
-    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
 
     void setSelectedItem(int index, QScatter3DSeries *series);
     static inline int invalidSelectionIndex() { return -1; }
+    virtual void clearSelection();
 
     void synchDataToRenderer();
 
@@ -80,8 +103,11 @@ public:
     virtual void removeSeries(QAbstract3DSeries *series);
     virtual QList<QScatter3DSeries *> scatterSeriesList();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
 public slots:
     void handleArrayReset();
@@ -90,8 +116,8 @@ public slots:
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
 
-    // Renderer callback handlers
-    void handleItemClicked(int index, QScatter3DSeries *series);
+protected:
+    virtual void startRecordingRemovesAndInserts();
 
 private:
     void adjustValueAxisRange();
@@ -99,7 +125,6 @@ private:
     Q_DISABLE_COPY(Scatter3DController)
 };
 
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

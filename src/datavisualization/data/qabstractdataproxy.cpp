@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QAbstractDataProxy
@@ -41,6 +41,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Base type for all QtDataVisualization data proxies.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
+ *
+ * For AbstractDataProxy enums, see \l QAbstractDataProxy::DataType
+ *
  * \sa BarDataProxy, ScatterDataProxy, SurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
 
@@ -92,7 +95,8 @@ QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 
 // QAbstractDataProxyPrivate
 
-QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q, QAbstractDataProxy::DataType type)
+QAbstractDataProxyPrivate::QAbstractDataProxyPrivate(QAbstractDataProxy *q,
+                                                     QAbstractDataProxy::DataType type)
     : QObject(0),
       q_ptr(q),
       m_type(type),
@@ -106,8 +110,8 @@ QAbstractDataProxyPrivate::~QAbstractDataProxyPrivate()
 
 void QAbstractDataProxyPrivate::setSeries(QAbstract3DSeries *series)
 {
-    setParent(series);
+    q_ptr->setParent(series);
     m_series = series;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

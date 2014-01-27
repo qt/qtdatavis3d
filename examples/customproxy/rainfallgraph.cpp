@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,8 +17,8 @@
 ****************************************************************************/
 
 #include "rainfallgraph.h"
-#include <QtDataVisualization/q3dcategoryaxis.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
@@ -66,20 +66,22 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     series->setMesh(QAbstract3DSeries::MeshCylinder);
 
     // Set shadows to medium
-    m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
 
     // Set selection mode to bar and column
-    m_graph->setSelectionMode(QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice);
 
     // Set theme
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeArmyBlue));
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeArmyBlue);
 
-    // Set font to theme
-    m_graph->theme()->setFont(QFont("Century Gothic", 30));
+    // Override font in theme
+    m_graph->activeTheme()->setFont(QFont("Century Gothic", 30));
+
+    // Override label background for theme
+    m_graph->activeTheme()->setLabelBackgroundEnabled(false);
 
     // Set camera position and zoom
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRightHigh);
-    m_graph->scene()->activeCamera()->setZoomLevel(75);
 
     // Set window title
     m_graph->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));

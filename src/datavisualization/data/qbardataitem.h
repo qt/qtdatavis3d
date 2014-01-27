@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,9 +19,9 @@
 #ifndef QBARDATAITEM_H
 #define QBARDATAITEM_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataItemPrivate;
 
@@ -30,13 +30,16 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataItem
 public:
     QBarDataItem();
     QBarDataItem(float value);
+    QBarDataItem(float value, float angle);
     QBarDataItem(const QBarDataItem &other);
     ~QBarDataItem();
 
     QBarDataItem &operator=(const QBarDataItem &other);
 
-    void setValue(float value) { m_value = value; }
-    float value() const { return m_value; }
+    inline void setValue(float value) { m_value = value; }
+    inline float value() const { return m_value; }
+    inline void setRotation(float angle) { m_angle = angle; }
+    inline float rotation() const { return m_angle; }
 
 protected:
     virtual void createExtraData();
@@ -45,8 +48,9 @@ protected:
 
 private:
     float m_value;
+    float m_angle;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

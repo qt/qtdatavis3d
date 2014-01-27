@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -88,8 +88,8 @@
     means there will be a gap of 20% of the bar's thickness between the bars in both directions.
 
     We want to be able to select rows of data for a closer inspection, so we set the selection mode
-    to slice row. This means that whenever we select a bar in the graph, the whole row will be
-    displayed separately.
+    to slice item and row. This means that whenever we select a bar in the graph, the whole row will be
+    displayed separately and the selected bar will be highlighted.
 
     We don't want to use the default colors, so we set one of the predefined themes as the active theme.
 

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QSurfaceDataProxy
@@ -54,6 +54,18 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * not get rendered.
  *
  * \sa {Qt Data Visualization Data Handling}
+ */
+
+/*!
+ * \typedef QtDataVisualization::QSurfaceDataRow
+ *
+ * A vector of \l {QSurfaceDataItem}s.
+ */
+
+/*!
+ * \typedef QtDataVisualization::QSurfaceDataArray
+ *
+ * A list of pointers to \l {QSurfaceDataRow}s.
  */
 
 /*!
@@ -343,9 +355,7 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
  * need to emit this signal yourself or the graph won't get updated.
  */
 
-//
 //  QSurfaceDataProxyPrivate
-//
 
 QSurfaceDataProxyPrivate::QSurfaceDataProxyPrivate(QSurfaceDataProxy *q)
     : QAbstractDataProxyPrivate(q, QAbstractDataProxy::DataTypeSurface),
@@ -520,4 +530,4 @@ void QSurfaceDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(surfaceSeries);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

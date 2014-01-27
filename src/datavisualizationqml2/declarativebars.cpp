@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,10 +17,11 @@
 ****************************************************************************/
 
 #include "declarativebars_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qitemmodelbardataproxy.h"
+#include "declarativescene_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -28,21 +29,12 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
-    m_barsController = new Bars3DController(boundingRect().toRect());
+    m_barsController = new Bars3DController(boundingRect().toRect(), new Declarative3DScene);
     AbstractDeclarative::setSharedController(m_barsController);
 
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_barsController, &Bars3DController::rowAxisChanged,
-//            this, &DeclarativeBars::rowAxisChanged);
-//    connect(m_barsController, &Bars3DController::valueAxisChanged,
-//            this, &DeclarativeBars::valueAxisChanged);
-//    connect(m_barsController, &Bars3DController::columnAxisChanged,
-//            this, &DeclarativeBars::columnAxisChanged);
+    QObject::connect(m_barsController, &Bars3DController::primarySeriesChanged,
+                     this, &DeclarativeBars::primarySeriesChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -50,34 +42,47 @@ DeclarativeBars::~DeclarativeBars()
     delete m_barsController;
 }
 
-Q3DCategoryAxis *DeclarativeBars::rowAxis() const
+QCategory3DAxis *DeclarativeBars::rowAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisZ());
+    return static_cast<QCategory3DAxis *>(m_barsController->axisZ());
 }
 
-void DeclarativeBars::setRowAxis(Q3DCategoryAxis *axis)
+void DeclarativeBars::setRowAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisZ(axis);
 }
 
-Q3DValueAxis *DeclarativeBars::valueAxis() const
+QValue3DAxis *DeclarativeBars::valueAxis() const
 {
-    return static_cast<Q3DValueAxis *>(m_barsController->axisY());
+    return static_cast<QValue3DAxis *>(m_barsController->axisY());
 }
 
-void DeclarativeBars::setValueAxis(Q3DValueAxis *axis)
+void DeclarativeBars::setValueAxis(QValue3DAxis *axis)
 {
     m_barsController->setAxisY(axis);
 }
 
-Q3DCategoryAxis *DeclarativeBars::columnAxis() const
+QCategory3DAxis *DeclarativeBars::columnAxis() const
 {
-    return static_cast<Q3DCategoryAxis *>(m_barsController->axisX());
+    return static_cast<QCategory3DAxis *>(m_barsController->axisX());
 }
 
-void DeclarativeBars::setColumnAxis(Q3DCategoryAxis *axis)
+void DeclarativeBars::setColumnAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisX(axis);
+}
+
+void DeclarativeBars::setMultiSeriesUniform(bool uniform)
+{
+    if (uniform != isMultiSeriesUniform()) {
+        m_barsController->setMultiSeriesScaling(uniform);
+        emit multiSeriesUniformChanged(uniform);
+    }
+}
+
+bool DeclarativeBars::isMultiSeriesUniform() const
+{
+    return m_barsController->multiSeriesScaling();
 }
 
 void DeclarativeBars::setBarThickness(float thicknessRatio)
@@ -163,4 +168,34 @@ void DeclarativeBars::removeSeries(QBar3DSeries *series)
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+void DeclarativeBars::insertSeries(int index, QBar3DSeries *series)
+{
+    m_barsController->insertSeries(index, series);
+}
+
+void DeclarativeBars::setPrimarySeries(QBar3DSeries *series)
+{
+    m_barsController->setPrimarySeries(series);
+}
+
+QBar3DSeries *DeclarativeBars::primarySeries() const
+{
+    return m_barsController->primarySeries();
+}
+
+void DeclarativeBars::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
+}
+
+void DeclarativeBars::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit valueAxisChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeBars::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
+}
+
+QT_END_NAMESPACE_DATAVISUALIZATION

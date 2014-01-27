@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -42,7 +42,14 @@ int main(int argc, char **argv)
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
 
-    Q3DBars *widgetchart = new Q3DBars();
+    // For testing custom surface format
+    QSurfaceFormat surfaceFormat;
+    surfaceFormat.setDepthBufferSize(24);
+#if !defined(QT_OPENGL_ES_2)
+    surfaceFormat.setSamples(8);
+#endif
+
+    Q3DBars *widgetchart = new Q3DBars(&surfaceFormat);
     QSize screenSize = widgetchart->screen()->size();
 
     QWidget *container = QWidget::createWindowContainer(widgetchart);
@@ -90,7 +97,7 @@ int main(int argc, char **argv)
     removeRowButton->setEnabled(false);
 
     QPushButton *removeRowsButton = new QPushButton(widget);
-    removeRowsButton->setText(QStringLiteral("Remove three rows from selected"));
+    removeRowsButton->setText(QStringLiteral("Remove three rows before selected"));
     removeRowsButton->setEnabled(false);
 
     QPushButton *massiveArrayButton = new QPushButton(widget);
@@ -102,6 +109,9 @@ int main(int argc, char **argv)
 
     QPushButton *labelButton = new QPushButton(widget);
     labelButton->setText(QStringLiteral("Change label style"));
+
+    QPushButton *multiScaleButton = new QPushButton(widget);
+    multiScaleButton->setText(QStringLiteral("Change multiseries scaling"));
 
     QPushButton *styleButton = new QPushButton(widget);
     styleButton->setText(QStringLiteral("Change bar style"));
@@ -118,6 +128,10 @@ int main(int argc, char **argv)
     QPushButton *swapAxisButton = new QPushButton(widget);
     swapAxisButton->setText(QStringLiteral("Swap value axis"));
     swapAxisButton->setEnabled(false);
+
+    QPushButton *insertRemoveTestButton = new QPushButton(widget);
+    insertRemoveTestButton->setText(QStringLiteral("Toggle insert/remove cycle"));
+    insertRemoveTestButton->setEnabled(true);
 
     QPushButton *releaseAxesButton = new QPushButton(widget);
     releaseAxesButton->setText(QStringLiteral("Release all axes"));
@@ -142,6 +156,14 @@ int main(int argc, char **argv)
     QPushButton *ownThemeButton = new QPushButton(widget);
     ownThemeButton->setText(QStringLiteral("Use own theme"));
     ownThemeButton->setEnabled(true);
+
+    QPushButton *primarySeriesTestsButton = new QPushButton(widget);
+    primarySeriesTestsButton->setText(QStringLiteral("Test primary series"));
+    primarySeriesTestsButton->setEnabled(true);
+
+    QPushButton *toggleRotationButton = new QPushButton(widget);
+    toggleRotationButton->setText(QStringLiteral("Toggle rotation"));
+    toggleRotationButton->setEnabled(true);
 
     QColorDialog *colorDialog = new QColorDialog(widget);
 
@@ -277,16 +299,20 @@ int main(int argc, char **argv)
     vLayout->addWidget(showFiveSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
+    vLayout->addWidget(multiScaleButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(selectionButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedBarButton, 0, Qt::AlignTop);
     vLayout->addWidget(swapAxisButton, 0, Qt::AlignTop);
+    vLayout->addWidget(insertRemoveTestButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
     vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
+    vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
+    vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
@@ -350,6 +376,8 @@ int main(int argc, char **argv)
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
 
+    QObject::connect(multiScaleButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::toggleMultiseriesScaling);
     QObject::connect(styleButton, &QPushButton::clicked, modifier, &GraphModifier::changeStyle);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);
@@ -373,6 +401,8 @@ int main(int argc, char **argv)
                      &GraphModifier::selectBar);
     QObject::connect(swapAxisButton, &QPushButton::clicked, modifier,
                      &GraphModifier::swapAxis);
+    QObject::connect(insertRemoveTestButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::insertRemoveTestToggle);
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
@@ -384,6 +414,10 @@ int main(int argc, char **argv)
                      &GraphModifier::changeColorStyle);
     QObject::connect(ownThemeButton, &QPushButton::clicked, modifier,
                      &GraphModifier::useOwnTheme);
+    QObject::connect(primarySeriesTestsButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::primarySeriesTest);
+    QObject::connect(toggleRotationButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::toggleRotation);
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
                      &GraphModifier::changeBaseColor);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,

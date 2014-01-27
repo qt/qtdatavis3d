@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,13 +32,16 @@
 #include "datavisualizationglobal_p.h"
 #include "declarativecolor_p.h"
 #include "colorgradient_p.h"
-#include "q3dtheme.h"
+#include "q3dtheme_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+#include <QtQml/qqmlparserstatus.h>
 
-class DeclarativeTheme3D : public Q3DTheme
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+
+class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
 {
     Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
     Q_PROPERTY(QQmlListProperty<DeclarativeColor> baseColors READ baseColors)
     Q_PROPERTY(QQmlListProperty<ColorGradient> baseGradients READ baseGradients)
@@ -73,11 +76,16 @@ public:
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
 
+    // From QQmlParserStatus
+    virtual void classBegin();
+    virtual void componentComplete();
+
 signals:
     void singleHighlightGradientChanged(ColorGradient *gradient);
     void multiHighlightGradientChanged(ColorGradient *gradient);
 
 protected:
+    void handleTypeChange(Theme themeType);
     void handleBaseColorUpdate();
     void handleBaseGradientUpdate();
     void handleSingleHLGradientUpdate();
@@ -113,6 +121,6 @@ private:
     bool m_dummyColors;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,8 +18,9 @@
 
 #include "declarativescatter_p.h"
 #include "qitemmodelscatterdataproxy.h"
+#include "declarativescene_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -27,21 +28,9 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
-    m_scatterController = new Scatter3DController(boundingRect().toRect());
+    m_scatterController = new Scatter3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_scatterController);
-
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_scatterController, &Scatter3DController::axisXChanged,
-//            this, &DeclarativeBars::axisXChanged);
-//    connect(m_scatterController, &Scatter3DController::axisYChanged,
-//            this, &DeclarativeBars::axisYChanged);
-//    connect(m_scatterController, &Scatter3DController::axisZChanged,
-//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -49,32 +38,32 @@ DeclarativeScatter::~DeclarativeScatter()
     delete m_scatterController;
 }
 
-Q3DValueAxis *DeclarativeScatter::axisX() const
+QValue3DAxis *DeclarativeScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisX());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisX());
 }
 
-void DeclarativeScatter::setAxisX(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisX(QValue3DAxis *axis)
 {
     m_scatterController->setAxisX(axis);
 }
 
-Q3DValueAxis *DeclarativeScatter::axisY() const
+QValue3DAxis *DeclarativeScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisY());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisY());
 }
 
-void DeclarativeScatter::setAxisY(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisY(QValue3DAxis *axis)
 {
     m_scatterController->setAxisY(axis);
 }
 
-Q3DValueAxis *DeclarativeScatter::axisZ() const
+QValue3DAxis *DeclarativeScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_scatterController->axisZ());
+    return static_cast<QValue3DAxis *>(m_scatterController->axisZ());
 }
 
-void DeclarativeScatter::setAxisZ(Q3DValueAxis *axis)
+void DeclarativeScatter::setAxisZ(QValue3DAxis *axis)
 {
     m_scatterController->setAxisZ(axis);
 }
@@ -123,4 +112,19 @@ void DeclarativeScatter::removeSeries(QScatter3DSeries *series)
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+void DeclarativeScatter::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeScatter::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeScatter::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit axisZChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+QT_END_NAMESPACE_DATAVISUALIZATION

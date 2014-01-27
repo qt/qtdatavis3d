@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "declarativetheme_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeTheme3D::DeclarativeTheme3D(QObject *parent)
     : Q3DTheme(parent),
@@ -29,6 +29,7 @@ DeclarativeTheme3D::DeclarativeTheme3D(QObject *parent)
       m_dummyGradients(false),
       m_dummyColors(false)
 {
+    connect(this, &Q3DTheme::typeChanged, this, &DeclarativeTheme3D::handleTypeChange);
 }
 
 DeclarativeTheme3D::~DeclarativeTheme3D()
@@ -46,6 +47,23 @@ void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, Q
     Q_UNUSED(list)
     Q_UNUSED(element)
     // Nothing to do, seriesChildren is there only to enable scoping gradient items in Theme3D item.
+}
+
+void DeclarativeTheme3D::handleTypeChange(Theme themeType)
+{
+    Q_UNUSED(themeType)
+
+    // Theme changed, disconnect base color/gradient connections
+    if (!m_colors.isEmpty()) {
+        foreach (DeclarativeColor *item, m_colors)
+            disconnect(item, 0, this, 0);
+        m_colors.clear();
+    }
+    if (!m_gradients.isEmpty()) {
+        foreach (ColorGradient *item, m_gradients)
+            disconnect(item, 0, this, 0);
+        m_gradients.clear();
+    }
 }
 
 void DeclarativeTheme3D::handleBaseColorUpdate()
@@ -150,6 +168,19 @@ ColorGradient *DeclarativeTheme3D::multiHighlightGradient() const
     return m_multiHLGradient;
 }
 
+void DeclarativeTheme3D::classBegin()
+{
+    // Turn off predefined type forcing for the duration of initial class construction
+    // so that predefined type customization can be done.
+    d_ptr->setForcePredefinedType(false);
+}
+
+void DeclarativeTheme3D::componentComplete()
+{
+    d_ptr->setForcePredefinedType(true);
+}
+
+
 void DeclarativeTheme3D::setThemeGradient(ColorGradient *gradient, GradientType type)
 {
     QLinearGradient newGradient = convertGradient(gradient);
@@ -217,7 +248,7 @@ void DeclarativeTheme3D::addColor(DeclarativeColor *color)
 QList<DeclarativeColor *> DeclarativeTheme3D::colorList()
 {
     if (m_colors.isEmpty()) {
-        // Create dummy ThemeColors from theme's gradients
+        // Create dummy ThemeColors from theme's colors
         m_dummyColors = true;
         QList<QColor> list = Q3DTheme::baseColors();
         foreach (QColor item, list) {
@@ -359,4 +390,4 @@ void DeclarativeTheme3D::clearBaseGradientsFunc(QQmlListProperty<ColorGradient> 
     reinterpret_cast<DeclarativeTheme3D *>(list->data)->clearGradients();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

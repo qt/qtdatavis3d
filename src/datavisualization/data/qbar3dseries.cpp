@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #include "qbar3dseries_p.h"
 #include "bars3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QBar3DSeries
@@ -51,7 +51,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *     \li @colLabel      \li Label from column axis
  *   \row
  *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li @seriesName    \li Name of the series
  *   \row
  *     \li %<format spec> \li Item value in specified format.
  * \endtable
@@ -93,16 +95,22 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Selects a bar at the \a position. The \a position is the (row, column) position in
  * the data array of the series.
  * Only one bar can be selected at a time.
- * To clear selection, set invalidSelectionPosition() as the \a position.
+ * To clear selection from this series, set invalidSelectionPosition as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting a bar on another added series will also
  * clear the selection.
+ * Removing rows from or inserting rows to the series before the row of the selected bar
+ * will adjust the selection so that the same bar will stay selected.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
- * \qmlmethod point Bar3DSeries::invalidSelectionPosition()
- * \return an invalid position for selection. Set this position to selectedBar property if you
- * want to clear the selection.
+ * \qmlproperty point Bar3DSeries::invalidSelectionPosition
+ * A constant property providing an invalid position for selection. Set this position to
+ * selectedBar property if you want to clear the selection from this series.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -162,10 +170,14 @@ QBarDataProxy *QBar3DSeries::dataProxy() const
  * Selects a bar at the \a position. The \a position is the (row, column) position in
  * the data array of the series.
  * Only one bar can be selected at a time.
- * To clear selection, set invalidSelectionPosition() as the \a position.
+ * To clear selection from this series, set invalidSelectionPosition() as the \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting a bar on another added series will also
  * clear the selection.
+ * Removing rows from or inserting rows to the series before the row of the selected bar
+ * will adjust the selection so that the same bar will stay selected.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 void QBar3DSeries::setSelectedBar(const QPoint &position)
 {
@@ -183,9 +195,11 @@ QPoint QBar3DSeries::selectedBar() const
 
 /*!
  * \return an invalid position for selection. Set this position to selectedBar property if you
- * want to clear the selection.
+ * want to clear the selection from this series.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
-QPoint QBar3DSeries::invalidSelectionPosition() const
+QPoint QBar3DSeries::invalidSelectionPosition()
 {
     return Bars3DController::invalidSelectionPosition();
 }
@@ -212,7 +226,7 @@ QBar3DSeriesPrivate::QBar3DSeriesPrivate(QBar3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeBar),
       m_selectedBar(Bars3DController::invalidSelectionPosition())
 {
-    m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
+    m_itemLabelFormat = QStringLiteral("@valueLabel");
     m_mesh = QAbstract3DSeries::MeshBevelBar;
 }
 
@@ -273,4 +287,4 @@ void QBar3DSeriesPrivate::setSelectedBar(const QPoint &position)
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

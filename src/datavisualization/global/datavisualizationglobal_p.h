@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -30,12 +30,11 @@
 #define DATAVISUALIZATIONGLOBAL_P_H
 
 #include "qdatavisualizationglobal.h"
-#include "qdatavisualizationenums.h"
 #include <QOpenGLFunctions>
 #include <QVector3D>
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // Constants used in several files
 // Distance from camera to origin
@@ -46,10 +45,10 @@ static const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 static const float gridLineOffset = 0.0001f; // Offset for lifting grid lines off background
 // Default light position. To have shadows working correctly, light should be as far as camera, or a bit further
 // y position is added to the minimum height (or can be thought to be that much above or below the camera)
-static const QVector3D defaultLightPos(0.0f, 0.5f, 0.0f);
-static const QVector3D zeroVector(0.0f, 0.0f, 0.0f);
-static const QVector3D upVector(0.0f, 1.0f, 0.0f);
-static const QVector3D cameraDistanceVector(0.0f, 0.0f, cameraDistance);
+static const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, 0.0f);
+static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
+static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
+static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
 
 // Skip color == selection texture's background color
 static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);
@@ -57,6 +56,6 @@ static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // DATAVISUALIZATIONGLOBAL_P_H
+#endif

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Abstract3DRenderer;
 class ObjectHelper;
@@ -53,6 +53,8 @@ public:
 
     inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
     inline const QAbstract3DSeries::Mesh &mesh() const { return m_mesh; }
+    inline const QQuaternion &meshRotation() const { return m_meshRotation; }
+    inline void setMeshRotation(const QQuaternion &rotation) { m_meshRotation = rotation; }
     inline ObjectHelper *object() const { return m_object; }
     inline const Q3DTheme::ColorStyle &colorStyle() const { return m_colorStyle; }
     inline const QVector3D &baseColor() const { return m_baseColor; }
@@ -61,12 +63,14 @@ public:
     inline const GLuint &singleHighlightGradientTexture() const { return m_singleHighlightGradientTexture; }
     inline const QVector3D &multiHighlightColor() const { return m_multiHighlightColor; }
     inline const GLuint &multiHighlightGradientTexture() const { return m_multiHighlightGradientTexture; }
+    inline const QString &name() const { return m_name; }
 
 protected:
     QAbstract3DSeries *m_series;
     QString m_itemLabelFormat;
     ObjectHelper *m_object;
     QAbstract3DSeries::Mesh m_mesh;
+    QQuaternion m_meshRotation;
 
     Q3DTheme::ColorStyle m_colorStyle;
     QVector3D m_baseColor;
@@ -75,9 +79,11 @@ protected:
     GLuint m_singleHighlightGradientTexture;
     QVector3D m_multiHighlightColor;
     GLuint m_multiHighlightGradientTexture;
+
+    QString m_name;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif
 

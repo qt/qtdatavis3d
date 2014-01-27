@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -22,7 +22,7 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const QString smoothString(QStringLiteral("Smooth"));
 
@@ -96,6 +96,9 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
             case QAbstract3DSeries::MeshMinimal:
                 meshFileName = QStringLiteral(":/defaultMeshes/minimal");
                 break;
+            case QAbstract3DSeries::MeshArrow:
+                meshFileName = QStringLiteral(":/defaultMeshes/arrow");
+                break;
             case QAbstract3DSeries::MeshPoint:
 #if defined(QT_OPENGL_ES_2)
                 qWarning("QAbstract3DSeries::MeshPoint is not fully supported on OpenGL ES2");
@@ -114,7 +117,6 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
             renderer->fixMeshFileName(meshFileName, m_mesh);
         }
 
-        // TODO: Optimize by having some kind of object cache in renderer instead of having separate ObjectHelper for each series?
         delete m_object;
         if (meshFileName.isEmpty()) {
             m_object = 0;
@@ -122,6 +124,11 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
             m_object = new ObjectHelper(meshFileName);
             m_object->load();
         }
+    }
+
+    if (seriesChanged || changeTracker.meshRotationChanged) {
+        m_meshRotation = series->meshRotation();
+        changeTracker.meshRotationChanged = false;
     }
 
     if (seriesChanged || changeTracker.colorStyleChanged) {
@@ -161,6 +168,11 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         renderer->fixGradientAndGenerateTexture(&gradient, &m_multiHighlightGradientTexture);
         changeTracker.multiHighlightGradientChanged = false;
     }
+
+    if (seriesChanged || changeTracker.nameChanged) {
+        m_name = series->name();
+        changeTracker.nameChanged = false;
+    }
 }
 
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)
@@ -171,4 +183,4 @@ void SeriesRenderCache::cleanup(TextureHelper *texHelper)
     texHelper->deleteTexture(&m_multiHighlightGradientTexture);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

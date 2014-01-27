@@ -15,6 +15,7 @@ uniform highp vec3 lightPosition_wrld;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp float shadowQuality;
+uniform highp vec3 lightColor;
 
 highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.94558609, -0.76890725),
@@ -36,8 +37,8 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
 void main() {
     highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.0) / 2.0);
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor;
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);
@@ -62,9 +63,10 @@ void main() {
     }
 
     gl_FragColor.rgb =
-        visibility * (materialAmbientColor +
+        (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
     gl_FragColor.a = 1.0;
+    gl_FragColor.rgb = visibility * clamp(gl_FragColor.rgb, 0.0, 1.0);
 }
 

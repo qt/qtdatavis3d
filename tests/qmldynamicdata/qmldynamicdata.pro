@@ -1,5 +1,5 @@
 !include( ../tests.pri ) {
-    error( "Couldn't find the examples.pri file!" )
+    error( "Couldn't find the tests.pri file!" )
 }
 
 QT += widgets

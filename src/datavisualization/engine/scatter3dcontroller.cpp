@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,21 +19,24 @@
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "q3dabstractaxis_p.h"
-#include "q3dvalueaxis_p.h"
+#include "qabstract3daxis_p.h"
+#include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
 #include <QMatrix4x4>
 #include <qmath.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-Scatter3DController::Scatter3DController(QRect boundRect)
-    : Abstract3DController(boundRect),
+static const int insertRemoveRecordReserveSize = 31;
+
+Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
+    : Abstract3DController(boundRect, scene),
       m_renderer(0),
       m_selectedItem(invalidSelectionIndex()),
-      m_selectedItemSeries(0)
+      m_selectedItemSeries(0),
+      m_recordInsertsAndRemoves(false)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: These cannot be set in Abstract3DController constructor, as they will call virtual
@@ -57,17 +60,15 @@ void Scatter3DController::initializeOpenGL()
     setRenderer(m_renderer);
     synchDataToRenderer();
 
-    QObject::connect(m_renderer, &Scatter3DRenderer::itemClicked, this,
-                     &Scatter3DController::handleItemClicked, Qt::QueuedConnection);
     emitNeedRender();
 }
 
 void Scatter3DController::synchDataToRenderer()
 {
-    Abstract3DController::synchDataToRenderer();
-
     if (!isInitialized())
         return;
+
+    Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
     if (m_changeTracker.selectedItemChanged) {
@@ -80,11 +81,9 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 {
     Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeScatter);
 
-    bool firstAdded = !m_seriesList.size();
-
     Abstract3DController::addSeries(series);
 
-    if (firstAdded)
+    if (series->isVisible())
         adjustValueAxisRange();
 
     QScatter3DSeries *scatterSeries =  static_cast<QScatter3DSeries *>(series);
@@ -94,14 +93,14 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 
 void Scatter3DController::removeSeries(QAbstract3DSeries *series)
 {
-    bool firstRemoved = (m_seriesList.size() && m_seriesList.at(0) == series);
+    bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
 
     Abstract3DController::removeSeries(series);
 
     if (m_selectedItemSeries == series)
         setSelectedItem(invalidSelectionIndex(), 0);
 
-    if (firstRemoved)
+    if (wasVisible)
         adjustValueAxisRange();
 }
 
@@ -120,8 +119,11 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
 
 void Scatter3DController::handleArrayReset()
 {
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
     emitNeedRender();
 }
@@ -130,9 +132,11 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -140,9 +144,11 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -150,12 +156,29 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series == m_selectedItemSeries) {
+        // If items removed from selected series before the selection, adjust the selection
+        int selectedItem = m_selectedItem;
+        if (startIndex <= selectedItem) {
+            if ((startIndex + count) > selectedItem)
+                selectedItem = -1; // Selected item removed
+            else
+                selectedItem -= count; // Move selected item down by amount of item removed
 
-    // Clear selection unless it is still valid
-    setSelectedItem(m_selectedItem, m_selectedItemSeries);
+            setSelectedItem(selectedItem, m_selectedItemSeries);
+        }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
+
+    if (m_recordInsertsAndRemoves) {
+        InsertRemoveRecord record(false, startIndex, count, series);
+        m_insertRemoveRecords.append(record);
+    }
 
     emitNeedRender();
 }
@@ -164,22 +187,45 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    // TODO should dirty only affected values?
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    if (series == m_selectedItemSeries) {
+        // If items inserted to selected series before the selection, adjust the selection
+        int selectedItem = m_selectedItem;
+        if (startIndex <= selectedItem) {
+            selectedItem += count;
+            setSelectedItem(selectedItem, m_selectedItemSeries);
+        }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
+
+    if (m_recordInsertsAndRemoves) {
+        InsertRemoveRecord record(true, startIndex, count, series);
+        m_insertRemoveRecords.append(record);
+    }
+
     emitNeedRender();
 }
 
-void Scatter3DController::handleItemClicked(int index, QScatter3DSeries *series)
+void Scatter3DController::startRecordingRemovesAndInserts()
 {
-    setSelectedItem(index, series);
+    m_recordInsertsAndRemoves = false;
 
-    // TODO: pass clicked to parent. (QTRD-2517)
-    // TODO: Also hover needed? (QTRD-2131)
+    if (m_scene->selectionQueryPosition() != Q3DScene::invalidSelectionPoint()) {
+        m_recordInsertsAndRemoves = true;
+        if (m_insertRemoveRecords.size()) {
+            m_insertRemoveRecords.clear();
+            // Reserve some space for remove/insert records to avoid unnecessary reallocations.
+            m_insertRemoveRecords.reserve(insertRemoveRecordReserveSize);
+        }
+    }
 }
 
 void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
-        Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+        QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -194,10 +240,47 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
 }
 
-void Scatter3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Scatter3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
+{
+    Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
+
+    adjustValueAxisRange();
+}
+
+void Scatter3DController::handlePendingClick()
+{
+    int index = m_renderer->clickedIndex();
+    QScatter3DSeries *series = static_cast<QScatter3DSeries *>(m_renderer->clickedSeries());
+
+    // Adjust position according to recorded events
+    int recordCount = m_insertRemoveRecords.size();
+    if (recordCount) {
+        for (int i = 0; i < recordCount; i++) {
+            const InsertRemoveRecord &record = m_insertRemoveRecords.at(i);
+            if (series == record.m_series && record.m_startIndex <= index) {
+                if (record.m_isInsert) {
+                    index += record.m_count;
+                } else {
+                    if ((record.m_startIndex + record.m_count) > index) {
+                        index = -1; // Selected row removed
+                        break;
+                    } else {
+                        index -= record.m_count; // Move selected item down by amount of items removed
+                    }
+                }
+            }
+        }
+    }
+
+    setSelectedItem(index, series);
+
+    m_renderer->resetClickedStatus();
+}
+
+void Scatter3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // We only support single item selection mode and no selection mode
-    if (mode != QDataVis::SelectionItem && mode != QDataVis::SelectionNone) {
+    if (mode != QAbstract3DGraph::SelectionItem && mode != QAbstract3DGraph::SelectionNone) {
         qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }
@@ -237,11 +320,16 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
     }
 }
 
+void Scatter3DController::clearSelection()
+{
+    setSelectedItem(invalidSelectionIndex(), 0);
+}
+
 void Scatter3DController::adjustValueAxisRange()
 {
-    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
-    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
-    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+    QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+    QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
     bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
     bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
     bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
@@ -347,4 +435,4 @@ void Scatter3DController::adjustValueAxisRange()
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

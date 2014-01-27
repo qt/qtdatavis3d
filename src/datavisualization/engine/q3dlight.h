@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/q3dobject.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DLightPrivate;
 class Q3DScene;
@@ -43,6 +43,6 @@ private:
     friend class Q3DScenePrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DLIGHT_H
+#endif

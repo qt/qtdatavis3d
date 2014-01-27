@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -29,9 +29,12 @@
 #ifndef ABSTRACT3DRENDERER_P_H
 #define ABSTRACT3DRENDERER_P_H
 
+//#define DISPLAY_RENDER_SPEED
+
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
+#ifdef DISPLAY_RENDER_SPEED
 #include <QTime>
+#endif
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
@@ -39,9 +42,7 @@
 #include "qabstractdataproxy.h"
 #include "seriesrendercache_p.h"
 
-//#define DISPLAY_RENDER_SPEED
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class TextureHelper;
 class Theme;
@@ -70,7 +71,7 @@ public:
     virtual void render(GLuint defaultFboHandle);
 
     virtual void updateTheme(Q3DTheme *theme);
-    virtual void updateSelectionMode(QDataVis::SelectionFlags newMode);
+    virtual void updateSelectionMode(QAbstract3DGraph::SelectionFlags newMode);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
@@ -80,24 +81,28 @@ public:
 #if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
 #endif
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality) = 0;
+    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
-    virtual void updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type);
-    virtual void updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title);
-    virtual void updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
-    virtual void updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type);
+    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title);
+    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
+    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
+    inline bool isClickPending() { return m_clickPending; }
+    inline void clearClickPending() { m_clickPending = false; }
+    inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
+
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
-    void requestShadowQuality(QDataVis::ShadowQuality quality); // For automatic quality adjustments
+    void requestShadowQuality(QAbstract3DGraph::ShadowQuality quality); // For automatic quality adjustments
 
 protected:
     Abstract3DRenderer(Abstract3DController *controller);
@@ -108,7 +113,7 @@ protected:
     virtual void handleShadowQualityChange();
     virtual void handleResize();
 
-    AxisRenderCache &axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation);
+    AxisRenderCache &axisCacheForOrientation(QAbstract3DAxis::AxisOrientation orientation);
 
     virtual void lowerShadowQuality();
 
@@ -118,10 +123,10 @@ protected:
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
     QRect m_viewport;
-    QDataVis::ShadowQuality m_cachedShadowQuality;
+    QAbstract3DGraph::ShadowQuality m_cachedShadowQuality;
     GLfloat m_autoScaleAdjustment;
 
-    QDataVis::SelectionFlags m_cachedSelectionMode;
+    QAbstract3DGraph::SelectionFlags m_cachedSelectionMode;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -137,6 +142,9 @@ protected:
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
+    bool m_selectionLabelDirty;
+    bool m_clickPending;
+    QAbstract3DSeries *m_clickedSeries;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;
@@ -145,6 +153,6 @@ protected:
 #endif
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // ABSTRACT3DRENDERER_P_H
+#endif

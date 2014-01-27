@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -30,16 +30,22 @@ Item {
 
     //! [4]
     Data {
-        id: seriesOneData
+        id: seriesData
     }
     //! [4]
 
-    Data {
-        id: seriesTwoData
+    //! [13]
+    Theme3D {
+        id: themeIsabelle
+        type: Theme3D.ThemeIsabelle
+        font.family: "Lucida Handwriting"
+        font.pointSize: 40
     }
+    //! [13]
 
-    Data {
-        id: seriesThreeData
+    Theme3D {
+        id: themeArmyBlue
+        type: Theme3D.ThemeArmyBlue
     }
 
     //! [8]
@@ -59,11 +65,7 @@ Item {
             height: dataView.height
             //! [2]
             //! [3]
-            theme: Theme3D {
-                type: Theme3D.ThemeIsabelle
-                font.family: "Lucida Handwriting"
-                font.pointSize: 40
-            }
+            theme: themeIsabelle
             shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [6]
@@ -87,7 +89,7 @@ Item {
 
                 //! [11]
                 ItemModelScatterDataProxy {
-                    itemModel: seriesOneData.model
+                    itemModel: seriesData.model
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -104,7 +106,7 @@ Item {
                 //! [12]
 
                 ItemModelScatterDataProxy {
-                    itemModel: seriesTwoData.modelTwo
+                    itemModel: seriesData.modelTwo
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -117,7 +119,7 @@ Item {
                 mesh: Abstract3DSeries.MeshMinimal
 
                 ItemModelScatterDataProxy {
-                    itemModel: seriesThreeData.modelThree
+                    itemModel: seriesData.modelThree
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
@@ -188,14 +190,14 @@ Item {
             text: "Change Theme"
             onClicked: {
                 if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
-                    // Ownership of the theme is transferred and old theme is destroyed when setting
-                    // a new one, so we need to create them dynamically
-                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
-                        Theme3D {type: Theme3D.ThemeIsabelle; font.family: "Lucida Handwriting";
-                        font.pointSize: 40}', parent);
+                    scatterGraph.theme = themeIsabelle
                 } else {
-                    scatterGraph.theme = Qt.createQmlObject('import QtDataVisualization 1.0;
-                        Theme3D {type: Theme3D.ThemeArmyBlue}', parent);
+                    scatterGraph.theme = themeArmyBlue
+                }
+                if (scatterGraph.theme.backgroundEnabled === true) {
+                    backgroundToggle.text = "Hide Background";
+                } else {
+                    backgroundToggle.text = "Show Background";
                 }
             }
         }

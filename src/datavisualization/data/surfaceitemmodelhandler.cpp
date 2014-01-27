@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "surfaceitemmodelhandler_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
@@ -131,7 +131,7 @@ void SurfaceItemModelHandler::resolveModel()
             for (int j = 0; j < columnList.size(); j++) {
                 newProxyRow[j].setPosition(QVector3D(columnList.at(j).toFloat(),
                                                      itemValueMap[rowKey][columnList.at(j)],
-                                                     rowList.at(i).toFloat()));
+                                           rowList.at(i).toFloat()));
             }
         }
     }
@@ -139,4 +139,4 @@ void SurfaceItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

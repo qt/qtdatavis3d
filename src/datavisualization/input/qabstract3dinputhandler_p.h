@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -33,7 +33,7 @@
 #include "qabstract3dinputhandler.h"
 #include <QRect>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DInputHandler;
 class Q3DScene;
@@ -45,6 +45,13 @@ public:
     ~QAbstract3DInputHandlerPrivate();
 
 public:
+    enum InputState {
+        InputStateNone = 0,
+        InputStateSelecting,
+        InputStateRotating,
+        InputStatePinching
+    };
+
     QAbstract3DInputHandler *q_ptr;
     int m_prevDistance;
     QPoint m_previousInputPos;
@@ -53,11 +60,10 @@ public:
     GLfloat m_defaultYRotation;
 
 private:
-    QAbstract3DInputHandler::InputState m_inputState;
+    QAbstract3DInputHandler::InputView m_inputView;
     QPoint m_inputPosition;
     QRect m_mainViewPort;
 
-    // TODO: Check if this could be avoided with signals/slots or some other way.
     Q3DScene *m_scene;
     bool m_isDefaultHandler;
 
@@ -65,6 +71,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QABSTRACT3DINPUTHANDLER_P_H
+#endif

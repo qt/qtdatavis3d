@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -46,8 +46,13 @@
 
     \snippet ../examples/qmlscatter/main.cpp 0
 
-    This will help us when deploying the application to Android. We'll also change the application
-    to be shown maximized by replacing
+    This will help us when deploying the application to Android.
+
+    We'll enable anti-aliasing for our application in environments that support it:
+
+    \snippet ../examples/qmlscatter/main.cpp 2
+
+    We'll also change the application to be shown maximized by replacing
 
     \code viewer.showExpanded(); \endcode
 
@@ -112,19 +117,22 @@
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 3
 
-    We added a built-in Theme3D and changed the font in it. We also changed the shadow quality.
+    We added a customized theme and changed the shadow quality.
     We're happy with the other visual properties, so we won't change them.
+
+    The custom theme is based on a predefined theme, but we change the font in it:
+
+    \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 13
 
     Then it's time to start feeding the graph some data.
 
     \section1 Adding data to the graph
 
-    Let's create a \c Data item inside the \c mainView and name it \c {seriesOneData}:
+    Let's create a \c Data item inside the \c mainView and name it \c seriesData:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 4
 
-    We'll add two more of these: \c seriesTwoData and \c seriesThreeData to add to the three series
-    we're going to have. They are added similarly as \c {seriesOneData}.
+    The \c seriesData item contains the data models for all three series we use in this example.
 
     This is the component that holds our data in \c {data.qml}. It has an \c Item as the main
     component.

@@ -1,4 +1,8 @@
-QT       += core gui datavisualization
+!include( ../tests.pri ) {
+    error( "Couldn't find the tests.pri file!" )
+}
+
+QT += core gui datavisualization
 
 TARGET = MinimalScatter
 TEMPLATE = app

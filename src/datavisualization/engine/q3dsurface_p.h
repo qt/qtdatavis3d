@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -30,27 +30,30 @@
 #define Q3DSURFACE_P_H
 
 #include "surface3dcontroller_p.h"
-#include "qdatavisualizationenums.h"
-#include "q3dwindow_p.h"
+#include "qabstract3dgraph_p.h"
 
 #include <QList>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DSurface;
 
-class Q3DSurfacePrivate : public Q3DWindowPrivate
+class Q3DSurfacePrivate : public QAbstract3DGraphPrivate
 {
     Q_OBJECT
 public:
     Q3DSurfacePrivate(Q3DSurface *q);
     ~Q3DSurfacePrivate();
 
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
     Q3DSurface *qptr();
 
     Surface3DController *m_shared;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DSURFACE_P_H
+#endif

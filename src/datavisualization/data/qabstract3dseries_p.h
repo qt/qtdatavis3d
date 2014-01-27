@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -33,7 +33,7 @@
 #ifndef QABSTRACT3DSERIES_P_H
 #define QABSTRACT3DSERIES_P_H
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstractDataProxy;
 class Abstract3DController;
@@ -42,6 +42,7 @@ struct QAbstract3DSeriesChangeBitField {
     bool itemLabelFormatChanged         : 1;
     bool meshChanged                    : 1;
     bool meshSmoothChanged              : 1;
+    bool meshRotationChanged            : 1;
     bool userDefinedMeshChanged         : 1;
     bool colorStyleChanged              : 1;
     bool baseColorChanged               : 1;
@@ -50,11 +51,13 @@ struct QAbstract3DSeriesChangeBitField {
     bool singleHighlightGradientChanged : 1;
     bool multiHighlightColorChanged     : 1;
     bool multiHighlightGradientChanged  : 1;
+    bool nameChanged                    : 1;
 
     QAbstract3DSeriesChangeBitField()
         : itemLabelFormatChanged(true),
           meshChanged(true),
           meshSmoothChanged(true),
+          meshRotationChanged(true),
           userDefinedMeshChanged(true),
           colorStyleChanged(true),
           baseColorChanged(true),
@@ -62,7 +65,8 @@ struct QAbstract3DSeriesChangeBitField {
           singleHighlightColorChanged(true),
           singleHighlightGradientChanged(true),
           multiHighlightColorChanged(true),
-          multiHighlightGradientChanged(true)
+          multiHighlightGradientChanged(true),
+          nameChanged(true)
     {
     }
 };
@@ -104,6 +108,7 @@ public:
     void setVisible(bool visible);
     void setMesh(QAbstract3DSeries::Mesh mesh);
     void setMeshSmooth(bool enable);
+    void setMeshRotation(const QQuaternion &rotation);
     void setUserDefinedMesh(const QString &meshFile);
 
     void setColorStyle(Q3DTheme::ColorStyle style);
@@ -113,6 +118,7 @@ public:
     void setSingleHighlightGradient(const QLinearGradient &gradient);
     void setMultiHighlightColor(const QColor &color);
     void setMultiHighlightGradient(const QLinearGradient &gradient);
+    void setName(const QString &name);
 
     void resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force);
 
@@ -126,6 +132,7 @@ public:
     Abstract3DController *m_controller;
     QAbstract3DSeries::Mesh m_mesh;
     bool m_meshSmooth;
+    QQuaternion m_meshRotation;
     QString m_userDefinedMesh;
 
     Q3DTheme::ColorStyle m_colorStyle;
@@ -136,8 +143,9 @@ public:
     QColor m_multiHighlightColor;
     QLinearGradient m_multiHighlightGradient;
 
+    QString m_name;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QAbstract3DSeries_P_H
+#endif

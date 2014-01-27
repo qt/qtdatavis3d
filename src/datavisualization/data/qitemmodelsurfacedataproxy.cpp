@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,9 +20,7 @@
 #include "surfaceitemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
-
-// TODO: CHECK DOCUMENTATION!
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QItemModelSurfaceDataProxy
@@ -160,7 +158,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QObject *parent)
  * Constructs QItemModelSurfaceDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, QObject *parent)
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
@@ -175,7 +174,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * in rows and columns already, so it also sets useModelCategories property to true.
  */
 QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
-                                                       const QString &valueRole, QObject *parent)
+                                                       const QString &valueRole,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
@@ -192,7 +192,8 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
 QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
-                                                       const QString &valueRole, QObject *parent)
+                                                       const QString &valueRole,
+                                                       QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
@@ -456,6 +457,27 @@ const QItemModelSurfaceDataProxyPrivate *QItemModelSurfaceDataProxy::dptrc() con
     return static_cast<const QItemModelSurfaceDataProxyPrivate *>(d_ptr.data());
 }
 
+// QItemModelSurfaceDataProxyPrivate
+
+QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q)
+    : QSurfaceDataProxyPrivate(q),
+      m_itemModelHandler(new SurfaceItemModelHandler(q)),
+      m_useModelCategories(false),
+      m_autoRowCategories(true),
+      m_autoColumnCategories(true)
+{
+}
+
+QItemModelSurfaceDataProxyPrivate::~QItemModelSurfaceDataProxyPrivate()
+{
+    delete m_itemModelHandler;
+}
+
+QItemModelSurfaceDataProxy *QItemModelSurfaceDataProxyPrivate::qptr()
+{
+    return static_cast<QItemModelSurfaceDataProxy *>(q_ptr);
+}
+
 void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
 {
     QObject::connect(m_itemModelHandler, &SurfaceItemModelHandler::itemModelChanged,
@@ -478,25 +500,4 @@ void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-// QItemModelSurfaceDataProxyPrivate
-
-QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelSurfaceDataProxy *q)
-    : QSurfaceDataProxyPrivate(q),
-      m_itemModelHandler(new SurfaceItemModelHandler(q)),
-      m_useModelCategories(false),
-      m_autoRowCategories(true),
-      m_autoColumnCategories(true)
-{
-}
-
-QItemModelSurfaceDataProxyPrivate::~QItemModelSurfaceDataProxyPrivate()
-{
-    delete m_itemModelHandler;
-}
-
-QItemModelSurfaceDataProxy *QItemModelSurfaceDataProxyPrivate::qptr()
-{
-    return static_cast<QItemModelSurfaceDataProxy *>(q_ptr);
-}
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

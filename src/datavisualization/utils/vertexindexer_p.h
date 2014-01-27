@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -35,11 +35,11 @@
 #include <QVector2D>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class VertexIndexer
 {
-    public:
+public:
     struct PackedVertex {
         QVector3D position;
         QVector2D uv;
@@ -69,7 +69,7 @@ class VertexIndexer
                              QVector<QVector3D> &out_tangents,
                              QVector<QVector3D> &out_bitangents);
 
-    private:
+private:
     static bool is_near(float v1, float v2);
     static bool getSimilarVertexIndex(const QVector3D &in_vertex,
                                       const QVector2D &in_uv,
@@ -83,6 +83,6 @@ class VertexIndexer
                                            unsigned short &result);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

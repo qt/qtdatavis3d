@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dtheme.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 struct Q3DThemeDirtyBitField {
     bool baseColorDirty                : 1;
@@ -85,17 +85,28 @@ struct Q3DThemeDirtyBitField {
     }
 };
 
-class Q3DThemePrivate : public QObject
+class QT_DATAVISUALIZATION_EXPORT Q3DThemePrivate : public QObject
 {
     Q_OBJECT
 public:
-    Q3DThemePrivate(Q3DTheme *q,
-                    Q3DTheme::Theme theme_id = Q3DTheme::ThemeUserDefined);
+    Q3DThemePrivate(Q3DTheme *q);
     virtual ~Q3DThemePrivate();
 
     void resetDirtyBits();
 
     bool sync(Q3DThemePrivate &other);
+
+    inline bool isDefaultTheme() { return m_isDefaultTheme; }
+    inline void setDefaultTheme(bool isDefault) { m_isDefaultTheme = isDefault; }
+
+    // If m_forcePredefinedType is true, it means we should forcibly update all properties
+    // of the theme to those of the predefined theme, when setting the theme type. Otherwise
+    // we only change the properties that haven't been explicitly changed since last render cycle.
+    // Defaults to true, and is only ever set to false by DeclarativeTheme3D to enable using
+    // predefined themes as base for custom themes, since the order of initial property sets cannot
+    // be easily controlled in QML.
+    inline bool isForcePredefinedType() { return m_forcePredefinedType; }
+    inline void setForcePredefinedType(bool enable) { m_forcePredefinedType = enable; }
 
 signals:
     void needRender();
@@ -126,11 +137,13 @@ public:
     bool m_backgoundEnabled;
     bool m_gridEnabled;
     bool m_labelBackground;
+    bool m_isDefaultTheme;
+    bool m_forcePredefinedType;
 
 protected:
     Q3DTheme *q_ptr;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

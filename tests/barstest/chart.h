@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -22,11 +22,13 @@
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 #include <QtDataVisualization/qbar3dseries.h>
+#include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
 #include <QDebug>
 #include <QStringList>
 #include <QPointer>
 #include <QColorDialog>
+#include <QTimer>
 
 using namespace QtDataVisualization;
 
@@ -80,14 +82,27 @@ public:
     void changeColorStyle();
     void showFiveSeries();
     QBarDataArray *makeDummyData();
+    void primarySeriesTest();
+    void insertRemoveTestToggle();
+    void toggleRotation();
 
 public slots:
     void flipViews();
     void setGradient();
+    void toggleMultiseriesScaling();
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);
     void setUseNullInputHandler(bool useNull);
+
+    void handleRowAxisChanged(QCategory3DAxis *axis);
+    void handleColumnAxisChanged(QCategory3DAxis *axis);
+    void handleValueAxisChanged(QValue3DAxis *axis);
+    void handlePrimarySeriesChanged(QBar3DSeries *series);
+
+    void insertRemoveTimerTimeout();
+    void triggerSelection();
+    void triggerRotation();
 
 signals:
     void shadowQualityChanged(int quality);
@@ -110,13 +125,14 @@ private:
     QStringList m_months;
     QStringList m_years;
     QPoint m_selectedBar;
-    Q3DValueAxis *m_autoAdjustingAxis;
-    Q3DValueAxis *m_fixedRangeAxis;
-    Q3DValueAxis *m_temperatureAxis;
-    Q3DCategoryAxis *m_yearAxis;
-    Q3DCategoryAxis *m_monthAxis;
-    Q3DCategoryAxis *m_genericRowAxis;
-    Q3DCategoryAxis *m_genericColumnAxis;
+    QBar3DSeries *m_selectedSeries;
+    QValue3DAxis *m_autoAdjustingAxis;
+    QValue3DAxis *m_fixedRangeAxis;
+    QValue3DAxis *m_temperatureAxis;
+    QCategory3DAxis *m_yearAxis;
+    QCategory3DAxis *m_monthAxis;
+    QCategory3DAxis *m_genericRowAxis;
+    QCategory3DAxis *m_genericColumnAxis;
     QBar3DSeries *m_temperatureData;
     QBar3DSeries *m_temperatureData2;
     QBar3DSeries *m_genericData;
@@ -125,10 +141,17 @@ private:
     QBar3DSeries *m_dummyData3;
     QBar3DSeries *m_dummyData4;
     QBar3DSeries *m_dummyData5;
-    Q3DValueAxis *m_currentAxis;
+    QValue3DAxis *m_currentAxis;
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;
     QAbstract3DInputHandler *m_defaultInputHandler;
+    Q3DTheme *m_ownTheme;
+    Q3DTheme *m_builtinTheme;
+    QTimer m_insertRemoveTimer;
+    int m_insertRemoveStep;
+    QAbstract3DInputHandler *m_customInputHandler;
+    QTimer m_selectionTimer;
+    QTimer m_rotationTimer;
 };
 
 #endif

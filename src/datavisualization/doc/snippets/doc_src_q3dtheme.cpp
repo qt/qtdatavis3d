@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -57,9 +57,9 @@ int main(int argc, char **argv)
 
     //! [3]
     Q3DBars *graph = new Q3DBars();
-    graph->setTheme(new Q3DTheme(Q3DTheme::ThemePrimaryColors));
-    graph->theme()->setBaseColor(Qt::red);
-    graph->theme()->setSingleHighlightColor(Qt::yellow);
+    graph->activeTheme()->setType(Q3DTheme::ThemePrimaryColors);
+    graph->activeTheme()->setBaseColor(Qt::red);
+    graph->activeTheme()->setSingleHighlightColor(Qt::yellow);
     //! [3]
 }
 

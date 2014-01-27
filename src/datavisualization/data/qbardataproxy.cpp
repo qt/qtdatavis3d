@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QBarDataProxy
@@ -38,13 +38,25 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * If you use QBarDataRow pointers to directly modify data after adding the array to the proxy,
  * you must also emit proper signal to make the graph update.
  *
- * QBarDataProxy optionally keeps track of row and column labels, which Q3DCategoryAxis can utilize
+ * QBarDataProxy optionally keeps track of row and column labels, which QCategory3DAxis can utilize
  * to show axis labels. The row and column labels are stored in separate array from the data and
  * row manipulation methods provide an alternate versions that don't affect the row labels.
  * This enables the option of having row labels that relate to the position of the data in the
  * array rather than the data itself.
  *
  * \sa {Qt Data Visualization Data Handling}
+ */
+
+/*!
+ * \typedef QtDataVisualization::QBarDataRow
+ *
+ * A vector of \l {QBarDataItem}s.
+ */
+
+/*!
+ * \typedef QtDataVisualization::QBarDataArray
+ *
+ * A list of pointers to \l {QBarDataRow}s.
  */
 
 /*!
@@ -713,4 +725,4 @@ void QBarDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(barSeries);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

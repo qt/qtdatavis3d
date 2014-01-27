@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "baritemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QItemModelBarDataProxy
@@ -446,6 +446,27 @@ const QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptrc() const
     return static_cast<const QItemModelBarDataProxyPrivate *>(d_ptr.data());
 }
 
+// QItemModelBarDataProxyPrivate
+
+QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q)
+    : QBarDataProxyPrivate(q),
+      m_itemModelHandler(new BarItemModelHandler(q)),
+      m_useModelCategories(false),
+      m_autoRowCategories(true),
+      m_autoColumnCategories(true)
+{
+}
+
+QItemModelBarDataProxyPrivate::~QItemModelBarDataProxyPrivate()
+{
+    delete m_itemModelHandler;
+}
+
+QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()
+{
+    return static_cast<QItemModelBarDataProxy *>(q_ptr);
+}
+
 void QItemModelBarDataProxyPrivate::connectItemModelHandler()
 {
     QObject::connect(m_itemModelHandler, &BarItemModelHandler::itemModelChanged,
@@ -468,25 +489,4 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-// QItemModelBarDataProxyPrivate
-
-QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataProxy *q)
-    : QBarDataProxyPrivate(q),
-      m_itemModelHandler(new BarItemModelHandler(q)),
-      m_useModelCategories(false),
-      m_autoRowCategories(true),
-      m_autoColumnCategories(true)
-{
-}
-
-QItemModelBarDataProxyPrivate::~QItemModelBarDataProxyPrivate()
-{
-    delete m_itemModelHandler;
-}
-
-QItemModelBarDataProxy *QItemModelBarDataProxyPrivate::qptr()
-{
-    return static_cast<QItemModelBarDataProxy *>(q_ptr);
-}
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

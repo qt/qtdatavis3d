@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "graphmodifier.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtDataVisualization/Q3DTheme>
@@ -27,7 +27,7 @@
 #include <QDebug>
 #include <QComboBox>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 //#define JITTER_PLANE
 //#define WONKY_PLANE
@@ -55,16 +55,26 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_theSeries(new QSurface3DSeries),
       m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
 {
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
     m_graph->addSeries(m_theSeries);
+
     changeStyle();
+
+    m_theSeries->setItemLabelFormat(QStringLiteral("@seriesName: (@xLabel, @zLabel): @yLabel"));
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
     connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
+
+    QObject::connect(m_graph, &Q3DSurface::axisXChanged, this,
+                     &GraphModifier::handleAxisXChanged);
+    QObject::connect(m_graph, &Q3DSurface::axisYChanged, this,
+                     &GraphModifier::handleAxisYChanged);
+    QObject::connect(m_graph, &Q3DSurface::axisZChanged, this,
+                     &GraphModifier::handleAxisZChanged);
 }
 
 GraphModifier::~GraphModifier()
@@ -137,6 +147,8 @@ void GraphModifier::toggleSqrtSin(bool enable)
         m_graph->axisX()->setLabelFormat("%.2f");
         m_graph->axisZ()->setLabelFormat("%.2f");
 
+        m_theSeries->setName("Sqrt & Sin");
+
         resetArrayAndSliders(dataArray, minZ, maxZ, minX, maxX);
 
         m_activeSample = GraphModifier::SqrtSin;
@@ -189,6 +201,8 @@ void GraphModifier::togglePlane(bool enable)
             *m_planeArray << newRow;
         }
 
+        m_theSeries->setName("Wonky Plane");
+
         resetArrayAndSliders(m_planeArray, minZ, maxZ + add, minX, m_xCount * maxStepX + minX);
 #else
         for (float i = 0; i < m_zCount; i++) {
@@ -208,6 +222,8 @@ void GraphModifier::togglePlane(bool enable)
 
             *m_planeArray << newRow;
         }
+
+        m_theSeries->setName("Plane");
 
         resetArrayAndSliders(m_planeArray, minZ, maxZ, minX, maxX);
 #endif
@@ -252,6 +268,8 @@ void GraphModifier::setHeightMapData(bool enable)
         m_graph->axisY()->setAutoAdjustRange(true);
         m_graph->axisX()->setLabelFormat("%.1f N");
         m_graph->axisZ()->setLabelFormat("%.1f E");
+
+        m_theSeries->setName("Height Map");
 
         resetArrayAndSliders(dataArray, minZ, maxZ, minX, maxX);
 
@@ -338,12 +356,12 @@ void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_graph->theme()->setFont(newFont);
+    m_graph->activeTheme()->setFont(newFont);
 }
 
 void GraphModifier::changeStyle()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::selectButtonClicked()
@@ -363,7 +381,7 @@ void GraphModifier::selectedPointChanged(const QPoint &point)
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    m_graph->activeTheme()->setType(Q3DTheme::Theme(theme));
 }
 
 
@@ -393,6 +411,21 @@ void GraphModifier::timeout()
     m_theSeries->dataProxy()->resetArray(m_planeArray);
 }
 
+void GraphModifier::handleAxisXChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisX());
+}
+
+void GraphModifier::handleAxisYChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisY());
+}
+
+void GraphModifier::handleAxisZChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisZ());
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);
@@ -405,7 +438,7 @@ void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, f
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
 }
 
@@ -414,7 +447,7 @@ void GraphModifier::changeSelectionMode(int mode)
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(mode).toInt();
-        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+        m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
     }
 }
 

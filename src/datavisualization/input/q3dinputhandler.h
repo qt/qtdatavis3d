@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -21,9 +21,9 @@
 
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Q3DInputHandler; // Workaround for qdoc bug, removing this will cause qdoc compiler to not find the class.
+class Q3DInputHandlerPrivate;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {
@@ -41,8 +41,10 @@ public:
 
 private:
     Q_DISABLE_COPY(Q3DInputHandler)
+
+    QScopedPointer<Q3DInputHandlerPrivate> d_ptr;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QDEFAULT3DINPUTHANDLER_H
+#endif

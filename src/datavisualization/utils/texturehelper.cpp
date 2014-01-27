@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -24,7 +24,7 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 TextureHelper::TextureHelper()
 {
@@ -43,7 +43,7 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
     QImage texImage = image;
 
-#if defined(Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     GLuint temp;
     //qDebug() << "old size" << image.size();
     GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
@@ -367,4 +367,4 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

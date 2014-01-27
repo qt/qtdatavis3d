@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,30 +19,26 @@
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QMouseEvent>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DInputHandlerPrivate;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(InputState)
-    Q_PROPERTY(InputState inputState READ inputState WRITE setInputState NOTIFY inputStateChanged)
+    Q_ENUMS(InputView)
+    Q_PROPERTY(InputView inputView READ inputView WRITE setInputView NOTIFY inputViewChanged)
     Q_PROPERTY(QPoint inputPosition READ inputPosition WRITE setInputPosition NOTIFY positionChanged)
     Q_PROPERTY(Q3DScene *scene READ scene WRITE setScene NOTIFY sceneChanged)
 
 public:
-    enum InputState {
-        InputStateNone = 0,
-        InputStateOnScene,
-        InputStateOnPrimaryView,
-        InputStateOnSecondaryView,
-        InputStateRotating,
-        InputStatePinching
+    enum InputView {
+        InputViewNone = 0,
+        InputViewOnPrimary,
+        InputViewOnSecondary
     };
 
 public:
@@ -58,9 +54,8 @@ public:
     virtual void wheelEvent(QWheelEvent *event);
 
 public:
-    // TODO: Check if the inputState needs to be visible outside of subclasses in the final architecture
-    InputState inputState();
-    void setInputState(InputState inputState);
+    InputView inputView() const;
+    void setInputView(InputView inputView);
 
     QPoint inputPosition() const;
     void setInputPosition(const QPoint &position);
@@ -70,7 +65,7 @@ public:
 
 signals:
     void positionChanged(QPoint position);
-    void inputStateChanged(InputState state);
+    void inputViewChanged(InputView view);
     void sceneChanged(const Q3DScene *scene);
 
 protected:
@@ -88,6 +83,6 @@ private:
     friend class QTouch3DInputHandlerPrivate;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QABSTRACT3DINPUTHANDLER_H
+#endif

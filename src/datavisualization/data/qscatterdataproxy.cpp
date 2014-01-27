@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QScatterDataProxy
@@ -33,6 +33,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
  *
  * \sa {Qt Data Visualization Data Handling}
+ */
+
+/*!
+ * \typedef QtDataVisualization::QScatterDataArray
+ *
+ * A vector of \l {QScatterDataItem}s.
  */
 
 /*!
@@ -408,4 +414,4 @@ QScatterDataProxy *QScatterDataProxyPrivate::qptr()
     return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

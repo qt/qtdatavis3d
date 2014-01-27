@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,15 +17,17 @@
 ****************************************************************************/
 
 #include "chart.h"
-#include <QtDataVisualization/q3dcategoryaxis.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include "custominputhandler.h"
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/q3dinputhandler.h>
 #include <QTime>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -45,13 +47,14 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_minval(-16.0f),
       m_maxval(20.0f),
       m_selectedBar(-1, -1),
-      m_autoAdjustingAxis(new Q3DValueAxis),
-      m_fixedRangeAxis(new Q3DValueAxis),
-      m_temperatureAxis(new Q3DValueAxis),
-      m_yearAxis(new Q3DCategoryAxis),
-      m_monthAxis(new Q3DCategoryAxis),
-      m_genericRowAxis(new Q3DCategoryAxis),
-      m_genericColumnAxis(new Q3DCategoryAxis),
+      m_selectedSeries(0),
+      m_autoAdjustingAxis(new QValue3DAxis),
+      m_fixedRangeAxis(new QValue3DAxis),
+      m_temperatureAxis(new QValue3DAxis),
+      m_yearAxis(new QCategory3DAxis),
+      m_monthAxis(new QCategory3DAxis),
+      m_genericRowAxis(new QCategory3DAxis),
+      m_genericColumnAxis(new QCategory3DAxis),
       m_temperatureData(new QBar3DSeries),
       m_temperatureData2(new QBar3DSeries),
       m_genericData(new QBar3DSeries),
@@ -63,8 +66,20 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_currentAxis(m_fixedRangeAxis),
       m_negativeValuesOn(false),
       m_useNullInputHandler(false),
-      m_defaultInputHandler(0)
+      m_defaultInputHandler(0),
+      m_ownTheme(0),
+      m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss)),
+      m_customInputHandler(new CustomInputHandler)
 {
+    m_temperatureData->setObjectName("m_temperatureData");
+    m_temperatureData2->setObjectName("m_temperatureData2");
+    m_genericData->setObjectName("m_genericData");
+    m_dummyData->setObjectName("m_dummyData");
+    m_dummyData2->setObjectName("m_dummyData2");
+    m_dummyData3->setObjectName("m_dummyData3");
+    m_dummyData4->setObjectName("m_dummyData4");
+    m_dummyData5->setObjectName("m_dummyData5");
+
     // Generate generic labels
     QStringList genericColumnLabels;
     for (int i = 0; i < 400; i++) {
@@ -116,12 +131,28 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->addAxis(m_genericRowAxis);
     m_graph->addAxis(m_genericColumnAxis);
 
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
+    m_graph->setActiveTheme(m_builtinTheme);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("1: @valueTitle for @colLabel @rowLabel: @valueLabel"));
-    m_temperatureData2->setItemLabelFormat(QStringLiteral("2: @valueTitle for @colLabel @rowLabel: @valueLabel"));
-    m_genericData->setItemLabelFormat(QStringLiteral("3: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+    m_temperatureData->setName("Oulu");
+    m_temperatureData2->setName("Helsinki");
+    m_genericData->setName("Generic series");
+    m_dummyData->setName("Dummy 1");
+    m_dummyData2->setName("Dummy 2");
+    m_dummyData3->setName("Dummy 3");
+    m_dummyData4->setName("Dummy 4");
+    m_dummyData5->setName("Dummy 5");
+
+    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_temperatureData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_genericData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
+
+    m_dummyData->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData3->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData4->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+    m_dummyData5->setItemLabelFormat(QStringLiteral("@seriesName: @valueLabel"));
+
     m_genericData->dataProxy()->setColumnLabels(genericColumnLabels);
 
     m_temperatureData->setBaseColor(Qt::red);
@@ -166,7 +197,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_temperatureData->setSingleHighlightGradient(singleHighlightGradient);
     m_temperatureData->setMultiHighlightGradient(multiHighlightGradient);
 
-    m_graph->theme()->setFont(QFont("Times Roman", 20));
+    m_graph->activeTheme()->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.
     m_defaultInputHandler = m_graph->activeInputHandler();
@@ -182,8 +213,25 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     QObject::connect(m_genericData, &QBar3DSeries::selectedBarChanged, this,
                      &GraphModifier::handleSelectionChange);
 
+    QObject::connect(m_graph, &Q3DBars::rowAxisChanged, this,
+                     &GraphModifier::handleRowAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::columnAxisChanged, this,
+                     &GraphModifier::handleColumnAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::valueAxisChanged, this,
+                     &GraphModifier::handleValueAxisChanged);
+    QObject::connect(m_graph, &Q3DBars::primarySeriesChanged, this,
+                     &GraphModifier::handlePrimarySeriesChanged);
+
+    QObject::connect(&m_insertRemoveTimer, &QTimer::timeout, this,
+                     &GraphModifier::insertRemoveTimerTimeout);
+
     m_graph->addSeries(m_temperatureData);
     m_graph->addSeries(m_temperatureData2);
+
+    QObject::connect(&m_selectionTimer, &QTimer::timeout, this,
+                     &GraphModifier::triggerSelection);
+    QObject::connect(&m_rotationTimer, &QTimer::timeout, this,
+                     &GraphModifier::triggerRotation);
 
     resetTemperatureData();
 }
@@ -507,7 +555,7 @@ void GraphModifier::removeRows()
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = m_selectedBar.x();
     if (row >= 0) {
-        int startRow = qMax(row - 2, 0);
+        int startRow = qMax(row - 3, 0);
         m_genericData->dataProxy()->removeRows(startRow, 3);
     }
 }
@@ -576,7 +624,10 @@ void GraphModifier::changeTheme()
 {
     static int theme = Q3DTheme::ThemeQt;
 
-    m_graph->setTheme(new Q3DTheme((Q3DTheme::Theme)theme));
+    Q3DTheme *currentTheme = m_graph->activeTheme();
+    m_builtinTheme->setType(Q3DTheme::Theme(theme));
+    if (currentTheme == m_ownTheme)
+        m_graph->setActiveTheme(m_builtinTheme);
 
     switch (theme) {
         case Q3DTheme::ThemeQt:
@@ -614,35 +665,35 @@ void GraphModifier::changeTheme()
 
 void GraphModifier::changeLabelStyle()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode()
 {
     static int selectionMode = m_graph->selectionMode();
 
-    if (++selectionMode > (QDataVis::SelectionItemAndColumn | QDataVis::SelectionSlice | QDataVis::SelectionMultiSeries))
-        selectionMode = QDataVis::SelectionNone;
+    if (++selectionMode > (QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionMultiSeries))
+        selectionMode = QAbstract3DGraph::SelectionNone;
 
-    m_graph->setSelectionMode((QDataVis::SelectionFlag)selectionMode);
+    m_graph->setSelectionMode((QAbstract3DGraph::SelectionFlag)selectionMode);
 }
 
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSize(m_fontSize);
-    m_graph->theme()->setFont(newFont);
+    m_graph->activeTheme()->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_graph->theme()->font();
+    QFont font = m_graph->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->theme()->setFont(font);
+    m_graph->activeTheme()->setFont(font);
 }
 
-void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
@@ -654,10 +705,16 @@ void GraphModifier::handleSelectionChange(const QPoint &position)
     m_selectedBar = position;
     int index = 0;
     foreach (QBar3DSeries *series, m_graph->seriesList()) {
-        if (series == sender())
+        if (series == sender()) {
+            if (series->selectedBar() != QBar3DSeries::invalidSelectionPosition())
+                m_selectedSeries = series;
             break;
+        }
         index++;
     }
+
+    if (m_selectedSeries->selectedBar() == QBar3DSeries::invalidSelectionPosition())
+        m_selectedSeries = 0;
 
     qDebug() << "Selected bar position:" << position << "series:" << index;
 }
@@ -676,10 +733,29 @@ void GraphModifier::setUseNullInputHandler(bool useNull)
         m_graph->setActiveInputHandler(m_defaultInputHandler);
 }
 
+void GraphModifier::handleRowAxisChanged(QCategory3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->rowAxis());
+}
+
+void GraphModifier::handleColumnAxisChanged(QCategory3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->columnAxis());
+}
+
+void GraphModifier::handleValueAxisChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->valueAxis());
+}
+
+void GraphModifier::handlePrimarySeriesChanged(QBar3DSeries *series)
+{
+    qDebug() << __FUNCTION__ << series;
+}
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
@@ -688,7 +764,7 @@ void GraphModifier::showFiveSeries()
 {
     releaseProxies();
     releaseAxes();
-    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn | QDataVis::SelectionMultiSeries);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn | QAbstract3DGraph::SelectionMultiSeries);
 
     m_dummyData->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
     m_dummyData2->dataProxy()->resetArray(makeDummyData(), QStringList(), QStringList());
@@ -735,14 +811,305 @@ QBarDataArray *GraphModifier::makeDummyData()
     return dataSet;
 }
 
+// Executes one step of the primary series test
+void GraphModifier::primarySeriesTest()
+{
+    static int nextStep = 0;
+
+    QStringList testLabels;
+    QStringList testLabels2;
+    QStringList testLabels3;
+    QStringList testLabels5;
+    testLabels << "1" << "2" << "3" << "4";
+    testLabels2 << "11" << "22" << "33" << "44";
+    testLabels3 << "111" << "222" << "333" << "444";
+    testLabels5 << "11111" << "22222" << "33333" << "44444";
+
+    switch (nextStep++) {
+    case 0: {
+        qDebug() << "Step 0 - Init:";
+        m_graph->addSeries(m_dummyData); // Add one series to enforce release in releaseProxies()
+        releaseProxies();
+        releaseAxes();
+        m_dummyData->dataProxy()->resetArray(makeDummyData(),
+                                             testLabels,
+                                             QStringList() << "A" << "B" << "C" << "D");
+        m_dummyData2->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels2,
+                                              QStringList() << "AA" << "BB" << "CC" << "DD");
+        m_dummyData3->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels3,
+                                              QStringList() << "AAA" << "BBB" << "CCC" << "DDD");
+        m_dummyData4->dataProxy()->resetArray(makeDummyData(),
+                                              QStringList() << "1111" << "2222" << "3333" << "4444",
+                                              QStringList() << "AAAA" << "BBBB" << "CCCC" << "DDDD");
+        m_dummyData5->dataProxy()->resetArray(makeDummyData(),
+                                              testLabels5,
+                                              QStringList() << "AAAAA" << "BBBBB" << "CCCCC" << "DDDDD");
+
+        m_graph->addSeries(m_dummyData);
+        m_graph->addSeries(m_dummyData2);
+        m_graph->addSeries(m_dummyData3);
+
+        m_dummyData->setBaseColor(Qt::black);
+        m_dummyData2->setBaseColor(Qt::white);
+        m_dummyData3->setBaseColor(Qt::red);
+        m_dummyData4->setBaseColor(Qt::blue);
+        m_dummyData5->setBaseColor(Qt::green);
+
+        if (m_graph->primarySeries() == m_dummyData)
+            if (m_graph->rowAxis()->labels() == testLabels)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 1: {
+        qDebug() << "Step 1 - Set another series as primary:";
+        m_graph->setPrimarySeries(m_dummyData3);
+        if (m_graph->primarySeries() == m_dummyData3) {
+            if (m_graph->rowAxis()->labels() == testLabels3)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        } else {
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        }
+        break;
+    }
+    case 2: {
+        qDebug() << "Step 2 - Add new series:";
+        m_graph->addSeries(m_dummyData4);
+        if (m_graph->primarySeries() == m_dummyData3)
+            if (m_graph->rowAxis()->labels() == testLabels3)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 3: {
+        qDebug() << "Step 3 - Reset primary series:";
+        m_graph->setPrimarySeries(0);
+        if (m_graph->primarySeries() == m_dummyData)
+            if (m_graph->rowAxis()->labels() == testLabels)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 4: {
+        qDebug() << "Step 4 - Set new series at primary:";
+        m_graph->setPrimarySeries(m_dummyData5);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 5: {
+        qDebug() << "Step 5 - Remove nonexistent series:";
+        m_graph->removeSeries(0);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 6: {
+        qDebug() << "Step 6 - Remove non-primary series:";
+        m_graph->removeSeries(m_dummyData);
+        if (m_graph->primarySeries() == m_dummyData5)
+            if (m_graph->rowAxis()->labels() == testLabels5)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData5, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 7: {
+        qDebug() << "Step 7 - Remove primary series:";
+        m_graph->removeSeries(m_dummyData5);
+        if (m_graph->primarySeries() == m_dummyData2) // first series removed, second should be first now
+            if (m_graph->rowAxis()->labels() == testLabels2)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 8: {
+        qDebug() << "Step 8 - move a series (m_dummyData2) forward to a different position";
+        m_graph->insertSeries(3, m_dummyData2);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(2) == m_dummyData2) // moving series forward, index decrements
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 2 has:" << m_graph->seriesList().at(2);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 9: {
+        qDebug() << "Step 9 - move a series (m_dummyData4) backward to a different position";
+        m_graph->insertSeries(0, m_dummyData4);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(0) == m_dummyData4)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 0 has:" << m_graph->seriesList().at(0);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 10: {
+        qDebug() << "Step 10 - Insert a series (m_dummyData) series to position 2";
+        m_graph->insertSeries(2, m_dummyData);
+        if (m_graph->primarySeries() == m_dummyData2)
+            if (m_graph->seriesList().at(2) == m_dummyData)
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Moved to incorrect index, index 2 has:" << m_graph->seriesList().at(2);
+        else
+            qDebug() << "--> FAIL!!! Primary should be m_dummyData3, actual: " << m_graph->primarySeries();
+        break;
+    }
+    case 11: {
+        qDebug() << "Step 11 - Remove everything";
+        m_graph->removeSeries(m_dummyData);
+        m_graph->removeSeries(m_dummyData2);
+        m_graph->removeSeries(m_dummyData3);
+        m_graph->removeSeries(m_dummyData4);
+        m_graph->removeSeries(m_dummyData5);
+        if (m_graph->primarySeries() == 0)
+            if (m_graph->rowAxis()->labels() == QStringList())
+                qDebug() << "--> SUCCESS";
+            else
+                qDebug() << "--> FAIL!!! Row labels incorrect: " << m_graph->rowAxis()->labels();
+        else
+            qDebug() << "--> FAIL!!! Primary should be null, actual: " << m_graph->primarySeries();
+        break;
+    }
+    default:
+        qDebug() << "-- Restarting test sequence --";
+        nextStep = 0;
+        break;
+    }
+
+
+}
+
+void GraphModifier::insertRemoveTestToggle()
+{
+    if (m_insertRemoveTimer.isActive()) {
+        m_insertRemoveTimer.stop();
+        m_selectionTimer.stop();
+        m_graph->removeSeries(m_dummyData);
+        m_graph->removeSeries(m_dummyData2);
+        releaseProxies();
+        releaseAxes();
+        m_graph->setActiveInputHandler(m_defaultInputHandler);
+    } else {
+        releaseProxies();
+        releaseAxes();
+        m_graph->rowAxis()->setRange(0, 32);
+        m_graph->columnAxis()->setRange(0, 10);
+        m_graph->setActiveInputHandler(m_customInputHandler);
+        m_graph->addSeries(m_dummyData);
+        m_graph->addSeries(m_dummyData2);
+        m_insertRemoveStep = 0;
+        m_insertRemoveTimer.start(100);
+        m_selectionTimer.start(10);
+    }
+}
+
+void GraphModifier::toggleRotation()
+{
+    if (m_rotationTimer.isActive())
+        m_rotationTimer.stop();
+    else
+        m_rotationTimer.start(20);
+}
+
+void GraphModifier::insertRemoveTimerTimeout()
+{
+    if (m_insertRemoveStep < 32) {
+        for (int k = 0; k < 1; k++) {
+            QBarDataRow *dataRow = new QBarDataRow(10);
+            for (float i = 0; i < 10; i++)
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+
+            QString label = QStringLiteral("Insert %1").arg(insertCounter++);
+            m_dummyData->dataProxy()->insertRow(0, dataRow, label);
+        }
+    } else {
+        for (int k = 0; k < 1; k++)
+            m_dummyData->dataProxy()->removeRows(0, 1);
+    }
+
+    if (m_insertRemoveStep < 16 || (m_insertRemoveStep > 31 && m_insertRemoveStep < 48)) {
+        for (int k = 0; k < 2; k++) {
+            QBarDataRow *dataRow = new QBarDataRow(10);
+            for (float i = 0; i < 10; i++)
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+
+            QString label = QStringLiteral("Insert %1").arg(insertCounter++);
+            m_dummyData2->dataProxy()->insertRow(0, dataRow, label);
+        }
+    } else {
+        for (int k = 0; k < 2; k++)
+            m_dummyData2->dataProxy()->removeRows(0, 1);
+    }
+
+    if (m_insertRemoveStep++ > 63)
+        m_insertRemoveStep = 0;
+}
+
+void GraphModifier::triggerSelection()
+{
+    m_graph->scene()->setSelectionQueryPosition(m_customInputHandler->inputPosition());
+}
+
+void GraphModifier::triggerRotation()
+{
+    if (m_selectedSeries) {
+        QPoint selectedBar = m_selectedSeries->selectedBar();
+        if (selectedBar != QBar3DSeries::invalidSelectionPosition()) {
+            QBarDataItem item(*(m_selectedSeries->dataProxy()->itemAt(selectedBar.x(), selectedBar.y())));
+            item.setRotation(item.rotation() + 1.0f);
+            m_selectedSeries->dataProxy()->setItem(selectedBar.x(), selectedBar.y(), item);
+        }
+    } else {
+        // Rotate the first series instead
+        static float seriesAngle = 0.0f;
+        if (m_graph->seriesList().size()) {
+            QQuaternion rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, seriesAngle++);
+            m_graph->seriesList().at(0)->setMeshRotation(rotation);
+        }
+    }
+}
+
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->theme()->setBackgroundEnabled(bool(enabled));
+    m_graph->activeTheme()->setBackgroundEnabled(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->theme()->setGridEnabled(bool(enabled));
+    m_graph->activeTheme()->setGridEnabled(bool(enabled));
 }
 
 void GraphModifier::rotateX(int rotation)
@@ -811,38 +1178,41 @@ void GraphModifier::setMaxY(int max)
 
 void GraphModifier::changeColorStyle()
 {
-    int style = m_graph->theme()->colorStyle();
+    int style = m_graph->activeTheme()->colorStyle();
 
     if (++style > Q3DTheme::ColorStyleRangeGradient)
         style = Q3DTheme::ColorStyleUniform;
 
-    m_graph->theme()->setColorStyle(Q3DTheme::ColorStyle(style));
+    m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyle(style));
 }
 
 void GraphModifier::useOwnTheme()
 {
-    Q3DTheme *theme = new Q3DTheme();
-    theme->setBackgroundEnabled(true);
-    theme->setGridEnabled(true);
-    theme->setAmbientLightStrength(0.3f);
-    theme->setBackgroundColor(QColor(QRgb(0x99ca53)));
-    QList<QColor> colors;
-    colors.append(QColor(QRgb(0x209fdf)));
-    theme->setBaseColors(colors);
-    theme->setColorStyle(Q3DTheme::ColorStyleUniform);
-    theme->setGridLineColor(QColor(QRgb(0x99ca53)));
-    theme->setHighlightLightStrength(7.0f);
-    theme->setLabelBackgroundEnabled(true);
-    theme->setLabelBorderEnabled(true);
-    theme->setLightColor(Qt::white);
-    theme->setLightStrength(6.0f);
-    theme->setMultiHighlightColor(QColor(QRgb(0x6d5fd5)));
-    theme->setSingleHighlightColor(QColor(QRgb(0xf6a625)));
-    theme->setLabelBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0));
-    theme->setLabelTextColor(QColor(QRgb(0x404044)));
-    theme->setWindowColor(QColor(QRgb(0xffffff)));
+    // Own theme is persistent, any changes to it via UI will be remembered
+    if (!m_ownTheme) {
+        m_ownTheme = new Q3DTheme();
+        m_ownTheme->setBackgroundEnabled(true);
+        m_ownTheme->setGridEnabled(true);
+        m_ownTheme->setAmbientLightStrength(0.3f);
+        m_ownTheme->setBackgroundColor(QColor(QRgb(0x99ca53)));
+        QList<QColor> colors;
+        colors.append(QColor(QRgb(0x209fdf)));
+        m_ownTheme->setBaseColors(colors);
+        m_ownTheme->setColorStyle(Q3DTheme::ColorStyleUniform);
+        m_ownTheme->setGridLineColor(QColor(QRgb(0x99ca53)));
+        m_ownTheme->setHighlightLightStrength(7.0f);
+        m_ownTheme->setLabelBackgroundEnabled(true);
+        m_ownTheme->setLabelBorderEnabled(true);
+        m_ownTheme->setLightColor(Qt::white);
+        m_ownTheme->setLightStrength(6.0f);
+        m_ownTheme->setMultiHighlightColor(QColor(QRgb(0x6d5fd5)));
+        m_ownTheme->setSingleHighlightColor(QColor(QRgb(0xf6a625)));
+        m_ownTheme->setLabelBackgroundColor(QColor(0xf6, 0xa6, 0x25, 0xa0));
+        m_ownTheme->setLabelTextColor(QColor(QRgb(0x404044)));
+        m_ownTheme->setWindowColor(QColor(QRgb(0xffffff)));
+    }
 
-    m_graph->setTheme(theme);
+    m_graph->setActiveTheme(m_ownTheme);
 
     m_colorDialog->open();
 }
@@ -852,7 +1222,7 @@ void GraphModifier::changeBaseColor(const QColor &color)
     qDebug() << "base color changed to" << color;
     QList<QColor> colors;
     colors.append(color);
-    m_graph->theme()->setBaseColors(colors);
+    m_graph->activeTheme()->setBaseColors(colors);
 }
 
 void GraphModifier::setGradient()
@@ -883,9 +1253,14 @@ void GraphModifier::setGradient()
 
     QList<QLinearGradient> barGradients;
     barGradients.append(barGradient);
-    m_graph->theme()->setBaseGradients(barGradients);
-    m_graph->theme()->setSingleHighlightGradient(singleHighlightGradient);
-    m_graph->theme()->setMultiHighlightGradient(multiHighlightGradient);
+    m_graph->activeTheme()->setBaseGradients(barGradients);
+    m_graph->activeTheme()->setSingleHighlightGradient(singleHighlightGradient);
+    m_graph->activeTheme()->setMultiHighlightGradient(multiHighlightGradient);
 
-    m_graph->theme()->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+    m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+}
+
+void GraphModifier::toggleMultiseriesScaling()
+{
+    m_graph->setMultiSeriesUniform(!m_graph->isMultiSeriesUniform());
 }

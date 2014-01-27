@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,10 +19,12 @@
 #ifndef QSCATTERDATAITEM_H
 #define QSCATTERDATAITEM_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
-#include <QVector3D>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+#include <QVector3D>
+#include <QQuaternion>
+
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QScatterDataItemPrivate;
 
@@ -38,6 +40,8 @@ public:
 
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
+    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline QQuaternion rotation() const { return m_rotation; }
     inline void setX(float value) { m_position.setX(value); }
     inline void setY(float value) { m_position.setY(value); }
     inline void setZ(float value) { m_position.setZ(value); }
@@ -52,8 +56,9 @@ protected:
 
 private:
     QVector3D m_position;
+    QQuaternion m_rotation;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

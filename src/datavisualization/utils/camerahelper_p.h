@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef CAMERAPOSITIONER_P_H
-#define CAMERAPOSITIONER_P_H
+#ifndef CAMERAHELPER_P_H
+#define CAMERAHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
@@ -39,7 +39,7 @@ class QVector3D;
 class QPoint;
 class QPointF;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class CameraHelper : public QObject
 {
@@ -86,6 +86,6 @@ public:
     void setCameraPreset(Q3DCamera::CameraPreset preset);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

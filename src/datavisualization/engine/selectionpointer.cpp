@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -22,17 +22,13 @@
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "q3dcamera.h"
-#include "q3dcamera_p.h"
 #include "drawer_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
 
-#include <QImage>
 #include <QMatrix4x4>
 
-#include <QDebug>
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const GLfloat sliceUnits = 2.5;
 
@@ -114,8 +110,15 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Position the pointer ball
     modelMatrix.translate(m_position);
 
+    if (!m_rotation.isIdentity()) {
+        modelMatrix.rotate(m_rotation);
+        itModelMatrix.rotate(m_rotation);
+    }
+
     // Scale the point with fixed values (at this point)
-    modelMatrix.scale(QVector3D(0.05f, 0.05f, 0.05f));
+    QVector3D scaleVector(0.05f, 0.05f, 0.05f);
+    modelMatrix.scale(scaleVector);
+    itModelMatrix.scale(scaleVector);
 
     MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
@@ -134,8 +137,11 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     m_pointShader->setUniformValue(m_pointShader->nModel(), itModelMatrix.inverted().transposed());
     m_pointShader->setUniformValue(m_pointShader->color(), m_highlightColor);
     m_pointShader->setUniformValue(m_pointShader->MVP(), MVPMatrix);
-    m_pointShader->setUniformValue(m_pointShader->ambientS(), m_cachedTheme->ambientLightStrength());
+    m_pointShader->setUniformValue(m_pointShader->ambientS(),
+                                   m_cachedTheme->ambientLightStrength());
     m_pointShader->setUniformValue(m_pointShader->lightS(), m_cachedTheme->lightStrength() * 2.0f);
+    m_pointShader->setUniformValue(m_pointShader->lightColor(),
+                                   Utils::vectorFromColor(m_cachedTheme->lightColor()));
 
     m_drawer->drawObject(m_pointShader, m_pointObj);
 
@@ -190,7 +196,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     glEnable(GL_DEPTH_TEST);
 }
 
-void SelectionPointer::setPosition(QVector3D position)
+void SelectionPointer::setPosition(const QVector3D &position)
 {
     m_position = position;
 }
@@ -201,9 +207,14 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setHighlightColor(QVector3D colorVector)
+void SelectionPointer::setHighlightColor(const QVector3D &colorVector)
 {
     m_highlightColor = colorVector;
+}
+
+void SelectionPointer::setRotation(const QQuaternion &rotation)
+{
+    m_rotation = rotation;
 }
 
 void SelectionPointer::setLabel(const QString &label)
@@ -223,7 +234,7 @@ void SelectionPointer::handleDrawerChange()
     setLabel(m_label);
 }
 
-void SelectionPointer::updateBoundingRect(QRect rect)
+void SelectionPointer::updateBoundingRect(const QRect &rect)
 {
     m_mainViewPort = rect;
 }
@@ -259,4 +270,4 @@ void SelectionPointer::loadLabelMesh()
     m_labelObj->load();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

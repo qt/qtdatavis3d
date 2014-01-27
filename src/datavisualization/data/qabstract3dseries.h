@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,13 +19,13 @@
 #ifndef QABSTRACT3DSERIES_H
 #define QABSTRACT3DSERIES_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QObject>
 #include <QScopedPointer>
 #include <QLinearGradient>
+#include <QQuaternion>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DSeriesPrivate;
 
@@ -39,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
     Q_PROPERTY(Mesh mesh READ mesh WRITE setMesh NOTIFY meshChanged)
     Q_PROPERTY(bool meshSmooth READ isMeshSmooth WRITE setMeshSmooth NOTIFY meshSmoothChanged)
+    Q_PROPERTY(QQuaternion meshRotation READ meshRotation WRITE setMeshRotation NOTIFY meshRotationChanged)
     Q_PROPERTY(QString userDefinedMesh READ userDefinedMesh WRITE setUserDefinedMesh NOTIFY userDefinedMeshChanged)
     Q_PROPERTY(QtDataVisualization::Q3DTheme::ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
     Q_PROPERTY(QColor baseColor READ baseColor WRITE setBaseColor NOTIFY baseColorChanged)
@@ -47,6 +48,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
 public:
     enum SeriesType {
@@ -67,6 +69,7 @@ public:
         MeshBevelCube,
         MeshSphere,
         MeshMinimal,
+        MeshArrow,
         MeshPoint
     };
 
@@ -90,6 +93,9 @@ public:
     void setMeshSmooth(bool enable);
     bool isMeshSmooth() const;
 
+    void setMeshRotation(const QQuaternion &rotation);
+    QQuaternion meshRotation() const;
+
     void setUserDefinedMesh(const QString &fileName);
     QString userDefinedMesh() const;
 
@@ -108,11 +114,15 @@ public:
     void setMultiHighlightGradient(const QLinearGradient &gradient);
     QLinearGradient multiHighlightGradient() const;
 
+    void setName(const QString &name);
+    QString name() const;
+
 signals:
     void itemLabelFormatChanged(QString format);
     void visibilityChanged(bool visible);
     void meshChanged(Mesh mesh);
     void meshSmoothChanged(bool enabled);
+    void meshRotationChanged(QQuaternion rotation);
     void userDefinedMeshChanged(QString fileName);
     void colorStyleChanged(Q3DTheme::ColorStyle style);
     void baseColorChanged(QColor color);
@@ -121,6 +131,7 @@ signals:
     void singleHighlightGradientChanged(QLinearGradient gradient);
     void multiHighlightColorChanged(QColor color);
     void multiHighlightGradientChanged(QLinearGradient gradient);
+    void nameChanged(QString name);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;
@@ -134,8 +145,9 @@ private:
     friend class Scatter3DController;
     friend class QBar3DSeries;
     friend class SeriesRenderCache;
+    friend class Abstract3DRenderer;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

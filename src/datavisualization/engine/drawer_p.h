@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -36,7 +36,7 @@
 #include "abstractrenderitem_p.h"
 #include <QFont>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -70,9 +70,7 @@ public:
 
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
-    void setFont(const QFont &font);
     QFont font() const;
-    void setLabelBackground(bool enabled);
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
@@ -81,7 +79,7 @@ public:
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
-                   QDataVis::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
+                   QAbstract3DGraph::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
                    const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
                    Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
@@ -94,12 +92,10 @@ Q_SIGNALS:
 
 private:
     Q3DTheme *m_theme;
-    QFont m_font;
-    bool m_labelBackground;
     TextureHelper *m_textureHelper;
     GLuint m_pointbuffer;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

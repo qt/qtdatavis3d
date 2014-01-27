@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -22,10 +22,13 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qsurfacedataitem.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
-
+namespace QtDataVisualization {
+// typedefs introduced this way because QDoc doesn't understand namespace macros
 typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
+}
+
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate;
 class QSurface3DSeries;
@@ -86,6 +89,6 @@ private:
     friend class Surface3DController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // QSURFACEDATAPROXY_H
+#endif

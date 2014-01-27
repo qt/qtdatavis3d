@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,16 +20,14 @@
 
 #include <qqml.h>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-void Datavis3Dqml2Plugin::registerTypes(const char *uri)
+void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
     // @uri QtDataVisualization
     qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
                                                          QLatin1String("Trying to create uncreatable: AbstractItemModel."));
-    qmlRegisterUncreatableType<QDataVis>(uri, 1, 0, "DataVis",
-                                         QLatin1String("Trying to create uncreatable: DataVis."));
-    qmlRegisterUncreatableType<Q3DAbstractAxis>(uri, 1, 0, "AbstractAxis3D",
+    qmlRegisterUncreatableType<QAbstract3DAxis>(uri, 1, 0, "AbstractAxis3D",
                                                 QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstractDataProxy>(uri, 1, 0, "AbstractDataProxy",
                                                    QLatin1String("Trying to create uncreatable: AbstractDataProxy."));
@@ -41,8 +39,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
                                                   QLatin1String("Trying to create uncreatable: SurfaceDataProxy."));
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
-    qmlRegisterUncreatableType<Q3DScene>(uri, 1, 0, "Scene3D",
-                                         QLatin1String("Trying to create uncreatable: Scene3D."));
+    qmlRegisterUncreatableType<Declarative3DScene>(uri, 1, 0, "Scene3D",
+                                                 QLatin1String("Trying to create uncreatable: Scene3D."));
     qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
                                                   QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",
@@ -60,8 +58,8 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
     qmlRegisterType<DeclarativeSurface>(uri, 1, 0, "Surface3D");
 
-    qmlRegisterType<Q3DValueAxis>(uri, 1, 0, "ValueAxis3D");
-    qmlRegisterType<Q3DCategoryAxis>(uri, 1, 0, "CategoryAxis3D");
+    qmlRegisterType<QValue3DAxis>(uri, 1, 0, "ValueAxis3D");
+    qmlRegisterType<QCategory3DAxis>(uri, 1, 0, "CategoryAxis3D");
 
     qmlRegisterType<Q3DCamera>(uri, 1, 0, "Camera3D");
     qmlRegisterType<Q3DLight>(uri, 1, 0, "Light3D");
@@ -80,7 +78,9 @@ void Datavis3Dqml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeBar3DSeries>(uri, 1, 0, "Bar3DSeries");
     qmlRegisterType<DeclarativeScatter3DSeries>(uri, 1, 0, "Scatter3DSeries");
     qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
+
+    qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,9 +17,9 @@
 ****************************************************************************/
 
 #include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/q3dcategoryaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qitemmodelbardataproxy.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
@@ -84,22 +84,23 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
-    m_graph->setDataWindow(m_rowCount, m_columnCount);
+    m_graph->rowAxis()->setRange(0, m_rowCount);
+    m_graph->columnAxis()->setRange(0, m_columnCount);
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_graph->setSelectionMode(QDataVis::SelectionItemRowAndColumn);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
-    m_graph->rowAxis()->setCategoryLabels(QStringList(QString()));
-    m_graph->columnAxis()->setCategoryLabels(QStringList(QString()));
+    m_graph->rowAxis()->setLabels(QStringList(QString()));
+    m_graph->columnAxis()->setLabels(QStringList(QString()));
 
-    m_graph->activeDataProxy()->setItemLabelFormat(QStringLiteral("@valueLabel"));
+    m_graph->seriesList().at(0)->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
     //! [6]
 
     // Set selection mode to slice row
-    m_graph->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
 
     //! [6]
 #endif
@@ -107,10 +108,10 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     //! [7]
 
     // Set theme
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
 
     // Set font
-    m_graph->theme()->setFont(QFont("Impact", 20));
+    m_graph->activeTheme()->setFont(QFont("Impact", 20));
 
     // Set preset camera position
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);

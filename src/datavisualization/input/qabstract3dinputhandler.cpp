@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -15,9 +15,10 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
+
 #include "qabstract3dinputhandler_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QAbstract3DInputHandler
@@ -31,23 +32,17 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \enum QAbstract3DInputHandler::InputState
+ * \enum QAbstract3DInputHandler::InputView
  *
- * Predefined input states for mouse and touch based input handlers. All states are not valid
- * with all input handlers.
+ * Predefined input views for mouse and touch based input handlers.
  *
- * \value InputStateNone
- *        Default "no input received" state.
- * \value InputStateOnScene
- *        Mouse or touch input received on the 3D scene.
- * \value InputStateOnPrimaryView
- *        Mouse or touch input received on the primary view area.
- * \value InputStateOnSecondaryView
+ * \value InputViewNone
+ *        Mouse or touch not on a view.
+ * \value InputViewOnPrimary
+ *        Mouse or touch input received on the primary view area. If secondary view is displayed when
+ *        inputView becomes InputViewOnPrimary, secondary view is closed.
+ * \value InputViewOnSecondary
  *        Mouse or touch input received on the secondary view area.
- * \value InputStateRotating
- *        Rotation of the 3D geometry ongoing.
- * \value InputStatePinching
- *        Pinch/punch multitouch input ongoing.
  */
 
 /*!
@@ -59,6 +54,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Base type for all QtDataVisualization input handlers.
  *
  * This type is uncreatable.
+ *
+ * For AbstractInputHandler3D enums, see \l QAbstract3DInputHandler::InputView
  */
 
 /*!
@@ -138,21 +135,21 @@ void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
 
 // Property get/set
 /*!
- * \property QAbstract3DInputHandler::inputState
+ * \property QAbstract3DInputHandler::inputView
  *
- * Current enumerated input state based on the processed input events.
- * When the state changes inputStateChanged() is emitted.
+ * Current enumerated input view based on the view of the processed input events.
+ * When the view changes inputViewChanged() is emitted.
  */
-QAbstract3DInputHandler::InputState QAbstract3DInputHandler::inputState()
+QAbstract3DInputHandler::InputView QAbstract3DInputHandler::inputView() const
 {
-    return d_ptr->m_inputState;
+    return d_ptr->m_inputView;
 }
 
-void QAbstract3DInputHandler::setInputState(InputState inputState)
+void QAbstract3DInputHandler::setInputView(InputView inputView)
 {
-    if (inputState != d_ptr->m_inputState) {
-        d_ptr->m_inputState = inputState;
-        emit inputStateChanged(inputState);
+    if (inputView != d_ptr->m_inputView) {
+        d_ptr->m_inputView = inputView;
+        emit inputViewChanged(inputView);
     }
 }
 
@@ -227,12 +224,11 @@ QPoint QAbstract3DInputHandler::previousInputPos() const
     return d_ptr->m_previousInputPos;
 }
 
-
 QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputHandler *q) :
     q_ptr(q),
     m_prevDistance(0),
     m_previousInputPos(QPoint(0,0)),
-    m_inputState(QAbstract3DInputHandler::InputStateNone),
+    m_inputView(QAbstract3DInputHandler::InputViewNone),
     m_inputPosition(QPoint(0,0)),
     m_scene(0)
 {
@@ -243,4 +239,4 @@ QAbstract3DInputHandlerPrivate::~QAbstract3DInputHandlerPrivate()
 
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

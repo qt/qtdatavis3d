@@ -1,0 +1,43 @@
+/****************************************************************************
+**
+** Copyright (C) 2014 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example qmlmultigraph
+    \title Qt Quick 2 Multiple Graphs Example
+    \ingroup qtdatavisualization_examples
+    \brief Showing multiple graphs simultaneously in a QML application.
+
+    The Qt Quick 2 multiple graphs example demonstrates using multiple graphs in single window.
+
+    \image qmlmultigraph-example.png
+
+    The interesting thing about this example is demonstrating that multiple graphs can be used
+    simultaneously, so most functionality is not explained in detail.
+    For more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
+
+    \section1 Multiple Graphs
+
+    Using multiple graphs in a single application doesn't require anything special, simply define
+    and position the graphs as normal. In this example the graphs are shown side by side in a RowLayout:
+
+    \snippet ../examples/qmlmultigraph/qml/qmlmultigraph/main.qml 0
+
+    Each graph has a parent Rectangle item to provide it with a border. The color of the rectangle is set
+    to fully transparent, because otherwise the rectangles would hide the graphs, which are always drawn behind
+    all other QML elements.
+*/

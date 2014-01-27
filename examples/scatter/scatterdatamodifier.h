@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -47,7 +47,7 @@ public slots:
     void changeStyle(int style);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
 
 signals:
     void backgroundEnabledChanged(bool enabled);

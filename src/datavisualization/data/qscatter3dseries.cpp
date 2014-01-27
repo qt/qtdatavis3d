@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #include "qscatter3dseries_p.h"
 #include "scatter3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QScatter3DSeries
@@ -43,13 +43,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *     \li @zTitle    \li Title from Z axis
  *   \row
  *     \li @xLabel    \li Item value formatted using the same format the X axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
  *   \row
  *     \li @yLabel    \li Item value formatted using the same format the Y axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
  *   \row
  *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
- *                            see \l{Q3DValueAxis::setLabelFormat()} for more information.
+ *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *   \row
+ *     \li @seriesName \li Name of the series
  * \endtable
  *
  * For example:
@@ -88,10 +90,14 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *
  * Selects an item at the \a index. The \a index is the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection, set invalidSelectionIndex() as the \a index.
+ * To clear selection from this series, set invalidSelectionIndex as the \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ * Removing items from or inserting items to the series before the selected item
+ * will adjust the selection so that the same item will stay selected.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -103,9 +109,11 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlmethod int Scatter3DSeries::invalidSelectionIndex()
- * \return an invalid index for selection. Set this index to selectedItem property if you
- * want to clear the selection.
+ * \qmlproperty int Scatter3DSeries::invalidSelectionIndex
+ * A constant property providing an invalid index for selection. Set this index to
+ * selectedItem property if you want to clear the selection from this series.
+ *
+ * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
@@ -164,10 +172,14 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
  *
  * Selects an item at the \a index. The \a index is the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection, set invalidSelectionIndex() as the \a index.
+ * To clear selection from this series, set invalidSelectionIndex() as the \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ * Removing items from or inserting items to the series before the selected item
+ * will adjust the selection so that the same item will stay selected.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
 void QScatter3DSeries::setSelectedItem(int index)
 {
@@ -207,9 +219,11 @@ float QScatter3DSeries::itemSize() const
 
 /*!
  * \return an invalid index for selection. Set this index to selectedItem property if you
- * want to clear the selection.
+ * want to clear the selection from this series.
+ *
+ * \sa QAbstract3DGraph::clearSelection()
  */
-int QScatter3DSeries::invalidSelectionIndex() const
+int QScatter3DSeries::invalidSelectionIndex()
 {
     return Scatter3DController::invalidSelectionIndex();
 }
@@ -237,7 +251,7 @@ QScatter3DSeriesPrivate::QScatter3DSeriesPrivate(QScatter3DSeries *q)
       m_selectedItem(Scatter3DController::invalidSelectionIndex()),
       m_itemSize(0.0f)
 {
-    m_itemLabelFormat = QStringLiteral("@valueTitle: @valueLabel");
+    m_itemLabelFormat = QStringLiteral("@xLabel, @yLabel, @zLabel");
     m_mesh = QAbstract3DSeries::MeshSphere;
 }
 
@@ -299,4 +313,4 @@ void QScatter3DSeriesPrivate::setItemSize(float size)
         m_controller->markSeriesVisualsDirty();
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -29,28 +29,17 @@
 #ifndef SURFACE3DRENDERER_P_H
 #define SURFACE3DRENDERER_P_H
 
-#include <QtCore/QSize>
-#include <QtCore/QObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QFont>
-#include <QWindow>
-
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "scatterrenderitem_p.h"
 #include "qsurfacedataproxy.h"
 
-class QOpenGLShaderProgram;
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
 class SurfaceObject;
-class TextureHelper;
-class Theme;
-class Drawer;
 class Q3DScene;
 class SelectionPointer;
 
@@ -69,7 +58,6 @@ private:
     bool m_cachedIsSlicingActivated;
 
     // Internal attributes purely related to how the scene is drawn with GL.
-    ShaderHelper *m_shader;
     ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceShader;
@@ -126,6 +114,7 @@ private:
     const QSurface3DSeries *m_selectedSeries;
     GLuint m_uniformGradientTexture;
     QVector3D m_uniformGradientTextureColor;
+    QPoint m_clickedPosition;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -140,6 +129,8 @@ public:
     void updateSurfaceGridStatus(bool enable);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
+    inline QPoint clickedPosition() const { return m_clickedPosition; }
+    void resetClickedStatus();
 
     void drawSlicedScene();
     void render(GLuint defaultFboHandle = 0);
@@ -148,12 +139,11 @@ protected:
     void initializeOpenGL();
 
 signals:
-    void pointClicked(QPoint position, QSurface3DSeries *series);
     void flatShadingSupportedChanged(bool supported);
 
 private:
     void updateSliceDataModel(const QPoint &point);
-    void updateShadowQuality(QDataVis::ShadowQuality quality);
+    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     QRect calculateSampleRect(const QSurfaceDataArray &array);
@@ -185,6 +175,6 @@ private:
     Q_DISABLE_COPY(Surface3DRenderer)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // SURFACE3DRENDERER_P_H
+#endif

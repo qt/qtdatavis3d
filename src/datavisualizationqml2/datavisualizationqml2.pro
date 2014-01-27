@@ -8,7 +8,11 @@ uri = QtDataVisualization
 
 static {
     DEFINES += QT_DATAVISUALIZATION_STATICLIB
-    CONFIG -= static staticlib
+    # Only build qml plugin static if Qt itself is also built static
+    !contains(QT_CONFIG, static): CONFIG -= static staticlib
+
+    # Insert the plugin URI into its meta data to enable static plugin usage
+    QMAKE_MOC_OPTIONS += -Muri=$$uri
 }
 
 INCLUDEPATH += ../../include \
@@ -27,7 +31,8 @@ SOURCES += \
     colorgradient.cpp \
     declarativeseries.cpp \
     declarativetheme.cpp \
-    declarativecolor.cpp
+    declarativecolor.cpp \
+    declarativescene.cpp
 
 HEADERS += \
     datavisualizationqml2_plugin.h \
@@ -38,7 +43,8 @@ HEADERS += \
     colorgradient_p.h \
     declarativeseries_p.h \
     declarativetheme_p.h \
-    declarativecolor_p.h
+    declarativecolor_p.h \
+    declarativescene_p.h
 
 OTHER_FILES = qmldir
 

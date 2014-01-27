@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -33,7 +33,7 @@
 #include "abstractdeclarative_p.h"
 #include "surface3dcontroller_p.h"
 #include "declarativesurface_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qsurfacedataproxy.h"
 #include "qsurface3dseries.h"
 
@@ -42,14 +42,14 @@
 #include <QObject>
 #include <QQuickWindow>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeSurface : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DValueAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
-    Q_PROPERTY(Q3DValueAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
-    Q_PROPERTY(Q3DValueAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
+    Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
+    Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -57,12 +57,12 @@ public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
     ~DeclarativeSurface();
 
-    Q3DValueAxis *axisX() const;
-    void setAxisX(Q3DValueAxis *axis);
-    Q3DValueAxis *axisY() const;
-    void setAxisY(Q3DValueAxis *axis);
-    Q3DValueAxis *axisZ() const;
-    void setAxisZ(Q3DValueAxis *axis);
+    QValue3DAxis *axisX() const;
+    void setAxisX(QValue3DAxis *axis);
+    QValue3DAxis *axisY() const;
+    void setAxisY(QValue3DAxis *axis);
+    QValue3DAxis *axisZ() const;
+    void setAxisZ(QValue3DAxis *axis);
 
     QQmlListProperty<QSurface3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
@@ -72,15 +72,20 @@ public:
     Q_INVOKABLE void addSeries(QSurface3DSeries *series);
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
+public slots:
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
+
 signals:
-    void axisXChanged(Q3DValueAxis *axis);
-    void axisYChanged(Q3DValueAxis *axis);
-    void axisZChanged(Q3DValueAxis *axis);
+    void axisXChanged(QValue3DAxis *axis);
+    void axisYChanged(QValue3DAxis *axis);
+    void axisZChanged(QValue3DAxis *axis);
 
 private:
     Surface3DController *m_surfaceController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

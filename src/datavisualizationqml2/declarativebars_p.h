@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -33,8 +33,8 @@
 #include "abstractdeclarative_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativebars_p.h"
-#include "q3dvalueaxis.h"
-#include "q3dcategoryaxis.h"
+#include "qvalue3daxis.h"
+#include "qcategory3daxis.h"
 #include "qbardataproxy.h"
 #include "qbar3dseries.h"
 
@@ -43,30 +43,35 @@
 #include <QObject>
 #include <QQuickWindow>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeBars : public AbstractDeclarative
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DCategoryAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
-    Q_PROPERTY(Q3DValueAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
-    Q_PROPERTY(Q3DCategoryAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
+    Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
+    Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
     ~DeclarativeBars();
 
-    Q3DCategoryAxis *rowAxis() const;
-    void setRowAxis(Q3DCategoryAxis *axis);
-    Q3DValueAxis *valueAxis() const;
-    void setValueAxis(Q3DValueAxis *axis);
-    Q3DCategoryAxis *columnAxis() const;
-    void setColumnAxis(Q3DCategoryAxis *axis);
+    QCategory3DAxis *rowAxis() const;
+    void setRowAxis(QCategory3DAxis *axis);
+    QValue3DAxis *valueAxis() const;
+    void setValueAxis(QValue3DAxis *axis);
+    QCategory3DAxis *columnAxis() const;
+    void setColumnAxis(QCategory3DAxis *axis);
+
+    void setMultiSeriesUniform(bool uniform);
+    bool isMultiSeriesUniform() const;
 
     void setBarThickness(float thicknessRatio);
     float barThickness() const;
@@ -84,20 +89,30 @@ public:
     static void clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
     Q_INVOKABLE void addSeries(QBar3DSeries *series);
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
+    Q_INVOKABLE void insertSeries(int index, QBar3DSeries *series);
+    void setPrimarySeries(QBar3DSeries *series);
+    QBar3DSeries *primarySeries() const;
+
+public slots:
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
 
 signals:
-    void rowAxisChanged(Q3DCategoryAxis *axis);
-    void valueAxisChanged(Q3DValueAxis *axis);
-    void columnAxisChanged(Q3DCategoryAxis *axis);
+    void rowAxisChanged(QCategory3DAxis *axis);
+    void valueAxisChanged(QValue3DAxis *axis);
+    void columnAxisChanged(QCategory3DAxis *axis);
+    void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
     void meshFileNameChanged(QString filename);
+    void primarySeriesChanged(QBar3DSeries *series);
 
 private:
     Bars3DController *m_barsController;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

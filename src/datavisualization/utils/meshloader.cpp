@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -24,9 +24,7 @@
 #include <QVector2D>
 #include <QVector3D>
 
-#include <QDebug>
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 QString slashTag = QStringLiteral("/");
 
@@ -35,8 +33,6 @@ bool MeshLoader::loadOBJ(const QString &path,
                          QVector<QVector2D> &out_uvs,
                          QVector<QVector3D> &out_normals)
 {
-    //qDebug() << "Loading OBJ file" << path;
-
     QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
     QVector<QVector3D> temp_vertices;
     QVector<QVector2D> temp_uvs;
@@ -96,9 +92,6 @@ bool MeshLoader::loadOBJ(const QString &path,
             normalIndices.append(normalIndex[1]);
             normalIndices.append(normalIndex[2]);
         }
-        else {
-            //qWarning("Line did not contain usable data");
-        }
     }
 
     // For each vertex of each triangle
@@ -122,4 +115,4 @@ bool MeshLoader::loadOBJ(const QString &path,
     return true;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

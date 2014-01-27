@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -46,7 +46,7 @@
 
 /*!
  * \qmlproperty CategoryAxis3D Bars3D::rowAxis
- * A user-defined row axis.
+ * The active row axis.
  *
  * If an axis is not given, a temporary default axis with no labels is created.
  * This temporary axis is destroyed if another axis is explicitly set to same orientation.
@@ -54,7 +54,7 @@
 
 /*!
  * \qmlproperty ValueAxis3D Bars3D::valueAxis
- * A user-defined value axis.
+ * The active value axis.
  *
  * If an axis is not given, a temporary default axis with no labels and automatically adjusting
  * range is created.
@@ -63,12 +63,18 @@
 
 /*!
  * \qmlproperty CategoryAxis3D Bars3D::columnAxis
- * A user-defined column axis.
+ * The active column axis.
  *
  * If an axis is not given, a temporary default axis with no labels is created.
  * This temporary axis is destroyed if another axis is explicitly set to same orientation.
  */
 
+/*!
+ * \qmlproperty bool Bars3D::multiSeriesUniform
+ * This property controls if bars are to be scaled with proportions set to a single series bar even
+ * if there are multiple series displayed. If set to \c {true}, \l{barSpacing}{bar spacing} will
+ * affect only X-axis correctly. It is preset to \c false by default.
+ */
 
 /*!
  * \qmlproperty real Bars3D::barThickness
@@ -87,7 +93,7 @@
  */
 
 /*!
- * \qmlproperty list<QBar3DSeries> Bars3D::seriesList
+ * \qmlproperty list<Bar3DSeries> Bars3D::seriesList
  * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
@@ -95,7 +101,20 @@
  */
 
 /*!
- * \qmlmethod void Bars3D::addSeries(QBar3DSeries *series)
+ * \qmlproperty Bar3DSeries Bars3D::primarySeries
+ * Specifies the \a series that is the primary series of the graph. The primary series
+ * is used to determine the row and column axis labels when the labels are not explicitly
+ * set to the axes.
+ * If the specified \a series is not already added to the graph, setting it as the
+ * primary series will also implicitly add it to the graph.
+ * If the primary series itself is removed from the graph, this property
+ * resets to default.
+ * If \a series is null, this property resets to default.
+ * Defaults to the first added series or zero if no series are added to the graph.
+ */
+
+/*!
+ * \qmlmethod void Bars3D::addSeries(Bar3DSeries series)
  * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
  * so the rows and columns of all series must match for the visualized data to be meaningful.
  * If the graph has multiple visible series, only the first one added will
@@ -105,6 +124,16 @@
  */
 
 /*!
- * \qmlmethod void Bars3D::removeSeries(QBar3DSeries *series)
+ * \qmlmethod void Bars3D::removeSeries(Bar3DSeries series)
  * Remove the \a series from the graph.
+ */
+
+/*!
+ * \qmlmethod void Bars3D::insertSeries(int index, Bar3DSeries series)
+ * Inserts the \a series into the position \a index in the series list.
+ * If the \a series has already been added to the list, it is moved to the
+ * new \a index.
+ * \note When moving a series to a new \a index that is after its old index,
+ * the new position in list is calculated as if the series was still in its old
+ * index, so the final index is actually the \a index decremented by one.
  */

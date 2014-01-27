@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #include "scatterdatamodifier.h"
 
 #include <QtDataVisualization/QScatterDataProxy>
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DScene>
 #include <QtDataVisualization/Q3DCamera>
 #include <QtDataVisualization/QScatter3DSeries>
@@ -32,20 +32,20 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_inputHandler(new CustomInputHandler())
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeDigia));
-    m_graph->setShadowQuality(QDataVis::ShadowQualityMedium);
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
 
     m_graph->axisX()->setRange(-10.0f, 10.0f);
     m_graph->axisY()->setRange(-5.0f, 5.0f);
     m_graph->axisZ()->setRange(-5.0f, 5.0f);
 
     QScatter3DSeries *series = new QScatter3DSeries;
-    series->setItemLabelFormat("@xLabel, @yLabel, @zLabel");
+    series->setItemLabelFormat(QStringLiteral("@xLabel, @yLabel, @zLabel"));
     series->setMesh(QAbstract3DSeries::MeshCube);
     series->setItemSize(0.15f);
     m_graph->addSeries(series);
@@ -159,7 +159,7 @@ void ScatterDataModifier::triggerSelection()
     m_graph->scene()->setSelectionQueryPosition(m_inputHandler->inputPosition());
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
@@ -167,6 +167,6 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality s
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
 }

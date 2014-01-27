@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -106,6 +106,12 @@ int main(int argc, char **argv)
     QPushButton *removeSeriesButton = new QPushButton(widget);
     removeSeriesButton->setText(QStringLiteral("Remove Series"));
 
+    QPushButton *toggleSeriesVisibilityButton = new QPushButton(widget);
+    toggleSeriesVisibilityButton->setText(QStringLiteral("Toggle visibility"));
+
+    QPushButton *changeSeriesNameButton = new QPushButton(widget);
+    changeSeriesNameButton->setText(QStringLiteral("Series name"));
+
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
@@ -172,6 +178,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeSeriesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(toggleSeriesVisibilityButton, 0, Qt::AlignTop);
+    vLayout->addWidget(changeSeriesNameButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
@@ -224,6 +232,10 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::addSeries);
     QObject::connect(removeSeriesButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::removeSeries);
+    QObject::connect(toggleSeriesVisibilityButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::toggleSeriesVisibility);
+    QObject::connect(changeSeriesNameButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::changeSeriesName);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,

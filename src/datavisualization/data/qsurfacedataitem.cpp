@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "qsurfacedataitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QSurfaceDataItem
@@ -72,13 +72,11 @@ QSurfaceDataItem::~QSurfaceDataItem()
 QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
 {
     m_position = other.m_position;
-    //m_size = other.m_size;
 
     if (other.d_ptr)
         createExtraData();
     else
         d_ptr = 0;
-    // TODO set extra data
 
     return *this;
 }
@@ -140,4 +138,4 @@ QSurfaceDataItemPrivate::~QSurfaceDataItemPrivate()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

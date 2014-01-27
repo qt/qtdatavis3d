@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,13 +19,11 @@
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
 #include "scatter3dcontroller_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "q3dcamera.h"
 #include "qscatter3dseries_p.h"
 
-#include <QMouseEvent>
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class Q3DScatter
@@ -80,24 +78,15 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * Constructs a new 3D scatter graph with optional \a parent window.
+ * Constructs a new 3D scatter graph with optional \a parent window
+ * and surface \a format.
  */
-Q3DScatter::Q3DScatter(QWindow *parent)
-    : Q3DWindow(new Q3DScatterPrivate(this), parent)
+Q3DScatter::Q3DScatter(const QSurfaceFormat *format, QWindow *parent)
+    : QAbstract3DGraph(new Q3DScatterPrivate(this), format, parent)
 {
     dptr()->m_shared = new Scatter3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Abstract3DController::selectionModeChanged, this,
-                     &Q3DScatter::selectionModeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, this,
-                     &Q3DScatter::shadowQualityChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::themeChanged, this,
-                     &Q3DScatter::themeChanged);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::needRender, d_ptr.data(),
-                     &Q3DWindowPrivate::renderLater);
-    QObject::connect(dptr()->m_shared, &Abstract3DController::shadowQualityChanged, dptr(),
-                     &Q3DScatterPrivate::handleShadowQualityUpdate);
 }
 
 /*!
@@ -128,57 +117,9 @@ void Q3DScatter::removeSeries(QScatter3DSeries *series)
 /*!
  * \return list of series added to this graph.
  */
-QList<QScatter3DSeries *> Q3DScatter::seriesList()
+QList<QScatter3DSeries *> Q3DScatter::seriesList() const
 {
-    return dptr()->m_shared->scatterSeriesList();
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseDoubleClickEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::touchEvent(QTouchEvent *event)
-{
-    dptr()->m_shared->touchEvent(event);
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mousePressEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mousePressEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mouseReleaseEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseReleaseEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::mouseMoveEvent(QMouseEvent *event)
-{
-    dptr()->m_shared->mouseMoveEvent(event, event->pos());
-}
-
-/*!
- * \internal
- */
-void Q3DScatter::wheelEvent(QWheelEvent *event)
-{
-    dptr()->m_shared->wheelEvent(event);
+    return dptrc()->m_shared->scatterSeriesList();
 }
 
 Q3DScatterPrivate *Q3DScatter::dptr()
@@ -192,72 +133,9 @@ const Q3DScatterPrivate *Q3DScatter::dptrc() const
 }
 
 /*!
- * \property Q3DScatter::theme
+ * \property Q3DScatter::axisX
  *
- * A \a theme to be used for the graph. Ownership of the \a theme is transferred. Previous theme
- * is deleted when a new one is set. Properties of the \a theme can be modified even after setting
- * it, and the modifications take effect immediately.
- */
-void Q3DScatter::setTheme(Q3DTheme *theme)
-{
-    dptr()->m_shared->setTheme(theme);
-}
-
-Q3DTheme *Q3DScatter::theme() const
-{
-    return dptrc()->m_shared->theme();
-}
-
-/*!
- * \property Q3DScatter::selectionMode
- *
- * Sets item selection \a mode to a combination of \c QDataVis::SelectionFlags. It is preset to
- * \c QDataVis::SelectionItem by default.
- *
- * \note Only \c QDataVis::SelectionItem and \c QDataVis::SelectionNone are supported.
- */
-void Q3DScatter::setSelectionMode(QDataVis::SelectionFlags mode)
-{
-    dptr()->m_shared->setSelectionMode(mode);
-}
-
-QDataVis::SelectionFlags Q3DScatter::selectionMode() const
-{
-    return dptrc()->m_shared->selectionMode();
-}
-
-/*!
- * \property Q3DScatter::scene
- *
- * This property contains the read only Q3DScene that can be used to access e.g. camera object.
- */
-Q3DScene *Q3DScatter::scene() const
-{
-    return dptrc()->m_shared->scene();
-}
-
-/*!
- * \property Q3DScatter::shadowQuality
- *
- * Sets shadow \a quality to one of \c QDataVis::ShadowQuality. It is preset to
- * \c QDataVis::ShadowQualityMedium by default.
- *
- * \note If setting QDataVis::ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is
- * done.
- */
-void Q3DScatter::setShadowQuality(QDataVis::ShadowQuality quality)
-{
-    return dptr()->m_shared->setShadowQuality(quality);
-}
-
-QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
-{
-    return dptrc()->m_shared->shadowQuality();
-}
-
-/*!
- * Sets a user-defined X-axis. Implicitly calls addAxis() to transfer ownership
+ * The active X-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -266,21 +144,20 @@ QDataVis::ShadowQuality Q3DScatter::shadowQuality() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisX(Q3DValueAxis *axis)
+void Q3DScatter::setAxisX(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisX(axis);
 }
 
-/*!
- * \return used X-axis.
- */
-Q3DValueAxis *Q3DScatter::axisX() const
+QValue3DAxis *Q3DScatter::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisX());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
 }
 
 /*!
- * Sets a user-defined Y-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DScatter::axisY
+ *
+ * The active Y-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -289,21 +166,20 @@ Q3DValueAxis *Q3DScatter::axisX() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisY(Q3DValueAxis *axis)
+void Q3DScatter::setAxisY(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisY(axis);
 }
 
-/*!
- * \return used Y-axis.
- */
-Q3DValueAxis *Q3DScatter::axisY() const
+QValue3DAxis *Q3DScatter::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisY());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
 }
 
 /*!
- * Sets a user-defined Z-axis. Implicitly calls addAxis() to transfer ownership
+ * \property Q3DScatter::axisZ
+ *
+ * The active Z-axis. Implicitly calls addAxis() to transfer ownership
  * of the \a axis to this graph.
  *
  * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
@@ -312,7 +188,7 @@ Q3DValueAxis *Q3DScatter::axisY() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
+void Q3DScatter::setAxisZ(QValue3DAxis *axis)
 {
     dptr()->m_shared->setAxisZ(axis);
 }
@@ -320,9 +196,9 @@ void Q3DScatter::setAxisZ(Q3DValueAxis *axis)
 /*!
  * \return used Z-axis.
  */
-Q3DValueAxis *Q3DScatter::axisZ() const
+QValue3DAxis *Q3DScatter::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(dptrc()->m_shared->axisZ());
+    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
 }
 
 /*!
@@ -332,7 +208,7 @@ Q3DValueAxis *Q3DScatter::axisZ() const
  *
  * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::addAxis(Q3DValueAxis *axis)
+void Q3DScatter::addAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->addAxis(axis);
 }
@@ -345,7 +221,7 @@ void Q3DScatter::addAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
+void Q3DScatter::releaseAxis(QValue3DAxis *axis)
 {
     dptr()->m_shared->releaseAxis(axis);
 }
@@ -355,35 +231,38 @@ void Q3DScatter::releaseAxis(Q3DValueAxis *axis)
  *
  * \sa addAxis()
  */
-QList<Q3DValueAxis *> Q3DScatter::axes() const
+QList<QValue3DAxis *> Q3DScatter::axes() const
 {
-    QList<Q3DAbstractAxis *> abstractAxes = dptrc()->m_shared->axes();
-    QList<Q3DValueAxis *> retList;
-    foreach (Q3DAbstractAxis *axis, abstractAxes)
-        retList.append(static_cast<Q3DValueAxis *>(axis));
+    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_shared->axes();
+    QList<QValue3DAxis *> retList;
+    foreach (QAbstract3DAxis *axis, abstractAxes)
+        retList.append(static_cast<QValue3DAxis *>(axis));
 
     return retList;
 }
 
-/*!
- * \fn void Q3DScatter::shadowQualityChanged(QDataVis::ShadowQuality quality)
- *
- * This signal is emitted when shadow \a quality changes.
- */
-
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
-    : Q3DWindowPrivate(q)
+    : QAbstract3DGraphPrivate(q)
 {
 }
 
 Q3DScatterPrivate::~Q3DScatterPrivate()
 {
-    delete m_shared;
 }
 
-void Q3DScatterPrivate::handleShadowQualityUpdate(QDataVis::ShadowQuality quality)
+void Q3DScatterPrivate::handleAxisXChanged(QAbstract3DAxis *axis)
 {
-    emit qptr()->shadowQualityChanged(quality);
+    emit qptr()->axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DScatterPrivate::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void Q3DScatterPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit qptr()->axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
 Q3DScatter *Q3DScatterPrivate::qptr()
@@ -391,5 +270,5 @@ Q3DScatter *Q3DScatterPrivate::qptr()
     return static_cast<Q3DScatter *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 

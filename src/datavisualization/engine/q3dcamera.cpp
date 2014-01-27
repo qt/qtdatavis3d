@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -26,7 +26,7 @@
 #include <qmath.h>
 #include <QVector3D>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class Q3DCamera
@@ -88,6 +88,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * data visualization. The class offers simple methods for setting the orbit point in rotations,
  * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
  * needed.
+ *
+ * For Camera3D enums, see \l Q3DCamera::CameraPreset
  */
 
 /*!
@@ -867,5 +869,4 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     q_ptr->setViewMatrix(viewMatrix);
 }
 
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

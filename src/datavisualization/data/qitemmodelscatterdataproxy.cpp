@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "scatteritemmodelhandler_p.h"
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QItemModelScatterDataProxy
@@ -32,7 +32,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * for Q3DScatter. It maps roles of QAbstractItemModel to the XYZ-values of Q3DScatter points.
  *
  * The data is resolved asynchronously whenever the mapping or the model changes.
- * QScatterDataProxy::arrayReset() is emitted when the data has been resolved.
+ * QScatterDataProxy::arrayReset() is emitted when the data has been resolved. However, inserts,
+ * removes, and single data item changes after the model initialization are resolved synchronously,
+ * unless the same frame also contains a change that causes the whole model to be resolved.
  *
  * Mapping ignores rows and columns of the QAbstractItemModel and treats
  * all items equally. It requires the model to provide at least three roles for the data items
@@ -235,18 +237,6 @@ const QItemModelScatterDataProxyPrivate *QItemModelScatterDataProxy::dptrc() con
     return static_cast<const QItemModelScatterDataProxyPrivate *>(d_ptr.data());
 }
 
-void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
-{
-    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
-                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
-                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
-}
-
 // QItemModelScatterDataProxyPrivate
 
 QItemModelScatterDataProxyPrivate::QItemModelScatterDataProxyPrivate(QItemModelScatterDataProxy *q)
@@ -265,4 +255,16 @@ QItemModelScatterDataProxy *QItemModelScatterDataProxyPrivate::qptr()
     return static_cast<QItemModelScatterDataProxy *>(q_ptr);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
+{
+    QObject::connect(m_itemModelHandler, &ScatterItemModelHandler::itemModelChanged,
+                     qptr(), &QItemModelScatterDataProxy::itemModelChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::xPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::yPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelScatterDataProxy::zPosRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+}
+
+QT_END_NAMESPACE_DATAVISUALIZATION

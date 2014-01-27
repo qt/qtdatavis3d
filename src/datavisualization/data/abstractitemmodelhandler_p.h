@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -34,7 +34,7 @@
 #include <QPointer>
 #include <QTimer>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class AbstractItemModelHandler : public QObject
 {
@@ -74,11 +74,12 @@ protected:
     QPointer<const QAbstractItemModel> m_itemModel;  // Not owned
     bool resolvePending;
     QTimer m_resolveTimer;
+    bool m_fullReset;
 
 private:
     Q_DISABLE_COPY(AbstractItemModelHandler)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

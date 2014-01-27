@@ -5,6 +5,7 @@ uniform highp float ambientStrength;
 uniform highp float shadowQuality;
 uniform highp vec3 color_mdl;
 uniform highp sampler2DShadow shadowMap;
+uniform highp vec3 lightColor;
 
 varying highp vec4 shadowCoord;
 varying highp vec3 position_wrld;
@@ -29,33 +30,10 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.19984126, 0.78641367),
                                       vec2(0.14383161, -0.14100790));
 
-/*highp vec2 poissonDisk[16] = vec2[16](vec2(-0.25, -0.25),
-                                      vec2(0.25, -0.25),
-                                      vec2(-0.25, 0.25),
-                                      vec2(0.25, 0.25),
-                                      vec2(-0.5, -0.5),
-                                      vec2(0.5, -0.5),
-                                      vec2(-0.5, 0.5),
-                                      vec2(0.5, 0.5),
-                                      vec2(-0.75, -0.75),
-                                      vec2(0.75, -0.75),
-                                      vec2(-0.75, 0.75),
-                                      vec2(0.75, 0.75),
-                                      vec2(-1.0, -1.0),
-                                      vec2(1.0, -1.0),
-                                      vec2(-1.0, 1.0),
-                                      vec2(1.0, 1.0));*/
-
-/*float random(vec3 seed, int i) {
-    vec4 seed4 = vec4(seed, i);
-    float dot_product = dot(seed4, vec4(12.9898, 78.233, 45.164, 94.673));
-    return fract(sin(dot_product) * 43758.5453);
-}*/
-
 void main() {
     highp vec3 materialDiffuseColor = color_mdl.rgb;
-    highp vec3 materialAmbientColor = vec3(ambientStrength, ambientStrength, ambientStrength) * materialDiffuseColor;
-    highp vec3 materialSpecularColor = vec3(1.0, 1.0, 1.0);
+    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor;
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);
@@ -70,10 +48,7 @@ void main() {
 
     vec4 shadCoords = shadowCoord;
     shadCoords.z -= bias;
-    // adjust shadow strength by increasing the multiplier and lowering the addition (their sum must be 1)
-    // direct method; needs large shadow texture to look good
-    //highp float visibility = 0.75 * shadow2DProj(shadowMap, shadCoords).r + 0.25;
-    // poisson disk sampling; smoothes edges
+
     highp float visibility = 0.6;
     for (int i = 0; i < 15; i++) {
         vec4 shadCoordsPD = shadCoords;
@@ -81,18 +56,11 @@ void main() {
         shadCoordsPD.y += sin(poissonDisk[i].y) / shadowQuality;
         visibility += 0.025 * shadow2DProj(shadowMap, shadCoordsPD).r;
     }
-    // stratified poisson; produces noise but hides pixel edges well
-    /*for (int i = 0; i < 15; i++) {
-        vec4 shadCoordsPD = shadCoords;
-        int index = int(16.0 * random(gl_FragCoord.xyy, i));
-        shadCoordsPD.xy += poissonDisk[index] / 150.0;
-        visibility += 0.05 * shadow2DProj(shadowMap, shadCoordsPD).r;
-    }
-    */
 
     gl_FragColor.rgb =
-        visibility * (materialAmbientColor +
+        (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
     gl_FragColor.a = 1.0;
+    gl_FragColor.rgb = visibility * clamp(gl_FragColor.rgb, 0.0, 1.0);
 }

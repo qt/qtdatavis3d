@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -36,7 +36,7 @@
 #include "colorgradient_p.h"
 #include <QQmlListProperty>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 enum GradientType {
     GradientTypeBase,
@@ -48,13 +48,16 @@ class DeclarativeBar3DSeries : public QBar3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
-    // selectedBar property is overloaded to use QPointF instead of QPoint to work around qml bug
+    // This property is overloaded to use QPointF instead of QPoint to work around qml bug
     // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
+    // This is static method in parent class, overload as constant property for qml.
+    Q_PROPERTY(QPointF invalidSelectionPosition READ invalidSelectionPosition CONSTANT)
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
+
 public:
     DeclarativeBar3DSeries(QObject *parent = 0);
     virtual ~DeclarativeBar3DSeries();
@@ -64,7 +67,7 @@ public:
 
     void setSelectedBar(const QPointF &position);
     QPointF selectedBar() const;
-    Q_INVOKABLE QPointF invalidSelectionPosition() const;
+    QPointF invalidSelectionPosition() const;
 
     void setBaseGradient(ColorGradient *gradient);
     ColorGradient *baseGradient() const;
@@ -97,7 +100,10 @@ class DeclarativeScatter3DSeries : public QScatter3DSeries
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
+    // This is static method in parent class, overload as constant property for qml.
+    Q_PROPERTY(int invalidSelectionIndex READ invalidSelectionIndex CONSTANT)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
+
 public:
     DeclarativeScatter3DSeries(QObject *parent = 0);
     virtual ~DeclarativeScatter3DSeries();
@@ -111,6 +117,8 @@ public:
     ColorGradient *singleHighlightGradient() const;
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
+
+    int invalidSelectionIndex() const;
 
 public slots:
     void handleBaseGradientUpdate();
@@ -132,18 +140,23 @@ class DeclarativeSurface3DSeries : public QSurface3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    // This property is overloaded to use QPointF instead of QPoint to work around qml bug
+    // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
+    // This is static method in parent class, overload as constant property for qml.
+    Q_PROPERTY(QPointF invalidSelectionPosition READ invalidSelectionPosition CONSTANT)
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
+
 public:
     DeclarativeSurface3DSeries(QObject *parent = 0);
     virtual ~DeclarativeSurface3DSeries();
 
     void setSelectedPoint(const QPointF &position);
     QPointF selectedPoint() const;
-    Q_INVOKABLE QPointF invalidSelectionPosition() const;
+    QPointF invalidSelectionPosition() const;
 
     QQmlListProperty<QObject> seriesChildren();
     static void appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element);
@@ -172,6 +185,6 @@ private:
     ColorGradient *m_multiHighlightGradient; // Not owned
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

@@ -6,7 +6,8 @@ HEADERS += $$PWD/meshloader_p.h \
            $$PWD/texturehelper_p.h \
            $$PWD/utils_p.h \
            $$PWD/abstractobjecthelper_p.h \
-           $$PWD/surfaceobject_p.h
+           $$PWD/surfaceobject_p.h \
+           $$PWD/qutils.h
 
 SOURCES += $$PWD/meshloader.cpp \
            $$PWD/vertexindexer.cpp \

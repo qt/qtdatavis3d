@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 import QtQuick 2.1
-import QtDataVisualization 1.0
 
 Item {
     property alias model: dataModel

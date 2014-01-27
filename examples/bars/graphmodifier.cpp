@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,8 +17,8 @@
 ****************************************************************************/
 
 #include "graphmodifier.h"
-#include <QtDataVisualization/q3dcategoryaxis.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
@@ -27,7 +27,7 @@
 #include <QTime>
 #include <QComboBox>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
@@ -42,21 +42,21 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
       m_minval(-20.0f),
       m_maxval(20.0f),
       //! [1]
-      m_temperatureAxis(new Q3DValueAxis),
-      m_yearAxis(new Q3DCategoryAxis),
-      m_monthAxis(new Q3DCategoryAxis),
-      m_primaryData(new QBarDataProxy),
-      m_secondaryData(new QBarDataProxy),
+      m_temperatureAxis(new QValue3DAxis),
+      m_yearAxis(new QCategory3DAxis),
+      m_monthAxis(new QCategory3DAxis),
+      m_primarySeries(new QBar3DSeries),
+      m_secondarySeries(new QBar3DSeries),
       //! [1]
-      m_primaryStyle(QAbstract3DSeries::MeshBevelBar),
-      m_secondaryStyle(QAbstract3DSeries::MeshSphere),
+      m_barMesh(QAbstract3DSeries::MeshBevelBar),
       m_smooth(false)
 {
     //! [2]
-    m_graph->setShadowQuality(QDataVis::ShadowQualitySoftMedium);
-    m_graph->theme()->setBackgroundEnabled(false);
-    m_graph->theme()->setFont(QFont("Times New Roman", m_fontSize));
-    m_graph->theme()->setLabelBackgroundEnabled(true);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
+    m_graph->activeTheme()->setBackgroundEnabled(false);
+    m_graph->activeTheme()->setFont(QFont("Times New Roman", m_fontSize));
+    m_graph->activeTheme()->setLabelBackgroundEnabled(true);
+    m_graph->setMultiSeriesUniform(true);
     //! [2]
 
     m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
@@ -78,21 +78,19 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     //! [3]
 
     //! [8]
-    QBar3DSeries *series = new QBar3DSeries(m_primaryData);
-    series->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
-    series->setMesh(QAbstract3DSeries::MeshBevelBar);
-    series->setMeshSmooth(false);
+    m_primarySeries->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
+    m_primarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
+    m_primarySeries->setMeshSmooth(false);
 
-    QBar3DSeries *series2 = new QBar3DSeries(m_secondaryData);
-    series2->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
-    series2->setMesh(QAbstract3DSeries::MeshSphere);
-    series2->setMeshSmooth(false);
-    series2->setVisible(false);
+    m_secondarySeries->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
+    m_secondarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
+    m_secondarySeries->setMeshSmooth(false);
+    m_secondarySeries->setVisible(false);
     //! [8]
 
     //! [4]
-    m_graph->addSeries(series);
-    m_graph->addSeries(series2);
+    m_graph->addSeries(m_primarySeries);
+    m_graph->addSeries(m_secondarySeries);
     //! [4]
 
     //! [6]
@@ -155,9 +153,9 @@ void GraphModifier::resetTemperatureData()
         dataSet2->append(dataRow2);
     }
 
-    // Add data to the graph (the graph assumes ownership of it)
-    m_primaryData->resetArray(dataSet, m_years, m_months);
-    m_secondaryData->resetArray(dataSet2, m_years, m_months);
+    // Add data to the data proxy (the data proxy assumes ownership of it)
+    m_primarySeries->dataProxy()->resetArray(dataSet, m_years, m_months);
+    m_secondarySeries->dataProxy()->resetArray(dataSet2, m_years, m_months);
     //! [5]
 }
 
@@ -165,9 +163,9 @@ void GraphModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
-        m_primaryStyle = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
-        if (m_graph->seriesList().size())
-            m_graph->seriesList().at(0)->setMesh(m_primaryStyle);
+        m_barMesh = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        m_primarySeries->setMesh(m_barMesh);
+        m_secondarySeries->setMesh(m_barMesh);
     }
 }
 
@@ -185,16 +183,17 @@ void GraphModifier::changePresetCamera()
 
 void GraphModifier::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
-    emit backgroundEnabledChanged(m_graph->theme()->isBackgroundEnabled());
-    emit gridEnabledChanged(m_graph->theme()->isGridEnabled());
-    emit fontChanged(m_graph->theme()->font());
-    emit fontSizeChanged(m_graph->theme()->font().pointSize());
+    Q3DTheme *currentTheme = m_graph->activeTheme();
+    currentTheme->setType(Q3DTheme::Theme(theme));
+    emit backgroundEnabledChanged(currentTheme->isBackgroundEnabled());
+    emit gridEnabledChanged(currentTheme->isGridEnabled());
+    emit fontChanged(currentTheme->font());
+    emit fontSizeChanged(currentTheme->font().pointSize());
 }
 
 void GraphModifier::changeLabelBackground()
 {
-    m_graph->theme()->setLabelBackgroundEnabled(!m_graph->theme()->isLabelBackgroundEnabled());
+    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void GraphModifier::changeSelectionMode(int selectionMode)
@@ -202,25 +201,25 @@ void GraphModifier::changeSelectionMode(int selectionMode)
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(selectionMode).toInt();
-        m_graph->setSelectionMode(QDataVis::SelectionFlags(flags));
+        m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
     }
 }
 
 void GraphModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
-    m_graph->theme()->setFont(newFont);
+    m_graph->activeTheme()->setFont(newFont);
 }
 
 void GraphModifier::changeFontSize(int fontsize)
 {
     m_fontSize = fontsize;
-    QFont font = m_graph->theme()->font();
+    QFont font = m_graph->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_graph->theme()->setFont(font);
+    m_graph->activeTheme()->setFont(font);
 }
 
-void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
@@ -229,7 +228,7 @@ void GraphModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
@@ -250,31 +249,22 @@ void GraphModifier::rotateY(int rotation)
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
-    m_graph->theme()->setBackgroundEnabled(bool(enabled));
+    m_graph->activeTheme()->setBackgroundEnabled(bool(enabled));
 }
 
 void GraphModifier::setGridEnabled(int enabled)
 {
-    m_graph->theme()->setGridEnabled(bool(enabled));
+    m_graph->activeTheme()->setGridEnabled(bool(enabled));
 }
 
 void GraphModifier::setSmoothBars(int smooth)
 {
     m_smooth = bool(smooth);
-    if (m_graph->seriesList().size()) {
-        m_graph->seriesList().at(0)->setMeshSmooth(m_smooth);
-        m_graph->seriesList().at(1)->setMeshSmooth(m_smooth);
-    }
+    m_primarySeries->setMeshSmooth(m_smooth);
+    m_secondarySeries->setMeshSmooth(m_smooth);
 }
 
 void GraphModifier::setSeriesVisibility(int enabled)
 {
-    m_graph->seriesList().at(1)->setVisible(bool(enabled));
-    if (enabled) {
-        m_graph->setBarThickness(2.0f);
-        m_graph->setBarSpacing(QSizeF(1.0, 3.0));
-    } else {
-        m_graph->setBarThickness(1.0f);
-        m_graph->setBarSpacing(QSizeF(1.0, 1.0));
-    }
+    m_secondarySeries->setVisible(bool(enabled));
 }

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Scatter3DRenderer;
 
@@ -43,35 +43,35 @@ public:
     virtual ~ScatterRenderItem();
 
     inline const QVector3D &position() const { return m_position; }
-    inline void setPosition(const QVector3D &pos);
+    inline void setPosition(const QVector3D &pos)
+    {
+        if (m_position != pos) {
+            m_position = pos;
+            // Force reformatting on next access by setting label string to null string
+            if (!m_selectionLabel.isNull())
+                setSelectionLabel(QString());
+        }
+    }
+
+    inline QQuaternion rotation() const { return m_rotation; }
+    inline void setRotation(const QQuaternion &rotation)
+    {
+        if (m_rotation != rotation)
+            m_rotation = rotation;
+    }
 
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
 
-    // TODO: Will we ever support item specific size? If not, remove.
-    //inline void setSize(float size);
-    //inline float size() const { return m_size; }
-
 protected:
     QVector3D m_position;
+    QQuaternion m_rotation;
     bool m_visible;
-    //float m_size; // TODO in case we need a fourth variable that adjusts scatter item size
 
     friend class QScatterDataItem;
 };
-
-void ScatterRenderItem::setPosition(const QVector3D &pos)
-{
-    if (m_position != pos) {
-        m_position = pos;
-        // Force reformatting on next access by setting label string to null string
-        if (!m_selectionLabel.isNull())
-            setSelectionLabel(QString());
-    }
-}
-
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "scatter3drenderer_p.h"
 #include "qscatterdataproxy.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 ScatterRenderItem::ScatterRenderItem()
     : AbstractRenderItem(),
@@ -33,10 +33,11 @@ ScatterRenderItem::ScatterRenderItem(const ScatterRenderItem &other)
       m_visible(false)
 {
     m_position = other.m_position;
+    m_rotation = other.m_rotation;
 }
 
 ScatterRenderItem::~ScatterRenderItem()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

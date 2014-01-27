@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef Q3DBARSRENDERER_p_H
-#define Q3DBARSRENDERER_p_H
+#ifndef Q3DBARSRENDERER_P_H
+#define Q3DBARSRENDERER_P_H
 
 #include "datavisualizationglobal_p.h"
 #include "bars3dcontroller_p.h"
@@ -39,7 +39,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -102,15 +102,19 @@ private:
     BarRenderItem m_dummyBarRenderItem;
     QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
-    float m_seriesScale;
+    float m_seriesScaleX;
+    float m_seriesScaleZ;
     float m_seriesStep;
     float m_seriesStart;
+    QPoint m_clickedPosition;
+    bool m_keepSeriesUniform;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
@@ -118,22 +122,23 @@ protected:
     virtual void initializeOpenGL();
 
 public slots:
+    void updateMultiSeriesScaling(bool uniform);
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
+    inline QPoint clickedPosition() const { return m_clickedPosition; }
+    void resetClickedStatus();
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
-
-signals:
-    void barClicked(QPoint position, QBar3DSeries *series);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
+    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
@@ -162,7 +167,6 @@ private:
     friend class BarRenderItem;
 };
 
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

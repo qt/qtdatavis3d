@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qdatavisualizationenums.h"
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
@@ -39,15 +38,13 @@ public:
 };
 StaticLibInitializer staticLibInitializer;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
 Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
-      m_font(theme->font()),
-      m_labelBackground(theme->isLabelBackgroundEnabled()),
       m_textureHelper(0),
       m_pointbuffer(0)
 {
@@ -71,8 +68,6 @@ void Drawer::initializeOpenGL()
 void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
-    m_font = m_theme->font();
-    m_labelBackground = m_theme->isLabelBackgroundEnabled();
     emit drawerChanged();
 }
 
@@ -81,25 +76,9 @@ Q3DTheme *Drawer::theme() const
     return m_theme;
 }
 
-void Drawer::setFont(const QFont &font)
-{
-    // We need to be able to override theme's font for drawer
-    // TODO: (or do we?)
-    m_font = font;
-    emit drawerChanged();
-}
-
 QFont Drawer::font() const
 {
-    return m_font;
-}
-
-void Drawer::setLabelBackground(bool enabled)
-{
-    // We need to be able to override theme's label background for drawer
-    // TODO: (or do we?)
-    m_labelBackground = enabled;
-    emit drawerChanged();
+    return m_theme->font();
 }
 
 void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
@@ -205,7 +184,7 @@ void Drawer::drawPoint(ShaderHelper *shader)
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                        const QVector3D &positionComp, const QVector3D &rotation,
-                       GLfloat itemHeight, QDataVis::SelectionFlags mode,
+                       GLfloat itemHeight, QAbstract3DGraph::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        const Q3DCamera *camera, bool useDepth, bool rotateAlong,
                        LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
@@ -223,7 +202,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     switch (position) {
     case LabelBelow: {
-        yPosition = -2.6f + positionComp.y(); // minus maximum negative height (+ some extra for axis title label)
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight - 0.1f;
         break;
     }
     case LabelLow: {
@@ -231,79 +210,96 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         break;
     }
     case LabelMid: {
-        // Use this for positioning with absolute item y position value
         yPosition = item.translation().y();
         break;
     }
     case LabelHigh: {
-        // TODO: Fix this. Can't seem to get it right (if ok with positive-only bars, doesn't look good on +- and vice versa)
         yPosition = item.translation().y() + itemHeight / 2.0f;
         break;
     }
     case LabelOver: {
-        float mod = 0.3f;
-        if (itemHeight < 0)
-            mod = 0.15f;
-        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight + mod;
+        yPosition = item.translation().y() - (positionComp.y() / 2.0f) + itemHeight + 0.1f;
         break;
     }
     case LabelBottom: {
-        yPosition = -2.95f + positionComp.y();
+        yPosition = -2.75f + positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelTop: {
-        yPosition = 2.95f - positionComp.y();
+        yPosition = 2.75f - positionComp.y();
         xPosition = 0.0f;
         break;
     }
     case LabelLeft: {
         yPosition = 0.0f;
-        xPosition = -2.95f;
+        xPosition = -2.75f;
         break;
     }
     case LabelRight: {
         yPosition = 0.0f;
-        xPosition = 2.95f;
+        xPosition = 2.75f;
         break;
     }
     }
 
     // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_font.pointSizeF() / 500.0f;
+    GLfloat scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Apply alignment
     GLfloat xAlignment = 0.0f;
     GLfloat yAlignment = 0.0f;
     GLfloat zAlignment = 0.0f;
+    GLfloat sinRotY = qFabs(qSin(qDegreesToRadians(rotation.y())));
+    GLfloat cosRotY = qFabs(qCos(qDegreesToRadians(rotation.y())));
+    GLfloat sinRotZ = 0.0f;
+    GLfloat cosRotZ = 0.0f;
+    if (rotation.z()) {
+        sinRotZ = qFabs(qSin(qDegreesToRadians(rotation.z())));
+        cosRotZ = qFabs(qCos(qDegreesToRadians(rotation.z())));
+    }
     switch (alignment) {
     case Qt::AlignLeft: {
-        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        zAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qSin(qDegreesToRadians(rotation.y())));
+        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
+            xAlignment = ((-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                          - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
+            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
+        } else {
+            xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+            zAlignment = ((GLfloat)textureSize.width() * scaleFactor) * sinRotY;
+        }
         break;
     }
     case Qt::AlignRight: {
-        xAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        zAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qSin(qDegreesToRadians(rotation.y())));
+        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
+            xAlignment = (((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
+            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
+                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
+        } else {
+            xAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+            zAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * sinRotY;
+        }
         break;
     }
     case Qt::AlignTop: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        if (itemHeight < 0)
-            yAlignment = -yAlignment;
+        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
         break;
     }
     case Qt::AlignBottom: {
-        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor)
-                * qFabs(qCos(qDegreesToRadians(rotation.y())));
-        if (itemHeight < 0)
-            yAlignment = -yAlignment;
+        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+        break;
+    }
+    case Qt::AlignHCenter: {
+        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
+        break;
+    }
+    case Qt::AlignVCenter: {
+        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
+                + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
         break;
     }
     default: {
@@ -315,7 +311,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         xPosition = item.translation().x();
         if (useDepth)
             zPosition = item.translation().z();
-        else if (mode.testFlag(QDataVis::SelectionColumn) && isSlicing)
+        else if (mode.testFlag(QAbstract3DGraph::SelectionColumn) && isSlicing)
             xPosition = -(item.translation().z()) + positionComp.z(); // flip first to left
     }
 
@@ -367,11 +363,11 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
     if (!text.isEmpty()) {
         // Create labels
         // Print label into a QImage using QPainter
-        QImage label = Utils::printTextToImage(m_font,
+        QImage label = Utils::printTextToImage(m_theme->font(),
                                                text,
                                                m_theme->labelBackgroundColor(),
                                                m_theme->labelTextColor(),
-                                               m_labelBackground,
+                                               m_theme->isLabelBackgroundEnabled(),
                                                m_theme->isLabelBorderEnabled(),
                                                widestLabel);
 
@@ -382,4 +378,4 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

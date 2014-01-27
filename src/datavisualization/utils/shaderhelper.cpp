@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 
 #include <QOpenGLShader>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -92,6 +92,7 @@ void ShaderHelper::initialize()
     m_shadowUniform = m_program->uniformLocation("shadowMap");
     m_gradientMinUniform = m_program->uniformLocation("gradMin");
     m_gradientHeightUniform = m_program->uniformLocation("gradHeight");
+    m_lightColorUniform = m_program->uniformLocation("lightColor");
     m_initialized = true;
 }
 
@@ -247,6 +248,13 @@ GLuint ShaderHelper::gradientHeight()
     return m_gradientHeightUniform;
 }
 
+GLuint ShaderHelper::lightColor()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_lightColorUniform;
+}
+
 GLuint ShaderHelper::posAtt()
 {
     if (!m_initialized)
@@ -268,4 +276,4 @@ GLuint ShaderHelper::normalAtt()
     return m_normalAttr;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

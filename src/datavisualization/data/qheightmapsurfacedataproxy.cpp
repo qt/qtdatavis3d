@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "qheightmapsurfacedataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 // Default ranges correspond value axis defaults
 const float defaultMinValue = 0.0f;
@@ -296,9 +296,7 @@ const QHeightMapSurfaceDataProxyPrivate *QHeightMapSurfaceDataProxy::dptrc() con
     return static_cast<const QHeightMapSurfaceDataProxyPrivate *>(d_ptr.data());
 }
 
-//
 //  QHeightMapSurfaceDataProxyPrivate
-//
 
 QHeightMapSurfaceDataProxyPrivate::QHeightMapSurfaceDataProxyPrivate(QHeightMapSurfaceDataProxy *q)
     : QSurfaceDataProxyPrivate(q),
@@ -321,7 +319,8 @@ QHeightMapSurfaceDataProxy *QHeightMapSurfaceDataProxyPrivate::qptr()
     return static_cast<QHeightMapSurfaceDataProxy *>(q_ptr);
 }
 
-void QHeightMapSurfaceDataProxyPrivate::setValueRanges(float minX, float maxX, float minZ, float maxZ)
+void QHeightMapSurfaceDataProxyPrivate::setValueRanges(float minX, float maxX,
+                                                       float minZ, float maxZ)
 {
     bool minXChanged = false;
     bool maxXChanged = false;
@@ -509,10 +508,10 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
             for (; j < lastCol; j++)
                 newRow[j].setPosition(QVector3D((float(j) * xMul) + m_minXValue,
                                                 float(bits[bitCount + (j * 4)]),
-                                                zVal));
+                                      zVal));
             newRow[j].setPosition(QVector3D(m_maxXValue,
                                             float(bits[bitCount + (j * 4)]),
-                                            zVal));
+                                  zVal));
         }
     } else {
         // Not grayscale, we'll need to calculate height from RGB
@@ -548,4 +547,4 @@ void QHeightMapSurfaceDataProxyPrivate::handlePendingResolve()
     emit qptr()->heightMapChanged(m_heightMap);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

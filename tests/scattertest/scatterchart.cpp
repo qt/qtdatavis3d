@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #include "scatterchart.h"
 #include <QtDataVisualization/qscatterdataproxy.h>
 #include <QtDataVisualization/qscatter3dseries.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
@@ -37,24 +37,31 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_selectedItem(-1),
       m_targetSeries(0)
 {
-    m_chart->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
-    QFont font = m_chart->theme()->font();
+    m_chart->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+    QFont font = m_chart->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_chart->theme()->setFont(font);
-    m_chart->setShadowQuality(QDataVis::ShadowQualityNone);
+    m_chart->activeTheme()->setFont(font);
+    m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
-    m_chart->setAxisX(new Q3DValueAxis);
-    m_chart->setAxisY(new Q3DValueAxis);
-    m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->setAxisX(new QValue3DAxis);
+    m_chart->setAxisY(new QValue3DAxis);
+    m_chart->setAxisZ(new QValue3DAxis);
 
     createAndAddSeries();
     createAndAddSeries();
 
-    m_chart->setSelectionMode(QDataVis::SelectionItem);
+    m_chart->setSelectionMode(QAbstract3DGraph::SelectionItem);
 
     QObject::connect(&m_timer, &QTimer::timeout, this, &ScatterDataModifier::timeout);
     QObject::connect(m_chart, &Q3DScatter::shadowQualityChanged, this,
                      &ScatterDataModifier::shadowQualityUpdatedByVisual);
+
+    QObject::connect(m_chart, &Q3DScatter::axisXChanged, this,
+                     &ScatterDataModifier::handleAxisXChanged);
+    QObject::connect(m_chart, &Q3DScatter::axisYChanged, this,
+                     &ScatterDataModifier::handleAxisYChanged);
+    QObject::connect(m_chart, &Q3DScatter::axisZChanged, this,
+                     &ScatterDataModifier::handleAxisZChanged);
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -105,6 +112,8 @@ void ScatterDataModifier::addData()
 
     m_chart->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     m_chart->seriesList().at(1)->dataProxy()->resetArray(dataArray2);
+    m_chart->seriesList().at(0)->setItemSize(0.0f);
+    m_chart->seriesList().at(1)->setItemSize(0.0f);
 }
 
 void ScatterDataModifier::changeStyle()
@@ -161,7 +170,7 @@ void ScatterDataModifier::changeTheme()
 {
     static int theme = Q3DTheme::ThemeQt;
 
-    m_chart->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    m_chart->activeTheme()->setType(Q3DTheme::Theme(theme));
 
     if (++theme > Q3DTheme::ThemeIsabelle)
         theme = Q3DTheme::ThemeQt;
@@ -169,22 +178,22 @@ void ScatterDataModifier::changeTheme()
 
 void ScatterDataModifier::changeLabelStyle()
 {
-    m_chart->theme()->setLabelBackgroundEnabled(!m_chart->theme()->isLabelBackgroundEnabled());
+    m_chart->activeTheme()->setLabelBackgroundEnabled(!m_chart->activeTheme()->isLabelBackgroundEnabled());
 }
 
 void ScatterDataModifier::changeFont(const QFont &font)
 {
     QFont newFont = font;
     newFont.setPointSizeF(m_fontSize);
-    m_chart->theme()->setFont(newFont);
+    m_chart->activeTheme()->setFont(newFont);
 }
 
 void ScatterDataModifier::changeFontSize(int fontSize)
 {
     m_fontSize = fontSize;
-    QFont font = m_chart->theme()->font();
+    QFont font = m_chart->activeTheme()->font();
     font.setPointSize(m_fontSize);
-    m_chart->theme()->setFont(font);
+    m_chart->activeTheme()->setFont(font);
 }
 
 void ScatterDataModifier::changePointSize(int pointSize)
@@ -192,7 +201,7 @@ void ScatterDataModifier::changePointSize(int pointSize)
     m_targetSeries->setItemSize(0.01f *  float(pointSize));
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(QDataVis::ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
      // Updates the UI component to show correct shadow quality
@@ -217,9 +226,9 @@ void ScatterDataModifier::resetAxes()
     m_chart->releaseAxis(m_chart->axisY());
     m_chart->releaseAxis(m_chart->axisZ());
 
-    m_chart->setAxisX(new Q3DValueAxis);
-    m_chart->setAxisY(new Q3DValueAxis);
-    m_chart->setAxisZ(new Q3DValueAxis);
+    m_chart->setAxisX(new QValue3DAxis);
+    m_chart->setAxisY(new QValue3DAxis);
+    m_chart->setAxisZ(new QValue3DAxis);
     m_chart->axisX()->setSegmentCount(5);
     m_chart->axisY()->setSegmentCount(5);
     m_chart->axisZ()->setSegmentCount(5);
@@ -461,21 +470,48 @@ void ScatterDataModifier::removeSeries()
     }
 }
 
+void ScatterDataModifier::toggleSeriesVisibility()
+{
+    if (m_targetSeries)
+        m_targetSeries->setVisible(!m_targetSeries->isVisible());
+}
+
+void ScatterDataModifier::changeSeriesName()
+{
+    if (m_targetSeries)
+        m_targetSeries->setName(m_targetSeries->name().append("-").append(QString::number(qrand() % 10)));
+}
+
+void ScatterDataModifier::handleAxisXChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisX());
+}
+
+void ScatterDataModifier::handleAxisYChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisY());
+}
+
+void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
+{
+    qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisZ());
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QDataVis::ShadowQuality sq = QDataVis::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_chart->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }
 
 void ScatterDataModifier::setBackgroundEnabled(int enabled)
 {
-    m_chart->theme()->setBackgroundEnabled((bool)enabled);
+    m_chart->activeTheme()->setBackgroundEnabled((bool)enabled);
 }
 
 void ScatterDataModifier::setGridEnabled(int enabled)
 {
-    m_chart->theme()->setGridEnabled((bool)enabled);
+    m_chart->activeTheme()->setGridEnabled((bool)enabled);
 }
 
 QVector3D ScatterDataModifier::randVector()
@@ -496,10 +532,12 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
         m_targetSeries = series;
 
     m_chart->addSeries(series);
-    series->setItemLabelFormat(QString("%1: @xLabel - @yLabel - @zLabel").arg(counter++));
+    series->setName(QString("Series %1").arg(counter++));
+    series->setItemLabelFormat(QStringLiteral("@seriesName: @xLabel - @yLabel - @zLabel"));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
     series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));
+    series->setItemSize(float(rand() % 90 + 10) / 100.0f);
 
     QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
                      &ScatterDataModifier::handleSelectionChange);

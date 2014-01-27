@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "surfacegraph.h"
 
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DTheme>
 #include <QtGui/QImage>
 #include <QtCore/qmath.h>
@@ -35,9 +35,9 @@ const float sampleMax = 8.0f;
 SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     : m_graph(surface)
 {
-    m_graph->setAxisX(new Q3DValueAxis);
-    m_graph->setAxisY(new Q3DValueAxis);
-    m_graph->setAxisZ(new Q3DValueAxis);
+    m_graph->setAxisX(new QValue3DAxis);
+    m_graph->setAxisY(new QValue3DAxis);
+    m_graph->setAxisZ(new QValue3DAxis);
 
     //! [0]
     m_sqrtSinProxy = new QSurfaceDataProxy();
@@ -229,7 +229,7 @@ void SurfaceGraph::setAxisZRange(float min, float max)
 //! [6]
 void SurfaceGraph::changeTheme(int theme)
 {
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::Theme(theme)));
+    m_graph->activeTheme()->setType(Q3DTheme::Theme(theme));
 }
 //! [6]
 

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -30,28 +30,28 @@
 #define Q3DBARS_P_H
 
 #include "bars3dcontroller_p.h"
-#include "qdatavisualizationenums.h"
-#include "q3dwindow_p.h"
+#include "qabstract3dgraph_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBars;
 
-class Q3DBarsPrivate : public Q3DWindowPrivate
+class Q3DBarsPrivate : public QAbstract3DGraphPrivate
 {
     Q_OBJECT
 public:
     Q3DBarsPrivate(Q3DBars *q);
     ~Q3DBarsPrivate();
 
-    // Used to detect when shadow quality changes autonomously due to e.g. resizing.
-    void handleShadowQualityUpdate(QDataVis::ShadowQuality quality);
+    void handleAxisXChanged(QAbstract3DAxis *axis);
+    void handleAxisYChanged(QAbstract3DAxis *axis);
+    void handleAxisZChanged(QAbstract3DAxis *axis);
 
     Q3DBars *qptr();
 
     Bars3DController *m_shared;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

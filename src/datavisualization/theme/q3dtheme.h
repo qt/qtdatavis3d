@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,12 +19,13 @@
 #ifndef Q3DTHEME_H
 #define Q3DTHEME_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QLinearGradient>
 #include <QFont>
 #include <QColor>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DThemePrivate;
 
@@ -42,7 +43,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_PROPERTY(QColor gridLineColor READ gridLineColor WRITE setGridLineColor NOTIFY gridLineColorChanged)
     Q_PROPERTY(QColor singleHighlightColor READ singleHighlightColor WRITE setSingleHighlightColor NOTIFY singleHighlightColorChanged)
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
-    Q_PROPERTY(QColor lightColor READ lightColor WRITE setLightColor NOTIFY lightColorChanged) // TODO: Not used yet
+    Q_PROPERTY(QColor lightColor READ lightColor WRITE setLightColor NOTIFY lightColorChanged)
     Q_PROPERTY(QList<QLinearGradient> baseGradients READ baseGradients WRITE setBaseGradients NOTIFY baseGradientsChanged)
     Q_PROPERTY(QLinearGradient singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
@@ -55,7 +56,6 @@ class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
     Q_PROPERTY(bool gridEnabled READ isGridEnabled WRITE setGridEnabled NOTIFY gridEnabledChanged)
     Q_PROPERTY(bool labelBackgroundEnabled READ isLabelBackgroundEnabled WRITE setLabelBackgroundEnabled NOTIFY labelBackgroundEnabledChanged)
     Q_PROPERTY(ColorStyle colorStyle READ colorStyle WRITE setColorStyle NOTIFY colorStyleChanged)
-    // TODO: Add everything we need (specularIntensity, lightDegradation, shaders?)
 
 public:
     enum ColorStyle {
@@ -178,11 +178,13 @@ protected:
     friend class ThemeManager;
     friend class Abstract3DRenderer;
     friend class Bars3DController;
+    friend class AbstractDeclarative;
+    friend class Abstract3DController;
 
 private:
     Q_DISABLE_COPY(Q3DTheme)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

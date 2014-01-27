@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "qbardataitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QBarDataItem
@@ -37,7 +37,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 QBarDataItem::QBarDataItem()
     : d_ptr(0), // private data doesn't exist by default (optimization)
-      m_value(0.0f)
+      m_value(0.0f),
+      m_angle(0.0f)
 {
 }
 
@@ -46,7 +47,18 @@ QBarDataItem::QBarDataItem()
  */
 QBarDataItem::QBarDataItem(float value)
     : d_ptr(0),
-      m_value(value)
+      m_value(value),
+      m_angle(0.0f)
+{
+}
+
+/*!
+ * Constructs QBarDataItem with \a value and \a angle
+ */
+QBarDataItem::QBarDataItem(float value, float angle)
+    : d_ptr(0),
+      m_value(value),
+      m_angle(angle)
 {
 }
 
@@ -72,11 +84,11 @@ QBarDataItem::~QBarDataItem()
 QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 {
     m_value = other.m_value;
+    m_angle = other.m_angle;
     if (other.d_ptr)
         createExtraData();
     else
         d_ptr = 0;
-    // TODO set extra data
     return *this;
 }
 
@@ -88,6 +100,16 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 /*!
  * \fn float QBarDataItem::value() const
  * \return value of this data item.
+ */
+
+/*!
+ * \fn void QBarDataItem::setRotation(float angle)
+ * Sets rotation \a angle in degrees for this data item.
+ */
+
+/*!
+ * \fn float QBarDataItem::rotation() const
+ * \return rotation angle in degrees for this data item.
  */
 
 /*!
@@ -107,4 +129,4 @@ QBarDataItemPrivate::~QBarDataItemPrivate()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

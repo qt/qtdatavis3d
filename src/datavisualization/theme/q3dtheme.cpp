@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,8 +17,9 @@
 ****************************************************************************/
 
 #include "q3dtheme_p.h"
+#include "thememanager_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class Q3DTheme
@@ -110,8 +111,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *     \li Qt::white
  *   \row
  *     \li lightColor
- *     \li The color of the specular light. Doesn't affect ambient light. \note Not yet supported
- *         in alpha release.
+ *     \li The color of the light. Affects both ambient and specular light.
  *     \li Qt::white
  *   \row
  *     \li lightStrength
@@ -121,22 +121,22 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  *   \row
  *     \li multiHighlightColor
  *     \li The color to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  *     \li Qt::blue
  *   \row
  *     \li multiHighlightGradient
  *     \li The gradient to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li singleHighlightColor
  *     \li The color to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionItem flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
  *     \li Qt::red
  *   \row
  *     \li singleHighlightGradient
  *     \li The gradient to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QDataVis::SelectionItem flag set.
+ *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li windowColor
@@ -234,6 +234,8 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * Using a user-defined theme:
  *
  * \snippet doc_src_q3dtheme.cpp 6
+ *
+ * For Theme3D enums, see \l Q3DTheme::ColorStyle and \l Q3DTheme::Theme
  */
 
 /*!
@@ -292,8 +294,6 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty Color Theme3D::lightColor
  *
  * Color for the specular light defined in Scene3D.
- *
- * \warning Not supported in alpha release.
  */
 
 /*!
@@ -377,6 +377,9 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \qmlproperty Theme3D.Theme Theme3D::type
  *
  * The type of the theme. If no type is set, the type is \c Theme3D.ThemeUserDefined.
+ * Changing the theme type after the item has been constructed will change all other properties
+ * of the theme to what the predefined theme specifies. Changing the theme type of the active theme
+ * of the graph will also reset all attached series to use the new theme.
  */
 
 /*!
@@ -385,7 +388,7 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 Q3DTheme::Q3DTheme(QObject *parent)
     : QObject(parent),
-      d_ptr(new Q3DThemePrivate(this, ThemeUserDefined))
+      d_ptr(new Q3DThemePrivate(this))
 {
 }
 
@@ -396,8 +399,9 @@ Q3DTheme::Q3DTheme(QObject *parent)
  */
 Q3DTheme::Q3DTheme(Theme themeType, QObject *parent)
     : QObject(parent),
-      d_ptr(new Q3DThemePrivate(this, themeType))
+      d_ptr(new Q3DThemePrivate(this))
 {
+    setType(themeType);
 }
 
 /*!
@@ -408,7 +412,7 @@ Q3DTheme::Q3DTheme(Q3DThemePrivate *d, Theme themeType,
     QObject(parent),
     d_ptr(d)
 {
-    d_ptr->m_themeId = themeType;
+    setType(themeType);
 }
 
 /*!
@@ -418,7 +422,6 @@ Q3DTheme::~Q3DTheme()
 {
 }
 
-// TODO: Add needRenders if necessary after color api has been added to series (QTRD-2200/2557)
 /*!
  * \property Q3DTheme::baseColors
  *
@@ -549,7 +552,7 @@ QColor Q3DTheme::gridLineColor() const
  * \property Q3DTheme::singleHighlightColor
  *
  * Highlight color for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode} has
- * \c QDataVis::SelectionItem flag set.
+ * \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
 {
@@ -569,7 +572,7 @@ QColor Q3DTheme::singleHighlightColor() const
  * \property Q3DTheme::multiHighlightColor
  *
  * Highlight color for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode} has
- * \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ * \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
 {
@@ -589,8 +592,6 @@ QColor Q3DTheme::multiHighlightColor() const
  * \property Q3DTheme::lightColor
  *
  * Color for the specular light defined in Q3DScene.
- *
- * \warning Not supported in alpha release.
  */
 void Q3DTheme::setLightColor(const QColor &color)
 {
@@ -638,7 +639,7 @@ QList<QLinearGradient> Q3DTheme::baseGradients() const
  * \property Q3DTheme::singleHighlightGradient
  *
  * Highlight gradient for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QDataVis::SelectionItem flag set.
+ * has \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
@@ -658,7 +659,7 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
  * \property Q3DTheme::multiHighlightGradient
  *
  * Highlight gradient for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QDataVis::SelectionRow or \c QDataVis::SelectionColumn flag set.
+ * has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
@@ -862,14 +863,18 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
 /*!
  * \property Q3DTheme::type
  *
- * The type of the theme. Type is automatically set when constructing a theme. User should not
- * need to use this when using C++ API.
+ * The type of the theme. The type is automatically set when constructing a theme,
+ * but can also be changed later. Changing the theme type will change all other
+ * properties of the theme to what the predefined theme specifies.
+ * Changing the theme type of the active theme of the graph will also reset all
+ * attached series to use the new theme.
  */
 void Q3DTheme::setType(Theme themeType)
 {
     d_ptr->m_dirtyBits.themeIdDirty = true;
     if (d_ptr->m_themeId != themeType) {
         d_ptr->m_themeId = themeType;
+        ThemeManager::setPredefinedPropertiesToTheme(this, themeType);
         emit typeChanged(themeType);
     }
 }
@@ -881,9 +886,9 @@ Q3DTheme::Theme Q3DTheme::type() const
 
 // Q3DThemePrivate
 
-Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
+Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q)
     : QObject(0),
-      m_themeId(theme_id),
+      m_themeId(Q3DTheme::ThemeUserDefined),
       m_backgroundColor(Qt::black),
       m_windowColor(Qt::black),
       m_textColor(Qt::white),
@@ -907,6 +912,8 @@ Q3DThemePrivate::Q3DThemePrivate(Q3DTheme *q, Q3DTheme::Theme theme_id)
       m_backgoundEnabled(true),
       m_gridEnabled(true),
       m_labelBackground(true),
+      m_isDefaultTheme(false),
+      m_forcePredefinedType(true),
       q_ptr(q)
 {
     m_baseColors.append(QColor(Qt::black));
@@ -947,118 +954,102 @@ void Q3DThemePrivate::resetDirtyBits()
 
 bool Q3DThemePrivate::sync(Q3DThemePrivate &other)
 {
-    bool changed = false;
+    bool updateDrawer = false;
     if (m_dirtyBits.ambientLightStrengthDirty) {
         other.q_ptr->setAmbientLightStrength(m_ambientLightStrength);
         m_dirtyBits.ambientLightStrengthDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.backgroundColorDirty) {
         other.q_ptr->setBackgroundColor(m_backgroundColor);
         m_dirtyBits.backgroundColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.backgroundEnabledDirty) {
         other.q_ptr->setBackgroundEnabled(m_backgoundEnabled);
         m_dirtyBits.backgroundEnabledDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.baseColorDirty) {
         other.q_ptr->setBaseColors(m_baseColors);
         m_dirtyBits.baseColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.baseGradientDirty) {
         other.q_ptr->setBaseGradients(m_baseGradients);
         m_dirtyBits.baseGradientDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.colorStyleDirty) {
         other.q_ptr->setColorStyle(m_colorStyle);
         m_dirtyBits.colorStyleDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.fontDirty) {
         other.q_ptr->setFont(m_font);
         m_dirtyBits.fontDirty = false;
-        changed = true;
+        updateDrawer = true;
     }
     if (m_dirtyBits.gridEnabledDirty) {
         other.q_ptr->setGridEnabled(m_gridEnabled);
         m_dirtyBits.gridEnabledDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.gridLineColorDirty) {
         other.q_ptr->setGridLineColor(m_gridLineColor);
         m_dirtyBits.gridLineColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.highlightLightStrengthDirty) {
         other.q_ptr->setHighlightLightStrength(m_highlightLightStrength);
         m_dirtyBits.highlightLightStrengthDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.labelBackgroundColorDirty) {
         other.q_ptr->setLabelBackgroundColor(m_textBackgroundColor);
         m_dirtyBits.labelBackgroundColorDirty = false;
-        changed = true;
+        updateDrawer = true;
     }
     if (m_dirtyBits.labelBackgroundEnabledDirty) {
         other.q_ptr->setLabelBackgroundEnabled(m_labelBackground);
         m_dirtyBits.labelBackgroundEnabledDirty = false;
-        changed = true;
+        updateDrawer = true;
     }
     if (m_dirtyBits.labelBorderEnabledDirty) {
         other.q_ptr->setLabelBorderEnabled(m_labelBorders);
         m_dirtyBits.labelBorderEnabledDirty = false;
-        changed = true;
+        updateDrawer = true;
     }
     if (m_dirtyBits.labelTextColorDirty) {
         other.q_ptr->setLabelTextColor(m_textColor);
         m_dirtyBits.labelTextColorDirty = false;
-        changed = true;
+        updateDrawer = true;
     }
     if (m_dirtyBits.lightColorDirty) {
         other.q_ptr->setLightColor(m_lightColor);
         m_dirtyBits.lightColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.lightStrengthDirty) {
         other.q_ptr->setLightStrength(m_lightStrength);
         m_dirtyBits.lightStrengthDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.multiHighlightColorDirty) {
         other.q_ptr->setMultiHighlightColor(m_multiHighlightColor);
         m_dirtyBits.multiHighlightColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.multiHighlightGradientDirty) {
         other.q_ptr->setMultiHighlightGradient(m_multiHighlightGradient);
         m_dirtyBits.multiHighlightGradientDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.singleHighlightColorDirty) {
         other.q_ptr->setSingleHighlightColor(m_singleHighlightColor);
         m_dirtyBits.singleHighlightColorDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.singleHighlightGradientDirty) {
         other.q_ptr->setSingleHighlightGradient(m_singleHighlightGradient);
         m_dirtyBits.singleHighlightGradientDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.themeIdDirty) {
         other.m_themeId = m_themeId; // Set directly to avoid a call to ThemeManager's useTheme()
         m_dirtyBits.themeIdDirty = false;
-        changed = true;
     }
     if (m_dirtyBits.windowColorDirty) {
         other.q_ptr->setWindowColor(m_windowColor);
         m_dirtyBits.windowColorDirty = false;
-        changed = true;
     }
-    return changed;
+
+    return updateDrawer;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

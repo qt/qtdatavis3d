@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,16 +17,21 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
+#include "declarativetheme_p.h"
+
 #include <QThread>
 #include <QGuiApplication>
 #include <QSGSimpleRectNode>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+
+static QList<const QQuickWindow *> clearList;
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
-    m_controller(0)
+    m_controller(0),
+    m_clearWindowBeforeRendering(true)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(true);
@@ -36,57 +41,93 @@ AbstractDeclarative::~AbstractDeclarative()
 {
 }
 
-Q3DScene* AbstractDeclarative::scene() const
+Declarative3DScene* AbstractDeclarative::scene() const
 {
-    return m_controller->scene();
+    return static_cast<Declarative3DScene *>(m_controller->scene());
 }
 
 void AbstractDeclarative::setTheme(Q3DTheme *theme)
 {
-    m_controller->setTheme(theme);
+    m_controller->setActiveTheme(theme);
 }
 
 Q3DTheme *AbstractDeclarative::theme() const
 {
-    return m_controller->theme();
+    return m_controller->activeTheme();
 }
 
-void AbstractDeclarative::setSelectionMode(QDataVis::SelectionFlags mode)
+void AbstractDeclarative::clearSelection()
 {
-    m_controller->setSelectionMode(mode);
+    m_controller->clearSelection();
 }
 
-QDataVis::SelectionFlags AbstractDeclarative::selectionMode() const
+void AbstractDeclarative::setClearWindowBeforeRendering(bool enable)
 {
-    return m_controller->selectionMode();
+    if (m_clearWindowBeforeRendering != enable) {
+        m_clearWindowBeforeRendering = enable;
+        emit clearWindowBeforeRenderingChanged(enable);
+    }
 }
 
-void AbstractDeclarative::setShadowQuality(QDataVis::ShadowQuality quality)
+bool AbstractDeclarative::clearWindowBeforeRendering() const
 {
-    m_controller->setShadowQuality(quality);
+    return m_clearWindowBeforeRendering;
 }
 
-QDataVis::ShadowQuality AbstractDeclarative::shadowQuality() const
+void AbstractDeclarative::setSelectionMode(SelectionFlags mode)
 {
-    return m_controller->shadowQuality();
+    int intmode = int(mode);
+    m_controller->setSelectionMode(QAbstract3DGraph::SelectionFlags(intmode));
+}
+
+AbstractDeclarative::SelectionFlags AbstractDeclarative::selectionMode() const
+{
+    int intmode = int(m_controller->selectionMode());
+    return SelectionFlags(intmode);
+}
+
+void AbstractDeclarative::setShadowQuality(ShadowQuality quality)
+{
+    m_controller->setShadowQuality(QAbstract3DGraph::ShadowQuality(quality));
+}
+
+AbstractDeclarative::ShadowQuality AbstractDeclarative::shadowQuality() const
+{
+    return ShadowQuality(m_controller->shadowQuality());
 }
 
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
+
+    // Reset default theme, as the default C++ theme is Q3DTheme, not DeclarativeTheme3D.
+    DeclarativeTheme3D *defaultTheme = new DeclarativeTheme3D;
+    defaultTheme->d_ptr->setDefaultTheme(true);
+    defaultTheme->setType(Q3DTheme::ThemeQt);
+    m_controller->setActiveTheme(defaultTheme);
+
     QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
-                     &AbstractDeclarative::shadowQualityChanged);
+                     &AbstractDeclarative::handleShadowQualityChange);
     QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
                      &AbstractDeclarative::inputHandlerChanged);
-    QObject::connect(m_controller, &Abstract3DController::themeChanged, this,
+    QObject::connect(m_controller, &Abstract3DController::activeThemeChanged, this,
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
-                     &AbstractDeclarative::selectionModeChanged);
+                     &AbstractDeclarative::handleSelectionModeChange);
+
+    QObject::connect(m_controller, &Abstract3DController::axisXChanged, this,
+                     &AbstractDeclarative::handleAxisXChanged);
+    QObject::connect(m_controller, &Abstract3DController::axisYChanged, this,
+                     &AbstractDeclarative::handleAxisYChanged);
+    QObject::connect(m_controller, &Abstract3DController::axisZChanged, this,
+                     &AbstractDeclarative::handleAxisZChanged);
 }
 
 void AbstractDeclarative::synchDataToRenderer()
 {
+    if (m_clearWindowBeforeRendering && clearList.size())
+        clearList.clear();
     m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
 }
@@ -140,24 +181,38 @@ void AbstractDeclarative::updateWindowParameters()
             win->update();
         }
 
-        QPointF point = QQuickItem::mapToScene(QPointF(m_cachedGeometry.x(), m_cachedGeometry.y()));
+        QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
         if (m_controller) {
-            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(), m_cachedGeometry.height()));
+            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
+                                            m_cachedGeometry.height()));
         }
     }
+}
+
+void AbstractDeclarative::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
+{
+    int intmode = int(mode);
+    emit selectionModeChanged(SelectionFlags(intmode));
+}
+
+void AbstractDeclarative::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
+{
+    emit shadowQualityChanged(ShadowQuality(quality));
 }
 
 void AbstractDeclarative::render()
 {
     updateWindowParameters();
 
-    // Clear the background as that is not done by default
-    glViewport(0, 0, window()->width(), window()->height());
-    QColor clearColor = window()->color();
-    glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // Clear the background once per window as that is not done by default
+    const QQuickWindow *win = window();
+    if (m_clearWindowBeforeRendering && !clearList.contains(win)) {
+        clearList.append(win);
+        QColor clearColor = win->color();
+        glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
-    // TODO: Store the state of these and restore before returning
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -214,4 +269,4 @@ void AbstractDeclarative::wheelEvent(QWheelEvent *event)
     m_controller->wheelEvent(event);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

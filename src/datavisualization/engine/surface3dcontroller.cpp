@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,9 +19,9 @@
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
 #include "camerahelper_p.h"
-#include "q3dabstractaxis_p.h"
-#include "q3dvalueaxis_p.h"
-#include "q3dcategoryaxis.h"
+#include "qabstract3daxis_p.h"
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 #include "shaderhelper_p.h"
@@ -30,10 +30,10 @@
 
 #include <QDebug>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-Surface3DController::Surface3DController(QRect rect)
-    : Abstract3DController(rect),
+Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
+    : Abstract3DController(rect, scene),
       m_renderer(0),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),
@@ -59,9 +59,7 @@ void Surface3DController::initializeOpenGL()
 
     m_renderer = new Surface3DRenderer(this);
     setRenderer(m_renderer);
-    synchDataToRenderer();
-    QObject::connect(m_renderer, &Surface3DRenderer::pointClicked, this,
-                     &Surface3DController::handlePointClicked, Qt::QueuedConnection);
+
     emitNeedRender();
 }
 
@@ -91,7 +89,8 @@ void Surface3DController::synchDataToRenderer()
     }
 }
 
-void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust)
+void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(
+        QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
@@ -111,9 +110,22 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
+    adjustValueAxisRange();
+
     // Visibility changes may require disabling/enabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
+}
+
+void Surface3DController::handlePendingClick()
+{
+    // This function is called while doing the sync, so it is okay to query from renderer
+    QPoint position = m_renderer->clickedPosition();
+    QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_renderer->clickedSeries());
+
+    setSelectedPoint(position, series);
+
+    m_renderer->resetClickedStatus();
 }
 
 QPoint Surface3DController::invalidSelectionPosition()
@@ -134,7 +146,8 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
     if (!m_seriesList.size()) {
         Abstract3DController::addSeries(series);
 
-        adjustValueAxisRange();
+        if (series->isVisible())
+            adjustValueAxisRange();
     } else {
         qWarning("Surface graph only supports a single series.");
     }
@@ -146,14 +159,15 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
 
 void Surface3DController::removeSeries(QAbstract3DSeries *series)
 {
-    if (series && series->d_ptr->m_controller == this) {
-        Abstract3DController::removeSeries(series);
+    bool wasVisible = (series && series->d_ptr->m_controller == this && series->isVisible());
 
-        if (m_selectedSeries == series)
-            setSelectedPoint(invalidSelectionPosition(), 0);
+    Abstract3DController::removeSeries(series);
 
+    if (m_selectedSeries == series)
+        setSelectedPoint(invalidSelectionPosition(), 0);
+
+    if (wasVisible)
         adjustValueAxisRange();
-    }
 }
 
 QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
@@ -169,18 +183,20 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
     return surfaceSeriesList;
 }
 
-void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
+void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // Currently surface only supports row and column modes when also slicing
-    if ((mode.testFlag(QDataVis::SelectionRow) || mode.testFlag(QDataVis::SelectionColumn))
-            && !mode.testFlag(QDataVis::SelectionSlice)) {
+    if ((mode.testFlag(QAbstract3DGraph::SelectionRow)
+         || mode.testFlag(QAbstract3DGraph::SelectionColumn))
+            && !mode.testFlag(QAbstract3DGraph::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
-    } else if (mode.testFlag(QDataVis::SelectionSlice)
-               && (mode.testFlag(QDataVis::SelectionRow) == mode.testFlag(QDataVis::SelectionColumn))) {
+    } else if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
+               && (mode.testFlag(QAbstract3DGraph::SelectionRow)
+                   == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QDataVis::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -191,8 +207,8 @@ void Surface3DController::setSelectionMode(QDataVis::SelectionFlags mode)
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QDataVis::SelectionSlice)
-                    && oldMode.testFlag(QDataVis::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -223,13 +239,11 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             pos = invalidSelectionPosition();
     }
 
-    if (selectionMode().testFlag(QDataVis::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
         if (pos == invalidSelectionPosition() || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {
             // If the selected point is outside data window, or there is no selected point, disable slicing
-            // TODO: (QTRD-2351) This logic doesn't match the renderer logic for non straight surfaces,
-            // but that logic needs to change anyway, so this is good for now.
             float axisMinX = m_axisX->min();
             float axisMaxX = m_axisX->max();
             float axisMinZ = m_axisZ->min();
@@ -264,20 +278,21 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
     }
 }
 
+void Surface3DController::clearSelection()
+{
+    setSelectedPoint(invalidSelectionPosition(), 0);
+}
+
 void Surface3DController::handleArrayReset()
 {
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     // Clear selection unless still valid
     setSelectedPoint(m_selectedPoint, m_selectedSeries);
     emitNeedRender();
-}
-
-void Surface3DController::handlePointClicked(const QPoint &position, QSurface3DSeries *series)
-{
-    setSelectedPoint(position, series);
-    // TODO: pass clicked to parent. (QTRD-2517)
-    // TODO: Also hover needed? (QTRD-2131)
 }
 
 void Surface3DController::handleFlatShadingSupportedChange(bool supported)
@@ -299,7 +314,8 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
     if (m_changedRows.size() == 0)
         m_changedRows.reserve(sender->rowCount());
 
-    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+    QSurface3DSeries *series = sender->series();
+    if (series->isVisible()) {
         // Change is for the visible series, put the change to queue
         int oldChangeCount = m_changedRows.size();
         for (int i = 0; i < count; i++) {
@@ -328,7 +344,8 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
 void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
-    if (static_cast<QSurface3DSeries *>(m_seriesList.at(0)) == sender->series()) {
+    QSurface3DSeries *series = sender->series();
+    if (series->isVisible()) {
         // Change is for the visible series, put the change to queue
         bool newItem = true;
         QPoint candidate(columnIndex, rowIndex);
@@ -354,8 +371,11 @@ void Surface3DController::handleRowsAdded(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
     emitNeedRender();
 }
 
@@ -363,8 +383,21 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series == m_selectedSeries) {
+        // If rows inserted to selected series before the selection, adjust the selection
+        int selectedRow = m_selectedPoint.x();
+        if (startIndex <= selectedRow) {
+            selectedRow += count;
+            setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
+        }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
+
     emitNeedRender();
 }
 
@@ -372,20 +405,33 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
 {
     Q_UNUSED(startIndex)
     Q_UNUSED(count)
-    adjustValueAxisRange();
-    m_isDataDirty = true;
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    if (series == m_selectedSeries) {
+        // If rows removed from selected series before the selection, adjust the selection
+        int selectedRow = m_selectedPoint.x();
+        if (startIndex <= selectedRow) {
+            if ((startIndex + count) > selectedRow)
+                selectedRow = -1; // Selected row removed
+            else
+                selectedRow -= count; // Move selected row down by amount of rows removed
 
-    // Clear selection unless still valid
-    setSelectedPoint(m_selectedPoint, m_selectedSeries);
+            setSelectedPoint(QPoint(selectedRow, m_selectedPoint.y()), m_selectedSeries);
+        }
+    }
+
+    if (series->isVisible()) {
+        adjustValueAxisRange();
+        m_isDataDirty = true;
+    }
 
     emitNeedRender();
 }
 
 void Surface3DController::adjustValueAxisRange()
 {
-    Q3DValueAxis *valueAxisX = static_cast<Q3DValueAxis *>(m_axisX);
-    Q3DValueAxis *valueAxisY = static_cast<Q3DValueAxis *>(m_axisY);
-    Q3DValueAxis *valueAxisZ = static_cast<Q3DValueAxis *>(m_axisZ);
+    QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+    QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+    QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
     bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
     bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
     bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
@@ -491,4 +537,4 @@ void Surface3DController::adjustValueAxisRange()
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -4,6 +4,10 @@ TARGET = DataVisualization
 
 QT = core gui
 DEFINES += QT_DATAVISUALIZATION_LIBRARY
+
+# Fix exports in static builds for applications linking datavisualization module
+static: MODULE_DEFINES += QT_DATAVISUALIZATION_STATICLIB
+
 MODULE_INCNAME = QtDataVisualization
 
 QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf

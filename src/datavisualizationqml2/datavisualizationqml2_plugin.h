@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -27,8 +27,8 @@
 #include "qitemmodelscatterdataproxy.h"
 #include "qitemmodelsurfacedataproxy.h"
 #include "qheightmapsurfacedataproxy.h"
-#include "q3dvalueaxis.h"
-#include "q3dcategoryaxis.h"
+#include "qvalue3daxis.h"
+#include "qcategory3daxis.h"
 #include "q3dobject.h"
 #include "q3dcamera.h"
 #include "q3dscene.h"
@@ -42,10 +42,11 @@
 #include "declarativetheme_p.h"
 #include "qabstract3dinputhandler.h"
 #include "declarativecolor_p.h"
+#include "declarativescene_p.h"
 
 #include <QQmlExtensionPlugin>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 QML_DECLARE_TYPE(AbstractDeclarative)
 QML_DECLARE_TYPE(DeclarativeBars)
@@ -53,13 +54,13 @@ QML_DECLARE_TYPE(DeclarativeScatter)
 QML_DECLARE_TYPE(DeclarativeSurface)
 
 QML_DECLARE_TYPE(const QAbstractItemModel)
-QML_DECLARE_TYPE(QDataVis)
 
-QML_DECLARE_TYPE(Q3DAbstractAxis)
-QML_DECLARE_TYPE(Q3DCategoryAxis)
-QML_DECLARE_TYPE(Q3DValueAxis)
+QML_DECLARE_TYPE(QAbstract3DAxis)
+QML_DECLARE_TYPE(QCategory3DAxis)
+QML_DECLARE_TYPE(QValue3DAxis)
 
 QML_DECLARE_TYPE(Q3DScene)
+QML_DECLARE_TYPE(Declarative3DScene)
 QML_DECLARE_TYPE(Q3DObject)
 QML_DECLARE_TYPE(Q3DCamera)
 QML_DECLARE_TYPE(Q3DLight)
@@ -91,9 +92,9 @@ QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Datavis3Dqml2Plugin : public QQmlExtensionPlugin
+class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
@@ -102,7 +103,7 @@ public:
     void registerTypes(const char *uri);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif // DATAVISUALIZATIONQML2_PLUGIN_H
 

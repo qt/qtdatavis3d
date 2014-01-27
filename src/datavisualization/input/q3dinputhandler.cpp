@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,11 +17,10 @@
 ****************************************************************************/
 
 #include "datavisualizationglobal_p.h"
-#include "q3dinputhandler.h"
+#include "q3dinputhandler_p.h"
 #include "q3dcamera_p.h"
-#include "q3dlight.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const int minZoomLevel         = 10;
 const int halfSizeZoomLevel    = 50;
@@ -44,20 +43,24 @@ const float rotationSpeed      = 100.0f;
  *
  * Default input handler has the following functionalty:
  * \table
- *   \header
- *     \li Mouse action                   \li Action
- *   \row
- *     \li Drag with right button pressed \li Rotate graph within limits set for Q3DCamera.
- *   \row
- *     \li Left click                     \li Select item under cursor or remove selection if none.
- *                                            May open the secondary view depending on the
- *                                            selection mode.
- *   \row
- *     \li Mouse wheel                    \li Zoom in/out within default range (10...500%).
- *   \row
- *     \li Left click on the primary view when the secondary view is visible
- *                                        \li Closes the secondary view.
- *                                            \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
+ *      \header
+ *          \li Mouse action
+ *          \li Action
+ *      \row
+ *          \li Drag with right button pressed
+ *          \li Rotate graph within limits set for Q3DCamera.
+ *      \row
+ *          \li Left click
+ *          \li Select item under cursor or remove selection if none.
+ *              May open the secondary view depending on the
+ *              \l {QAbstract3DGraph::selectionMode}{selection mode}.
+ *      \row
+ *          \li Mouse wheel
+ *          \li Zoom in/out within default range (10...500%).
+ *      \row
+ *          \li Left click on the primary view when the secondary view is visible
+ *          \li Closes the secondary view.
+ *          \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
  */
 
@@ -66,7 +69,8 @@ const float rotationSpeed      = 100.0f;
  * and is then passed to QObject constructor.
  */
 Q3DInputHandler::Q3DInputHandler(QObject *parent) :
-    QAbstract3DInputHandler(parent)
+    QAbstract3DInputHandler(parent),
+    d_ptr(new Q3DInputHandlerPrivate(this))
 {
 }
 
@@ -84,24 +88,25 @@ Q3DInputHandler::~Q3DInputHandler()
  */
 void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-#if defined(Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 #else
     if (Qt::LeftButton == event->button()) {
         if (scene()->isSlicingActive()) {
             if (scene()->isPointInPrimarySubView(mousePos)) {
-                setInputState(InputStateOnPrimaryView);
+                setInputView(InputViewOnPrimary);
             } else if (scene()->isPointInSecondarySubView(mousePos)) {
-                setInputState(InputStateOnSecondaryView);
+                setInputView(InputViewOnSecondary);
             } else {
-                setInputState(InputStateNone);
+                setInputView(InputViewNone);
             }
         } else {
-            setInputState(InputStateOnScene);
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
             scene()->setSelectionQueryPosition(mousePos);
+            setInputView(InputViewOnPrimary);
+            d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
         }
     } else if (Qt::MiddleButton == event->button()) {
         // reset rotations
@@ -109,7 +114,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
     } else if (Qt::RightButton == event->button()) {
         // disable rotating when in slice view
         if (!scene()->isSlicingActive())
-            setInputState(InputStateRotating);
+            d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateRotating;
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
@@ -123,14 +128,15 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined (Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
-    if (InputStateRotating == inputState()) {
+    if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {
         // update mouse positions to prevent jumping when releasing or repressing a button
         setInputPosition(mousePos);
     }
-    setInputState(InputStateNone);
+    d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateNone;
+    setInputView(InputViewNone);
 #endif
 }
 
@@ -141,10 +147,10 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined (Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
-    if (InputStateRotating == inputState()) {
+    if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {
         // Calculate mouse movement since last frame
         float xRotation = scene()->activeCamera()->xRotation();
         float yRotation = scene()->activeCamera()->yRotation();
@@ -190,4 +196,14 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
     scene()->activeCamera()->setZoomLevel(zoomLevel);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+Q3DInputHandlerPrivate::Q3DInputHandlerPrivate(Q3DInputHandler *q)
+    : q_ptr(q),
+      m_inputState(QAbstract3DInputHandlerPrivate::InputStateNone)
+{
+}
+
+Q3DInputHandlerPrivate::~Q3DInputHandlerPrivate()
+{
+}
+
+QT_END_NAMESPACE_DATAVISUALIZATION

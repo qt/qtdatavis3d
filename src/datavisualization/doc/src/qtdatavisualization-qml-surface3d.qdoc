@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -46,7 +46,7 @@
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisX
-  A user-defined X axis.
+  The active X axis.
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
@@ -55,7 +55,7 @@
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisY
-  A user-defined Y axis.
+  The active Y axis.
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.
@@ -64,7 +64,7 @@
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisZ
-  A user-defined Z axis.
+  The active Z axis.
 
   If an axis is not given, a temporary default axis with no labels and automatically adjusting
   range is created.

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -22,7 +22,7 @@
 #include "qsurfacedataproxy.h"
 #include <QMetaMethod>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static void setSeriesGradient(QAbstract3DSeries *series, const ColorGradient &gradient, GradientType type)
 {
@@ -235,6 +235,11 @@ ColorGradient *DeclarativeScatter3DSeries::multiHighlightGradient() const
     return m_multiHighlightGradient;
 }
 
+int DeclarativeScatter3DSeries::invalidSelectionIndex() const
+{
+    return QScatter3DSeries::invalidSelectionIndex();
+}
+
 void DeclarativeScatter3DSeries::handleBaseGradientUpdate()
 {
     if (m_baseGradient)
@@ -343,4 +348,4 @@ void DeclarativeSurface3DSeries::handleMultiHighlightGradientUpdate()
         setSeriesGradient(this, *m_multiHighlightGradient, GradientTypeMulti);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -1,5 +1,5 @@
-HEADERS += $$PWD/q3dwindow_p.h \
-           $$PWD/q3dwindow.h \
+HEADERS += $$PWD/qabstract3dgraph_p.h \
+           $$PWD/qabstract3dgraph.h \
            $$PWD/q3dbars.h \
            $$PWD/q3dbars_p.h \
            $$PWD/drawer_p.h \
@@ -28,7 +28,7 @@ HEADERS += $$PWD/q3dwindow_p.h \
            $$PWD/q3dobject_p.h \
            $$PWD/q3dscene_p.h
 
-SOURCES += $$PWD/q3dwindow.cpp \
+SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/q3dbars.cpp \
            $$PWD/drawer.cpp \
            $$PWD/bars3dcontroller.cpp \

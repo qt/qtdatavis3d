@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -39,7 +39,7 @@ class QPoint;
 class QSizeF;
 class QOpenGLShaderProgram;
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
@@ -92,6 +92,8 @@ private:
     QVector<ScatterRenderItemArray> m_renderingArrays;
     GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
+    QVector<float> m_cachedItemSize;
+    int m_clickedIndex;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
@@ -101,6 +103,9 @@ public:
     void updateData();
     void updateScene(Q3DScene *scene);
 
+    inline int clickedIndex() const { return m_clickedIndex; }
+    void resetClickedStatus();
+
     void render(GLuint defaultFboHandle);
 
 protected:
@@ -109,7 +114,7 @@ protected:
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(QDataVis::ShadowQuality quality);
+    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
@@ -137,18 +142,17 @@ private:
 
 public slots:
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
 
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 
-signals:
-    void itemClicked(int index, QScatter3DSeries *series);
-
 private:
     QVector3D indexToSelectionColor(GLint index);
-    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index, QScatter3DSeries *&series);
+    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index,
+                                        QAbstract3DSeries *&series);
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

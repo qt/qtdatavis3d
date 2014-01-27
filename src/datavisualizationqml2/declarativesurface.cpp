@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,10 +17,11 @@
 ****************************************************************************/
 
 #include "declarativesurface_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "qitemmodelsurfacedataproxy.h"
+#include "declarativescene_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -28,21 +29,9 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
 
-    // TODO: These seem to have no effect; find a way to activate anti-aliasing
-    setAntialiasing(true);
-    setSmooth(true);
-
     // Create the shared component on the main GUI thread.
-    m_surfaceController = new Surface3DController(boundingRect().toRect());
+    m_surfaceController = new Surface3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_surfaceController);
-
-    // TODO: Uncomment when doing QTRD-2669
-//    connect(m_surfaceController, &Surface3DController::axisXChanged,
-//            this, &DeclarativeBars::axisXChanged);
-//    connect(m_surfaceController, &Surface3DController::axisYChanged,
-//            this, &DeclarativeBars::axisYChanged);
-//    connect(m_surfaceController, &Surface3DController::axisZChanged,
-//            this, &DeclarativeBars::axisZChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -50,32 +39,32 @@ DeclarativeSurface::~DeclarativeSurface()
     delete m_surfaceController;
 }
 
-Q3DValueAxis *DeclarativeSurface::axisX() const
+QValue3DAxis *DeclarativeSurface::axisX() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisX());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisX());
 }
 
-void DeclarativeSurface::setAxisX(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisX(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisX(axis);
 }
 
-Q3DValueAxis *DeclarativeSurface::axisY() const
+QValue3DAxis *DeclarativeSurface::axisY() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisY());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisY());
 }
 
-void DeclarativeSurface::setAxisY(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisY(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisY(axis);
 }
 
-Q3DValueAxis *DeclarativeSurface::axisZ() const
+QValue3DAxis *DeclarativeSurface::axisZ() const
 {
-    return static_cast<Q3DValueAxis *>(m_surfaceController->axisZ());
+    return static_cast<QValue3DAxis *>(m_surfaceController->axisZ());
 }
 
-void DeclarativeSurface::setAxisZ(Q3DValueAxis *axis)
+void DeclarativeSurface::setAxisZ(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisZ(axis);
 }
@@ -124,4 +113,19 @@ void DeclarativeSurface::removeSeries(QSurface3DSeries *series)
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+void DeclarativeSurface::handleAxisXChanged(QAbstract3DAxis *axis)
+{
+    emit axisXChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeSurface::handleAxisYChanged(QAbstract3DAxis *axis)
+{
+    emit axisYChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void DeclarativeSurface::handleAxisZChanged(QAbstract3DAxis *axis)
+{
+    emit axisZChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+QT_END_NAMESPACE_DATAVISUALIZATION

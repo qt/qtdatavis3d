@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -18,7 +18,7 @@
 
 #include "qscatterdataitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QScatterDataItem
@@ -72,6 +72,7 @@ QScatterDataItem::~QScatterDataItem()
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
+    m_rotation = other.m_rotation;
 
     if (other.d_ptr)
         createExtraData();
@@ -89,6 +90,20 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 /*!
  * \fn QVector3D QScatterDataItem::position() const
  * \return position of this data item.
+ */
+
+/*!
+ * \fn void QScatterDataItem::setRotation(const QQuaternion &rotation)
+ * Sets \a rotation to this data item.
+ * The \a rotation should be a normalized QQuaternion.
+ * If the series also has rotation, item and series rotations are multiplied together.
+ * Defaults to no rotation.
+ */
+
+/*!
+ * \fn QQuaternion QScatterDataItem::rotation() const
+ * \return rotation of this data item.
+ * \sa setRotation()
  */
 
 /*!
@@ -138,4 +153,4 @@ QScatterDataItemPrivate::~QScatterDataItemPrivate()
 {
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

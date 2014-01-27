@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -31,7 +31,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Bars3DRenderer;
 
@@ -47,7 +47,15 @@ public:
     inline const QPoint &position() const { return m_position; }
 
     // Actual cached data value of the bar (needed to trigger label reformats)
-    inline void setValue(float value);
+    inline void setValue(float value)
+    {
+        m_value = value;
+         // Force reformatting on next access by setting label string to null string
+        if (!m_sliceLabel.isNull())
+            setSliceLabel(QString());
+        if (!m_selectionLabel.isNull())
+            setSelectionLabel(QString());
+    }
     inline float value() const { return m_value; }
 
     // Normalized bar height
@@ -59,12 +67,15 @@ public:
 
     // Formatted label for item.
     void setSliceLabel(const QString &label);
-    QString &sliceLabel(); // Formats label if not previously formatted
+    const QString &sliceLabel() const; // Formats label if not previously formatted
 
     // Series index in visual series that this item belongs to.
     // This is only utilized by slicing, so it may not be up to date on all items.
     inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
-    inline int seriesIndex() { return m_seriesIndex; }
+    inline int seriesIndex() const { return m_seriesIndex; }
+
+    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline const QQuaternion &rotation() const { return m_rotation; }
 
 protected:
     float m_value;
@@ -73,23 +84,14 @@ protected:
     QString m_sliceLabel;
     LabelItem *m_sliceLabelItem;
     int m_seriesIndex;
+    QQuaternion m_rotation;
 
     friend class QBarDataItem;
 };
 
-void BarRenderItem::setValue(float value)
-{
-    m_value = value;
-     // Force reformatting on next access by setting label string to null string
-    if (!m_sliceLabel.isNull())
-        setSliceLabel(QString());
-    if (!m_selectionLabel.isNull())
-        setSelectionLabel(QString());
-}
-
 typedef QVector<BarRenderItem> BarRenderItemRow;
 typedef QVector<BarRenderItemRow> BarRenderItemArray;
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

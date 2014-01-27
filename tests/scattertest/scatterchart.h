@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -49,7 +49,7 @@ public:
 
 public slots:
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void clear();
     void resetAxes();
     void addOne();
@@ -67,6 +67,12 @@ public slots:
     void setGradient();
     void addSeries();
     void removeSeries();
+    void toggleSeriesVisibility();
+    void changeSeriesName();
+
+    void handleAxisXChanged(QValue3DAxis *axis);
+    void handleAxisYChanged(QValue3DAxis *axis);
+    void handleAxisZChanged(QValue3DAxis *axis);
 
 signals:
     void shadowQualityChanged(int quality);

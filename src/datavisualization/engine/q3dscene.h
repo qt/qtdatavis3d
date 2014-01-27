@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,11 +19,12 @@
 #ifndef Q3DSCENE_H
 #define Q3DSCENE_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+
 #include <QObject>
 #include <QRect>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCamera;
 class Q3DBox;
@@ -59,7 +60,7 @@ public:
 
     void setSelectionQueryPosition(const QPoint &point);
     QPoint selectionQueryPosition() const;
-    static const QPoint invalidSelectionPoint();
+    static QPoint invalidSelectionPoint();
 
     void setSlicingActive(bool isSlicing);
     bool isSlicingActive() const;
@@ -96,7 +97,7 @@ private:
     Q_DISABLE_COPY(Q3DScene)
 
     friend class AbstractDeclarative;
-    friend class Q3DWindow;
+    friend class QAbstract3DGraph;
     friend class Abstract3DController;
     friend class Q3DScenePrivate;
     friend class Abstract3DRenderer;
@@ -104,8 +105,9 @@ private:
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
     friend class Q3DCameraPrivate;
+    friend class Q3DObject;
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // Q3DSCENE_H
+#endif

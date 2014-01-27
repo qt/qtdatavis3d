@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -54,7 +54,7 @@ public slots:
     void changeSelectionMode(int selectionMode);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QDataVis::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -74,13 +74,12 @@ private:
     float m_maxval;
     QStringList m_months;
     QStringList m_years;
-    Q3DValueAxis *m_temperatureAxis;
-    Q3DCategoryAxis *m_yearAxis;
-    Q3DCategoryAxis *m_monthAxis;
-    QBarDataProxy *m_primaryData;
-    QBarDataProxy *m_secondaryData;
-    QAbstract3DSeries::Mesh m_primaryStyle;
-    QAbstract3DSeries::Mesh m_secondaryStyle;
+    QValue3DAxis *m_temperatureAxis;
+    QCategory3DAxis *m_yearAxis;
+    QCategory3DAxis *m_monthAxis;
+    QBar3DSeries *m_primarySeries;
+    QBar3DSeries *m_secondarySeries;
+    QAbstract3DSeries::Mesh m_barMesh;
     bool m_smooth;
 };
 

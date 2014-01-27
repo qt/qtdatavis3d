@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,86 +19,72 @@
 #ifndef Q3DBARS_H
 #define Q3DBARS_H
 
-#include <QtDataVisualization/qdatavisualizationenums.h>
-#include <QtDataVisualization/q3dwindow.h>
-#include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/qabstract3dgraph.h>
 #include <QFont>
 #include <QLinearGradient>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBarsPrivate;
-class Q3DAbstractAxis;
-class Q3DCategoryAxis;
-class Q3DValueAxis;
-class Q3DScene;
+class QAbstract3DAxis;
+class QCategory3DAxis;
+class QValue3DAxis;
 class QBar3DSeries;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DBars : public Q3DWindow
+class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
-    Q_PROPERTY(QtDataVisualization::QDataVis::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QtDataVisualization::QDataVis::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
+    Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
+    Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
+    Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
 
 public:
-    explicit Q3DBars(QWindow *parent = 0);
+    explicit Q3DBars(const QSurfaceFormat *format = 0, QWindow *parent = 0);
     virtual ~Q3DBars();
 
+    void setPrimarySeries(QBar3DSeries *series);
+    QBar3DSeries *primarySeries() const;
     void addSeries(QBar3DSeries *series);
     void removeSeries(QBar3DSeries *series);
-    QList<QBar3DSeries *> seriesList();
+    void insertSeries(int index, QBar3DSeries *series);
+    QList<QBar3DSeries *> seriesList() const;
 
-    void setTheme(Q3DTheme *theme);
-    Q3DTheme *theme() const;
+    void setMultiSeriesUniform(bool uniform);
+    bool isMultiSeriesUniform() const;
 
     void setBarThickness(float thicknessRatio);
-    float barThickness();
+    float barThickness() const;
 
-    void setBarSpacing(QSizeF spacing);
-    QSizeF barSpacing();
+    void setBarSpacing(const QSizeF &spacing);
+    QSizeF barSpacing() const;
 
     void setBarSpacingRelative(bool relative);
-    bool isBarSpacingRelative();
+    bool isBarSpacingRelative() const;
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
-    QDataVis::SelectionFlags selectionMode() const;
-
-    Q3DScene *scene() const;
-
-    void setShadowQuality(QDataVis::ShadowQuality quality);
-    QDataVis::ShadowQuality shadowQuality() const;
-
-    void setRowAxis(Q3DCategoryAxis *axis);
-    Q3DCategoryAxis *rowAxis() const;
-    void setColumnAxis(Q3DCategoryAxis *axis);
-    Q3DCategoryAxis *columnAxis() const;
-    void setValueAxis(Q3DValueAxis *axis);
-    Q3DValueAxis *valueAxis() const;
-    void addAxis(Q3DAbstractAxis *axis);
-    void releaseAxis(Q3DAbstractAxis *axis);
-    QList<Q3DAbstractAxis *> axes() const;
+    void setRowAxis(QCategory3DAxis *axis);
+    QCategory3DAxis *rowAxis() const;
+    void setColumnAxis(QCategory3DAxis *axis);
+    QCategory3DAxis *columnAxis() const;
+    void setValueAxis(QValue3DAxis *axis);
+    QValue3DAxis *valueAxis() const;
+    void addAxis(QAbstract3DAxis *axis);
+    void releaseAxis(QAbstract3DAxis *axis);
+    QList<QAbstract3DAxis *> axes() const;
 
 signals:
-    void selectionModeChanged(QDataVis::SelectionFlags mode);
-    void shadowQualityChanged(QDataVis::ShadowQuality quality);
+    void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(QSizeF spacing);
     void barSpacingRelativeChanged(bool relative);
-    void themeChanged(Q3DTheme *theme);
-
-protected:
-
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
+    void rowAxisChanged(QCategory3DAxis *axis);
+    void columnAxisChanged(QCategory3DAxis *axis);
+    void valueAxisChanged(QValue3DAxis *axis);
+    void primarySeriesChanged(QBar3DSeries *series);
 
 private:
     Q3DBarsPrivate *dptr();
@@ -106,6 +92,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

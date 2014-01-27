@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,8 +32,7 @@
 #include "abstract3dcontroller_p.h"
 #include "datavisualizationglobal_p.h"
 
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Surface3DRenderer;
 class QSurface3DSeries;
@@ -70,18 +69,21 @@ private:
     QVector<int> m_changedRows;
 
 public:
-    explicit Surface3DController(QRect rect);
+    explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
     virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
+    virtual void clearSelection();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
     static QPoint invalidSelectionPosition();
     bool isFlatShadingSupported();
@@ -98,9 +100,6 @@ public slots:
     void handleRowsInserted(int startIndex, int count);
     void handleItemChanged(int rowIndex, int columnIndex);
 
-    // Renderer callback handlers
-    void handlePointClicked(const QPoint &position, QSurface3DSeries *series);
-
     void handleFlatShadingSupportedChange(bool supported);
 
 private:
@@ -109,6 +108,6 @@ private:
     Q_DISABLE_COPY(Surface3DController)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // SURFACE3DCONTROLLER_P_H
+#endif

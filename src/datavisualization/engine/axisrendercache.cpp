@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,10 +20,10 @@
 #include "qmath.h"
 #include <QFontMetrics>
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AxisRenderCache::AxisRenderCache()
-    : m_type(Q3DAbstractAxis::AxisTypeNone),
+    : m_type(QAbstract3DAxis::AxisTypeNone),
       m_min(0.0f),
       m_max(10.0f),
       m_segmentCount(5),
@@ -51,7 +51,7 @@ void AxisRenderCache::setDrawer(Drawer *drawer)
     }
 }
 
-void AxisRenderCache::setType(Q3DAbstractAxis::AxisType type)
+void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
 {
     m_type = type;
 
@@ -183,4 +183,4 @@ int AxisRenderCache::maxLabelWidth(const QStringList &labels) const
     return labelWidth;
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,20 +32,20 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 
-//#define DISPLAY_RENDER_SPEED
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Bars3DRenderer;
 class QBar3DSeries;
 
 struct Bars3DChangeBitField {
-    bool slicingActiveChanged     : 1;
-    bool barSpecsChanged          : 1;
-    bool selectedBarChanged       : 1;
+    bool slicingActiveChanged       : 1;
+    bool multiSeriesScalingChanged  : 1;
+    bool barSpecsChanged            : 1;
+    bool selectedBarChanged         : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
+        multiSeriesScalingChanged(true),
         barSpecsChanged(true),
         selectedBarChanged(true)
     {
@@ -63,8 +63,10 @@ private:
     QPoint m_selectedBar;     // Points to row & column in data window.
     QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
                                        // single series selection cases.
+    QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
 
     // Look'n'feel
+    bool m_isMultiSeriesUniform;
     bool m_isBarSpecRelative;
     GLfloat m_barThicknessRatio;
     QSizeF m_barSpacing;
@@ -73,11 +75,14 @@ private:
     Bars3DRenderer *m_renderer;
 
 public:
-    explicit Bars3DController(QRect rect);
+    explicit Bars3DController(QRect rect, Q3DScene *scene = 0);
     ~Bars3DController();
 
     virtual void initializeOpenGL();
     virtual void synchDataToRenderer();
+
+    void setMultiSeriesScaling(bool uniform);
+    bool multiSeriesScaling() const;
 
     // bar thickness, spacing between bars, and is spacing relative to thickness or absolute
     // y -component sets the thickness/spacing of z -direction
@@ -89,19 +94,24 @@ public:
     QSizeF barSpacing();
     bool isBarSpecRelative();
 
-    void setSelectionMode(QDataVis::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void setSelectedBar(const QPoint &position, QBar3DSeries *series);
+    virtual void clearSelection();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(Q3DAbstractAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
+    virtual void handlePendingClick();
 
     static QPoint invalidSelectionPosition();
 
-    virtual void setAxisX(Q3DAbstractAxis *axis);
-    virtual void setAxisZ(Q3DAbstractAxis *axis);
+    virtual void setAxisX(QAbstract3DAxis *axis);
+    virtual void setAxisZ(QAbstract3DAxis *axis);
 
+    virtual void setPrimarySeries(QBar3DSeries *series);
+    virtual QBar3DSeries *primarySeries() const;
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
+    virtual void insertSeries(int index, QAbstract3DSeries *series);
     virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
@@ -116,11 +126,11 @@ public slots:
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
 
-    // Renderer callback handlers
-    void handleBarClicked(const QPoint &position, QBar3DSeries *series);
+signals:
+    void primarySeriesChanged(QBar3DSeries *series);
 
 protected:
-    virtual Q3DAbstractAxis *createDefaultAxis(Q3DAbstractAxis::AxisOrientation orientation);
+    virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
 
 private:
     void adjustAxisRanges();
@@ -130,7 +140,6 @@ private:
 
 };
 
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

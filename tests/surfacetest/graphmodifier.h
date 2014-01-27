@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -86,6 +86,10 @@ public slots:
     void flipViews();
     void changeSelectionMode(int mode);
     void timeout();
+
+    void handleAxisXChanged(QValue3DAxis *axis);
+    void handleAxisYChanged(QValue3DAxis *axis);
+    void handleAxisZChanged(QValue3DAxis *axis);
 
 private:
     void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,

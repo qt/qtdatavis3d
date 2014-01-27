@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "abstract3drenderer_p.h"
-#include "q3dvalueaxis.h"
+#include "qvalue3daxis.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
 #include "q3dscene_p.h"
@@ -27,27 +27,28 @@
 #include "q3dtheme_p.h"
 #include "objecthelper_p.h"
 
-Q_DECLARE_METATYPE(QtDataVisualization::QDataVis::ShadowQuality)
-
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
       m_hasNegativeValues(false),
       m_cachedTheme(new Q3DTheme()),
       m_drawer(new Drawer(m_cachedTheme)),
-      m_cachedShadowQuality(QDataVis::ShadowQualityMedium),
+      m_cachedShadowQuality(QAbstract3DGraph::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
-      m_cachedSelectionMode(QDataVis::SelectionNone),
+      m_cachedSelectionMode(QAbstract3DGraph::SelectionNone),
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
       m_selectionState(SelectNone),
-      m_devicePixelRatio(1.0f)
-    #ifdef DISPLAY_RENDER_SPEED
+      m_devicePixelRatio(1.0f),
+      m_selectionLabelDirty(true),
+      m_clickPending(false),
+      m_clickedSeries(0)
+#ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
-    #endif
+#endif
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -85,9 +86,9 @@ void Abstract3DRenderer::initializeOpenGL()
     m_textureHelper = new TextureHelper();
     m_drawer->initializeOpenGL();
 
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationX).setDrawer(m_drawer);
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationY).setDrawer(m_drawer);
-    axisCacheForOrientation(Q3DAbstractAxis::AxisOrientationZ).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationX).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationY).setDrawer(m_drawer);
+    axisCacheForOrientation(QAbstract3DAxis::AxisOrientationZ).setDrawer(m_drawer);
 }
 
 void Abstract3DRenderer::render(const GLuint defaultFboHandle)
@@ -102,7 +103,8 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     // Measure speed (as milliseconds per frame)
     m_numFrames++;
     if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (=" << float(m_numFrames) << "fps)";
+        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (="
+                 << float(m_numFrames) << "fps)";
         m_numFrames = 0;
         m_lastFrameTime.restart();
     }
@@ -122,9 +124,15 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
                m_viewport.y(),
                m_viewport.width(),
                m_viewport.height());
+    glScissor(m_viewport.x(),
+              m_viewport.y(),
+              m_viewport.width(),
+              m_viewport.height());
+    glEnable(GL_SCISSOR_TEST);
     QVector3D clearColor = Utils::vectorFromColor(m_cachedTheme->windowColor());
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
 }
 
 QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)
@@ -145,7 +153,8 @@ void Abstract3DRenderer::updateInputPosition(const QPoint &position)
     m_inputPosition = position;
 }
 
-void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const QString &fragmentShader)
+void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
+                                             const QString &fragmentShader)
 {
     // Do nothing by default
     Q_UNUSED(vertexShader)
@@ -155,14 +164,10 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader, const 
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
-    bool changed = theme->d_ptr->sync(*m_cachedTheme->d_ptr);
+    bool updateDrawer = theme->d_ptr->sync(*m_cachedTheme->d_ptr);
 
-    if (changed) {
-        // Update drawer if sync changed something
+    if (updateDrawer)
         m_drawer->setTheme(m_cachedTheme);
-        // Re-initialize shaders
-        reInitShaders();
-    }
 }
 
 void Abstract3DRenderer::updateScene(Q3DScene *scene)
@@ -189,11 +194,15 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
                                logicalPixelPosition.y() * m_devicePixelRatio));
 
+    // Synchronize the renderer scene to controller scene
+    scene->d_ptr->sync(*m_cachedScene->d_ptr);
+
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
     } else {
         // Selections are one-shot, reset selection active to false before processing
         scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
+        m_clickPending = true;
 
         if (scene->isSlicingActive()) {
             if (scene->isPointInPrimarySubView(logicalPixelPosition))
@@ -206,15 +215,12 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
             updateSelectionState(SelectOnScene);
         }
     }
-
-    // Synchronize the controller scene with renderer
-    scene->d_ptr->sync(*m_cachedScene->d_ptr);
 }
 
 void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QDataVis::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
                             QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
         initShaders(QStringLiteral(":/shaders/vertexShadow"),
@@ -244,15 +250,15 @@ void Abstract3DRenderer::handleShadowQualityChange()
     reInitShaders();
 
 #if defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality != QDataVis::ShadowQualityNone) {
-        emit requestShadowQuality(QDataVis::ShadowQualityNone);
+    if (m_cachedShadowQuality != QAbstract3DGraph::ShadowQualityNone) {
+        emit requestShadowQuality(QAbstract3DGraph::ShadowQualityNone);
         qWarning("Shadows are not yet supported for OpenGL ES2");
-        m_cachedShadowQuality = QDataVis::ShadowQualityNone;
+        m_cachedShadowQuality = QAbstract3DGraph::ShadowQualityNone;
     }
 #endif
 }
 
-void Abstract3DRenderer::updateSelectionMode(QDataVis::SelectionFlags mode)
+void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     m_cachedSelectionMode = mode;
     m_selectionDirty = true;
@@ -280,39 +286,46 @@ void Abstract3DRenderer::handleResize()
 #endif
 }
 
-void Abstract3DRenderer::updateAxisType(Q3DAbstractAxis::AxisOrientation orientation, Q3DAbstractAxis::AxisType type)
+void Abstract3DRenderer::updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
+                                        QAbstract3DAxis::AxisType type)
 {
     axisCacheForOrientation(orientation).setType(type);
 }
 
-void Abstract3DRenderer::updateAxisTitle(Q3DAbstractAxis::AxisOrientation orientation, const QString &title)
+void Abstract3DRenderer::updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
+                                         const QString &title)
 {
     axisCacheForOrientation(orientation).setTitle(title);
 }
 
-void Abstract3DRenderer::updateAxisLabels(Q3DAbstractAxis::AxisOrientation orientation, const QStringList &labels)
+void Abstract3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                          const QStringList &labels)
 {
     axisCacheForOrientation(orientation).setLabels(labels);
 }
 
-void Abstract3DRenderer::updateAxisRange(Q3DAbstractAxis::AxisOrientation orientation, float min, float max)
+void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation,
+                                         float min, float max)
 {
     AxisRenderCache &cache = axisCacheForOrientation(orientation);
     cache.setMin(min);
     cache.setMax(max);
 }
 
-void Abstract3DRenderer::updateAxisSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                                int count)
 {
     axisCacheForOrientation(orientation).setSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisSubSegmentCount(Q3DAbstractAxis::AxisOrientation orientation, int count)
+void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                                   int count)
 {
     axisCacheForOrientation(orientation).setSubSegmentCount(count);
 }
 
-void Abstract3DRenderer::updateAxisLabelFormat(Q3DAbstractAxis::AxisOrientation orientation, const QString &format)
+void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
+                                               const QString &format)
 {
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
@@ -348,19 +361,26 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
         visibleCount = 0;
     }
     foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible())
+        if (current->isVisible()) {
+            // Item selection label may need update
+            if (current->d_ptr->m_changeTracker.nameChanged
+                    || current->d_ptr->m_changeTracker.itemLabelFormatChanged) {
+                m_selectionLabelDirty = true;
+            }
             m_visibleSeriesList[visibleCount++].populate(current, this);
+        }
     }
 }
 
-AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::AxisOrientation orientation)
+AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(
+        QAbstract3DAxis::AxisOrientation orientation)
 {
     switch (orientation) {
-    case Q3DAbstractAxis::AxisOrientationX:
+    case QAbstract3DAxis::AxisOrientationX:
         return m_axisCacheX;
-    case Q3DAbstractAxis::AxisOrientationY:
+    case QAbstract3DAxis::AxisOrientationY:
         return m_axisCacheY;
-    case Q3DAbstractAxis::AxisOrientationZ:
+    case QAbstract3DAxis::AxisOrientationZ:
         return m_axisCacheZ;
     default:
         qFatal("Abstract3DRenderer::axisCacheForOrientation");
@@ -370,32 +390,32 @@ AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(Q3DAbstractAxis::Ax
 
 void Abstract3DRenderer::lowerShadowQuality()
 {
-    QDataVis::ShadowQuality newQuality = QDataVis::ShadowQualityNone;
+    QAbstract3DGraph::ShadowQuality newQuality = QAbstract3DGraph::ShadowQualityNone;
 
     switch (m_cachedShadowQuality) {
-    case QDataVis::ShadowQualityHigh:
+    case QAbstract3DGraph::ShadowQualityHigh:
         qWarning("Creating high quality shadows failed. Changing to medium quality.");
-        newQuality = QDataVis::ShadowQualityMedium;
+        newQuality = QAbstract3DGraph::ShadowQualityMedium;
         break;
-    case QDataVis::ShadowQualityMedium:
+    case QAbstract3DGraph::ShadowQualityMedium:
         qWarning("Creating medium quality shadows failed. Changing to low quality.");
-        newQuality = QDataVis::ShadowQualityLow;
+        newQuality = QAbstract3DGraph::ShadowQualityLow;
         break;
-    case QDataVis::ShadowQualityLow:
+    case QAbstract3DGraph::ShadowQualityLow:
         qWarning("Creating low quality shadows failed. Switching shadows off.");
-        newQuality = QDataVis::ShadowQualityNone;
+        newQuality = QAbstract3DGraph::ShadowQualityNone;
         break;
-    case QDataVis::ShadowQualitySoftHigh:
+    case QAbstract3DGraph::ShadowQualitySoftHigh:
         qWarning("Creating soft high quality shadows failed. Changing to soft medium quality.");
-        newQuality = QDataVis::ShadowQualitySoftMedium;
+        newQuality = QAbstract3DGraph::ShadowQualitySoftMedium;
         break;
-    case QDataVis::ShadowQualitySoftMedium:
+    case QAbstract3DGraph::ShadowQualitySoftMedium:
         qWarning("Creating soft medium quality shadows failed. Changing to soft low quality.");
-        newQuality = QDataVis::ShadowQualitySoftLow;
+        newQuality = QAbstract3DGraph::ShadowQualitySoftLow;
         break;
-    case QDataVis::ShadowQualitySoftLow:
+    case QAbstract3DGraph::ShadowQualitySoftLow:
         qWarning("Creating soft low quality shadows failed. Switching shadows off.");
-        newQuality = QDataVis::ShadowQualityNone;
+        newQuality = QAbstract3DGraph::ShadowQualityNone;
         break;
     default:
         // You'll never get here
@@ -406,7 +426,8 @@ void Abstract3DRenderer::lowerShadowQuality()
     updateShadowQuality(newQuality);
 }
 
-void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture)
+void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient,
+                                                       GLuint *gradientTexture)
 {
     // Readjust start/stop to match gradient texture size
     gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
@@ -420,4 +441,4 @@ void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient
     *gradientTexture = m_textureHelper->createGradientTexture(*gradient);
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

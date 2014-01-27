@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -31,10 +31,10 @@
 
 #include "datavisualizationglobal_p.h"
 #include "labelitem_p.h"
-#include "q3dabstractaxis_p.h"
+#include "qabstract3daxis_p.h"
 #include "drawer_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class AxisRenderCache : public QObject
 {
@@ -45,8 +45,8 @@ public:
 
     void setDrawer(Drawer *drawer);
 
-    void setType(Q3DAbstractAxis::AxisType type);
-    inline Q3DAbstractAxis::AxisType type() const { return m_type; }
+    void setType(QAbstract3DAxis::AxisType type);
+    inline QAbstract3DAxis::AxisType type() const { return m_type; }
     void setTitle(const QString &title);
     inline const QString &title() { return m_title; }
     void setLabels(const QStringList &labels);
@@ -76,7 +76,7 @@ private:
     int maxLabelWidth(const QStringList &labels) const;
 
     // Cached axis values
-    Q3DAbstractAxis::AxisType m_type;
+    QAbstract3DAxis::AxisType m_type;
     QString m_title;
     QStringList m_labels;
     float m_min;
@@ -96,6 +96,6 @@ private:
     Q_DISABLE_COPY(AxisRenderCache)
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

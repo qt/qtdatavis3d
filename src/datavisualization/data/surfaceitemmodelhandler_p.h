@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -32,7 +32,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelsurfacedataproxy_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class SurfaceItemModelHandler : public AbstractItemModelHandler
 {
@@ -48,6 +48,6 @@ protected:
     QSurfaceDataArray *m_proxyArray; // Not owned
 };
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION
 
 #endif

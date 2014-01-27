@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -34,7 +34,7 @@ Item {
 
     Timer {
         id: dataTimer
-        interval: 20
+        interval: 1
         running: true
         repeat: true
         property bool isIncreasing: true
@@ -42,13 +42,31 @@ Item {
         onTriggered: {
             if (isIncreasing) {
                 graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                if (graphModel.count == 500) {
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                if (graphModel.count > 5000) {
                     scatterGraph.theme.type = Theme3D.ThemeIsabelle;
                     isIncreasing = false;
                 }
             } else {
                 // TODO: Once QTRD-2645 is fixed, change this to remove from
                 // random index to add coverage.
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
+                graphModel.remove(2);
                 graphModel.remove(2);
                 if (graphModel.count == 2) {
                     scatterGraph.theme.type = Theme3D.ThemeDigia;

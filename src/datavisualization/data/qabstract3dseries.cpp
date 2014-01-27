@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -21,7 +21,7 @@
 #include "qabstractdataproxy_p.h"
 #include "abstract3dcontroller_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \class QAbstract3DSeries
@@ -34,6 +34,16 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
+ * \class QAbstract3DSeriesChangeBitField
+ * \internal
+ */
+
+/*!
+ * \class QAbstract3DSeriesThemeOverrideBitField
+ * \internal
+ */
+
+/*!
  * \qmltype Abstract3DSeries
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
@@ -42,7 +52,57 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * \brief Base type for all QtDataVisualization series.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
+ *
+ * For Abstract3DSeries enums, see \l QAbstract3DSeries::SeriesType and \l QAbstract3DSeries::Mesh
+ *
  * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
+ */
+
+/*!
+ * \enum QAbstract3DSeries::SeriesType
+ *
+ * Type of the series.
+ *
+ * \value SeriesTypeNone
+ *        No series type.
+ * \value SeriesTypeBar
+ *        Series type for Q3DBars.
+ * \value SeriesTypeScatter
+ *        Series type for Q3DScatter.
+ * \value SeriesTypeSurface
+ *        Series type for Q3DSurface.
+ */
+
+/*!
+ *  \enum QAbstract3DSeries::Mesh
+ *
+ *  Predefined mesh types. All styles are not usable with all visualization types.
+ *
+ *  \value MeshUserDefined
+ *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
+ *  \value MeshBar
+ *         Basic rectangular bar.
+ *  \value MeshCube
+ *         Basic cube.
+ *  \value MeshPyramid
+ *         Four-sided pyramid.
+ *  \value MeshCone
+ *         Basic cone.
+ *  \value MeshCylinder
+ *         Basic cylinder.
+ *  \value MeshBevelBar
+ *         Slightly beveled (rounded) rectangular bar.
+ *  \value MeshBevelCube
+ *         Slightly beveled (rounded) cube.
+ *  \value MeshSphere
+ *         Sphere.
+ *  \value MeshMinimal
+ *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
+ *  \value MeshArrow
+ *         Arrow pointing upwards.
+ *  \value MeshPoint
+ *         2D point. Usable only with Q3DScatter.
+ *         \b Note: Shadows and color gradients do not affect this style.
  */
 
 /*!
@@ -79,6 +139,18 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  * This property doesn't affect custom meshes used when mesh is
  * \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
  * Defaults to \c false.
+ */
+
+/*!
+ * \qmlproperty quaternion Abstract3DSeries::meshRotation
+ *
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized quaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * Bar3DSeries ignores any rotation that is not around Y-axis.
+ * Surface3DSeries applies the rotation only to the selection pointer.
+ * Defaults to no rotation.
  */
 
 /*!
@@ -159,48 +231,12 @@ QT_DATAVISUALIZATION_BEGIN_NAMESPACE
  */
 
 /*!
- * \enum QAbstract3DSeries::SeriesType
+ * \qmlproperty string Abstract3DSeries::name
  *
- * Type of the series.
+ * Sets the series name.
+ * Series name can be used in item label format with tag \c{@seriesName}.
  *
- * \value SeriesTypeNone
- *        No series type.
- * \value SeriesTypeBar
- *        Series type for Q3DBars.
- * \value SeriesTypeScatter
- *        Series type for Q3DScatter.
- * \value SeriesTypeSurface
- *        Series type for Q3DSurface.
- */
-
-/*!
- *  \enum QAbstract3DSeries::Mesh
- *
- *  Predefined mesh types. All styles are not usable with all visualization types.
- *
- *  \value MeshUserDefined
- *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.
- *  \value MeshBar
- *         Basic rectangular bar.
- *  \value MeshCube
- *         Basic cube.
- *  \value MeshPyramid
- *         Four-sided pyramid.
- *  \value MeshCone
- *         Basic cone.
- *  \value MeshCylinder
- *         Basic cylinder.
- *  \value MeshBevelBar
- *         Slightly beveled (rounded) rectangular bar.
- *  \value MeshBevelCube
- *         Slightly beveled (rounded) cube.
- *  \value MeshSphere
- *         Sphere.
- *  \value MeshMinimal
- *         The minimal 3D mesh: a triangular pyramid. Usable only with Q3DScatter.
- *  \value MeshPoint
- *         2D point. Usable only with Q3DScatter.
- *         \b Note: Shadows and color gradients do not affect this style.
+ * \sa itemLabelFormat
  */
 
 /*!
@@ -279,7 +315,8 @@ bool QAbstract3DSeries::isVisible() const
  */
 void QAbstract3DSeries::setMesh(QAbstract3DSeries::Mesh mesh)
 {
-    if ((mesh == QAbstract3DSeries::MeshPoint || mesh == QAbstract3DSeries::MeshMinimal)
+    if ((mesh == QAbstract3DSeries::MeshPoint || mesh == QAbstract3DSeries::MeshMinimal
+         || mesh == QAbstract3DSeries::MeshArrow)
             && type() != QAbstract3DSeries::SeriesTypeScatter) {
         qWarning() << "Specified style is only supported for QScatter3DSeries.";
     } else if (d_ptr->m_mesh != mesh) {
@@ -311,6 +348,30 @@ void QAbstract3DSeries::setMeshSmooth(bool enable)
 bool QAbstract3DSeries::isMeshSmooth() const
 {
     return d_ptr->m_meshSmooth;
+}
+
+/*!
+ * \property QAbstract3DSeries::meshRotation
+ *
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized QQuaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * QBar3DSeries ignores any rotation that is not around Y-axis.
+ * QSurface3DSeries applies the rotation only to the selection pointer.
+ * Defaults to no rotation.
+ */
+void QAbstract3DSeries::setMeshRotation(const QQuaternion &rotation)
+{
+    if (d_ptr->m_meshRotation != rotation) {
+        d_ptr->setMeshRotation(rotation);
+        emit meshRotationChanged(rotation);
+    }
+}
+
+QQuaternion QAbstract3DSeries::meshRotation() const
+{
+    return d_ptr->m_meshRotation;
 }
 
 /*!
@@ -486,6 +547,27 @@ QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
     return d_ptr->m_multiHighlightGradient;
 }
 
+/*!
+ * \property QAbstract3DSeries::name
+ *
+ * Sets the series name.
+ * Series name can be used in item label format with tag \c{@seriesName}.
+ *
+ * \sa itemLabelFormat
+ */
+void QAbstract3DSeries::setName(const QString &name)
+{
+    if (d_ptr->m_name != name) {
+        d_ptr->setName(name);
+        emit nameChanged(name);
+    }
+}
+
+QString QAbstract3DSeries::name() const
+{
+    return d_ptr->m_name;
+}
+
 // QAbstract3DSeriesPrivate
 
 QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
@@ -563,6 +645,14 @@ void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
         m_controller->markSeriesVisualsDirty();
 }
 
+void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
+{
+    m_meshRotation = rotation;
+    m_changeTracker.meshRotationChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
 void QAbstract3DSeriesPrivate::setUserDefinedMesh(const QString &meshFile)
 {
     m_userDefinedMesh = meshFile;
@@ -627,6 +717,14 @@ void QAbstract3DSeriesPrivate::setMultiHighlightGradient(const QLinearGradient &
         m_controller->markSeriesVisualsDirty();
 }
 
+void QAbstract3DSeriesPrivate::setName(const QString &name)
+{
+    m_name = name;
+    m_changeTracker.nameChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
 void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force)
 {
     int themeIndex = seriesIndex;
@@ -664,4 +762,4 @@ void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesInd
     }
 }
 
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

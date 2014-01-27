@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,12 +20,17 @@
 
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
+#include <QtDataVisualization/Q3DCamera>
+#include <QtDataVisualization/QBar3DSeries>
+#include <QtDataVisualization/QScatter3DSeries>
+#include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/Q3DTheme>
 #include <QScrollBar>
 #include <QSize>
 #include <QImage>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
                          QTextEdit *statusArea) :
@@ -39,29 +44,33 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_mode(Surface)
 {
     // Initialize surface
-    m_surface->setTheme(QDataVis::ThemeIsabelle);
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setSelectionMode(QDataVis::SelectionNone);
-    m_surface->setGridVisible(false);
-    m_surface->setGradient(gradient);
+    m_surface->setSelectionMode(QAbstract3DGraph::SelectionNone);
+    m_surface->activeTheme()->setGridEnabled(false);
+    m_surface->activeTheme()->setBackgroundEnabled(false);
+    m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
     m_surface->axisY()->setMax(255);
-    m_surface->setSurfaceGridEnabled(false);
-    m_surface->setBackgroundVisible(false);
-    m_surface->setFlatShadingEnabled(true);
-    m_surface->setActiveDataProxy(new QHeightMapSurfaceDataProxy());
-    m_surface->setCameraPosition(0.0, 90.0, 105);
+    QSurface3DSeries *series1 = new QSurface3DSeries(new QHeightMapSurfaceDataProxy());
+    series1->setFlatShadingEnabled(true);
+    series1->setDrawMode(QSurface3DSeries::DrawSurface);
+    series1->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    series1->setBaseGradient(gradient);
+    m_surface->addSeries(series1);
 
     // Initialize scatter
-    m_scatter->setTheme(QDataVis::ThemeStoneMoss);
-    m_scatter->setSelectionMode(QDataVis::SelectionNone);
-    m_scatter->setGridVisible(false);
-    m_scatter->setObjectType(QDataVis::MeshDots, false);
-    m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
-    m_scatter->setCameraPosition(0.0, 85.0, 110);
+    m_scatter->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+    m_scatter->setSelectionMode(QAbstract3DGraph::SelectionNone);
+    m_scatter->activeTheme()->setGridEnabled(false);
+    m_scatter->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
+    m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
+    QScatter3DSeries *series2 = new QScatter3DSeries;
+    series2->setMesh(QAbstract3DSeries::MeshPoint);
+    m_scatter->addSeries(series2);
     m_scatter->axisY()->setMin(-128);
     m_scatter->axisY()->setMax(128);
     m_scatter->axisX()->setMin(-m_resolution.width() / 2);
@@ -70,16 +79,16 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_scatter->axisZ()->setMax(m_resolution.height() / 2);
 
     // Initialize bars
-    m_bars->setTheme(QDataVis::ThemeQt);
-    m_bars->setSelectionMode(QDataVis::SelectionNone);
-    m_bars->setGridVisible(false);
-    m_bars->setBarType(QDataVis::MeshBars, true);
-#if 1
-    m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
-#else
+    m_bars->activeTheme()->setType(Q3DTheme::ThemeQt);
+    m_bars->setSelectionMode(QAbstract3DGraph::SelectionNone);
+    m_bars->activeTheme()->setGridEnabled(false);
+    m_bars->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
-#endif
-    m_bars->setCameraPosition(0.0, 75.0);
+    m_bars->scene()->activeCamera()->setCameraPosition(0.0, 75.0, 150);
+    QBar3DSeries *series3 = new QBar3DSeries;
+    series3->setMesh(QAbstract3DSeries::MeshBar);
+    series3->setMeshSmooth(true);
+    m_bars->addSeries(series3);
     m_bars->valueAxis()->setMax(255);
 
     // Hide scroll bar
@@ -92,21 +101,10 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
 }
 
 SurfaceData::~SurfaceData()
-{   // HACK: The current context needs to be destroyed last
-    // TODO: Fix properly in datavis code somehow
-    if (m_mode == Surface) {
-        delete m_scatter;
-        delete m_bars;
-        delete m_surface;
-    } else if (m_mode == MeshBars) {
-        delete m_scatter;
-        delete m_surface;
-        delete m_bars;
-    } else {
-        delete m_bars;
-        delete m_surface;
-        delete m_scatter;
-    }
+{
+    delete m_bars;
+    delete m_surface;
+    delete m_scatter;
 }
 
 void SurfaceData::updateData()
@@ -114,11 +112,12 @@ void SurfaceData::updateData()
     QImage depthMap = m_kinect.getDepth();
     if (m_resize) // Resize for better performance
         depthMap = depthMap.scaled(m_resolution);
-    if (m_mode != Surface)
+    if (m_mode != Surface) {
         setData(depthMap);
-    else
-        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->activeDataProxy())->setHeightMap(
+    } else {
+        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->seriesList().at(0)->dataProxy())->setHeightMap(
                 depthMap);
+    }
 }
 
 void SurfaceData::updateStatus(QKinect::KinectStatus status)
@@ -164,7 +163,7 @@ void SurfaceData::stop()
 
 void SurfaceData::setDistance(int distance)
 {
-    m_kinect.setMaxDist(unsigned int(distance * 100));
+    m_kinect.setMaxDist((unsigned int)(distance * 100));
 }
 
 void SurfaceData::setResolution(int selection)
@@ -226,24 +225,26 @@ void SurfaceData::scrollDown()
 
 void SurfaceData::useGradientOne()
 {
-    m_surface->setTheme(QDataVis::ThemeIsabelle);
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setGradient(gradient);
+    m_surface->seriesList().at(0)->setBaseGradient(gradient);
+    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Thermal image imitation"));
 }
 
 void SurfaceData::useGradientTwo()
 {
-    m_surface->setTheme(QDataVis::ThemeQt);
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeQt);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(0.8, Qt::red);
     gradient.setColorAt(1.0, Qt::green);
-    m_surface->setGradient(gradient);
+    m_surface->seriesList().at(0)->setBaseGradient(gradient);
+    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Highlight foreground"));
 }
 
@@ -278,7 +279,7 @@ void SurfaceData::setData(const QImage &image)
         }
 
         QScatterDataArray *dataArray = new QScatterDataArray(m_scatterDataArray->mid(0, count));
-        static_cast<QScatterDataProxy *>(m_scatter->activeDataProxy())->resetArray(dataArray);
+        m_scatter->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     } else {
         QBarDataArray *dataArray = m_barDataArray;
         for (int i = 0; i < imageHeight; i++, bitCount -= widthBits) {
@@ -287,7 +288,7 @@ void SurfaceData::setData(const QImage &image)
                 newRow[j] = qreal(bits[bitCount + (j * 4)]);
         }
 
-        static_cast<QBarDataProxy *>(m_bars->activeDataProxy())->resetArray(dataArray);
+        m_bars->seriesList().at(0)->dataProxy()->resetArray(dataArray);
     }
 }
 

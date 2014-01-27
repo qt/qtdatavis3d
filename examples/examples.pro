@@ -2,8 +2,11 @@ TEMPLATE = subdirs
 SUBDIRS += qmlbars \
            qmlscatter \
            qmlsurface \
-           qmlcustominput
-!android: {
+           qmlcustominput \
+           qmllegend \
+           qmlmultigraph
+
+!android:!ios {
     SUBDIRS += bars \
                custominput \
                customproxy \

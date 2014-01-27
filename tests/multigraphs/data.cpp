@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #define NOMINMAX
 
 #include "data.h"
-#include <QtDataVisualization/Q3DValueAxis>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DCamera>
 #include <QtDataVisualization/QBar3DSeries>
 #include <QtDataVisualization/QScatter3DSeries>
@@ -29,7 +29,7 @@
 #include <QSize>
 #include <QImage>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
            QTextEdit *statusArea, QWidget *widget) :
@@ -42,18 +42,20 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_resolution(QSize(300, 300)),
     m_resolutionLevel(0),
     m_mode(Surface),
+    m_scatterDataArray(0),
+    m_barDataArray(0),
     m_started(false)
 {
     // Initialize surface
-    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->setSelectionMode(QDataVis::SelectionNone);
-    m_surface->theme()->setGridEnabled(false);
-    m_surface->theme()->setBackgroundEnabled(false);
+    m_surface->setSelectionMode(QAbstract3DGraph::SelectionNone);
+    m_surface->activeTheme()->setGridEnabled(false);
+    m_surface->activeTheme()->setBackgroundEnabled(false);
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
     QSurface3DSeries *series1 = new QSurface3DSeries(new QHeightMapSurfaceDataProxy());
     series1->setFlatShadingEnabled(true);
@@ -63,20 +65,20 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
     m_surface->addSeries(series1);
 
     // Initialize scatter
-    m_scatter->setTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss));
-    m_scatter->setSelectionMode(QDataVis::SelectionNone);
-    m_scatter->theme()->setGridEnabled(false);
-    m_scatter->setShadowQuality(QDataVis::ShadowQualitySoftLow);
+    m_scatter->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+    m_scatter->setSelectionMode(QAbstract3DGraph::SelectionNone);
+    m_scatter->activeTheme()->setGridEnabled(false);
+    m_scatter->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
     m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
     QScatter3DSeries *series2 = new QScatter3DSeries;
     series2->setMesh(QAbstract3DSeries::MeshPoint);
     m_scatter->addSeries(series2);
 
     // Initialize bars
-    m_bars->setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
-    m_bars->setSelectionMode(QDataVis::SelectionItemAndRow | QDataVis::SelectionSlice);
-    m_bars->theme()->setGridEnabled(false);
-    m_bars->setShadowQuality(QDataVis::ShadowQualityLow);
+    m_bars->activeTheme()->setType(Q3DTheme::ThemeQt);
+    m_bars->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
+    m_bars->activeTheme()->setGridEnabled(false);
+    m_bars->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
     m_bars->scene()->activeCamera()->setCameraPosition(0.0, 75.0, 150);
     QBar3DSeries *series3 = new QBar3DSeries;
@@ -88,21 +90,10 @@ Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
 }
 
 Data::~Data()
-{   // HACK: The current context needs to be destroyed last
-    // TODO: Fix properly in datavis code somehow
-    if (m_mode == Surface) {
-        delete m_scatter;
-        delete m_bars;
-        delete m_surface;
-    } else if (m_mode == Bars) {
-        delete m_scatter;
-        delete m_surface;
-        delete m_bars;
-    } else {
-        delete m_bars;
-        delete m_surface;
-        delete m_scatter;
-    }
+{
+    delete m_bars;
+    delete m_surface;
+    delete m_scatter;
     delete m_widget;
     delete m_scatterDataArray; // only portion of this array is set to graph
 }
@@ -185,24 +176,26 @@ void Data::scrollDown()
 
 void Data::useGradientOne()
 {
-    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
     m_surface->seriesList().at(0)->setBaseGradient(gradient);
+    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Thermal image imitation"));
 }
 
 void Data::useGradientTwo()
 {
-    m_surface->setTheme(new Q3DTheme(Q3DTheme::ThemeQt));
+    m_surface->activeTheme()->setType(Q3DTheme::ThemeQt);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::white);
     gradient.setColorAt(0.8, Qt::red);
     gradient.setColorAt(1.0, Qt::green);
     m_surface->seriesList().at(0)->setBaseGradient(gradient);
+    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Highlight foreground"));
 }
 

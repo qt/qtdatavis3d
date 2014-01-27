@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -28,6 +28,15 @@
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
 
+  \note QML doesn't support the type of anti-aliasing used by Qt Data Visualization graphs
+  by default. Setting the \c antialiasing property doesn't affect graphs. To enable
+  anti-aliasing for graphs, a custom surface format must be set up for the QQuickView
+  before showing it. You can use the convenience function
+  \c{QtDataVisualization::qDefaultSurfaceFormat()} to create the custom surface format object.
+
+  For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag and
+  \l QAbstract3DGraph::ShadowQuality
+
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 
@@ -42,11 +51,43 @@
  */
 
 /*!
+  \qmlproperty Scene3D AbstractGraph3D::scene
+  Read only Q3DScene that can be used to access e.g. camera object.
+ */
+
+/*!
   \qmlproperty AbstractInputHandler3D AbstractGraph3D::inputHandler
   Input handler. You can disable default input handlers by setting this property to \c null.
  */
 
 /*!
   \qmlproperty Theme3D AbstractGraph3D::theme
-  Theme of the graph.
+  The active theme of the graph.
  */
+
+/*!
+  \qmlproperty bool AbstractGraph3D::clearWindowBeforeRendering
+
+  Indicates if the graph should also clear the whole window before rendering the graph,
+  including the areas outside the graph.
+  Since the graphs are drawn first under other QML items, the regular QML window clearing
+  before rendering is suppressed when there are any graphs in the window; the graphs
+  handle the clearing themselves instead.
+  If you have any other items besides graphs that do similar
+  custom drawing under other QML items, you need to set this property to false on all graphs
+  drawn to same window with the other custom items, or it is likely that the
+  other custom items do not render properly.
+  Defaults to true.
+
+  \note This property should be set to the same value for all graphs in the same window.
+  Otherwise some graphs may not show.
+
+  \note If window clearing before rendering is suppressed, any areas of the window not fully
+  covered with opaque items may not draw properly.
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::clearSelection()
+ * Clears selection from all attached series.
+ */
+

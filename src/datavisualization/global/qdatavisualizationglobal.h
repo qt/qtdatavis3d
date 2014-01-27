@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -52,16 +52,7 @@
 #  define QT_DATAVISUALIZATION_AUTOTEST_EXPORT
 #endif
 
-#define QT_DATAVISUALIZATION_NAMESPACE QtDataVisualization
+#define QT_BEGIN_NAMESPACE_DATAVISUALIZATION namespace QtDataVisualization {
+#define QT_END_NAMESPACE_DATAVISUALIZATION }
 
-#ifdef QT_DATAVISUALIZATION_NAMESPACE
-#  define QT_DATAVISUALIZATION_BEGIN_NAMESPACE namespace QT_DATAVISUALIZATION_NAMESPACE {
-#  define QT_DATAVISUALIZATION_END_NAMESPACE }
-#  define QT_DATAVISUALIZATION_USE_NAMESPACE using namespace QT_DATAVISUALIZATION_NAMESPACE;
-#else
-#  define QT_DATAVISUALIZATION_BEGIN_NAMESPACE
-#  define QT_DATAVISUALIZATION_END_NAMESPACE
-#  define QT_DATAVISUALIZATION_USE_NAMESPACE
 #endif
-
-#endif // QVIS3DGLOBAL_H

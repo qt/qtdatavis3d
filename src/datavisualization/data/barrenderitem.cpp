@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -19,7 +19,7 @@
 #include "barrenderitem_p.h"
 #include "bars3drenderer_p.h"
 
-QT_DATAVISUALIZATION_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
@@ -39,6 +39,7 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_sliceLabel = other.m_sliceLabel;
     m_sliceLabelItem = 0;
     m_seriesIndex = other.m_seriesIndex;
+    m_rotation = other.m_rotation;
 }
 
 BarRenderItem::~BarRenderItem()
@@ -60,10 +61,9 @@ void BarRenderItem::setSliceLabel(const QString &label)
     m_sliceLabel = label;
 }
 
-QString &BarRenderItem::sliceLabel()
+const QString &BarRenderItem::sliceLabel() const
 {
     return m_sliceLabel;
 }
 
-
-QT_DATAVISUALIZATION_END_NAMESPACE
+QT_END_NAMESPACE_DATAVISUALIZATION

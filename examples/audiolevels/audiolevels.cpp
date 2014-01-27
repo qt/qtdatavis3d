@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Digia Plc
+** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
 ** For any questions to Digia, please use contact form at http://qt.digia.com
 **
@@ -20,7 +20,7 @@
 #include "audiolevels.h"
 
 #include <QtDataVisualization/qbardataproxy.h>
-#include <QtDataVisualization/q3dvalueaxis.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
@@ -29,7 +29,7 @@
 #include <QAudioDeviceInfo>
 #include <QAudioInput>
 
-QT_DATAVISUALIZATION_USE_NAMESPACE
+using namespace QtDataVisualization;
 
 AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     : QObject(parent),
@@ -43,30 +43,31 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     m_graph->valueAxis()->setRange(-100.0f, 100.0f);
     m_graph->valueAxis()->setSegmentCount(20);
     m_graph->valueAxis()->setLabelFormat(QStringLiteral("%d%%"));
-    m_graph->setShadowQuality(QDataVis::ShadowQualityNone);
-    m_graph->setSelectionMode(QDataVis::SelectionNone);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_graph->scene()->activeCamera()->setCameraPosition(-25.0f, 10.0f, 190.0f);
-    m_graph->setTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle));
-    m_graph->theme()->setGridEnabled(true);
-    m_graph->theme()->setBackgroundEnabled(false);
-    QFont font = m_graph->theme()->font();
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
+    m_graph->activeTheme()->setGridEnabled(true);
+    m_graph->activeTheme()->setBackgroundEnabled(false);
+    QFont font = m_graph->activeTheme()->font();
     font.setPointSize(10);
-    m_graph->theme()->setFont(font);
+    m_graph->activeTheme()->setFont(font);
     QBar3DSeries *series = new QBar3DSeries;
     series->setMesh(QAbstract3DSeries::MeshBar);
     m_graph->addSeries(series);
 
     //! [0]
+    QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
+
     QAudioFormat formatAudio;
-    formatAudio.setSampleRate(8000);
-    formatAudio.setChannelCount(1);
-    formatAudio.setSampleSize(8);
-    formatAudio.setCodec("audio/pcm");
+    formatAudio.setSampleRate(inputDevice.supportedSampleRates().at(0));
+    formatAudio.setChannelCount(inputDevice.supportedChannelCounts().at(0));
+    formatAudio.setSampleSize(inputDevice.supportedSampleSizes().at(0));
+    formatAudio.setCodec(inputDevice.supportedCodecs().at(0));
     formatAudio.setByteOrder(QAudioFormat::LittleEndian);
     formatAudio.setSampleType(QAudioFormat::UnSignedInt);
 
-    QAudioDeviceInfo inputDevices = QAudioDeviceInfo::defaultInputDevice();
-    m_audioInput = new QAudioInput(inputDevices, formatAudio, this);
+    m_audioInput = new QAudioInput(inputDevice, formatAudio, this);
 #ifdef Q_OS_MAC
     // Mac seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
     m_audioInput->setBufferSize(256);
