@@ -88,7 +88,7 @@ Q3DInputHandler::~Q3DInputHandler()
  */
 void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-#if defined(Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 #else
@@ -128,7 +128,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined (Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
     if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {
@@ -147,7 +147,7 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined (Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
     if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {

@@ -66,7 +66,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
     QSize labelSize;
 
-#if defined(Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     // Android can't handle textures with dimensions not in power of 2. Resize labels accordingly.
     // Add some padding before converting to power of two to avoid too tight fit
     GLuint prePadding = 5;
@@ -95,7 +95,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setFont(valueFont);
     if (!labelBackground) {
         painter.setPen(txtColor);
-#if defined(Q_OS_ANDROID)
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
                          (labelSize.height() - valueStrHeight) / 2.0f,
                          valueStrWidth, valueStrHeight,
