@@ -66,9 +66,9 @@
 
     \snippet ../examples/surface/surfacegraph.cpp 0
 
-    Then we fill the proxy with a simple square root and sin wave data. This is done by
+    Then we fill the proxy with a simple square root and sine wave data. This is done by
     creating a new \c QSurfaceDataArray instance and adding \c QSurfaceDataRow elements to it.
-    The created \c QSurfaceDataArray is set to be a the data array for the QSurfaceDataProxy.
+    The created \c QSurfaceDataArray is set to be the data array for the QSurfaceDataProxy.
 
     \snippet ../examples/surface/surfacegraph.cpp 1
 
@@ -85,10 +85,7 @@
     \c {Sqrt & Sin} radio button, the selected series is activated with the following
     code. First we set the decorative issues like enable the grid for the surface and
     select the flat shading mode. Next lines define the axis label format and value
-    ranges. The Y-value value of the function we use to generate the points varies between
-    0.0 and 2.0, but no individual point actually hits exactly those, so we set the Y-axis range
-    explicitly. The other axes we are happy to leave to automatically adjust their range to the
-    data, which is the default behavior. Finally we make sure the correct series is added to the
+    ranges. Finally we make sure the correct series is added to the
     graph. We need to first remove the other series, since surface graphs only support a single
     series at a time:
 

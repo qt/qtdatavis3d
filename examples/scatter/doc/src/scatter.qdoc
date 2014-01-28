@@ -75,11 +75,7 @@
     None of these are required, but are used to override graph defaults. You can try how it looks
     with the preset defaults by commenting the block above out.
 
-    Then we'll set axes for the graph:
-
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 1
-
-    And finally we create a QScatterDataProxy and the associated QScatter3DSeries. We set custom label format
+    Finally we create a QScatterDataProxy and the associated QScatter3DSeries. We set custom label format
     and mesh smoothing for the series and add it to the graph:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 2
@@ -92,8 +88,7 @@
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 3
 
-    The actual data addition is done in \c addData() method. First we configure the axes we created
-    in constructor:
+    The actual data addition is done in \c addData() method. First we configure the axes:
 
     \snippet ../examples/scatter/scatterdatamodifier.cpp 4
 

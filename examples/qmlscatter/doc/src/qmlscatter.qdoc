@@ -46,7 +46,7 @@
 
     \snippet ../examples/qmlscatter/main.cpp 0
 
-    This will help us when deploying the application to Android.
+    This will make application deployment easier.
 
     We'll enable anti-aliasing for our application in environments that support it:
 

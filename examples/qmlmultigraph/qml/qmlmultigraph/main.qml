@@ -50,7 +50,10 @@ Item {
                 id: surfaceGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
-                theme: Theme3D { type: Theme3D.ThemePrimaryColors }
+                theme: Theme3D {
+                    type: Theme3D.ThemePrimaryColors
+                    font.pointSize: 60
+                }
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Surface3DSeries {
@@ -78,7 +81,10 @@ Item {
                 id: scatterGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
-                theme: Theme3D { type: Theme3D.ThemeDigia }
+                theme: Theme3D {
+                    type: Theme3D.ThemeDigia
+                    font.pointSize: 60
+                }
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Scatter3DSeries {
@@ -104,7 +110,10 @@ Item {
                 id: barGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
-                theme: Theme3D { type: Theme3D.ThemeQt }
+                theme: Theme3D {
+                    type: Theme3D.ThemeQt
+                    font.pointSize: 60
+                }
                 selectionMode: AbstractGraph3D.SelectionItemAndRow | AbstractGraph3D.SelectionSlice
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 

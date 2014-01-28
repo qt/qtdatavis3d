@@ -80,6 +80,6 @@
 
     \note In the future versions of Qt Data Visualization, QBarDataItem might get extended so that
     it does allocate some memory to store other optional bar properties besides the value.
-    In use cases where those optional properties are used, using \c memmove and \c memcpy would lead to
+    In use cases where those optional properties are used, using \c memmove and \c memcpy could lead to
     memory leaks, so use them with care.
 */

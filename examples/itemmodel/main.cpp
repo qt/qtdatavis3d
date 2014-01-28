@@ -80,8 +80,8 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     // and add a small space between them
     m_graph->setBarThickness(1.0f);
     m_graph->setBarSpacing(QSizeF(0.2, 0.2));
-    //! [5]
 
+    //! [5]
 #ifndef USE_STATIC_DATA
     // Set up sample space; make it as deep as it's wide
     m_graph->rowAxis()->setRange(0, m_rowCount);
@@ -98,7 +98,6 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_graph->seriesList().at(0)->setItemLabelFormat(QStringLiteral("@valueLabel"));
 #else
     //! [6]
-
     // Set selection mode to slice row
     m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
 
@@ -106,7 +105,6 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 #endif
 
     //! [7]
-
     // Set theme
     m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
 
@@ -138,6 +136,7 @@ void GraphDataGenerator::start()
 #else
     //! [8]
     setupModel();
+
     // Table needs to be shown before the size of its headers can be accurately obtained,
     // so we postpone it a bit
     m_dataTimer = new QTimer();

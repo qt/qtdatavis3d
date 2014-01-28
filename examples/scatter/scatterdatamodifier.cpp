@@ -52,12 +52,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [0]
 
-    //! [1]
-    m_graph->setAxisX(new QValue3DAxis);
-    m_graph->setAxisY(new QValue3DAxis);
-    m_graph->setAxisZ(new QValue3DAxis);
-    //! [1]
-
     //! [2]
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);

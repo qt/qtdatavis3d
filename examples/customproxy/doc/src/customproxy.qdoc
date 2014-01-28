@@ -33,8 +33,8 @@
     This example defines a simple flexible data set \c VariantDataSet where each data item is a
     a variant list. Each item can have multiple different values, identified by their index in
     the list. In this example, the data set is storing monthly rainfall data, where the value in
-    index one is the year, index two contains the month, and the third value has the amount
-    of rainfall in that month.
+    index zero is the year, the value in index one is the month, and the value in index two is
+    the amount of rainfall in that month.
 
     The custom proxy we provide here is similar to item model based proxies provided by Qt
     Data Visualization in that it requires a mapping to interpret the data.
