@@ -15,4 +15,4 @@ SUBDIRS += qmlbars \
                surface
 }
 
-qtHaveModule(multimedia):!android: SUBDIRS += audiolevels
+qtHaveModule(multimedia):!android:!ios: SUBDIRS += audiolevels
