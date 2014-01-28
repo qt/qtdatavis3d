@@ -83,6 +83,9 @@ int main(int argc, char **argv)
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
+    QPushButton *itemCountButton = new QPushButton(widget);
+    itemCountButton->setText(QStringLiteral("Toggle item count"));
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -108,6 +111,7 @@ int main(int argc, char **argv)
     //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(itemCountButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox, 0, Qt::AlignTop);
@@ -130,6 +134,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changeLabelStyle);
+    QObject::connect(itemCountButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::toggleItemCount);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setBackgroundEnabled);

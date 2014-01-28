@@ -41,6 +41,7 @@ public:
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void setSmoothDots(int smooth);
+    void toggleItemCount();
     void start();
 
 public slots:
@@ -61,6 +62,8 @@ private:
     int m_fontSize;
     QAbstract3DSeries::Mesh m_style;
     bool m_smooth;
+    int m_itemCount;
+    float m_curveDivider;
 };
 
 #endif

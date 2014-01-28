@@ -31,12 +31,17 @@ using namespace QtDataVisualization;
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
 
 const int numberOfItems = 3600;
+const float curveDivider = 3.0f;
+const int lowerNumberOfItems = 900;
+const float lowerCurveDivider = 0.75f;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_fontSize(40.0f),
       m_style(QAbstract3DSeries::MeshSphere),
-      m_smooth(true)
+      m_smooth(true),
+      m_itemCount(lowerNumberOfItems),
+      m_curveDivider(lowerCurveDivider)
 {
     //! [0]
     m_graph->activeTheme()->setType(Q3DTheme::ThemeEbony);
@@ -78,28 +83,27 @@ void ScatterDataModifier::addData()
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
-    m_graph->axisX()->setRange(-30.0f, 30.0f);
-    m_graph->axisY()->setRange(-1.0f, 1.0f);
-    m_graph->axisZ()->setRange(-30.0f, 30.0f);
     //! [4]
 
     //! [5]
     QScatterDataArray *dataArray = new QScatterDataArray;
-    dataArray->resize(numberOfItems);
+    dataArray->resize(m_itemCount);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
     //! [5]
 
 #ifdef RANDOM_SCATTER
-    for (int i = 0; i < numberOfItems; i++) {
+    for (int i = 0; i < m_itemCount; i++) {
         ptrToDataArray->setPosition(randVector());
         ptrToDataArray++;
     }
 #else
     //! [6]
-    float limit = qSqrt(numberOfItems) / 2.0f;
+    float limit = qSqrt(m_itemCount) / 2.0f;
     for (float i = -limit; i < limit; i++) {
         for (float j = -limit; j < limit; j++) {
-            ptrToDataArray->setPosition(QVector3D(i, qCos(qDegreesToRadians((i * j) / 3.0f)), j));
+            ptrToDataArray->setPosition(QVector3D(i + 0.5f,
+                                                  qCos(qDegreesToRadians((i * j) / m_curveDivider)),
+                                                  j + 0.5f));
             ptrToDataArray++;
         }
     }
@@ -182,6 +186,19 @@ void ScatterDataModifier::setGridEnabled(int enabled)
     m_graph->activeTheme()->setGridEnabled((bool)enabled);
 }
 //! [8]
+
+void ScatterDataModifier::toggleItemCount()
+{
+    if (m_itemCount == numberOfItems) {
+        m_itemCount = lowerNumberOfItems;
+        m_curveDivider = lowerCurveDivider;
+    } else {
+        m_itemCount = numberOfItems;
+        m_curveDivider = curveDivider;
+    }
+    m_graph->seriesList().at(0)->dataProxy()->resetArray(0);
+    addData();
+}
 
 QVector3D ScatterDataModifier::randVector()
 {
