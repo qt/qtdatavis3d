@@ -133,24 +133,20 @@ Item {
     }
 
     Button {
-        id: shadowToggle
+        id: angleAdjust
         anchors.bottom: mappingToggle.top
         width: camControlArea.width
-        text: "Hide Shadows"
+        text: "Adjust angle"
+        property real currentAngle: 0
         onClicked: {
-            if (testChart.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
-                testChart.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
-                text = "Hide Shadows"
-            } else {
-                testChart.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                text = "Show Shadows"
-            }
+            currentAngle += 5
+            chartData.series.meshAngle = currentAngle
         }
     }
 
     Button {
         id: dataToggle
-        anchors.bottom: shadowToggle.top
+        anchors.bottom: angleAdjust.top
         width: camControlArea.width
         text: "Show 2010 - 2012"
         onClicked: {

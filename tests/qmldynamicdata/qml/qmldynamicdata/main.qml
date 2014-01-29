@@ -28,8 +28,8 @@ Item {
 
     ListModel {
         id: graphModel
-        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0 }
-        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0 }
+        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0; rotation: "0.92388, 0.220942, 0.220942, 0.220942"}
+        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0; rotation: "0.953717, 0.173613, 0.173613, 0.173613"}
     }
 
     Timer {
@@ -114,6 +114,7 @@ Item {
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
+                    rotationRole: "rotation"
                 }
             }
         }

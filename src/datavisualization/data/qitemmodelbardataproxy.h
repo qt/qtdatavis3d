@@ -34,6 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
     Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY valueRoleChanged)
+    Q_PROPERTY(QString rotationRole READ rotationRole WRITE setRotationRole NOTIFY rotationRoleChanged)
     Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY rowCategoriesChanged)
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY columnCategoriesChanged)
     Q_PROPERTY(bool useModelCategories READ useModelCategories WRITE setUseModelCategories NOTIFY useModelCategoriesChanged)
@@ -50,8 +51,15 @@ public:
                            QObject *parent = 0);
     QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
                            const QString &columnRole, const QString &valueRole,
+                           const QString &rotationRole, QObject *parent = 0);
+    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+                           const QString &columnRole, const QString &valueRole,
                            const QStringList &rowCategories, const QStringList &columnCategories,
                            QObject *parent = 0);
+    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+                           const QString &columnRole, const QString &valueRole,
+                           const QString &rotationRole, const QStringList &rowCategories,
+                           const QStringList &columnCategories, QObject *parent = 0);
     virtual ~QItemModelBarDataProxy();
 
     void setItemModel(const QAbstractItemModel *itemModel);
@@ -63,6 +71,8 @@ public:
     QString columnRole() const;
     void setValueRole(const QString &role);
     QString valueRole() const;
+    void setRotationRole(const QString &role);
+    QString rotationRole() const;
 
     void setRowCategories(const QStringList &categories);
     QStringList rowCategories() const;
@@ -88,6 +98,7 @@ signals:
     void rowRoleChanged(QString role);
     void columnRoleChanged(QString role);
     void valueRoleChanged(QString role);
+    void rotationRoleChanged(QString role);
     void rowCategoriesChanged(QStringList categories);
     void columnCategoriesChanged(QStringList categories);
     void useModelCategoriesChanged(bool enable);
