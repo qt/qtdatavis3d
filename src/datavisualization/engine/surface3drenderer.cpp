@@ -583,8 +583,10 @@ void Surface3DRenderer::drawSlicedScene()
 
     GLfloat aspect = (GLfloat)m_secondarySubViewport.width()
             / (GLfloat)m_secondarySubViewport.height();
-    projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
-                           -sliceUnits, sliceUnits, -1.0f, 4.0f);
+    GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
+    projectionMatrix.ortho(-sliceUnitsScaled * aspect, sliceUnitsScaled * aspect,
+                           -sliceUnitsScaled, sliceUnitsScaled,
+                           -1.0f, 4.0f);
 
     // Set view matrix
     QMatrix4x4 viewMatrix;

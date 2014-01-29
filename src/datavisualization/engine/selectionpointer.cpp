@@ -91,9 +91,11 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 projectionMatrix;
     if (m_cachedIsSlicingActivated) {
         GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+        GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
-        projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
-                               -sliceUnits, sliceUnits, -1.0f, 4.0f);
+        projectionMatrix.ortho(-sliceUnitsScaled * aspect, sliceUnitsScaled * aspect,
+                               -sliceUnitsScaled, sliceUnitsScaled,
+                               -1.0f, 4.0f);
     } else {
         viewMatrix = camera->viewMatrix();
         projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
