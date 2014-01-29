@@ -1,4 +1,8 @@
-include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
+include($QT_INSTALL_DOCS/global/macros.qdocconf)
+include($QT_INSTALL_DOCS/global/qt-cpp-defines.qdocconf)
+include($QT_INSTALL_DOCS/global/compat.qdocconf)
+include($QT_INSTALL_DOCS/global/fileextensions.qdocconf)
+include($QT_INSTALL_DOCS/global/qt-html-templates-offline.qdocconf)
 
 project             = QtDataVisualization
 description         = Qt Data Visualization Reference Documentation
@@ -12,9 +16,14 @@ imagedirs  += ../images \
               images
 sourcedirs += ..
 
-depends += qtcore qtgui qtdeclarative
+#depends += qtcore qtgui qtdeclarative
 
-indexes += $QTDIR/doc/html/qt.index
+#indexes += $QTDIR/doc/html/qt.index
+indexes +=  $QT_INSTALL_DOCS/qtcore/qtcore.index \
+            $QT_INSTALL_DOCS/qtgui/qtgui.index \
+            $QT_INSTALL_DOCS/qtqml/qtqml.index \
+            $QT_INSTALL_DOCS/qtquick/qtquick.index
+
 
 qhp.projects                            = qtdatavisualization
 
@@ -45,23 +54,6 @@ qhp.qtdatavisualization.subprojects.types.indexTitle            = Qt Data Visual
 qhp.qtdatavisualization.subprojects.types.selectors             = fake:qmlclass
 qhp.qtdatavisualization.subprojects.types.sortPages             = true
 
-HTML.footer = \
-    "<div class=\"footer\">\n" \
-    "    <p>\n" \
-    "      <acronym title=\"Copyright\">&copy;</acronym> 2014 Digia. Qt and Qt logos are\n" \
-    "      trademarks of of Digia Corporation in Finland and/or other countries worldwide.\n" \
-    "    </p>\n" \
-    "      All other trademarks are property of their respective owners.\n" \
-    "    <br />\n" \
-    "    <p>\n" \
-    "      Licensees holding valid Qt Enterprise licenses may use this document in accordance\n" \
-    "      with the Qt Enterprise License Agreement provided with the Software or,\n" \
-    "      alternatively, in accordance with the terms contained in a written agreement\n" \
-    "      between you and Digia.\n" \
-    "    </p>\n" \
-    "</div>\n"
-
-navigation.homepage = Qt Enterprise:
 navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes
 navigation.qmltypespage = Qt Data Visualization QML Types
