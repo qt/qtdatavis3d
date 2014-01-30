@@ -158,6 +158,7 @@
         \li Grid visibility
         \li Bar shading smoothness
         \li Visibility of the second bar series
+        \li Data range to be shown
         \li Bar style
         \li Selection mode
         \li Theme

@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     //! [1]
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2006-2012)"));
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2006-2013)"));
 
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
@@ -167,6 +167,18 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
+    QComboBox *rangeList = new QComboBox(widget);
+    rangeList->addItem(QStringLiteral("2006"));
+    rangeList->addItem(QStringLiteral("2007"));
+    rangeList->addItem(QStringLiteral("2008"));
+    rangeList->addItem(QStringLiteral("2009"));
+    rangeList->addItem(QStringLiteral("2010"));
+    rangeList->addItem(QStringLiteral("2011"));
+    rangeList->addItem(QStringLiteral("2012"));
+    rangeList->addItem(QStringLiteral("2013"));
+    rangeList->addItem(QStringLiteral("All"));
+    rangeList->setCurrentIndex(8);
+
     //! [5]
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate horizontally")));
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -179,6 +191,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
     vLayout->addWidget(seriesCheckBox);
+    vLayout->addWidget(new QLabel(QStringLiteral("Show year")));
+    vLayout->addWidget(rangeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
     vLayout->addWidget(barStyleList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
@@ -219,6 +233,9 @@ int main(int argc, char **argv)
                      backgroundCheckBox, &QCheckBox::setChecked);
     QObject::connect(modifier, &GraphModifier::gridEnabledChanged,
                      gridCheckBox, &QCheckBox::setChecked);
+
+    QObject::connect(rangeList, SIGNAL(currentIndexChanged(int)), modifier,
+                     SLOT(changeRange(int)));
 
     QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeStyle(int)));

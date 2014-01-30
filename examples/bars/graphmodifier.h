@@ -50,6 +50,7 @@ public:
     void setSeriesVisibility(int enabled);
 
 public slots:
+    void changeRange(int range);
     void changeStyle(int style);
     void changeSelectionMode(int selectionMode);
     void changeTheme(int theme);
