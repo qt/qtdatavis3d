@@ -225,11 +225,11 @@ void Scatter3DRenderer::updateData()
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
-    scene->activeCamera()->setMinYRotation(-90.0f);
+    scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
+        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         m_hasHeightAdjustmentChanged = false;
     }
 
@@ -273,7 +273,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = activeCamera->viewMatrix();
+    QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
     int seriesCount = m_visibleSeriesList.size();
@@ -354,7 +354,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = activeCamera->calculatePositionRelativeToCamera(
+        QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
         // Set the depth projection matrix

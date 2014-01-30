@@ -99,10 +99,10 @@ Item {
         y: 0
         width:  298
         height: 298
-        minXValue: testChart.scene.activeCamera.minXRotation
-        minYValue: testChart.scene.activeCamera.minYRotation
-        maxXValue: testChart.scene.activeCamera.maxXRotation
-        maxYValue: testChart.scene.activeCamera.maxYRotation
+        minXValue: -180
+        minYValue: 0
+        maxXValue: 180
+        maxYValue: 90
     }
 
     Slider {

@@ -535,7 +535,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
+        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
     }
@@ -857,7 +857,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                  / (GLfloat)m_primarySubViewport.height(), 0.1f, 100.0f);
 
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->viewMatrix();
+    QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->d_ptr->viewMatrix();
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
@@ -914,7 +914,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = m_cachedScene->activeCamera()->calculatePositionRelativeToCamera(
+        QVector3D depthLightPos = m_cachedScene->activeCamera()->d_ptr->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 

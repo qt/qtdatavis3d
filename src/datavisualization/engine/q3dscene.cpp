@@ -438,23 +438,6 @@ void Q3DScene::setDevicePixelRatio(float pixelRatio)
     }
 }
 
-/*!
- * Calculates and sets the light position relative to the currently active camera using the given
- * parameters.
- * The relative 3D offset to the current camera position is defined in \a relativePosition.
- * Optional \a fixedRotation fixes the light rotation around the data visualization area to the
- * given value in degrees.
- * Optional \a distanceModifier modifies the distance of the light from the data visualization.
- */
-void Q3DScene::setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                                float fixedRotation, float distanceModifier)
-{
-    d_ptr->m_light->setPosition(
-                d_ptr->m_camera->calculatePositionRelativeToCamera(relativePosition,
-                                                                   fixedRotation,
-                                                                   distanceModifier));
-}
-
 Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     QObject(0),
     q_ptr(q),
@@ -648,6 +631,23 @@ QRect Q3DScenePrivate::glPrimarySubViewport()
 QRect Q3DScenePrivate::glSecondarySubViewport()
 {
     return m_glSecondarySubViewport;
+}
+
+/*!
+ * \internal
+ * Calculates and sets the light position relative to the currently active camera using the given
+ * parameters.
+ * The relative 3D offset to the current camera position is defined in \a relativePosition.
+ * Optional \a fixedRotation fixes the light rotation around the data visualization area to the
+ * given value in degrees.
+ * Optional \a distanceModifier modifies the distance of the light from the data visualization.
+ */
+void Q3DScenePrivate::setLightPositionRelativeToCamera(const QVector3D &relativePosition,
+                                                       float fixedRotation, float distanceModifier)
+{
+    m_light->setPosition(m_camera->d_ptr->calculatePositionRelativeToCamera(relativePosition,
+                                                                            fixedRotation,
+                                                                            distanceModifier));
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

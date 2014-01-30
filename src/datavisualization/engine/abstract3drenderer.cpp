@@ -188,7 +188,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
 
     scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
     // Set light position (rotate light with activeCamera, a bit above it (as set in defaultLightPos))
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
+    scene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
 
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,

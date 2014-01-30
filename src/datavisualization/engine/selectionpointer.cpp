@@ -21,7 +21,7 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
-#include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "drawer_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
@@ -97,7 +97,7 @@ void SelectionPointer::render(GLuint defaultFboHandle)
                                -sliceUnitsScaled, sliceUnitsScaled,
                                -1.0f, 4.0f);
     } else {
-        viewMatrix = camera->viewMatrix();
+        viewMatrix = camera->d_ptr->viewMatrix();
         projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
                                      / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
     }

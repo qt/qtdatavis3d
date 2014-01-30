@@ -86,6 +86,10 @@ public:
     QRect glPrimarySubViewport();
     QRect glSecondarySubViewport();
 
+    void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
+                                          float fixedRotation = 0.0f,
+                                          float distanceModifier = 0.0f);
+
 signals:
     void needRender();
 

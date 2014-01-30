@@ -77,9 +77,6 @@ public:
     float devicePixelRatio() const;
     void setDevicePixelRatio(float pixelRatio);
 
-    Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                                      float fixedRotation = 0.0f,
-                                                      float distanceModifier = 0.0f);
 signals:
     void viewportChanged(QRect viewport);
     void primarySubViewportChanged(QRect subViewport);

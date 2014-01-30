@@ -274,15 +274,15 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
     if (m_hasNegativeValues)
-        scene->activeCamera()->setMinYRotation(-90.0);
+        scene->activeCamera()->d_ptr->setMinYRotation(-90.0);
     else
-        scene->activeCamera()->setMinYRotation(0.0f);
+        scene->activeCamera()->d_ptr->setMinYRotation(0.0f);
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->setBaseOrientation(cameraDistanceVector,
-                                                  zeroVector,
-                                                  upVector);
+        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector,
+                                                         zeroVector,
+                                                         upVector);
         m_hasHeightAdjustmentChanged = false;
     }
 
@@ -767,7 +767,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
 
     // Get the view matrix
-    QMatrix4x4 viewMatrix = activeCamera->viewMatrix();
+    QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();
 
     // Calculate drawing order
     // Draw order is reversed to optimize amount of drawing (ie. draw front objects first,
@@ -842,7 +842,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = activeCamera->calculatePositionRelativeToCamera(
+        QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
