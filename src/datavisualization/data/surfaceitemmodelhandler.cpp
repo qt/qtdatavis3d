@@ -20,6 +20,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+static const int noRoleIndex = -1;
+
 SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),
@@ -50,7 +52,9 @@ void SurfaceItemModelHandler::resolveModel()
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
-    int valueRole = roleHash.key(m_proxy->valueRole().toLatin1(), Qt::DisplayRole);
+    int xPosRole = roleHash.key(m_proxy->xPosRole().toLatin1(), noRoleIndex);
+    int yPosRole = roleHash.key(m_proxy->yPosRole().toLatin1(), Qt::DisplayRole);
+    int zPosRole = roleHash.key(m_proxy->zPosRole().toLatin1(), noRoleIndex);
     int rowCount = m_itemModel->rowCount();
     int columnCount = m_itemModel->columnCount();
 
@@ -66,15 +70,41 @@ void SurfaceItemModelHandler::resolveModel()
         for (int i = 0; i < rowCount; i++) {
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++) {
+                float xPos = j;
+                float zPos = i;
+                if (xPosRole != noRoleIndex) {
+                    xPos = m_itemModel->index(i, j).data(xPosRole).toFloat();
+                } else {
+                    QString header = m_itemModel->headerData(j, Qt::Horizontal).toString();
+                    bool ok = false;
+                    float headerValue = header.toFloat(&ok);
+                    if (ok)
+                        xPos = headerValue;
+                }
+
+                if (zPosRole != noRoleIndex) {
+                    zPos = m_itemModel->index(i, j).data(zPosRole).toFloat();
+                } else {
+                    QString header = m_itemModel->headerData(i, Qt::Vertical).toString();
+                    bool ok = false;
+                    float headerValue = header.toFloat(&ok);
+                    if (ok)
+                        zPos = headerValue;
+                }
+
                 newProxyRow[j].setPosition(
-                            QVector3D(m_itemModel->headerData(j, Qt::Horizontal).toFloat(),
-                                      m_itemModel->index(i, j).data(valueRole).toFloat(),
-                                      m_itemModel->headerData(i, Qt::Vertical).toFloat()));
+                            QVector3D(xPos,
+                                      m_itemModel->index(i, j).data(yPosRole).toFloat(),
+                                      zPos));
             }
         }
     } else {
         int rowRole = roleHash.key(m_proxy->rowRole().toLatin1());
         int columnRole = roleHash.key(m_proxy->columnRole().toLatin1());
+        if (xPosRole == noRoleIndex)
+            xPosRole = columnRole;
+        if (zPosRole == noRoleIndex)
+            zPosRole = rowRole;
 
         bool generateRows = m_proxy->autoRowCategories();
         bool generateColumns = m_proxy->autoColumnCategories();
@@ -87,14 +117,17 @@ void SurfaceItemModelHandler::resolveModel()
         QHash<QString, bool> columnListHash;
 
         // Sort values into rows and columns
-        typedef QHash<QString, float> ColumnValueMap;
+        typedef QHash<QString, QVector3D> ColumnValueMap;
         QHash <QString, ColumnValueMap> itemValueMap;
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
                 QString rowRoleStr = index.data(rowRole).toString();
                 QString columnRoleStr = index.data(columnRole).toString();
-                itemValueMap[rowRoleStr][columnRoleStr] = index.data(valueRole).toReal();
+                QVector3D itemPos(index.data(xPosRole).toReal(),
+                                  index.data(yPosRole).toReal(),
+                                  index.data(zPosRole).toReal());
+                itemValueMap[rowRoleStr][columnRoleStr] = itemPos;
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
@@ -128,11 +161,8 @@ void SurfaceItemModelHandler::resolveModel()
         for (int i = 0; i < rowList.size(); i++) {
             QString rowKey = rowList.at(i);
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnList.size(); j++) {
-                newProxyRow[j].setPosition(QVector3D(columnList.at(j).toFloat(),
-                                                     itemValueMap[rowKey][columnList.at(j)],
-                                           rowList.at(i).toFloat()));
-            }
+            for (int j = 0; j < columnList.size(); j++)
+                newProxyRow[j].setPosition(itemValueMap[rowKey][columnList.at(j)]);
         }
     }
 

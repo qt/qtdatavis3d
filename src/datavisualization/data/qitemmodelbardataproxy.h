@@ -87,7 +87,8 @@ public:
     bool autoColumnCategories() const;
 
     void remap(const QString &rowRole, const QString &columnRole,
-               const QString &valueRole, const QStringList &rowCategories,
+               const QString &valueRole, const QString &rotationRole,
+               const QStringList &rowCategories,
                const QStringList &columnCategories);
 
     Q_INVOKABLE int rowCategoryIndex(const QString& category);

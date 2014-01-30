@@ -60,15 +60,17 @@ Item {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelSurfaceDataProxy {
                         itemModel: data.surfaceData
-                        // Mapping model roles to surface series rows, columns, and values.
-                        rowRole: "longitude"
-                        columnRole: "latitude"
-                        valueRole: "pop_density"
+                        // The surface data points are not neatly lined up in rows and columns,
+                        // so we define explicit row and column roles.
+                        rowRole: "row"
+                        columnRole: "col"
+                        xPosRole: "latitude"
+                        zPosRole: "longitude"
+                        yPosRole: "pop_density"
                     }
                 }
             }
         }
-
 
         Rectangle {
             Layout.fillHeight: true

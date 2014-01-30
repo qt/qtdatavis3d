@@ -52,7 +52,9 @@ private:
 
     QString m_rowRole;
     QString m_columnRole;
-    QString m_valueRole;
+    QString m_xPosRole;
+    QString m_yPosRole;
+    QString m_zPosRole;
 
     // For row/column items, sort items into these categories. Other categories are ignored.
     QStringList m_rowCategories;

@@ -466,24 +466,26 @@ bool QItemModelBarDataProxy::autoColumnCategories() const
 }
 
 /*!
- * Changes \a rowRole, \a columnRole, \a valueRole, \a rowCategories and \a columnCategories to the
- * mapping.
+ * Changes \a rowRole, \a columnRole, \a valueRole, \a rotationRole,
+ * \a rowCategories and \a columnCategories to the mapping.
  */
 void QItemModelBarDataProxy::remap(const QString &rowRole,
                                    const QString &columnRole,
                                    const QString &valueRole,
+                                   const QString &rotationRole,
                                    const QStringList &rowCategories,
                                    const QStringList &columnCategories)
 {
     setRowRole(rowRole);
     setColumnRole(columnRole);
     setValueRole(valueRole);
+    setRotationRole(rotationRole);
     setRowCategories(rowCategories);
     setColumnCategories(columnCategories);
 }
 
 /*!
- * /return index of the specified \a category in row categories list.
+ * \return index of the specified \a category in row categories list.
  * If the row categories list is empty, -1 is returned.
  * \note If the automatic row categories generation is in use, this method will
  * not return a valid index before the data in the model is resolved for the first time.
@@ -494,7 +496,7 @@ int QItemModelBarDataProxy::rowCategoryIndex(const QString &category)
 }
 
 /*!
- * /return index of the specified \a category in column categories list.
+ * \return index of the specified \a category in column categories list.
  * If the category is not found, -1 is returned.
  * \note If the automatic column categories generation is in use, this method will
  * not return a valid index before the data in the model is resolved for the first time.
@@ -550,6 +552,8 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
     QObject::connect(qptr(), &QItemModelBarDataProxy::columnRoleChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::valueRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rotationRoleChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::rowCategoriesChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);

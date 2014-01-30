@@ -88,7 +88,7 @@ Item {
                     itemModel: surfaceData.model
                     rowRole: "longitude"
                     columnRole: "latitude"
-                    valueRole: "height"
+                    yPosRole: "height"
                 }
                 //! [6]
 
