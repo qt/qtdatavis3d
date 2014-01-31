@@ -148,8 +148,10 @@ void SurfaceData::updateData()
     if (m_mode != Surface) {
         setData(depthMap);
     } else {
+        static_cast<QHeightMapSurfaceDataProxy *>(m_surface->seriesList().at(0)->dataProxy())->setValueRanges(
+                    0, depthMap.width(), 0, depthMap.height());
         static_cast<QHeightMapSurfaceDataProxy *>(m_surface->seriesList().at(0)->dataProxy())->setHeightMap(
-                depthMap);
+                    depthMap);
     }
 }
 

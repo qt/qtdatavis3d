@@ -71,12 +71,15 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     QPushButton *startButton = new QPushButton(widget);
+    startButton->setMinimumHeight(60);
     startButton->setText(QStringLiteral("Start Kinect"));
 
     QPushButton *stopButton = new QPushButton(widget);
+    stopButton->setMinimumHeight(60);
     stopButton->setText(QStringLiteral("Stop Kinect"));
 
     QComboBox *resolutionBox = new QComboBox(widget);
+    resolutionBox->setMinimumHeight(60);
     resolutionBox->addItem(QStringLiteral("Low"));
     resolutionBox->addItem(QStringLiteral("Medium"));
     resolutionBox->addItem(QStringLiteral("High"));
@@ -84,12 +87,14 @@ int main(int argc, char **argv)
     resolutionBox->setCurrentIndex(0);
 
     QComboBox *modeBox = new QComboBox(widget);
+    modeBox->setMinimumHeight(60);
     modeBox->addItem(QStringLiteral("Surface Plot"));
     modeBox->addItem(QStringLiteral("Scatter Chart"));
     modeBox->addItem(QStringLiteral("Bar Chart"));
     modeBox->setCurrentIndex(0);
 
     QSlider *distanceSlider = new QSlider(Qt::Horizontal, widget);
+    distanceSlider->setMinimumHeight(60);
     distanceSlider->setTickInterval(10);
     distanceSlider->setTickPosition(QSlider::TicksBelow);
     distanceSlider->setMinimum(10);
@@ -102,15 +107,15 @@ int main(int argc, char **argv)
     gradientOne.setColorAt(0.67, Qt::red);
     gradientOne.setColorAt(1.0, Qt::yellow);
 
-    QPixmap pm(200, 24);
+    QPixmap pm(200, 60);
     QPainter pmp(&pm);
     pmp.setBrush(QBrush(gradientOne));
     pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 200, 24);
+    pmp.drawRect(0, 0, 200, 60);
 
     QPushButton *gradientOneButton = new QPushButton(widget);
     gradientOneButton->setIcon(QIcon(pm));
-    gradientOneButton->setIconSize(QSize(200, 24));
+    gradientOneButton->setIconSize(QSize(200, 60));
     gradientOneButton->setToolTip(QStringLiteral("Colors: Thermal Imitation"));
 
     QLinearGradient gradientTwo(0, 0, 200, 1);
@@ -120,11 +125,11 @@ int main(int argc, char **argv)
 
     pmp.setBrush(QBrush(gradientTwo));
     pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 200, 24);
+    pmp.drawRect(0, 0, 200, 60);
 
     QPushButton *gradientTwoButton = new QPushButton(widget);
     gradientTwoButton->setIcon(QIcon(pm));
-    gradientTwoButton->setIconSize(QSize(200, 24));
+    gradientTwoButton->setIconSize(QSize(200, 60));
     gradientTwoButton->setToolTip(QStringLiteral("Colors: Highlight Foreground"));
 
     QTextEdit *status = new QTextEdit(QStringLiteral("<b>Ready</b><br>"), widget);
